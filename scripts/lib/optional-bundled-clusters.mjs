@@ -1,0 +1,54 @@
+export const optionalBundledClusters = [
+  "acpx",
+  "arcee",
+  "chutes",
+  "copilot-proxy",
+  "diagnostics-otel",
+  "diffs",
+  "fireworks",
+  "googlechat",
+  "litellm",
+  "matrix",
+  "memory-lancedb",
+  "msteams",
+  "nostr",
+  "open-prose",
+  "openshell",
+  "runway",
+  "sglang",
+  "tlon",
+  "twitch",
+  "ui",
+  "venice",
+  "vydra",
+  "whatsapp",
+  "zalouser",
+];
+
+export const optionalBundledClusterSet = new Set(optionalBundledClusters);
+
+export const OPTIONAL_BUNDLED_BUILD_ENV = "KAIJIBOT_INCLUDE_OPTIONAL_BUNDLED";
+
+export function isOptionalBundledCluster(cluster) {
+  return optionalBundledClusterSet.has(cluster);
+}
+
+export function shouldIncludeOptionalBundledClusters(env = process.env) {
+  // Release artifacts should preserve the last shipped upgrade surface by
+  // default. Specific size-sensitive lanes can still opt out explicitly.
+  return env[OPTIONAL_BUNDLED_BUILD_ENV] !== "0";
+}
+
+export function hasReleasedBundledInstall(packageJson) {
+  return (
+    typeof packageJson?.kaijibot?.install?.npmSpec === "string" &&
+    packageJson.kaijibot.install.npmSpec.trim().length > 0
+  );
+}
+
+export function shouldBuildBundledCluster(cluster, env = process.env, options = {}) {
+  if (hasReleasedBundledInstall(options.packageJson)) {
+    return true;
+  }
+  return shouldIncludeOptionalBundledClusters(env) || !isOptionalBundledCluster(cluster);
+}

@@ -1,0 +1,124 @@
+import { describe, expect, it } from "vitest";
+import type { KaijiBotConfig } from "../config/config.js";
+import { enablePluginInConfig } from "./enable.js";
+
+function expectEnableResult(
+  cfg: KaijiBotConfig,
+  pluginId: string,
+  params: {
+    enabled: boolean;
+    assert: (result: ReturnType<typeof enablePluginInConfig>) => void;
+  },
+) {
+  const result = enablePluginInConfig(cfg, pluginId);
+  expect(result.enabled).toBe(params.enabled);
+  params.assert(result);
+}
+
+function expectEnabledAllowlist(
+  result: ReturnType<typeof enablePluginInConfig>,
+  expected: string[],
+) {
+  expect(result.config.plugins?.allow).toEqual(expected);
+}
+
+function expectBuiltInChannelEnabled(result: ReturnType<typeof enablePluginInConfig>) {
+  expect(result.config.channels?.feishu?.enabled).toBe(true);
+  expect(result.config.plugins?.entries?.feishu?.enabled).toBe(true);
+}
+
+function expectBuiltInChannelEnabledWithAllowlist(
+  result: ReturnType<typeof enablePluginInConfig>,
+  expectedAllowlist?: string[],
+) {
+  expectBuiltInChannelEnabled(result);
+  if (expectedAllowlist) {
+    expectEnabledAllowlist(result, expectedAllowlist);
+  }
+}
+
+// CI: depends on bundled plugin manifest registry source not present on CI runners.
+describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
+  it.each([
+    {
+      name: "enables a plugin entry",
+      cfg: {} as KaijiBotConfig,
+      pluginId: "google",
+      expectedEnabled: true,
+      assert: (result: ReturnType<typeof enablePluginInConfig>) => {
+        expect(result.config.plugins?.entries?.google?.enabled).toBe(true);
+      },
+    },
+    {
+      name: "adds plugin to allowlist when allowlist is configured",
+      cfg: {
+        plugins: {
+          allow: ["memory-core"],
+        },
+      } as KaijiBotConfig,
+      pluginId: "google",
+      expectedEnabled: true,
+      assert: (result: ReturnType<typeof enablePluginInConfig>) => {
+        expectEnabledAllowlist(result, ["memory-core", "google"]);
+      },
+    },
+    {
+      name: "refuses enable when plugin is denylisted",
+      cfg: {
+        plugins: {
+          deny: ["google"],
+        },
+      } as KaijiBotConfig,
+      pluginId: "google",
+      expectedEnabled: false,
+      assert: (result: ReturnType<typeof enablePluginInConfig>) => {
+        expect(result.reason).toBe("blocked by denylist");
+      },
+    },
+    {
+      name: "writes built-in channels to channels.<id>.enabled and plugins.entries",
+      cfg: {} as KaijiBotConfig,
+      pluginId: "feishu",
+      expectedEnabled: true,
+      assert: expectBuiltInChannelEnabled,
+    },
+    {
+      name: "adds built-in channel id to allowlist when allowlist is configured",
+      cfg: {
+        plugins: {
+          allow: ["memory-core"],
+        },
+      } as KaijiBotConfig,
+      pluginId: "feishu",
+      expectedEnabled: true,
+      assert: (result: ReturnType<typeof enablePluginInConfig>) => {
+        expectBuiltInChannelEnabledWithAllowlist(result, ["memory-core", "feishu"]);
+      },
+    },
+    {
+      name: "re-enables built-in channels after explicit plugin-level disable",
+      cfg: {
+        channels: {
+          feishu: {
+            enabled: true,
+          },
+        },
+        plugins: {
+          entries: {
+            feishu: {
+              enabled: false,
+            },
+          },
+        },
+      } as KaijiBotConfig,
+      pluginId: "feishu",
+      expectedEnabled: true,
+      assert: expectBuiltInChannelEnabledWithAllowlist,
+    },
+  ])("$name", ({ cfg, pluginId, expectedEnabled, assert }) => {
+    expectEnableResult(cfg, pluginId, {
+      enabled: expectedEnabled,
+      assert,
+    });
+  });
+});

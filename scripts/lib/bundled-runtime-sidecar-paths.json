@@ -1,0 +1,13 @@
+[
+  "dist/extensions/browser/runtime-api.js",
+  "dist/extensions/copilot-proxy/runtime-api.js",
+  "dist/extensions/diffs/runtime-api.js",
+  "dist/extensions/feishu/runtime-api.js",
+  "dist/extensions/google/runtime-api.js",
+  "dist/extensions/lmstudio/runtime-api.js",
+  "dist/extensions/memory-core/runtime-api.js",
+  "dist/extensions/ollama/runtime-api.js",
+  "dist/extensions/open-prose/runtime-api.js",
+  "dist/extensions/webhooks/runtime-api.js",
+  "dist/extensions/zai/runtime-api.js"
+]

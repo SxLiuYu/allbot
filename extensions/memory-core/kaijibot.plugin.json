@@ -1,0 +1,57 @@
+{
+  "id": "memory-core",
+  "kind": "memory",
+  "commandAliases": [
+    {
+      "name": "consolidation",
+      "kind": "runtime-slash",
+      "cliCommand": "memory"
+    }
+  ],
+  "uiHints": {
+    "consolidation.cron": {
+      "label": "Consolidation Schedule",
+      "placeholder": "0 3 * * *",
+      "help": "Cron expression for memory consolidation runs (default: daily at 3am)."
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "consolidation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "cron": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "verboseLogging": {
+            "type": "boolean"
+          },
+          "concurrency": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "batchSize": {
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 16000
+          },
+          "lookbackDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 90
+          }
+        }
+      }
+    }
+  }
+}

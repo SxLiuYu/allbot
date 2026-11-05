@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_atmosphere"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="52dp"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="32dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="2dp">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron_left"
+                android:contentDescription="返回" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="常用操作"
+                android:textColor="@color/ink_1"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="4dp"
+            android:text="点击行复制命令，自动跳转 Termux"
+            android:textColor="@color/ink_2"
+            android:textSize="12sp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:layout_marginBottom="8dp"
+            android:fontFamily="monospace" android:text="# gateway"
+            android:textColor="@color/accent_muted" android:textSize="11sp" />
+
+        <LinearLayout android:id="@+id/cmdStatus"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_status" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="查看运行状态" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text="kaijibot gateway status"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cmdStart"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@null" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_play" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="启动网关（后台运行）" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text=". ~/.kaijibot/start-gateway.sh"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cmdRestart"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@null" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_restart" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="重启网关" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text="kaijibot gateway restart"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cmdStop"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@null" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_stop" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="停止网关" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text="kaijibot gateway stop"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cmdLog"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@null" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_log" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="查看运行日志" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text="tail -50 ~/.kaijibot/gateway.log"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:layout_marginBottom="8dp"
+            android:fontFamily="monospace" android:text="# maintenance"
+            android:textColor="@color/accent_muted" android:textSize="11sp" />
+
+        <LinearLayout android:id="@+id/cmdUpdate"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_download" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="更新到最新版" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text="kaijibot update"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cmdOnboard"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_settings" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="重新配置" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:fontFamily="monospace" android:text="kaijibot onboard"
+                    android:textColor="@color/accent_muted" android:textSize="11sp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:layout_marginBottom="8dp"
+            android:fontFamily="monospace" android:text="# system"
+            android:textColor="@color/accent_muted" android:textSize="11sp" />
+
+        <LinearLayout android:id="@+id/cmdBattery"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_battery" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="电池优化白名单" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="防止系统杀后台进程" android:textColor="@color/ink_3" android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cmdBoot"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="52dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:padding="14dp" android:layout_marginBottom="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true" android:focusable="true">
+            <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                android:src="@drawable/ic_power" android:layout_marginEnd="12dp" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="开机自启动" android:textColor="@color/ink_1" android:textSize="14sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="安装 Termux:Boot 即可" android:textColor="@color/ink_3" android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

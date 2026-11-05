@@ -1,0 +1,140 @@
+import type { PersonaTree } from "../types.js";
+import { detectSentiment } from "./sentiment-detector.js";
+import type { ExtractionResult } from "./types.js";
+
+const BLACKLIST_PATTERNS: ReadonlyArray<{ pattern: RegExp }> = [
+  { pattern: /永远不要跟我提(.{1,30}?)(?:了|吧|了啊)?$/ },
+  { pattern: /别再跟我说(.{1,30}?)(?:了|吧|了啊)?$/ },
+  { pattern: /以后别提(.{1,30}?)(?:了|吧|了啊)?$/ },
+  { pattern: /我受够了(.{1,30}?)(?:了|吧|了啊)?$/ },
+  { pattern: /不想再听到(.{1,30}?)(?:了|吧|了啊)?$/ },
+  { pattern: /拉黑(.{1,30}?)(?:了|吧|了啊)?$/ },
+  { pattern: /never mention (?:about )?(.{1,40}?) again/i },
+  { pattern: /stop talking about (.+?)$/i },
+  { pattern: /don'?t ever mention (.+?)$/i },
+  { pattern: /i'?m sick of (.+?)$/i },
+  { pattern: /blacklist (.+?)$/i },
+  { pattern: /ban (.+?)$/i },
+];
+
+export function detectBlacklistIntent(userMessage: string): string[] {
+  const results: string[] = [];
+  for (const { pattern } of BLACKLIST_PATTERNS) {
+    const match = userMessage.match(pattern);
+    if (match?.[1]) {
+      results.push(match[1].trim());
+    }
+  }
+  return results;
+}
+
+/**
+ * Extract persona attributes from a conversation turn using rule-based analysis.
+ *
+ * This is the Phase 2 version — purely rule-based, no LLM call.
+ * Phase 4 will add LLM-based deep extraction.
+ *
+ * This function MUST be cheap and fast (<50ms).
+ */
+export function extractFromMessage(
+  userMessage: string,
+  _assistantMessage: string,
+  _existingPersona?: PersonaTree,
+): ExtractionResult {
+  const attributes: ExtractionResult["attributes"] = [];
+  const domains: ExtractionResult["domains"] = [];
+  const recentFocus: string[] = [];
+
+  // Domain detection is handled by LLM extraction (llm-extractor.ts).
+  // The rule-based fallback returns no domains — typedInsights remain
+  // empty until the LLM pipeline fills them.
+
+  // Detect explicit self-disclosure patterns
+  const disclosurePatterns: Array<{
+    pattern: RegExp;
+    trait: string;
+    source: "explicit" | "inferred";
+  }> = [
+    {
+      pattern: /我(?:是|做|在|负责|擅长|专注于?)\s*(.{2,20})/,
+      trait: "自我描述",
+      source: "explicit",
+    },
+    {
+      pattern: /我(?:的工作|职业|岗位|职位)\s*(?:是|做)?\s*(.{2,20})/,
+      trait: "职业",
+      source: "explicit",
+    },
+    {
+      pattern: /(?:我的|我们的?)\s*(?:项目|团队|公司)\s*(.{2,30})/,
+      trait: "项目/组织",
+      source: "explicit",
+    },
+  ];
+
+  for (const { pattern, trait, source } of disclosurePatterns) {
+    const match = userMessage.match(pattern);
+    if (match?.[1]) {
+      attributes.push({
+        field: `identity.coreTraits.${trait}`,
+        value: match[1].trim(),
+        confidence: source === "explicit" ? 0.8 : 0.5,
+        source,
+        evidence: match[0],
+      });
+    }
+  }
+
+  // Extract recent focus from message
+  const nouns = extractKeyPhrases(userMessage);
+  recentFocus.push(...nouns.slice(0, 5));
+
+  const sentiment = detectSentiment(userMessage);
+  const blacklistRequests = detectBlacklistIntent(userMessage);
+
+  const result: ExtractionResult = {
+    attributes,
+    domains,
+    recentFocus,
+
+    blacklistRequests: blacklistRequests.length > 0 ? blacklistRequests : undefined,
+    sentiment,
+  };
+  return result;
+}
+
+const NOISE_PATTERNS: ReadonlyArray<RegExp> = [
+  /^```.*$/,
+  /^`[^`]+`$/,
+  /^\s*$/,
+  /^\d+$/,
+  /^(yes|no|ok|okay|好的|嗯|是|不是|对|不对|哈|啊|呢|吧|么|吗|哦|噢)$/i,
+  /^(if|the|a|an|is|are|was|were|be|been|being|do|does|did|will|would|can|could|should|may|might|shall|to|of|in|for|on|with|at|by|from|as|into|about|this|that|these|those|it|its|or|and|but|not|no|so|than|too|very)$/i,
+];
+
+function isNoisePhrase(s: string): boolean {
+  for (const pat of NOISE_PATTERNS) {
+    if (pat.test(s)) {
+      return true;
+    }
+  }
+  if (/^[\s\p{P}\p{S}\p{C}]+$/u.test(s)) {
+    return true;
+  }
+  if (/^[\d\s,.\-+/\\#@$%^&*(){}[\]|~`]+$/.test(s)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Simple key phrase extraction — split on common delimiters and filter.
+ */
+function extractKeyPhrases(text: string): string[] {
+  const cleaned = text.replace(/```[\s\S]*?```/g, "").replace(/`[^`]+`/g, "");
+  const phrases = cleaned
+    .split(/[，。！？,.!?\n\r;；:：\s—–\-_=+|/\\{}[\]()]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 2 && s.length <= 30 && !isNoisePhrase(s));
+  return [...new Set(phrases)].slice(0, 5);
+}

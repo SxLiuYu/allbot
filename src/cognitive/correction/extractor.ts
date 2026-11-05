@@ -1,0 +1,273 @@
+import { randomUUID } from "node:crypto";
+import {
+  DEFAULT_COGNITIVE_LOCALE,
+  L,
+  pickLocalized,
+  type CognitiveLocale,
+} from "../cognitive-locale.js";
+import type { CorrectionRecord } from "./types.js";
+
+const CORRECTION_SIGNAL_PATTERNS: RegExp[] = [
+  // Chinese: direct correction
+  /不对[，。]?/,
+  /不对[吧啊劲]?/,
+  /不是这个/,
+  /不是这样的/,
+  /错了/,
+  /搞错/,
+  /没弄对/,
+  /没搞对/,
+  /纠正/,
+  /更正/,
+  /换一个/,
+  /应该是/,
+  /应该用/,
+  /答案不对/,
+  /好像不对/,
+  /看起来不对/,
+  /不符合/,
+  // Chinese: action-oriented correction
+  /重新来/,
+  /重新[做试写]/,
+  /改[成一]*/,
+  /重做/,
+  /不要[用这那样]/,
+  /别[用这那样]/,
+  /不能[这样那样]/,
+  /不[是对]这样/,
+  /怎么还是/,
+  /还是不行/,
+  /又不行了/,
+  /这不是我要的/,
+  // Chinese: 怎么 + negative context
+  /怎么回事/,
+  /怎么搞的/,
+  /怎么又/,
+  /怎么会/,
+  /怎么不对/,
+  // Chinese: 为什么 + negative context
+  /为什么不/,
+  /为什么还是/,
+  /为什么又/,
+  /为什么没/,
+  // Chinese: 问题
+  /有问题/,
+  /出问题了/,
+  // Chinese: agent apology
+  /抱歉[，。]?/,
+  /对不起[，。]?/,
+  /我错了/,
+  /是我的[错失误]/,
+  // English correction patterns
+  /\bwrong\b/i,
+  /\bnot (that|this|right|correct|quite right)\b/i,
+  /\bthat's not right\b/i,
+  /\btry (again|a different)\b/i,
+  /\bincorrect\b/i,
+  /\bshould (use|be|do)\b/i,
+  /\bdon't use\b/i,
+  /\buse .* instead\b/i,
+  /\bfix that\b/i,
+  /\bmissed it\b/i,
+  // English: agent apology
+  /\bsorry\b/i,
+];
+
+const RUNTIME_PATTERN_TTL_MS = 60_000;
+
+let runtimePatternResolver: (() => RegExp[]) | null = null;
+let runtimePatternCache: RegExp[] = [];
+let runtimePatternCacheAt = 0;
+
+export function setRuntimePatternResolver(resolver: (() => RegExp[]) | null): void {
+  runtimePatternResolver = resolver;
+  runtimePatternCacheAt = 0;
+}
+
+function getRuntimePatterns(): RegExp[] {
+  if (runtimePatternResolver === null) {
+    return [];
+  }
+  const now = Date.now();
+  if (now - runtimePatternCacheAt < RUNTIME_PATTERN_TTL_MS) {
+    return runtimePatternCache;
+  }
+  try {
+    runtimePatternCache = runtimePatternResolver();
+    runtimePatternCacheAt = now;
+  } catch {
+    runtimePatternCache = [];
+  }
+  return runtimePatternCache;
+}
+
+function mergedSignalPatterns(): RegExp[] {
+  const runtime = getRuntimePatterns();
+  if (runtime.length === 0) {
+    return CORRECTION_SIGNAL_PATTERNS;
+  }
+  return [...CORRECTION_SIGNAL_PATTERNS, ...runtime];
+}
+
+export function hasCorrectionSignals(transcript: string): boolean {
+  if (!transcript || transcript.length === 0) {
+    return false;
+  }
+  for (const pattern of mergedSignalPatterns()) {
+    if (pattern.test(transcript)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+const TOOL_CALL_MARKERS = [
+  "tool_call",
+  "tool_use",
+  "mcp__",
+  "browser_action",
+  "web_search",
+  "playwright",
+];
+
+/** When external tool calls dominate a session, skip correction extraction to avoid misattributing tool errors as agent mistakes. */
+export function shouldSkipCorrectionExtraction(
+  transcript: string,
+  densityThreshold = 0.05,
+): boolean {
+  if (!transcript || transcript.length === 0) {
+    return false;
+  }
+  const lower = transcript.toLowerCase();
+  const tokens = lower.split(/\s+/).filter(Boolean);
+  if (tokens.length < 20) {
+    return false;
+  }
+  let hits = 0;
+  for (const token of tokens) {
+    if (TOOL_CALL_MARKERS.some((marker) => token.includes(marker))) {
+      hits++;
+    }
+  }
+  return hits / tokens.length > densityThreshold;
+}
+
+export async function extractCorrectionsFromTranscript(
+  transcript: string,
+  generateText: (prompt: string) => Promise<string>,
+  locale: CognitiveLocale = DEFAULT_COGNITIVE_LOCALE,
+): Promise<CorrectionRecord[]> {
+  const cappedTranscript = transcript.length > 16_000 ? transcript.slice(0, 16_000) : transcript;
+
+  const prompt = buildExtractionPrompt(cappedTranscript, locale);
+
+  try {
+    const raw = await generateText(prompt);
+    const parsed = parseExtractionResponse(raw);
+    const now = Date.now();
+
+    return parsed.map((item) => ({
+      id: randomUUID(),
+      domain: (item.domain ?? "general").toLowerCase().trim(),
+      trigger: item.trigger ?? "general",
+      mistake: item.mistake,
+      correction: item.correction,
+      provenance: "user" as const,
+      reinforcedCount: 0,
+      createdAt: now,
+      lastReinforced: now,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+const EXTRACTION_PROMPT_ZH = `分析以下对话记录，提取所有用户对助手行为的纠正。一个纠正发生在以下情况：
+1. 用户告诉助手它做错了某事
+2. 助手道歉并纠正了自己的行为
+3. 用户建议了更好的做法
+
+对每个纠正，提供：
+- domain: 相关领域（如 "feishu-doc", "code-review", "general"）
+- trigger: 何时应该应用此纠正（如 "创建飞书文档时"）
+- mistake: 助手做错了什么（简洁，一句话）
+- correction: 正确的做法是什么（简洁，一句话）
+
+仅输出 JSON 数组，不要其他内容：
+[{"domain":"...","trigger":"...","mistake":"...","correction":"..."}]
+
+如果没有发现纠正，输出空数组 []。
+
+对话记录：
+{transcript}`;
+
+const EXTRACTION_PROMPT_EN = `Analyze the following conversation transcript and extract every case where the user corrected the assistant's behavior. A correction occurs when:
+1. The user tells the assistant it did something wrong.
+2. The assistant apologizes and corrects itself.
+3. The user suggests a better approach.
+
+For each correction, provide:
+- domain: the relevant domain (e.g. "feishu-doc", "code-review", "general")
+- trigger: when this correction should apply (e.g. "when creating Feishu docs")
+- mistake: what the assistant did wrong (concise, one sentence)
+- correction: what the correct approach is (concise, one sentence)
+
+Output only a JSON array, nothing else:
+[{"domain":"...","trigger":"...","mistake":"...","correction":"..."}]
+
+If no corrections are found, output an empty array [].
+
+Conversation transcript:
+{transcript}`;
+
+const EXTRACTION_PROMPT = L(EXTRACTION_PROMPT_ZH, EXTRACTION_PROMPT_EN);
+
+function buildExtractionPrompt(transcript: string, locale: CognitiveLocale): string {
+  return pickLocalized(EXTRACTION_PROMPT, locale).replace("{transcript}", transcript);
+}
+
+function parseExtractionResponse(
+  raw: string,
+): Array<{ domain?: string; trigger?: string; mistake: string; correction: string }> {
+  let jsonStr = raw.trim();
+
+  const codeBlockMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+  if (codeBlockMatch) {
+    jsonStr = codeBlockMatch[1]!.trim();
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch {
+    const arrayMatch = jsonStr.match(/\[[\s\S]*\]/);
+    if (arrayMatch) {
+      try {
+        parsed = JSON.parse(arrayMatch[0]);
+      } catch {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+
+  if (!Array.isArray(parsed)) {
+    return [];
+  }
+
+  return parsed.filter(
+    (item): item is { domain?: string; trigger?: string; mistake: string; correction: string } => {
+      if (typeof item !== "object" || item === null) {
+        return false;
+      }
+      const obj = item as Record<string, unknown>;
+      return (
+        typeof obj.mistake === "string" &&
+        typeof obj.correction === "string" &&
+        (obj.mistake as string).length > 0 &&
+        (obj.correction as string).length > 0
+      );
+    },
+  );
+}

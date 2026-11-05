@@ -1,0 +1,1730 @@
+import { createHash } from "node:crypto";
+import fs from "node:fs/promises";
+import path from "node:path";
+import {
+  hasOutboundReplyContent,
+  resolveSendableOutboundReplyParts,
+} from "kaijibot/plugin-sdk/reply-payload";
+import {
+  resolveAgentConfig,
+  resolveAgentWorkspaceDir,
+  resolveDefaultAgentId,
+} from "../agents/agent-scope.js";
+import { appendCronStyleCurrentTimeLine } from "../agents/current-time.js";
+import { resolveEffectiveMessagesConfig } from "../agents/identity.js";
+import { resolveEmbeddedSessionLane } from "../agents/pi-embedded-runner.js";
+import { DEFAULT_HEARTBEAT_FILENAME } from "../agents/workspace.js";
+import { resolveHeartbeatReplyPayload } from "../auto-reply/heartbeat-reply-payload.js";
+import {
+  DEFAULT_HEARTBEAT_ACK_MAX_CHARS,
+  isHeartbeatContentEffectivelyEmpty,
+  isTaskDue,
+  parseHeartbeatTasks,
+  resolveHeartbeatPrompt as resolveHeartbeatPromptText,
+  stripHeartbeatToken,
+  type HeartbeatTask,
+} from "../auto-reply/heartbeat.js";
+import {
+  HEARTBEAT_TOKEN,
+  startsWithSilentToken,
+  stripLeadingSilentToken,
+} from "../auto-reply/tokens.js";
+import type { ReplyPayload } from "../auto-reply/types.js";
+import { getChannelPlugin } from "../channels/plugins/index.js";
+import type { ChannelHeartbeatDeps } from "../channels/plugins/types.public.js";
+import { loadConfig } from "../config/config.js";
+import {
+  canonicalizeMainSessionAlias,
+  resolveAgentMainSessionKey,
+} from "../config/sessions/main-session.js";
+import { resolveStorePath } from "../config/sessions/paths.js";
+import { loadSessionStore } from "../config/sessions/store-load.js";
+import { saveSessionStore, updateSessionStore } from "../config/sessions/store.js";
+import type { AgentDefaultsConfig } from "../config/types.agent-defaults.js";
+import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import { resolveCronSession } from "../cron/isolated-agent/session.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
+import { getQueueSize } from "../process/command-queue.js";
+import { CommandLane } from "../process/lanes.js";
+import {
+  isSubagentSessionKey,
+  normalizeAgentId,
+  parseAgentSessionKey,
+  resolveAgentIdFromSessionKey,
+  toAgentStoreSessionKey,
+} from "../routing/session-key.js";
+import { defaultRuntime, type RuntimeEnv } from "../runtime.js";
+import {
+  normalizeLowercaseStringOrEmpty,
+  normalizeOptionalString,
+} from "../shared/string-coerce.js";
+import { escapeRegExp } from "../utils.js";
+import { loadOrCreateDeviceIdentity } from "./device-identity.js";
+import { formatErrorMessage, hasErrnoCode } from "./errors.js";
+import { isWithinActiveHours } from "./heartbeat-active-hours.js";
+import {
+  buildDegenerateReplyFallback,
+  isDegenerateReplyText,
+} from "./heartbeat-degeneration-guard.js";
+import {
+  buildEvolutionEventPrompt,
+  buildInsightEventPrompt,
+  buildExecEventPrompt,
+  buildCronEventPrompt,
+  isCronSystemEvent,
+  isEvolutionSignalEvent,
+  isInsightEvent,
+  isExecCompletionEvent,
+} from "./heartbeat-events-filter.js";
+import { emitHeartbeatEvent, resolveIndicatorType } from "./heartbeat-events.js";
+import { resolveHeartbeatReasonKind } from "./heartbeat-reason.js";
+import {
+  computeNextHeartbeatPhaseDueMs,
+  resolveHeartbeatPhaseMs,
+  resolveNextHeartbeatDueMs,
+} from "./heartbeat-schedule.js";
+import {
+  isHeartbeatEnabledForAgent,
+  resolveHeartbeatIntervalMs,
+  resolveHeartbeatSummaryForAgent,
+  type HeartbeatSummary,
+} from "./heartbeat-summary.js";
+import { resolveHeartbeatVisibility } from "./heartbeat-visibility.js";
+import {
+  areHeartbeatsEnabled,
+  type HeartbeatRunResult,
+  type HeartbeatWakeHandler,
+  requestHeartbeatNow,
+  setHeartbeatsEnabled,
+  setHeartbeatWakeHandler,
+} from "./heartbeat-wake.js";
+import type { OutboundSendDeps } from "./outbound/deliver.js";
+import { deliverOutboundPayloads } from "./outbound/deliver.js";
+import { buildOutboundSessionContext } from "./outbound/session-context.js";
+import {
+  resolveHeartbeatDeliveryTarget,
+  resolveHeartbeatSenderContext,
+} from "./outbound/targets.js";
+import {
+  consumeSystemEventEntries,
+  peekSystemEventEntries,
+  resolveSystemEventDeliveryContext,
+} from "./system-events.js";
+
+export type HeartbeatDeps = OutboundSendDeps &
+  ChannelHeartbeatDeps & {
+    getReplyFromConfig?: typeof import("./heartbeat-runner.runtime.js").getReplyFromConfig;
+    runtime?: RuntimeEnv;
+    getQueueSize?: (lane?: string) => number;
+    nowMs?: () => number;
+    onInsightDeliveryOutcome?: (params: {
+      agentId: string;
+      sessionKey: string;
+      insightId: string;
+      delivered: boolean;
+    }) => Promise<void> | void;
+  };
+
+const log = createSubsystemLogger("gateway/heartbeat");
+
+const DEFAULT_HEARTBEAT_RUN_TIMEOUT_SECONDS = 600;
+let heartbeatRunnerRuntimePromise: Promise<typeof import("./heartbeat-runner.runtime.js")> | null =
+  null;
+
+function loadHeartbeatRunnerRuntime() {
+  heartbeatRunnerRuntimePromise ??= import("./heartbeat-runner.runtime.js");
+  return heartbeatRunnerRuntimePromise;
+}
+
+export { areHeartbeatsEnabled, setHeartbeatsEnabled };
+export {
+  isHeartbeatEnabledForAgent,
+  resolveHeartbeatIntervalMs,
+  resolveHeartbeatSummaryForAgent,
+  type HeartbeatSummary,
+} from "./heartbeat-summary.js";
+
+type HeartbeatConfig = AgentDefaultsConfig["heartbeat"];
+type HeartbeatAgent = {
+  agentId: string;
+  heartbeat?: HeartbeatConfig;
+};
+
+export { isCronSystemEvent };
+
+type HeartbeatAgentState = {
+  agentId: string;
+  heartbeat?: HeartbeatConfig;
+  intervalMs: number;
+  phaseMs: number;
+  nextDueMs: number;
+};
+
+export type HeartbeatRunner = {
+  stop: () => void;
+  updateConfig: (cfg: KaijiBotConfig) => void;
+};
+
+function resolveHeartbeatSchedulerSeed(explicitSeed?: string) {
+  const normalized = normalizeOptionalString(explicitSeed);
+  if (normalized) {
+    return normalized;
+  }
+  try {
+    return loadOrCreateDeviceIdentity().deviceId;
+  } catch {
+    return createHash("sha256")
+      .update(process.env.HOME ?? "")
+      .update("\0")
+      .update(process.cwd())
+      .digest("hex");
+  }
+}
+
+function hasExplicitHeartbeatAgents(cfg: KaijiBotConfig) {
+  const list = cfg.agents?.list ?? [];
+  return list.some((entry) => Boolean(entry?.heartbeat));
+}
+
+function resolveHeartbeatConfig(
+  cfg: KaijiBotConfig,
+  agentId?: string,
+): HeartbeatConfig | undefined {
+  const defaults = cfg.agents?.defaults?.heartbeat;
+  if (!agentId) {
+    return defaults;
+  }
+  const overrides = resolveAgentConfig(cfg, agentId)?.heartbeat;
+  if (!defaults && !overrides) {
+    return overrides;
+  }
+  return { ...defaults, ...overrides };
+}
+
+function resolveHeartbeatAgents(cfg: KaijiBotConfig): HeartbeatAgent[] {
+  const list = cfg.agents?.list ?? [];
+  if (hasExplicitHeartbeatAgents(cfg)) {
+    return list
+      .filter((entry) => entry?.heartbeat)
+      .map((entry) => {
+        const id = normalizeAgentId(entry.id);
+        return { agentId: id, heartbeat: resolveHeartbeatConfig(cfg, id) };
+      })
+      .filter((entry) => entry.agentId);
+  }
+  const fallbackId = resolveDefaultAgentId(cfg);
+  return [{ agentId: fallbackId, heartbeat: resolveHeartbeatConfig(cfg, fallbackId) }];
+}
+
+export function resolveHeartbeatPrompt(cfg: KaijiBotConfig, heartbeat?: HeartbeatConfig) {
+  return resolveHeartbeatPromptText(heartbeat?.prompt ?? cfg.agents?.defaults?.heartbeat?.prompt);
+}
+
+function resolveHeartbeatAckMaxChars(cfg: KaijiBotConfig, heartbeat?: HeartbeatConfig) {
+  return Math.max(
+    0,
+    heartbeat?.ackMaxChars ??
+      cfg.agents?.defaults?.heartbeat?.ackMaxChars ??
+      DEFAULT_HEARTBEAT_ACK_MAX_CHARS,
+  );
+}
+
+function resolveHeartbeatSession(
+  cfg: KaijiBotConfig,
+  agentId?: string,
+  heartbeat?: HeartbeatConfig,
+  forcedSessionKey?: string,
+) {
+  const sessionCfg = cfg.session;
+  const scope = sessionCfg?.scope ?? "per-sender";
+  const resolvedAgentId = normalizeAgentId(agentId ?? resolveDefaultAgentId(cfg));
+  const mainSessionKey =
+    scope === "global" ? "global" : resolveAgentMainSessionKey({ cfg, agentId: resolvedAgentId });
+  const storeAgentId = scope === "global" ? resolveDefaultAgentId(cfg) : resolvedAgentId;
+  const storePath = resolveStorePath(sessionCfg?.store, {
+    agentId: storeAgentId,
+  });
+  const store = loadSessionStore(storePath);
+  const mainEntry = store[mainSessionKey];
+
+  if (scope === "global") {
+    return {
+      sessionKey: mainSessionKey,
+      storePath,
+      store,
+      entry: mainEntry,
+      suppressOriginatingContext: false,
+    };
+  }
+
+  // Guard: never route heartbeats to subagent sessions, regardless of entry path.
+  const forced = forcedSessionKey?.trim();
+  if (forced && isSubagentSessionKey(forced)) {
+    return {
+      sessionKey: mainSessionKey,
+      storePath,
+      store,
+      entry: mainEntry,
+      suppressOriginatingContext: true,
+    };
+  }
+
+  if (forced && !isSubagentSessionKey(forced)) {
+    const forcedCandidate = toAgentStoreSessionKey({
+      agentId: resolvedAgentId,
+      requestKey: forced,
+      mainKey: cfg.session?.mainKey,
+    });
+    if (!isSubagentSessionKey(forcedCandidate)) {
+      const forcedCanonical = canonicalizeMainSessionAlias({
+        cfg,
+        agentId: resolvedAgentId,
+        sessionKey: forcedCandidate,
+      });
+      if (forcedCanonical !== "global" && !isSubagentSessionKey(forcedCanonical)) {
+        const sessionAgentId = resolveAgentIdFromSessionKey(forcedCanonical);
+        if (sessionAgentId === normalizeAgentId(resolvedAgentId)) {
+          return {
+            sessionKey: forcedCanonical,
+            storePath,
+            store,
+            entry: store[forcedCanonical],
+            suppressOriginatingContext: false,
+          };
+        }
+      }
+    }
+  }
+
+  const trimmed = heartbeat?.session?.trim() ?? "";
+  if (!trimmed || isSubagentSessionKey(trimmed)) {
+    return {
+      sessionKey: mainSessionKey,
+      storePath,
+      store,
+      entry: mainEntry,
+      suppressOriginatingContext: false,
+    };
+  }
+
+  const normalized = normalizeLowercaseStringOrEmpty(trimmed);
+  if (normalized === "main" || normalized === "global") {
+    return {
+      sessionKey: mainSessionKey,
+      storePath,
+      store,
+      entry: mainEntry,
+      suppressOriginatingContext: false,
+    };
+  }
+
+  const candidate = toAgentStoreSessionKey({
+    agentId: resolvedAgentId,
+    requestKey: trimmed,
+    mainKey: cfg.session?.mainKey,
+  });
+  if (isSubagentSessionKey(candidate)) {
+    return {
+      sessionKey: mainSessionKey,
+      storePath,
+      store,
+      entry: mainEntry,
+      suppressOriginatingContext: false,
+    };
+  }
+  const canonical = canonicalizeMainSessionAlias({
+    cfg,
+    agentId: resolvedAgentId,
+    sessionKey: candidate,
+  });
+  if (canonical !== "global" && !isSubagentSessionKey(canonical)) {
+    const sessionAgentId = resolveAgentIdFromSessionKey(canonical);
+    if (sessionAgentId === normalizeAgentId(resolvedAgentId)) {
+      return {
+        sessionKey: canonical,
+        storePath,
+        store,
+        entry: store[canonical],
+        suppressOriginatingContext: false,
+      };
+    }
+  }
+
+  return {
+    sessionKey: mainSessionKey,
+    storePath,
+    store,
+    entry: mainEntry,
+    suppressOriginatingContext: false,
+  };
+}
+
+function resolveIsolatedHeartbeatSessionKey(params: {
+  sessionKey: string;
+  configuredSessionKey: string;
+  sessionEntry?: { heartbeatIsolatedBaseSessionKey?: string };
+}) {
+  const storedBaseSessionKey = params.sessionEntry?.heartbeatIsolatedBaseSessionKey?.trim();
+  if (storedBaseSessionKey) {
+    const suffix = params.sessionKey.slice(storedBaseSessionKey.length);
+    if (
+      params.sessionKey.startsWith(storedBaseSessionKey) &&
+      suffix.length > 0 &&
+      /^(:heartbeat)+$/.test(suffix)
+    ) {
+      return {
+        isolatedSessionKey: `${storedBaseSessionKey}:heartbeat`,
+        isolatedBaseSessionKey: storedBaseSessionKey,
+      };
+    }
+  }
+
+  // Collapse repeated `:heartbeat` suffixes introduced by wake-triggered re-entry.
+  // The guard on configuredSessionKey ensures we do not strip a legitimate single
+  // `:heartbeat` suffix that is part of the user-configured base key itself
+  // (e.g. heartbeat.session: "alerts:heartbeat"). When the configured key already
+  // ends with `:heartbeat`, a forced wake passes `configuredKey:heartbeat` which
+  // must be treated as a new base rather than an existing isolated key.
+  const configuredSuffix = params.sessionKey.slice(params.configuredSessionKey.length);
+  if (
+    params.sessionKey.startsWith(params.configuredSessionKey) &&
+    /^(:heartbeat)+$/.test(configuredSuffix) &&
+    !params.configuredSessionKey.endsWith(":heartbeat")
+  ) {
+    return {
+      isolatedSessionKey: `${params.configuredSessionKey}:heartbeat`,
+      isolatedBaseSessionKey: params.configuredSessionKey,
+    };
+  }
+  return {
+    isolatedSessionKey: `${params.sessionKey}:heartbeat`,
+    isolatedBaseSessionKey: params.sessionKey,
+  };
+}
+
+function resolveHeartbeatReasoningPayloads(
+  replyResult: ReplyPayload | ReplyPayload[] | undefined,
+): ReplyPayload[] {
+  const payloads = Array.isArray(replyResult) ? replyResult : replyResult ? [replyResult] : [];
+  return payloads.filter((payload) => {
+    const text = typeof payload.text === "string" ? payload.text : "";
+    return text.trimStart().startsWith("Reasoning:");
+  });
+}
+
+async function restoreHeartbeatUpdatedAt(params: {
+  storePath: string;
+  sessionKey: string;
+  updatedAt?: number;
+}) {
+  const { storePath, sessionKey, updatedAt } = params;
+  if (typeof updatedAt !== "number") {
+    return;
+  }
+  const store = loadSessionStore(storePath);
+  const entry = store[sessionKey];
+  if (!entry) {
+    return;
+  }
+  const now = Date.now();
+  const currentUpdatedAt = entry.updatedAt ?? 0;
+  if (currentUpdatedAt !== updatedAt && now - currentUpdatedAt < 5000) {
+    await updateSessionStore(storePath, (nextStore) => {
+      const nextEntry = nextStore[sessionKey];
+      if (!nextEntry) {
+        return;
+      }
+      const liveUpdatedAt = nextEntry.updatedAt ?? 0;
+      if (Date.now() - liveUpdatedAt < 5000) {
+        nextStore[sessionKey] = { ...nextEntry, updatedAt };
+      }
+    });
+  }
+}
+
+function stripLeadingHeartbeatResponsePrefix(
+  text: string,
+  responsePrefix: string | undefined,
+): string {
+  const normalizedPrefix = responsePrefix?.trim();
+  if (!normalizedPrefix) {
+    return text;
+  }
+
+  // Require a boundary after the configured prefix so short prefixes like "Hi"
+  // do not strip the beginning of normal words like "History".
+  const prefixPattern = new RegExp(
+    `^${escapeRegExp(normalizedPrefix)}(?=$|\\s|[\\p{P}\\p{S}])\\s*`,
+    "iu",
+  );
+  return text.replace(prefixPattern, "");
+}
+
+function normalizeHeartbeatReply(
+  payload: ReplyPayload,
+  responsePrefix: string | undefined,
+  ackMaxChars: number,
+) {
+  const rawText = typeof payload.text === "string" ? payload.text : "";
+  // Relay turns occasionally emit "NO_REPLY<visible text>" glued together when
+  // the model intends a real reply but adds the silent token first. Strip only
+  // the glued form so it never leaks to channels or the delivery mirror; the
+  // punctuation-separated form ("NO_REPLY: note") stays visible, matching the
+  // chat streaming path (#19537).
+  const rawTextWithoutSilentToken = startsWithSilentToken(rawText)
+    ? stripLeadingSilentToken(rawText)
+    : rawText;
+  const textForStrip = stripLeadingHeartbeatResponsePrefix(
+    rawTextWithoutSilentToken,
+    responsePrefix,
+  );
+  const stripped = stripHeartbeatToken(textForStrip, {
+    mode: "heartbeat",
+    maxAckChars: ackMaxChars,
+  });
+  const hasMedia = resolveSendableOutboundReplyParts(payload).hasMedia;
+  if (stripped.shouldSkip && !hasMedia) {
+    return {
+      shouldSkip: true,
+      text: "",
+      hasMedia,
+    };
+  }
+  let finalText = stripped.text;
+  if (responsePrefix && finalText && !finalText.startsWith(responsePrefix)) {
+    finalText = `${responsePrefix} ${finalText}`;
+  }
+  return { shouldSkip: false, text: finalText, hasMedia };
+}
+
+type HeartbeatReasonFlags = {
+  isExecEventReason: boolean;
+  isCronEventReason: boolean;
+  isWakeReason: boolean;
+};
+
+type HeartbeatSkipReason = "empty-heartbeat-file";
+
+type HeartbeatPreflight = HeartbeatReasonFlags & {
+  session: ReturnType<typeof resolveHeartbeatSession>;
+  pendingEventEntries: ReturnType<typeof peekSystemEventEntries>;
+  turnSourceDeliveryContext: ReturnType<typeof resolveSystemEventDeliveryContext>;
+  hasTaggedCronEvents: boolean;
+  shouldInspectPendingEvents: boolean;
+  skipReason?: HeartbeatSkipReason;
+  tasks?: HeartbeatTask[];
+  heartbeatFileContent?: string;
+};
+
+function resolveHeartbeatReasonFlags(reason?: string): HeartbeatReasonFlags {
+  const reasonKind = resolveHeartbeatReasonKind(reason);
+  return {
+    isExecEventReason: reasonKind === "exec-event",
+    isCronEventReason: reasonKind === "cron",
+    isWakeReason: reasonKind === "wake" || reasonKind === "hook",
+  };
+}
+
+async function resolveHeartbeatPreflight(params: {
+  cfg: KaijiBotConfig;
+  agentId: string;
+  heartbeat?: HeartbeatConfig;
+  forcedSessionKey?: string;
+  reason?: string;
+}): Promise<HeartbeatPreflight> {
+  const reasonFlags = resolveHeartbeatReasonFlags(params.reason);
+  const session = resolveHeartbeatSession(
+    params.cfg,
+    params.agentId,
+    params.heartbeat,
+    params.forcedSessionKey,
+  );
+  const pendingEventEntries = peekSystemEventEntries(session.sessionKey);
+  const turnSourceDeliveryContext = resolveSystemEventDeliveryContext(pendingEventEntries);
+  const hasTaggedCronEvents = pendingEventEntries.some((event) =>
+    event.contextKey?.startsWith("cron:"),
+  );
+  // Wake-triggered runs should only inspect pending events when preflight peeks
+  // the same queue that the run itself will execute/drain.
+  const shouldInspectWakePendingEvents = (() => {
+    if (!reasonFlags.isWakeReason) {
+      return false;
+    }
+    if (params.heartbeat?.isolatedSession === false) {
+      return true;
+    }
+    const configuredSession = resolveHeartbeatSession(params.cfg, params.agentId, params.heartbeat);
+    const { isolatedSessionKey } = resolveIsolatedHeartbeatSessionKey({
+      sessionKey: session.sessionKey,
+      configuredSessionKey: configuredSession.sessionKey,
+      sessionEntry: session.entry,
+    });
+    return isolatedSessionKey === session.sessionKey;
+  })();
+  const shouldInspectPendingEvents =
+    reasonFlags.isExecEventReason ||
+    reasonFlags.isCronEventReason ||
+    shouldInspectWakePendingEvents ||
+    hasTaggedCronEvents ||
+    pendingEventEntries.some((e) => isEvolutionSignalEvent(e.text)) ||
+    pendingEventEntries.some((e) => isInsightEvent(e.text));
+  const shouldBypassFileGates =
+    reasonFlags.isExecEventReason ||
+    reasonFlags.isCronEventReason ||
+    reasonFlags.isWakeReason ||
+    hasTaggedCronEvents;
+  const basePreflight = {
+    ...reasonFlags,
+    session,
+    pendingEventEntries,
+    turnSourceDeliveryContext,
+    hasTaggedCronEvents,
+    shouldInspectPendingEvents,
+  } satisfies Omit<HeartbeatPreflight, "skipReason">;
+
+  if (shouldBypassFileGates) {
+    return basePreflight;
+  }
+
+  const workspaceDir = resolveAgentWorkspaceDir(params.cfg, params.agentId);
+  const heartbeatFilePath = path.join(workspaceDir, DEFAULT_HEARTBEAT_FILENAME);
+  let heartbeatFileContent: string | undefined;
+  try {
+    heartbeatFileContent = await fs.readFile(heartbeatFilePath, "utf-8");
+    const tasks = parseHeartbeatTasks(heartbeatFileContent);
+    if (isHeartbeatContentEffectivelyEmpty(heartbeatFileContent) && tasks.length === 0) {
+      return {
+        ...basePreflight,
+        skipReason: "empty-heartbeat-file",
+        tasks: [],
+        heartbeatFileContent,
+      };
+    }
+    // Return tasks even if file has other content - backward compatible
+    return {
+      ...basePreflight,
+      tasks,
+      heartbeatFileContent,
+    };
+  } catch (err: unknown) {
+    if (hasErrnoCode(err, "ENOENT")) {
+      // Missing HEARTBEAT.md is intentional in some setups (for example, when
+      // heartbeat instructions live outside the file), so keep the run active.
+      // The heartbeat prompt already says "if it exists".
+      return basePreflight;
+    }
+    // For other read errors, proceed with heartbeat as before.
+  }
+
+  return basePreflight;
+}
+
+type HeartbeatPromptResolution = {
+  prompt: string | null;
+  hasExecCompletion: boolean;
+  hasCronEvents: boolean;
+  hasEvolutionSignal: boolean;
+  hasInsightEvent: boolean;
+};
+
+function appendHeartbeatWorkspacePathHint(prompt: string, workspaceDir: string): string {
+  if (!/heartbeat\.md/i.test(prompt)) {
+    return prompt;
+  }
+  const heartbeatFilePath = path.join(workspaceDir, DEFAULT_HEARTBEAT_FILENAME).replace(/\\/g, "/");
+  const hint = `When reading HEARTBEAT.md, use workspace file ${heartbeatFilePath} (exact case). Do not read docs/heartbeat.md.`;
+  if (prompt.includes(hint)) {
+    return prompt;
+  }
+  return `${prompt}\n${hint}`;
+}
+
+function resolveHeartbeatRunPrompt(params: {
+  cfg: KaijiBotConfig;
+  heartbeat?: HeartbeatConfig;
+  preflight: HeartbeatPreflight;
+  canRelayToUser: boolean;
+  workspaceDir: string;
+  startedAt: number;
+  heartbeatFileContent?: string;
+}): HeartbeatPromptResolution {
+  const pendingEventEntries = params.preflight.pendingEventEntries;
+  const pendingEvents = params.preflight.shouldInspectPendingEvents
+    ? pendingEventEntries.map((event) => event.text)
+    : [];
+  const cronEvents = pendingEventEntries
+    .filter(
+      (event) =>
+        (params.preflight.isCronEventReason || event.contextKey?.startsWith("cron:")) &&
+        isCronSystemEvent(event.text),
+    )
+    .map((event) => event.text);
+  const hasExecCompletion = pendingEvents.some(isExecCompletionEvent);
+  const hasCronEvents = cronEvents.length > 0;
+  const hasEvolutionSignal = pendingEvents.some(isEvolutionSignalEvent);
+  const hasInsightEvent = pendingEvents.some(isInsightEvent);
+
+  // If tasks are defined, build a batched prompt with due tasks
+  if (params.preflight.tasks && params.preflight.tasks.length > 0) {
+    const tasks = params.preflight.tasks;
+    const dueTasks = tasks.filter((task) =>
+      isTaskDue(
+        (params.preflight.session.entry?.heartbeatTaskState as Record<string, number>)?.[task.name],
+        task.interval,
+        params.startedAt,
+      ),
+    );
+
+    if (dueTasks.length > 0) {
+      const taskList = dueTasks.map((task) => `- ${task.name}: ${task.prompt}`).join("\n");
+      let prompt = `Run the following periodic tasks (only those due based on their intervals):
+
+${taskList}
+
+After completing all due tasks, reply HEARTBEAT_OK.`;
+
+      // Preserve HEARTBEAT.md directives (non-task content)
+      if (params.heartbeatFileContent) {
+        const directives = params.heartbeatFileContent
+          .replace(/^[\s\S]*?^tasks:[\s\S]*?(?=^[^\s]|^$)/m, "")
+          .trim();
+        if (directives) {
+          prompt += `\n\nAdditional context from HEARTBEAT.md:\n${directives}`;
+        }
+      }
+      return {
+        prompt,
+        hasExecCompletion: false,
+        hasCronEvents: false,
+        hasEvolutionSignal: false,
+        hasInsightEvent: false,
+      };
+    }
+    // No tasks due - skip this heartbeat to avoid wasteful API calls
+    return {
+      prompt: null,
+      hasExecCompletion: false,
+      hasCronEvents: false,
+      hasEvolutionSignal: false,
+      hasInsightEvent: false,
+    };
+  }
+
+  // Fallback to original behavior
+  const basePrompt = hasEvolutionSignal
+    ? buildEvolutionEventPrompt({ deliverToUser: params.canRelayToUser })
+    : hasInsightEvent
+      ? buildInsightEventPrompt()
+      : hasExecCompletion
+        ? buildExecEventPrompt({ deliverToUser: params.canRelayToUser })
+        : hasCronEvents
+          ? buildCronEventPrompt(cronEvents, { deliverToUser: params.canRelayToUser })
+          : resolveHeartbeatPrompt(params.cfg, params.heartbeat);
+  const prompt = appendHeartbeatWorkspacePathHint(basePrompt, params.workspaceDir);
+
+  return { prompt, hasExecCompletion, hasCronEvents, hasEvolutionSignal, hasInsightEvent };
+}
+
+export async function runHeartbeatOnce(opts: {
+  cfg?: KaijiBotConfig;
+  agentId?: string;
+  sessionKey?: string;
+  heartbeat?: HeartbeatConfig;
+  reason?: string;
+  deps?: HeartbeatDeps;
+}): Promise<HeartbeatRunResult> {
+  const cfg = opts.cfg ?? loadConfig();
+  const explicitAgentId = typeof opts.agentId === "string" ? opts.agentId.trim() : "";
+  const forcedSessionAgentId =
+    explicitAgentId.length > 0 ? undefined : parseAgentSessionKey(opts.sessionKey)?.agentId;
+  const agentId = normalizeAgentId(
+    explicitAgentId || forcedSessionAgentId || resolveDefaultAgentId(cfg),
+  );
+  const heartbeat = opts.heartbeat ?? resolveHeartbeatConfig(cfg, agentId);
+  const isCognitiveDelivery =
+    opts.reason === "cognitive-insight" || opts.reason === "cognitive-evolution";
+  if (!areHeartbeatsEnabled()) {
+    return { status: "skipped", reason: "disabled" };
+  }
+  if (!isCognitiveDelivery && !isHeartbeatEnabledForAgent(cfg, agentId)) {
+    return { status: "skipped", reason: "disabled" };
+  }
+  if (!isCognitiveDelivery && !resolveHeartbeatIntervalMs(cfg, undefined, heartbeat)) {
+    return { status: "skipped", reason: "disabled" };
+  }
+
+  const startedAt = opts.deps?.nowMs?.() ?? Date.now();
+  if (!isWithinActiveHours(cfg, heartbeat, startedAt)) {
+    return { status: "skipped", reason: "quiet-hours" };
+  }
+
+  const queueSize = (opts.deps?.getQueueSize ?? getQueueSize)(CommandLane.Main);
+  if (queueSize > 0) {
+    return { status: "skipped", reason: "requests-in-flight" };
+  }
+
+  // Preflight centralizes trigger classification, event inspection, and HEARTBEAT.md gating.
+  const preflight = await resolveHeartbeatPreflight({
+    cfg,
+    agentId,
+    heartbeat,
+    forcedSessionKey: opts.sessionKey,
+    reason: opts.reason,
+  });
+  if (preflight.skipReason) {
+    emitHeartbeatEvent({
+      status: "skipped",
+      reason: preflight.skipReason,
+      durationMs: Date.now() - startedAt,
+    });
+    return { status: "skipped", reason: preflight.skipReason };
+  }
+  const { entry, sessionKey, storePath, suppressOriginatingContext } = preflight.session;
+
+  // Check the resolved session lane — if it is busy, skip to avoid interrupting
+  // an active streaming turn.  The wake-layer retry (heartbeat-wake.ts) will
+  // re-schedule this wake automatically.  See #14396 (closed without merge).
+  const sessionLaneKey = resolveEmbeddedSessionLane(sessionKey);
+  const sessionLaneSize = (opts.deps?.getQueueSize ?? getQueueSize)(sessionLaneKey);
+  if (sessionLaneSize > 0) {
+    emitHeartbeatEvent({
+      status: "skipped",
+      reason: "requests-in-flight",
+      durationMs: Date.now() - startedAt,
+    });
+    return { status: "skipped", reason: "requests-in-flight" };
+  }
+
+  const previousUpdatedAt = entry?.updatedAt;
+
+  // isolatedSession: true → always isolated (explicit config).
+  // isolatedSession: false → never isolated (explicit opt-out).
+  // isolatedSession: undefined (default) → isolated for timer/cron ticks,
+  //   non-isolated for wake reasons (needs delivery context for routing).
+  // Evolution always runs in user's base session regardless.
+  const isolatedExplicit = heartbeat?.isolatedSession;
+  const useIsolatedSession =
+    (isolatedExplicit === true || (isolatedExplicit == null && !preflight.isWakeReason)) &&
+    opts.reason !== "cognitive-evolution" &&
+    opts.reason !== "cognitive-insight";
+  const delivery = resolveHeartbeatDeliveryTarget({
+    cfg,
+    entry,
+    heartbeat,
+    // Isolated heartbeat runs drain system events from their dedicated
+    // `:heartbeat` session, not from the base session we peek during preflight.
+    // Reusing base-session turnSource routing here can pin later isolated runs
+    // to stale channels/threads because that base-session event context remains queued.
+    turnSource: useIsolatedSession ? undefined : preflight.turnSourceDeliveryContext,
+  });
+  const heartbeatAccountId = heartbeat?.accountId?.trim();
+  if (delivery.reason === "unknown-account") {
+    log.warn("heartbeat: unknown accountId", {
+      accountId: delivery.accountId ?? heartbeatAccountId ?? null,
+      target: heartbeat?.target ?? "none",
+    });
+  } else if (heartbeatAccountId) {
+    log.info("heartbeat: using explicit accountId", {
+      accountId: delivery.accountId ?? heartbeatAccountId,
+      target: heartbeat?.target ?? "none",
+      channel: delivery.channel,
+    });
+  }
+  const visibility =
+    delivery.channel !== "none"
+      ? resolveHeartbeatVisibility({
+          cfg,
+          channel: delivery.channel,
+          accountId: delivery.accountId,
+        })
+      : { showOk: false, showAlerts: true, useIndicator: true };
+  const { sender } = resolveHeartbeatSenderContext({ cfg, entry, delivery });
+  const responsePrefix = resolveEffectiveMessagesConfig(cfg, agentId, {
+    channel: delivery.channel !== "none" ? delivery.channel : undefined,
+    accountId: delivery.accountId,
+  }).responsePrefix;
+
+  const canRelayToUser = Boolean(
+    delivery.channel !== "none" && delivery.to && visibility.showAlerts,
+  );
+  const workspaceDir = resolveAgentWorkspaceDir(cfg, agentId);
+  const { prompt, hasExecCompletion, hasCronEvents, hasEvolutionSignal, hasInsightEvent } =
+    resolveHeartbeatRunPrompt({
+      cfg,
+      heartbeat,
+      preflight,
+      canRelayToUser,
+      workspaceDir,
+      startedAt,
+      heartbeatFileContent: preflight.heartbeatFileContent,
+    });
+
+  const insightIdForOutcome = hasInsightEvent
+    ? (preflight.pendingEventEntries
+        .map((event) => event.contextKey ?? "")
+        .find((key) => key.startsWith("insight:"))
+        ?.slice("insight:".length) ?? null)
+    : null;
+  const insightOutcomeDep = opts.deps?.onInsightDeliveryOutcome;
+  const reportInsightOutcome = async (delivered: boolean) => {
+    if (!insightIdForOutcome || !insightOutcomeDep) {
+      return;
+    }
+    try {
+      await insightOutcomeDep({ agentId, sessionKey, insightId: insightIdForOutcome, delivered });
+    } catch (err) {
+      log.error("insight delivery outcome handler failed", { error: formatErrorMessage(err) });
+    }
+  };
+
+  // An insight is already delivered once a prior heartbeat run wrote its
+  // deliveryMessageId to the InsightStore (see the send path below). A redundant
+  // wake for the same insight:<id> event may produce no outbound content — that is
+  // NOT a delivery failure and must not be reported as false, or the scheduler
+  // re-arms pendingInsightDelivery and redelivers an insight the user already got.
+  const isInsightAlreadyDelivered = async (insightId: string | null): Promise<boolean> => {
+    if (!insightId) {
+      return false;
+    }
+    try {
+      const { resolveConfigDir } = await import("../utils.js");
+      const { InsightStore } = await import("../cognitive/insight/store.js");
+      const { resolveCognitiveUserId } = await import("../cognitive/identity.js");
+      const uid = resolveCognitiveUserId(sessionKey);
+      if (!uid) {
+        return false;
+      }
+      const store = new InsightStore(resolveConfigDir());
+      const rec = await store.load(agentId, uid, insightId);
+      return Boolean(rec?.deliveryMessageId);
+    } catch {
+      return false;
+    }
+  };
+
+  // If no tasks are due, skip heartbeat entirely
+  if (prompt === null) {
+    // Wake-triggered events should stay queued when the run short-circuits:
+    // no reply turn ran, so there is nothing that actually consumed that wake payload.
+    const shouldConsumeInspectedEvents =
+      !preflight.isWakeReason && preflight.shouldInspectPendingEvents;
+    if (shouldConsumeInspectedEvents && preflight.pendingEventEntries.length > 0) {
+      consumeSystemEventEntries(sessionKey, preflight.pendingEventEntries);
+    }
+    return { status: "skipped", reason: "no-tasks-due" };
+  }
+
+  let runSessionKey = sessionKey;
+  if (useIsolatedSession) {
+    const configuredSession = resolveHeartbeatSession(cfg, agentId, heartbeat);
+    // Collapse only the repeated `:heartbeat` suffixes introduced by wake-triggered
+    // re-entry for heartbeat-created isolated sessions. Real session keys that
+    // happen to end with `:heartbeat` still get a distinct isolated sibling.
+    const { isolatedSessionKey, isolatedBaseSessionKey } = resolveIsolatedHeartbeatSessionKey({
+      sessionKey,
+      configuredSessionKey: configuredSession.sessionKey,
+      sessionEntry: entry,
+    });
+    const cronSession = resolveCronSession({
+      cfg,
+      sessionKey: isolatedSessionKey,
+      agentId,
+      nowMs: startedAt,
+      forceNew: false,
+    });
+    cronSession.sessionEntry.heartbeatIsolatedBaseSessionKey = isolatedBaseSessionKey;
+    cronSession.sessionEntry.transient = true;
+    cronSession.store[isolatedSessionKey] = cronSession.sessionEntry;
+    await saveSessionStore(cronSession.storePath, cronSession.store);
+    runSessionKey = isolatedSessionKey;
+  }
+  // When running in an isolated session, system events were enqueued to the base
+  // sessionKey but the agent turn drains from the isolated sessionKey. Re-enqueue
+  // preflight-peeked events into the isolated session so the agent can see them.
+  if (runSessionKey !== sessionKey && preflight.pendingEventEntries.length > 0) {
+    const { enqueueSystemEvent: reEnqueue } = await import("./system-events.js");
+    for (const event of preflight.pendingEventEntries) {
+      reEnqueue(event.text, {
+        sessionKey: runSessionKey,
+        contextKey: event.contextKey,
+        deliveryContext: event.deliveryContext,
+        trusted: event.trusted,
+      });
+    }
+    // Drain originals from base sessionKey so they aren't orphaned
+    const { consumeSystemEventEntries } = await import("./system-events.js");
+    consumeSystemEventEntries(sessionKey, preflight.pendingEventEntries);
+  }
+  const activeSessionPendingEventEntries =
+    runSessionKey === sessionKey
+      ? preflight.pendingEventEntries
+      : peekSystemEventEntries(runSessionKey);
+  const hasUntrustedInspectedEvents =
+    preflight.shouldInspectPendingEvents &&
+    preflight.pendingEventEntries.some((event) => event.trusted === false);
+  const hasUntrustedActiveSessionEvents = activeSessionPendingEventEntries.some(
+    (event) => event.trusted === false,
+  );
+  const hasUntrustedPendingEvents = hasUntrustedInspectedEvents || hasUntrustedActiveSessionEvents;
+
+  // Update task last run times AFTER successful heartbeat completion
+  const updateTaskTimestamps = async () => {
+    if (!preflight.tasks || preflight.tasks.length === 0) {
+      return;
+    }
+
+    const store = loadSessionStore(storePath);
+    const current = store[sessionKey];
+    // Initialize stub entry on first run when current doesn't exist
+    const base = current ?? {
+      // Generate valid sessionId - derive from sessionKey without colons
+      sessionId: sessionKey.replace(/:/g, "_"),
+      updatedAt: startedAt,
+      createdAt: startedAt,
+      messageCount: 0,
+      lastMessageAt: startedAt,
+      heartbeatTaskState: {},
+    };
+    const taskState = { ...base.heartbeatTaskState };
+
+    for (const task of preflight.tasks) {
+      if (isTaskDue(taskState[task.name], task.interval, startedAt)) {
+        taskState[task.name] = startedAt;
+      }
+    }
+
+    store[sessionKey] = { ...base, heartbeatTaskState: taskState };
+    await saveSessionStore(storePath, store);
+  };
+
+  const consumeInspectedSystemEvents = () => {
+    if (!preflight.shouldInspectPendingEvents || preflight.pendingEventEntries.length === 0) {
+      return;
+    }
+    consumeSystemEventEntries(sessionKey, preflight.pendingEventEntries);
+  };
+
+  const ctx = {
+    Body: appendCronStyleCurrentTimeLine(prompt, cfg, startedAt),
+    From: sender,
+    To: sender,
+    OriginatingChannel:
+      !suppressOriginatingContext && delivery.channel !== "none" ? delivery.channel : undefined,
+    OriginatingTo: !suppressOriginatingContext ? delivery.to : undefined,
+    AccountId: delivery.accountId,
+    MessageThreadId: delivery.threadId,
+    Provider: hasEvolutionSignal
+      ? "evolution-event"
+      : hasInsightEvent
+        ? "insight-event"
+        : hasExecCompletion
+          ? "exec-event"
+          : hasCronEvents
+            ? "cron-event"
+            : "heartbeat",
+    SessionKey: runSessionKey,
+    ForceSenderIsOwnerFalse:
+      hasExecCompletion || hasUntrustedPendingEvents || hasEvolutionSignal || hasInsightEvent,
+  };
+  if (!visibility.showAlerts && !visibility.showOk && !visibility.useIndicator) {
+    emitHeartbeatEvent({
+      status: "skipped",
+      reason: "alerts-disabled",
+      durationMs: Date.now() - startedAt,
+      channel: delivery.channel !== "none" ? delivery.channel : undefined,
+      accountId: delivery.accountId,
+    });
+    return { status: "skipped", reason: "alerts-disabled" };
+  }
+
+  const heartbeatOkText = responsePrefix ? `${responsePrefix} ${HEARTBEAT_TOKEN}` : HEARTBEAT_TOKEN;
+  const outboundSession = buildOutboundSessionContext({
+    cfg,
+    agentId,
+    sessionKey,
+  });
+  const canAttemptHeartbeatOk = Boolean(
+    visibility.showOk && delivery.channel !== "none" && delivery.to,
+  );
+  const maybeSendHeartbeatOk = async () => {
+    if (!canAttemptHeartbeatOk || delivery.channel === "none" || !delivery.to) {
+      return false;
+    }
+    const heartbeatPlugin = getChannelPlugin(delivery.channel);
+    if (heartbeatPlugin?.heartbeat?.checkReady) {
+      const readiness = await heartbeatPlugin.heartbeat.checkReady({
+        cfg,
+        accountId: delivery.accountId,
+        deps: opts.deps,
+      });
+      if (!readiness.ok) {
+        return false;
+      }
+    }
+    await deliverOutboundPayloads({
+      cfg,
+      channel: delivery.channel,
+      to: delivery.to,
+      accountId: delivery.accountId,
+      threadId: delivery.threadId,
+      payloads: [{ text: heartbeatOkText }],
+      session: outboundSession,
+      deps: opts.deps,
+      mirror: {
+        sessionKey,
+        agentId,
+        text: heartbeatOkText,
+      },
+    });
+    return true;
+  };
+
+  try {
+    const heartbeatModelOverride = normalizeOptionalString(heartbeat?.model);
+    const suppressToolErrorWarnings = heartbeat?.suppressToolErrorWarnings === true;
+    // Background relay turns must never inherit the multi-day global agent
+    // timeout: a degenerating stream once ran 16-18 minutes before the
+    // provider gave up. 10 minutes is generous for relay turns with tools.
+    const timeoutOverrideSeconds =
+      typeof heartbeat?.timeoutSeconds === "number"
+        ? heartbeat.timeoutSeconds
+        : DEFAULT_HEARTBEAT_RUN_TIMEOUT_SECONDS;
+    const bootstrapContextMode: "lightweight" | undefined =
+      heartbeat?.lightContext === true ? "lightweight" : undefined;
+    const replyOpts = {
+      isHeartbeat: true,
+      ...(heartbeatModelOverride ? { heartbeatModelOverride } : {}),
+      suppressToolErrorWarnings,
+      // Heartbeat timeout is a per-run override so user turns keep the global default.
+      timeoutOverrideSeconds,
+      bootstrapContextMode,
+    };
+    const getReplyFromConfig =
+      opts.deps?.getReplyFromConfig ?? (await loadHeartbeatRunnerRuntime()).getReplyFromConfig;
+    const replyResult = await getReplyFromConfig(ctx, replyOpts, cfg);
+    const replyPayload = resolveHeartbeatReplyPayload(replyResult);
+    const includeReasoning = heartbeat?.includeReasoning === true;
+    const reasoningPayloads = includeReasoning
+      ? resolveHeartbeatReasoningPayloads(replyResult).filter((payload) => payload !== replyPayload)
+      : [];
+
+    if (!replyPayload || !hasOutboundReplyContent(replyPayload)) {
+      await restoreHeartbeatUpdatedAt({
+        storePath,
+        sessionKey,
+        updatedAt: previousUpdatedAt,
+      });
+
+      const okSent = await maybeSendHeartbeatOk();
+      emitHeartbeatEvent({
+        status: "ok-empty",
+        reason: opts.reason,
+        durationMs: Date.now() - startedAt,
+        channel: delivery.channel !== "none" ? delivery.channel : undefined,
+        accountId: delivery.accountId,
+        silent: !okSent,
+        indicatorType: visibility.useIndicator ? resolveIndicatorType("ok-empty") : undefined,
+      });
+      await updateTaskTimestamps();
+      consumeInspectedSystemEvents();
+      // Redundant wake for an already-delivered insight (deliveryMessageId set)
+      // must report true, not false — otherwise pendingInsightDelivery is re-armed
+      // and the scheduler redelivers an insight the user already received.
+      await reportInsightOutcome(
+        hasInsightEvent ? await isInsightAlreadyDelivered(insightIdForOutcome) : false,
+      );
+      return { status: "ran", durationMs: Date.now() - startedAt };
+    }
+
+    const ackMaxChars = resolveHeartbeatAckMaxChars(cfg, heartbeat);
+    const normalized = normalizeHeartbeatReply(replyPayload, responsePrefix, ackMaxChars);
+    // For exec completion and evolution signal events, don't skip even if the
+    // response looks like HEARTBEAT_OK. Fall back to the original reply text.
+    const eventFallbackText =
+      (hasExecCompletion || hasEvolutionSignal || hasInsightEvent) &&
+      !normalized.text.trim() &&
+      replyPayload.text?.trim()
+        ? replyPayload.text.trim()
+        : null;
+    if (eventFallbackText) {
+      normalized.text = eventFallbackText;
+      normalized.shouldSkip = false;
+    }
+    // Last-line circuit breaker: a relay turn stuck in a degenerate loop must
+    // never reach a channel. The stored insight event is itself verified, so
+    // insight relays fall back to the original text instead of the garbage.
+    let degenerateBlocked: { reason: "length" | "repetition"; replyChars: number } | null = null;
+    const relaySourceText = normalized.text.trim();
+    if (relaySourceText && !normalized.shouldSkip) {
+      const verdict = isDegenerateReplyText(relaySourceText);
+      if (verdict.degenerate) {
+        const insightEventText = preflight.pendingEventEntries.find((event) =>
+          String(event.contextKey ?? "").startsWith("insight:"),
+        )?.text;
+        normalized.text = buildDegenerateReplyFallback(insightEventText);
+        normalized.shouldSkip = false;
+        degenerateBlocked = { reason: verdict.reason, replyChars: relaySourceText.length };
+        log.warn("heartbeat reply blocked by degeneration guard; delivering fallback", {
+          reason: verdict.reason,
+          replyChars: relaySourceText.length,
+          shingleRatio: verdict.shingleRatio,
+          hasInsightFallback: Boolean(insightEventText),
+        });
+      }
+    }
+    const shouldSkipMain =
+      normalized.shouldSkip && !normalized.hasMedia && !hasExecCompletion && !hasEvolutionSignal;
+    if (shouldSkipMain && reasoningPayloads.length === 0) {
+      await restoreHeartbeatUpdatedAt({
+        storePath,
+        sessionKey,
+        updatedAt: previousUpdatedAt,
+      });
+
+      const okSent = await maybeSendHeartbeatOk();
+      emitHeartbeatEvent({
+        status: "ok-token",
+        reason: opts.reason,
+        durationMs: Date.now() - startedAt,
+        channel: delivery.channel !== "none" ? delivery.channel : undefined,
+        accountId: delivery.accountId,
+        silent: !okSent,
+        indicatorType: visibility.useIndicator ? resolveIndicatorType("ok-token") : undefined,
+      });
+      await updateTaskTimestamps();
+      consumeInspectedSystemEvents();
+      return { status: "ran", durationMs: Date.now() - startedAt };
+    }
+
+    const mediaUrls = resolveSendableOutboundReplyParts(replyPayload).mediaUrls;
+
+    // Suppress duplicate heartbeats (same payload) within a short window.
+    // This prevents "nagging" when nothing changed but the model repeats the same items.
+    const prevHeartbeatText =
+      typeof entry?.lastHeartbeatText === "string" ? entry.lastHeartbeatText : "";
+    const prevHeartbeatAt =
+      typeof entry?.lastHeartbeatSentAt === "number" ? entry.lastHeartbeatSentAt : undefined;
+    const isDuplicateMain =
+      !shouldSkipMain &&
+      !mediaUrls.length &&
+      Boolean(prevHeartbeatText.trim()) &&
+      normalized.text.trim() === prevHeartbeatText.trim() &&
+      typeof prevHeartbeatAt === "number" &&
+      startedAt - prevHeartbeatAt < 24 * 60 * 60 * 1000;
+
+    if (isDuplicateMain) {
+      await restoreHeartbeatUpdatedAt({
+        storePath,
+        sessionKey,
+        updatedAt: previousUpdatedAt,
+      });
+
+      emitHeartbeatEvent({
+        status: "skipped",
+        reason: "duplicate",
+        preview: normalized.text.slice(0, 200),
+        durationMs: Date.now() - startedAt,
+        hasMedia: false,
+        channel: delivery.channel !== "none" ? delivery.channel : undefined,
+        accountId: delivery.accountId,
+      });
+      await updateTaskTimestamps();
+      consumeInspectedSystemEvents();
+      await reportInsightOutcome(
+        hasInsightEvent ? await isInsightAlreadyDelivered(insightIdForOutcome) : false,
+      );
+      return { status: "ran", durationMs: Date.now() - startedAt };
+    }
+
+    // Reasoning payloads are text-only; any attachments stay on the main reply.
+    const previewText = shouldSkipMain
+      ? reasoningPayloads
+          .map((payload) => payload.text)
+          .filter((text): text is string => Boolean(text?.trim()))
+          .join("\n")
+      : normalized.text;
+
+    if (delivery.channel === "none" || !delivery.to) {
+      emitHeartbeatEvent({
+        status: "skipped",
+        reason: delivery.reason ?? "no-target",
+        preview: previewText?.slice(0, 200),
+        durationMs: Date.now() - startedAt,
+        hasMedia: mediaUrls.length > 0,
+        accountId: delivery.accountId,
+      });
+      await updateTaskTimestamps();
+      consumeInspectedSystemEvents();
+      // These early returns consume the insight event without sending; without
+      // an outcome report, awaitingDeliveryConfirmation would never clear.
+      await reportInsightOutcome(
+        hasInsightEvent ? await isInsightAlreadyDelivered(insightIdForOutcome) : false,
+      );
+      return { status: "ran", durationMs: Date.now() - startedAt };
+    }
+
+    if (!visibility.showAlerts) {
+      await updateTaskTimestamps();
+      await restoreHeartbeatUpdatedAt({
+        storePath,
+        sessionKey,
+        updatedAt: previousUpdatedAt,
+      });
+      emitHeartbeatEvent({
+        status: "skipped",
+        reason: "alerts-disabled",
+        preview: previewText?.slice(0, 200),
+        durationMs: Date.now() - startedAt,
+        channel: delivery.channel,
+        hasMedia: mediaUrls.length > 0,
+        accountId: delivery.accountId,
+        indicatorType: visibility.useIndicator ? resolveIndicatorType("sent") : undefined,
+      });
+      consumeInspectedSystemEvents();
+      await reportInsightOutcome(
+        hasInsightEvent ? await isInsightAlreadyDelivered(insightIdForOutcome) : false,
+      );
+      return { status: "ran", durationMs: Date.now() - startedAt };
+    }
+
+    const deliveryAccountId = delivery.accountId;
+    const heartbeatPlugin = getChannelPlugin(delivery.channel);
+    if (heartbeatPlugin?.heartbeat?.checkReady) {
+      const readiness = await heartbeatPlugin.heartbeat.checkReady({
+        cfg,
+        accountId: deliveryAccountId,
+        deps: opts.deps,
+      });
+      if (!readiness.ok) {
+        emitHeartbeatEvent({
+          status: "skipped",
+          reason: readiness.reason,
+          preview: previewText?.slice(0, 200),
+          durationMs: Date.now() - startedAt,
+          hasMedia: mediaUrls.length > 0,
+          channel: delivery.channel,
+          accountId: delivery.accountId,
+        });
+        log.info("heartbeat: channel not ready", {
+          channel: delivery.channel,
+          reason: readiness.reason,
+        });
+        return { status: "skipped", reason: readiness.reason };
+      }
+    }
+
+    const deliveryResults = await deliverOutboundPayloads({
+      cfg,
+      channel: delivery.channel,
+      to: delivery.to,
+      accountId: deliveryAccountId,
+      session: outboundSession,
+      threadId: delivery.threadId,
+      payloads: [
+        ...reasoningPayloads,
+        ...(shouldSkipMain
+          ? []
+          : [
+              {
+                text: normalized.text,
+                mediaUrls,
+              },
+            ]),
+      ],
+      deps: opts.deps,
+      mirror: {
+        sessionKey,
+        agentId,
+        text: normalized.text,
+        mediaUrls: mediaUrls.length > 0 ? mediaUrls : undefined,
+      },
+    });
+
+    if (hasInsightEvent && deliveryResults.length > 0) {
+      const msgId = deliveryResults[0]?.messageId;
+      if (msgId) {
+        try {
+          const { resolveConfigDir } = await import("../utils.js");
+          const { InsightStore } = await import("../cognitive/insight/store.js");
+          const { resolveCognitiveUserId } = await import("../cognitive/identity.js");
+          const insightUserId = resolveCognitiveUserId(sessionKey);
+          if (insightUserId) {
+            // Match the delivered insight by its contextKey (insight:<id>), not
+            // by "first record without a deliveryMessageId" — that heuristic
+            // races with older undelivered insights and writes the wrong msgId.
+            const insightId = preflight.pendingEventEntries
+              .map((event) => event.contextKey ?? "")
+              .find((key) => key.startsWith("insight:"))
+              ?.slice("insight:".length);
+            const insightStore = new InsightStore(resolveConfigDir());
+            if (insightId) {
+              const record = await insightStore.load(agentId, insightUserId, insightId);
+              if (record && !record.deliveryMessageId) {
+                record.deliveryMessageId = msgId;
+                await insightStore.save(agentId, insightUserId, record);
+              }
+            }
+          }
+        } catch {
+          // best-effort — don't block heartbeat on insight store update
+        }
+      }
+    }
+
+    // Record last delivered heartbeat payload for dedupe.
+    if (!shouldSkipMain && normalized.text.trim()) {
+      const store = loadSessionStore(storePath);
+      const current = store[sessionKey];
+      if (current) {
+        store[sessionKey] = {
+          ...current,
+          lastHeartbeatText: normalized.text,
+          lastHeartbeatSentAt: startedAt,
+        };
+        await saveSessionStore(storePath, store);
+      }
+    }
+
+    emitHeartbeatEvent({
+      status: "sent",
+      to: delivery.to,
+      preview: previewText?.slice(0, 200),
+      durationMs: Date.now() - startedAt,
+      hasMedia: mediaUrls.length > 0,
+      channel: delivery.channel,
+      accountId: delivery.accountId,
+      indicatorType: visibility.useIndicator ? resolveIndicatorType("sent") : undefined,
+      replyChars: normalized.text.length,
+      ...(degenerateBlocked
+        ? {
+            degenerateBlocked: degenerateBlocked.reason,
+            blockedReplyChars: degenerateBlocked.replyChars,
+          }
+        : {}),
+    });
+    await updateTaskTimestamps();
+    consumeInspectedSystemEvents();
+    await reportInsightOutcome(true);
+    await restoreHeartbeatUpdatedAt({
+      storePath,
+      sessionKey,
+      updatedAt: previousUpdatedAt,
+    });
+    return { status: "ran", durationMs: Date.now() - startedAt };
+  } catch (err) {
+    const reason = formatErrorMessage(err);
+    emitHeartbeatEvent({
+      status: "failed",
+      reason,
+      durationMs: Date.now() - startedAt,
+      channel: delivery.channel !== "none" ? delivery.channel : undefined,
+      accountId: delivery.accountId,
+      indicatorType: visibility.useIndicator ? resolveIndicatorType("failed") : undefined,
+    });
+    log.error(`heartbeat failed: ${reason}`, { error: reason });
+    try {
+      // Genuine failure, but if the insight was already delivered in a prior
+      // run (deliveryMessageId set), report true so pendingInsightDelivery is
+      // not re-armed for an insight the user already received.
+      await reportInsightOutcome(
+        hasInsightEvent ? await isInsightAlreadyDelivered(insightIdForOutcome) : false,
+      );
+    } catch {
+      // reportInsightOutcome may be in TDZ if error occurred before its definition
+    }
+    return { status: "failed", reason };
+  }
+}
+
+export function startHeartbeatRunner(opts: {
+  cfg?: KaijiBotConfig;
+  runtime?: RuntimeEnv;
+  abortSignal?: AbortSignal;
+  runOnce?: typeof runHeartbeatOnce;
+  stableSchedulerSeed?: string;
+  onInsightDeliveryOutcome?: HeartbeatDeps["onInsightDeliveryOutcome"];
+}): HeartbeatRunner {
+  const runtime = opts.runtime ?? defaultRuntime;
+  const runOnce = opts.runOnce ?? runHeartbeatOnce;
+  const insightDeliveryOutcome = opts.onInsightDeliveryOutcome;
+  const state = {
+    cfg: opts.cfg ?? loadConfig(),
+    runtime,
+    schedulerSeed: resolveHeartbeatSchedulerSeed(opts.stableSchedulerSeed),
+    agents: new Map<string, HeartbeatAgentState>(),
+    timer: null as NodeJS.Timeout | null,
+    stopped: false,
+  };
+  let initialized = false;
+
+  const resolveNextDue = (
+    now: number,
+    intervalMs: number,
+    phaseMs: number,
+    prevState?: HeartbeatAgentState,
+  ) =>
+    resolveNextHeartbeatDueMs({
+      nowMs: now,
+      intervalMs,
+      phaseMs,
+      prev: prevState
+        ? {
+            intervalMs: prevState.intervalMs,
+            phaseMs: prevState.phaseMs,
+            nextDueMs: prevState.nextDueMs,
+          }
+        : undefined,
+    });
+
+  const advanceAgentSchedule = (agent: HeartbeatAgentState, now: number, reason?: string) => {
+    agent.nextDueMs =
+      reason === "interval"
+        ? computeNextHeartbeatPhaseDueMs({
+            nowMs: now,
+            intervalMs: agent.intervalMs,
+            phaseMs: agent.phaseMs,
+          })
+        : // Targeted and action-driven wakes still count as a fresh heartbeat run
+          // for cooldown purposes, so keep the existing now + interval behavior.
+          now + agent.intervalMs;
+  };
+
+  const scheduleNext = () => {
+    if (state.stopped) {
+      return;
+    }
+    if (state.timer) {
+      clearTimeout(state.timer);
+      state.timer = null;
+    }
+    if (state.agents.size === 0) {
+      return;
+    }
+    const now = Date.now();
+    let nextDue = Number.POSITIVE_INFINITY;
+    for (const agent of state.agents.values()) {
+      if (agent.nextDueMs < nextDue) {
+        nextDue = agent.nextDueMs;
+      }
+    }
+    if (!Number.isFinite(nextDue)) {
+      return;
+    }
+    const delay = Math.max(0, nextDue - now);
+    state.timer = setTimeout(() => {
+      state.timer = null;
+      requestHeartbeatNow({ reason: "interval", coalesceMs: 0 });
+    }, delay);
+    state.timer.unref?.();
+  };
+
+  const updateConfig = (cfg: KaijiBotConfig) => {
+    if (state.stopped) {
+      return;
+    }
+    const now = Date.now();
+    const prevAgents = state.agents;
+    const prevEnabled = prevAgents.size > 0;
+    const nextAgents = new Map<string, HeartbeatAgentState>();
+    const intervals: number[] = [];
+    for (const agent of resolveHeartbeatAgents(cfg)) {
+      const intervalMs = resolveHeartbeatIntervalMs(cfg, undefined, agent.heartbeat);
+      if (!intervalMs) {
+        continue;
+      }
+      const phaseMs = resolveHeartbeatPhaseMs({
+        schedulerSeed: state.schedulerSeed,
+        agentId: agent.agentId,
+        intervalMs,
+      });
+      intervals.push(intervalMs);
+      const prevState = prevAgents.get(agent.agentId);
+      const nextDueMs = resolveNextDue(now, intervalMs, phaseMs, prevState);
+      nextAgents.set(agent.agentId, {
+        agentId: agent.agentId,
+        heartbeat: agent.heartbeat,
+        intervalMs,
+        phaseMs,
+        nextDueMs,
+      });
+    }
+
+    state.cfg = cfg;
+    state.agents = nextAgents;
+    const nextEnabled = nextAgents.size > 0;
+    if (!initialized) {
+      if (!nextEnabled) {
+        log.info("heartbeat: disabled", { enabled: false });
+      } else {
+        log.info("heartbeat: started", { intervalMs: Math.min(...intervals) });
+      }
+      initialized = true;
+    } else if (prevEnabled !== nextEnabled) {
+      if (!nextEnabled) {
+        log.info("heartbeat: disabled", { enabled: false });
+      } else {
+        log.info("heartbeat: started", { intervalMs: Math.min(...intervals) });
+      }
+    }
+
+    scheduleNext();
+  };
+
+  const run: HeartbeatWakeHandler = async (params) => {
+    if (state.stopped) {
+      return {
+        status: "skipped",
+        reason: "disabled",
+      } satisfies HeartbeatRunResult;
+    }
+    if (!areHeartbeatsEnabled()) {
+      return {
+        status: "skipped",
+        reason: "disabled",
+      } satisfies HeartbeatRunResult;
+    }
+    if (state.agents.size === 0) {
+      return {
+        status: "skipped",
+        reason: "disabled",
+      } satisfies HeartbeatRunResult;
+    }
+
+    const reason = params?.reason;
+    const requestedAgentId = params?.agentId ? normalizeAgentId(params.agentId) : undefined;
+    const requestedSessionKey = normalizeOptionalString(params?.sessionKey);
+    const isInterval = reason === "interval";
+    const startedAt = Date.now();
+    const now = startedAt;
+    let ran = false;
+    // Track requests-in-flight so we can skip re-arm in finally — the wake
+    // layer handles retry for this case (DEFAULT_RETRY_MS = 1 s).
+    let requestsInFlight = false;
+
+    try {
+      if (requestedSessionKey || requestedAgentId) {
+        const targetAgentId = requestedAgentId ?? resolveAgentIdFromSessionKey(requestedSessionKey);
+        let targetAgent = state.agents.get(targetAgentId);
+        if (!targetAgent) {
+          const isCognitiveDelivery =
+            reason === "cognitive-insight" || reason === "cognitive-evolution";
+          if (isCognitiveDelivery) {
+            targetAgent = {
+              agentId: targetAgentId,
+              heartbeat: resolveHeartbeatConfig(state.cfg, targetAgentId),
+              intervalMs: 0,
+              phaseMs: 0,
+              nextDueMs: now,
+            };
+          }
+        }
+        if (!targetAgent) {
+          return { status: "skipped", reason: "disabled" };
+        }
+        try {
+          const res = await runOnce({
+            cfg: state.cfg,
+            agentId: targetAgent.agentId,
+            heartbeat: targetAgent.heartbeat,
+            reason,
+            sessionKey: requestedSessionKey,
+            deps: {
+              runtime: state.runtime,
+              ...(insightDeliveryOutcome
+                ? { onInsightDeliveryOutcome: insightDeliveryOutcome }
+                : {}),
+            },
+          });
+          if (res.status !== "skipped" || res.reason !== "disabled") {
+            advanceAgentSchedule(targetAgent, now, reason);
+          }
+          return res.status === "ran" ? { status: "ran", durationMs: Date.now() - startedAt } : res;
+        } catch (err) {
+          const errMsg = formatErrorMessage(err);
+          log.error(`heartbeat runner: targeted runOnce threw unexpectedly: ${errMsg}`, {
+            error: errMsg,
+          });
+          advanceAgentSchedule(targetAgent, now, reason);
+          return { status: "failed", reason: errMsg };
+        }
+      }
+
+      for (const agent of state.agents.values()) {
+        if (isInterval && now < agent.nextDueMs) {
+          continue;
+        }
+
+        let res: HeartbeatRunResult;
+        try {
+          res = await runOnce({
+            cfg: state.cfg,
+            agentId: agent.agentId,
+            heartbeat: agent.heartbeat,
+            reason,
+            deps: {
+              runtime: state.runtime,
+              ...(insightDeliveryOutcome
+                ? { onInsightDeliveryOutcome: insightDeliveryOutcome }
+                : {}),
+            },
+          });
+        } catch (err) {
+          const errMsg = formatErrorMessage(err);
+          log.error(`heartbeat runner: runOnce threw unexpectedly: ${errMsg}`, { error: errMsg });
+          advanceAgentSchedule(agent, now, reason);
+          continue;
+        }
+        if (res.status === "skipped" && res.reason === "requests-in-flight") {
+          // Do not advance the schedule — the main lane is busy and the wake
+          // layer will retry shortly (DEFAULT_RETRY_MS = 1 s).  Calling
+          // scheduleNext() here would register a 0 ms timer that races with
+          // the wake layer's 1 s retry and wins, bypassing the cooldown.
+          requestsInFlight = true;
+          return res;
+        }
+        if (res.status !== "skipped" || res.reason !== "disabled") {
+          advanceAgentSchedule(agent, now, reason);
+        }
+        if (res.status === "ran") {
+          ran = true;
+        }
+      }
+
+      if (ran) {
+        return { status: "ran", durationMs: Date.now() - startedAt };
+      }
+      return { status: "skipped", reason: isInterval ? "not-due" : "disabled" };
+    } finally {
+      // Always re-arm the timer — except for requests-in-flight, where the
+      // wake layer (heartbeat-wake.ts) handles retry via schedule(DEFAULT_RETRY_MS).
+      if (!requestsInFlight) {
+        scheduleNext();
+      }
+    }
+  };
+
+  const wakeHandler: HeartbeatWakeHandler = async (params) =>
+    run({
+      reason: params.reason,
+      agentId: params.agentId,
+      sessionKey: params.sessionKey,
+    });
+  const disposeWakeHandler = setHeartbeatWakeHandler(wakeHandler);
+  updateConfig(state.cfg);
+
+  const cleanup = () => {
+    if (state.stopped) {
+      return;
+    }
+    state.stopped = true;
+    disposeWakeHandler();
+    if (state.timer) {
+      clearTimeout(state.timer);
+    }
+    state.timer = null;
+  };
+
+  opts.abortSignal?.addEventListener("abort", cleanup, { once: true });
+
+  return { stop: cleanup, updateConfig };
+}

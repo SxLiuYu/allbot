@@ -1,0 +1,94 @@
+import { OPERATOR_USER_ID } from "../cognitive/identity.js";
+import type { KaijiBotConfig } from "../config/config.js";
+import { resolveStorePath } from "../config/sessions/paths.js";
+import { loadSessionStore } from "../config/sessions/store-load.js";
+import { isCronSessionKey, isSubagentSessionKey } from "../sessions/session-key-utils.js";
+
+export type CognitiveDeliveryTarget = {
+  sessionKey: string;
+  channel: string;
+  to: string;
+  accountId?: string;
+};
+
+export function findSessionKeyForUserId(
+  cfg: KaijiBotConfig | undefined,
+  userId: string,
+  agentId: string = "main",
+): string | undefined {
+  if (!cfg) {
+    return undefined;
+  }
+
+  const storePath = resolveStorePath(cfg.session?.store, { agentId });
+  const store = loadSessionStore(storePath);
+  const lowerUserId = userId.toLowerCase();
+
+  const directKey = `agent:${agentId}:${userId}`;
+  if (store[directKey] && !isSubagentSessionKey(directKey) && !isCronSessionKey(directKey)) {
+    return directKey;
+  }
+
+  for (const key of Object.keys(store)) {
+    if (isSubagentSessionKey(key) || isCronSessionKey(key)) {
+      continue;
+    }
+    if (key.toLowerCase().endsWith(`:${lowerUserId}`)) {
+      return key;
+    }
+  }
+
+  if (lowerUserId === OPERATOR_USER_ID) {
+    for (const key of Object.keys(store)) {
+      if (isSubagentSessionKey(key) || isCronSessionKey(key)) {
+        continue;
+      }
+      if (key.toLowerCase().endsWith(":main")) {
+        return key;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Resolve the full delivery target for a cognitive insight: session key,
+ * channel, and recipient address. Returns undefined if no routable session
+ * exists or if the session has no channel binding (e.g. lastChannel missing).
+ */
+export function resolveCognitiveDeliveryTarget(
+  cfg: KaijiBotConfig | undefined,
+  userId: string,
+  agentId: string = "main",
+): CognitiveDeliveryTarget | undefined {
+  if (!cfg) {
+    return undefined;
+  }
+
+  const storePath = resolveStorePath(cfg.session?.store, { agentId });
+  const store = loadSessionStore(storePath);
+
+  const sessionKey = findSessionKeyForUserId(cfg, userId, agentId);
+  if (!sessionKey) {
+    return undefined;
+  }
+
+  const entry = store[sessionKey];
+  if (!entry) {
+    return undefined;
+  }
+
+  const channel = entry.lastChannel;
+  const to = entry.lastTo;
+  if (!channel || channel === "none" || !to) {
+    return undefined;
+  }
+
+  return {
+    sessionKey,
+    channel,
+    to,
+    accountId: entry.lastAccountId ?? undefined,
+  };
+}

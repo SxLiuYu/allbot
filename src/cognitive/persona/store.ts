@@ -1,0 +1,333 @@
+import { existsSync } from "node:fs";
+import { mkdir, readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { writeTextAtomic, getOrCreateScopedAsyncLock } from "../../infra/json-files.js";
+import type { PersonaTree, DomainNode, InterestPhase } from "../types.js";
+import { safeParsePersona } from "./persona-schema.js";
+
+const COGNITIVE_DIR = "cognitive";
+const PERSONA_DIR = "persona";
+
+const MIGRATION_SKIP_USER_IDS = new Set(["main", "kaijibot-tui", "slug-generator"]);
+
+function backfillStalePhases(persona: PersonaTree): void {
+  const now = Date.now();
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+  for (const domain of Object.values(persona.domains)) {
+    const insightCount = domain.keyInsights.length + (domain.insights?.length ?? 0);
+    // Recompute if domain is marked emergent but has evidence of deeper engagement
+    if (domain.phase === "emergent" && (domain.depth >= 2 || insightCount >= 3)) {
+      const ageSinceLastMention = now - domain.lastMentioned;
+      if (ageSinceLastMention < SEVEN_DAYS_MS) {
+        domain.phase = "stable";
+        domain.phaseEnteredAt ??= domain.lastMentioned;
+      }
+    }
+  }
+}
+
+function inferPhase(domain: DomainNode): { phase: InterestPhase; phaseEnteredAt: number } {
+  const now = Date.now();
+  const age = now - domain.lastMentioned;
+  const dayMs = 86_400_000;
+  if (domain.depth <= 1 && domain.recurrence <= 1) {
+    return { phase: "emergent", phaseEnteredAt: domain.lastMentioned };
+  }
+  if (domain.negationSignals >= 3) {
+    return { phase: "declining", phaseEnteredAt: domain.lastNegatedAt ?? domain.lastMentioned };
+  }
+  if (age > 30 * dayMs) {
+    return { phase: "dormant", phaseEnteredAt: domain.lastMentioned + 30 * dayMs };
+  }
+  return { phase: "stable", phaseEnteredAt: domain.lastMentioned };
+}
+
+export function migrateToTypedInsights(persona: PersonaTree): PersonaTree {
+  for (const domain of Object.values(persona.domains)) {
+    if (domain.insights && domain.insights.length > 0) {
+      continue;
+    }
+
+    domain.insights = domain.keyInsights.map((text) => ({
+      text,
+      category: "durable" as const,
+      confidence: 0.5,
+      source: "inferred" as const,
+      firstObserved: domain.lastMentioned,
+      lastReinforced: domain.lastMentioned,
+      evidenceCount: 1,
+      halfLifeDays: 30,
+    }));
+
+    if (domain.phase === undefined) {
+      const { phase, phaseEnteredAt } = inferPhase(domain);
+      domain.phase = phase;
+      domain.phaseEnteredAt = phaseEnteredAt;
+    }
+  }
+  return persona;
+}
+
+function shouldMigrateFlatFile(userId: string, persona: PersonaTree | null): boolean {
+  if (MIGRATION_SKIP_USER_IDS.has(userId)) {
+    return false;
+  }
+  if (!persona) {
+    return false;
+  }
+  if (userId.startsWith("ou_")) {
+    return true;
+  }
+  return Object.keys(persona.domains).length > 0 || persona.rapport.totalExchanges > 0;
+}
+
+/**
+ * Preserve an unloadable persona file before the next write replaces it with a
+ * default persona — without the .invalid.bak copy the reset is unrecoverable.
+ */
+async function quarantineInvalidPersona(
+  path: string,
+  agentId: string,
+  userId: string,
+  raw: string,
+): Promise<void> {
+  try {
+    const bakPath = `${path}.invalid.bak`;
+    if (!existsSync(bakPath)) {
+      await mkdir(dirname(path), { recursive: true });
+      await writeFile(bakPath, raw, "utf-8");
+      console.warn(`[PersonaStore] Quarantined invalid persona to ${bakPath}`);
+    }
+  } catch (err) {
+    console.warn(
+      `[PersonaStore] Failed to quarantine invalid persona for ${agentId}/${userId}: ${String(err)}`,
+    );
+  }
+}
+
+export class PersonaStore {
+  constructor(private readonly configDir: string) {}
+
+  private async withLock<T>(agentId: string, userId: string, fn: () => Promise<T>): Promise<T> {
+    // Process-global scope: multiple PersonaStore instances exist in one
+    // gateway process (scheduler, reply path, tools, consolidation), and a
+    // per-instance lock map would let their writes interleave.
+    const lock = getOrCreateScopedAsyncLock(`persona:${this.configDir}:${agentId}/${userId}`);
+    return lock(fn);
+  }
+
+  /**
+   * Atomically load → mutate → save. Use this instead of separate load/save
+   * calls when the caller intends to modify the persona, so concurrent writers
+   * (session-memory hook, consolidation cron, scheduler, evolution) cannot
+   * silently drop each other's updates.
+   */
+  async update(
+    agentId: string,
+    userId: string,
+    mutator: (persona: PersonaTree) => PersonaTree | Promise<PersonaTree>,
+  ): Promise<PersonaTree> {
+    let next!: PersonaTree;
+    await this.withLock(agentId, userId, async () => {
+      const current = await this.loadOrCreate(agentId, userId);
+      next = await mutator(current);
+      await this.saveUnlocked(agentId, userId, next);
+    });
+    return next;
+  }
+
+  /**
+   * Migrate legacy flat persona files from `persona/{userId}.json`
+   * to the new directory layout `persona/main/{userId}.json`.
+   * Safe to call multiple times — no-ops if already migrated.
+   */
+  async migrateFromFlatLayout(): Promise<{ migrated: string[]; skipped: string[] }> {
+    const personaDir = join(this.configDir, COGNITIVE_DIR, PERSONA_DIR);
+    if (!existsSync(personaDir)) {
+      return { migrated: [], skipped: [] };
+    }
+
+    const entries = await readdir(personaDir);
+    const jsonFiles = entries.filter((name) => name.endsWith(".json"));
+    if (jsonFiles.length === 0) {
+      return { migrated: [], skipped: [] };
+    }
+
+    const migrated: string[] = [];
+    const skipped: string[] = [];
+
+    for (const fileName of jsonFiles) {
+      const userId = fileName.slice(0, -5);
+      const srcPath = join(personaDir, fileName);
+      const dstPath = this.personaPath("main", userId);
+
+      if (existsSync(dstPath)) {
+        skipped.push(userId);
+        continue;
+      }
+
+      let persona: PersonaTree | null = null;
+      try {
+        const raw = await readFile(srcPath, "utf-8");
+        persona = safeParsePersona(JSON.parse(raw));
+      } catch {
+        skipped.push(userId);
+        continue;
+      }
+
+      if (shouldMigrateFlatFile(userId, persona)) {
+        const targetDir = join(this.configDir, COGNITIVE_DIR, PERSONA_DIR, "main");
+        await mkdir(targetDir, { recursive: true });
+        await rename(srcPath, dstPath);
+        migrated.push(userId);
+      } else {
+        skipped.push(userId);
+      }
+    }
+
+    if (migrated.length > 0) {
+      console.info(
+        `[PersonaStore] Migrated ${migrated.length} persona(s) to main/ subdirectory: ${migrated.join(", ")}`,
+      );
+    }
+
+    return { migrated, skipped };
+  }
+
+  private personaPath(agentId: string, userId: string): string {
+    return join(this.configDir, COGNITIVE_DIR, PERSONA_DIR, agentId, `${userId}.json`);
+  }
+
+  async load(agentId: string, userId: string): Promise<PersonaTree | undefined> {
+    const path = this.personaPath(agentId, userId);
+    if (!existsSync(path)) {
+      return undefined;
+    }
+    const raw = await readFile(path, "utf-8");
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      console.warn(`[PersonaStore] Malformed JSON for ${agentId}/${userId}, ignoring`);
+      await quarantineInvalidPersona(path, agentId, userId, raw);
+      return undefined;
+    }
+    const validated = safeParsePersona(parsed);
+    if (validated === null) {
+      console.warn(`[PersonaStore] Invalid persona JSON for ${agentId}/${userId}, ignoring`);
+      await quarantineInvalidPersona(path, agentId, userId, raw);
+      return undefined;
+    }
+    // Backfill userId for personas created before identity.userId was persisted
+    if (!validated.identity.userId) {
+      validated.identity.userId = userId;
+    }
+    backfillStalePhases(validated);
+    const result = migrateToTypedInsights(validated);
+    if (
+      result.feedbackProfile.consecutiveNoResponses &&
+      result.feedbackProfile.consecutiveNoResponses > 8
+    ) {
+      result.feedbackProfile.consecutiveNoResponses = 8;
+    }
+    return result;
+  }
+
+  async save(agentId: string, userId: string, persona: PersonaTree): Promise<void> {
+    await this.withLock(agentId, userId, async () => {
+      await this.saveUnlocked(agentId, userId, persona);
+    });
+  }
+
+  private async saveUnlocked(agentId: string, userId: string, persona: PersonaTree): Promise<void> {
+    const targetPath = this.personaPath(agentId, userId);
+    await writeTextAtomic(targetPath, JSON.stringify(persona, null, 2));
+  }
+
+  async loadOrCreate(agentId: string, userId: string): Promise<PersonaTree> {
+    const existing = await this.load(agentId, userId);
+    if (existing) {
+      return existing;
+    }
+    const persona = migrateToTypedInsights(createDefaultPersona());
+    persona.identity.userId = userId;
+    return persona;
+  }
+
+  async listUserIds(agentId: string): Promise<string[]> {
+    const dir = join(this.configDir, COGNITIVE_DIR, PERSONA_DIR, agentId);
+    try {
+      const entries = await readdir(dir);
+      return entries
+        .filter((name) => name.endsWith(".json") && !name.endsWith(".bak"))
+        .map((name) => name.slice(0, -5))
+        .filter((userId) => {
+          if (userId === agentId) {
+            return false;
+          }
+          if (userId.includes("-control-ui")) {
+            return false;
+          }
+          return true;
+        })
+        .toSorted();
+    } catch {
+      return [];
+    }
+  }
+
+  async listAgentIds(): Promise<string[]> {
+    const dir = join(this.configDir, COGNITIVE_DIR, PERSONA_DIR);
+    try {
+      const entries = await readdir(dir);
+      const result: string[] = [];
+      for (const name of entries) {
+        const full = join(dir, name);
+        const s = await stat(full);
+        if (s.isDirectory()) {
+          result.push(name);
+        }
+      }
+      return result.toSorted();
+    } catch {
+      return [];
+    }
+  }
+}
+
+export function createDefaultPersona(): PersonaTree {
+  return {
+    identity: {
+      coreTraits: {},
+      expertDomains: [],
+      interestDomains: [],
+      curiosityDomains: [],
+    },
+    domains: {},
+    recentFocus: [],
+    moodHistory: [],
+    feedbackProfile: {
+      topicBandits: {},
+      optimalFrequencyHours: 4,
+      lastProactiveAt: 0,
+      recentInsightIds: [],
+      recentInsightContents: [],
+      recentInsightDomains: [],
+      recentInsightTypes: [],
+    },
+    rapport: {
+      trustScore: 0.1,
+      totalExchanges: 0,
+      avgResponseLength: 0,
+      selfDisclosureLevel: 0,
+    },
+    domainBlacklist: [],
+    lifecycle: {
+      stage: "new",
+      lastActiveAt: 0,
+      lastStageTransitionAt: 0,
+      totalActiveDays: 0,
+    },
+    calibrationHistory: [],
+  };
+}
