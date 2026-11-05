@@ -135,11 +135,9 @@ function makeGateContext(persona: PersonaTree, eventTimestamp: number): GateCont
 describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
   // ── Test 1 ───────────────────────────────────────────────────────────
 
-  // MIGRATED (goal 洞察投放人化重构): fixture timestamps moved off the epoch
-  // — near-1970 values yield negative lastActiveAt, which the momentum path
-  // correctly treats as never-active (factor 0). Realistic timestamps keep
-  // the fixture inside the live momentum window.
-  it("records attempted domains after identify even when resolve returns nothing", async () => {
+  // MIGRATED: failed resolve attempts no longer consume domain-window slots —
+  // the attempted append is rolled back, so the next cycle sees a clean window.
+  it("rolls back attempted domains after identify even when resolve returns nothing", async () => {
     const eventTimestamp = Date.now();
     const persona = richPersona(eventTimestamp);
 
@@ -147,7 +145,7 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
       pipelineConfig,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -161,24 +159,14 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
     });
 
     expect(result).toBeUndefined();
-    expect(persona.feedbackProfile.recentInsightDomains).toBeDefined();
-    expect(persona.feedbackProfile.recentInsightDomains!.length).toBeGreaterThan(0);
-
-    const recordedDomains = persona.feedbackProfile.recentInsightDomains!;
-    const lastEntry = recordedDomains[recordedDomains.length - 1]!;
-    expect(lastEntry.length).toBeGreaterThan(0);
-    const allDomainNames = Object.keys(persona.domains);
-    expect(lastEntry.some((d) => allDomainNames.includes(d))).toBe(true);
+    expect(persona.feedbackProfile.recentInsightDomains ?? []).toEqual([]);
   });
 
   // ── Test 2 ───────────────────────────────────────────────────────────
 
-  // MIGRATED (goal 洞察投放人化重构): cycle-1 attempt dynamics use real
-  // Math.random (pickBestTopic), so the exact 0.405-vs-0.625 arithmetic was
-  // run-dependent. The contract under test — an attempted-but-undelivered
-  // domain ranks BELOW an un-attempted one at equal base pAct — is asserted
-  // directly and holds for any cycle-1 outcome.
-  it("domain cooldown penalizes attempted-but-undelivered domains on next cycle", async () => {
+  // MIGRATED: an attempted-but-undelivered domain is rolled back, so the
+  // next identify() call sees no cooldown penalty for it.
+  it("failed attempt does not penalize its domain on the next cycle", async () => {
     const eventTimestamp = Date.now();
     const persona = richPersona(eventTimestamp);
 
@@ -186,7 +174,7 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
       pipelineConfig,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: async () => [] },
@@ -197,29 +185,12 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
       timestamp: eventTimestamp,
     });
 
-    const recordedDomains = persona.feedbackProfile.recentInsightDomains!;
-    expect(recordedDomains.length).toBeGreaterThan(0);
-    const attempted = new Set(recordedDomains.flat());
-    const c1Domain = recordedDomains[recordedDomains.length - 1]!;
-    const freshDomain = DOMAIN_KEYS.find((d) => !attempted.has(d));
-    expect(freshDomain).toBeDefined();
+    expect(persona.feedbackProfile.recentInsightDomains ?? []).toEqual([]);
 
-    persona.feedbackProfile.recentInsightTypes = [];
-
-    const schedulerC2 = new ProactiveScheduler(
-      pipelineConfig,
-      {
-        loadPersona: async () => persona,
-        onInsightReady: async () => {},
-        savePersona: async () => {},
-      },
-      { insightGenerator: async () => [] },
-    );
-
-    const opportunities: Opportunity[] = [
+    const attempts: Opportunity[] = [
       {
         type: "domain_depth",
-        targetDomains: c1Domain,
+        targetDomains: [DOMAIN_KEYS[0]],
         sourceDomains: [],
         pNeed: 0.7,
         pAccept: 0.7,
@@ -227,7 +198,7 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
       },
       {
         type: "cross_domain",
-        targetDomains: [freshDomain!],
+        targetDomains: [DOMAIN_KEYS[1]],
         sourceDomains: [],
         pNeed: 0.7,
         pAccept: 0.7,
@@ -235,13 +206,10 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
       },
     ];
 
-    const selected = schedulerC2.identify(opportunities, persona);
-    expect(selected.length).toBeGreaterThanOrEqual(1);
-    expect(selected[0]!.targetDomains).toContain(freshDomain);
-
-    const penalized = selected.find((o) => o.targetDomains === c1Domain);
-    if (penalized) {
-      expect(penalized.pAct).toBeLessThan(0.49);
+    const selected = schedulerC1.identify(attempts, persona);
+    expect(selected).toHaveLength(2);
+    for (const opportunity of selected) {
+      expect(opportunity.pAct).toBe(0.49);
     }
   });
 
@@ -253,7 +221,7 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
 
     const scheduler = new ProactiveScheduler(pipelineConfig, {
       loadPersona: async () => persona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -317,7 +285,7 @@ describe.skipIf(process.env.CI)("ProactiveScheduler pipeline lifecycle", () => {
           pipelineConfig,
           {
             loadPersona: async () => currentPersona,
-            onInsightReady: async () => {},
+            onInsightReady: async () => true,
             savePersona: async (_agentId, _userId, p) => {
               savedPersona = p;
             },

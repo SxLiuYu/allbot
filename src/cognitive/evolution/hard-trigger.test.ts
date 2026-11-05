@@ -120,13 +120,17 @@ describe("evaluateHardTrigger", () => {
   it("signal includes existing skills when configDir has skills", async () => {
     const { evaluateHardTrigger } = await import("./hard-trigger.js");
     const { SkillPersistenceWriter } = await import("./skill-writer.js");
+    const { resolveEvolutionSkillBaseDir } = await import("./skill-lifecycle.js");
     const { mkdtempSync, rmSync } = await import("node:fs");
     const { join } = await import("node:path");
     const { tmpdir } = await import("node:os");
 
     const tempDir = mkdtempSync(join(tmpdir(), "kaijibot-trigger-skills-test-"));
     try {
-      const writer = new SkillPersistenceWriter(tempDir);
+      // Skills live under <workspace>/skills/agent, the same root the evolution
+      // tools write to; configDir alone is not the workspace root.
+      const skillBaseDir = resolveEvolutionSkillBaseDir({ configDir: tempDir });
+      const writer = new SkillPersistenceWriter(skillBaseDir);
       await writer.writeSkill({
         name: "existing-skill",
         description: "An existing skill",

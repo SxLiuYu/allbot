@@ -10,8 +10,19 @@ export const STEP_TIMEOUT_MS_DEFAULT = 10 * 60 * 1000;
 type StepAwaiter = {
   taskId: string;
   stepIndex: number;
+  /** Owner of the in-flight step, checked against the reporting turn. */
+  agentId?: string;
+  userId?: string;
+  sessionKey?: string;
   resolve: (outcome: TaskStepOutcome) => void;
   timer: ReturnType<typeof setTimeout>;
+};
+
+/** Identity of the turn that calls task_step_report (ownership check). */
+export type TaskStepReporter = {
+  agentId?: string;
+  userId?: string;
+  sessionKey?: string;
 };
 
 /**
@@ -29,22 +40,66 @@ function awaiterKey(taskId: string, stepIndex: number): string {
 export type ReportStepOutcomeResult = { delivered: true } | { delivered: false; reason: string };
 
 /**
+ * Verify the reporting turn belongs to the step's owner. A step is only
+ * resolvable by the (agent, user, session) that the runner registered it for;
+ * without this, any turn that knows/guesses a taskId + stepIndex could close
+ * another user's step. Fields absent on either side are skipped.
+ */
+function ownerMismatch(awaiter: StepAwaiter, reporter?: TaskStepReporter): string | undefined {
+  if (!reporter) {
+    return undefined;
+  }
+  if (
+    reporter.sessionKey !== undefined &&
+    awaiter.sessionKey !== undefined &&
+    reporter.sessionKey !== awaiter.sessionKey
+  ) {
+    return "session";
+  }
+  if (
+    reporter.userId !== undefined &&
+    awaiter.userId !== undefined &&
+    reporter.userId !== awaiter.userId
+  ) {
+    return "user";
+  }
+  if (
+    reporter.agentId !== undefined &&
+    awaiter.agentId !== undefined &&
+    reporter.agentId !== awaiter.agentId
+  ) {
+    return "agent";
+  }
+  return undefined;
+}
+
+/**
  * Called by the task_step_report agent tool: resolve the pending step.
  * Exported for the tool and for tests that simulate the agent turn.
  */
-export function reportStepOutcome(params: {
-  taskId: string;
-  stepIndex: number;
-  summary: string;
-  done?: boolean;
-  error?: string;
-}): ReportStepOutcomeResult {
+export function reportStepOutcome(
+  params: {
+    taskId: string;
+    stepIndex: number;
+    summary: string;
+    done?: boolean;
+    error?: string;
+  },
+  reporter?: TaskStepReporter,
+): ReportStepOutcomeResult {
   const key = awaiterKey(params.taskId, params.stepIndex);
   const awaiter = awaiters.get(key);
   if (!awaiter) {
     return {
       delivered: false,
       reason: `No pending step ${params.stepIndex} for task ${params.taskId}`,
+    };
+  }
+  const mismatch = ownerMismatch(awaiter, reporter);
+  if (mismatch) {
+    return {
+      delivered: false,
+      reason: `Step ${params.stepIndex} of task ${params.taskId} does not belong to this ${mismatch}`,
     };
   }
   awaiters.delete(key);
@@ -148,6 +203,9 @@ export function createProductionStepDriver(deps: ProductionStepDriverDeps) {
       awaiters.set(key, {
         taskId: task.id,
         stepIndex,
+        ...(task.agentId ? { agentId: task.agentId } : {}),
+        ...(task.userId ? { userId: task.userId } : {}),
+        sessionKey: deps.sessionKey,
         resolve,
         timer,
       });

@@ -8,6 +8,7 @@ const mockGenerate = vi.fn().mockResolvedValue({
   bodyMarkdown: "## When to use\n\nUse when testing.\n\n## Workflow\n\n1. Step one\n2. Step two",
 });
 const mockSave = vi.fn().mockResolvedValue(undefined);
+const mockList = vi.fn().mockResolvedValue([]);
 const mockCheckBeforeGenerate = vi.fn().mockResolvedValue({ shouldCreate: true });
 
 vi.mock("../../cognitive/evolution/engine.js", () => ({
@@ -20,7 +21,12 @@ vi.mock("../../cognitive/evolution/engine.js", () => ({
 vi.mock("../../cognitive/evolution/store.js", () => ({
   EvolutionStore: class {
     save = mockSave;
+    list = mockList;
   },
+}));
+
+vi.mock("../../cognitive/evolution/standalone-generate.js", () => ({
+  createStandaloneGenerateText: vi.fn().mockRejectedValue(new Error("no provider in tests")),
 }));
 
 const mockWriteSkill = vi
@@ -39,6 +45,7 @@ vi.mock("../../cognitive/evolution/skill-writer.js", () => ({
 
 vi.mock("../../cognitive/evolution/skill-lifecycle.js", () => ({
   SkillLifecycleManager: class {},
+  resolveEvolutionSkillBaseDir: vi.fn().mockReturnValue("/home/test/.kaijibot/workspace"),
 }));
 
 vi.mock("../../utils.js", async (importOriginal) => {
@@ -55,6 +62,7 @@ describe("createEvolutionSuggestTool", () => {
     mockWriteSkill.mockResolvedValue("/home/test/.kaijibot/skills/agent/test-skill/SKILL.md");
     mockListSkillNames.mockResolvedValue([]);
     mockReadSkillMeta.mockResolvedValue(null);
+    mockList.mockResolvedValue([]);
     mockCheckBeforeGenerate.mockResolvedValue({ shouldCreate: true });
   });
 
@@ -104,7 +112,7 @@ describe("createEvolutionSuggestTool", () => {
       expect(mockGenerate).not.toHaveBeenCalled();
     });
 
-    it("generates, saves, and returns saved status", async () => {
+    it("defaults to needs_approval and does not write the skill", async () => {
       mockGenerate.mockResolvedValueOnce({
         name: "feishu-wiki-archive",
         description: "Archive wiki pages",
@@ -118,6 +126,43 @@ describe("createEvolutionSuggestTool", () => {
       })!;
 
       const result = await tool.execute("call-3", {
+        taskSummary: "complex workflow",
+        toolCalls: ["tool_a", "tool_b", "tool_c"],
+        uniqueToolCount: 3,
+        reasoningTurns: 8,
+        durationMs: 15000,
+        domain: "code-review",
+      });
+
+      const payload = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+      expect(payload.status).toBe("needs_approval");
+      expect(payload.skillName).toBe("feishu-wiki-archive");
+      expect(payload.draftId).toBeDefined();
+      expect(payload.draft.name).toBe("feishu-wiki-archive");
+      expect(payload.draft.bodyMarkdown).toContain("When to use");
+      expect(mockWriteSkill).not.toHaveBeenCalled();
+      expect(mockSave).toHaveBeenCalledTimes(1);
+      expect(mockSave.mock.calls[0][1].draft.name).toBe("feishu-wiki-archive");
+      expect(mockSave.mock.calls[0][1].savedSkillPath).toBeUndefined();
+    });
+
+    it("saves immediately when requireApproval is false", async () => {
+      mockGenerate.mockResolvedValueOnce({
+        name: "feishu-wiki-archive",
+        description: "Archive wiki pages",
+        triggerPhrases: ["归档", "archive"],
+        bodyMarkdown:
+          "## When to use\n\nUse when archiving wiki.\n\n## Workflow\n\n1. Scan\n2. Move",
+      });
+
+      const tool = createEvolutionSuggestTool({
+        sessionKey: "agent:main:user-2",
+        config: {
+          cognitive: { enabled: true, evolution: { requireApproval: false } },
+        } as never,
+      })!;
+
+      const result = await tool.execute("call-3-auto", {
         taskSummary: "complex workflow",
         toolCalls: ["tool_a", "tool_b", "tool_c"],
         uniqueToolCount: 3,
@@ -168,6 +213,9 @@ describe("createEvolutionSuggestTool", () => {
 
       const tool = createEvolutionSuggestTool({
         sessionKey: "agent:main:user-4",
+        config: {
+          cognitive: { enabled: true, evolution: { requireApproval: false } },
+        } as never,
       })!;
 
       const result = await tool.execute("call-5", {
@@ -270,9 +318,9 @@ describe("createEvolutionSuggestTool", () => {
       expect(mockGenerate).toHaveBeenCalledTimes(1);
     });
 
-    it("returns no_session when both deliveryTo and sessionKey yield no userId", async () => {
+    it("returns no_session for system sessions that yield no userId", async () => {
       const tool = createEvolutionSuggestTool({
-        sessionKey: "agent:main:main",
+        sessionKey: "agent:main:cron:evolution",
       })!;
 
       const result = await tool.execute("call-10", {
@@ -349,6 +397,9 @@ describe("createEvolutionSuggestTool", () => {
 
       const tool = createEvolutionSuggestTool({
         sessionKey: "agent:main:user-path",
+        config: {
+          cognitive: { enabled: true, evolution: { requireApproval: false } },
+        } as never,
       })!;
 
       await tool.execute("call-path", {
@@ -366,6 +417,145 @@ describe("createEvolutionSuggestTool", () => {
         "/home/test/.kaijibot/skills/agent/path-test/SKILL.md",
       );
       expect(savedRecord.draft.name).toBe("path-test");
+    });
+
+    describe("user decision", () => {
+      function statusOf(result: { details?: unknown }): unknown {
+        return (result.details as { status?: unknown } | undefined)?.status;
+      }
+
+      const storedDraft = {
+        id: "record-1",
+        userId: "user-approve",
+        candidate: {
+          taskSummary: "task",
+          toolCalls: ["a"],
+          uniqueToolCount: 1,
+          reasoningTurns: 1,
+          durationMs: 1,
+          domain: "test",
+        },
+        draft: {
+          name: "approved-skill",
+          description: "Approved skill",
+          triggerPhrases: ["go"],
+          bodyMarkdown: "# Approved",
+        },
+        timestamp: 1,
+      };
+
+      it("writes the stored draft when the host injects an approve decision", async () => {
+        mockList.mockResolvedValueOnce([structuredClone(storedDraft)]);
+        const tool = createEvolutionSuggestTool({
+          sessionKey: "agent:main:user-approve",
+          getUserDecision: () => ({
+            action: "approve",
+            draftId: "record-1",
+            confirmationId: "conf-1",
+            skillName: "approved-skill",
+          }),
+        })!;
+
+        const result = await tool.execute("call-approve", {});
+
+        const payload = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+        expect(payload.status).toBe("saved");
+        expect(payload.skillName).toBe("approved-skill");
+        expect(mockWriteSkill).toHaveBeenCalledTimes(1);
+        expect(mockWriteSkill.mock.calls[0][0].name).toBe("approved-skill");
+        expect(mockGenerate).not.toHaveBeenCalled();
+        expect(mockSave).toHaveBeenCalledTimes(1);
+        expect(mockSave.mock.calls[0][1].userResponse).toBe("accepted");
+      });
+
+      it("marks the record rejected and writes nothing on reject", async () => {
+        mockList.mockResolvedValueOnce([structuredClone(storedDraft)]);
+        const tool = createEvolutionSuggestTool({
+          sessionKey: "agent:main:user-approve",
+          getUserDecision: () => ({
+            action: "reject",
+            draftId: "record-1",
+            confirmationId: "conf-2",
+            skillName: "approved-skill",
+          }),
+        })!;
+
+        const result = await tool.execute("call-reject", {});
+
+        const payload = JSON.parse((result.content as Array<{ text: string }>)[0].text);
+        expect(payload.status).toBe("rejected");
+        expect(mockWriteSkill).not.toHaveBeenCalled();
+        expect(mockGenerate).not.toHaveBeenCalled();
+        expect(mockSave.mock.calls[0][1].userResponse).toBe("rejected");
+      });
+
+      it("refuses a decision without a confirmation id", async () => {
+        const tool = createEvolutionSuggestTool({
+          sessionKey: "agent:main:user-approve",
+          getUserDecision: () => ({
+            action: "approve",
+            draftId: "record-1",
+            confirmationId: "  ",
+            skillName: "approved-skill",
+          }),
+        })!;
+
+        const result = await tool.execute("call-no-conf", {});
+        expect(statusOf(result)).toBe("approval_invalid");
+        expect(mockWriteSkill).not.toHaveBeenCalled();
+      });
+
+      it("refuses an expired decision", async () => {
+        mockList.mockResolvedValueOnce([structuredClone(storedDraft)]);
+        const tool = createEvolutionSuggestTool({
+          sessionKey: "agent:main:user-approve",
+          getUserDecision: () => ({
+            action: "approve",
+            draftId: "record-1",
+            confirmationId: "conf-3",
+            skillName: "approved-skill",
+            expiresAt: Date.now() - 1000,
+          }),
+        })!;
+
+        const result = await tool.execute("call-expired", {});
+        expect(statusOf(result)).toBe("approval_invalid");
+        expect(mockWriteSkill).not.toHaveBeenCalled();
+      });
+
+      it("refuses a decision for a different skill name", async () => {
+        mockList.mockResolvedValueOnce([structuredClone(storedDraft)]);
+        const tool = createEvolutionSuggestTool({
+          sessionKey: "agent:main:user-approve",
+          getUserDecision: () => ({
+            action: "approve",
+            draftId: "record-1",
+            confirmationId: "conf-4",
+            skillName: "other-skill",
+          }),
+        })!;
+
+        const result = await tool.execute("call-mismatch", {});
+        expect(statusOf(result)).toBe("approval_invalid");
+        expect(mockWriteSkill).not.toHaveBeenCalled();
+      });
+
+      it("returns draft_not_found when the record is gone", async () => {
+        mockList.mockResolvedValueOnce([]);
+        const tool = createEvolutionSuggestTool({
+          sessionKey: "agent:main:user-approve",
+          getUserDecision: () => ({
+            action: "approve",
+            draftId: "missing",
+            confirmationId: "conf-5",
+            skillName: "approved-skill",
+          }),
+        })!;
+
+        const result = await tool.execute("call-missing", {});
+        expect(statusOf(result)).toBe("draft_not_found");
+        expect(mockWriteSkill).not.toHaveBeenCalled();
+      });
     });
   });
 });

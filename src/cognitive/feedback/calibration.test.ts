@@ -1,10 +1,16 @@
 import { describe, it, expect } from "vitest";
-import type { CalibrationRecord } from "../types.js";
+import type { CalibrationRecord, InsightRecord, PersonaTree } from "../types.js";
 import {
-  recordCalibration,
-  computeCalibrationSlope,
+  DEFAULT_PREDICTED_PACCEPT,
+  MAX_CALIBRATION_RECORDS,
+  appendCalibration,
   applyCalibrationCorrection,
+  computeCalibrationSlope,
   getCalibrationStats,
+  readInsightGateSnapshot,
+  recordCalibration,
+  recordNoResponseCalibration,
+  resolvePredictedPAccept,
 } from "./calibration.js";
 
 function makeRecords(
@@ -22,6 +28,56 @@ function makeMixedRecords(
   entries: Array<{ predicted: number; outcome: CalibrationRecord["actualOutcome"] }>,
 ): CalibrationRecord[] {
   return entries.map((e, i) => recordCalibration(`insight-${i}`, e.predicted, e.outcome, 1000 + i));
+}
+
+type InsightWithGateSnapshot = InsightRecord & {
+  gateSnapshot?: { pAccept: number } | null;
+};
+
+function makeInsight(overrides: Partial<InsightWithGateSnapshot> = {}): InsightWithGateSnapshot {
+  return {
+    id: "insight-test",
+    generatedAt: 1000,
+    triggerSource: "scheduled",
+    targetDomains: ["AI/机器学习"],
+    sourceDomains: ["arxiv"],
+    content: "Test insight",
+    rationale: "Test rationale",
+    sources: [],
+    deliveredAt: 1500,
+    ...overrides,
+  };
+}
+
+function makePersona(overrides: Partial<PersonaTree["feedbackProfile"]> = {}): PersonaTree {
+  return {
+    identity: {
+      coreTraits: {},
+      expertDomains: [],
+      interestDomains: [],
+      curiosityDomains: [],
+    },
+    domains: {},
+    recentFocus: [],
+    feedbackProfile: {
+      topicBandits: {},
+      optimalFrequencyHours: 4,
+      lastProactiveAt: 0,
+      recentInsightIds: [],
+      recentInsightContents: [],
+      ...overrides,
+    },
+    rapport: {
+      trustScore: 0.5,
+      totalExchanges: 10,
+      avgResponseLength: 50,
+      selfDisclosureLevel: 0.3,
+    },
+    domainBlacklist: [],
+    lifecycle: { stage: "new", lastActiveAt: 0, lastStageTransitionAt: 0, totalActiveDays: 0 },
+    calibrationHistory: [],
+    moodHistory: [],
+  };
 }
 
 describe("recordCalibration", () => {
@@ -58,6 +114,105 @@ describe("recordCalibration", () => {
       const record = recordCalibration("x", 0.5, outcome, 0);
       expect(record.actualOutcome).toBe(outcome);
     }
+  });
+});
+
+describe("appendCalibration", () => {
+  it("appends the record after the existing history", () => {
+    const history = makeRecords(2, 0.5, "positive");
+    const record = recordCalibration("new", 0.7, "negative", 5000);
+
+    const result = appendCalibration(history, record);
+
+    expect(result).toHaveLength(3);
+    expect(result.at(-1)).toEqual(record);
+  });
+
+  it("keeps only the newest MAX_CALIBRATION_RECORDS entries", () => {
+    const history = makeRecords(MAX_CALIBRATION_RECORDS, 0.5, "positive");
+    const record = recordCalibration("newest", 0.7, "no_response", 5000);
+
+    const result = appendCalibration(history, record);
+
+    expect(result).toHaveLength(MAX_CALIBRATION_RECORDS);
+    expect(result[0]?.insightId).toBe("insight-1");
+    expect(result.at(-1)?.insightId).toBe("newest");
+  });
+});
+
+describe("readInsightGateSnapshot", () => {
+  it("returns the snapshot attached to the insight record", () => {
+    const insight = makeInsight({ gateSnapshot: { pAccept: 0.7 } });
+
+    expect(readInsightGateSnapshot(insight)).toEqual({ pAccept: 0.7 });
+  });
+
+  it("returns null when the record has no snapshot", () => {
+    expect(readInsightGateSnapshot(makeInsight())).toBeNull();
+  });
+
+  it("returns null when pAccept is not a number", () => {
+    const insight = makeInsight({ gateSnapshot: { pAccept: "0.7" as unknown as number } });
+
+    expect(readInsightGateSnapshot(insight)).toBeNull();
+  });
+});
+
+describe("resolvePredictedPAccept", () => {
+  it("returns the snapshot pAccept", () => {
+    expect(resolvePredictedPAccept("insight-1", { pAccept: 0.66 })).toBe(0.66);
+  });
+
+  it("clamps the value into [0, 1]", () => {
+    expect(resolvePredictedPAccept("insight-1", { pAccept: 1.4 })).toBe(1);
+    expect(resolvePredictedPAccept("insight-1", { pAccept: -0.2 })).toBe(0);
+  });
+
+  it("falls back to DEFAULT_PREDICTED_PACCEPT without a snapshot", () => {
+    expect(resolvePredictedPAccept("insight-1")).toBe(DEFAULT_PREDICTED_PACCEPT);
+    expect(resolvePredictedPAccept("insight-1", null)).toBe(DEFAULT_PREDICTED_PACCEPT);
+  });
+
+  it("falls back when pAccept is not finite", () => {
+    expect(resolvePredictedPAccept("insight-1", { pAccept: Number.NaN })).toBe(
+      DEFAULT_PREDICTED_PACCEPT,
+    );
+  });
+});
+
+describe("recordNoResponseCalibration", () => {
+  it("uses the explicit insight id and gate snapshot", () => {
+    const record = recordNoResponseCalibration(
+      makePersona(),
+      { insightId: "insight-9", gateSnapshot: { pAccept: 0.8 } },
+      5000,
+    );
+
+    expect(record).toEqual({
+      insightId: "insight-9",
+      predictedPAccept: 0.8,
+      actualOutcome: "no_response",
+      timestamp: 5000,
+    });
+  });
+
+  it("falls back to the latest recentInsightIds entry", () => {
+    const persona = makePersona({ recentInsightIds: ["older", "latest"] });
+
+    const record = recordNoResponseCalibration(persona, { gateSnapshot: { pAccept: 0.3 } });
+
+    expect(record.insightId).toBe("latest");
+    expect(record.predictedPAccept).toBe(0.3);
+  });
+
+  it("derives an id from lastProactiveAt and predicts 0.5 without a snapshot", () => {
+    const persona = makePersona({ lastProactiveAt: 1234 });
+
+    const record = recordNoResponseCalibration(persona);
+
+    expect(record.insightId).toBe("no-response:1234");
+    expect(record.predictedPAccept).toBe(DEFAULT_PREDICTED_PACCEPT);
+    expect(record.actualOutcome).toBe("no_response");
   });
 });
 

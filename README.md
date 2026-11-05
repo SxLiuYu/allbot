@@ -21,11 +21,11 @@ KaijiBot 不一样。你在飞书里跟它聊了几次之后，它会开始**主
 | **交互方式** | 你问它才答   | 被动响应 + 长记忆        | **主动推送洞察** + 正常对话                                          |
 | **用户建模** | 无状态       | 向量库 rerank            | **TypedInsight 6 类 + 类别衰减半衰期 + 兴趣生命周期**                |
 | **时机感知** | 不管你在干嘛 | 无                       | **PRISM 成本敏感门控**(凌晨不打扰、信任低时克制)                     |
-| **自我进化** | 无           | 无                       | **Agent 自主创建/删除技能**(代码不做质量判断)                        |
+| **自我进化** | 无           | 无                       | **Agent 自主创建/删除技能**(LLM 质量门,0.7 分阈值)                  |
 | **纠错学习** | 无           | 无                       | **双路径纠错记忆**(同样的错误不犯第二次)                             |
 | **部署形态** | 云端 SaaS    | 云端 SaaS                | **云端 / 本地 / Android 手机本地运行**(Termux,完整 agent,非瘦客户端) |
 
-> 渠道集成方面：**飞书 + 微信**（一等渠道，深度支持）；另打包 16 个继承自上游的渠道（Telegram/Discord/Slack 等，未深度测试，仅供参考）。中英文 CLI / 向导 / 认知层 prompt 自动切换，40+ LLM 提供商可插拔。各数字以 `docs/channels/index.md` 为准。
+> 渠道集成方面：只打包 **飞书 + 微信** 两个一等渠道（深度支持）。上游 OpenClaw 的 Telegram/Discord/Slack 等频道在 KaijiBot 中没有打包代码，文档仅作为上游参考归档在 `docs/archive/channels/`，详见 `docs/channels/index.md`。中英文 CLI / 向导 / 认知层 prompt 自动切换，40+ LLM 提供商可插拔。
 
 ## ✨ 核心特性
 
@@ -52,7 +52,7 @@ flowchart LR
 
 - **Persona 画像** — 每次对话都在学习你。LLM 驱动的结构化提取,从对话中自动发现领域和兴趣。洞察按类别独立衰减(`tool_config` 7天 / `domain_knowledge` 30天 / `behavioral_pattern` 90天...),兴趣生命周期自动追踪(emergent→stable→declining→dormant→revived)。领域由 LLM 动态发现,不依赖硬编码关键词。
 - **跨域洞察** — 你同时关注 A 和 B,它发现二者有潜在联系。你之前问过但没深入的问题,它从新角度跟进。你在某个领域钻得够深了,它推荐延伸方向。LLM 自我精炼(critique→rewrite,最多 3 轮)保证质量,语义去重确保每次推送都有新意。
-- **时机门控** — 不是想发就发。PRISM 模型计算每条洞察的期望价值,只有预期收益超过打扰成本时才推送。凌晨不打扰,信任度低时克制,你最近活跃度低就先等等。每日自持上限(默认 1-2 条)+ 不固定间隔的随机投放节奏,像朋友分享而不是定时任务;不回复会自然收敛,你一开口立刻恢复。
+- **时机门控** — 不是想发就发。PRISM 模型计算每条洞察的期望价值,只有预期收益超过打扰成本时才推送。凌晨不打扰,信任度低时克制,你最近活跃度低就先等等。每日自持上限(默认 2 条)+ 不固定间隔的随机投放节奏,像朋友分享而不是定时任务;不回复会自然收敛,你一开口立刻恢复。主动推送默认关闭,需要显式开启 `cognitive.proactive.enabled: true`。
 - **信任演化** — 刚认识时谨慎试探,聊多了越来越懂你,最终变成可以大胆推荐的深度伙伴。SARA 框架驱动四个阶段的信任演化,信任等级决定系统被允许做什么。
 - **偏好学习** — 你回复长了、追问了"为什么",它记下你喜欢这个话题。你敷衍了,它下次换一个方向。Thompson Sampling 驱动的偏好学习,隐式反馈比显式反馈更诚实。
 
@@ -90,13 +90,14 @@ flowchart LR
 
 它怎么做到的：
 
-- **Hard Trigger 检测** — 代码层只做噪音过滤，不做质量判断。检测到复杂任务后注入系统事件。
+- **Hard Trigger 检测** — 代码层做噪音过滤，检测到复杂任务后注入系统事件。
 - **Agent 自主决策** — Agent 拥有完整对话上下文，自己判断是否值得做成技能。不值得就忽略。
+- **质量门** — 草稿落盘前由 LLM 按 4 个维度评分取均值，低于 0.7 分最多 refine 2 次，仍未通过则拒绝。
 - **完整生命周期** — 创建前去重检查、创建后跟踪使用频率、长期不用自动清理。
 
 **🧬 真实样例 — Agent 自主决策的两种相反结果**
 
-下面两条是运营者真实运行时 Agent 的两种相反决策。**这是"代码不做质量判断"架构声明的活证据** —— 大多数"自进化 agent"会无差别地为每个复杂任务创建技能,KaijiBot 的 Agent 会自己判断"这事该不该固化成流程"。
+下面两条是运营者真实运行时 Agent 的两种相反决策。大多数"自进化 agent"会无差别地为每个复杂任务创建技能,KaijiBot 的 Agent 会自己判断"这事该不该固化成流程";决定创建后,草稿还要通过 0.7 分阈值的 LLM 质量门。
 
 <table>
 <tr>
@@ -116,7 +117,7 @@ flowchart LR
 </tr>
 </table>
 
-注意 evo2 这条 —— Agent 给出的拒绝理由是有内容的(初稿看骨架、二稿看节奏、终稿看字句),不是模板化的"我无法处理"。这种"自己说不"的能力,是"代码只降噪、Agent 全权判断"架构的直接产物。
+注意 evo2 这条 —— Agent 给出的拒绝理由是有内容的(初稿看骨架、二稿看节奏、终稿看字句),不是模板化的"我无法处理"。这种"自己说不"的能力来自 Agent 的全权判断;而它决定"说 yes"之后,质量门仍会独立把关。
 
 ### 🔄 纠错自进化 — 同样的错误不犯第二次
 
@@ -245,7 +246,7 @@ curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install-termux.
 | 条件            | 说明                     | 获取方式                                                                                                                                                                                                                                  |
 | --------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **LLM API Key** | 至少一个 AI 提供商的密钥 | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [通义千问](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) 任选其一 |
-| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat)（一等渠道，运行 `kaijibot channels login --channel wechat` 接入）· 另打包 16 个继承渠道（Telegram/Discord/Slack 等，未深度测试，仅供参考）  |
+| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat)（一等渠道，运行 `kaijibot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考  |
 
 ### 安装（推荐方式）
 
@@ -271,7 +272,20 @@ iwr -useb https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.ps1 | ie
 kaijibot gateway --port 18789 --verbose
 ```
 
-启动后在飞书里找到你的机器人，发一条消息。KaijiBot 自动开始构建你的认知画像，几轮对话后会主动推送第一条洞察。
+启动后在飞书里找到你的机器人，发一条消息。KaijiBot 自动开始构建你的认知画像。
+
+主动洞察和任务系统默认关闭，需要时在 `~/.kaijibot/kaijibot.json` 里显式开启：
+
+```json
+{
+  "cognitive": {
+    "proactive": { "enabled": true },
+    "tasks": { "enabled": true }
+  }
+}
+```
+
+开启后，几轮对话它会主动推送第一条洞察。
 
 <details>
 <summary><b>📦 其他安装方式</b></summary>
@@ -360,7 +374,7 @@ export EXA_API_KEY="your-key"
 export TAVILY_API_KEY="your-key"
 ```
 
-配置文件位于 `~/.kaijibot/kaijibot.json`，支持热重载。认知系统可通过 `cognitive.enabled: false` 关闭。详细配置参考 `AGENTS.md`。
+配置文件位于 `~/.kaijibot/kaijibot.json`，支持热重载。认知层总开关 `cognitive.enabled` 默认开启；其中主动推送 `cognitive.proactive.enabled` 和任务系统 `cognitive.tasks.enabled` 默认关闭，需要显式设为 `true`。设为 `cognitive.enabled: false` 会关闭整个认知层。详细配置参考 `AGENTS.md`。
 
 ## 与 OpenClaw 的关系
 

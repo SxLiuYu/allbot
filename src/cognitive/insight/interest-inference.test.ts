@@ -195,6 +195,24 @@ describe("buildInterestInferencePrompt", () => {
     expect(prompt).toContain("rust");
   });
 
+  it("localizes candidate query examples for English personas", () => {
+    const persona = makePersona({
+      identity: {
+        ...makePersona().identity,
+        primaryLanguage: "en",
+      },
+    });
+    const prompt = buildInterestInferencePrompt(persona, makeInput(), "extend");
+
+    expect(prompt).toContain("latest release OR breakthrough OR launch");
+    expect(prompt).not.toContain("新进展 OR 突破 OR 发布");
+  });
+
+  it("keeps Chinese candidate query examples for Chinese personas", () => {
+    const prompt = buildInterestInferencePrompt(makePersona(), makeInput(), "extend");
+    expect(prompt).toContain("新进展 OR 突破 OR 发布");
+  });
+
   it("handles persona with empty domains gracefully", () => {
     const persona = makePersona({
       domains: {},

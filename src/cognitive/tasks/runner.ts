@@ -2,6 +2,9 @@ import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { TaskStore } from "./store.js";
 import {
   clampText,
+  DEFAULT_MAX_CONCURRENT_PER_USER,
+  DEFAULT_MAX_CONCURRENT_TASKS,
+  isTerminalTaskStatus,
   TASK_RESULT_MAX_CHARS,
   TASK_SUMMARY_MAX_CHARS,
   type TaskRecord,
@@ -43,6 +46,10 @@ export type TaskRunnerDeps = {
    */
   onTaskTerminal?: (task: TaskRecord) => Promise<void> | void;
   now?: () => number;
+  /** Concurrent drives allowed per (agentId, userId). Default 1. */
+  maxConcurrentPerUser?: number;
+  /** Global concurrent-drive ceiling across all users. */
+  maxConcurrent?: number;
 };
 
 /**
@@ -59,7 +66,16 @@ export type TaskRunnerDeps = {
  */
 export class TaskRunner {
   private readonly deps: TaskRunnerDeps;
-  private running = false;
+  /**
+   * In-flight ticks per `agentId/userId` plus a global count. One user's slow
+   * step no longer blocks other users (the old single boolean serialized the
+   * whole process), while each user still runs at most
+   * `maxConcurrentPerUser` drives and the process keeps a global ceiling.
+   */
+  private readonly activeByUser = new Map<string, number>();
+  private activeTotal = 0;
+  /** Tasks currently being driven by this runner instance. */
+  private readonly liveTaskIds = new Set<string>();
 
   constructor(deps: TaskRunnerDeps) {
     this.deps = deps;
@@ -71,35 +87,59 @@ export class TaskRunner {
 
   /**
    * Claim the oldest queued task, or a running task left behind by a crash.
-   * Atomic claim via store.update under the scoped lock.
+   * Atomic claim via store.update under the scoped lock. A task already being
+   * driven by this instance is skipped, so concurrent drives for one user
+   * (maxConcurrentPerUser > 1) never double-run a task; a `running` record
+   * not in the live set comes from a crashed process and is resumed.
    */
   private async claimNext(agentId: string, userId: string): Promise<TaskRecord | undefined> {
     const tasks = await this.deps.store.list(agentId, userId);
     const runnable = tasks
       .filter((t) => t.status === "queued" || t.status === "running")
       .toSorted((a, b) => a.createdAt - b.createdAt);
-    const candidate = runnable[0];
-    if (!candidate) {
+    if (runnable.length === 0) {
       return undefined;
     }
-    const claimed = await this.deps.store.update(agentId, userId, candidate.id, (task) => {
-      if (task.status !== "queued" && task.status !== "running") {
-        // Lost the claim race; caller re-reads.
-        return task;
+    for (const candidate of runnable) {
+      // Reserved synchronously inside the store's lock, so two claim attempts
+      // racing on the same record cannot both win.
+      let reserved = false;
+      let claimed: TaskRecord | undefined;
+      try {
+        claimed = await this.deps.store.update(agentId, userId, candidate.id, (task) => {
+          if (task.status !== "queued" && task.status !== "running") {
+            // Lost the claim race; caller re-reads.
+            return task;
+          }
+          if (task.status === "running" && this.liveTaskIds.has(task.id)) {
+            // Owned by a drive already running in this process.
+            return task;
+          }
+          reserved = true;
+          this.liveTaskIds.add(task.id);
+          return {
+            ...task,
+            status: "running",
+            budget: {
+              ...task.budget,
+              startedAt: task.budget.startedAt ?? this.now(),
+            },
+          };
+        });
+      } catch (err) {
+        if (reserved) {
+          this.liveTaskIds.delete(candidate.id);
+        }
+        throw err;
       }
-      return {
-        ...task,
-        status: "running",
-        budget: {
-          ...task.budget,
-          startedAt: task.budget.startedAt ?? this.now(),
-        },
-      };
-    });
-    if (!claimed || (claimed.status !== "running" && claimed.status !== "queued")) {
-      return undefined;
+      if (reserved && claimed?.status === "running") {
+        return claimed;
+      }
+      if (reserved) {
+        this.liveTaskIds.delete(candidate.id);
+      }
     }
-    return claimed;
+    return undefined;
   }
 
   private budgetExceeded(task: TaskRecord): { reason: "steps" | "wallclock" } | undefined {
@@ -130,12 +170,24 @@ export class TaskRunner {
         .filter((s) => s.status === "ok")
         .map((s) => s.summary)
         .join("\n\n") || "无已完成步骤";
-    const halted = await this.deps.store.update(agentId, userId, task.id, (current) => ({
-      ...current,
-      status: "halted",
-      result: clampText(partial, TASK_RESULT_MAX_CHARS),
-    }));
+    const halted = await this.deps.store.update(agentId, userId, task.id, (current) =>
+      isTerminalTaskStatus(current.status)
+        ? current
+        : {
+            ...current,
+            status: "halted" as const,
+            result: clampText(partial, TASK_RESULT_MAX_CHARS),
+          },
+    );
     const finalTask = halted ?? task;
+    if (finalTask.status !== "halted") {
+      // A cancel (or another terminal transition) won the race.
+      log.info("task not halted; status changed concurrently", {
+        taskId: task.id,
+        status: finalTask.status,
+      });
+      return finalTask;
+    }
     await this.deps.deliver(finalTask, `${message}\n\n部分进展：\n${clampText(partial, 2000)}`);
     log.info("task halted", { taskId: task.id, reason, steps: finalTask.budget.usedSteps });
     await this.notifyTerminal(finalTask);
@@ -157,6 +209,22 @@ export class TaskRunner {
   private async drive(agentId: string, userId: string, task: TaskRecord): Promise<void> {
     let current = task;
     for (;;) {
+      // Cancellation is checked before every step: re-read the persisted
+      // record (cancelTask writes it) so a queued/running task stops at the
+      // next boundary. The claim guard already excludes cancelled tasks.
+      const latest = await this.deps.store.get(agentId, userId, current.id);
+      if (!latest) {
+        return;
+      }
+      if (latest.status === "cancelled") {
+        log.info("task cancelled before step", {
+          taskId: current.id,
+          steps: latest.budget.usedSteps,
+        });
+        return;
+      }
+      current = latest;
+
       const exceeded = this.budgetExceeded(current);
       if (exceeded) {
         await this.halt(agentId, userId, current, exceeded.reason);
@@ -198,29 +266,58 @@ export class TaskRunner {
       }
       current = updated;
 
+      // A cancel that landed while the step was running wins over the step's
+      // outcome: never flip a cancelled task to done/failed.
+      if (updated.status === "cancelled") {
+        log.info("task cancelled during step", { taskId: current.id, step: stepIndex });
+        return;
+      }
+
       if (outcome.error) {
         const message = `任务「${current.goal}」第 ${stepIndex} 步失败：${step.error ?? "unknown error"}`;
-        const failed = await this.deps.store.update(agentId, userId, current.id, (t) => ({
-          ...t,
-          status: "failed",
-          result: clampText(message, TASK_RESULT_MAX_CHARS),
-        }));
-        await this.deps.deliver(failed ?? current, message);
+        const failed = await this.deps.store.update(agentId, userId, current.id, (t) =>
+          isTerminalTaskStatus(t.status)
+            ? t
+            : {
+                ...t,
+                status: "failed" as const,
+                result: clampText(message, TASK_RESULT_MAX_CHARS),
+              },
+        );
+        if (!failed || failed.status !== "failed") {
+          log.info("step failure not recorded; task status changed concurrently", {
+            taskId: current.id,
+            status: failed?.status ?? "missing",
+          });
+          return;
+        }
+        await this.deps.deliver(failed, message);
         log.warn("task step failed", { taskId: current.id, step: stepIndex });
-        await this.notifyTerminal(failed ?? current);
+        await this.notifyTerminal(failed);
         return;
       }
 
       if (outcome.done) {
         const message = `任务完成「${current.goal}」：\n${step.summary}`;
-        const doneTask = await this.deps.store.update(agentId, userId, current.id, (t) => ({
-          ...t,
-          status: "done",
-          result: clampText(step.summary, TASK_RESULT_MAX_CHARS),
-        }));
-        await this.deps.deliver(doneTask ?? current, message);
+        const doneTask = await this.deps.store.update(agentId, userId, current.id, (t) =>
+          isTerminalTaskStatus(t.status)
+            ? t
+            : {
+                ...t,
+                status: "done" as const,
+                result: clampText(step.summary, TASK_RESULT_MAX_CHARS),
+              },
+        );
+        if (!doneTask || doneTask.status !== "done") {
+          log.info("step completion not recorded; task status changed concurrently", {
+            taskId: current.id,
+            status: doneTask?.status ?? "missing",
+          });
+          return;
+        }
+        await this.deps.deliver(doneTask, message);
         log.info("task done", { taskId: current.id, steps: current.budget.usedSteps });
-        await this.notifyTerminal(doneTask ?? current);
+        await this.notifyTerminal(doneTask);
         return;
       }
 
@@ -252,13 +349,21 @@ export class TaskRunner {
 
   /**
    * One scheduler pass: drive at most `maxTasksPerTick` tasks to terminal
-   * state. Re-entrancy guarded (a slow tick must not stack with the next).
+   * state. Concurrent ticks are allowed for different users; for the same
+   * user a tick that finds the user already running returns 0 immediately
+   * (the next scheduled pass picks the queue up), so one slow step cannot
+   * stack duplicate drives. The global ceiling bounds total in-flight work.
    */
   async tick(agentId: string, userId: string, maxTasksPerTick = 1): Promise<number> {
-    if (this.running) {
+    const userKey = `${agentId}/${userId}`;
+    const perUserLimit = this.deps.maxConcurrentPerUser ?? DEFAULT_MAX_CONCURRENT_PER_USER;
+    const globalLimit = this.deps.maxConcurrent ?? DEFAULT_MAX_CONCURRENT_TASKS;
+    const perUserActive = this.activeByUser.get(userKey) ?? 0;
+    if (perUserActive >= perUserLimit || this.activeTotal >= globalLimit) {
       return 0;
     }
-    this.running = true;
+    this.activeByUser.set(userKey, perUserActive + 1);
+    this.activeTotal += 1;
     let progressed = 0;
     try {
       while (progressed < maxTasksPerTick) {
@@ -266,11 +371,21 @@ export class TaskRunner {
         if (!claimed) {
           break;
         }
-        await this.drive(agentId, userId, claimed);
+        try {
+          await this.drive(agentId, userId, claimed);
+        } finally {
+          this.liveTaskIds.delete(claimed.id);
+        }
         progressed++;
       }
     } finally {
-      this.running = false;
+      const remaining = (this.activeByUser.get(userKey) ?? 1) - 1;
+      if (remaining <= 0) {
+        this.activeByUser.delete(userKey);
+      } else {
+        this.activeByUser.set(userKey, remaining);
+      }
+      this.activeTotal -= 1;
     }
     return progressed;
   }

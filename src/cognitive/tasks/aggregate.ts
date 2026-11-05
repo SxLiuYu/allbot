@@ -47,11 +47,18 @@ export async function aggregateOnTaskTerminal(
     ...(task.result ? { result: task.result } : {}),
   }));
 
-  await deps.store.update(child.parentAgentId, child.userId, parent.id, (t) => ({
-    ...t,
-    status: "queued",
-    subtaskResults,
-  }));
+  // Guard inside the mutation: a cancel can land between the read above and
+  // this write, and a cancelled parent must never be resurrected to queued.
+  const released = await deps.store.update(child.parentAgentId, child.userId, parent.id, (t) =>
+    t.status === "blocked" ? { ...t, status: "queued", subtaskResults } : t,
+  );
+  if (!released || released.status !== "queued") {
+    log.info("parent no longer blocked; subtask results not released", {
+      parentTaskId: parent.id,
+      status: released?.status ?? "missing",
+    });
+    return "none";
+  }
   await deps.wakeParent?.({
     agentId: child.parentAgentId,
     userId: child.userId,

@@ -236,6 +236,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           insights.push(candidate);
+          return true;
         },
         savePersona: async () => {},
       },
@@ -274,7 +275,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
       makeSchedulerConfig(),
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: generator, fragmentStore: isolatedFragmentStore },
@@ -320,7 +321,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
       makeSchedulerConfig(),
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: generator, fragmentStore: isolatedFragmentStore },
@@ -360,7 +361,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
       makeSchedulerConfig(),
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: generator, fragmentStore: isolatedFragmentStore },
@@ -412,7 +413,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
       makeSchedulerConfig(),
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: generator, fragmentStore: isolatedFragmentStore },
@@ -453,6 +454,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           delivered.push(candidate);
+          return true;
         },
         savePersona: async () => {},
       },
@@ -472,7 +474,7 @@ describe.skipIf(process.env.CI)("insight pipeline integration", () => {
     const persona = makePersona();
     const scheduler = new ProactiveScheduler(makeSchedulerConfig(), {
       loadPersona: async () => persona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 

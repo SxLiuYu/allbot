@@ -447,7 +447,7 @@ describe.skipIf(!isLive || !ZAI_API_KEY)(
           makeSchedulerConfig(),
           {
             loadPersona: async () => persona,
-            onInsightReady: async () => {},
+            onInsightReady: async () => true,
             savePersona: async () => {},
           },
           { insightGenerator: unifiedGenerator, fragmentStore },

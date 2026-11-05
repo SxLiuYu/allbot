@@ -1,13 +1,31 @@
-import { describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 
-vi.mock("../../cognitive/evolution/skill-writer.js", () => ({
-  SkillPersistenceWriter: vi.fn().mockImplementation(() => ({
-    removeSkill: vi.fn().mockResolvedValue(true),
-    listSkills: vi.fn().mockResolvedValue([]),
-  })),
+const { mockRemove } = vi.hoisted(() => ({
+  mockRemove: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("../../cognitive/evolution/skill-writer.js", () => ({
+  SkillPersistenceWriter: class {
+    removeSkill = mockRemove;
+    listSkills = vi.fn().mockResolvedValue([]);
+  },
+}));
+
+vi.mock("../../cognitive/evolution/audit-log.js", () => ({
+  AuditLog: class {
+    append = vi.fn().mockResolvedValue({});
+  },
+}));
+
+function statusOf(result: { details?: unknown }): unknown {
+  return (result.details as { status?: unknown } | undefined)?.status;
+}
+
 describe("createEvolutionDeleteTool", () => {
+  beforeEach(() => {
+    mockRemove.mockClear();
+  });
+
   it("returns null when cognitive is disabled", async () => {
     const { createEvolutionDeleteTool } = await import("./evolution-delete-tool.js");
     const tool = createEvolutionDeleteTool({ config: { cognitive: { enabled: false } } as never });
@@ -29,29 +47,73 @@ describe("createEvolutionDeleteTool", () => {
     expect(tool!.name).toBe("delete_skill");
   });
 
-  it("deletes a skill and returns status", async () => {
+  it("deletes a skill when the host supplies a matching user confirmation", async () => {
     const { createEvolutionDeleteTool } = await import("./evolution-delete-tool.js");
-    const tool = createEvolutionDeleteTool({ config: {} as never });
-    const result = await tool!.execute("test-call", { name: "test-skill", confirm: true } as never);
-    expect(result.content).toBeDefined();
+    const tool = createEvolutionDeleteTool({
+      config: {} as never,
+      getUserConfirmation: () => ({
+        confirmationId: "user-confirmed-1",
+        skillName: "test-skill",
+      }),
+    });
+    const result = await tool!.execute("test-call", { name: "test-skill" } as never);
+
+    expect(statusOf(result)).toBe("deleted");
+    expect(mockRemove).toHaveBeenCalledWith("test-skill");
   });
 
-  it("refuses deletion when confirm is false", async () => {
+  it("refuses deletion without a host confirmation, even if the model passes confirm:true", async () => {
     const { createEvolutionDeleteTool } = await import("./evolution-delete-tool.js");
     const tool = createEvolutionDeleteTool({ config: {} as never });
     const result = await tool!.execute("test-call", {
       name: "test-skill",
-      confirm: false,
+      confirm: true,
     } as never);
-    const text = JSON.stringify(result);
-    expect(text).toContain("confirm");
+
+    expect(statusOf(result)).toBe("confirm_required");
+    expect(mockRemove).not.toHaveBeenCalled();
   });
 
-  it("refuses deletion when confirm is missing", async () => {
+  it("refuses deletion when the confirmation is for a different skill", async () => {
     const { createEvolutionDeleteTool } = await import("./evolution-delete-tool.js");
-    const tool = createEvolutionDeleteTool({ config: {} as never });
+    const tool = createEvolutionDeleteTool({
+      config: {} as never,
+      getUserConfirmation: () => ({
+        confirmationId: "user-confirmed-2",
+        skillName: "other-skill",
+      }),
+    });
     const result = await tool!.execute("test-call", { name: "test-skill" } as never);
-    const text = JSON.stringify(result);
-    expect(text).toContain("confirm");
+
+    expect(statusOf(result)).toBe("confirm_required");
+    expect(mockRemove).not.toHaveBeenCalled();
+  });
+
+  it("refuses deletion when the confirmation id is empty", async () => {
+    const { createEvolutionDeleteTool } = await import("./evolution-delete-tool.js");
+    const tool = createEvolutionDeleteTool({
+      config: {} as never,
+      getUserConfirmation: () => ({ confirmationId: "  ", skillName: "test-skill" }),
+    });
+    const result = await tool!.execute("test-call", { name: "test-skill" } as never);
+
+    expect(statusOf(result)).toBe("confirm_required");
+    expect(mockRemove).not.toHaveBeenCalled();
+  });
+
+  it("refuses deletion when the confirmation has expired", async () => {
+    const { createEvolutionDeleteTool } = await import("./evolution-delete-tool.js");
+    const tool = createEvolutionDeleteTool({
+      config: {} as never,
+      getUserConfirmation: () => ({
+        confirmationId: "user-confirmed-3",
+        skillName: "test-skill",
+        expiresAt: Date.now() - 1000,
+      }),
+    });
+    const result = await tool!.execute("test-call", { name: "test-skill" } as never);
+
+    expect(statusOf(result)).toBe("confirm_required");
+    expect(mockRemove).not.toHaveBeenCalled();
   });
 });

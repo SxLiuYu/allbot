@@ -3,7 +3,7 @@ export type CognitiveConfig = {
   enabled?: boolean;
   /** Proactive behavior settings */
   proactive?: {
-    /** Allow proactive pushes (default: true) */
+    /** Allow proactive pushes (default: false) */
     enabled?: boolean;
     /** Minimum interval between proactive pushes in hours (default: 0.5) */
     minIntervalHours?: number;
@@ -52,6 +52,10 @@ export type CognitiveConfig = {
     inferenceModel?: string;
     /** Output language for generated insights (default: "zh"). Auto-detected from persona if omitted. */
     outputLanguage?: string;
+    /** Max LLM calls per insight delivery (default: 3). Caps cost per delivered insight. */
+    maxLlmCallsPerDelivery?: number;
+    /** Max candidate insights generated per event (default: 2). */
+    maxCandidatesPerEvent?: number;
     /** Use LLM-as-Judge to verify pattern-mode insights (default: true). */
     patternVerification?: boolean;
     /** Use LLM to check semantic novelty after trigram dedup passes (default: true). */
@@ -59,16 +63,22 @@ export type CognitiveConfig = {
   };
   /** Cognitive task system — unattended multi-step task execution */
   tasks?: {
-    /** Enable the task system (default: true). Task creation is rejected when disabled. */
+    /** Enable the task system (default: false). Task creation is rejected when disabled. */
     enabled?: boolean;
     /** Default step ceiling per task (default: 12). Reaching it halts the task. */
     maxSteps?: number;
     /**
      * Send a short chat message after each non-terminal task step
-     * (default: true). Chat-first progress visibility — most users never see
+     * (default: false). Chat-first progress visibility — most users never see
      * the Control UI. Terminal outcomes always deliver regardless.
      */
     progressMessages?: boolean;
+    /** Max sub-tasks a single task may spawn (default: 3). */
+    maxSubTasks?: number;
+    /** Max nesting depth for sub-tasks (default: 3). */
+    maxTaskDepth?: number;
+    /** Max tasks running concurrently per user (default: 1). */
+    maxConcurrentPerUser?: number;
   };
   /** Feedback settings (reserved — currently unused by runtime; feedback is collected implicitly by default) */
   feedback?: {
@@ -83,6 +93,8 @@ export type CognitiveConfig = {
     enabled?: boolean;
     /** Override model for quality gate judge (format: "provider/model"). When set, the judge uses a different model than the draft generator, reducing self-scoring bias. */
     qualityGateModel?: string;
+    /** Require explicit approval before an evolved skill is written (default: true). */
+    requireApproval?: boolean;
   };
   /** Correction memory settings */
   correction?: {

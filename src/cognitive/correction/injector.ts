@@ -1,8 +1,12 @@
 import { jaccardSimilarity, tokenize } from "../../infra/text-similarity.js";
 import { L, pickLocalized, type CognitiveLocale } from "../cognitive-locale.js";
+import { sanitizeUserFacingField } from "./store.js";
 import type { CorrectionRecord } from "./types.js";
 
 export const MAX_INJECTED_CORRECTIONS = 15;
+
+/** Hard cap on the rendered corrections block, including the section header. */
+export const MAX_INJECTED_PROMPT_CHARS = 4000;
 
 const MIN_SUBSTRING_LEN = 4;
 
@@ -87,12 +91,30 @@ export function formatCorrectionsPrompt(
     })
     .slice(0, MAX_INJECTED_CORRECTIONS);
 
-  const lines = ["## Known Corrections", pickLocalized(SECTION_HEADER, locale), ""];
+  const header = ["## Known Corrections", pickLocalized(SECTION_HEADER, locale)].join("\n");
 
-  for (let i = 0; i < sorted.length; i++) {
-    const c = sorted[i]!;
-    lines.push(`${i + 1}. [${c.trigger}] ${c.mistake} → ${c.correction}`);
+  // Records arrive already sanitized in normal flow, but legacy files on disk
+  // and direct callers are not guaranteed to be. Sanitize at render time too so
+  // a poisoned field cannot reach the system prompt.
+  const body: string[] = [];
+  let totalChars = header.length;
+  for (const c of sorted) {
+    const line = `${body.length + 1}. [${sanitizeUserFacingField(c.trigger)}] ${sanitizeUserFacingField(
+      c.mistake,
+    )} → ${sanitizeUserFacingField(c.correction)}`;
+    const nextTotal = totalChars + 1 + line.length;
+    if (nextTotal > MAX_INJECTED_PROMPT_CHARS) {
+      // Higher-weight records were considered first, so skipping an oversized
+      // one never displaces a more relevant correction.
+      continue;
+    }
+    body.push(line);
+    totalChars = nextTotal;
   }
 
-  return lines.join("\n");
+  if (body.length === 0) {
+    return "";
+  }
+
+  return [header, ...body].join("\n");
 }

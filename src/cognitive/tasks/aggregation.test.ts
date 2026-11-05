@@ -174,8 +174,11 @@ describe("parent aggregation (M3-R3)", () => {
     await new Promise((r) => setTimeout(r, 50));
     // The child's agent turn: report done.
     const { createTaskStepReportTool } = await import("../../agents/tools/task-tool.js");
-    const report = createTaskStepReportTool();
-    await report.execute("child-report", {
+    const childReport = createTaskStepReportTool({
+      sessionKey: "agent:researcher:ou_alice",
+      agentId: "researcher",
+    });
+    await childReport.execute("child-report", {
       taskId: child!.id,
       stepIndex: 1,
       summary: "子任务结论：X",
@@ -198,7 +201,11 @@ describe("parent aggregation (M3-R3)", () => {
     expect(stepPrompt?.text).toContain("子任务结果");
     expect(stepPrompt?.text).toContain("子任务结论：X");
     expect(stepPrompt?.text).toContain("/tmp/ws/");
-    await report.execute("parent-report", {
+    const parentReport = createTaskStepReportTool({
+      sessionKey: "agent:main:ou_alice",
+      agentId: "main",
+    });
+    await parentReport.execute("parent-report", {
       taskId: parent!.id,
       stepIndex: 1,
       summary: "汇总：结合子任务结论 X，任务完成",
@@ -211,5 +218,32 @@ describe("parent aggregation (M3-R3)", () => {
     expect(final?.result).toContain("汇总");
     const resultDelivery = deliveries.find((d) => d.includes("需要拆分的任务"));
     expect(resultDelivery).toContain("汇总");
+  });
+
+  it("never resurrects a cancelled parent when its last subtask finishes", async () => {
+    const parent = await store.create("main", "ou_alice", { goal: "被取消的父任务" });
+    await store.update("main", "ou_alice", parent.id, (t) => ({ ...t, status: "blocked" }));
+    const child = await store.create("researcher", "ou_alice", {
+      goal: "唯一子任务",
+      parentTaskId: parent.id,
+      parentAgentId: "main",
+    });
+    // Cancellation lands while the child is still running.
+    await store.update("main", "ou_alice", parent.id, (t) => ({
+      ...t,
+      status: "cancelled",
+      result: "任务已取消",
+    }));
+    const doneChild = await store.update("researcher", "ou_alice", child.id, (t) => ({
+      ...t,
+      status: "done",
+      result: "子任务完成",
+    }));
+
+    expect(await aggregator()(doneChild!)).toBe("none");
+    const stillCancelled = await store.get("main", "ou_alice", parent.id);
+    expect(stillCancelled?.status).toBe("cancelled");
+    expect(stillCancelled?.subtaskResults).toBeUndefined();
+    expect(wakes).toHaveLength(0);
   });
 });

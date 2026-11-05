@@ -4,9 +4,17 @@ import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { PersonaTree } from "../types.js";
 import { evaluateTaskCreationGate } from "./pacing.js";
 import type { TaskStore, CreateTaskInput } from "./store.js";
-import type { TaskRecord } from "./types.js";
+import {
+  clampText,
+  DEFAULT_MAX_SUBTASKS,
+  DEFAULT_MAX_TASK_DEPTH,
+  isTerminalTaskStatus,
+  TASK_RESULT_MAX_CHARS,
+  type TaskRecord,
+} from "./types.js";
 
 const log = createSubsystemLogger("cognitive/tasks");
+const TASK_CANCELLED_RESULT = "任务已取消";
 
 /** Both the cognitive master switch and the tasks flag must be on. */
 export function tasksEnabled(cfg: KaijiBotConfig | undefined): boolean {
@@ -22,7 +30,58 @@ export function tasksEnabled(cfg: KaijiBotConfig | undefined): boolean {
 
 export type CreateTaskResult =
   | { ok: true; task: TaskRecord }
-  | { ok: false; code: "disabled" | "pacing_vetoed" | "unknown_agent"; reason: string };
+  | {
+      ok: false;
+      code:
+        | "disabled"
+        | "pacing_vetoed"
+        | "unknown_agent"
+        | "parent_not_found"
+        | "max_depth_exceeded"
+        | "max_subtasks_exceeded";
+      reason: string;
+    };
+
+export type CancelTaskResult =
+  | { ok: true; task: TaskRecord }
+  | { ok: false; code: "not_found" | "already_finished"; reason: string };
+
+function taskLimits(config: KaijiBotConfig | undefined): {
+  maxTaskDepth: number;
+  maxSubTasks: number;
+} {
+  return {
+    maxTaskDepth: config?.cognitive?.tasks?.maxTaskDepth ?? DEFAULT_MAX_TASK_DEPTH,
+    maxSubTasks: config?.cognitive?.tasks?.maxSubTasks ?? DEFAULT_MAX_SUBTASKS,
+  };
+}
+
+/**
+ * Depth of a task in its parent chain (root = 1). Returns undefined when the
+ * chain cannot be resolved (unknown id) and stops walking past maxDepth so a
+ * corrupt cyclic chain cannot loop forever.
+ */
+async function resolveTaskDepth(
+  store: TaskStore,
+  userId: string,
+  taskId: string,
+  maxDepth: number,
+): Promise<number | undefined> {
+  let depth = 0;
+  let cursor: string | undefined = taskId;
+  while (cursor) {
+    const found = await store.findTaskAcrossAgents(userId, cursor);
+    if (!found) {
+      return undefined;
+    }
+    depth += 1;
+    if (depth > maxDepth) {
+      return depth;
+    }
+    cursor = found.task.parentTaskId;
+  }
+  return depth;
+}
 
 export type TaskServiceDeps = {
   store: TaskStore;
@@ -90,6 +149,38 @@ export async function createTaskSafely(
     }
   }
 
+  const limits = taskLimits(deps.config);
+  if (input.parentTaskId) {
+    const parentDepth = await resolveTaskDepth(
+      deps.store,
+      userId,
+      input.parentTaskId,
+      limits.maxTaskDepth,
+    );
+    if (parentDepth === undefined) {
+      return {
+        ok: false,
+        code: "parent_not_found",
+        reason: `parent task ${input.parentTaskId} not found for user ${userId}`,
+      };
+    }
+    if (parentDepth + 1 > limits.maxTaskDepth) {
+      return {
+        ok: false,
+        code: "max_depth_exceeded",
+        reason: `subtask depth ${parentDepth + 1} exceeds maxTaskDepth ${limits.maxTaskDepth}`,
+      };
+    }
+    const siblings = await deps.store.listSubtasks(userId, input.parentTaskId);
+    if (siblings.length >= limits.maxSubTasks) {
+      return {
+        ok: false,
+        code: "max_subtasks_exceeded",
+        reason: `parent task ${input.parentTaskId} already has ${siblings.length} subtasks (max ${limits.maxSubTasks})`,
+      };
+    }
+  }
+
   const maxSteps = input.maxSteps ?? deps.config?.cognitive?.tasks?.maxSteps;
   const ownerAgentId = targetAgentId ?? agentId;
   const task = await deps.store.create(ownerAgentId, userId, {
@@ -117,4 +208,45 @@ export async function createTaskSafely(
     ...(targetAgentId ? { assignedBy: agentId } : {}),
   });
   return { ok: true, task };
+}
+
+/**
+ * User-initiated cancellation. The runner re-checks the persisted status
+ * before every step, so a running task stops advancing at the next boundary
+ * and a queued task is never claimed.
+ *
+ * Idempotent for an already-cancelled task; finished tasks are left alone.
+ */
+export async function cancelTask(
+  store: TaskStore,
+  agentId: string,
+  userId: string,
+  taskId: string,
+): Promise<CancelTaskResult> {
+  const updated = await store.update(agentId, userId, taskId, (task) => {
+    if (isTerminalTaskStatus(task.status)) {
+      return task;
+    }
+    return {
+      ...task,
+      status: "cancelled",
+      result: clampText(TASK_CANCELLED_RESULT, TASK_RESULT_MAX_CHARS),
+    };
+  });
+  if (!updated) {
+    return {
+      ok: false,
+      code: "not_found",
+      reason: `task ${taskId} not found for ${agentId}/${userId}`,
+    };
+  }
+  if (updated.status !== "cancelled") {
+    return {
+      ok: false,
+      code: "already_finished",
+      reason: `task ${taskId} is already ${updated.status}`,
+    };
+  }
+  log.info("task cancelled", { agentId, userId, taskId });
+  return { ok: true, task: updated };
 }

@@ -1979,7 +1979,9 @@ describe("drainFormattedSystemEvents", () => {
       });
 
       expect(expectedTimestamp).toBeDefined();
-      expect(result).toContain(`System: [${expectedTimestamp}] Model switched.`);
+      expect(result).toContain(
+        `System (untrusted): [${expectedTimestamp}] <untrusted_source>Model switched.</untrusted_source>`,
+      );
     } finally {
       resetSystemEventsForTest();
       vi.useRealTimers();

@@ -48,7 +48,11 @@ function makePersona(overrides: Partial<PersonaTree["feedbackProfile"]> = {}): P
   };
 }
 
-function makeInsight(overrides: Partial<InsightRecord> = {}): InsightRecord {
+type InsightWithGateSnapshot = InsightRecord & {
+  gateSnapshot?: { pAccept: number } | null;
+};
+
+function makeInsight(overrides: Partial<InsightWithGateSnapshot> = {}): InsightWithGateSnapshot {
   return {
     id: "insight-test",
     generatedAt: 1000,
@@ -282,6 +286,46 @@ describe("processInsightFeedback", () => {
     expect(pb["pattern:3"].alpha).toBe(3);
     expect(pb["seed:3"]).toBeUndefined();
   });
+
+  it("records calibration with the insight's gate snapshot pAccept", () => {
+    const persona = makePersona();
+    const insight = makeInsight({ gateSnapshot: { pAccept: 0.82 } });
+
+    const result = processInsightFeedback(persona, insight, "positive");
+
+    expect(result.calibrationHistory).toHaveLength(1);
+    expect(result.calibrationHistory[0]).toMatchObject({
+      insightId: "insight-test",
+      predictedPAccept: 0.82,
+      actualOutcome: "positive",
+    });
+  });
+
+  it("falls back to 0.5 when the insight has no gate snapshot", () => {
+    const persona = makePersona();
+    const insight = makeInsight();
+
+    const result = processInsightFeedback(persona, insight, "negative");
+
+    expect(result.calibrationHistory[0]!.predictedPAccept).toBe(0.5);
+  });
+
+  it("ignores an invalid gate snapshot and falls back to 0.5", () => {
+    const persona = makePersona();
+    const insight = makeInsight({ gateSnapshot: { pAccept: Number.NaN } });
+
+    const result = processInsightFeedback(persona, insight, "engaged");
+
+    expect(result.calibrationHistory[0]!.predictedPAccept).toBe(0.5);
+  });
+
+  it("clamps an out-of-range gate pAccept into [0, 1]", () => {
+    const insight = makeInsight({ gateSnapshot: { pAccept: 1.4 } });
+
+    const result = processInsightFeedback(makePersona(), insight, "positive");
+
+    expect(result.calibrationHistory[0]!.predictedPAccept).toBe(1);
+  });
 });
 
 describe("processInsightDeliverySignal", () => {
@@ -336,6 +380,18 @@ describe("processNoResponse", () => {
     // bandits untouched
     expect(result.feedbackProfile.topicBandits).toEqual(persona.feedbackProfile.topicBandits);
     expect(result.feedbackProfile.modeBandits).toBeUndefined();
+  });
+
+  it("records a no_response calibration sample even without context", () => {
+    const persona = makePersona({ lastProactiveAt: 777 });
+
+    const result = processNoResponse(persona);
+
+    expect(result.calibrationHistory[0]).toMatchObject({
+      insightId: "no-response:777",
+      predictedPAccept: 0.5,
+      actualOutcome: "no_response",
+    });
   });
 
   it("with domains — existing bandits get beta += 0.3", () => {
@@ -403,6 +459,7 @@ describe("processNoResponse", () => {
     expect(persona.feedbackProfile.topicBandits).toEqual(origBandits);
     expect(persona.feedbackProfile.topicBandits["AI/机器学习"]).toBe(origAIRef);
     expect(persona.feedbackProfile.modeBandits).toBeUndefined();
+    expect(persona.calibrationHistory).toEqual([]);
   });
 
   it("always increments consecutiveNoResponses regardless of context", () => {
@@ -429,6 +486,70 @@ describe("processNoResponse", () => {
     // mode bandit created
     expect(result.feedbackProfile.modeBandits!["extend"]!.beta).toBeCloseTo(1.2);
     expect(result.feedbackProfile.consecutiveNoResponses).toBe(1);
+  });
+
+  it("writes a no_response calibration sample using the gate snapshot", () => {
+    const persona = makePersona({
+      lastProactiveAt: 1_700_000_000_000,
+      recentInsightIds: ["insight-42"],
+    });
+    const ctx: NoResponseContext = {
+      previousDomains: ["AI/机器学习"],
+      gateSnapshot: { pAccept: 0.72 },
+    };
+
+    const result = processNoResponse(persona, ctx);
+
+    expect(result.calibrationHistory).toHaveLength(1);
+    expect(result.calibrationHistory[0]).toMatchObject({
+      insightId: "insight-42",
+      predictedPAccept: 0.72,
+      actualOutcome: "no_response",
+    });
+  });
+
+  it("prefers an explicit insightId in the context", () => {
+    const persona = makePersona({ recentInsightIds: ["older-insight"] });
+
+    const result = processNoResponse(persona, {
+      previousDomains: [],
+      insightId: "insight-7",
+      gateSnapshot: { pAccept: 0.4 },
+    });
+
+    expect(result.calibrationHistory[0]).toMatchObject({
+      insightId: "insight-7",
+      predictedPAccept: 0.4,
+    });
+  });
+
+  it("derives a stable id from lastProactiveAt and falls back to 0.5 without a snapshot", () => {
+    const persona = makePersona({ lastProactiveAt: 1234 });
+
+    const result = processNoResponse(persona, { previousDomains: [] });
+
+    expect(result.calibrationHistory[0]).toMatchObject({
+      insightId: "no-response:1234",
+      predictedPAccept: 0.5,
+      actualOutcome: "no_response",
+    });
+  });
+
+  it("keeps at most 50 calibration records when appending silence samples", () => {
+    const seed = Array.from({ length: 50 }, (_, i) => ({
+      insightId: `seed-${i}`,
+      predictedPAccept: 0.5,
+      actualOutcome: "positive" as const,
+      timestamp: i,
+    }));
+    const persona = makePersona();
+    persona.calibrationHistory = seed;
+
+    const result = processNoResponse(persona, { previousDomains: [] });
+
+    expect(result.calibrationHistory).toHaveLength(50);
+    expect(result.calibrationHistory[0]?.insightId).toBe("seed-1");
+    expect(result.calibrationHistory.at(-1)?.actualOutcome).toBe("no_response");
   });
 });
 
@@ -551,6 +672,38 @@ describe("extractImplicitSignals with previousTopics", () => {
     ]);
 
     expect(signals.some((s) => s.type === "question_depth")).toBe(false);
+  });
+});
+
+describe("extractImplicitSignals responseLatencyMs", () => {
+  it("accepts a real latency through the named-options form", () => {
+    const signals = extractImplicitSignals("hello", {
+      responseLatencyMs: 12_000,
+      topic: "AI/机器学习",
+    });
+
+    const latency = signals.find((s) => s.type === "response_latency");
+    expect(latency?.value).toBe(12_000);
+    expect(latency?.topic).toBe("AI/机器学习");
+  });
+
+  it("still accepts the legacy positional latency argument", () => {
+    const signals = extractImplicitSignals("hello", 5_000, "AI/机器学习");
+
+    expect(signals.find((s) => s.type === "response_latency")?.value).toBe(5_000);
+  });
+
+  it("ignores a non-finite or negative latency", () => {
+    expect(
+      extractImplicitSignals("hello", { responseLatencyMs: Number.NaN }).some(
+        (s) => s.type === "response_latency",
+      ),
+    ).toBe(false);
+    expect(
+      extractImplicitSignals("hello", { responseLatencyMs: -1 }).some(
+        (s) => s.type === "response_latency",
+      ),
+    ).toBe(false);
   });
 });
 

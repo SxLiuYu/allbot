@@ -1,3 +1,4 @@
+import { getRuntimeConfigSnapshot } from "../../config/runtime-snapshot.js";
 import type { PersonaTree } from "../types.js";
 import type { SchedulerEvent } from "./types.js";
 
@@ -25,6 +26,8 @@ import type { SchedulerEvent } from "./types.js";
 
 export const MIN_SEND_GAP_H = 1;
 export const CONVERSATIONAL_WINDOW_H = 2;
+/** Fallback when cognitive.proactive.activeHours.timezone is unset/invalid. */
+export const DEFAULT_PACING_TIMEZONE = "Asia/Shanghai";
 const DAY_MS = 24 * 3_600_000;
 const HR_MS = 3_600_000;
 
@@ -33,10 +36,74 @@ export type PacingVerdict = {
   reason: string;
 };
 
+const dayFormatterCache = new Map<string, Intl.DateTimeFormat | null>();
+
+function getDayFormatter(timezone: string): Intl.DateTimeFormat | null {
+  const cached = dayFormatterCache.get(timezone);
+  if (cached !== undefined) {
+    return cached;
+  }
+  let formatter: Intl.DateTimeFormat | null = null;
+  try {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  } catch {
+    formatter = null;
+  }
+  dayFormatterCache.set(timezone, formatter);
+  return formatter;
+}
+
+/**
+ * Calendar-day ordinal in `timezone` (days since 1970-01-01 local). Two
+ * instants share a value iff they fall on the same local calendar date, so
+ * the budget resets at local midnight instead of UTC midnight.
+ *
+ * Computing via calendar parts (not a fixed UTC offset) keeps the boundary
+ * correct for zones with DST. Invalid zone ids fall back to
+ * DEFAULT_PACING_TIMEZONE.
+ */
+export function localDayIndex(nowMs: number, timezone: string = DEFAULT_PACING_TIMEZONE): number {
+  const trimmed = timezone.trim();
+  const requested = trimmed.length > 0 ? trimmed : DEFAULT_PACING_TIMEZONE;
+  const formatter =
+    getDayFormatter(requested) ?? getDayFormatter(DEFAULT_PACING_TIMEZONE) ?? undefined;
+  if (!formatter) {
+    // Extremely old ICU without Asia/Shanghai — degrade to UTC rather than throw.
+    return Math.floor(nowMs / DAY_MS);
+  }
+  const parts = formatter.formatToParts(new Date(nowMs));
+  let year = 0;
+  let month = 0;
+  let day = 0;
+  for (const part of parts) {
+    if (part.type === "year") {
+      year = Number(part.value);
+    } else if (part.type === "month") {
+      month = Number(part.value);
+    } else if (part.type === "day") {
+      day = Number(part.value);
+    }
+  }
+  return Math.floor(Date.UTC(year, month - 1, day) / DAY_MS);
+}
+
+function pacingTimezone(): string {
+  const configured = getRuntimeConfigSnapshot()?.cognitive?.proactive?.activeHours?.timezone?.trim();
+  if (!configured) {
+    return DEFAULT_PACING_TIMEZONE;
+  }
+  return getDayFormatter(configured) ? configured : DEFAULT_PACING_TIMEZONE;
+}
+
 function dayIndex(ts: number): number {
-  // UTC-anchored day boundary (= 08:00 Asia/Shanghai): budget resets before
-  // the morning activity window, and activeHours keeps nights quiet anyway.
-  return Math.floor(ts / DAY_MS);
+  // Local-day boundary from activeHours.timezone so a calendar day cannot
+  // receive two batches (UTC midnight = 08:00 Asia/Shanghai did exactly that).
+  return localDayIndex(ts, pacingTimezone());
 }
 
 /**
@@ -64,6 +131,21 @@ export function bumpDailySend(persona: PersonaTree, now: number): void {
     return;
   }
   persona.feedbackProfile.dailySendCount = (persona.feedbackProfile.dailySendCount ?? 0) + 1;
+}
+
+/**
+ * Release one send from the daily budget after a delivery that looked accepted
+ * at enqueue time was rejected by the channel. Only decrements when the
+ * counter still belongs to the day of the original send.
+ */
+export function releaseDailySend(persona: PersonaTree, sentAt: number): void {
+  if (persona.feedbackProfile.dailySendAnchorDay !== dayIndex(sentAt)) {
+    return;
+  }
+  const count = persona.feedbackProfile.dailySendCount ?? 0;
+  if (count > 0) {
+    persona.feedbackProfile.dailySendCount = count - 1;
+  }
 }
 
 /**

@@ -2,12 +2,15 @@ import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from "vite
 import { isDuplicateBySemanticOverlap } from "../insight/content-similarity.js";
 import { buildSearchQuery } from "../insight/llm-engine.js";
 import type { InsightCandidate } from "../insight/types.js";
+import type { DecisionLedger, LedgerEntry } from "../ledger/index.js";
 import { createDefaultPersona } from "../persona/store.js";
 import type { PersonaTree } from "../types.js";
+import { localDayIndex } from "./delivery-pacing.js";
 import {
   ProactiveScheduler,
   filterBlacklistedOpportunities,
   isTopicStale,
+  mixUserSeed,
 } from "./proactive-scheduler.js";
 import type { SchedulerConfig, Opportunity } from "./types.js";
 
@@ -88,6 +91,45 @@ const highThresholdConfig: SchedulerConfig = {
   costFalseAlarm: 100,
 };
 
+function makeLedgerRecorder(): { ledger: DecisionLedger; entries: LedgerEntry[] } {
+  const entries: LedgerEntry[] = [];
+  return {
+    entries,
+    ledger: {
+      async record(entry) {
+        entries.push(entry);
+      },
+      async listRecent() {
+        return [];
+      },
+    },
+  };
+}
+
+function reEngagementPersona(now: number): PersonaTree {
+  const persona = personaWithDomains();
+  persona.lifecycle.lastActiveAt = now - 11 * 24 * 3600_000;
+  persona.feedbackProfile.lastProactiveAt = now - 11 * 24 * 3600_000;
+  persona.feedbackProfile.consecutiveNoResponses = 0;
+  persona.feedbackProfile.lastReEngageAttemptAt = 0;
+  return persona;
+}
+
+function deliveredInsight(id = "ledger-insight"): InsightCandidate {
+  return {
+    id,
+    content: "Ledger delivery test insight",
+    rationale: "test",
+    targetDomains: ["AI/机器学习"],
+    sourceDomains: [],
+    relevanceScore: 0.8,
+    surpriseScore: 0.5,
+    compositeScore: 0.65,
+    sources: [{ url: "https://example.com", title: "Test", credibility: 0.5 }],
+    verificationStatus: "unverified",
+  };
+}
+
 function makeScheduler(
   schedulerConfig: SchedulerConfig = config,
   persona?: PersonaTree,
@@ -99,7 +141,7 @@ function makeScheduler(
     schedulerConfig,
     {
       loadPersona: async () => persona ?? personaWithDomains(),
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     },
     {
@@ -114,7 +156,7 @@ describeDet("ProactiveScheduler", () => {
   it("returns undefined when persona not found", async () => {
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => undefined,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -135,7 +177,7 @@ describeDet("ProactiveScheduler", () => {
 
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => persona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -161,7 +203,7 @@ describeDet("ProactiveScheduler", () => {
     const savedLedger: number[] = [];
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => persona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async (_agentId, _userId, p) => {
         savedLedger.push(p.feedbackProfile.consecutiveNoResponses ?? -1);
       },
@@ -196,7 +238,7 @@ describeDet("ProactiveScheduler", () => {
     const savedLedger: number[] = [];
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => persona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async (_agentId, _userId, p) => {
         savedLedger.push(p.feedbackProfile.consecutiveNoResponses ?? -1);
       },
@@ -231,6 +273,7 @@ describeDet("ProactiveScheduler", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           capturedCandidates.push(candidate);
+          return true;
         },
         savePersona: async (_agentId, _userId, p) => {
           savedPersona = p;
@@ -584,7 +627,7 @@ describeDet("ProactiveScheduler", () => {
     );
   });
 
-  it("applies exponential cooldown backoff after repeated resolve failures", async () => {
+  it("does not start the in-process cooldown after resolve failures", async () => {
     const persona = personaWithDomains();
     persona.feedbackProfile.consecutiveResolveFailures = 4;
 
@@ -604,10 +647,53 @@ describeDet("ProactiveScheduler", () => {
     await scheduler.processEvent("user1", { type: "timer", timestamp: t0 }, "main");
     expect(persona.feedbackProfile.consecutiveResolveFailures).toBe(5);
 
-    // 1h later: with failures=5 the backoff factor is 2^3 = 8 → 4h cooldown,
-    // so this event must be skipped before the candidate loop.
+    // No send happened, so no cooldown: the next event still runs the
+    // candidate loop and increments the failure counter again.
     await scheduler.processEvent("user1", { type: "timer", timestamp: t0 + 60 * 60_000 }, "main");
-    expect(persona.feedbackProfile.consecutiveResolveFailures).toBe(5);
+    expect(persona.feedbackProfile.consecutiveResolveFailures).toBe(6);
+  });
+
+  it("starts the in-process cooldown only after a successful send", async () => {
+    const persona = personaWithDomains();
+    let generateCount = 0;
+
+    const fakeInsight: InsightCandidate = {
+      id: "cooldown-ok",
+      content: "Cooldown test insight",
+      rationale: "test",
+      targetDomains: ["AI/机器学习"],
+      sourceDomains: [],
+      relevanceScore: 0.8,
+      surpriseScore: 0.5,
+      compositeScore: 0.65,
+      sources: [{ url: "https://example.com", title: "Test", credibility: 0.5 }],
+      verificationStatus: "unverified",
+    };
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      {
+        insightGenerator: async () => {
+          generateCount++;
+          return [fakeInsight];
+        },
+      },
+    );
+
+    const t0 = Date.now();
+    await scheduler.processEvent("user1", { type: "timer", timestamp: t0 }, "main");
+    const countAfterSend = generateCount;
+    expect(countAfterSend).toBeGreaterThan(0);
+
+    persona.feedbackProfile.awaitingDeliveryConfirmation = null;
+    await scheduler.processEvent("user1", { type: "timer", timestamp: t0 + 60 * 60_000 }, "main");
+    // minIntervalHours=4 → still inside the cooldown; no second generation.
+    expect(generateCount).toBe(countAfterSend);
   });
 
   it("backfills the dedup window from listRecentInsightContents", async () => {
@@ -719,7 +805,7 @@ describeDet("ProactiveScheduler", () => {
   it("start and stop do not throw", async () => {
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => personaWithDomains(),
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -732,7 +818,7 @@ describeDet("ProactiveScheduler", () => {
   it("stop is idempotent", async () => {
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => undefined,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -754,7 +840,7 @@ describeDet("ProactiveScheduler", () => {
         }
         return personaWithDomains();
       },
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -781,7 +867,7 @@ describeDet("ProactiveScheduler", () => {
         goodProcessed!();
         return personaWithDomains();
       },
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -800,7 +886,7 @@ describeDet("ProactiveScheduler", () => {
         processedUsers.push(userId);
         return personaWithDomains();
       },
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -833,6 +919,7 @@ describeDet("ProactiveScheduler", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           capturedCandidates.push(candidate);
+          return true;
         },
         savePersona: async () => {},
       },
@@ -870,6 +957,7 @@ describeDet("ProactiveScheduler", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           capturedCandidates.push(candidate);
+          return true;
         },
         savePersona: async () => {},
       },
@@ -916,7 +1004,7 @@ describeDet("ProactiveScheduler", () => {
         config,
         {
           loadPersona: async () => JSON.parse(JSON.stringify(iterPersona)) as PersonaTree,
-          onInsightReady: async () => {},
+          onInsightReady: async () => true,
           savePersona: async () => {},
         },
         { insightGenerator: async () => [fakeInsight] },
@@ -1132,7 +1220,7 @@ describe("ProactiveScheduler.identify", () => {
   });
 
   it("penalizes dormant domains and boosts revived domains via InterestPhase", () => {
-    const scheduler = makeScheduler(config);
+    const scheduler = makeScheduler({ ...config, maxCandidatesPerEvent: 5 });
     const persona = createDefaultPersona();
     persona.rapport.trustScore = 0.8;
     persona.domains = {
@@ -1333,7 +1421,7 @@ describeDet("ProactiveScheduler pipeline integration", () => {
 
     const scheduler = new ProactiveScheduler(config, {
       loadPersona: async () => emptyPersona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -1353,7 +1441,7 @@ describeDet("ProactiveScheduler pipeline integration", () => {
     const persona = personaWithDomains();
     const scheduler = new ProactiveScheduler(highThresholdConfig, {
       loadPersona: async () => persona,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -1375,7 +1463,7 @@ describeDet("ProactiveScheduler pipeline integration", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -1602,7 +1690,7 @@ describeDet("ProactiveScheduler — semantic dedup", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: async () => [fakeInsight] },
@@ -1642,7 +1730,7 @@ describeDet("ProactiveScheduler — semantic dedup", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: async () => [fakeInsight] },
@@ -1680,7 +1768,7 @@ describeDet("ProactiveScheduler — semantic dedup", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: async () => [fakeInsight] },
@@ -1720,7 +1808,7 @@ describeDet("ProactiveScheduler — semantic dedup", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersona = p;
         },
@@ -1763,7 +1851,7 @@ describeDet("ProactiveScheduler — semantic dedup", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: async () => [fakeInsight] },
@@ -2299,7 +2387,7 @@ describeDet("Push fatigue", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersona = p;
         },
@@ -2533,7 +2621,7 @@ describeDet("6-cycle integration test — all fixes together", () => {
         integrationConfig,
         {
           loadPersona: async () => currentPersona,
-          onInsightReady: async () => {},
+          onInsightReady: async () => true,
           savePersona: async (_agentId, _userId, p) => {
             savedPersona = p;
           },
@@ -2609,7 +2697,7 @@ describeDet("6-cycle integration test — all fixes together", () => {
         integrationConfig,
         {
           loadPersona: async () => currentPersona,
-          onInsightReady: async () => {},
+          onInsightReady: async () => true,
           savePersona: async (_agentId, _userId, p) => {
             savedPersona = p;
           },
@@ -2742,8 +2830,8 @@ describeDet("6-cycle integration test — all fixes together", () => {
 // Fix 2: attemptedDomains persisted when insight killed by dedup
 // ---------------------------------------------------------------------------
 
-describeDet("processEvent — attemptedDomains persistence on dedup kill", () => {
-  it("saves persona with attemptedDomains when resolve returns null", async () => {
+describeDet("processEvent — attempted-domain rollback on resolve failure", () => {
+  it("rolls back the attempted domain when resolve returns null", async () => {
     const persona = personaWithDomains();
     let savedPersona: PersonaTree | undefined;
 
@@ -2751,7 +2839,7 @@ describeDet("processEvent — attemptedDomains persistence on dedup kill", () =>
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersona = p;
         },
@@ -2770,11 +2858,12 @@ describeDet("processEvent — attemptedDomains persistence on dedup kill", () =>
 
     expect(result).toBeUndefined();
     expect(savedPersona).toBeDefined();
-    expect(savedPersona!.feedbackProfile.recentInsightDomains!.length).toBeGreaterThan(0);
+    expect(savedPersona!.feedbackProfile.recentInsightDomains).toEqual([]);
   });
 
-  it("saves persona when resolve returns null for all candidates", async () => {
+  it("leaves no attempted domains after every candidate fails", async () => {
     const persona = personaWithDomains();
+    persona.feedbackProfile.recentInsightDomains = [["Rust"]];
 
     let savedPersona: PersonaTree | undefined;
 
@@ -2782,7 +2871,7 @@ describeDet("processEvent — attemptedDomains persistence on dedup kill", () =>
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersona = p;
         },
@@ -2801,7 +2890,8 @@ describeDet("processEvent — attemptedDomains persistence on dedup kill", () =>
 
     expect(result).toBeUndefined();
     expect(savedPersona).toBeDefined();
-    expect(savedPersona!.feedbackProfile.recentInsightDomains!.length).toBeGreaterThan(0);
+    // Previous history survives; the failed attempt's append does not.
+    expect(savedPersona!.feedbackProfile.recentInsightDomains).toEqual([["Rust"]]);
   });
 });
 
@@ -2882,7 +2972,7 @@ describeDet("processEvent — pre-gen freshness fallback", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -2935,7 +3025,7 @@ describeDet("processEvent — pre-gen freshness fallback", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -3112,6 +3202,7 @@ describeDet("processEvent per-user queue", () => {
         loadPersona: async () => personaSnapshot,
         onInsightReady: async () => {
           executionOrder.push("delivered");
+          return true;
         },
         savePersona: async (_agentId, _userId, persona) => {
           personaSnapshot = persona;
@@ -3172,7 +3263,7 @@ describeDet("processEvent per-user queue", () => {
           }
           return undefined;
         },
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -3251,7 +3342,7 @@ describeDet("insight hallucination gates", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -3375,7 +3466,7 @@ describeDet("insight hallucination gates", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -3455,7 +3546,7 @@ describeDet("insight hallucination gates", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -3528,6 +3619,7 @@ describeDet("insight hallucination gates", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           deliveredCandidates.push(candidate);
+          return true;
         },
         savePersona: async () => {},
       },
@@ -3572,7 +3664,7 @@ describeDet("insight hallucination gates", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -3703,6 +3795,7 @@ describeDet("insight hallucination gates", () => {
         loadPersona: async () => persona,
         onInsightReady: async (_agentId, _userId, candidate) => {
           deliveredCandidates.push(candidate);
+          return true;
         },
         savePersona: async () => {},
       },
@@ -3847,7 +3940,7 @@ describeDet("resolve loop: all modes triggered (no starvation)", () => {
         { ...config, epsilonGreedy: 1.0 },
         {
           loadPersona: async () => persona,
-          onInsightReady: async () => {},
+          onInsightReady: async () => true,
           savePersona: async () => {},
         },
         {
@@ -3901,6 +3994,7 @@ describeDet("resolve loop: all modes triggered (no starvation)", () => {
           loadPersona: async () => persona,
           onInsightReady: async (_a, _u, candidate) => {
             resolvedModes.push(candidate.resolvedMode ?? "unknown");
+            return true;
           },
           savePersona: async () => {},
         },
@@ -4074,7 +4168,7 @@ describeDet("ProactiveScheduler — social ledger lazy transition", () => {
       { ...noResponseConfig, minTrustScore: 1.5 },
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_a, _u, p) => {
           savedPersona = p;
         },
@@ -4099,7 +4193,7 @@ describeDet("ProactiveScheduler — social ledger lazy transition", () => {
       { ...noResponseConfig, minTrustScore: 1.5 },
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_a, _u, p) => {
           savedPersona = p;
         },
@@ -4122,7 +4216,7 @@ describeDet("ProactiveScheduler — social ledger lazy transition", () => {
       { ...noResponseConfig, minTrustScore: 1.5 },
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_a, _u, p) => {
           savedPersona = p;
         },
@@ -4149,7 +4243,7 @@ describeDet("ProactiveScheduler — social ledger lazy transition", () => {
       { ...noResponseConfig, minTrustScore: 1.5 },
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_a, _u, p) => {
           savedPersona = p;
         },
@@ -4171,7 +4265,7 @@ describeDet("ProactiveScheduler — social ledger lazy transition", () => {
       { ...noResponseConfig, minTrustScore: 1.5 },
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_a, _u, p) => {
           savedPersona = p;
         },
@@ -4185,5 +4279,353 @@ describeDet("ProactiveScheduler — social ledger lazy transition", () => {
     const penalizedBeta = savedPersona!.feedbackProfile.topicBandits["AI/机器学习"]!.beta;
     expect(penalizedBeta).toBeGreaterThan(originalBeta);
     expect(savedPersona!.feedbackProfile.modeBandits?.surprise).toBeDefined();
+  });
+});
+
+describeDet("ProactiveScheduler — decision ledger", () => {
+  it("records a veto when the daily budget is exhausted", async () => {
+    const now = Date.now();
+    const persona = personaWithDomains();
+    persona.feedbackProfile.dailySendAnchorDay = localDayIndex(now);
+    persona.feedbackProfile.dailySendCount = 2;
+    const { ledger, entries } = makeLedgerRecorder();
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      { ledger },
+    );
+
+    const result = await scheduler.processEvent("user1", { type: "timer", timestamp: now }, "main");
+
+    expect(result).toBeUndefined();
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.decision).toBe("vetoed");
+    expect(entries[0]!.eventType).toBe("timer");
+    expect(entries[0]!.vetoReasons[0]).toContain("daily budget");
+    expect(entries[0]!.llmCalls).toBe(0);
+  });
+
+  it("records a veto when a previous insight is still awaiting confirmation", async () => {
+    const now = Date.now();
+    const persona = personaWithDomains();
+    persona.feedbackProfile.awaitingDeliveryConfirmation = {
+      candidate: deliveredInsight("awaiting"),
+      opportunityType: "cross_domain",
+      eventTimestamp: now - 5 * 60_000,
+    };
+    const { ledger, entries } = makeLedgerRecorder();
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      { ledger },
+    );
+
+    await scheduler.processEvent("user1", { type: "persona_change", timestamp: now }, "main");
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.eventType).toBe("persona_change");
+    expect(entries[0]!.vetoReasons[0]).toContain("awaiting delivery confirmation");
+  });
+
+  it("records a veto when the stochastic hazard rejects the tick", async () => {
+    const now = Date.now();
+    const persona = personaWithDomains();
+    persona.lifecycle.lastActiveAt = now - 3 * 3600_000;
+    persona.feedbackProfile.lastProactiveAt = now - 2 * 3600_000;
+    persona.feedbackProfile.lastNoResponseAt = undefined;
+    persona.feedbackProfile.optimalFrequencyHours = 100;
+    const { ledger, entries } = makeLedgerRecorder();
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      { ledger },
+    );
+
+    await scheduler.processEvent("hazard-user", { type: "info_scan", timestamp: now }, "main");
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.eventType).toBe("info_scan");
+    expect(entries[0]!.vetoReasons[0]).toContain("hazard draw");
+  });
+
+  it("records a veto when the in-process cooldown is active", async () => {
+    const now = Date.now();
+    const persona = personaWithDomains();
+    const { ledger, entries } = makeLedgerRecorder();
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      { ledger, insightGenerator: async () => [deliveredInsight()] },
+    );
+
+    await scheduler.processEvent("user1", { type: "timer", timestamp: now }, "main");
+    persona.feedbackProfile.awaitingDeliveryConfirmation = null;
+
+    await scheduler.processEvent("user1", { type: "external", timestamp: now + 3600_000 }, "main");
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.eventType).toBe("external");
+    expect(entries[0]!.vetoReasons[0]).toContain("cooldown");
+  });
+
+  it("does not record a delivery attempt when onInsightReady returns non-true", async () => {
+    const now = Date.now();
+    const persona = personaWithDomains();
+    const { ledger, entries } = makeLedgerRecorder();
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: (async () => undefined) as unknown as (
+          agentId: string,
+          userId: string,
+          candidate: InsightCandidate,
+        ) => Promise<boolean>,
+        savePersona: async () => {},
+      },
+      { ledger, insightGenerator: async () => [deliveredInsight("void-delivery")] },
+    );
+
+    const result = await scheduler.processEvent("user1", { type: "timer", timestamp: now }, "main");
+
+    expect(result).toBeUndefined();
+    expect(persona.feedbackProfile.pendingInsightDelivery?.candidate.id).toBe("void-delivery");
+    expect(persona.feedbackProfile.dailySendCount ?? 0).toBe(0);
+    expect(entries).toHaveLength(0);
+  });
+});
+
+describeDet("ProactiveScheduler — re-engagement hard vetoes", () => {
+  it("delivers and persists the attempt before generation, even if resolve fails", async () => {
+    const now = Date.now();
+    const persona = reEngagementPersona(now);
+    let generateCount = 0;
+    let savedPersona: PersonaTree | undefined;
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async (_agentId, _userId, p) => {
+          savedPersona = p;
+        },
+      },
+      {
+        insightGenerator: async () => {
+          generateCount++;
+          return [];
+        },
+      },
+    );
+
+    const result = await scheduler.processEvent(
+      "silent-user",
+      { type: "timer", timestamp: now },
+      "main",
+    );
+
+    expect(result).toBeUndefined();
+    expect(generateCount).toBeGreaterThan(0);
+    expect(savedPersona?.feedbackProfile.lastReEngageAttemptAt).toBe(now);
+  });
+
+  it.each([
+    [
+      "suppression",
+      (persona: PersonaTree, now: number) => {
+        persona.feedbackProfile.suppressUntil = now + 3600_000;
+      },
+    ],
+    [
+      "trust floor",
+      (persona: PersonaTree, _now: number) => {
+        persona.rapport.trustScore = 0.2;
+      },
+    ],
+    [
+      "exchange floor",
+      (persona: PersonaTree, _now: number) => {
+        persona.rapport.totalExchanges = 3;
+      },
+    ],
+  ])("rejects the check-in on %s", async (_label, mutate) => {
+    const now = Date.now();
+    const persona = reEngagementPersona(now);
+    mutate(persona, now);
+    let generateCount = 0;
+
+    const scheduler = new ProactiveScheduler(
+      config,
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      {
+        insightGenerator: async () => {
+          generateCount++;
+          return [];
+        },
+      },
+    );
+
+    const result = await scheduler.processEvent(
+      "silent-user",
+      { type: "timer", timestamp: now },
+      "main",
+    );
+
+    expect(result).toBeUndefined();
+    expect(generateCount).toBe(0);
+    expect(persona.feedbackProfile.lastReEngageAttemptAt).toBe(0);
+  });
+
+  it("rejects the check-in outside active hours", async () => {
+    const now = Date.now();
+    const persona = reEngagementPersona(now);
+    let generateCount = 0;
+
+    const scheduler = new ProactiveScheduler(
+      { ...config, activeHoursStart: "09:00", activeHoursEnd: "10:00" },
+      {
+        loadPersona: async () => persona,
+        onInsightReady: async () => true,
+        savePersona: async () => {},
+      },
+      {
+        insightGenerator: async () => {
+          generateCount++;
+          return [];
+        },
+      },
+    );
+
+    const result = await scheduler.processEvent(
+      "silent-user",
+      { type: "timer", timestamp: now },
+      "main",
+    );
+
+    expect(result).toBeUndefined();
+    expect(generateCount).toBe(0);
+  });
+});
+
+describeDet("ProactiveScheduler — identity-mixed seeds and candidate cap", () => {
+  it("mixes agentId:userId into the random seed", () => {
+    const seed = 1_700_000_005_000;
+    expect(mixUserSeed(seed, "main", "user-a")).not.toBe(mixUserSeed(seed, "main", "user-b"));
+    expect(mixUserSeed(seed, "main", "user-a")).toBe(mixUserSeed(seed, "main", "user-a"));
+  });
+
+  it("defaults identify to 2 candidates", () => {
+    const scheduler = makeScheduler(config);
+    const opportunities: Opportunity[] = [1, 2, 3, 4].map((i) => ({
+      type: "domain_depth" as const,
+      targetDomains: [`D${i}`],
+      sourceDomains: [],
+      pNeed: 0.9,
+      pAccept: 0.9,
+      pAct: 0.81,
+    }));
+
+    expect(scheduler.identify(opportunities)).toHaveLength(2);
+  });
+
+  it("reads the cap from SchedulerConfig when provided", () => {
+    const scheduler = makeScheduler({ ...config, maxCandidatesPerEvent: 3 });
+    const opportunities: Opportunity[] = [1, 2, 3, 4].map((i) => ({
+      type: "domain_depth" as const,
+      targetDomains: [`D${i}`],
+      sourceDomains: [],
+      pNeed: 0.9,
+      pAccept: 0.9,
+      pAct: 0.81,
+    }));
+
+    expect(scheduler.identify(opportunities)).toHaveLength(3);
+  });
+});
+
+describeDet("ProactiveScheduler.start — tick resilience", () => {
+  it("keeps scheduling after listUsers throws once", async () => {
+    let calls = 0;
+    let processed = 0;
+    let resolveSecond: () => void;
+    const secondCall = new Promise<void>((resolve) => {
+      resolveSecond = resolve;
+    });
+    let resolveProcessed: () => void;
+    const processedOnce = new Promise<void>((resolve) => {
+      resolveProcessed = resolve;
+    });
+
+    const scheduler = new ProactiveScheduler(config, {
+      loadPersona: async () => {
+        processed++;
+        resolveProcessed!();
+        return personaWithDomains();
+      },
+      onInsightReady: async () => true,
+      savePersona: async () => {},
+    });
+
+    scheduler.start(async () => {
+      calls++;
+      if (calls === 1) {
+        throw new Error("registry offline");
+      }
+      resolveSecond!();
+      return [{ agentId: "main", userId: "user-a" }];
+    }, 10);
+
+    await Promise.race([
+      Promise.all([secondCall, processedOnce]),
+      new Promise((resolve) => setTimeout(resolve, 500)),
+    ]);
+    scheduler.stop();
+
+    expect(calls).toBeGreaterThanOrEqual(2);
+    expect(processed).toBeGreaterThanOrEqual(1);
+  });
+
+  it("does not schedule another tick after stop", async () => {
+    let calls = 0;
+    const scheduler = new ProactiveScheduler(config, {
+      loadPersona: async () => personaWithDomains(),
+      onInsightReady: async () => true,
+      savePersona: async () => {},
+    });
+
+    scheduler.start(async () => {
+      calls++;
+      return [];
+    }, 10);
+    scheduler.stop();
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(calls).toBe(0);
   });
 });

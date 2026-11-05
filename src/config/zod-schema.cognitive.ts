@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CognitiveProactiveSchema = z
   .object({
-    enabled: z.boolean().default(true),
+    enabled: z.boolean().default(false),
     minIntervalHours: z.number().min(0.5).max(168).default(0.5),
     activeHours: z
       .object({
@@ -43,6 +43,8 @@ export const CognitiveInsightSchema = z
     verificationLevel: z.enum(["basic", "strict", "paranoid"]).optional(),
     inferenceModel: z.string().optional(),
     outputLanguage: z.string().optional(),
+    maxLlmCallsPerDelivery: z.number().min(1).max(100).default(3),
+    maxCandidatesPerEvent: z.number().min(1).max(20).default(2),
   })
   .strict()
   .optional();
@@ -82,14 +84,23 @@ export const CognitiveEvolutionSchema = z
       }
     }
     return val;
-  }, z.object({ enabled: z.boolean().default(true), qualityGateModel: z.string().optional() }).strict())
+  }, z
+    .object({
+      enabled: z.boolean().default(true),
+      qualityGateModel: z.string().optional(),
+      requireApproval: z.boolean().default(true),
+    })
+    .strict())
   .optional();
 
 export const CognitiveTasksSchema = z
   .object({
-    enabled: z.boolean().default(true),
+    enabled: z.boolean().default(false),
     maxSteps: z.number().min(1).max(100).optional(),
-    progressMessages: z.boolean().default(true),
+    progressMessages: z.boolean().default(false),
+    maxSubTasks: z.number().min(1).max(20).default(3),
+    maxTaskDepth: z.number().min(1).max(10).default(3),
+    maxConcurrentPerUser: z.number().min(1).max(20).default(1),
   })
   .strict()
   .optional();

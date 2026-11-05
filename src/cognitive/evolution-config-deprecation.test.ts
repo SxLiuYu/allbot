@@ -17,7 +17,7 @@ describe("CognitiveEvolutionSchema — deprecated field stripping", () => {
       enabled: true,
       clawhubEnabled: true,
     });
-    expect(parsed).toEqual({ enabled: true });
+    expect(parsed).toEqual({ enabled: true, requireApproval: true });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("clawhubEnabled"));
   });
 
@@ -26,7 +26,7 @@ describe("CognitiveEvolutionSchema — deprecated field stripping", () => {
       enabled: false,
       minComplexity: 0.8,
     });
-    expect(parsed).toEqual({ enabled: false });
+    expect(parsed).toEqual({ enabled: false, requireApproval: true });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("minComplexity"));
   });
 
@@ -39,7 +39,7 @@ describe("CognitiveEvolutionSchema — deprecated field stripping", () => {
       clawhubRegistry: "https://example.com",
       clawhubAutoPublish: true,
     });
-    expect(parsed).toEqual({ enabled: true });
+    expect(parsed).toEqual({ enabled: true, requireApproval: true });
     expect(warnSpy).toHaveBeenCalledTimes(5);
   });
 

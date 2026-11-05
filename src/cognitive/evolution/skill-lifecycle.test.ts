@@ -3,7 +3,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
-import { SkillLifecycleManager } from "./skill-lifecycle.js";
+import {
+  resolveEvolutionSkillBaseDir,
+  resolveEvolutionSkillsRoot,
+  SkillLifecycleManager,
+} from "./skill-lifecycle.js";
 import { SkillPersistenceWriter } from "./skill-writer.js";
 import type { SkillDraft } from "./types.js";
 
@@ -29,6 +33,24 @@ beforeEach(() => {
 
 afterEach(() => {
   rmSync(tempDir, { recursive: true, force: true });
+});
+
+describe("resolveEvolutionSkillsRoot", () => {
+  it("falls back to <configDir>/workspace/skills/agent", () => {
+    expect(resolveEvolutionSkillBaseDir({ configDir: "/state" })).toBe(join("/state", "workspace"));
+    expect(resolveEvolutionSkillsRoot({ configDir: "/state" })).toBe(
+      join("/state", "workspace", "skills", "agent"),
+    );
+  });
+
+  it("honors a configured agent workspace", () => {
+    const customWs = join(tmpdir(), "kaijibot-custom-workspace");
+    const config = { agents: { defaults: { workspace: customWs } } } as never;
+    expect(resolveEvolutionSkillBaseDir({ config, agentId: "main" })).toBe(customWs);
+    expect(resolveEvolutionSkillsRoot({ config, agentId: "main" })).toBe(
+      join(customWs, "skills", "agent"),
+    );
+  });
 });
 
 describe("SkillLifecycleManager", () => {

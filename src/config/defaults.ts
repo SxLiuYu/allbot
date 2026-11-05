@@ -379,11 +379,7 @@ export function applyCompactionDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
 
 export function applyCognitiveDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
   const cognitive = cfg.cognitive;
-  if (!cognitive) {
-    return cfg;
-  }
-
-  let mutated = false;
+  let mutated = cognitive === undefined;
   const next = { ...cognitive };
 
   if (next.enabled === undefined) {
@@ -391,93 +387,143 @@ export function applyCognitiveDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
     mutated = true;
   }
 
-  if (next.proactive) {
-    const proactive = { ...next.proactive };
-    if (proactive.enabled === undefined) {
-      proactive.enabled = true;
-      mutated = true;
-    }
-    if (proactive.minIntervalHours === undefined) {
-      proactive.minIntervalHours = 0.5;
-      mutated = true;
-    }
-    if (proactive.maxDailyInsights === undefined) {
-      proactive.maxDailyInsights = 2;
-      mutated = true;
-    }
-    if (mutated) {
-      next.proactive = proactive;
-    }
+  let proactiveMutated = next.proactive === undefined;
+  const proactive = { ...next.proactive };
+  if (proactive.enabled === undefined) {
+    proactive.enabled = false;
+    proactiveMutated = true;
+  }
+  if (proactive.minIntervalHours === undefined) {
+    proactive.minIntervalHours = 0.5;
+    proactiveMutated = true;
+  }
+  if (proactive.maxDailyInsights === undefined) {
+    proactive.maxDailyInsights = 2;
+    proactiveMutated = true;
+  }
+  let activeHoursMutated = proactive.activeHours === undefined;
+  const activeHours = { ...proactive.activeHours };
+  if (activeHours.start === undefined) {
+    activeHours.start = "09:00";
+    activeHoursMutated = true;
+  }
+  if (activeHours.end === undefined) {
+    activeHours.end = "22:00";
+    activeHoursMutated = true;
+  }
+  if (activeHoursMutated) {
+    proactive.activeHours = activeHours;
+    proactiveMutated = true;
+  }
+  if (proactiveMutated) {
+    next.proactive = proactive;
+    mutated = true;
   }
 
+  let tasksMutated = next.tasks === undefined;
   const tasks = { ...next.tasks };
-  if (next.tasks === undefined) {
-    mutated = true;
-  }
   if (tasks.enabled === undefined) {
-    tasks.enabled = true;
-    mutated = true;
+    tasks.enabled = false;
+    tasksMutated = true;
   }
   if (tasks.maxSteps === undefined) {
     tasks.maxSteps = 12;
-    mutated = true;
+    tasksMutated = true;
   }
   if (tasks.progressMessages === undefined) {
-    tasks.progressMessages = true;
-    mutated = true;
+    tasks.progressMessages = false;
+    tasksMutated = true;
   }
-  if (mutated) {
+  if (tasks.maxSubTasks === undefined) {
+    tasks.maxSubTasks = 3;
+    tasksMutated = true;
+  }
+  if (tasks.maxTaskDepth === undefined) {
+    tasks.maxTaskDepth = 3;
+    tasksMutated = true;
+  }
+  if (tasks.maxConcurrentPerUser === undefined) {
+    tasks.maxConcurrentPerUser = 1;
+    tasksMutated = true;
+  }
+  if (tasksMutated) {
     next.tasks = tasks;
+    mutated = true;
   }
 
   if (next.persona) {
+    let personaMutated = false;
     const persona = { ...next.persona };
     if (persona.autoExtract === undefined) {
       persona.autoExtract = true;
-      mutated = true;
+      personaMutated = true;
     }
     if (persona.identityRefreshHours === undefined) {
       persona.identityRefreshHours = 24;
-      mutated = true;
+      personaMutated = true;
     }
-    if (mutated) {
+    if (personaMutated) {
       next.persona = persona;
+      mutated = true;
     }
   }
 
   if (next.insight) {
+    let insightMutated = false;
     const insight = { ...next.insight };
     if (insight.sources) {
+      let sourcesMutated = false;
       const sources = { ...insight.sources };
       if (sources.scanIntervalHours === undefined) {
         sources.scanIntervalHours = 6;
-        mutated = true;
+        sourcesMutated = true;
       }
-      if (mutated) {
+      if (sourcesMutated) {
         insight.sources = sources;
+        insightMutated = true;
       }
     }
     if (insight.verificationLevel === undefined) {
       insight.verificationLevel = "basic";
+      insightMutated = true;
+    }
+    if (insight.maxLlmCallsPerDelivery === undefined) {
+      insight.maxLlmCallsPerDelivery = 3;
+      insightMutated = true;
+    }
+    if (insight.maxCandidatesPerEvent === undefined) {
+      insight.maxCandidatesPerEvent = 2;
+      insightMutated = true;
+    }
+    if (insightMutated) {
+      next.insight = insight;
       mutated = true;
     }
-    if (mutated) {
-      next.insight = insight;
+  }
+
+  if (next.evolution) {
+    const evolution = { ...next.evolution };
+    if (evolution.requireApproval === undefined) {
+      evolution.requireApproval = true;
+      next.evolution = evolution;
+      mutated = true;
     }
   }
 
   if (next.feedback) {
+    let feedbackMutated = false;
     const feedback = { ...next.feedback };
     if (feedback.mechanism === undefined) {
       feedback.mechanism = "emoji";
-      mutated = true;
+      feedbackMutated = true;
     }
     if (feedback.implicitFeedback === undefined) {
       feedback.implicitFeedback = true;
-      mutated = true;
+      feedbackMutated = true;
     }
-    if (mutated) {
+    if (feedbackMutated) {
       next.feedback = feedback;
+      mutated = true;
     }
   }
 

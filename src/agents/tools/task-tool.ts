@@ -62,10 +62,17 @@ const TaskStepReportSchema = Type.Object({
 
 /**
  * Resolves a pending task step (see cognitive/tasks/step-driver.ts). Called
- * by the agent at the end of a task-step turn; stateless — the registry
- * matches on (taskId, stepIndex).
+ * by the agent at the end of a task-step turn; matches on (taskId,
+ * stepIndex) and verifies the reporting turn's session/user/agent owns the
+ * step (a step in another user's task cannot be closed from this session).
  */
-export function createTaskStepReportTool(): AnyAgentTool {
+export function createTaskStepReportTool(
+  deps: {
+    sessionKey?: string;
+    deliveryTo?: string;
+    agentId?: string;
+  } = {},
+): AnyAgentTool {
   return {
     name: "task_step_report",
     label: "Report Task Step",
@@ -80,7 +87,13 @@ export function createTaskStepReportTool(): AnyAgentTool {
         done?: boolean;
         error?: string;
       };
-      const result = reportStepOutcome(params);
+      const userId = resolveCorrectionUserId(deps.sessionKey, deps.deliveryTo);
+      const reporter = {
+        ...(deps.sessionKey ? { sessionKey: deps.sessionKey } : {}),
+        ...(userId ? { userId } : {}),
+        ...(deps.agentId ? { agentId: deps.agentId } : {}),
+      };
+      const result = reportStepOutcome(params, reporter);
       if (!result.delivered) {
         return jsonResult({ status: "no_pending_step", message: result.reason });
       }

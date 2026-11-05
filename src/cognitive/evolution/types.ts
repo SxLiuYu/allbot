@@ -119,3 +119,49 @@ export type SkillMeta = {
 export type DedupCheckResult =
   | { duplicate: false }
   | { duplicate: true; existingName: string; similarity: number };
+
+/**
+ * User-issued confirmation for a mutating evolution action.
+ *
+ * This MUST be injected by the host after the user explicitly confirmed the
+ * action. It is never read from model-supplied tool parameters.
+ */
+export type EvolutionUserConfirmation = {
+  /** Opaque identifier for the user's confirmation event. */
+  confirmationId: string;
+  /** Exact skill name the user confirmed. */
+  skillName: string;
+  /** Epoch ms after which the confirmation is no longer valid. */
+  expiresAt?: number;
+};
+
+/** User decision on a pending evolution draft (approve or reject). */
+export type EvolutionUserDecision = EvolutionUserConfirmation & {
+  action: "approve" | "reject";
+  /** Evolution record ID of the draft the decision applies to. */
+  draftId: string;
+};
+
+/** Returns true when the host-provided confirmation is present, matches the skill, and is unexpired. */
+export function isValidEvolutionConfirmation(
+  confirmation: EvolutionUserConfirmation | undefined,
+  skillName: string,
+  now: number = Date.now(),
+): boolean {
+  if (!confirmation) {
+    return false;
+  }
+  if (
+    typeof confirmation.confirmationId !== "string" ||
+    confirmation.confirmationId.trim() === ""
+  ) {
+    return false;
+  }
+  if (confirmation.skillName !== skillName) {
+    return false;
+  }
+  if (confirmation.expiresAt !== undefined && confirmation.expiresAt <= now) {
+    return false;
+  }
+  return true;
+}

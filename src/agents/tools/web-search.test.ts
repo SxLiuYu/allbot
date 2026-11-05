@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { createEmptyPluginRegistry } from "../../plugins/registry.js";
+import { setActivePluginRegistry } from "../../plugins/runtime.js";
+import { clearActiveRuntimeWebToolsMetadata } from "../../secrets/runtime-web-tools-state.js";
+import { createWebSearchTool } from "./web-search.js";
 import {
   buildUnsupportedSearchFilterResponse,
   isoToPerplexityDate,
@@ -123,5 +127,65 @@ describe("web_search scoped config merge", () => {
       apiKey: "brave-test-key",
       brave: { count: 5, apiKey: "brave-test-key" },
     });
+  });
+});
+
+describe("web_search untrusted output", () => {
+  beforeEach(() => {
+    setActivePluginRegistry(createEmptyPluginRegistry());
+    clearActiveRuntimeWebToolsMetadata();
+  });
+
+  afterEach(() => {
+    setActivePluginRegistry(createEmptyPluginRegistry());
+    clearActiveRuntimeWebToolsMetadata();
+  });
+
+  it("wraps tool output in <untrusted_source> and escapes inner tags", async () => {
+    const registry = createEmptyPluginRegistry();
+    registry.webSearchProviders.push({
+      pluginId: "custom-search",
+      pluginName: "Custom Search",
+      source: "test",
+      provider: {
+        id: "custom",
+        label: "Custom Search",
+        hint: "Custom runtime provider",
+        envVars: ["CUSTOM_SEARCH_API_KEY"],
+        placeholder: "custom-...",
+        signupUrl: "https://example.com/signup",
+        autoDetectOrder: 1,
+        credentialPath: "tools.web.search.custom.apiKey",
+        getCredentialValue: () => "configured",
+        setCredentialValue: () => {},
+        createTool: () => ({
+          description: "custom runtime tool",
+          parameters: {},
+          execute: async () => ({ ok: true, note: "<script>" }),
+        }),
+      },
+    });
+    setActivePluginRegistry(registry);
+
+    const tool = createWebSearchTool({
+      sandboxed: true,
+      runtimeWebSearch: {
+        providerConfigured: "custom",
+        providerSource: "configured",
+        selectedProvider: "custom",
+        selectedProviderKeySource: "config",
+        diagnostics: [],
+      },
+    });
+
+    const result = await tool?.execute?.("call-untrusted-output", {});
+    const text = (result?.content?.[0] as { text?: string } | undefined)?.text ?? "";
+
+    expect(text.startsWith("<untrusted_source>")).toBe(true);
+    expect(text.endsWith("</untrusted_source>")).toBe(true);
+    expect(text).toContain('"provider": "custom"');
+    expect(text).toContain("&lt;script&gt;");
+    expect(text).not.toContain("<script>");
+    expect(result?.details).toMatchObject({ ok: true, provider: "custom" });
   });
 });

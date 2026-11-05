@@ -36,7 +36,7 @@ import { generateSkillDraftLLM } from "./llm-draft-generator.js";
 import { SkillLifecycleManager } from "./skill-lifecycle.js";
 import { SkillPersistenceWriter } from "./skill-writer.js";
 import { EvolutionStore } from "./store.js";
-import type { EvolutionCandidate } from "./types.js";
+import type { EvolutionCandidate, EvolutionUserDecision } from "./types.js";
 
 const { mockRequestHeartbeatNow } = vi.hoisted(() => ({
   mockRequestHeartbeatNow: vi.fn(),
@@ -242,7 +242,7 @@ describe("Phase 3: skill creation pipeline — generate + dedup + save", () => {
     const savedPath = await writer.writeSkill(draft);
 
     expect(existsSync(savedPath)).toBe(true);
-    expect(savedPath).toContain("skills/agent");
+    expect(savedPath).toContain(join("skills", "agent"));
     expect(savedPath).toContain(draft.name);
 
     const content = readFileSync(savedPath, "utf-8");
@@ -462,8 +462,10 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
   it("tool generates skill, saves to disk, returns status=saved", async () => {
     const { createEvolutionSuggestTool } =
       await import("../../agents/tools/evolution-suggest-tool.js");
+    let decision: EvolutionUserDecision | undefined;
     const tool = createEvolutionSuggestTool({
       sessionKey: "agent:main:ou_tool_test_user",
+      getUserDecision: () => decision,
     });
 
     expect(tool).not.toBeNull();
@@ -481,13 +483,27 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
       domain: "feishu-wiki",
     });
 
-    const parsed = extractToolResult(result);
+    // Default flow drafts only; nothing is written until the user approves.
+    const draftResult = extractToolResult(result);
+    expect(draftResult.status).toBe("needs_approval");
+    expect(draftResult.skillName).toBeTruthy();
+    expect(draftResult.savedPath).toBeUndefined();
+    expect((draftResult.description as string).length).toBeGreaterThan(0);
+
+    decision = {
+      action: "approve",
+      draftId: draftResult.draftId as string,
+      confirmationId: "conf-e2e-tool-1",
+      skillName: draftResult.skillName as string,
+    };
+
+    const parsed = extractToolResult(await tool!.execute("tc-1-approve", {}));
     expect(parsed.status).toBe("saved");
     expect(parsed.skillName).toBeTruthy();
-    expect(parsed.savedPath).toContain("skills/agent");
+    expect(parsed.savedPath).toContain(join("skills", "agent"));
     expect((parsed.description as string).length).toBeGreaterThan(0);
 
-    const writer = new SkillPersistenceWriter(toolTempDir);
+    const writer = new SkillPersistenceWriter(join(toolTempDir, "workspace"));
     const names = await writer.listSkillNames();
     expect(names.length).toBeGreaterThanOrEqual(1);
 
@@ -506,21 +522,38 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
     const { createEvolutionSuggestTool } =
       await import("../../agents/tools/evolution-suggest-tool.js");
 
+    let decision: EvolutionUserDecision | undefined;
     const tool = createEvolutionSuggestTool({
       sessionKey: "agent:main:ou_tool_dedup_user",
+      getUserDecision: () => decision,
     });
 
-    await tool!.execute("tc-dedup-1", {
-      taskSummary: "导出飞书多维表格数据到Excel",
-      toolCalls: ["feishu_base_list", "feishu_base_records", "xlsx_create", "xlsx_write"],
-      uniqueToolCount: 4,
-      reasoningTurns: 5,
-      durationMs: 60_000,
-      domain: "feishu-data-export",
-    });
+    const first = extractToolResult(
+      await tool!.execute("tc-dedup-1", {
+        taskSummary: "导出飞书多维表格数据到Excel",
+        toolCalls: ["feishu_base_list", "feishu_base_records", "xlsx_create", "xlsx_write"],
+        uniqueToolCount: 4,
+        reasoningTurns: 5,
+        durationMs: 60_000,
+        domain: "feishu-data-export",
+      }),
+    );
+    expect(first.status).toBe("needs_approval");
+
+    decision = {
+      action: "approve",
+      draftId: first.draftId as string,
+      confirmationId: "conf-e2e-dedup-1",
+      skillName: first.skillName as string,
+    };
+    const approved = extractToolResult(await tool!.execute("tc-dedup-1-approve", {}));
+    expect(approved.status).toBe("saved");
+
+    // Without an injected decision the tool goes back to the draft path.
+    decision = undefined;
 
     const result2 = await tool!.execute("tc-dedup-2", {
-      taskSummary: "批量导出飞书多维表格记录",
+      taskSummary: "导出飞书多维表格数据到Excel",
       toolCalls: ["feishu_base_records", "xlsx_create", "xlsx_write"],
       uniqueToolCount: 3,
       reasoningTurns: 4,
@@ -534,7 +567,7 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
     console.log(`  Status: ${parsed2.status}`);
     console.log(`  ═══════════════════════\n`);
 
-    expect(["saved", "duplicate"]).toContain(parsed2.status);
+    expect(parsed2.status).toBe("duplicate");
   });
 
   it("tool returns no_session when sessionKey has no userId", async () => {
@@ -574,7 +607,7 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
     });
 
     const parsed = extractToolResult(result);
-    expect(parsed.status).toBe("saved");
+    expect(parsed.status).toBe("needs_approval");
     expect(parsed.skillName).toBeTruthy();
   });
 });

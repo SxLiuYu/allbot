@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import fs from "node:fs/promises";
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
+import type { KaijiBotConfig } from "../../config/config.js";
 import {
   ensureContextEnginesInitialized,
   resolveContextEngine,
@@ -108,6 +109,14 @@ import type { EmbeddedPiAgentMeta, EmbeddedPiRunResult } from "./types.js";
 import { createUsageAccumulator, mergeUsageIntoAccumulator } from "./usage-accumulator.js";
 
 type ApiKeyInfo = ResolvedProviderAuth;
+
+/**
+ * `cognitive.evolution.enabled=false` disables evolution signals entirely.
+ * Default is enabled (undefined !== false).
+ */
+export function isCognitiveEvolutionEnabled(config?: KaijiBotConfig): boolean {
+  return config?.cognitive?.evolution?.enabled !== false;
+}
 
 /**
  * Best-effort backfill of sessionKey from sessionId when not explicitly provided.
@@ -1610,7 +1619,10 @@ export async function runEmbeddedPiAgent(
           );
 
           if (!aborted && params.sessionKey && params.config) {
-            if (attempt.toolMetas.length >= 3) {
+            const { resolveAgentIdFromSessionKey } =
+              await import("../../routing/session-key.js");
+            const agentId = resolveAgentIdFromSessionKey(params.sessionKey);
+            if (attempt.toolMetas.length >= 3 && isCognitiveEvolutionEnabled(params.config)) {
               Promise.resolve().then(async () => {
                 try {
                   const { resolveConfigDir } = await import("../../utils.js");
@@ -1623,6 +1635,8 @@ export async function runEmbeddedPiAgent(
                     senderId: params.senderId,
                     started,
                     configDir: resolveConfigDir(),
+                    config: params.config,
+                    agentId,
                   });
                 } catch (err) {
                   log.debug(`evolution hard trigger skipped: ${String(err)}`);
@@ -1637,6 +1651,8 @@ export async function runEmbeddedPiAgent(
                 await trackSkillUsage({
                   toolMetas: attempt.toolMetas,
                   configDir: resolveConfigDir(),
+                  config: params.config,
+                  agentId,
                 });
               } catch (err) {
                 log.debug(`skill usage tracking skipped: ${String(err)}`);

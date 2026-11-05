@@ -18,9 +18,10 @@ const mocks = vi.hoisted(() => ({
   resolveConfigDir: vi.fn(() => ""),
 }));
 
-vi.mock("../../utils.js", () => ({
-  resolveConfigDir: mocks.resolveConfigDir,
-}));
+vi.mock("../../utils.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../utils.js")>();
+  return { ...actual, resolveConfigDir: mocks.resolveConfigDir };
+});
 
 type Captured = { ok: boolean; result?: unknown; error?: { message?: string } };
 
@@ -164,5 +165,44 @@ describe("tasks.list / tasks.get RPC contract (T11)", () => {
     await cognitiveTaskHandlers["tasks.get"]!(missing.opts);
     expect(missing.responses[0]!.ok).toBe(false);
     expect(String(missing.responses[0]!.error?.message)).toContain("not found");
+  });
+
+  it("tasks.cancel resolves the owning agent and persists the cancelled status", async () => {
+    const { TaskStore } = await import("../../cognitive/tasks/store.js");
+    const store = new TaskStore(storeDir);
+    const active = (await store.list("researcher", "ou_rpc")).find(
+      (t) => t.goal === "子任务-researcher",
+    );
+
+    const { opts, responses } = makeOpts({ taskId: active!.id, userId: "ou_rpc" });
+    await cognitiveTaskHandlers["tasks.cancel"]!(opts);
+    expect(responses[0]!.ok).toBe(true);
+    const task = (responses[0]!.result as { task: Record<string, unknown> }).task;
+    expect(task.status).toBe("cancelled");
+    expect(task.agentId).toBe("researcher");
+    expect((await store.get("researcher", "ou_rpc", active!.id))?.status).toBe("cancelled");
+  });
+
+  it("tasks.cancel rejects unknown ids and already-finished tasks", async () => {
+    const { TaskStore } = await import("../../cognitive/tasks/store.js");
+    const store = new TaskStore(storeDir);
+
+    const unknown = makeOpts({ taskId: "task-missing", userId: "ou_rpc" });
+    await cognitiveTaskHandlers["tasks.cancel"]!(unknown.opts);
+    expect(unknown.responses[0]!.ok).toBe(false);
+    expect(String(unknown.responses[0]!.error?.message)).toContain("not found");
+
+    const done = (await store.list("main", "ou_rpc")).find((t) => t.goal === "已完结任务");
+    const finished = makeOpts({ taskId: done!.id, userId: "ou_rpc" });
+    await cognitiveTaskHandlers["tasks.cancel"]!(finished.opts);
+    expect(finished.responses[0]!.ok).toBe(false);
+    expect(String(finished.responses[0]!.error?.message)).toContain("already done");
+  });
+
+  it("tasks.cancel rejects malformed params", async () => {
+    const { opts, responses } = makeOpts({ taskId: "task-x" }); // userId missing
+    await cognitiveTaskHandlers["tasks.cancel"]!(opts);
+    expect(responses[0]!.ok).toBe(false);
+    expect(String(responses[0]!.error?.message)).toContain("invalid tasks.cancel params");
   });
 });

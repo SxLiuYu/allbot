@@ -1530,15 +1530,15 @@ export const FIELD_HELP: Record<string, string> = {
   cognitive:
     "Cognitive layer controls for KaijiBot's proactive AI system: persona modeling, proactive insight delivery, skill self-evolution, and correction memory. Disable this section to revert to a purely reactive assistant.",
   "cognitive.enabled":
-    "Master switch for the entire cognitive layer (default: true). When false, all subsystems are disabled: no proactive insights, no persona extraction, no skill evolution, no correction memory.",
+    "Master switch for the cognitive layer (default: true). When false, cognitive context injection, the proactive scheduler, the task service, correction memory, and evolution tools do not run. Other assistant features are unaffected.",
   "cognitive.proactive":
     "Proactive insight delivery settings controlling when and how KaijiBot initiates outbound messages to the user based on learned patterns and cross-domain connections.",
   "cognitive.proactive.enabled":
-    "Allow proactive insight pushes to the user (default: true). When false, KaijiBot only responds to direct messages and never initiates conversations.",
+    "Allow proactive insight pushes to the user (default: false). When false, KaijiBot only responds to direct messages and never initiates conversations.",
   "cognitive.proactive.minIntervalHours":
     "Minimum hours between proactive pushes per user (default: 0.5). Lower values increase push frequency but risk annoying the user; higher values reduce noise but slow down insight delivery.",
   "cognitive.proactive.activeHours":
-    "Time window during which proactive pushes are allowed. Insights are suppressed outside this window to respect the user's schedule.",
+    'Time window during which proactive pushes are allowed (default: "09:00"–"22:00" host-local time). The defaults are applied even when the cognitive section is omitted, so pushes are never sent outside this window unless it is overridden.',
   "cognitive.proactive.activeHours.start":
     'Start time of the active window in 24h HH:MM format (e.g. "09:00"). Proactive pushes are suppressed before this time.',
   "cognitive.proactive.activeHours.end":
@@ -1546,7 +1546,7 @@ export const FIELD_HELP: Record<string, string> = {
   "cognitive.proactive.activeHours.timezone":
     'Timezone for the active hours window. Accepts "user" (persona-inferred), "local" (host), or an IANA timezone string (e.g. "Asia/Shanghai"). Default: "user".',
   "cognitive.proactive.digestMode":
-    'Reserved for future use. Controls batching of proactive insights: "realtime" (default, send immediately), "daily", or "weekly". Only realtime is currently implemented.',
+    "Deprecated; retained for backward compatibility and not read by any code. Proactive pushes are always realtime.",
   "cognitive.proactive.costFalseAlarm":
     "Cost penalty for sending an insight the user does not value, used by the PRISM gate to balance push frequency against relevance. Higher values make the system more conservative.",
   "cognitive.proactive.costFalseNegative":
@@ -1556,19 +1556,19 @@ export const FIELD_HELP: Record<string, string> = {
   "cognitive.persona":
     "User cognitive model settings controlling how KaijiBot builds and maintains a per-user persona from conversations.",
   "cognitive.persona.autoExtract":
-    "Automatically extract and update user persona from conversations using LLM-driven analysis (default: true). When false, the persona model is frozen and never updates.",
+    "Deprecated; retained for backward compatibility and not read by any code. Persona extraction is not implemented, so setting this has no effect.",
   "cognitive.persona.extractionModel":
     'Lightweight model used for persona extraction (format: "provider/model"). When unset, the main agent model is used. Setting a faster/cheaper model here reduces extraction cost.',
   "cognitive.persona.identityRefreshHours":
-    "Interval in hours between L1 identity memory refresh cycles (default: 24). Lower values refresh more frequently but consume more tokens.",
+    "Deprecated; retained for backward compatibility and not read by any code. L1 identity memory refresh is not implemented, so setting this has no effect.",
   "cognitive.tasks":
     "Unattended multi-step task execution: delegate an outcome and the agent works on it in bounded steps, then reports back. Tasks respect the same pacing gates as proactive insights.",
   "cognitive.tasks.enabled":
-    "Enable the cognitive task system (default: true). When false, task creation is rejected. Only effective when cognitive.enabled is true.",
+    "Enable the cognitive task system (default: false). When false, task creation is rejected. Only effective when cognitive.enabled is true.",
   "cognitive.tasks.maxSteps":
     "Default step ceiling per task (default: 12). A task that reaches this ceiling is halted with a partial-result notification instead of running forever.",
   "cognitive.tasks.progressMessages":
-    "Send a short chat message after each non-terminal task step (default: true). Chat-first progress visibility for users who never open the Control UI. Terminal outcomes (done/failed/halted) always deliver regardless.",
+    "Send a short chat message after each non-terminal task step (default: false). Chat-first progress visibility for users who never open the Control UI. Terminal outcomes (done/failed/halted) always deliver regardless.",
   "cognitive.insight":
     "Insight generation engine settings controlling how cross-domain connections, domain-depth follow-ups, and exploration candidates are produced.",
   "cognitive.insight.inferenceModel":
@@ -1596,7 +1596,7 @@ export const FIELD_HELP: Record<string, string> = {
   "cognitive.feedback":
     "Feedback collection settings (reserved — feedback is currently collected implicitly via reply engagement metrics).",
   "cognitive.feedback.mechanism":
-    'Reserved for future use. Intended feedback mechanism: "emoji", "buttons", or "text". Currently unused — feedback is always implicit.',
+    "Deprecated; retained for backward compatibility and not read by any code. Feedback is always collected implicitly.",
   "cognitive.feedback.implicitFeedback":
     "Collect implicit feedback from user reply patterns such as response length, follow-up questions, and insight-reply attribution (default: true). Set false to disable the entire implicit feedback pipeline.",
   secrets:

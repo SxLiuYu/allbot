@@ -1,3 +1,4 @@
+import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
 import type { Fragment, FragmentCluster } from "../insight/fragment-types.js";
@@ -139,7 +140,7 @@ function makeScheduler(
     config,
     {
       loadPersona: async () => persona ?? personaWithDomains(),
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     },
     {
@@ -210,6 +211,7 @@ describe.skip("Self-refine: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "good",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -233,6 +235,7 @@ describe.skip("Self-refine: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "good",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -256,6 +259,7 @@ describe.skip("Self-refine: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -290,6 +294,7 @@ describe.skip("Self-refine: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -326,6 +331,7 @@ describe.skip("Self-refine: knowledge mode", () => {
       sources: [],
       confidence: 0.7,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -361,6 +367,7 @@ describe.skip("Self-refine: knowledge mode", () => {
       sources: [],
       confidence: 0.7,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -385,6 +392,7 @@ describe.skip("LLM-as-Judge verification (knowledge mode)", () => {
       sources: [],
       confidence: 0.8,
       notes: "good",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -406,6 +414,7 @@ describe.skip("LLM-as-Judge verification (knowledge mode)", () => {
       sources: [],
       confidence: 0.2,
       notes: "generic",
+      approved: false,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -426,6 +435,7 @@ describe.skip("LLM-as-Judge verification (knowledge mode)", () => {
       sources: [],
       confidence: 0.5,
       notes: "decent",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -448,6 +458,7 @@ describe.skip("Pattern-mode LLM judge", () => {
       sources: [],
       confidence: 0.8,
       notes: "good",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -484,6 +495,7 @@ describe.skip("Pattern-mode LLM judge", () => {
       sources: [],
       confidence: 0.8,
       notes: "good behavioral observation",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -505,6 +517,7 @@ describe.skip("Pattern-mode LLM judge", () => {
       sources: [],
       confidence: 0.5,
       notes: "ok",
+      approved: true,
     });
 
     const config: SchedulerConfig = { minIntervalHours: 4, minTrustScore: 0.3 };
@@ -512,7 +525,7 @@ describe.skip("Pattern-mode LLM judge", () => {
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -541,7 +554,7 @@ describe.skip("Constructor: new parameters accepted", () => {
       baseConfig,
       {
         loadPersona: async () => undefined,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       deps,
@@ -553,7 +566,7 @@ describe.skip("Constructor: new parameters accepted", () => {
   it("works without llmDeps (backward compatible)", () => {
     const scheduler = new ProactiveScheduler(baseConfig, {
       loadPersona: async () => undefined,
-      onInsightReady: async () => {},
+      onInsightReady: async () => true,
       savePersona: async () => {},
     });
 
@@ -646,6 +659,7 @@ describe.skip("LLM freshness check: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -669,6 +683,7 @@ describe.skip("LLM freshness check: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -689,6 +704,7 @@ describe.skip("LLM freshness check: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(config, persona, {
@@ -709,6 +725,7 @@ describe.skip("LLM freshness check: knowledge mode", () => {
       sources: [],
       confidence: 0.8,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -786,6 +803,7 @@ describe.skip("LLM freshness check: pattern mode", () => {
       sources: [],
       confidence: 0.5,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(baseConfig, persona, {
@@ -806,6 +824,7 @@ describe.skip("LLM freshness check: pattern mode", () => {
       sources: [],
       confidence: 0.5,
       notes: "ok",
+      approved: true,
     });
 
     const scheduler = makeScheduler(config, persona, {
@@ -816,5 +835,209 @@ describe.skip("LLM freshness check: pattern mode", () => {
 
     expect(result).not.toBeNull();
     expect(mockedFreshness).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Runnable coverage for the new llm-engine judge / refine behaviour.
+// The suites above remain skipped because they exercise scheduler paths that
+// are not part of the insight-engine change; these tests call the real engine.
+// ---------------------------------------------------------------------------
+
+const ENGINE_TEST_MODEL: Model<Api> = {
+  id: "test-model",
+  name: "Test Model",
+  api: "openai-completions",
+  provider: "test",
+  baseUrl: "http://localhost:11434/v1",
+  reasoning: false,
+  input: ["text"],
+  cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+  contextWindow: 128000,
+  maxTokens: 4096,
+};
+
+const ENGINE_TEST_AUTH = { apiKey: "test-key", source: "test", mode: "api-key" as const };
+
+function engineMessage(text: string): AssistantMessage {
+  return {
+    role: "assistant",
+    content: [{ type: "text", text }],
+    api: "openai-completions",
+    provider: "test",
+    model: "test-model",
+    usage: {
+      input: 10,
+      output: 20,
+      cacheRead: 0,
+      cacheWrite: 0,
+      totalTokens: 30,
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+    },
+    stopReason: "stop",
+    timestamp: Date.now(),
+  };
+}
+
+async function actualEngine() {
+  return vi.importActual<typeof import("../insight/llm-engine.js")>("../insight/llm-engine.js");
+}
+
+describe("New engine logic: merged judge, approved gate, fail-closed novelty, single refine round", () => {
+  it("serves novelty and verification with one judge call", async () => {
+    const engine = await actualEngine();
+    const candidate = makeCandidate();
+    const complete = vi.fn().mockResolvedValue(
+      engineMessage(
+        JSON.stringify({
+          approved: true,
+          novel: true,
+          confidence: 0.85,
+          status: "verified",
+          reasons: ["specific", "new angle"],
+          notes: "ok",
+        }),
+      ),
+    );
+    const deps: LlmInsightDeps = {
+      complete,
+      prepareModel: async () => ({ model: ENGINE_TEST_MODEL, auth: ENGINE_TEST_AUTH }),
+    };
+
+    const freshness = await engine.checkSemanticNoveltyWithLLM(
+      candidate,
+      ["past one", "past two"],
+      fakeBotConfig,
+      deps,
+      undefined,
+      personaWithDomains(),
+    );
+    const verification = await engine.verifyInsightWithLLM(
+      candidate,
+      personaWithDomains(),
+      fakeBotConfig,
+      deps,
+    );
+
+    expect(complete).toHaveBeenCalledTimes(1);
+    expect(freshness.isNovel).toBe(true);
+    expect(verification.approved).toBe(true);
+    expect(verification.status).toBe("verified");
+  });
+
+  it("downgrades approved=false even when the model reports high confidence", async () => {
+    const engine = await actualEngine();
+    const deps: LlmInsightDeps = {
+      complete: async () =>
+        engineMessage(
+          JSON.stringify({
+            approved: false,
+            confidence: 0.99,
+            status: "verified",
+            notes: "not for this user",
+          }),
+        ),
+      prepareModel: async () => ({ model: ENGINE_TEST_MODEL, auth: ENGINE_TEST_AUTH }),
+    };
+
+    const verification = await engine.verifyInsightWithLLM(
+      makeCandidate(),
+      personaWithDomains(),
+      fakeBotConfig,
+      deps,
+    );
+
+    expect(verification.approved).toBe(false);
+    expect(verification.status).toBe("unverified");
+  });
+
+  it("fails closed when the novelty judge is unavailable", async () => {
+    const engine = await actualEngine();
+    const deps: LlmInsightDeps = {
+      complete: async () => {
+        throw new Error("judge down");
+      },
+      prepareModel: async () => ({ model: ENGINE_TEST_MODEL, auth: ENGINE_TEST_AUTH }),
+    };
+
+    const freshness = await engine.checkSemanticNoveltyWithLLM(
+      makeCandidate(),
+      ["past one", "past two"],
+      fakeBotConfig,
+      deps,
+    );
+
+    expect(freshness.isNovel).toBe(false);
+    expect(freshness.reason).toContain("unavailable");
+  });
+
+  it("caps refine at one round per candidate lineage", async () => {
+    const engine = await actualEngine();
+    const candidate = makeCandidate();
+    const critique: LlmCritiqueResult = {
+      specificity: 0.5,
+      personaRelevance: 0.5,
+      actionability: 0.5,
+      surprise: 0.5,
+      voiceMatch: 0.5,
+      overallScore: 0.5,
+      critique: "needs work",
+      improvementSuggestions: ["be more specific"],
+    };
+    const complete = vi
+      .fn()
+      .mockResolvedValueOnce(
+        engineMessage(
+          JSON.stringify([
+            {
+              content: "Revised insight that names a concrete mechanism instead of vague hype.",
+              rationale: "specific",
+              targetDomains: ["AI"],
+              sourceDomains: [],
+              relevanceScore: 0.8,
+              surpriseScore: 0.7,
+            },
+          ]),
+        ),
+      )
+      .mockResolvedValueOnce(
+        engineMessage(
+          JSON.stringify([
+            {
+              content: "A second rewrite that should never be requested by the engine.",
+              rationale: "too many rounds",
+              targetDomains: ["AI"],
+              sourceDomains: [],
+              relevanceScore: 0.8,
+              surpriseScore: 0.7,
+            },
+          ]),
+        ),
+      );
+    const deps: LlmInsightDeps = {
+      complete,
+      prepareModel: async () => ({ model: ENGINE_TEST_MODEL, auth: ENGINE_TEST_AUTH }),
+    };
+
+    const first = await engine.refineInsightWithLLM(
+      "original prompt",
+      candidate,
+      critique,
+      personaWithDomains(),
+      fakeBotConfig,
+      deps,
+    );
+    const second = await engine.refineInsightWithLLM(
+      "original prompt",
+      first!,
+      critique,
+      personaWithDomains(),
+      fakeBotConfig,
+      deps,
+    );
+
+    expect(first).not.toBeNull();
+    expect(second).toBeNull();
+    expect(complete).toHaveBeenCalledTimes(1);
   });
 });

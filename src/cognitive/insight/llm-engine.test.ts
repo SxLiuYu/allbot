@@ -1471,6 +1471,42 @@ describe("generateInsightCandidatesLLM — domain force-alignment", () => {
   });
 });
 
+describe("buildInsightPrompt — language instruction", () => {
+  it("uses Chinese output instruction for the default locale", () => {
+    const { prompt } = buildInsightPrompt(makePersona(), makeInput());
+    expect(prompt).toContain("用中文输出。");
+  });
+
+  it("uses English output instruction for the en locale", () => {
+    const { prompt } = buildInsightPrompt(makePersona(), makeInput(), [], [], "en");
+    expect(prompt).toContain("Output in English.");
+    expect(prompt).not.toContain("用中文输出。");
+  });
+});
+
+describe("buildInsightPrompt — correction context", () => {
+  it("includes correction context when provided", () => {
+    const { prompt } = buildInsightPrompt(
+      makePersona(),
+      makeInput(),
+      [],
+      [],
+      "zh",
+      undefined,
+      undefined,
+      undefined,
+      "## Known Corrections\n1. [trigger] mistake → correction",
+    );
+    expect(prompt).toContain("Known Corrections");
+    expect(prompt).toContain("mistake → correction");
+  });
+
+  it("omits the section when no corrections exist", () => {
+    const { prompt } = buildInsightPrompt(makePersona(), makeInput());
+    expect(prompt).not.toContain("Known Corrections");
+  });
+});
+
 describe("buildInsightPrompt — TARGET DOMAINS constraint", () => {
   it("includes TARGET DOMAINS section with input targetDomains", () => {
     const { prompt } = buildInsightPrompt(
@@ -1599,7 +1635,7 @@ describe("matchWebResultsToDomainsLLM", () => {
 // ---------------------------------------------------------------------------
 
 describe("buildVoiceSection", () => {
-  it("returns empty string (tone delegated to heartbeat)", () => {
+  it("returns empty string when no soul content is available", () => {
     const persona = makePersona({
       identity: {
         ...makePersona().identity,
@@ -1613,10 +1649,19 @@ describe("buildVoiceSection", () => {
     });
     expect(buildVoiceSection(persona)).toBe("");
   });
+
+  it("emits the SOUL block when soul content is provided", () => {
+    expect(buildVoiceSection(makePersona(), "You are witty and sarcastic.")).toContain(
+      "SOUL / VOICE",
+    );
+    expect(buildVoiceSection(makePersona(), "You are witty and sarcastic.")).toContain(
+      "witty and sarcastic",
+    );
+  });
 });
 
 describe("tone removal from insight prompts", () => {
-  it("buildInsightPrompt does NOT include soulContent", () => {
+  it("buildInsightPrompt includes soulContent", () => {
     const { prompt } = buildInsightPrompt(
       makePersona(),
       makeInput(),
@@ -1626,8 +1671,8 @@ describe("tone removal from insight prompts", () => {
       undefined,
       "## YOUR PERSONALITY AND VOICE\nYou are witty and sarcastic.",
     );
-    expect(prompt).not.toContain("YOUR PERSONALITY AND VOICE");
-    expect(prompt).not.toContain("witty");
+    expect(prompt).toContain("YOUR PERSONALITY AND VOICE");
+    expect(prompt).toContain("witty");
   });
 
   it("buildInsightPrompt does NOT include emotional stances", () => {
@@ -1666,7 +1711,7 @@ describe("tone removal from insight prompts", () => {
     expect(prompt).toContain("Do NOT copy their structure");
   });
 
-  it("buildSurpriseInsightPrompt does NOT include soulContent", () => {
+  it("buildSurpriseInsightPrompt includes soulContent", () => {
     const { prompt } = buildSurpriseInsightPrompt(
       makePersona(),
       makeInput(),
@@ -1677,8 +1722,8 @@ describe("tone removal from insight prompts", () => {
       undefined,
       "## YOUR PERSONALITY AND VOICE\nBe dramatic.",
     );
-    expect(prompt).not.toContain("YOUR PERSONALITY AND VOICE");
-    expect(prompt).not.toContain("dramatic");
+    expect(prompt).toContain("YOUR PERSONALITY AND VOICE");
+    expect(prompt).toContain("dramatic");
   });
 
   it("buildSurpriseInsightPrompt does NOT include emotional stances", () => {
@@ -1734,7 +1779,7 @@ describe("tone removal from insight prompts", () => {
     expect(prompt).toContain("Do NOT copy their structure");
   });
 
-  it("buildPatternInsightPrompt does NOT include soulContent or tone directives", () => {
+  it("buildPatternInsightPrompt includes soulContent but not tone directives", () => {
     const { prompt } = buildPatternInsightPrompt(
       makePersona(),
       makeInput(),
@@ -1742,7 +1787,8 @@ describe("tone removal from insight prompts", () => {
       "zh",
       "## YOUR PERSONALITY AND VOICE\nBe warm.",
     );
-    expect(prompt).not.toContain("YOUR PERSONALITY AND VOICE");
+    expect(prompt).toContain("YOUR PERSONALITY AND VOICE");
+    expect(prompt).toContain("Be warm.");
     expect(prompt).not.toContain("your own voice");
     expect(prompt).not.toContain("YOUR MOOD RIGHT NOW");
     expect(prompt).not.toContain("Speak naturally");

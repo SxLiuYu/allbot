@@ -1,4 +1,5 @@
 import type { KaijiBotConfig } from "../../config/config.js";
+import { wrapUntrustedSourceText } from "../../infra/system-events.js";
 import { resolveManifestContractOwnerPluginId } from "../../plugins/manifest-registry.js";
 import type { RuntimeWebSearchMetadata } from "../../secrets/runtime-web-tools.types.js";
 import {
@@ -7,7 +8,7 @@ import {
   runWebSearch,
 } from "../../web-search/runtime.js";
 import type { AnyAgentTool } from "./common.js";
-import { jsonResult } from "./common.js";
+import { textResult } from "./common.js";
 import { SEARCH_CACHE } from "./web-search-provider-common.js";
 
 export function createWebSearchTool(options?: {
@@ -46,10 +47,11 @@ export function createWebSearchTool(options?: {
         preferRuntimeProviders,
         args: args as Record<string, unknown>,
       });
-      return jsonResult({
+      const payload = {
         ...result.result,
         provider: result.provider,
-      });
+      };
+      return textResult(wrapUntrustedSourceText(JSON.stringify(payload, null, 2)), payload);
     },
   };
 }

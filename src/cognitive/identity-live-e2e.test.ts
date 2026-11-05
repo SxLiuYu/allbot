@@ -418,7 +418,7 @@ describe("Phase 1f: insight heartbeat delivery chain", () => {
     expect(block).toBeDefined();
     expect(block!).toContain("[Cognitive Insight]");
     expect(block!).toContain(insightText);
-    expect(block!).toContain("System:");
+    expect(block!).toContain("System (untrusted):");
   });
 
   it("shouldDropSystemEventUserMessage filters insight system event from chat history", async () => {

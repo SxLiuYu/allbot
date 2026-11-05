@@ -126,7 +126,7 @@ describe("checkSemanticNoveltyWithLLM prompt construction", () => {
     expect(promptText).toContain("ownership模型");
     expect(promptText).toContain("装饰器终于稳定");
     expect(promptText).toContain("函数式而非面向对象");
-    expect(promptText).toContain("isNovel");
+    expect(promptText).toContain("novel");
   });
 
   it("shows all 5 past insights truncated to 120 chars", async () => {
@@ -219,7 +219,7 @@ describe("checkSemanticNoveltyWithLLM novel response", () => {
 // ---------------------------------------------------------------------------
 
 describe("checkSemanticNoveltyWithLLM malformed response", () => {
-  it("returns isNovel: true on malformed JSON", async () => {
+  it("returns isNovel: false (fail-closed) on malformed JSON", async () => {
     const result = await checkSemanticNoveltyWithLLM(
       makeCandidate(),
       threePastInsights,
@@ -227,11 +227,11 @@ describe("checkSemanticNoveltyWithLLM malformed response", () => {
       successDeps("this is not valid json {{{"),
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 
-  it("returns isNovel: true when isNovel is not boolean", async () => {
+  it("returns isNovel: false (fail-closed) when isNovel is not boolean", async () => {
     const result = await checkSemanticNoveltyWithLLM(
       makeCandidate(),
       threePastInsights,
@@ -239,7 +239,7 @@ describe("checkSemanticNoveltyWithLLM malformed response", () => {
       successDeps(JSON.stringify({ isNovel: "yes", reason: "not a bool" })),
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 
@@ -251,11 +251,11 @@ describe("checkSemanticNoveltyWithLLM malformed response", () => {
       successDeps(JSON.stringify({ isNovel: true, reason: 42 })),
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 
-  it("returns isNovel: true on empty LLM response", async () => {
+  it("returns isNovel: false (fail-closed) on empty LLM response", async () => {
     const result = await checkSemanticNoveltyWithLLM(
       makeCandidate(),
       threePastInsights,
@@ -263,7 +263,7 @@ describe("checkSemanticNoveltyWithLLM malformed response", () => {
       successDeps(""),
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 });
@@ -273,7 +273,7 @@ describe("checkSemanticNoveltyWithLLM malformed response", () => {
 // ---------------------------------------------------------------------------
 
 describe("checkSemanticNoveltyWithLLM error handling", () => {
-  it("returns isNovel: true when LLM throws", async () => {
+  it("returns isNovel: false (fail-closed) when LLM throws", async () => {
     const result = await checkSemanticNoveltyWithLLM(
       makeCandidate(),
       threePastInsights,
@@ -281,11 +281,11 @@ describe("checkSemanticNoveltyWithLLM error handling", () => {
       errorDeps,
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 
-  it("returns isNovel: true when everything throws", async () => {
+  it("returns isNovel: false (fail-closed) when everything throws", async () => {
     const bombDeps: LlmInsightDeps = {
       complete: async () => {
         throw new Error("catastrophic");
@@ -301,11 +301,11 @@ describe("checkSemanticNoveltyWithLLM error handling", () => {
       bombDeps,
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 
-  it("returns isNovel: true when prepareModel returns error", async () => {
+  it("returns isNovel: false (fail-closed) when prepareModel returns error", async () => {
     const deps: LlmInsightDeps = {
       complete: async () => assistantMessage("unused"),
       prepareModel: async () => ({ error: "no model available" }),
@@ -317,7 +317,7 @@ describe("checkSemanticNoveltyWithLLM error handling", () => {
       deps,
     );
 
-    expect(result.isNovel).toBe(true);
+    expect(result.isNovel).toBe(false);
     expect(result.reason).toContain("unavailable");
   });
 });

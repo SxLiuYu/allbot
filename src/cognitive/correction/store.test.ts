@@ -197,6 +197,43 @@ describe("CorrectionStore", () => {
     expect(remaining).toHaveLength(1);
   });
 
+  it("removeByIds deletes only the requested corrections", async () => {
+    const keep = makeCorrection({ domain: "keep" });
+    const dropA = makeCorrection({ domain: "drop-a" });
+    const dropB = makeCorrection({ domain: "drop-b" });
+    await store.add(AGENT, USER, keep);
+    await store.add(AGENT, USER, dropA);
+    await store.add(AGENT, USER, dropB);
+
+    const removed = await store.removeByIds(AGENT, USER, [dropA.id, dropB.id]);
+    expect(removed).toBe(2);
+
+    const remaining = await store.loadAll(AGENT, USER);
+    expect(remaining.map((r) => r.id)).toEqual([keep.id]);
+  });
+
+  it("removeByIds returns 0 for unknown ids and keeps all records", async () => {
+    const record = makeCorrection();
+    await store.add(AGENT, USER, record);
+
+    const removed = await store.removeByIds(AGENT, USER, ["does-not-exist"]);
+    expect(removed).toBe(0);
+
+    const remaining = await store.loadAll(AGENT, USER);
+    expect(remaining).toHaveLength(1);
+  });
+
+  it("removeByIds returns 0 for an empty id list", async () => {
+    const record = makeCorrection();
+    await store.add(AGENT, USER, record);
+
+    const removed = await store.removeByIds(AGENT, USER, []);
+    expect(removed).toBe(0);
+
+    const remaining = await store.loadAll(AGENT, USER);
+    expect(remaining).toHaveLength(1);
+  });
+
   it("respects custom ttlDays parameter", async () => {
     const record = makeCorrection({
       lastReinforced: Date.now() - 5 * 86_400_000,

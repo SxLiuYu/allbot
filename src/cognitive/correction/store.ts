@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { getOrCreateScopedAsyncLock, writeTextAtomic } from "../../infra/json-files.js";
 import { textSimilarity } from "../../infra/text-similarity.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
-import type { PatternRegistry } from "./pattern-registry.js";
 import {
   CORRECTION_STORE_VERSION,
   DEFAULT_CORRECTION_TTL_DAYS,
@@ -15,8 +14,6 @@ import type { CorrectionRecord, CorrectionStoreData } from "./types.js";
 
 const log = createSubsystemLogger("correction");
 const CORRECTIONS_DIR = "cognitive/corrections";
-
-const PROMOTE_AT_REINFORCEMENT_COUNT = 5;
 
 const MAX_USER_FACING_FIELD_CHARS = 2000;
 
@@ -52,7 +49,12 @@ const INJECTION_PATTERNS: ReadonlyArray<RegExp> = [
 
 const REDACTED = "[redacted-injection]";
 
-function sanitizeUserFacingField(value: string): string {
+/**
+ * Strip prompt-injection payloads from a user-facing correction field and cap
+ * its length. Used both on write (before persisting) and on read (before the
+ * field is spliced into a system prompt).
+ */
+export function sanitizeUserFacingField(value: string): string {
   if (typeof value !== "string" || value.length === 0) {
     return "";
   }
@@ -77,38 +79,8 @@ function sanitizeRecord(record: CorrectionRecord): CorrectionRecord {
   };
 }
 
-const TOKEN_STOPWORDS = new Set([
-  "the",
-  "and",
-  "for",
-  "not",
-  "but",
-  "with",
-  "this",
-  "that",
-  "from",
-  "have",
-  "was",
-  "were",
-  "are",
-  "has",
-  "had",
-  "you",
-  "your",
-  "使用",
-  "应该",
-  "需要",
-  "没有",
-]);
-
 export class CorrectionStore {
-  private patternRegistry: PatternRegistry | null = null;
-
   constructor(private readonly configDir: string) {}
-
-  attachPatternRegistry(registry: PatternRegistry | null): void {
-    this.patternRegistry = registry;
-  }
 
   private async withLock<T>(agentId: string, userId: string, fn: () => Promise<T>): Promise<T> {
     // Scoped (cross-instance) lock: this store is instantiated per call site
@@ -185,65 +157,27 @@ export class CorrectionStore {
   }
 
   async reinforce(agentId: string, userId: string, id: string): Promise<void> {
-    let promoted = false;
-    let reinforcedCount = 0;
-    await this.withLock(agentId, userId, async () => {
-      const result = await this.reinforceUnlocked(agentId, userId, id);
-      promoted = result.promoted;
-      reinforcedCount = result.reinforcedCount;
-    });
+    const reinforcedCount = await this.withLock(agentId, userId, () =>
+      this.reinforceUnlocked(agentId, userId, id),
+    );
     log.info("correction reinforced", {
       id,
       reinforcedCount,
       agentId,
       userId,
-      promoted,
     });
   }
 
-  private async reinforceUnlocked(
-    agentId: string,
-    userId: string,
-    id: string,
-  ): Promise<{ reinforcedCount: number; promoted: boolean }> {
+  private async reinforceUnlocked(agentId: string, userId: string, id: string): Promise<number> {
     const records = await this.loadRecords(agentId, userId);
     const target = records.find((r) => r.id === id);
     if (!target) {
-      return { reinforcedCount: 0, promoted: false };
+      return 0;
     }
     target.reinforcedCount++;
     target.lastReinforced = Date.now();
     await this.writeRecords(agentId, userId, records);
-    if (target.reinforcedCount === PROMOTE_AT_REINFORCEMENT_COUNT && this.patternRegistry) {
-      try {
-        await this.maybePromoteToPattern(target);
-        return { reinforcedCount: target.reinforcedCount, promoted: true };
-      } catch (err) {
-        log.debug("pattern promotion failed (non-fatal)", {
-          id,
-          error: String(err),
-        });
-      }
-    }
-    return { reinforcedCount: target.reinforcedCount, promoted: false };
-  }
-
-  private async maybePromoteToPattern(target: CorrectionRecord): Promise<void> {
-    const tokens = extractDistinctiveTokens(`${target.trigger} ${target.mistake}`);
-    if (tokens.length === 0) {
-      return;
-    }
-    const pattern = `(${tokens.join("|")})`;
-    await this.patternRegistry!.add({
-      pattern,
-      flags: "i",
-      source: "auto-promoted",
-    });
-    log.info("correction promoted to pattern", {
-      id: target.id,
-      domain: target.domain,
-      pattern,
-    });
+    return target.reinforcedCount;
   }
 
   async findSimilar(
@@ -371,31 +305,4 @@ export class CorrectionStore {
       return [];
     }
   }
-}
-
-const TOKEN_SPLIT_RE = /[\s,，。、；;：:！!？?（）()[\]{}'"""''《》<>/\\|`~@#$%^&*\-_=+]+/;
-const MAX_PROMOTED_TOKENS = 3;
-
-function extractDistinctiveTokens(text: string): string[] {
-  const seen = new Set<string>();
-  const result: string[] = [];
-  for (const raw of text.split(TOKEN_SPLIT_RE)) {
-    const token = raw.trim();
-    if (token.length < 3) {
-      continue;
-    }
-    const lower = token.toLowerCase();
-    if (TOKEN_STOPWORDS.has(lower)) {
-      continue;
-    }
-    if (seen.has(lower)) {
-      continue;
-    }
-    seen.add(lower);
-    result.push(token);
-    if (result.length >= MAX_PROMOTED_TOKENS) {
-      break;
-    }
-  }
-  return result;
 }

@@ -390,6 +390,31 @@ describe("resolveModel", () => {
     expect(result.model?.reasoning).toBe(true);
   });
 
+  it("propagates compat flags from matching configured fallback model", () => {
+    const cfg = {
+      models: {
+        providers: {
+          custom: {
+            baseUrl: "http://localhost:9000",
+            api: "openai-completions",
+            models: [
+              {
+                ...makeModel("no-tools"),
+                compat: { supportsTools: false },
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as KaijiBotConfig;
+
+    const result = resolveModelForTest("custom", "no-tools", "/tmp/agent", cfg);
+
+    expect((result.model as { compat?: unknown } | undefined)?.compat).toMatchObject({
+      supportsTools: false,
+    });
+  });
+
   it("propagates image input capability from matching configured fallback model", () => {
     const cfg = {
       models: {

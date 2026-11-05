@@ -76,4 +76,10 @@ export type SchedulerConfig = {
    * scheduler/delivery-pacing.ts.
    */
   maxDailyInsights?: number;
+  /**
+   * Max opportunities returned by identify() per event (default 2). Mirrors
+   * cognitive.insight.maxCandidatesPerEvent; when unset here the scheduler
+   * falls back to that config value and then to 2.
+   */
+  maxCandidatesPerEvent?: number;
 };

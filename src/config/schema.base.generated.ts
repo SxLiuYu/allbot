@@ -22448,17 +22448,17 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
             type: "boolean",
             title: "Cognitive Layer Enabled",
             description:
-              "Master switch for the entire cognitive layer (default: true). When false, all subsystems are disabled: no proactive insights, no persona extraction, no skill evolution, no correction memory.",
+              "Master switch for the cognitive layer (default: true). When false, cognitive context injection, the proactive scheduler, the task service, correction memory, and evolution tools do not run. Other assistant features are unaffected.",
           },
           proactive: {
             type: "object",
             properties: {
               enabled: {
-                default: true,
+                default: false,
                 type: "boolean",
                 title: "Proactive Push Enabled",
                 description:
-                  "Allow proactive insight pushes to the user (default: true). When false, KaijiBot only responds to direct messages and never initiates conversations.",
+                  "Allow proactive insight pushes to the user (default: false). When false, KaijiBot only responds to direct messages and never initiates conversations.",
               },
               minIntervalHours: {
                 default: 0.5,
@@ -22501,14 +22501,14 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
                 additionalProperties: false,
                 title: "Proactive Active Hours",
                 description:
-                  "Time window during which proactive pushes are allowed. Insights are suppressed outside this window to respect the user's schedule.",
+                  'Time window during which proactive pushes are allowed (default: "09:00"–"22:00" host-local time). The defaults are applied even when the cognitive section is omitted, so pushes are never sent outside this window unless it is overridden.',
               },
               digestMode: {
                 type: "string",
                 enum: ["realtime", "daily", "weekly"],
                 title: "Proactive Digest Mode",
                 description:
-                  'Reserved for future use. Controls batching of proactive insights: "realtime" (default, send immediately), "daily", or "weekly". Only realtime is currently implemented.',
+                  "Deprecated; retained for backward compatibility and not read by any code. Proactive pushes are always realtime.",
               },
               costFalseNegative: {
                 type: "number",
@@ -22549,7 +22549,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
                 type: "boolean",
                 title: "Persona Auto Extract",
                 description:
-                  "Automatically extract and update user persona from conversations using LLM-driven analysis (default: true). When false, the persona model is frozen and never updates.",
+                  "Deprecated; retained for backward compatibility and not read by any code. Persona extraction is not implemented, so setting this has no effect.",
               },
               extractionModel: {
                 type: "string",
@@ -22563,7 +22563,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
                 maximum: 720,
                 title: "Persona Identity Refresh (hours)",
                 description:
-                  "Interval in hours between L1 identity memory refresh cycles (default: 24). Lower values refresh more frequently but consume more tokens.",
+                  "Deprecated; retained for backward compatibility and not read by any code. L1 identity memory refresh is not implemented, so setting this has no effect.",
               },
             },
             required: ["autoExtract"],
@@ -22630,7 +22630,20 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
                 description:
                   'Language for generated insight messages (e.g. "zh", "en", "ja"). When unset, KaijiBot auto-detects from the user persona.',
               },
+              maxLlmCallsPerDelivery: {
+                default: 3,
+                type: "number",
+                minimum: 1,
+                maximum: 100,
+              },
+              maxCandidatesPerEvent: {
+                default: 2,
+                type: "number",
+                minimum: 1,
+                maximum: 20,
+              },
             },
+            required: ["maxLlmCallsPerDelivery", "maxCandidatesPerEvent"],
             additionalProperties: false,
             title: "Insight Engine",
             description:
@@ -22644,7 +22657,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
                 enum: ["emoji", "buttons", "text"],
                 title: "Feedback Mechanism (Reserved)",
                 description:
-                  'Reserved for future use. Intended feedback mechanism: "emoji", "buttons", or "text". Currently unused — feedback is always implicit.',
+                  "Deprecated; retained for backward compatibility and not read by any code. Feedback is always collected implicitly.",
               },
               implicitFeedback: {
                 type: "boolean",
@@ -22671,8 +22684,12 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
               qualityGateModel: {
                 type: "string",
               },
+              requireApproval: {
+                default: true,
+                type: "boolean",
+              },
             },
-            required: ["enabled"],
+            required: ["enabled", "requireApproval"],
             additionalProperties: false,
             title: "Skill Evolution",
             description:
@@ -22696,8 +22713,39 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
                 description:
                   "Default step ceiling per task (default: 12). A task that reaches this ceiling is halted with a partial-result notification instead of running forever.",
               },
+              progressMessages: {
+                default: false,
+                type: "boolean",
+                title: "Cognitive Task Progress Messages",
+                description:
+                  "Send a short chat message after each non-terminal task step (default: false). Chat-first progress visibility for users who never open the Control UI. Terminal outcomes (done/failed/halted) always deliver regardless.",
+              },
+              maxSubTasks: {
+                default: 3,
+                type: "number",
+                minimum: 1,
+                maximum: 20,
+              },
+              maxTaskDepth: {
+                default: 3,
+                type: "number",
+                minimum: 1,
+                maximum: 10,
+              },
+              maxConcurrentPerUser: {
+                default: 1,
+                type: "number",
+                minimum: 1,
+                maximum: 20,
+              },
             },
-            required: ["enabled"],
+            required: [
+              "enabled",
+              "progressMessages",
+              "maxSubTasks",
+              "maxTaskDepth",
+              "maxConcurrentPerUser",
+            ],
             additionalProperties: false,
             title: "Cognitive Tasks",
             description:
@@ -27439,7 +27487,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.enabled": {
       label: "Cognitive Layer Enabled",
-      help: "Master switch for the entire cognitive layer (default: true). When false, all subsystems are disabled: no proactive insights, no persona extraction, no skill evolution, no correction memory.",
+      help: "Master switch for the cognitive layer (default: true). When false, cognitive context injection, the proactive scheduler, the task service, correction memory, and evolution tools do not run. Other assistant features are unaffected.",
       tags: ["advanced"],
     },
     "cognitive.proactive": {
@@ -27449,7 +27497,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.proactive.enabled": {
       label: "Proactive Push Enabled",
-      help: "Allow proactive insight pushes to the user (default: true). When false, KaijiBot only responds to direct messages and never initiates conversations. Only effective when cognitive.enabled is true.",
+      help: "Allow proactive insight pushes to the user (default: false). When false, KaijiBot only responds to direct messages and never initiates conversations. Only effective when cognitive.enabled is true.",
       tags: ["advanced"],
     },
     "cognitive.proactive.minIntervalHours": {
@@ -27459,7 +27507,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.proactive.activeHours": {
       label: "Proactive Active Hours",
-      help: "Time window during which proactive pushes are allowed. Insights are suppressed outside this window to respect the user's schedule.",
+      help: 'Time window during which proactive pushes are allowed (default: "09:00"–"22:00" host-local time). The defaults are applied even when the cognitive section is omitted, so pushes are never sent outside this window unless it is overridden.',
       tags: ["advanced"],
     },
     "cognitive.proactive.activeHours.start": {
@@ -27479,7 +27527,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.proactive.digestMode": {
       label: "Proactive Digest Mode",
-      help: 'Reserved for future use. Controls batching of proactive insights: "realtime" (default, send immediately), "daily", or "weekly". Only realtime is currently implemented.',
+      help: "Deprecated; retained for backward compatibility and not read by any code. Proactive pushes are always realtime.",
       tags: ["advanced"],
     },
     "cognitive.proactive.costFalseAlarm": {
@@ -27504,7 +27552,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.persona.autoExtract": {
       label: "Persona Auto Extract",
-      help: "Automatically extract and update user persona from conversations using LLM-driven analysis (default: true). When false, the persona model is frozen and never updates. Only effective when cognitive.enabled is true.",
+      help: "Deprecated; retained for backward compatibility and not read by any code. Persona extraction is not implemented, so setting this has no effect. Only effective when cognitive.enabled is true.",
       tags: ["advanced"],
     },
     "cognitive.persona.extractionModel": {
@@ -27514,7 +27562,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.persona.identityRefreshHours": {
       label: "Persona Identity Refresh (hours)",
-      help: "Interval in hours between L1 identity memory refresh cycles (default: 24). Lower values refresh more frequently but consume more tokens.",
+      help: "Deprecated; retained for backward compatibility and not read by any code. L1 identity memory refresh is not implemented, so setting this has no effect.",
       tags: ["advanced"],
     },
     "cognitive.tasks": {
@@ -27534,7 +27582,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.tasks.progressMessages": {
       label: "Cognitive Task Progress Messages",
-      help: "Send a short chat message after each non-terminal task step (default: true). Chat-first progress visibility for users who never open the Control UI. Terminal outcomes (done/failed/halted) always deliver regardless.",
+      help: "Send a short chat message after each non-terminal task step (default: false). Chat-first progress visibility for users who never open the Control UI. Terminal outcomes (done/failed/halted) always deliver regardless.",
       tags: ["advanced"],
     },
     "cognitive.insight": {
@@ -27604,7 +27652,7 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
     },
     "cognitive.feedback.mechanism": {
       label: "Feedback Mechanism (Reserved)",
-      help: 'Reserved for future use. Intended feedback mechanism: "emoji", "buttons", or "text". Currently unused — feedback is always implicit.',
+      help: "Deprecated; retained for backward compatibility and not read by any code. Feedback is always collected implicitly.",
       tags: ["storage"],
     },
     "cognitive.feedback.implicitFeedback": {
@@ -28920,6 +28968,6 @@ export const GENERATED_BASE_CONFIG_SCHEMA: BaseConfigSchemaResponse = {
       tags: ["advanced", "url-secret"],
     },
   },
-  version: "2026.10.29",
+  version: "2026.11.02",
   generatedAt: "2026-03-22T21:17:33.302Z",
 };

@@ -9,6 +9,30 @@ const ARCHIVE_DIR = "_archive";
 const SKILL_FILE = "SKILL.md";
 const STALE_THRESHOLD_MS = 30 * 24 * 60 * 60 * 1000;
 
+/**
+ * A skill name must be a single path segment. Anything else could escape the
+ * skills root (for example "." or ".." make removeSkill delete the whole
+ * skills/agent directory).
+ */
+export function isValidSkillName(name: unknown): name is string {
+  if (typeof name !== "string") {
+    return false;
+  }
+  if (name.trim() === "" || name === "." || name === "..") {
+    return false;
+  }
+  if (name.includes("/") || name.includes("\\")) {
+    return false;
+  }
+  return true;
+}
+
+function assertValidSkillName(name: unknown): asserts name is string {
+  if (!isValidSkillName(name)) {
+    throw new Error(`Invalid skill name: ${String(name)}`);
+  }
+}
+
 export class SkillPersistenceWriter {
   constructor(
     private readonly skillBaseDir: string,
@@ -21,9 +45,7 @@ export class SkillPersistenceWriter {
   }
 
   async writeSkill(draft: SkillDraft): Promise<string> {
-    if (draft.name.includes("..") || draft.name.startsWith("/") || draft.name.includes("\\")) {
-      throw new Error(`Invalid skill name: ${draft.name}`);
-    }
+    assertValidSkillName(draft.name);
 
     const dir = this.skillDir(draft.name);
     await mkdir(dir, { recursive: true });
@@ -31,11 +53,25 @@ export class SkillPersistenceWriter {
     const content = this.formatSkillMarkdown(draft);
     const targetPath = join(dir, SKILL_FILE);
 
+    await this.backupExistingSkill(dir);
+
     await writeTextAtomic(targetPath, content);
 
     await this.writeBundledFiles(dir, draft);
 
     return targetPath;
+  }
+
+  private async backupExistingSkill(dir: string): Promise<void> {
+    const targetPath = join(dir, SKILL_FILE);
+    let existing: string;
+    try {
+      existing = await readFile(targetPath, "utf-8");
+    } catch {
+      // First creation has nothing to back up.
+      return;
+    }
+    await writeTextAtomic(join(dir, `${SKILL_FILE}.${Date.now()}.bak`), existing);
   }
 
   private async writeBundledFiles(dir: string, draft: SkillDraft): Promise<void> {
@@ -61,6 +97,9 @@ export class SkillPersistenceWriter {
   }
 
   async skillExists(name: string): Promise<boolean> {
+    if (!isValidSkillName(name)) {
+      return false;
+    }
     try {
       await access(join(this.skillDir(name), SKILL_FILE));
       return true;
@@ -70,17 +109,13 @@ export class SkillPersistenceWriter {
   }
 
   async removeSkill(name: string): Promise<void> {
-    if (name.includes("..") || name.startsWith("/")) {
-      throw new Error(`Invalid skill name: ${name}`);
-    }
+    assertValidSkillName(name);
     const dir = this.skillDir(name);
     await rm(dir, { recursive: true, force: true });
   }
 
   async archiveSkill(name: string): Promise<string> {
-    if (name.includes("..") || name.startsWith("/")) {
-      throw new Error(`Invalid skill name: ${name}`);
-    }
+    assertValidSkillName(name);
     const subdir = this.options.agentSkills !== false ? AGENT_SKILLS_DIR : SKILLS_DIR;
     const sourceDir = join(this.skillBaseDir, subdir, name);
     const archiveDir = join(this.skillBaseDir, subdir, ARCHIVE_DIR);
@@ -111,7 +146,7 @@ export class SkillPersistenceWriter {
   }
 
   async readArchivedSkillMeta(name: string): Promise<SkillMeta | null> {
-    if (name.includes("..") || name.startsWith("/")) {
+    if (!isValidSkillName(name)) {
       return null;
     }
     const subdir = this.options.agentSkills !== false ? AGENT_SKILLS_DIR : SKILLS_DIR;
@@ -155,9 +190,7 @@ export class SkillPersistenceWriter {
   }
 
   async recoverSkill(name: string): Promise<string> {
-    if (name.includes("..") || name.startsWith("/")) {
-      throw new Error(`Invalid skill name: ${name}`);
-    }
+    assertValidSkillName(name);
     const subdir = this.options.agentSkills !== false ? AGENT_SKILLS_DIR : SKILLS_DIR;
     const archivePath = join(this.skillBaseDir, subdir, ARCHIVE_DIR, name);
     const activePath = join(this.skillBaseDir, subdir, name);
@@ -184,6 +217,9 @@ export class SkillPersistenceWriter {
   }
 
   async findSkillDir(name: string): Promise<string | null> {
+    if (!isValidSkillName(name)) {
+      return null;
+    }
     const agentDir = join(this.skillBaseDir, AGENT_SKILLS_DIR, name);
     try {
       await access(join(agentDir, SKILL_FILE));
@@ -267,9 +303,7 @@ export class SkillPersistenceWriter {
   }
 
   async updateSkill(name: string, content: string): Promise<string> {
-    if (name.includes("..") || name.startsWith("/") || name.includes("\\")) {
-      throw new Error(`Invalid skill name: ${name}`);
-    }
+    assertValidSkillName(name);
 
     const dir = await this.findSkillDir(name);
     if (!dir) {

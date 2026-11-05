@@ -1,8 +1,9 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TaskRunner, type TaskStepOutcome } from "./runner.js";
+import { cancelTask } from "./service.js";
 import { TaskStore } from "./store.js";
 import type { TaskRecord } from "./types.js";
 
@@ -241,5 +242,121 @@ describe("TaskRunner", () => {
     expect(stacked).toBe(0);
     release!();
     await first;
+  });
+
+  it("never claims a cancelled task", async () => {
+    const created = await store.create(AGENT, USER, { goal: "已取消的任务" });
+    const cancelled = await cancelTask(store, AGENT, USER, created.id);
+    expect(cancelled.ok).toBe(true);
+
+    let calls = 0;
+    const runner = makeRunner(async () => {
+      calls++;
+      return { summary: "不该执行", done: true };
+    });
+    expect(await runner.tick(AGENT, USER)).toBe(0);
+    expect(calls).toBe(0);
+    expect((await store.get(AGENT, USER, created.id))?.status).toBe("cancelled");
+    expect(delivered).toHaveLength(0);
+  });
+
+  it("stops before the next step when cancelled mid-step, and a done outcome cannot override it", async () => {
+    const created = await store.create(AGENT, USER, { goal: "进行中被取消" });
+    let calls = 0;
+    const runner = makeRunner(async (task) => {
+      calls++;
+      // Cancellation lands while this step's agent turn is still running.
+      const result = await cancelTask(store, AGENT, USER, task.id);
+      expect(result.ok).toBe(true);
+      return { summary: "这一步已完成", done: true };
+    });
+
+    const progressed = await runner.tick(AGENT, USER);
+    expect(progressed).toBe(1);
+    expect(calls).toBe(1); // no further step is started
+
+    const final = await store.get(AGENT, USER, created.id);
+    expect(final?.status).toBe("cancelled");
+    expect(final?.result).toBe("任务已取消");
+    // The step is checkpointed (it ran) but no terminal notification fires.
+    expect(final?.steps).toHaveLength(1);
+    expect(delivered).toHaveLength(0);
+  });
+
+  it("drives different users concurrently (per-user serialization, not global)", async () => {
+    await store.create(AGENT, USER, { goal: "用户A任务" });
+    await store.create(AGENT, "test-user-2", { goal: "用户B任务" });
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const started: string[] = [];
+    const runner = makeRunner(async (task) => {
+      started.push(task.goal);
+      await gate;
+      return { summary: "done", done: true };
+    });
+
+    const first = runner.tick(AGENT, USER);
+    const second = runner.tick(AGENT, "test-user-2");
+    // Both users reach their step at the same time; the old global boolean
+    // would have made the second tick return 0 without starting a step.
+    await vi.waitFor(() => expect(started).toHaveLength(2));
+    release!();
+    expect(await Promise.all([first, second])).toEqual([1, 1]);
+  });
+
+  it("enforces the global concurrency ceiling across users", async () => {
+    await store.create(AGENT, USER, { goal: "用户A任务" });
+    await store.create(AGENT, "test-user-2", { goal: "用户B任务" });
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const started: string[] = [];
+    const runner = new TaskRunner({
+      store,
+      deliver,
+      maxConcurrent: 1,
+      runStep: async (task) => {
+        started.push(task.goal);
+        await gate;
+        return { summary: "done", done: true };
+      },
+    });
+
+    const first = runner.tick(AGENT, USER);
+    await vi.waitFor(() => expect(started).toHaveLength(1));
+    expect(await runner.tick(AGENT, "test-user-2")).toBe(0);
+    expect(started).toHaveLength(1);
+    release!();
+    expect(await first).toBe(1);
+  });
+
+  it("honors maxConcurrentPerUser > 1", async () => {
+    await store.create(AGENT, USER, { goal: "任务1" });
+    await store.create(AGENT, USER, { goal: "任务2" });
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const started: string[] = [];
+    const runner = new TaskRunner({
+      store,
+      deliver,
+      maxConcurrentPerUser: 2,
+      runStep: async (task) => {
+        started.push(task.goal);
+        await gate;
+        return { summary: "done", done: true };
+      },
+    });
+
+    const first = runner.tick(AGENT, USER);
+    await vi.waitFor(() => expect(started).toHaveLength(1));
+    const second = runner.tick(AGENT, USER);
+    await vi.waitFor(() => expect(started).toHaveLength(2));
+    release!();
+    expect(await Promise.all([first, second])).toEqual([1, 1]);
   });
 });

@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createDefaultPersona } from "../persona/store.js";
 import {
-  checkProactiveGate,
   computeGradedGate,
-  computeRepetitionDecay,
   computeEngagementFactor,
   computeTimeFactor,
 } from "./gate.js";
@@ -13,100 +11,6 @@ const baseConfig: SchedulerConfig = {
   minIntervalHours: 4,
   minTrustScore: 0.3,
 };
-
-// ── Legacy binary gate tests ─────────────────────────────────────────
-
-describe("checkProactiveGate", () => {
-  it("blocks when trust is too low", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.1;
-    persona.rapport.totalExchanges = 10;
-    const result = checkProactiveGate(persona, baseConfig);
-    expect(result.allowed).toBe(false);
-    expect(result.reasons).toEqual(
-      expect.arrayContaining([expect.stringContaining("Trust score")]),
-    );
-  });
-
-  it("blocks when too soon after last proactive", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.5;
-    persona.rapport.totalExchanges = 10;
-    persona.feedbackProfile.lastProactiveAt = Date.now() - 1000;
-    const result = checkProactiveGate(persona, baseConfig);
-    expect(result.allowed).toBe(false);
-    expect(result.reasons).toEqual(expect.arrayContaining([expect.stringContaining("Too soon")]));
-  });
-
-  it("blocks when suppressed", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.5;
-    persona.rapport.totalExchanges = 10;
-    persona.feedbackProfile.lastProactiveAt = 0;
-    persona.feedbackProfile.suppressUntil = Date.now() + 3600000;
-    const result = checkProactiveGate(persona, baseConfig);
-    expect(result.allowed).toBe(false);
-    expect(result.reasons).toEqual(expect.arrayContaining([expect.stringContaining("Suppressed")]));
-  });
-
-  it("blocks when total exchanges < 5", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.5;
-    persona.rapport.totalExchanges = 3;
-    persona.feedbackProfile.lastProactiveAt = 0;
-    const result = checkProactiveGate(persona, baseConfig);
-    expect(result.allowed).toBe(false);
-  });
-
-  it("allows when all conditions are met", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.5;
-    persona.rapport.totalExchanges = 10;
-    persona.feedbackProfile.lastProactiveAt = 0;
-    const result = checkProactiveGate(persona, baseConfig);
-    expect(result.allowed).toBe(true);
-    expect(result.reasons).toEqual([]);
-  });
-
-  it("blocks outside active hours", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.5;
-    persona.rapport.totalExchanges = 10;
-    persona.feedbackProfile.lastProactiveAt = 0;
-
-    const config: SchedulerConfig = {
-      ...baseConfig,
-      activeHoursStart: "09:00",
-      activeHoursEnd: "10:00",
-      timezone: "UTC",
-    };
-
-    const testTime = new Date("2026-04-11T15:00:00Z").getTime();
-    const result = checkProactiveGate(persona, config, testTime);
-    expect(result.allowed).toBe(false);
-    expect(result.reasons).toEqual(
-      expect.arrayContaining([expect.stringContaining("Outside active hours")]),
-    );
-  });
-
-  it("allows within active hours", () => {
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.5;
-    persona.rapport.totalExchanges = 10;
-    persona.feedbackProfile.lastProactiveAt = 0;
-
-    const config: SchedulerConfig = {
-      ...baseConfig,
-      activeHoursStart: "09:00",
-      activeHoursEnd: "22:00",
-      timezone: "UTC",
-    };
-
-    const testTime = new Date("2026-04-11T14:00:00Z").getTime();
-    const result = checkProactiveGate(persona, config, testTime);
-    expect(result.allowed).toBe(true);
-  });
-});
 
 // ── PRISM graded gate tests ──────────────────────────────────────────
 
@@ -354,7 +258,7 @@ describe("computeGradedGate", () => {
       config: { ...baseConfig },
     });
     const result = computeGradedGate(ctx);
-    // Default threshold = C_FA/(C_FN+C_FA) = 1/(5+1) ≈ 0.167
+    // Default threshold = C_FA/(C_FN+C_FA) = 3/(7+3) = 0.3
     // With active user, good domains, persona_change event → should trigger
     expect(result.decision).toBe(true);
   });
@@ -413,30 +317,29 @@ describe("computeGradedGate", () => {
     );
   });
 
-  it("active hours check does NOT veto non-timer events", () => {
-    const eventTime = new Date("2026-04-11T23:00:00Z").getTime();
-    const persona = createDefaultPersona();
-    persona.rapport.trustScore = 0.7;
-    persona.rapport.totalExchanges = 10;
-    persona.feedbackProfile.lastProactiveAt = eventTime - 10 * 3600_000;
-    persona.feedbackProfile.optimalFrequencyHours = 4;
-    persona.lifecycle.stage = "active";
-    persona.lifecycle.lastActiveAt = eventTime - 3 * 3600_000;
-    persona.lifecycle.totalActiveDays = 15;
-    persona.domains = {
-      "AI/ML": {
-        depth: 5,
-        recurrence: 10,
-        lastMentioned: eventTime,
-        keyInsights: [],
-        activeQuestions: [],
-        negationSignals: 0,
-      },
-    };
-    persona.feedbackProfile.topicBandits = { "AI/ML": { alpha: 5, beta: 1 } };
-
+  it("hard veto: midnight info_scan rejected", () => {
+    const eventTime = new Date("2026-04-11T02:00:00Z").getTime();
     const ctx = makeGateContext({
-      persona,
+      event: { type: "info_scan", timestamp: eventTime },
+      config: {
+        ...baseConfig,
+        activeHoursStart: "09:00",
+        activeHoursEnd: "18:00",
+        timezone: "UTC",
+      },
+    });
+    const result = computeGradedGate(ctx);
+    expect(result.decision).toBe(false);
+    expect(result.reasons).toEqual(
+      expect.arrayContaining([expect.stringContaining("Outside active hours")]),
+    );
+    expect(result.pNeed).toBe(0);
+    expect(result.pAct).toBe(0);
+  });
+
+  it("hard veto: midnight persona_change rejected", () => {
+    const eventTime = new Date("2026-04-11T02:00:00Z").getTime();
+    const ctx = makeGateContext({
       event: { type: "persona_change", timestamp: eventTime },
       config: {
         ...baseConfig,
@@ -446,7 +349,12 @@ describe("computeGradedGate", () => {
       },
     });
     const result = computeGradedGate(ctx);
-    expect(result.pNeed).toBeGreaterThan(0);
+    expect(result.decision).toBe(false);
+    expect(result.reasons).toEqual(
+      expect.arrayContaining([expect.stringContaining("Outside active hours")]),
+    );
+    expect(result.pNeed).toBe(0);
+    expect(result.pAct).toBe(0);
   });
 
   it("hard veto: suppression still enforced", () => {
@@ -486,64 +394,6 @@ describe("computeGradedGate", () => {
     expect(result.pAccept).toBe(0);
     expect(result.pAct).toBe(0);
     expect(result.decision).toBe(false);
-  });
-});
-
-describe("computeRepetitionDecay", () => {
-  it("returns 1 when only one recent insight", () => {
-    const persona = createDefaultPersona();
-    persona.feedbackProfile.recentInsightDomains = [["AI/ML"]];
-    expect(computeRepetitionDecay(persona)).toBe(1);
-  });
-
-  it("returns 1 when recent domains are diverse", () => {
-    const persona = createDefaultPersona();
-    persona.feedbackProfile.recentInsightDomains = [
-      ["AI/ML"],
-      ["Rust"],
-      ["Design"],
-      ["Security"],
-      ["Cloud"],
-    ];
-    expect(computeRepetitionDecay(persona)).toBe(1);
-  });
-
-  it("does not penalize a single broad insight overlapping with narrow ones", () => {
-    const persona = createDefaultPersona();
-    persona.feedbackProfile.recentInsightDomains = [
-      ["哲学"],
-      ["AI工具链"],
-      ["产品"],
-      ["机器学习"],
-      ["认知架构", "产品", "软件架构", "机器学习", "云", "编程", "哲学", "创业"],
-    ];
-    expect(computeRepetitionDecay(persona)).toBe(1);
-  });
-
-  it("decays when all recent insights target same domain", () => {
-    const persona = createDefaultPersona();
-    persona.feedbackProfile.recentInsightDomains = [
-      ["编程语言"],
-      ["编程语言"],
-      ["编程语言"],
-      ["编程语言"],
-      ["编程语言"],
-    ];
-    const decay = computeRepetitionDecay(persona);
-    expect(decay).toBeLessThan(1);
-    expect(decay).toBeGreaterThanOrEqual(0.25);
-  });
-
-  it("decays when most insights share overlapping domains", () => {
-    const persona = createDefaultPersona();
-    persona.feedbackProfile.recentInsightDomains = [
-      ["AI/ML", "Rust"],
-      ["AI/ML", "Design"],
-      ["AI/ML"],
-    ];
-    const decay = computeRepetitionDecay(persona);
-    expect(decay).toBeLessThan(1);
-    expect(decay).toBeGreaterThan(0);
   });
 });
 

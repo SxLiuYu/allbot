@@ -1,8 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { createProductionStepDriver, pendingStepCount } from "../../cognitive/tasks/step-driver.js";
 import { TaskStore } from "../../cognitive/tasks/store.js";
 import type { KaijiBotConfig } from "../../config/config.js";
 import { createTempHomeEnv } from "../../test-utils/temp-home.js";
-import { createTaskStatusTool, createTaskTool } from "./task-tool.js";
+import { createTaskStatusTool, createTaskStepReportTool, createTaskTool } from "./task-tool.js";
 
 function cfg(tasks?: { enabled?: boolean }): KaijiBotConfig {
   return { cognitive: { enabled: true, tasks } } as unknown as KaijiBotConfig;
@@ -134,5 +135,53 @@ describe("task tools", () => {
     const statusTool = createTaskStatusTool({ config: cfg({ enabled: true }), ...sessionDeps })!;
     const payload = parsePayload(await statusTool.execute("call-9", { taskId: "no-such-task" }));
     expect(payload.status).toBe("not_found");
+  });
+
+  it("task_step_report is scoped to the session that owns the step", async () => {
+    const driver = createProductionStepDriver({
+      sessionKey: "agent:main:ou_alice",
+      enqueueSystemEvent: () => true,
+      requestHeartbeatNow: () => {},
+      stepTimeoutMs: 2_000,
+    });
+    const task = {
+      id: "task-tool-own",
+      agentId: "main",
+      userId: "ou_alice",
+      budget: { usedSteps: 0, maxSteps: 3, maxWallClockMs: 60_000 },
+      steps: [],
+    } as never;
+    const pending = driver(task);
+    await vi.waitFor(() => expect(pendingStepCount()).toBe(1));
+
+    // Another user's turn cannot close ou_alice's step.
+    const foreign = createTaskStepReportTool({
+      sessionKey: "agent:main:ou_bob",
+      agentId: "main",
+    });
+    const rejected = parsePayload(
+      await foreign.execute("call-10", {
+        taskId: "task-tool-own",
+        stepIndex: 1,
+        summary: "冒名汇报",
+      }),
+    );
+    expect(rejected.status).toBe("no_pending_step");
+
+    // The owning session reports normally.
+    const owner = createTaskStepReportTool({
+      sessionKey: "agent:main:ou_alice",
+      agentId: "main",
+    });
+    const accepted = parsePayload(
+      await owner.execute("call-11", {
+        taskId: "task-tool-own",
+        stepIndex: 1,
+        summary: "完成",
+        done: true,
+      }),
+    );
+    expect(accepted.status).toBe("recorded");
+    expect((await pending).summary).toBe("完成");
   });
 });

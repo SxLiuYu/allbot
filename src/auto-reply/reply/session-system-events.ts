@@ -6,7 +6,10 @@ import {
   formatZonedTimestamp,
   resolveTimezone,
 } from "../../infra/format-time/format-datetime.ts";
-import { drainSystemEventEntries } from "../../infra/system-events.js";
+import {
+  drainSystemEventEntries,
+  wrapUntrustedSourceText,
+} from "../../infra/system-events.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
@@ -91,8 +94,10 @@ export async function drainFormattedSystemEvents(params: {
         return [];
       }
       const prefix = event.trusted === false ? "System (untrusted)" : "System";
+      const body =
+        event.trusted === false ? wrapUntrustedSourceText(compacted) : compacted;
       const timestamp = `[${formatSystemEventTimestamp(event.ts, params.cfg)}]`;
-      return compacted
+      return body
         .split("\n")
         .map((subline, index) => `${prefix}: ${index === 0 ? `${timestamp} ` : ""}${subline}`);
     }),

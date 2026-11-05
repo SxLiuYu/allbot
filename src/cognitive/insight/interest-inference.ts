@@ -3,6 +3,7 @@ import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import type { KaijiBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
+import { detectCognitiveLocale } from "../cognitive-locale.js";
 import type { PersonaTree } from "../types.js";
 import type { Fragment } from "./fragment-types.js";
 import { getFilteredInsights } from "./llm-engine.js";
@@ -195,6 +196,18 @@ export function buildInterestInferencePrompt(
 - Prefer cross-domain bridges that connect two areas the user knows about in an unexpected way
 - Include the year ${currentYear} in the searchQuery to surface cutting-edge developments`;
 
+  const locale = detectCognitiveLocale(persona);
+  const queryExamples =
+    locale === "en"
+      ? [
+          "event-driven query: {personaAnchor} latest release OR breakthrough OR launch",
+          "comparison query: {personaAnchor} vs {alternative} benchmark",
+        ]
+      : [
+          "event-driven query: {personaAnchor} 新进展 OR 突破 OR 发布",
+          "comparison query: {personaAnchor} vs {alternative} benchmark",
+        ];
+
   return `You are an expert at identifying latent interests and knowledge gaps from a user's knowledge profile.
 
 ## USER'S KNOWN KNOWLEDGE
@@ -229,8 +242,8 @@ Respond with ONLY a JSON object (no markdown, no code fences):
   "estimatedSurprise": 0.8,
   "personaAnchor": "A specific concrete noun from the user's persona (a tool, project, technique, or concept they mentioned)",
   "candidateQueries": [
-    "event-driven query: {personaAnchor} 新进展 OR 突破 OR 发布",
-    "comparison query: {personaAnchor} vs {alternative} benchmark"
+    "${queryExamples[0]}",
+    "${queryExamples[1]}"
   ]
 }`;
 }

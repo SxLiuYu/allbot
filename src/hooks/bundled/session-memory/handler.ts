@@ -51,6 +51,15 @@ interface TopicEntry {
 
 const log = createSubsystemLogger("hooks/session-memory");
 
+/**
+ * Correction extraction is part of the cognitive layer: it requires
+ * `cognitive.enabled` (default true) and `cognitive.correction.enabled`
+ * (default true) to both be on.
+ */
+export function isCorrectionExtractionEnabled(cfg?: KaijiBotConfig): boolean {
+  return cfg?.cognitive?.enabled !== false && cfg?.cognitive?.correction?.enabled !== false;
+}
+
 const MESSAGE_CAP = 500;
 
 const MEMORY_TYPE_TO_SECTION: Record<string, string> = {
@@ -375,7 +384,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
     }
 
     // --- Post-session correction extraction ---
-    const correctionEnabled = cfg?.cognitive?.correction?.enabled !== false;
+    const correctionEnabled = isCorrectionExtractionEnabled(cfg);
     if (sessionContent && cfg && allowLlm && correctionEnabled) {
       try {
         const {

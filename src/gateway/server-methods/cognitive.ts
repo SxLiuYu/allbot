@@ -4,8 +4,15 @@ import {
   validateTasksGetParams,
   validateTasksListParams,
 } from "../protocol/index.js";
+import { TasksCancelParamsSchema } from "../protocol/schema/tasks.js";
+import { compileTypeBoxValidator } from "../protocol/typebox-validator.js";
 import type { GatewayRequestHandlers } from "./types.js";
 import { assertValidParams } from "./validation.js";
+
+type TasksCancelParams = { taskId: string; userId: string; agentId?: string };
+
+const validateTasksCancelParams =
+  compileTypeBoxValidator<TasksCancelParams>(TasksCancelParamsSchema);
 
 export async function loadCognitiveStatsSummary(configDir: string): Promise<{
   enabled: boolean;
@@ -24,11 +31,23 @@ export async function loadCognitiveStatsSummary(configDir: string): Promise<{
   const { SkillLifecycleManager } = await import("../../cognitive/evolution/skill-lifecycle.js");
   const { SkillPersistenceWriter } = await import("../../cognitive/evolution/skill-writer.js");
   const { readConfigFileSnapshot } = await import("../../config/io.js");
+  const { loadConfig } = await import("../../config/config.js");
+  const { resolveDefaultAgentId } = await import("../../agents/agent-scope.js");
+  const { resolveEvolutionSkillBaseDir } =
+    await import("../../cognitive/evolution/skill-lifecycle.js");
 
   const personaStore = new PersonaStore(configDir);
   const insightStore = new InsightStore(configDir);
   const correctionStore = new CorrectionStore(configDir);
-  const writer = new SkillPersistenceWriter(configDir);
+  const statsConfig = loadConfig();
+  // Skills live under <agent workspace>/skills/agent, not under configDir.
+  const writer = new SkillPersistenceWriter(
+    resolveEvolutionSkillBaseDir({
+      config: statsConfig,
+      agentId: resolveDefaultAgentId(statsConfig),
+      configDir,
+    }),
+  );
   const skillLifecycle = new SkillLifecycleManager(writer);
 
   // Aggregate data across all agents/users
@@ -265,6 +284,127 @@ export const cognitiveHandlers: GatewayRequestHandlers = {
     }
   },
 
+  "cognitive.evolution.decide": async ({ respond, params }) => {
+    try {
+      const agentId = typeof params.agentId === "string" ? params.agentId.trim() : "";
+      const userId = typeof params.userId === "string" ? params.userId.trim() : "";
+      const draftId = typeof params.draftId === "string" ? params.draftId.trim() : "";
+      const action = params.action;
+      if (
+        !agentId ||
+        !userId ||
+        !draftId ||
+        (action !== "approve" && action !== "reject")
+      ) {
+        respond(
+          false,
+          undefined,
+          errorShape(
+            ErrorCodes.INVALID_REQUEST,
+            "agentId, userId, draftId and action ('approve'|'reject') are required",
+          ),
+        );
+        return;
+      }
+
+      const { resolveConfigDir } = await import("../../utils.js");
+      const { EvolutionStore } = await import("../../cognitive/evolution/store.js");
+      const store = new EvolutionStore(resolveConfigDir());
+      const records = await store.list(agentId, userId);
+      const record = records.find((item) => item.id === draftId);
+      if (!record?.draft) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.INVALID_REQUEST, `unknown skill draft "${draftId}"`),
+        );
+        return;
+      }
+      if (record.userResponse) {
+        respond(
+          false,
+          undefined,
+          errorShape(
+            ErrorCodes.INVALID_REQUEST,
+            `skill draft "${draftId}" was already ${record.userResponse}`,
+          ),
+        );
+        return;
+      }
+
+      const { grantEvolutionDecision } =
+        await import("../../cognitive/evolution/approval-store.js");
+      const grant = grantEvolutionDecision({
+        agentId,
+        userId,
+        draftId,
+        skillName: record.draft.name,
+        action,
+      });
+      respond(true, {
+        ok: true,
+        draftId,
+        skillName: grant.skillName,
+        action: grant.action,
+        confirmationId: grant.confirmationId,
+        expiresAt: grant.expiresAt,
+        note: "The agent applies this decision on its next evaluate_skill_evolution call.",
+      });
+    } catch (err) {
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
+    }
+  },
+
+  "cognitive.evolution.delete": async ({ respond, params }) => {
+    try {
+      const agentId = typeof params.agentId === "string" ? params.agentId.trim() : "";
+      const userId = typeof params.userId === "string" ? params.userId.trim() : "";
+      const skillName = typeof params.skillName === "string" ? params.skillName.trim() : "";
+      if (!agentId || !userId || !skillName) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.INVALID_REQUEST, "agentId, userId and skillName are required"),
+        );
+        return;
+      }
+
+      const { resolveConfigDir } = await import("../../utils.js");
+      const { loadConfig } = await import("../../config/config.js");
+      const { resolveEvolutionSkillBaseDir } =
+        await import("../../cognitive/evolution/skill-lifecycle.js");
+      const skillBaseDir = resolveEvolutionSkillBaseDir({
+        config: loadConfig(),
+        agentId,
+        configDir: resolveConfigDir(),
+      });
+      const { SkillPersistenceWriter: Writer } =
+        await import("../../cognitive/evolution/skill-writer.js");
+      const writer = new Writer(skillBaseDir);
+      if (!(await writer.skillExists(skillName))) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.INVALID_REQUEST, `unknown skill "${skillName}"`),
+        );
+        return;
+      }
+
+      const { grantSkillDeleteConfirmation } =
+        await import("../../cognitive/evolution/approval-store.js");
+      const grant = grantSkillDeleteConfirmation({ agentId, userId, skillName });
+      respond(true, {
+        ok: true,
+        skillName: grant.skillName,
+        confirmationId: grant.confirmationId,
+        expiresAt: grant.expiresAt,
+        note: "The agent deletes this skill on its next delete_skill call.",
+      });
+    } catch (err) {
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
+    }
+  },
+
   "cognitive.corrections.list": async ({ respond, params }) => {
     try {
       const { resolveConfigDir } = await import("../../utils.js");
@@ -277,6 +417,35 @@ export const cognitiveHandlers: GatewayRequestHandlers = {
       const corrections = await store.listActive(agentId, userId);
 
       respond(true, { corrections });
+    } catch (err) {
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
+    }
+  },
+
+  "cognitive.corrections.delete": async ({ respond, params }) => {
+    try {
+      const agentId = params.agentId as string | undefined;
+      const userId = params.userId as string | undefined;
+      const ids = Array.isArray(params.ids)
+        ? params.ids.filter((id): id is string => typeof id === "string" && id.length > 0)
+        : [];
+      if (!agentId || !userId || ids.length === 0) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.INVALID_REQUEST, "agentId, userId and ids are required"),
+        );
+        return;
+      }
+
+      const { resolveConfigDir } = await import("../../utils.js");
+      const configDir = resolveConfigDir();
+      const { CorrectionStore } = await import("../../cognitive/correction/store.js");
+
+      const store = new CorrectionStore(configDir);
+      const removed = await store.removeByIds(agentId, userId, ids);
+
+      respond(true, { removed });
     } catch (err) {
       respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
     }
@@ -370,6 +539,38 @@ export const cognitiveTaskHandlers: GatewayRequestHandlers = {
         return;
       }
       respond(true, { task: found.task });
+    } catch (err) {
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
+    }
+  },
+
+  "tasks.cancel": async ({ params, respond }) => {
+    if (!assertValidParams(params, validateTasksCancelParams, "tasks.cancel", respond)) {
+      return;
+    }
+    const p = params;
+    try {
+      const { resolveConfigDir } = await import("../../utils.js");
+      const { TaskStore } = await import("../../cognitive/tasks/store.js");
+      const { cancelTask } = await import("../../cognitive/tasks/service.js");
+      const store = new TaskStore(resolveConfigDir());
+
+      const agentId = p.agentId ?? (await store.findTaskAcrossAgents(p.userId, p.taskId))?.agentId;
+      if (!agentId) {
+        respond(
+          false,
+          undefined,
+          errorShape(ErrorCodes.INVALID_REQUEST, `task ${p.taskId} not found for user ${p.userId}`),
+        );
+        return;
+      }
+
+      const result = await cancelTask(store, agentId, p.userId, p.taskId);
+      if (!result.ok) {
+        respond(false, undefined, errorShape(ErrorCodes.INVALID_REQUEST, result.reason));
+        return;
+      }
+      respond(true, { task: result.task });
     } catch (err) {
       respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
     }

@@ -8,6 +8,7 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { filterHeartbeatPairs } from "../../../auto-reply/heartbeat-filter.js";
 import { resolveChannelCapabilities } from "../../../config/channel-capabilities.js";
+import type { KaijiBotConfig } from "../../../config/config.js";
 import { formatErrorMessage } from "../../../infra/errors.js";
 import { resolveHeartbeatSummaryForAgent } from "../../../infra/heartbeat-summary.js";
 import { getMachineDisplayName } from "../../../infra/machine-name.js";
@@ -257,6 +258,22 @@ export {
 };
 
 const MAX_BTW_SNAPSHOT_MESSAGES = 100;
+
+/**
+ * Resolve whether the cognitive write path may run for this turn.
+ * `cognitive.enabled=false` disables the whole path; `persona.autoExtract=false`
+ * additionally skips the persona and fragment LLM extraction while keeping
+ * implicit feedback collection.
+ */
+export function resolveCognitiveWritePathFlags(config?: KaijiBotConfig): {
+  cognitiveEnabled: boolean;
+  personaAutoExtract: boolean;
+} {
+  return {
+    cognitiveEnabled: config?.cognitive?.enabled !== false,
+    personaAutoExtract: config?.cognitive?.persona?.autoExtract !== false,
+  };
+}
 
 function summarizeMessagePayload(msg: AgentMessage): { textChars: number; imageBlocks: number } {
   const content = (msg as { content?: unknown }).content;
@@ -939,7 +956,12 @@ export async function runEmbeddedAttempt(
         modelRegistry: params.modelRegistry,
         model: params.model,
         thinkingLevel: mapThinkingLevel(params.thinkLevel),
-        tools: resolveSessionToolsParam(builtInTools),
+        // An empty `tools` array is treated as "unspecified" by the SDK, which
+        // then enables its built-in read/bash/edit/write defaults. Models with
+        // `compat.supportsTools: false` must opt out explicitly.
+        ...(toolsEnabled
+          ? { tools: resolveSessionToolsParam(builtInTools) }
+          : { noTools: "all" as const }),
         customTools: allCustomTools,
         sessionManager,
         settingsManager,
@@ -1957,6 +1979,12 @@ export async function runEmbeddedAttempt(
           );
         }
 
+        // NOTE: implicit feedback used to receive `promptStartedAt → now` as
+        // "response latency". That interval measures the model round-trip, not
+        // how long the user took to reply, and inflated the engagement signal
+        // for slow providers. The inbound path does not expose a real
+        // user-reply timestamp here, so the latency signal is omitted.
+
         // Capture snapshot before compaction wait so we have complete messages if timeout occurs
         // Check compaction state before and after to avoid race condition where compaction starts during capture
         // Use session state (not subscription) for snapshot decisions - need instantaneous compaction status
@@ -2220,11 +2248,17 @@ export async function runEmbeddedAttempt(
           const turnSnapshot = messagesSnapshot.slice(prePromptMessageCount);
           const senderId = params.senderId;
           const agentId = params.agentId ?? "main";
+          const { cognitiveEnabled, personaAutoExtract } = resolveCognitiveWritePathFlags(
+            params.config,
+          );
 
           // Fire-and-forget: cognitive layer must not block the response
           Promise.resolve()
             .then(async () => {
               try {
+                if (!cognitiveEnabled) {
+                  return;
+                }
                 const { extractFromMessageLLM, createDefaultDeps } =
                   await import("../../../cognitive/persona/llm-extractor.js");
                 const { PersonaStore } = await import("../../../cognitive/persona/store.js");
@@ -2276,7 +2310,6 @@ export async function runEmbeddedAttempt(
                   .slice(-2000);
 
                 const persona = await store.loadOrCreate(agentId, userId);
-                const deps = createDefaultDeps();
                 if (!params.config) {
                   return;
                 }
@@ -2285,39 +2318,45 @@ export async function runEmbeddedAttempt(
                 // attribution.
                 const implicitFeedbackEnabled =
                   params.config.cognitive?.feedback?.implicitFeedback !== false;
-                const extraction = await extractFromMessageLLM(
-                  userText,
-                  assistantText,
-                  persona,
-                  params.config,
-                  deps,
-                );
+                const extraction = personaAutoExtract
+                  ? await extractFromMessageLLM(
+                      userText,
+                      assistantText,
+                      persona,
+                      params.config,
+                      createDefaultDeps(),
+                    )
+                  : undefined;
 
                 // Apply through update(): the LLM extraction above can take
                 // seconds, and a blind save() of the pre-LLM snapshot would
                 // clobber any concurrent persona write (scheduler saves,
                 // outcome finalize, handshake clear) that landed in between.
                 const feedbackUpdated = await store.update(agentId, userId, (current) => {
-                  const merged = mergeExtraction(current, extraction);
+                  const merged = extraction ? mergeExtraction(current, extraction) : current;
                   const pruned = prunePersona(merged);
 
                   if (!implicitFeedbackEnabled) {
                     return pruned;
                   }
-                  const topic = inferTopicFromContext(pruned, extraction, userText);
+                  const topic = inferTopicFromContext(pruned, extraction ?? {}, userText);
                   const previousTopics = pruned.recentFocus;
-                  const signals = extractImplicitSignals(
-                    userText,
-                    undefined,
+                  const signals = extractImplicitSignals(userText, {
                     topic,
                     previousTopics,
-                  );
+                  });
                   const withSignals = processImplicitFeedback(pruned, signals);
                   // Reply-to-insight attribution: if this turn is the user
                   // answering a recent proactive insight, credit/penalize the
                   // insight's own domain bandits.
                   return applyInsightReplyAttribution(withSignals, userText);
                 });
+
+                // cognitive.persona.autoExtract=false skips the fragment LLM
+                // extraction too; fragments are part of the persona model.
+                if (!personaAutoExtract) {
+                  return;
+                }
 
                 try {
                   log.info(`fragment diag: entering collectFragments block`, {

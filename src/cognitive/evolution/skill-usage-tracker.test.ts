@@ -21,7 +21,7 @@ describe("trackSkillUsage", () => {
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), "kaijibot-skill-usage-test-"));
-    writer = new SkillPersistenceWriter(tempDir);
+    writer = new SkillPersistenceWriter(join(tempDir, "workspace"));
   });
 
   afterEach(() => {
@@ -80,5 +80,35 @@ describe("trackSkillUsage", () => {
         configDir: tempDir,
       }),
     ).resolves.toBeUndefined();
+  });
+
+  it("uses <configDir>/workspace/skills/agent as the root when no config is provided", async () => {
+    await writer.writeSkill(makeDraft({ name: "workspace-skill" }));
+    const configDirWriter = new SkillPersistenceWriter(tempDir);
+    expect(await configDirWriter.readSkillMeta("workspace-skill")).toBeNull();
+
+    const { trackSkillUsage } = await import("./skill-usage-tracker.js");
+    await trackSkillUsage({
+      toolMetas: [{ toolName: "read", meta: "/anywhere/skills/agent/workspace-skill/SKILL.md" }],
+      configDir: tempDir,
+    });
+
+    expect((await writer.readSkillMeta("workspace-skill"))!.usageCount).toBe(1);
+  });
+
+  it("honors a custom agent workspace when config and agentId are provided", async () => {
+    const customWs = join(tempDir, "custom-workspace");
+    const customWriter = new SkillPersistenceWriter(customWs);
+    await customWriter.writeSkill(makeDraft({ name: "custom-skill" }));
+
+    const { trackSkillUsage } = await import("./skill-usage-tracker.js");
+    await trackSkillUsage({
+      toolMetas: [{ toolName: "read", meta: `${customWs}/skills/agent/custom-skill/SKILL.md` }],
+      configDir: tempDir,
+      config: { agents: { defaults: { workspace: customWs } } } as never,
+      agentId: "main",
+    });
+
+    expect((await customWriter.readSkillMeta("custom-skill"))!.usageCount).toBe(1);
   });
 });

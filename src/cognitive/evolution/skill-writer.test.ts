@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { readFile, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -41,13 +41,23 @@ describe("SkillPersistenceWriter", () => {
     expect(content).toContain("This is the body.");
   });
 
-  it("creates parent directory if missing", async () => {
+  it("rejects nested names containing path separators", async () => {
     const draft = makeDraft({ name: "deep/nested/skill" });
-    const path = await writer.writeSkill(draft);
+    await expect(writer.writeSkill(draft)).rejects.toThrow("Invalid skill name");
+  });
 
-    expect(existsSync(path)).toBe(true);
-    const content = await readFile(path, "utf-8");
-    expect(content).toContain("name: deep/nested/skill");
+  it("rejects empty, dot, dot-dot, and whitespace skill names", async () => {
+    for (const name of ["", ".", "..", "   "]) {
+      await expect(writer.writeSkill(makeDraft({ name }))).rejects.toThrow("Invalid skill name");
+      await expect(writer.removeSkill(name)).rejects.toThrow("Invalid skill name");
+    }
+  });
+
+  it("removeSkill rejects traversal names and keeps the skills root intact", async () => {
+    await writer.writeSkill(makeDraft({ name: "keeper" }));
+    await expect(writer.removeSkill("..")).rejects.toThrow("Invalid skill name");
+    await expect(writer.removeSkill(".")).rejects.toThrow("Invalid skill name");
+    expect(existsSync(join(tempDir, "skills", "agent", "keeper", "SKILL.md"))).toBe(true);
   });
 
   it("skillExists returns true for existing and false for missing", async () => {
@@ -299,6 +309,20 @@ describe("SkillPersistenceWriter", () => {
 
     const bakPath = join(tempDir, "skills", "agent", "fresh-skill", "SKILL.md.bak");
     await expect(access(bakPath)).rejects.toThrow();
+  });
+
+  it("writeSkill() backs up the previous SKILL.md as SKILL.md.<timestamp>.bak on overwrite", async () => {
+    await writer.writeSkill(makeDraft({ name: "overwrite-me", bodyMarkdown: "old body" }));
+    await writer.writeSkill(makeDraft({ name: "overwrite-me", bodyMarkdown: "new body" }));
+
+    const dir = join(tempDir, "skills", "agent", "overwrite-me");
+    const backups = readdirSync(dir).filter((name) => /^SKILL\.md\.\d+\.bak$/.test(name));
+    expect(backups).toHaveLength(1);
+    expect(await readFile(join(dir, backups[0]!), "utf-8")).toContain("old body");
+
+    const active = await readFile(join(dir, "SKILL.md"), "utf-8");
+    expect(active).toContain("new body");
+    expect(active).not.toContain("old body");
   });
 
   it("updateSkill() overwrites a previous .bak on subsequent updates", async () => {

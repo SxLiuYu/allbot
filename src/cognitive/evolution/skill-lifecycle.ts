@@ -1,6 +1,42 @@
+import { join } from "node:path";
+import { resolveAgentWorkspaceDir } from "../../agents/agent-scope.js";
+import { resolveDefaultAgentWorkspaceDir } from "../../agents/workspace.js";
+import type { KaijiBotConfig } from "../../config/config.js";
 import { textSimilarity } from "../../infra/text-similarity.js";
+import { DEFAULT_AGENT_ID } from "../../routing/session-key.js";
 import type { SkillPersistenceWriter } from "./skill-writer.js";
 import type { SkillMeta, DedupCheckResult } from "./types.js";
+
+/** Location inputs for the single source of truth of evolution skill paths. */
+export type EvolutionSkillRootOptions = {
+  /** Full config when available; honors a custom agent workspace. */
+  config?: KaijiBotConfig;
+  /** Agent whose workspace owns the skills (defaults to "main"). */
+  agentId?: string;
+  /** State/config dir fallback: <configDir>/workspace. */
+  configDir?: string;
+};
+
+/**
+ * Workspace root under which agent-created skills live at `skills/agent`.
+ *
+ * Every evolution caller must go through this resolver so that writes, usage
+ * tracking, and the daily cleanup all point at the same directory.
+ */
+export function resolveEvolutionSkillBaseDir(options: EvolutionSkillRootOptions = {}): string {
+  if (options.config) {
+    return resolveAgentWorkspaceDir(options.config, options.agentId ?? DEFAULT_AGENT_ID);
+  }
+  if (options.configDir) {
+    return join(options.configDir, "workspace");
+  }
+  return resolveDefaultAgentWorkspaceDir();
+}
+
+/** Absolute root of agent-created skills: `<workspace>/skills/agent`. */
+export function resolveEvolutionSkillsRoot(options: EvolutionSkillRootOptions = {}): string {
+  return join(resolveEvolutionSkillBaseDir(options), "skills", "agent");
+}
 
 function levenshtein(a: string, b: string): number {
   const m = a.length;

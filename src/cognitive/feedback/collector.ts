@@ -1,6 +1,13 @@
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { PersonaTree, InsightRecord } from "../types.js";
-import { recordCalibration } from "./calibration.js";
+import {
+  appendCalibration,
+  readInsightGateSnapshot,
+  recordCalibration,
+  recordNoResponseCalibration,
+  resolvePredictedPAccept,
+} from "./calibration.js";
+import type { InsightGateSnapshot } from "./calibration.js";
 import {
   updateBanditFromFeedback,
   adaptFrequency,
@@ -135,68 +142,8 @@ export function inferTopicFromContext(
   return undefined;
 }
 
-/**
- * Extract implicit feedback signals from a conversation turn.
- */
-export function extractImplicitSignals(
-  userMessage: string,
-  responseLatencyMs?: number,
-  topic?: string,
-  previousTopics?: string[],
-): ImplicitFeedbackSignal[] {
-  const signals: ImplicitFeedbackSignal[] = [];
-
-  signals.push({
-    type: "response_length",
-    topic,
-    value: userMessage.length,
-    timestamp: Date.now(),
-  });
-
-  if (responseLatencyMs !== undefined) {
-    signals.push({
-      type: "response_latency",
-      topic,
-      value: responseLatencyMs,
-      timestamp: Date.now(),
-    });
-  }
-
-  // Question depth — check if user asks deep follow-up questions
-  const hasDeepQuestion = /(为什么|如何|怎样|what if|why|how come|深层|本质)/.test(userMessage);
-  if (hasDeepQuestion) {
-    signals.push({
-      type: "question_depth",
-      topic,
-      value: 1,
-      timestamp: Date.now(),
-    });
-  }
-
-  // Topic continuation / abandonment detection
-  if (topic && previousTopics && previousTopics.length > 0) {
-    const recentTopics = previousTopics.slice(-3);
-    const isContinuation = recentTopics.some((t) => t.toLowerCase() === topic.toLowerCase());
-    if (isContinuation) {
-      signals.push({
-        type: "topic_continuation",
-        topic,
-        value: 1,
-        timestamp: Date.now(),
-      });
-    } else if (recentTopics.length > 0) {
-      const abandonedTopic = recentTopics[recentTopics.length - 1];
-      signals.push({
-        type: "topic_abandonment",
-        topic: abandonedTopic,
-        value: 1,
-        timestamp: Date.now(),
-      });
-    }
-  }
-
-  return signals;
-}
+export { extractImplicitSignals } from "./signal-extraction.js";
+export type { ImplicitSignalOptions } from "./signal-extraction.js";
 
 const INSIGHT_FEEDBACK_SENTIMENT = ["positive", "negative", "neutral", "engaged"] as const;
 export type InsightFeedbackSentiment = (typeof INSIGHT_FEEDBACK_SENTIMENT)[number];
@@ -371,7 +318,11 @@ export function processInsightFeedback(
     ? Math.max(persona.feedbackProfile.lastProactiveAt, insight.deliveredAt)
     : persona.feedbackProfile.lastProactiveAt;
 
-  const calRecord = recordCalibration(insight.id, 0.5, feedback);
+  const calRecord = recordCalibration(
+    insight.id,
+    resolvePredictedPAccept(insight.id, readInsightGateSnapshot(insight)),
+    feedback,
+  );
 
   return {
     ...persona,
@@ -386,7 +337,7 @@ export function processInsightFeedback(
       optimalFrequencyHours: newFrequency,
       lastProactiveAt,
     },
-    calibrationHistory: [...persona.calibrationHistory, calRecord].slice(-50),
+    calibrationHistory: appendCalibration(persona.calibrationHistory, calRecord),
   };
 }
 
@@ -418,11 +369,22 @@ export function processInsightDeliverySignal(
 export type NoResponseContext = {
   previousDomains: string[];
   previousMode?: string;
+  /** Id of the unanswered insight; falls back to the latest recentInsightIds entry. */
+  insightId?: string;
+  /** Gate snapshot of the unanswered insight, used as the predicted pAccept. */
+  gateSnapshot?: InsightGateSnapshot | null;
 };
 
 export function processNoResponse(persona: PersonaTree, context?: NoResponseContext): PersonaTree {
   const prev = persona.feedbackProfile.consecutiveNoResponses ?? 0;
   const updated = prev + 1;
+
+  // Silence is a calibration outcome whether or not the caller still knows
+  // which domains/mode were involved.
+  const calibrationHistory = appendCalibration(
+    persona.calibrationHistory,
+    recordNoResponseCalibration(persona, context),
+  );
 
   if (!context) {
     log.info("no-response streak incremented", { prev, updated });
@@ -432,6 +394,7 @@ export function processNoResponse(persona: PersonaTree, context?: NoResponseCont
         ...persona.feedbackProfile,
         consecutiveNoResponses: updated,
       },
+      calibrationHistory,
     };
   }
 
@@ -475,6 +438,7 @@ export function processNoResponse(persona: PersonaTree, context?: NoResponseCont
       topicBandits: updatedBandits,
       ...(updatedModeBandits !== undefined ? { modeBandits: updatedModeBandits } : {}),
     },
+    calibrationHistory,
   };
 }
 

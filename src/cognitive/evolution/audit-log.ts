@@ -14,6 +14,26 @@ export type AuditEntry = {
   metadata?: Record<string, unknown>;
 };
 
+/** Audit operations emitted by the skill approval workflow. */
+export const EVOLUTION_AUDIT_OPERATIONS = {
+  /** A draft was produced and is waiting for user approval. */
+  draft: "skill.draft",
+  /** The user approved a draft and it was written to disk. */
+  approve: "skill.approve",
+  /** The user rejected a draft; nothing was written. */
+  reject: "skill.reject",
+} as const;
+
+export type EvolutionAuditOperation =
+  (typeof EVOLUTION_AUDIT_OPERATIONS)[keyof typeof EVOLUTION_AUDIT_OPERATIONS];
+
+export type EvolutionAuditEvent = {
+  actor: string;
+  target: string;
+  agentId?: string;
+  metadata?: Record<string, unknown>;
+};
+
 const MAX_AUDIT_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_ARCHIVED_FILES = 5;
 
@@ -43,6 +63,42 @@ export class AuditLog {
     const line = JSON.stringify(full) + "\n";
     await appendFile(this.filePath(), line, "utf-8");
     return full;
+  }
+
+  /** Record that a skill draft is waiting for user approval. */
+  async recordDraft(event: EvolutionAuditEvent): Promise<AuditEntry> {
+    return this.append({
+      operation: EVOLUTION_AUDIT_OPERATIONS.draft,
+      actor: event.actor,
+      target: event.target,
+      outcome: "skipped",
+      agentId: event.agentId,
+      metadata: event.metadata,
+    });
+  }
+
+  /** Record that a user approved a draft and it was persisted. */
+  async recordApprove(event: EvolutionAuditEvent): Promise<AuditEntry> {
+    return this.append({
+      operation: EVOLUTION_AUDIT_OPERATIONS.approve,
+      actor: event.actor,
+      target: event.target,
+      outcome: "success",
+      agentId: event.agentId,
+      metadata: event.metadata,
+    });
+  }
+
+  /** Record that a user rejected a draft; nothing was written. */
+  async recordReject(event: EvolutionAuditEvent): Promise<AuditEntry> {
+    return this.append({
+      operation: EVOLUTION_AUDIT_OPERATIONS.reject,
+      actor: event.actor,
+      target: event.target,
+      outcome: "skipped",
+      agentId: event.agentId,
+      metadata: event.metadata,
+    });
   }
 
   private async rotateIfNeeded(): Promise<void> {

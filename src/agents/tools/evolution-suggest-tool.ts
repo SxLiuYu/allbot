@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Type } from "typebox";
 import { t } from "../../cli/i18n/translate.js";
 import { resolveCorrectionUserId } from "../../cognitive/correction/userid.js";
+import type { EvolutionUserDecision } from "../../cognitive/evolution/types.js";
 import type { KaijiBotConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
@@ -30,6 +31,11 @@ export function createEvolutionSuggestTool(deps: {
   config?: KaijiBotConfig;
   sessionKey?: string;
   deliveryTo?: string;
+  /**
+   * User decision (approve/reject) injected by the host after an explicit user
+   * action. Never sourced from model-supplied tool parameters.
+   */
+  getUserDecision?: () => EvolutionUserDecision | undefined;
 }): AnyAgentTool | null {
   if (deps.config?.cognitive?.enabled === false) {
     return null;
@@ -42,9 +48,10 @@ export function createEvolutionSuggestTool(deps: {
     name: "evaluate_skill_evolution",
     label: "Create Evolution Skill",
     description:
-      "Creates and saves a reusable Skill from the current task context. " +
+      "Drafts a reusable Skill from the current task context. " +
       "Call this ONLY when you have independently decided a task is worth preserving as a skill " +
-      "(based on [Evolution Signal] or your own judgment). The tool generates the skill via LLM and saves it automatically. " +
+      "(based on [Evolution Signal] or your own judgment). By default the draft is returned for user " +
+      "approval and is NOT written to disk; it is saved only after the user explicitly approves it. " +
       "Always tell the user what happened. For modifying existing skills, use patch_skill instead.",
     parameters: EvolutionSuggestSchema,
     async execute(_toolCallId: string, rawParams: unknown) {
@@ -66,15 +73,122 @@ export function createEvolutionSuggestTool(deps: {
         const { resolveConfigDir } = await import("../../utils.js");
         const { consumeToolErrorProfile } = await import("../tool-error-summary.js");
         const { resolveAgentIdFromSessionKey } = await import("../../routing/session-key.js");
-        const { resolveAgentWorkspaceDir } = await import("../agent-scope.js");
 
         const configDir = resolveConfigDir();
         const store = new EvolutionStore(configDir);
         const agentId = resolveAgentIdFromSessionKey(deps.sessionKey);
 
-        let skillBaseDir = configDir;
-        if (deps.config) {
-          skillBaseDir = resolveAgentWorkspaceDir(deps.config, agentId);
+        const { resolveEvolutionSkillBaseDir } =
+          await import("../../cognitive/evolution/skill-lifecycle.js");
+        const skillBaseDir = resolveEvolutionSkillBaseDir({
+          config: deps.config,
+          agentId,
+          configDir,
+        });
+
+        const userId = resolveCorrectionUserId(deps.sessionKey, deps.deliveryTo);
+        if (!userId) {
+          return textResult("No user session; skill creation skipped.", { status: "no_session" });
+        }
+
+        // Approval / rejection only happens when the host injects a decision
+        // after the user explicitly acted. Model tool params cannot approve.
+        const decision = deps.getUserDecision?.();
+        if (decision) {
+          if (typeof decision.draftId !== "string" || decision.draftId.trim() === "") {
+            return textResult("Skill decision is missing the draft it applies to.", {
+              status: "approval_invalid",
+            });
+          }
+          if (decision.action !== "approve" && decision.action !== "reject") {
+            return textResult("Skill decision has an unknown action.", {
+              status: "approval_invalid",
+            });
+          }
+          if (
+            typeof decision.confirmationId !== "string" ||
+            decision.confirmationId.trim() === "" ||
+            (decision.expiresAt !== undefined && decision.expiresAt <= Date.now())
+          ) {
+            return textResult("Skill decision is not a valid user confirmation.", {
+              status: "approval_invalid",
+            });
+          }
+
+          const records = await store.list(agentId, userId);
+          const record = records.find((item) => item.id === decision.draftId);
+          if (!record?.draft) {
+            return jsonResult({
+              status: "draft_not_found",
+              draftId: decision.draftId,
+              suggestionText: "No matching draft was found; generate a new skill draft first.",
+            });
+          }
+
+          const { isValidEvolutionConfirmation } =
+            await import("../../cognitive/evolution/types.js");
+          if (!isValidEvolutionConfirmation(decision, record.draft.name)) {
+            return textResult("Skill decision is not a valid user confirmation.", {
+              status: "approval_invalid",
+            });
+          }
+
+          if (decision.action === "reject") {
+            record.userResponse = "rejected";
+            await store.save(agentId, record);
+
+            try {
+              const { AuditLog } = await import("../../cognitive/evolution/audit-log.js");
+              const audit = new AuditLog(configDir);
+              await audit.recordReject({
+                actor: userId,
+                target: record.draft.name,
+                agentId,
+                metadata: { confirmationId: decision.confirmationId },
+              });
+            } catch {
+              /* non-fatal */
+            }
+
+            return jsonResult({
+              status: "rejected",
+              skillName: record.draft.name,
+              suggestionText: `Skill draft "${record.draft.name}" was rejected; nothing was written.`,
+            });
+          }
+
+          const { SkillPersistenceWriter } =
+            await import("../../cognitive/evolution/skill-writer.js");
+          const writer = new SkillPersistenceWriter(skillBaseDir);
+          const savedPath = await writer.writeSkill(record.draft);
+
+          record.userResponse = "accepted";
+          record.savedSkillPath = savedPath;
+          await store.save(agentId, record);
+
+          try {
+            const { AuditLog } = await import("../../cognitive/evolution/audit-log.js");
+            const audit = new AuditLog(configDir);
+            await audit.recordApprove({
+              actor: userId,
+              target: record.draft.name,
+              agentId,
+              metadata: { confirmationId: decision.confirmationId, savedPath },
+            });
+          } catch {
+            /* non-fatal */
+          }
+
+          return jsonResult({
+            status: "saved",
+            skillName: record.draft.name,
+            savedPath,
+            description: record.draft.description,
+            suggestionText: t("cli.tool.evolution.savedSuggestion", {
+              name: record.draft.name,
+              description: record.draft.description,
+            }),
+          });
         }
 
         let engine: InstanceType<
@@ -96,11 +210,6 @@ export function createEvolutionSuggestTool(deps: {
           }
         } catch {
           engine = new EvolutionEngine(store);
-        }
-
-        const userId = resolveCorrectionUserId(deps.sessionKey, deps.deliveryTo);
-        if (!userId) {
-          return textResult("No user session; skill creation skipped.", { status: "no_session" });
         }
 
         const errorProfile = deps.sessionKey ? consumeToolErrorProfile(deps.sessionKey) : undefined;
@@ -251,13 +360,53 @@ export function createEvolutionSuggestTool(deps: {
           draft = refinedDraft;
         }
 
+        const evolutionConfig = deps.config?.cognitive?.evolution as unknown as
+          | { requireApproval?: boolean }
+          | undefined;
+        const requireApproval = evolutionConfig?.requireApproval !== false;
+
+        const draftRecordId = randomUUID();
+        if (requireApproval) {
+          const record = {
+            id: draftRecordId,
+            userId,
+            candidate,
+            draft,
+            timestamp: Date.now(),
+          };
+          await store.save(agentId, record);
+
+          try {
+            const { AuditLog } = await import("../../cognitive/evolution/audit-log.js");
+            const audit = new AuditLog(configDir);
+            await audit.recordDraft({
+              actor: userId,
+              target: draft.name,
+              agentId,
+              metadata: { draftId: draftRecordId },
+            });
+          } catch {
+            /* non-fatal */
+          }
+
+          return jsonResult({
+            status: "needs_approval",
+            draftId: draftRecordId,
+            skillName: draft.name,
+            description: draft.description,
+            draft,
+            existingSkills,
+            suggestionText: `Skill draft "${draft.name}" is ready. It was not saved; the user must approve it first.`,
+          });
+        }
+
         const { SkillPersistenceWriter: SW2 } =
           await import("../../cognitive/evolution/skill-writer.js");
         const saveWriter = new SW2(skillBaseDir);
         const savedPath = await saveWriter.writeSkill(draft);
 
         const record = {
-          id: randomUUID(),
+          id: draftRecordId,
           userId,
           candidate,
           draft,

@@ -533,6 +533,11 @@ function resolveConfiguredFallbackModel(params: {
           providerConfig?.models?.[0]?.maxTokens ??
           DEFAULT_CONTEXT_TOKENS,
         headers: requestConfig.headers,
+        // Custom providers configured without a per-model `api` resolve
+        // through this fallback. Dropping `compat` here silently re-enabled
+        // tools (and other transport quirks) for models that declared
+        // `supportsTools: false`.
+        ...(configuredModel?.compat ? { compat: configuredModel.compat } : {}),
       } as Model<Api>,
       providerRequest,
     ),

@@ -250,4 +250,6 @@ export type InsightRecord = {
     structureSeed?: number;
     patternFrame?: number;
   };
+  /** PRISM gate decision at generation time, used as the calibration prediction. */
+  gateSnapshot?: { pAccept: number };
 };

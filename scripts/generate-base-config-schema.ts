@@ -70,7 +70,14 @@ if (args.has("--check") && args.has("--write")) {
   throw new Error("Use either --check or --write, not both.");
 }
 
-if (import.meta.url === new URL(process.argv[1] ?? "", "file://").href) {
+// Compare resolved filesystem paths: `new URL(process.argv[1], "file://")`
+// never matches on Windows (drive letters / backslashes), which made
+// `pnpm config:schema:gen` silently write nothing there.
+const invokedDirectly =
+  process.argv[1] !== undefined &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invokedDirectly) {
   const result = writeBaseConfigSchemaModule({ check: args.has("--check") });
   if (result.changed) {
     if (args.has("--check")) {

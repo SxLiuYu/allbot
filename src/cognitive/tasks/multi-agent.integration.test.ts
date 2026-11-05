@@ -125,7 +125,15 @@ describe("multi-agent task e2e (T9)", () => {
     const childBId = JSON.parse((splitB.content[0] as { text: string }).text).taskId as string;
     const childAId = JSON.parse((splitA.content[0] as { text: string }).text).taskId as string;
 
-    const reportTool = createTaskStepReportTool();
+    // task_step_report is ownership-scoped: each agent's turn reports on the
+    // session it is actually running in.
+    const reportTools = new Map(
+      ["main", "researcher", "writer"].map((agentId) => [
+        agentId,
+        createTaskStepReportTool({ sessionKey: `agent:${agentId}:${USER}`, agentId }),
+      ]),
+    );
+    const reportTool = reportTools.get("main")!;
     await reportTool.execute("parent-step-1", {
       taskId: parent!.id,
       stepIndex: 1,
@@ -146,7 +154,7 @@ describe("multi-agent task e2e (T9)", () => {
         text.includes("[Task Step 1/") &&
         text.includes("调研 A 侧事实"),
     );
-    await reportTool.execute("researcher-step-1", {
+    await reportTools.get("researcher")!.execute("researcher-step-1", {
       taskId: childAId,
       stepIndex: 1,
       summary: "A 侧结论：事实甲成立",
@@ -165,7 +173,7 @@ describe("multi-agent task e2e (T9)", () => {
         text.includes("[Task Step 1/") &&
         text.includes("起草 B 侧草稿"),
     );
-    await reportTool.execute("writer-step-1", {
+    await reportTools.get("writer")!.execute("writer-step-1", {
       taskId: childBId,
       stepIndex: 1,
       summary: "B 侧草稿：建议乙",

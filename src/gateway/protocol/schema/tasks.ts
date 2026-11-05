@@ -26,3 +26,16 @@ export const TasksGetParamsSchema = Type.Object(
   },
   { additionalProperties: false },
 );
+
+/**
+ * Cancel a queued/running/blocked task. `agentId` is optional: without it the
+ * owning agent is resolved across namespaces (task ids are UUIDs).
+ */
+export const TasksCancelParamsSchema = Type.Object(
+  {
+    taskId: NonEmptyString,
+    userId: NonEmptyString,
+    agentId: Type.Optional(NonEmptyString),
+  },
+  { additionalProperties: false },
+);

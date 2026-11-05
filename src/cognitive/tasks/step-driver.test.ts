@@ -81,4 +81,50 @@ describe("step driver", () => {
     const result = reportStepOutcome({ taskId: "nope", stepIndex: 1, summary: "x" });
     expect(result.delivered).toBe(false);
   });
+
+  it("rejects a report from another session/user/agent and keeps the step pending", async () => {
+    const driver = createProductionStepDriver({
+      sessionKey: "agent:main:ou_alice",
+      enqueueSystemEvent: () => true,
+      requestHeartbeatNow: () => {},
+      stepTimeoutMs: 1_000,
+    });
+    const task = {
+      id: "task-owner",
+      agentId: "main",
+      userId: "ou_alice",
+      budget: { usedSteps: 0, maxSteps: 3, maxWallClockMs: 60_000 },
+      steps: [],
+    } as never;
+    const pending = driver(task);
+    await vi.waitFor(() => expect(pendingStepCount()).toBe(1));
+
+    const wrongSession = reportStepOutcome(
+      { taskId: "task-owner", stepIndex: 1, summary: "篡改" },
+      { sessionKey: "agent:main:ou_bob", userId: "ou_bob" },
+    );
+    expect(wrongSession.delivered).toBe(false);
+    if (wrongSession.delivered) {
+      throw new Error("expected the wrong-session step to be rejected");
+    }
+    expect(wrongSession.reason).toContain("does not belong to this session");
+
+    const wrongAgent = reportStepOutcome(
+      { taskId: "task-owner", stepIndex: 1, summary: "篡改" },
+      { sessionKey: "agent:main:ou_alice", userId: "ou_alice", agentId: "other" },
+    );
+    expect(wrongAgent.delivered).toBe(false);
+
+    // Still pending after both rejected attempts: a foreign turn cannot close it.
+    expect(pendingStepCount()).toBe(1);
+
+    const owner = reportStepOutcome(
+      { taskId: "task-owner", stepIndex: 1, summary: "本人汇报", done: true },
+      { sessionKey: "agent:main:ou_alice", userId: "ou_alice", agentId: "main" },
+    );
+    expect(owner.delivered).toBe(true);
+    const outcome = await pending;
+    expect(outcome.summary).toBe("本人汇报");
+    expect(outcome.done).toBe(true);
+  });
 });

@@ -101,7 +101,12 @@ import { runSetupWizard } from "../wizard/setup.js";
 import { createAuthRateLimiter, type AuthRateLimiter } from "./auth-rate-limit.js";
 import { resolveGatewayAuth } from "./auth.js";
 import { startChannelHealthMonitor } from "./channel-health-monitor.js";
-import { mergeSchedulerFeedbackProfile } from "./cognitive-persona-merge.js";
+import {
+  applyUndeliveredInsightOutcome,
+  createInsightRecord,
+  mergeSchedulerFeedbackProfile,
+  resolveInsightTriggerSource,
+} from "./cognitive-persona-merge.js";
 import { resolveGatewayReloadSettings, startGatewayConfigReloader } from "./config-reload.js";
 import type { ControlUiRootState } from "./control-ui.js";
 import {
@@ -1457,6 +1462,7 @@ export async function startGatewayServer(
           const { PersonaChangeSource } =
             await import("../cognitive/scheduler/event-sources/persona-change-source.js");
           const { PersonaStore } = await import("../cognitive/persona/store.js");
+          const { createDecisionLedger } = await import("../cognitive/ledger/index.js");
           const { resolveConfigDir } = await import("../utils.js");
           const {
             generateInsightCandidatesLLM,
@@ -1466,6 +1472,15 @@ export async function startGatewayServer(
           const cognitiveStore = new PersonaStore(resolveConfigDir());
           await cognitiveStore.migrateFromFlatLayout();
           const baseInsightDeps = createDefaultInsightDeps();
+          const decisionLedger = createDecisionLedger({
+            dir: path.join(resolveConfigDir(), "ledger"),
+          });
+          // The onInsightReady callback receives no event argument, so the
+          // gateway tracks which event source is driving processEvent() for a
+          // user and stamps the resulting InsightRecord with its real trigger.
+          // Timer ticks never enter this map and stay "scheduled".
+          const insightEventTypes = new Map<string, SchedulerEvent["type"]>();
+          const insightEventKey = (agentId: string, userId: string) => `${agentId}\u0000${userId}`;
 
           // Startup sweep: insight system events are in-memory and did not
           // survive this restart, so any awaitingDeliveryConfirmation older
@@ -1497,6 +1512,22 @@ export async function startGatewayServer(
               return;
             }
             if (delivered) {
+              // Stamp the actual channel-delivery time. Records are written
+              // without deliveredAt at enqueue time; the heartbeat runner sets
+              // deliveryMessageId right after the channel send and reports the
+              // outcome, so this is the first point with a real send timestamp.
+              try {
+                const { InsightStore: InsightStoreForDelivery } =
+                  await import("../cognitive/insight/store.js");
+                const insightStore = new InsightStoreForDelivery(resolveConfigDir());
+                const record = await insightStore.load(agentId, userId, insightId);
+                if (record && record.deliveredAt === undefined) {
+                  record.deliveredAt = Date.now();
+                  await insightStore.save(agentId, userId, record);
+                }
+              } catch (err) {
+                log.warn(`cognitive insight deliveredAt update failed: ${String(err)}`);
+              }
               await cognitiveStore.update(agentId, userId, (persona) => {
                 // Outcome reports can arrive stale (redundant wakes, replays):
                 // an outcome for insight X must only finalize or clear state
@@ -1532,56 +1563,9 @@ export async function startGatewayServer(
               });
               return;
             }
-            await cognitiveStore.update(agentId, userId, (persona) => {
-              const awaiting = persona.feedbackProfile.awaitingDeliveryConfirmation;
-              const matching = awaiting?.candidate.id === insightId ? awaiting : undefined;
-              const existing = persona.feedbackProfile.pendingInsightDelivery;
-              if (existing && existing.generatedAt > record.generatedAt) {
-                if (matching) {
-                  persona.feedbackProfile.awaitingDeliveryConfirmation = null;
-                }
-                return persona;
-              }
-              const candidate: import("../cognitive/insight/types.js").InsightCandidate =
-                matching?.candidate ?? {
-                  id: record.id,
-                  content: record.content,
-                  rationale: record.rationale,
-                  targetDomains: record.targetDomains,
-                  sourceDomains: record.sourceDomains,
-                  relevanceScore: 0,
-                  surpriseScore: 0,
-                  compositeScore: 0,
-                  sources: record.sources,
-                  verificationStatus: "verified",
-                  ...(record.resolvedMode ? { resolvedMode: record.resolvedMode } : {}),
-                  ...(record.promptVariant ? { promptVariant: record.promptVariant } : {}),
-                };
-              persona.feedbackProfile.pendingInsightDelivery = {
-                candidate,
-                generatedAt: matching?.eventTimestamp ?? record.generatedAt,
-                opportunityType: matching?.opportunityType ?? "redelivery",
-                attemptCount: (existing?.attemptCount ?? 0) + 1,
-              };
-              if (matching) {
-                persona.feedbackProfile.awaitingDeliveryConfirmation = null;
-              }
-              const ts = matching?.eventTimestamp ?? record.generatedAt;
-              if (ts > persona.feedbackProfile.lastProactiveAt) {
-                persona.feedbackProfile.lastProactiveAt = ts;
-              }
-              const prevContents = persona.feedbackProfile.recentInsightContents ?? [];
-              persona.feedbackProfile.recentInsightContents = (
-                prevContents[prevContents.length - 1] === candidate.content
-                  ? prevContents
-                  : [...prevContents, candidate.content]
-              ).slice(-10);
-              const prevIds = persona.feedbackProfile.recentInsightIds ?? [];
-              persona.feedbackProfile.recentInsightIds = (
-                prevIds[prevIds.length - 1] === candidate.id ? prevIds : [...prevIds, candidate.id]
-              ).slice(-20);
-              return persona;
-            });
+            await cognitiveStore.update(agentId, userId, (persona) =>
+              applyUndeliveredInsightOutcome(persona, insightId, record),
+            );
           };
 
           const insightDeps = {
@@ -1680,6 +1664,25 @@ export async function startGatewayServer(
               },
               applyNoResponseLedger: async (agentId, userId, lastProactiveAt) => {
                 const { processNoResponse } = await import("../cognitive/feedback/collector.js");
+                // Silence is a calibration sample: load the unanswered insight
+                // so the prediction comes from the gate decision that actually
+                // admitted it, not from the 0.5 fallback.
+                let lastInsightId: string | undefined;
+                let gateSnapshot: { pAccept: number } | null = null;
+                try {
+                  const { InsightStore: InsightStoreForCalibration } =
+                    await import("../cognitive/insight/store.js");
+                  const { readInsightGateSnapshot } =
+                    await import("../cognitive/feedback/calibration.js");
+                  const calibrationStore = new InsightStoreForCalibration(resolveConfigDir());
+                  const [lastInsight] = await calibrationStore.listRecent(agentId, userId, 1);
+                  if (lastInsight) {
+                    lastInsightId = lastInsight.id;
+                    gateSnapshot = readInsightGateSnapshot(lastInsight);
+                  }
+                } catch (err) {
+                  log.warn(`no-response calibration lookup failed: ${String(err)}`);
+                }
                 return await cognitiveStore.update(agentId, userId, (current) => {
                   // Re-check on fresh state: a reply since the scheduler's
                   // snapshot was loaded resets the streak (making this send
@@ -1701,6 +1704,8 @@ export async function startGatewayServer(
                   const updated = processNoResponse(current, {
                     previousDomains,
                     previousMode,
+                    ...(lastInsightId ? { insightId: lastInsightId } : {}),
+                    gateSnapshot,
                   });
                   updated.feedbackProfile.lastNoResponseAt = lastProactiveAt;
                   return updated;
@@ -1714,22 +1719,15 @@ export async function startGatewayServer(
                 return records.map((r) => r.content);
               },
               async onInsightReady(agentId: string, userId: string, candidate) {
-                const record: import("../cognitive/types.js").InsightRecord = {
-                  id: candidate.id,
-                  generatedAt: Date.now(),
-                  triggerSource: "scheduled",
-                  targetDomains: candidate.targetDomains,
-                  sourceDomains: candidate.sourceDomains,
-                  content: candidate.content,
-                  rationale: candidate.rationale,
-                  sources: candidate.sources,
-                  deliveredAt: Date.now(),
-                  resolvedMode: candidate.resolvedMode,
-                  promptVariant: candidate.promptVariant,
-                };
+                const record = createInsightRecord(
+                  candidate,
+                  resolveInsightTriggerSource(
+                    insightEventTypes.get(insightEventKey(agentId, userId)),
+                  ),
+                  Date.now(),
+                );
 
                 try {
-                  const { resolveConfigDir } = await import("../utils.js");
                   const { InsightStore } = await import("../cognitive/insight/store.js");
                   const insightStore = new InsightStore(resolveConfigDir());
                   await insightStore.save(agentId, userId, record);
@@ -1738,28 +1736,41 @@ export async function startGatewayServer(
                 }
 
                 try {
-                  const { findSessionKeyForUserId } = await import("./cognitive-delivery.js");
+                  const { resolveCognitiveDeliveryTarget } =
+                    await import("./cognitive-delivery.js");
                   const { enqueueSystemEvent } = await import("../infra/system-events.js");
                   const { requestHeartbeatNow } = await import("../infra/heartbeat-wake.js");
 
-                  const insightText = candidate.content;
-                  const sessionKey = findSessionKeyForUserId(cfgAtStart, userId, agentId);
-                  if (sessionKey) {
-                    enqueueSystemEvent(
-                      `[Cognitive Insight] ${insightText}\n（这是一条已生成的主动洞察，请用你自己的语言自然地分享给用户。）`,
-                      { sessionKey, contextKey: `insight:${record.id}` },
-                    );
-                    requestHeartbeatNow({ reason: "cognitive-insight", sessionKey });
-                    log.info(`cognitive insight enqueued for heartbeat delivery to ${userId}`, {
-                      sessionKey,
-                    });
-                    return true;
-                  } else {
+                  // A session with no channel binding (TUI-only, lastChannel
+                  // "none", missing recipient) cannot receive a proactive
+                  // push; heartbeat would report delivered:false anyway, so
+                  // treat it as unroutable before arming confirmation state.
+                  const target = resolveCognitiveDeliveryTarget(cfgAtStart, userId, agentId);
+                  if (!target) {
                     log.info(
-                      `cognitive insight: no routable session for ${userId}, skipping delivery`,
+                      `cognitive insight: no routable channel for ${userId}, skipping delivery`,
                     );
                     return false;
                   }
+                  const queued = enqueueSystemEvent(
+                    `[Cognitive Insight] ${candidate.content}\n（这是一条已生成的主动洞察，请用你自己的语言自然地分享给用户。）`,
+                    { sessionKey: target.sessionKey, contextKey: `insight:${record.id}` },
+                  );
+                  if (!queued) {
+                    log.info(
+                      `cognitive insight: queue rejected insight ${record.id} for ${userId}`,
+                    );
+                    return false;
+                  }
+                  requestHeartbeatNow({
+                    reason: "cognitive-insight",
+                    sessionKey: target.sessionKey,
+                  });
+                  log.info(`cognitive insight enqueued for heartbeat delivery to ${userId}`, {
+                    sessionKey: target.sessionKey,
+                    channel: target.channel,
+                  });
+                  return true;
                 } catch (err) {
                   log.warn(`cognitive insight delivery failed: ${String(err)}`);
                   return false;
@@ -1781,12 +1792,14 @@ export async function startGatewayServer(
                   {
                     maxCandidates: options?.maxCandidates,
                     timeout: 90_000,
+                    ...(options?.agentId ? { agentId: options.agentId } : {}),
                   },
                 );
               },
               fragmentStore: sharedFragmentStore,
               llmDeps: insightDeps,
               botConfig: cfgAtStart,
+              ledger: decisionLedger,
             },
           );
 
@@ -1802,10 +1815,14 @@ export async function startGatewayServer(
               }
             }
             for (const { agentId, userId } of allEntries) {
+              const eventKey = insightEventKey(agentId, userId);
+              insightEventTypes.set(eventKey, event.type);
               try {
                 await proactiveScheduler.processEvent(userId, event, agentId);
               } catch (e) {
                 log.warn(`cognitive event failed for ${agentId}/${userId}: ${String(e)}`);
+              } finally {
+                insightEventTypes.delete(eventKey);
               }
             }
           };
@@ -1830,152 +1847,163 @@ export async function startGatewayServer(
           }, schedulerIntervalMs);
           backgroundStoppable.push(proactiveScheduler);
 
-          // ── Cognitive task runner bootstrap ──
-          // Unattended multi-step task execution (cognitive.tasks.enabled,
-          // default off). Steps and results flow through the same
-          // system-event + heartbeat idiom as insight delivery, so the agent
-          // shares results naturally; per-step progress goes straight to the
-          // user's channel via deliverProgress (chat-first visibility, M5).
-          if (cfgAtStart.cognitive?.tasks?.enabled === true && !minimalTestGateway) {
-            const { TaskStore: TaskStoreCls } = await import("../cognitive/tasks/store.js");
-            const { TaskRunner } = await import("../cognitive/tasks/runner.js");
-            const { createProductionStepDriver } =
-              await import("../cognitive/tasks/step-driver.js");
-            const { aggregateOnTaskTerminal } = await import("../cognitive/tasks/aggregate.js");
-            const { resolveConfigDir: resolveConfigDirForTasks } = await import("../utils.js");
-            const { resolveAgentWorkspaceDir } = await import("../agents/agent-scope.js");
-            const { findSessionKeyForUserId } = await import("./cognitive-delivery.js");
-            const { enqueueSystemEvent } = await import("../infra/system-events.js");
-            const { requestHeartbeatNow } = await import("../infra/heartbeat-wake.js");
-
-            const gatewayTaskStore = new TaskStoreCls(resolveConfigDirForTasks());
-            const gatewayTaskRunner = new TaskRunner({
-              store: gatewayTaskStore,
-              runStep: async (task) => {
-                const sessionKey = findSessionKeyForUserId(cfgAtStart, task.userId, task.agentId);
-                if (!sessionKey) {
-                  return {
-                    summary: "",
-                    error: `No routable session for ${task.userId}; cannot run task steps`,
-                  };
-                }
-                return await createProductionStepDriver({
-                  sessionKey,
-                  enqueueSystemEvent,
-                  requestHeartbeatNow,
-                  // Shared per-task workspace (M3): hierarchy tasks point at
-                  // the parent agent's workspace so cooperating agents share
-                  // one WORKING_MEMORY.md.
-                  resolveSharedTaskDir: (task2) => {
-                    const rootId = task2.parentTaskId ?? task2.id;
-                    const ownerAgentId = task2.parentAgentId ?? task2.agentId;
-                    return `${resolveAgentWorkspaceDir(cfgAtStart, ownerAgentId)}/.kaijibot/tasks/${rootId}`;
-                  },
-                })(task);
-              },
-              deliver: async (task, message) => {
-                const sessionKey = findSessionKeyForUserId(cfgAtStart, task.userId, task.agentId);
-                if (!sessionKey) {
-                  log.info(
-                    `cognitive task: no routable session for ${task.userId}; result not delivered`,
-                  );
-                  return;
-                }
-                enqueueSystemEvent(
-                  `[Task Result] ${message}\n（这是一个后台任务的完成通知，请用你自己的语言自然地告知用户。）`,
-                  { sessionKey, contextKey: `task-result:${task.id}` },
-                );
-                requestHeartbeatNow({ reason: "cognitive-task", sessionKey });
-              },
-              // Chat-first progress visibility (M5): short deterministic
-              // messages straight to the user's channel after every
-              // non-terminal step. Most users never open the Control UI.
-              // Runner swallows errors here — delivery must never break the loop.
-              deliverProgress:
-                cfgAtStart.cognitive?.tasks?.progressMessages === false
-                  ? undefined
-                  : async (task, stepIndex, summary) => {
-                      const { resolveCognitiveDeliveryTarget } =
-                        await import("./cognitive-delivery.js");
-                      const target = resolveCognitiveDeliveryTarget(
-                        cfgAtStart,
-                        task.userId,
-                        task.agentId,
-                      );
-                      if (!target) {
-                        // Session has no channel binding (e.g. TUI-only) —
-                        // progress is a chat concern; nothing to send.
-                        return;
-                      }
-                      const { deliverOutboundPayloads } =
-                        await import("../infra/outbound/deliver.js");
-                      const { clampText } = await import("../cognitive/tasks/types.js");
-                      await deliverOutboundPayloads({
-                        cfg: cfgAtStart,
-                        channel: target.channel,
-                        to: target.to,
-                        ...(target.accountId ? { accountId: target.accountId } : {}),
-                        payloads: [
-                          {
-                            text: `[任务进度] ${clampText(task.goal, 40)}（步骤 ${stepIndex}/${task.budget.maxSteps}）：${clampText(summary, 200)}`,
-                          },
-                        ],
-                      });
-                    },
-              onTaskTerminal: async (task) => {
-                await aggregateOnTaskTerminal(
-                  {
-                    store: gatewayTaskStore,
-                    wakeParent: async ({ agentId, userId, taskId }) => {
-                      const sessionKey = findSessionKeyForUserId(cfgAtStart, userId, agentId);
-                      if (!sessionKey) {
-                        // The 60s tick still re-claims the released parent.
-                        log.info(
-                          `cognitive task: no session to wake for parent ${taskId}; tick will resume it`,
-                        );
-                        return;
-                      }
-                      requestHeartbeatNow({ reason: "cognitive-task", sessionKey });
-                    },
-                  },
-                  task,
-                );
-              },
-            });
-
-            const runTaskTickForAllUsers = async () => {
-              try {
-                for (const agentId of await gatewayTaskStore.listAgentIds()) {
-                  for (const userId of await gatewayTaskStore.listUserIds(agentId)) {
-                    await gatewayTaskRunner.tick(agentId, userId).catch((e) => {
-                      log.warn(`cognitive task tick failed for ${agentId}/${userId}: ${String(e)}`);
-                    });
-                  }
-                }
-              } catch (err) {
-                log.warn(`cognitive task tick fan-out failed: ${String(err)}`);
-              }
-            };
-            // Boot-time pass resumes tasks left running by a crash.
-            void runTaskTickForAllUsers();
-            const taskTickMs = process.env.KAIJIBOT_TASK_TICK_MS
-              ? Number(process.env.KAIJIBOT_TASK_TICK_MS)
-              : 60_000;
-            const taskTicker = setInterval(() => void runTaskTickForAllUsers(), taskTickMs);
-            taskTicker.unref?.();
-            backgroundStoppable.push({
-              stop: () => {
-                clearInterval(taskTicker);
-              },
-            });
-            log.info("cognitive task runner started", { tickMs: taskTickMs });
-          }
-
           log.info(
             `cognitive proactive scheduler started (interval=${schedulerIntervalMs}ms, multi-user timer + info-scan + persona-change)`,
           );
         } catch (err) {
           log.warn(`cognitive scheduler skipped: ${String(err)}`);
+        }
+      })();
+    }
+
+    // Cognitive task runner: deliberately independent of the proactive
+    // scheduler gate so disabling proactive insight delivery does not also
+    // disable unattended multi-step task execution.
+    // Unattended multi-step task execution (cognitive.tasks.enabled, default
+    // off). Steps and results flow through the same system-event + heartbeat
+    // idiom as insight delivery, so the agent shares results naturally;
+    // per-step progress goes straight to the user's channel via
+    // deliverProgress (chat-first visibility, M5).
+    if (
+      !minimalTestGateway &&
+      cfgAtStart.cognitive?.enabled !== false &&
+      cfgAtStart.cognitive?.tasks?.enabled === true
+    ) {
+      void (async () => {
+        try {
+          const { TaskStore: TaskStoreCls } = await import("../cognitive/tasks/store.js");
+          const { TaskRunner } = await import("../cognitive/tasks/runner.js");
+          const { createProductionStepDriver } = await import("../cognitive/tasks/step-driver.js");
+          const { aggregateOnTaskTerminal } = await import("../cognitive/tasks/aggregate.js");
+          const { resolveConfigDir } = await import("../utils.js");
+          const { resolveAgentWorkspaceDir } = await import("../agents/agent-scope.js");
+          const { findSessionKeyForUserId } = await import("./cognitive-delivery.js");
+          const { enqueueSystemEvent } = await import("../infra/system-events.js");
+          const { requestHeartbeatNow } = await import("../infra/heartbeat-wake.js");
+
+          const gatewayTaskStore = new TaskStoreCls(resolveConfigDir());
+          const gatewayTaskRunner = new TaskRunner({
+            store: gatewayTaskStore,
+            runStep: async (task) => {
+              const sessionKey = findSessionKeyForUserId(cfgAtStart, task.userId, task.agentId);
+              if (!sessionKey) {
+                return {
+                  summary: "",
+                  error: `No routable session for ${task.userId}; cannot run task steps`,
+                };
+              }
+              return await createProductionStepDriver({
+                sessionKey,
+                enqueueSystemEvent,
+                requestHeartbeatNow,
+                // Shared per-task workspace (M3): hierarchy tasks point at
+                // the parent agent's workspace so cooperating agents share
+                // one WORKING_MEMORY.md.
+                resolveSharedTaskDir: (task2) => {
+                  const rootId = task2.parentTaskId ?? task2.id;
+                  const ownerAgentId = task2.parentAgentId ?? task2.agentId;
+                  return `${resolveAgentWorkspaceDir(cfgAtStart, ownerAgentId)}/.kaijibot/tasks/${rootId}`;
+                },
+              })(task);
+            },
+            deliver: async (task, message) => {
+              const sessionKey = findSessionKeyForUserId(cfgAtStart, task.userId, task.agentId);
+              if (!sessionKey) {
+                log.info(
+                  `cognitive task: no routable session for ${task.userId}; result not delivered`,
+                );
+                return;
+              }
+              enqueueSystemEvent(
+                `[Task Result] ${message}\n（这是一个后台任务的完成通知，请用你自己的语言自然地告知用户。）`,
+                { sessionKey, contextKey: `task-result:${task.id}` },
+              );
+              requestHeartbeatNow({ reason: "cognitive-task", sessionKey });
+            },
+            // Chat-first progress visibility (M5): short deterministic
+            // messages straight to the user's channel after every
+            // non-terminal step. Most users never open the Control UI.
+            // Runner swallows errors here — delivery must never break the loop.
+            deliverProgress:
+              cfgAtStart.cognitive?.tasks?.progressMessages === false
+                ? undefined
+                : async (task, stepIndex, summary) => {
+                    const { resolveCognitiveDeliveryTarget } =
+                      await import("./cognitive-delivery.js");
+                    const target = resolveCognitiveDeliveryTarget(
+                      cfgAtStart,
+                      task.userId,
+                      task.agentId,
+                    );
+                    if (!target) {
+                      // Session has no channel binding (e.g. TUI-only) —
+                      // progress is a chat concern; nothing to send.
+                      return;
+                    }
+                    const { deliverOutboundPayloads } =
+                      await import("../infra/outbound/deliver.js");
+                    const { clampText } = await import("../cognitive/tasks/types.js");
+                    await deliverOutboundPayloads({
+                      cfg: cfgAtStart,
+                      channel: target.channel,
+                      to: target.to,
+                      ...(target.accountId ? { accountId: target.accountId } : {}),
+                      payloads: [
+                        {
+                          text: `[任务进度] ${clampText(task.goal, 40)}（步骤 ${stepIndex}/${task.budget.maxSteps}）：${clampText(summary, 200)}`,
+                        },
+                      ],
+                    });
+                  },
+            onTaskTerminal: async (task) => {
+              await aggregateOnTaskTerminal(
+                {
+                  store: gatewayTaskStore,
+                  wakeParent: async ({ agentId, userId, taskId }) => {
+                    const sessionKey = findSessionKeyForUserId(cfgAtStart, userId, agentId);
+                    if (!sessionKey) {
+                      // The 60s tick still re-claims the released parent.
+                      log.info(
+                        `cognitive task: no session to wake for parent ${taskId}; tick will resume it`,
+                      );
+                      return;
+                    }
+                    requestHeartbeatNow({ reason: "cognitive-task", sessionKey });
+                  },
+                },
+                task,
+              );
+            },
+          });
+
+          const runTaskTickForAllUsers = async () => {
+            try {
+              for (const agentId of await gatewayTaskStore.listAgentIds()) {
+                for (const userId of await gatewayTaskStore.listUserIds(agentId)) {
+                  await gatewayTaskRunner.tick(agentId, userId).catch((e) => {
+                    log.warn(`cognitive task tick failed for ${agentId}/${userId}: ${String(e)}`);
+                  });
+                }
+              }
+            } catch (err) {
+              log.warn(`cognitive task tick fan-out failed: ${String(err)}`);
+            }
+          };
+          // Boot-time pass resumes tasks left running by a crash.
+          void runTaskTickForAllUsers();
+          const taskTickMs = process.env.KAIJIBOT_TASK_TICK_MS
+            ? Number(process.env.KAIJIBOT_TASK_TICK_MS)
+            : 60_000;
+          const taskTicker = setInterval(() => void runTaskTickForAllUsers(), taskTickMs);
+          taskTicker.unref?.();
+          backgroundStoppable.push({
+            stop: () => {
+              clearInterval(taskTicker);
+            },
+          });
+          log.info("cognitive task runner started", { tickMs: taskTickMs });
+        } catch (err) {
+          log.warn(`cognitive task runner skipped: ${String(err)}`);
         }
       })();
     }
@@ -2333,9 +2361,20 @@ export async function startGatewayServer(
           const { resolveConfigDir } = await import("../utils.js");
           const configDir = resolveConfigDir();
           const { SkillPersistenceWriter } = await import("../cognitive/evolution/skill-writer.js");
-          const { SkillLifecycleManager } =
+          const { SkillLifecycleManager, resolveEvolutionSkillBaseDir } =
             await import("../cognitive/evolution/skill-lifecycle.js");
-          const writer = new SkillPersistenceWriter(configDir);
+          // Same root as the evolution write/delete/usage units:
+          // <agent workspace>/skills/agent (falls back to
+          // <configDir>/workspace/skills/agent). Using configDir directly
+          // pointed the daily sweep at <configDir>/skills/agent, a directory
+          // the rest of the evolution pipeline never writes.
+          const writer = new SkillPersistenceWriter(
+            resolveEvolutionSkillBaseDir({
+              config: cfgAtStart,
+              agentId: defaultAgentId,
+              configDir,
+            }),
+          );
           const lifecycle = new SkillLifecycleManager(writer);
           const { Cron } = await import("croner");
           const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

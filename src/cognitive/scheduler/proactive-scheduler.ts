@@ -14,6 +14,7 @@ import { findCrossDomainConnections, semanticDistance } from "../insight/cross-d
 import { generateInsightCandidates } from "../insight/engine.js";
 import { FragmentStore } from "../insight/fragment-store.js";
 import {
+  assessInsightQuality,
   critiqueInsightWithLLM,
   refineInsightWithLLM,
   verifyInsightWithLLM,
@@ -21,13 +22,20 @@ import {
 } from "../insight/llm-engine.js";
 import type { LlmInsightDeps } from "../insight/llm-engine.js";
 import type { InsightCandidate, InsightEngineInput, InsightMode } from "../insight/types.js";
+import type { DecisionLedger } from "../ledger/index.js";
 import type { PersonaTree } from "../types.js";
 import { computeContentStrategy } from "./content-strategy.js";
 import { bumpDailySend, checkDailyBudget, checkStochasticSpacing } from "./delivery-pacing.js";
 import { computeGradedGate } from "./gate.js";
 import { selectMode } from "./mode-selection.js";
 import { evaluateReEngagementBudget } from "./re-engagement.js";
-import type { SchedulerEvent, SchedulerConfig, GateContext, Opportunity } from "./types.js";
+import type {
+  SchedulerEvent,
+  SchedulerConfig,
+  GateContext,
+  GradedGateDecision,
+  Opportunity,
+} from "./types.js";
 
 const log = createSubsystemLogger("cognitive/scheduler");
 
@@ -67,6 +75,8 @@ export type InsightGeneratorFn = (
     verificationLevel?: "basic" | "strict" | "paranoid";
     maxCandidates?: number;
     mode?: InsightMode;
+    /** Agent whose workspace owns SOUL.md / correction records. */
+    agentId?: string;
   },
 ) => Promise<InsightCandidate[]>;
 
@@ -109,6 +119,101 @@ export function isTopicStale(
 function seededRandom(seed: number): number {
   const s = (seed * 1103515245 + 12345) & 0x7fffffff;
   return s / 0x7fffffff;
+}
+
+function hashIdentity(agentId: string, userId: string): number {
+  const value = `${agentId}:${userId}`;
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * Mix the agent/user identity into a timestamp-derived seed. Without this,
+ * every user processed at the same tick draws the same random number and
+ * they all send (or all stay silent) together.
+ */
+export function mixUserSeed(seed: number, agentId: string, userId: string): number {
+  return (seed ^ hashIdentity(agentId, userId)) >>> 0;
+}
+
+let decisionTraceCounter = 0;
+
+function nextTraceId(agentId: string, userId: string, at: number): string {
+  decisionTraceCounter = (decisionTraceCounter + 1) % 1_000_000;
+  return `scheduler-${at}-${agentId}-${userId}-${decisionTraceCounter}`;
+}
+
+const MIN_EXCHANGES_FOR_CONTACT = 5;
+
+function isOutsideActiveHours(nowMs: number, config: SchedulerConfig): boolean {
+  if (!config.activeHoursStart || !config.activeHoursEnd) {
+    return false;
+  }
+  const tz = config.timezone ?? "Asia/Shanghai";
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    });
+    const [currentHour = 0, currentMin = 0] = formatter
+      .format(new Date(nowMs))
+      .split(":")
+      .map(Number);
+    const currentMinutes = currentHour * 60 + currentMin;
+
+    const [startHour = 0, startMin = 0] = config.activeHoursStart.split(":").map(Number);
+    const [endHour = 0, endMin = 0] = config.activeHoursEnd.split(":").map(Number);
+    const startMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+
+    if (startMinutes > endMinutes) {
+      return currentMinutes >= endMinutes && currentMinutes < startMinutes;
+    }
+    return currentMinutes < startMinutes || currentMinutes > endMinutes;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Hard vetoes that still apply to the re-engagement channel. That channel
+ * bypasses only the probabilistic gate and the stochastic hazard draw —
+ * suppression, active hours, relationship floor, and trust floor are safety
+ * rails, not pacing preferences.
+ */
+export function computeReEngagementVetoes(
+  persona: PersonaTree,
+  event: SchedulerEvent,
+  config: SchedulerConfig,
+): string[] {
+  const reasons: string[] = [];
+  const now = event.timestamp;
+
+  if (config.activeHoursStart && config.activeHoursEnd && isOutsideActiveHours(now, config)) {
+    reasons.push(`Outside active hours (${config.activeHoursStart}-${config.activeHoursEnd})`);
+  }
+  if (persona.feedbackProfile.suppressUntil && persona.feedbackProfile.suppressUntil > now) {
+    const remaining = persona.feedbackProfile.suppressUntil - now;
+    reasons.push(`Suppressed for ${Math.round(remaining / 3_600_000)}h`);
+  }
+  if (persona.rapport.trustScore < config.minTrustScore) {
+    reasons.push(
+      `Trust ${persona.rapport.trustScore.toFixed(2)} < ${config.minTrustScore.toFixed(2)}`,
+    );
+  }
+  if (persona.rapport.totalExchanges < MIN_EXCHANGES_FOR_CONTACT) {
+    reasons.push(
+      `Only ${persona.rapport.totalExchanges} exchanges — need at least ${MIN_EXCHANGES_FOR_CONTACT}`,
+    );
+  }
+
+  return reasons;
 }
 
 const DEFAULT_EPSILON_GREEDY = 0.2;
@@ -161,8 +266,10 @@ export class ProactiveScheduler {
   private readonly fragmentStore: FragmentStore;
   private readonly llmDeps: LlmInsightDeps | undefined;
   private readonly botConfig: KaijiBotConfig | undefined;
+  private readonly ledger: DecisionLedger | undefined;
   private readonly processEventQueue = new KeyedAsyncQueue();
   private readonly lastProcessEventAt = new Map<string, number>();
+  private stopped = false;
 
   constructor(
     private readonly config: SchedulerConfig,
@@ -172,7 +279,7 @@ export class ProactiveScheduler {
         agentId: string,
         userId: string,
         candidate: InsightCandidate,
-      ) => Promise<boolean | void>;
+      ) => Promise<boolean>;
       savePersona: (agentId: string, userId: string, persona: PersonaTree) => Promise<void>;
       /**
        * Atomic no-response ledger transition on freshly-loaded state.
@@ -204,12 +311,43 @@ export class ProactiveScheduler {
       fragmentStore?: FragmentStore;
       llmDeps?: LlmInsightDeps;
       botConfig?: KaijiBotConfig;
+      ledger?: DecisionLedger;
     },
   ) {
     this.generateInsights = deps?.insightGenerator ?? defaultInsightGenerator;
     this.fragmentStore = deps?.fragmentStore ?? new FragmentStore(join(homedir(), ".kaijibot"));
     this.llmDeps = deps?.llmDeps;
     this.botConfig = deps?.botConfig;
+    this.ledger = deps?.ledger;
+  }
+
+  private async recordVetoDecision(
+    agentId: string,
+    userId: string,
+    event: SchedulerEvent,
+    reason: string,
+  ): Promise<void> {
+    if (!this.ledger) {
+      return;
+    }
+    try {
+      await this.ledger.record({
+        traceId: nextTraceId(agentId, userId, event.timestamp),
+        agentId,
+        userId,
+        at: event.timestamp,
+        eventType: event.type,
+        decision: "vetoed",
+        vetoReasons: [reason],
+        llmCalls: 0,
+      });
+    } catch (err) {
+      log.warn("decision ledger write failed", {
+        userId,
+        eventType: event.type,
+        error: formatErrorMessage(err),
+      });
+    }
   }
 
   async search(persona: PersonaTree, event: SchedulerEvent): Promise<Opportunity[]> {
@@ -320,7 +458,13 @@ export class ProactiveScheduler {
       sorted.length > 0 ? sorted : [...phaseAdjusted].toSorted((a, b) => b.pAct - a.pAct);
 
     const aboveThreshold = pool.filter((opp) => opp.pAct > threshold);
-    return aboveThreshold.slice(0, 5);
+    const maxCandidates = Math.max(
+      1,
+      this.config.maxCandidatesPerEvent ??
+        this.botConfig?.cognitive?.insight?.maxCandidatesPerEvent ??
+        2,
+    );
+    return aboveThreshold.slice(0, maxCandidates);
   }
 
   async resolve(
@@ -390,6 +534,7 @@ export class ProactiveScheduler {
               verificationLevel: "basic",
               maxCandidates: 1,
               mode: "pattern",
+              agentId,
             },
           );
 
@@ -427,6 +572,8 @@ export class ProactiveScheduler {
               recentInsightContents,
               this.botConfig,
               this.llmDeps,
+              undefined,
+              persona,
             );
             if (!freshness.isNovel) {
               log.info("LLM freshness check: pattern semantically repetitive", {
@@ -439,8 +586,9 @@ export class ProactiveScheduler {
 
           candidate.verificationStatus = "partial";
 
+          let verification: Awaited<ReturnType<typeof verifyInsightWithLLM>> | undefined;
           if (this.llmDeps && this.botConfig && this.config.patternVerification !== false) {
-            const verification = await verifyInsightWithLLM(
+            verification = await verifyInsightWithLLM(
               candidate,
               persona,
               this.botConfig,
@@ -461,6 +609,14 @@ export class ProactiveScheduler {
             log.warn("pattern-mode insight contradicted by verification, skipping delivery", {
               userId,
               content: candidate.content.slice(0, 80),
+            });
+            return null;
+          }
+          if (verification && !verification.approved) {
+            log.info("pattern-mode insight not approved by judge, skipping delivery", {
+              userId,
+              confidence: verification.confidence,
+              notes: verification.notes,
             });
             return null;
           }
@@ -510,6 +666,7 @@ export class ProactiveScheduler {
       verificationLevel: "basic" as const,
       maxCandidates: 1,
       mode,
+      agentId,
     };
 
     let candidate: InsightCandidate;
@@ -536,14 +693,19 @@ export class ProactiveScheduler {
 
       let bestCandidate: InsightCandidate = initialResult[0]!;
       let bestScore = scoreCandidate(bestCandidate);
+      const initialQuality = assessInsightQuality(bestCandidate, input.targetDomains);
 
-      if (bestScore >= 0.7 && bestCandidate.sources.length >= 2) {
-        log.info("heuristic quality gate: skipping refine for high-quality candidate", {
+      if (!initialQuality.needsRefinement) {
+        log.info("deterministic quality gate: skipping refine", {
           userId: persona.identity?.userId,
           score: bestScore,
           sources: bestCandidate.sources.length,
         });
-      } else if (bestScore < QUALITY_EARLY_EXIT_THRESHOLD) {
+      } else {
+        log.info("deterministic quality gate: refinement needed", {
+          userId: persona.identity?.userId,
+          failures: initialQuality.failures,
+        });
         for (let refine = 0; refine < MAX_QUALITY_RETRIES; refine++) {
           const critique = await critiqueInsightWithLLM(
             bestCandidate,
@@ -556,7 +718,7 @@ export class ProactiveScheduler {
           }
 
           const refined = await refineInsightWithLLM(
-            "",
+            `Generate a ${mode}-mode insight for domains: ${input.targetDomains.join(", ") || "(none)"}.`,
             bestCandidate,
             critique,
             persona,
@@ -568,11 +730,15 @@ export class ProactiveScheduler {
           }
 
           const refinedScore = scoreCandidate(refined);
-          if (refinedScore > bestScore) {
+          const refinedQuality = assessInsightQuality(refined, input.targetDomains);
+          if (
+            refinedScore > bestScore ||
+            refinedQuality.failures.length < initialQuality.failures.length
+          ) {
             bestCandidate = refined;
             bestScore = refinedScore;
           }
-          if (bestScore >= QUALITY_EARLY_EXIT_THRESHOLD) {
+          if (!refinedQuality.needsRefinement) {
             break;
           }
         }
@@ -699,6 +865,8 @@ export class ProactiveScheduler {
           recentInsightContents,
           this.botConfig,
           this.llmDeps,
+          undefined,
+          persona,
         );
         if (!freshness.isNovel) {
           log.info("LLM freshness check: semantically repetitive", {
@@ -728,6 +896,14 @@ export class ProactiveScheduler {
         log.warn("knowledge-mode insight contradicted by verification, skipping delivery", {
           userId: persona.identity?.userId,
           content: candidate.content.slice(0, 80),
+        });
+        return null;
+      }
+      if (!verification.approved) {
+        log.info("knowledge-mode insight not approved by judge, skipping delivery", {
+          userId: persona.identity?.userId,
+          confidence: verification.confidence,
+          notes: verification.notes,
         });
         return null;
       }
@@ -790,12 +966,23 @@ export class ProactiveScheduler {
         ? prevContents
         : [...prevContents, insight.content]
     ).slice(-10);
+    // The scheduler already appended the attempted domains/types before
+    // resolve ran; only append again when they are not the tail entry, so a
+    // delivered insight occupies one slot instead of two.
     const prevDomains = persona.feedbackProfile.recentInsightDomains ?? [];
-    persona.feedbackProfile.recentInsightDomains = [...prevDomains, insight.targetDomains].slice(
-      -5,
-    );
+    const lastDomains = prevDomains[prevDomains.length - 1];
+    const domainsAlreadyRecorded =
+      lastDomains !== undefined &&
+      lastDomains.length === insight.targetDomains.length &&
+      lastDomains.every((d, i) => d === insight.targetDomains[i]);
+    persona.feedbackProfile.recentInsightDomains = domainsAlreadyRecorded
+      ? prevDomains
+      : [...prevDomains, insight.targetDomains].slice(-5);
     const prevTypes = persona.feedbackProfile.recentInsightTypes ?? [];
-    persona.feedbackProfile.recentInsightTypes = [...prevTypes, opportunityType].slice(-5);
+    const typesAlreadyRecorded = prevTypes[prevTypes.length - 1] === opportunityType;
+    persona.feedbackProfile.recentInsightTypes = typesAlreadyRecorded
+      ? prevTypes
+      : [...prevTypes, opportunityType].slice(-5);
     const mode = insight.resolvedMode ?? "surprise";
     const prevModes = persona.feedbackProfile.recentInsightModes ?? [];
     persona.feedbackProfile.recentInsightModes = [...prevModes, mode].slice(-5);
@@ -820,6 +1007,8 @@ export class ProactiveScheduler {
       return undefined;
     }
 
+    const cooldownKey = `${agentId}:${userId}`;
+
     // Pending insight delivery retry — bypasses gate and LLM (zero token cost).
     // Stored in persona file so it survives gateway restarts.
     // After one failed attempt (attemptCount >= 1, typically a NO_REPLY), stop
@@ -841,10 +1030,14 @@ export class ProactiveScheduler {
       } else {
         // Pending retries respect the daily cap too: a user who already got
         // today's allotment waits for tomorrow even for a redelivery.
-        if (
-          !checkDailyBudget(persona, event.timestamp, this.config.maxDailyInsights ?? 2).allowed
-        ) {
+        const retryBudget = checkDailyBudget(
+          persona,
+          event.timestamp,
+          this.config.maxDailyInsights ?? 2,
+        );
+        if (!retryBudget.allowed) {
           log.info("pending retry deferred by daily budget", { userId });
+          await this.recordVetoDecision(agentId, userId, event, retryBudget.reason);
           return undefined;
         }
         log.info("retrying pending insight delivery", {
@@ -853,7 +1046,7 @@ export class ProactiveScheduler {
           ageMs: Math.round(ageMs / 60_000),
         });
         const retryResult = await this.callbacks.onInsightReady(agentId, userId, pending.candidate);
-        if (retryResult !== false) {
+        if (retryResult) {
           bumpDailySend(persona, event.timestamp);
           persona.feedbackProfile.awaitingDeliveryConfirmation = {
             candidate: pending.candidate,
@@ -861,6 +1054,7 @@ export class ProactiveScheduler {
             eventTimestamp: event.timestamp,
           };
           persona.feedbackProfile.pendingInsightDelivery = null;
+          this.lastProcessEventAt.set(cooldownKey, event.timestamp);
           await this.callbacks.savePersona(agentId, userId, persona);
           log.info("pending insight re-enqueued, awaiting confirmation", {
             userId,
@@ -878,7 +1072,6 @@ export class ProactiveScheduler {
       }
     }
 
-    const cooldownKey = `${agentId}:${userId}`;
     const resolveFailures = persona.feedbackProfile.consecutiveResolveFailures ?? 0;
     const backoffFactor =
       resolveFailures >= RESOLVE_FAILURE_BACKOFF_THRESHOLD
@@ -887,9 +1080,9 @@ export class ProactiveScheduler {
     const cooldownMs = (this.config.minIntervalHours ?? 0.5) * 60 * 60 * 1000 * backoffFactor;
     const lastAt = this.lastProcessEventAt.get(cooldownKey);
     if (lastAt && event.timestamp - lastAt < cooldownMs) {
+      await this.recordVetoDecision(agentId, userId, event, "in-process cooldown");
       return undefined;
     }
-    this.lastProcessEventAt.set(cooldownKey, event.timestamp);
 
     // Previous insight still awaiting delivery confirmation — don't generate
     // a new one until the outcome is known (avoids stacking insights).
@@ -909,6 +1102,12 @@ export class ProactiveScheduler {
         });
       } else {
         log.info("skipping — previous insight awaiting delivery confirmation", { userId });
+        await this.recordVetoDecision(
+          agentId,
+          userId,
+          event,
+          "previous insight awaiting delivery confirmation",
+        );
         return undefined;
       }
     }
@@ -964,17 +1163,15 @@ export class ProactiveScheduler {
     // Re-engagement budget: the only channel allowed to reach a user whose
     // silence has closed the normal cadence path (momentum 0). Bypasses the
     // graded gate; rate-limited and ledger-capped by its own rules.
-    const budget = evaluateReEngagementBudget(
-      persona,
-      event.timestamp,
-      seededRandom(event.timestamp),
-    );
+    const userSeed = mixUserSeed(event.timestamp, agentId, userId);
+    const budget = evaluateReEngagementBudget(persona, event.timestamp, seededRandom(userSeed));
 
     // Daily self-restraint cap (checked before the gate to save LLM cost):
     // at most maxDailyInsights delivered sends per user per UTC day.
     const dailyCap = this.config.maxDailyInsights ?? 2;
     const dailyBudget = checkDailyBudget(persona, event.timestamp, dailyCap);
     if (!dailyBudget.allowed) {
+      await this.recordVetoDecision(agentId, userId, event, dailyBudget.reason);
       return undefined;
     }
 
@@ -988,10 +1185,16 @@ export class ProactiveScheduler {
         event.type,
         event.timestamp,
         seededRandom(
-          event.timestamp ^ Math.max(1, Math.floor(persona.feedbackProfile.lastProactiveAt / 1000)),
+          mixUserSeed(
+            event.timestamp ^
+              Math.max(1, Math.floor(persona.feedbackProfile.lastProactiveAt / 1000)),
+            agentId,
+            userId,
+          ),
         ),
       );
       if (!pacing.allowed) {
+        await this.recordVetoDecision(agentId, userId, event, pacing.reason);
         return undefined;
       }
       if (pacing.allowed && pacing.reason === "conversational moment") {
@@ -1005,23 +1208,48 @@ export class ProactiveScheduler {
       recentInsightCount: 0,
       config: this.config,
     };
-    const gateResult = budget.allowed
-      ? ({
+    let gateResult: GradedGateDecision;
+    if (budget.allowed) {
+      // Re-engagement bypasses only the probability gate and the hazard
+      // draw. Suppression, active hours, trust, and relationship depth are
+      // hard vetoes — a check-in must not ignore a user's "don't contact me".
+      const vetoes = computeReEngagementVetoes(persona, event, this.config);
+      if (vetoes.length > 0) {
+        gateResult = {
+          pNeed: 0,
+          pAccept: 0,
+          pAct: 0,
+          decision: false,
+          reasons: vetoes,
+        };
+      } else {
+        gateResult = {
           pNeed: 0.5,
           pAccept: 0.5,
           pAct: 0.5,
           decision: true,
           reasons: ["re-engagement budget"],
-        } as const)
-      : computeGradedGate(gateContext);
-    if (budget.allowed) {
-      persona.feedbackProfile.lastReEngageAttemptAt = event.timestamp;
-      log.info("re-engagement budget check-in", {
-        userId,
-        unanswered: persona.feedbackProfile.consecutiveNoResponses ?? 0,
-      });
+        };
+        // Persist the attempt before generation: a check-in that fails in
+        // resolve() still consumed the 14-day cooldown slot, otherwise every
+        // tick would retry the same silent user forever.
+        persona.feedbackProfile.lastReEngageAttemptAt = event.timestamp;
+        await this.callbacks.savePersona(agentId, userId, persona);
+        log.info("re-engagement budget check-in", {
+          userId,
+          unanswered: persona.feedbackProfile.consecutiveNoResponses ?? 0,
+        });
+      }
+    } else {
+      gateResult = computeGradedGate(gateContext);
     }
     if (!gateResult.decision) {
+      await this.recordVetoDecision(
+        agentId,
+        userId,
+        event,
+        gateResult.reasons.join("; ") || "graded gate veto",
+      );
       await this.callbacks.savePersona(agentId, userId, persona);
       log.info("gate vetoed", {
         userId,
@@ -1096,7 +1324,11 @@ export class ProactiveScheduler {
     }
 
     const epsilon = this.config.epsilonGreedy ?? DEFAULT_EPSILON_GREEDY;
-    const orderedCandidates = applyEpsilonGreedy(candidates, epsilon, event.timestamp);
+    const orderedCandidates = applyEpsilonGreedy(
+      candidates,
+      epsilon,
+      mixUserSeed(event.timestamp, agentId, userId),
+    );
     if (orderedCandidates !== candidates) {
       log.info("epsilon-greedy promoted exploration candidate", {
         userId,
@@ -1110,6 +1342,11 @@ export class ProactiveScheduler {
     let insight: InsightCandidate | null = null;
     let selected: Opportunity | undefined;
     let attemptedResolve = false;
+    // Dedup windows captured just before the attempt that produced the
+    // delivered insight. A failed delivery must release those slots: the
+    // insight never reached the user, so it cannot suppress the next send.
+    let preDeliveryDomains = persona.feedbackProfile.recentInsightDomains;
+    let preDeliveryTypes = persona.feedbackProfile.recentInsightTypes;
     for (const candidate of orderedCandidates) {
       // Budget check-ins ("long time no see") bypass the domain freshness
       // window: for a user silent for weeks, the "recent" insight history is
@@ -1125,15 +1362,16 @@ export class ProactiveScheduler {
       }
 
       selected = candidate;
-      const attemptedDomains = [
-        ...(persona.feedbackProfile.recentInsightDomains ?? []),
-        selected.targetDomains,
-      ].slice(-5);
+      // Snapshot for rollback: an attempt that resolve() rejects must not
+      // consume a slot in the domain dedup window, otherwise every failed
+      // attempt progressively silences the domains we tried.
+      const previousDomains = persona.feedbackProfile.recentInsightDomains;
+      const previousTypes = persona.feedbackProfile.recentInsightTypes;
+      preDeliveryDomains = previousDomains;
+      preDeliveryTypes = previousTypes;
+      const attemptedDomains = [...(previousDomains ?? []), selected.targetDomains].slice(-5);
       persona.feedbackProfile.recentInsightDomains = attemptedDomains;
-      const attemptedTypes = [
-        ...(persona.feedbackProfile.recentInsightTypes ?? []),
-        selected.type,
-      ].slice(-5);
+      const attemptedTypes = [...(previousTypes ?? []), selected.type].slice(-5);
       persona.feedbackProfile.recentInsightTypes = attemptedTypes;
 
       attemptedResolve = true;
@@ -1143,6 +1381,8 @@ export class ProactiveScheduler {
       if (insight) {
         break;
       }
+      persona.feedbackProfile.recentInsightDomains = previousDomains;
+      persona.feedbackProfile.recentInsightTypes = previousTypes;
       await this.callbacks.savePersona(agentId, userId, persona);
     }
 
@@ -1181,17 +1421,28 @@ export class ProactiveScheduler {
         contentPreview: insight.content.slice(0, 80),
         mode: insightMode,
       });
+      persona.feedbackProfile.recentInsightDomains = preDeliveryDomains;
+      persona.feedbackProfile.recentInsightTypes = preDeliveryTypes;
       await this.callbacks.savePersona(agentId, userId, persona);
       return undefined;
     }
 
+    // Persist the gate decision with the candidate so calibration can compare
+    // it against the outcome; without it every sample falls back to 0.5.
+    insight.gateSnapshot = { pAccept: gateResult.pAccept };
+
     const deliveryResult = await this.callbacks.onInsightReady(agentId, userId, insight);
-    if (deliveryResult === false) {
+    if (!deliveryResult) {
       persona.feedbackProfile.pendingInsightDelivery = {
         candidate: insight,
         generatedAt: event.timestamp,
         opportunityType: selected.type,
       };
+      // The insight never reached the user: give back the dedup slots its
+      // generation attempt consumed, otherwise a channel outage silently
+      // blocks the domains we just tried.
+      persona.feedbackProfile.recentInsightDomains = preDeliveryDomains;
+      persona.feedbackProfile.recentInsightTypes = preDeliveryTypes;
       await this.callbacks.savePersona(agentId, userId, persona);
       log.info("insight delivery failed, stored as pending", {
         userId,
@@ -1207,6 +1458,9 @@ export class ProactiveScheduler {
     };
     persona.feedbackProfile.consecutiveResolveFailures = 0;
     bumpDailySend(persona, event.timestamp);
+    // Cooldown starts only after a real send. Gate-vetoed or failed attempts
+    // must not make the next event look "too soon".
+    this.lastProcessEventAt.set(cooldownKey, event.timestamp);
     await this.callbacks.savePersona(agentId, userId, persona);
 
     return insight;
@@ -1217,36 +1471,46 @@ export class ProactiveScheduler {
     intervalMs?: number,
   ): void {
     const baseInterval = intervalMs ?? this.config.minIntervalHours * 60 * 60 * 1000;
+    this.stopped = false;
 
     const scheduleNext = (): void => {
+      if (this.stopped) {
+        return;
+      }
       const jitter = baseInterval * (0.5 + Math.random());
       this.timerHandle = setTimeout(tick, jitter);
       this.timerHandle?.unref?.();
     };
 
     const tick = async (): Promise<void> => {
-      const users = await listUsers();
-      log.info("timer tick", { userCount: users.length, baseInterval });
-      for (const { agentId, userId } of users) {
-        try {
-          const result = await this.processEvent(
-            userId,
-            {
-              type: "timer",
-              timestamp: Date.now(),
-            },
-            agentId,
-          );
-          log.info("processEvent done", {
-            userId,
-            result: result ? "insight generated" : "no insight",
-          });
-        } catch (err) {
-          log.warn("tick failed", { userId, error: String(err) });
+      try {
+        // listUsers() is outside the per-user try: one registry/IO failure
+        // must not kill the timer chain permanently.
+        const users = await listUsers();
+        log.info("timer tick", { userCount: users.length, baseInterval });
+        for (const { agentId, userId } of users) {
+          try {
+            const result = await this.processEvent(
+              userId,
+              {
+                type: "timer",
+                timestamp: Date.now(),
+              },
+              agentId,
+            );
+            log.info("processEvent done", {
+              userId,
+              result: result ? "insight generated" : "no insight",
+            });
+          } catch (err) {
+            log.warn("tick failed", { userId, error: String(err) });
+          }
         }
+      } catch (err) {
+        log.warn("tick failed", { error: String(err) });
+      } finally {
+        scheduleNext();
       }
-
-      scheduleNext();
     };
 
     scheduleNext();
@@ -1336,6 +1600,7 @@ export class ProactiveScheduler {
   }
 
   stop(): void {
+    this.stopped = true;
     if (this.timerHandle !== undefined) {
       clearTimeout(this.timerHandle);
       this.timerHandle = undefined;

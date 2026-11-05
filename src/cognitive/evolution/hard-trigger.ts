@@ -16,6 +16,10 @@ export type HardTriggerParams = {
   senderId?: string | null;
   started: number;
   configDir?: string;
+  /** Full config, so a custom agent workspace is honored when listing skills. */
+  config?: import("../../config/config.js").KaijiBotConfig;
+  /** Agent whose workspace owns the skills; parsed from the session key when absent. */
+  agentId?: string;
   /** Locale for the generated signal text. Defaults to zh (legacy behavior). */
   locale?: CognitiveLocale;
 };
@@ -81,11 +85,29 @@ export async function evaluateHardTrigger(params: HardTriggerParams): Promise<vo
   const uniqueTools = new Set(toolCalls);
   const durationMs = Date.now() - params.started;
 
+  let agentId = params.agentId;
+  if (!agentId) {
+    try {
+      const { parseAgentSessionKey } = await import("../../routing/session-key.js");
+      const parsed = parseAgentSessionKey(params.sessionKey);
+      if (parsed) {
+        agentId = parsed.agentId;
+      }
+    } catch {}
+  }
+
   let existingSkills: Array<{ name: string; description: string }> | undefined;
-  if (params.configDir) {
+  if (params.config || params.configDir) {
     try {
       const { SkillPersistenceWriter } = await import("./skill-writer.js");
-      const writer = new SkillPersistenceWriter(params.configDir);
+      const { resolveEvolutionSkillBaseDir } = await import("./skill-lifecycle.js");
+      // Same root the evolution tools write to: <agent workspace>/skills/agent.
+      const skillBaseDir = resolveEvolutionSkillBaseDir({
+        config: params.config,
+        agentId,
+        configDir: params.configDir,
+      });
+      const writer = new SkillPersistenceWriter(skillBaseDir);
       const names = await writer.listSkillNames();
       const skills: Array<{ name: string; description: string }> = [];
       for (const name of names) {
@@ -99,15 +121,6 @@ export async function evaluateHardTrigger(params: HardTriggerParams): Promise<vo
       // Non-critical; proceed without skill list
     }
   }
-
-  let agentId: string | undefined;
-  try {
-    const { parseAgentSessionKey } = await import("../../routing/session-key.js");
-    const parsed = parseAgentSessionKey(params.sessionKey);
-    if (parsed) {
-      agentId = parsed.agentId;
-    }
-  } catch {}
 
   const signalText = buildEvolutionSignal({
     toolCalls,

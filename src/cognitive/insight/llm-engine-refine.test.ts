@@ -1,5 +1,5 @@
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { KaijiBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import {
@@ -7,6 +7,7 @@ import {
   buildRefinePrompt,
   buildVerificationPrompt,
   critiqueInsightWithLLM,
+  generateInsightCandidatesLLM,
   refineInsightWithLLM,
   verifyInsightWithLLM,
   type LlmInsightDeps,
@@ -782,5 +783,182 @@ describe("verifyInsightWithLLM", () => {
       successDeps(verifyJSON({ confidence: 2.5, status: "verified" })),
     );
     expect(result.confidence).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Refine round cap, prompt passthrough and deterministic rejection
+// ---------------------------------------------------------------------------
+
+describe("refineInsightWithLLM — round cap and prompt passthrough", () => {
+  const critique: LlmCritiqueResult = {
+    specificity: 0.5,
+    personaRelevance: 0.5,
+    actionability: 0.5,
+    surprise: 0.5,
+    voiceMatch: 0.5,
+    overallScore: 0.5,
+    critique: "needs work",
+    improvementSuggestions: ["be more specific"],
+  };
+
+  it("rejects a second refine round for the same candidate lineage", async () => {
+    const candidate = makeCandidate({ id: "single-round-id" });
+    const complete = vi
+      .fn()
+      .mockResolvedValueOnce(assistantMessage(validRefineJSON()))
+      .mockResolvedValueOnce(assistantMessage(validRefineJSON()));
+    const deps: LlmInsightDeps = {
+      complete,
+      prepareModel: async () => ({ model: TEST_MODEL, auth: TEST_AUTH }),
+    };
+
+    const first = await refineInsightWithLLM(
+      "prompt",
+      candidate,
+      critique,
+      makePersona(),
+      makeConfig(),
+      deps,
+    );
+    const second = await refineInsightWithLLM(
+      "prompt",
+      first!,
+      critique,
+      makePersona(),
+      makeConfig(),
+      deps,
+    );
+
+    expect(first).not.toBeNull();
+    expect(second).toBeNull();
+    expect(complete).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back to the stored generation prompt when the caller passes an empty string", async () => {
+    const generationJSON = JSON.stringify([
+      {
+        content:
+          "Rust 到 WASM 的编译链路最近出现了新的优化，跟你的 TypeScript 工具链经验直接相关。",
+        rationale: "bridge",
+        targetDomains: ["typescript"],
+        sourceDomains: ["rust"],
+        relevanceScore: 0.8,
+        surpriseScore: 0.7,
+        sourceIndices: [0],
+      },
+    ]);
+    let refinePrompt = "";
+    const complete = vi
+      .fn()
+      .mockResolvedValueOnce(assistantMessage(generationJSON))
+      .mockImplementationOnce(
+        async (_model: unknown, context: { messages: Array<{ content: string }> }) => {
+          refinePrompt = context.messages[0]!.content;
+          return assistantMessage(validRefineJSON());
+        },
+      );
+    const deps: LlmInsightDeps = {
+      complete: complete as unknown as LlmInsightDeps["complete"],
+      prepareModel: async () => ({ model: TEST_MODEL, auth: TEST_AUTH }),
+      webSearch: async () => [
+        {
+          title: "Rust WASM optimization",
+          url: "https://example.com/wasm",
+          snippet: "New optimizing backend for Rust to WASM",
+        },
+      ],
+    };
+
+    const [generated] = await generateInsightCandidatesLLM(
+      makePersona(),
+      {
+        targetDomains: ["typescript"],
+        recentFocus: ["wasm"],
+        trustScore: 0.7,
+        recentInsightIds: [],
+        recentInsightContents: [],
+      },
+      makeConfig(),
+      deps,
+    );
+
+    expect(generated).toBeDefined();
+    const refined = await refineInsightWithLLM(
+      "",
+      generated!,
+      critique,
+      makePersona(),
+      makeConfig(),
+      deps,
+    );
+
+    expect(refined).not.toBeNull();
+    expect(refinePrompt).toContain("ORIGINAL GENERATION PROMPT");
+    expect(refinePrompt).toContain("EXAMPLES of ideal insights");
+  });
+
+  it("rejects a refined insight that violates deterministic quality checks", async () => {
+    const bannedJSON = JSON.stringify([
+      {
+        content: "这个方向值得关注，因为它跟你的 TypeScript 经验有关，可以继续跟进。",
+        rationale: "banned phrase",
+        targetDomains: ["rust", "typescript"],
+        sourceDomains: ["wasm"],
+        relevanceScore: 0.9,
+        surpriseScore: 0.7,
+      },
+    ]);
+
+    const result = await refineInsightWithLLM(
+      "prompt",
+      makeCandidate({ id: "deterministic-reject-id" }),
+      critique,
+      makePersona(),
+      makeConfig(),
+      successDeps(bannedJSON),
+    );
+
+    expect(result).toBeNull();
+  });
+});
+
+describe("refineInsightWithLLM — originalPrompt option", () => {
+  it("uses options.originalPrompt when the positional prompt is empty", async () => {
+    let captured = "";
+    const deps: LlmInsightDeps = {
+      complete: async (_model, context) => {
+        const content = context.messages[0]!.content;
+        captured =
+          typeof content === "string"
+            ? content
+            : content.map((block) => (block.type === "text" ? block.text : "")).join("");
+        return assistantMessage(validRefineJSON());
+      },
+      prepareModel: async () => ({ model: TEST_MODEL, auth: TEST_AUTH }),
+    };
+    const critique: LlmCritiqueResult = {
+      specificity: 0.5,
+      personaRelevance: 0.5,
+      actionability: 0.5,
+      surprise: 0.5,
+      voiceMatch: 0.5,
+      overallScore: 0.5,
+      critique: "needs work",
+      improvementSuggestions: ["be specific"],
+    };
+
+    const result = await refineInsightWithLLM(
+      "",
+      makeCandidate({ id: "options-prompt-id" }),
+      critique,
+      makePersona(),
+      makeConfig(),
+      deps,
+      { originalPrompt: "OPTIONS ORIGINAL PROMPT TEXT" },
+    );
+
+    expect(result).not.toBeNull();
+    expect(captured).toContain("OPTIONS ORIGINAL PROMPT TEXT");
   });
 });

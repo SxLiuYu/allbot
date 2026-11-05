@@ -122,7 +122,7 @@ describe("task lifecycle e2e (T1)", () => {
     //    arrives — simulated below by calling the REAL tool).
     const runner = makeProductionRunner();
     const tickPromise = runner.tick(AGENT, USER);
-    const reportTool = createTaskStepReportTool();
+    const reportTool = createTaskStepReportTool({ sessionKey: SESSION_KEY, agentId: AGENT });
 
     const summaries = ["收集了资料", "整理了要点", "摘要已完成"];
     for (let step = 1; step <= 3; step++) {

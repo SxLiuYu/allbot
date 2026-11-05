@@ -23,6 +23,17 @@ export type SystemEvent = {
 
 const MAX_EVENTS = 20;
 
+const UNTRUSTED_SOURCE_TAG = "untrusted_source";
+
+/**
+ * Wrap untrusted content in `<untrusted_source>` for prompt injection defense.
+ * Inner `<`/`>` are escaped so content cannot close or forge the wrapper.
+ */
+export function wrapUntrustedSourceText(text: string): string {
+  const escaped = text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  return `<${UNTRUSTED_SOURCE_TAG}>${escaped}</${UNTRUSTED_SOURCE_TAG}>`;
+}
+
 type SessionQueue = {
   queue: SystemEvent[];
   lastText: string | null;
@@ -106,7 +117,7 @@ export function enqueueSystemEvent(text: string, options: SystemEventOptions) {
     ts: Date.now(),
     contextKey: normalizedContextKey,
     deliveryContext: normalizedDeliveryContext,
-    trusted: options.trusted !== false,
+    trusted: options.trusted === true,
   });
   if (entry.queue.length > MAX_EVENTS) {
     entry.queue.shift();
@@ -147,7 +158,7 @@ function areSystemEventsEqual(left: SystemEvent, right: SystemEvent): boolean {
     left.text === right.text &&
     left.ts === right.ts &&
     (left.contextKey ?? null) === (right.contextKey ?? null) &&
-    (left.trusted ?? true) === (right.trusted ?? true) &&
+    (left.trusted ?? false) === (right.trusted ?? false) &&
     areDeliveryContextsEqual(left.deliveryContext, right.deliveryContext)
   );
 }

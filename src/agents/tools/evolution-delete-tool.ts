@@ -1,18 +1,21 @@
 import { Type } from "typebox";
+import type { EvolutionUserConfirmation } from "../../cognitive/evolution/types.js";
 import type { KaijiBotConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
 
 export const EvolutionDeleteSchema = Type.Object({
   name: Type.String({ description: "Name of the skill to delete permanently" }),
-  confirm: Type.Boolean({
-    description: "Must be true to confirm deletion. Refuses otherwise.",
-  }),
 });
 
 export function createEvolutionDeleteTool(deps: {
   config?: KaijiBotConfig;
   sessionKey?: string;
+  /**
+   * User confirmation injected by the host after an explicit user action.
+   * Returning undefined means the user has not confirmed this deletion.
+   */
+  getUserConfirmation?: () => EvolutionUserConfirmation | undefined;
 }): AnyAgentTool | null {
   if (deps.config?.cognitive?.enabled === false) {
     return null;
@@ -25,14 +28,17 @@ export function createEvolutionDeleteTool(deps: {
     name: "delete_skill",
     label: "Delete Skill",
     description:
-      "Delete a skill permanently. Requires an explicit confirmation (confirm: true). " +
-      "Use only when the user clearly asks to remove a skill that was created earlier.",
+      "Delete a skill permanently. The host must supply a user confirmation for the exact skill name; " +
+      "without it the tool refuses and asks for confirmation. Use only when the user clearly asks to " +
+      "remove a skill that was created earlier.",
     parameters: EvolutionDeleteSchema,
     async execute(_toolCallId: string, rawParams: unknown) {
-      const params = rawParams as { name: string; confirm?: boolean };
+      const params = rawParams as { name: string };
 
-      if (params.confirm !== true) {
-        return textResult("Deletion requires confirm: true to proceed.", {
+      const confirmation = deps.getUserConfirmation?.();
+      const { isValidEvolutionConfirmation } = await import("../../cognitive/evolution/types.js");
+      if (!confirmation || !isValidEvolutionConfirmation(confirmation, params.name)) {
+        return textResult("Deletion requires an explicit user confirmation for this skill name.", {
           status: "confirm_required",
         });
       }
@@ -41,16 +47,17 @@ export function createEvolutionDeleteTool(deps: {
         const { SkillPersistenceWriter } =
           await import("../../cognitive/evolution/skill-writer.js");
         const { resolveConfigDir } = await import("../../utils.js");
+        const { resolveAgentIdFromSessionKey } = await import("../../routing/session-key.js");
+        const { resolveEvolutionSkillBaseDir } =
+          await import("../../cognitive/evolution/skill-lifecycle.js");
 
         const configDir = resolveConfigDir();
-
-        let skillBaseDir = configDir;
-        if (deps.config) {
-          const { resolveAgentIdFromSessionKey } = await import("../../routing/session-key.js");
-          const { resolveAgentWorkspaceDir } = await import("../agent-scope.js");
-          const agentId = resolveAgentIdFromSessionKey(deps.sessionKey);
-          skillBaseDir = resolveAgentWorkspaceDir(deps.config, agentId);
-        }
+        const agentId = resolveAgentIdFromSessionKey(deps.sessionKey);
+        const skillBaseDir = resolveEvolutionSkillBaseDir({
+          config: deps.config,
+          agentId,
+          configDir,
+        });
 
         const writer = new SkillPersistenceWriter(skillBaseDir);
         await writer.removeSkill(params.name);
@@ -63,6 +70,7 @@ export function createEvolutionDeleteTool(deps: {
             actor: deps.sessionKey ?? "agent",
             target: params.name,
             outcome: "success",
+            metadata: { confirmationId: confirmation.confirmationId },
           });
         } catch {
           /* non-fatal */

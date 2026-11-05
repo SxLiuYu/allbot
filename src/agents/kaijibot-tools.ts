@@ -1,3 +1,8 @@
+import { resolveCorrectionUserId } from "../cognitive/correction/userid.js";
+import {
+  consumeEvolutionDecision,
+  consumeSkillDeleteConfirmation,
+} from "../cognitive/evolution/approval-store.js";
 import { tasksEnabled } from "../cognitive/tasks/service.js";
 import type { KaijiBotConfig } from "../config/config.js";
 import { callGateway } from "../gateway/call.js";
@@ -311,6 +316,13 @@ export function createKaijiBotTools(
         config: resolvedConfig,
         sessionKey: options?.agentSessionKey,
         deliveryTo: options?.agentTo,
+        // Approval comes from the host (Control UI / gateway RPC), never from
+        // tool parameters. The grant is scoped to this agent+user and consumed
+        // once, so a stale approval cannot authorise a later draft.
+        getUserDecision: () => {
+          const userId = resolveCorrectionUserId(options?.agentSessionKey, options?.agentTo);
+          return userId ? consumeEvolutionDecision(sessionAgentId, userId) : undefined;
+        },
       }),
       createEvolutionPatchTool({
         config: resolvedConfig,
@@ -319,6 +331,10 @@ export function createKaijiBotTools(
       createEvolutionDeleteTool({
         config: resolvedConfig,
         sessionKey: options?.agentSessionKey,
+        getUserConfirmation: () => {
+          const userId = resolveCorrectionUserId(options?.agentSessionKey, options?.agentTo);
+          return userId ? consumeSkillDeleteConfirmation(sessionAgentId, userId) : undefined;
+        },
       }),
       createEvolutionArchiveTool({
         config: resolvedConfig,
@@ -348,7 +364,11 @@ export function createKaijiBotTools(
               deliveryTo: options?.agentTo,
               agentId: sessionAgentId,
             }),
-            createTaskStepReportTool(),
+            createTaskStepReportTool({
+              sessionKey: options?.agentSessionKey,
+              deliveryTo: options?.agentTo,
+              agentId: sessionAgentId,
+            }),
           ]
         : []),
       createSwitchSoulTool({ agentId: sessionAgentId }),

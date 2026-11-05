@@ -295,7 +295,7 @@ describe.skipIf(process.env.CI)("Improvement #2: Semantic dedup via domain overl
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       { insightGenerator: async () => [fakeInsight], fragmentStore: isolatedFragmentStore },
@@ -331,7 +331,7 @@ describe.skipIf(process.env.CI)("Improvement #2: Semantic dedup via domain overl
       config,
       {
         loadPersona: async () => persona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersona = p;
         },
@@ -390,7 +390,7 @@ describe.skipIf(process.env.CI)("Improvement #2: Semantic dedup via domain overl
           // Return latest saved persona (simulates reload from disk)
           return savedPersonas.length > 0 ? savedPersonas[savedPersonas.length - 1]! : persona;
         },
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersonas.push(p);
         },
@@ -625,7 +625,7 @@ describe.skipIf(process.env.CI)("Combined: full pipeline with all 3 improvements
         loadPersona: async () => {
           return savedPersonas.length > 0 ? savedPersonas[savedPersonas.length - 1]! : persona;
         },
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async (_agentId, _userId, p) => {
           savedPersonas.push(p);
         },
@@ -682,7 +682,7 @@ describe.skipIf(process.env.CI)("Combined: full pipeline with all 3 improvements
       config,
       {
         loadPersona: async () => savedPersonas[savedPersonas.length - 1]!,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {
@@ -723,7 +723,7 @@ describe.skipIf(process.env.CI)("Combined: full pipeline with all 3 improvements
       config,
       {
         loadPersona: async () => latestPersona,
-        onInsightReady: async () => {},
+        onInsightReady: async () => true,
         savePersona: async () => {},
       },
       {

@@ -116,4 +116,26 @@ describe("AuditLog", () => {
     const results = await log.query({});
     expect(results).toHaveLength(3);
   });
+
+  it("records draft, approve, and reject events with distinct operations", async () => {
+    const draft = await log.recordDraft({ actor: "user-1", target: "skill-a" });
+    const approve = await log.recordApprove({
+      actor: "user-1",
+      target: "skill-b",
+      metadata: { confirmationId: "c-1" },
+    });
+    const reject = await log.recordReject({ actor: "user-1", target: "skill-c" });
+
+    expect(draft.operation).toBe("skill.draft");
+    expect(draft.outcome).toBe("skipped");
+    expect(approve.operation).toBe("skill.approve");
+    expect(approve.outcome).toBe("success");
+    expect(approve.metadata).toEqual({ confirmationId: "c-1" });
+    expect(reject.operation).toBe("skill.reject");
+    expect(reject.outcome).toBe("skipped");
+
+    expect(await log.query({ operation: "skill.draft" })).toHaveLength(1);
+    expect(await log.query({ operation: "skill.approve" })).toHaveLength(1);
+    expect(await log.query({ operation: "skill.reject" })).toHaveLength(1);
+  });
 });

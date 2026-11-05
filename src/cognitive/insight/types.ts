@@ -87,6 +87,12 @@ export type InsightCandidate = {
   promptVariant?: InsightRecord["promptVariant"];
   citedSourceIndices?: number[];
   webGroundedness?: number;
+  /**
+   * PRISM gate decision that admitted this candidate. Persisted with the
+   * insight record so calibration compares the predicted pAccept against the
+   * real outcome instead of falling back to a constant 0.5.
+   */
+  gateSnapshot?: { pAccept: number };
 };
 
 /** Result of LLM-based critique of an insight candidate. */

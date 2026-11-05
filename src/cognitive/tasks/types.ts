@@ -99,6 +99,15 @@ export const TASK_RESULT_MAX_CHARS = 8000;
 export const DEFAULT_TASK_MAX_STEPS = 12;
 export const DEFAULT_TASK_MAX_WALL_CLOCK_MS = 30 * 60 * 1000;
 
+/** Hierarchy guards: root task is depth 1; deeper nesting is rejected. */
+export const DEFAULT_MAX_TASK_DEPTH = 3;
+/** Max children a single task may spawn (all agents, terminal ones included). */
+export const DEFAULT_MAX_SUBTASKS = 3;
+/** Concurrent task drives per (agentId, userId). */
+export const DEFAULT_MAX_CONCURRENT_PER_USER = 1;
+/** Global cap on concurrent task drives across all users. */
+export const DEFAULT_MAX_CONCURRENT_TASKS = 8;
+
 export function clampText(text: string | undefined, maxChars: number): string {
   const trimmed = (text ?? "").trim();
   if (trimmed.length <= maxChars) {

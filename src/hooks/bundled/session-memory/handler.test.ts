@@ -17,6 +17,7 @@ vi.mock("../../llm-slug-generator.js", () => ({
 }));
 
 let handler: typeof import("./handler.js").default;
+let isCorrectionExtractionEnabled: typeof import("./handler.js").isCorrectionExtractionEnabled;
 let suiteWorkspaceRoot = "";
 let workspaceCaseCounter = 0;
 
@@ -28,7 +29,7 @@ async function createCaseWorkspace(prefix = "case"): Promise<string> {
 }
 
 beforeAll(async () => {
-  ({ default: handler } = await import("./handler.js"));
+  ({ default: handler, isCorrectionExtractionEnabled } = await import("./handler.js"));
   suiteWorkspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-session-memory-"));
 });
 
@@ -542,5 +543,29 @@ describe("session-memory hook", () => {
 
     expect(memoryContent).toContain("user: Only message 1");
     expect(memoryContent).toContain("assistant: Only message 2");
+  });
+});
+
+describe("isCorrectionExtractionEnabled", () => {
+  it("defaults to enabled when config is missing", () => {
+    expect(isCorrectionExtractionEnabled(undefined)).toBe(true);
+  });
+
+  it("stays enabled with empty cognitive config", () => {
+    expect(isCorrectionExtractionEnabled({ cognitive: {} } as KaijiBotConfig)).toBe(true);
+  });
+
+  it("returns false when cognitive.enabled is false", () => {
+    expect(isCorrectionExtractionEnabled({ cognitive: { enabled: false } } as KaijiBotConfig)).toBe(
+      false,
+    );
+  });
+
+  it("returns false when cognitive.correction.enabled is false", () => {
+    expect(
+      isCorrectionExtractionEnabled({
+        cognitive: { correction: { enabled: false } },
+      } as KaijiBotConfig),
+    ).toBe(false);
   });
 });

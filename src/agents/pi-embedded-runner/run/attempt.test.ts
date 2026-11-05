@@ -15,6 +15,7 @@ import {
   resolveEmbeddedAgentStreamFn,
   resolvePromptBuildHookResult,
   resolvePromptModeForSession,
+  resolveCognitiveWritePathFlags,
   shouldWarnOnOrphanedUserRepair,
   wrapStreamFnRepairMalformedToolCallArguments,
   wrapStreamFnSanitizeMalformedToolCalls,
@@ -2023,6 +2024,37 @@ describe("buildAfterTurnRuntimeContext", () => {
       currentChannelId: "C123",
       currentThreadTs: "thread-9",
       currentMessageId: "msg-42",
+    });
+  });
+});
+
+describe("resolveCognitiveWritePathFlags", () => {
+  it("defaults to enabled when config is missing", () => {
+    expect(resolveCognitiveWritePathFlags(undefined)).toEqual({
+      cognitiveEnabled: true,
+      personaAutoExtract: true,
+    });
+  });
+
+  it("disables the whole write path when cognitive.enabled is false", () => {
+    expect(
+      resolveCognitiveWritePathFlags({
+        cognitive: { enabled: false },
+      } as KaijiBotConfig),
+    ).toEqual({
+      cognitiveEnabled: false,
+      personaAutoExtract: true,
+    });
+  });
+
+  it("keeps implicit feedback but skips persona extraction when persona.autoExtract is false", () => {
+    expect(
+      resolveCognitiveWritePathFlags({
+        cognitive: { persona: { autoExtract: false } },
+      } as KaijiBotConfig),
+    ).toEqual({
+      cognitiveEnabled: true,
+      personaAutoExtract: false,
     });
   });
 });

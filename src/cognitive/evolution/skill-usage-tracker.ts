@@ -1,3 +1,4 @@
+import type { KaijiBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 
 const log = createSubsystemLogger("cognitive/evolution/skill-usage");
@@ -5,6 +6,10 @@ const log = createSubsystemLogger("cognitive/evolution/skill-usage");
 export type SkillUsageTrackParams = {
   toolMetas: ReadonlyArray<{ toolName: string; meta?: string }>;
   configDir: string;
+  /** Full config when available, so a custom agent workspace is honored. */
+  config?: KaijiBotConfig;
+  /** Agent whose workspace owns the skills (defaults to "main"). */
+  agentId?: string;
 };
 
 /**
@@ -21,7 +26,14 @@ export async function trackSkillUsage(params: SkillUsageTrackParams): Promise<vo
   }
 
   const { SkillPersistenceWriter } = await import("./skill-writer.js");
-  const writer = new SkillPersistenceWriter(params.configDir);
+  const { resolveEvolutionSkillBaseDir } = await import("./skill-lifecycle.js");
+  const writer = new SkillPersistenceWriter(
+    resolveEvolutionSkillBaseDir({
+      config: params.config,
+      agentId: params.agentId,
+      configDir: params.configDir,
+    }),
+  );
 
   const seen = new Set<string>();
   for (const entry of skillReads) {
