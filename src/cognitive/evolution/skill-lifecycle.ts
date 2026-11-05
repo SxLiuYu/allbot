@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { resolveAgentWorkspaceDir } from "../../agents/agent-scope.js";
 import { resolveDefaultAgentWorkspaceDir } from "../../agents/workspace.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { textSimilarity } from "../../infra/text-similarity.js";
 import { DEFAULT_AGENT_ID } from "../../routing/session-key.js";
 import type { SkillPersistenceWriter } from "./skill-writer.js";
@@ -10,7 +10,7 @@ import type { SkillMeta, DedupCheckResult } from "./types.js";
 /** Location inputs for the single source of truth of evolution skill paths. */
 export type EvolutionSkillRootOptions = {
   /** Full config when available; honors a custom agent workspace. */
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   /** Agent whose workspace owns the skills (defaults to "main"). */
   agentId?: string;
   /** State/config dir fallback: <configDir>/workspace. */

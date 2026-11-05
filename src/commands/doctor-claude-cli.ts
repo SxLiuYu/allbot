@@ -12,7 +12,7 @@ import type {
 } from "../agents/auth-profiles/types.js";
 import { readClaudeCliCredentialsCached } from "../agents/cli-credentials.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveExecutablePath } from "../infra/executable-path.js";
 import {
   normalizeOptionalLowercaseString,
@@ -32,7 +32,7 @@ type ClaudeCliReadableCredential =
 
 type ClaudeCliDirHealth = "present" | "missing" | "not_directory" | "unreadable" | "readonly";
 
-function usesClaudeCliModelSelection(cfg: KaijiBotConfig): boolean {
+function usesClaudeCliModelSelection(cfg: AllBotConfig): boolean {
   const primary = resolvePrimaryStringValue(
     cfg.agents?.defaults?.model as string | { primary?: string; fallbacks?: string[] } | undefined,
   );
@@ -44,7 +44,7 @@ function usesClaudeCliModelSelection(cfg: KaijiBotConfig): boolean {
   );
 }
 
-function hasClaudeCliConfigSignals(cfg: KaijiBotConfig): boolean {
+function hasClaudeCliConfigSignals(cfg: AllBotConfig): boolean {
   if (usesClaudeCliModelSelection(cfg)) {
     return true;
   }
@@ -68,7 +68,7 @@ function hasClaudeCliStoreSignals(store: AuthProfileStore): boolean {
   return Object.values(store.profiles).some((profile) => profile?.provider === CLAUDE_CLI_PROVIDER);
 }
 
-function resolveClaudeCliCommand(cfg: KaijiBotConfig): string {
+function resolveClaudeCliCommand(cfg: AllBotConfig): string {
   const configured = cfg.agents?.defaults?.cliBackends ?? {};
   for (const [key, entry] of Object.entries(configured)) {
     if (normalizeOptionalLowercaseString(key) !== CLAUDE_CLI_PROVIDER) {
@@ -155,7 +155,7 @@ function formatWorkspaceHealthLine(workspaceDir: string, health: ClaudeCliDirHea
     return `- Workspace: ${display} (writable).`;
   }
   if (health === "missing") {
-    return `- Workspace: ${display} (missing; KaijiBot will create it on first run).`;
+    return `- Workspace: ${display} (missing; AllBot will create it on first run).`;
   }
   if (health === "not_directory") {
     return `- Workspace: ${display} exists but is not a directory.`;
@@ -184,7 +184,7 @@ function formatProjectDirHealthLine(projectDir: string, health: ClaudeCliDirHeal
 }
 
 export function noteClaudeCliHealth(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   deps?: {
     noteFn?: typeof note;
     env?: NodeJS.ProcessEnv;
@@ -241,30 +241,30 @@ export function noteClaudeCliHealth(
     lines.push("- Headless Claude auth: unavailable without interactive prompting.");
     fixHints.push(
       `- Fix: run ${formatCliCommand("claude auth login")}, then ${formatCliCommand(
-        "kaijibot models auth login --provider anthropic --method cli --set-default",
+        "allbot models auth login --provider anthropic --method cli --set-default",
       )}.`,
     );
   }
 
   if (!storedProfile) {
-    lines.push(`- KaijiBot auth profile: missing (${CLAUDE_CLI_PROFILE_ID}) in ${authStorePath}.`);
+    lines.push(`- AllBot auth profile: missing (${CLAUDE_CLI_PROFILE_ID}) in ${authStorePath}.`);
     fixHints.push(
       `- Fix: run ${formatCliCommand(
-        "kaijibot models auth login --provider anthropic --method cli --set-default",
+        "allbot models auth login --provider anthropic --method cli --set-default",
       )}.`,
     );
   } else if (storedProfile.provider !== CLAUDE_CLI_PROVIDER) {
     lines.push(
-      `- KaijiBot auth profile: ${CLAUDE_CLI_PROFILE_ID} is wired to provider "${storedProfile.provider}" instead of "${CLAUDE_CLI_PROVIDER}".`,
+      `- AllBot auth profile: ${CLAUDE_CLI_PROFILE_ID} is wired to provider "${storedProfile.provider}" instead of "${CLAUDE_CLI_PROVIDER}".`,
     );
     fixHints.push(
       `- Fix: rerun ${formatCliCommand(
-        "kaijibot models auth login --provider anthropic --method cli --set-default",
+        "allbot models auth login --provider anthropic --method cli --set-default",
       )} to rewrite the profile cleanly.`,
     );
   } else {
     lines.push(
-      `- KaijiBot auth profile: ${CLAUDE_CLI_PROFILE_ID} (provider ${CLAUDE_CLI_PROVIDER}).`,
+      `- AllBot auth profile: ${CLAUDE_CLI_PROFILE_ID} (provider ${CLAUDE_CLI_PROVIDER}).`,
     );
   }
 

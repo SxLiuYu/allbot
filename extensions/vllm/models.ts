@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
-import { discoverOpenAICompatibleLocalModels } from "kaijibot/plugin-sdk/provider-setup";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
+import { discoverOpenAICompatibleLocalModels } from "allbot/plugin-sdk/provider-setup";
 import { VLLM_DEFAULT_BASE_URL, VLLM_PROVIDER_LABEL } from "./defaults.js";
 
-type ModelsConfig = NonNullable<KaijiBotConfig["models"]>;
+type ModelsConfig = NonNullable<AllBotConfig["models"]>;
 type ProviderConfig = NonNullable<ModelsConfig["providers"]>[string];
 
 export async function buildVllmProvider(params?: {

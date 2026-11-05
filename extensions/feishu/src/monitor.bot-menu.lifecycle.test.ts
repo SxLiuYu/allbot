@@ -31,7 +31,7 @@ const {
 
 let _handlers: Record<string, (data: unknown) => Promise<void>> = {};
 let lastRuntime: RuntimeEnv | null = null;
-const originalStateDir = process.env.KAIJIBOT_STATE_DIR;
+const originalStateDir = process.env.ALLBOT_STATE_DIR;
 const lifecycleConfig = createFeishuLifecycleConfig({
   accountId: "acct-menu",
   appId: "cli_test",
@@ -88,7 +88,7 @@ describe("Feishu bot-menu lifecycle", () => {
     vi.clearAllMocks();
     _handlers = {};
     lastRuntime = null;
-    setFeishuLifecycleStateDir("kaijibot-feishu-bot-menu");
+    setFeishuLifecycleStateDir("allbot-feishu-bot-menu");
 
     createFeishuReplyDispatcherMock.mockReturnValue(createFeishuLifecycleReplyDispatcher());
 

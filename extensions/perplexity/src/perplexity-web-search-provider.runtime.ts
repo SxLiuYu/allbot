@@ -2,7 +2,7 @@ import {
   readNumberParam,
   readStringArrayParam,
   readStringParam,
-} from "kaijibot/plugin-sdk/provider-web-search";
+} from "allbot/plugin-sdk/provider-web-search";
 import {
   buildSearchCacheKey,
   DEFAULT_SEARCH_COUNT,
@@ -21,8 +21,8 @@ import {
   withTrustedWebSearchEndpoint,
   wrapWebContent,
   writeCachedSearchPayload,
-} from "kaijibot/plugin-sdk/provider-web-search";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/provider-web-search";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import {
   DEFAULT_PERPLEXITY_BASE_URL,
   inferPerplexityBaseUrlFromApiKey,

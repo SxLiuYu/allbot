@@ -1,4 +1,4 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
 import { applyQianfanConfig, QIANFAN_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildQianfanProvider } from "./provider-catalog.js";
 

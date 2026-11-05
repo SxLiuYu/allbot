@@ -9,7 +9,7 @@ function resolveAccountsDir(): string {
 
 /**
  * Path to the persistent get_updates_buf file for an account.
- * Stored alongside account data: ~/.kaijibot/wechat/accounts/{accountId}.sync.json
+ * Stored alongside account data: ~/.allbot/wechat/accounts/{accountId}.sync.json
  */
 export function getSyncBufFilePath(accountId: string): string {
   return path.join(resolveAccountsDir(), `${accountId}.sync.json`);

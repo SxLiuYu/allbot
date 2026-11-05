@@ -1,3 +1,3 @@
-import { describeZAIProviderRuntimeContract } from "kaijibot/plugin-sdk/provider-test-contracts";
+import { describeZAIProviderRuntimeContract } from "allbot/plugin-sdk/provider-test-contracts";
 
 describeZAIProviderRuntimeContract();

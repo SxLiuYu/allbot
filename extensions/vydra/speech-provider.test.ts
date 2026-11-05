@@ -43,7 +43,7 @@ describe("vydra speech provider", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await provider.synthesize({
-      text: "KaijiBot test",
+      text: "AllBot test",
       cfg: {} as never,
       providerConfig: { apiKey: "vydra-test-key" },
       target: "audio-file",
@@ -56,7 +56,7 @@ describe("vydra speech provider", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
-          text: "KaijiBot test",
+          text: "AllBot test",
           voice_id: "21m00Tcm4TlvDq8ikWAM",
         }),
       }),

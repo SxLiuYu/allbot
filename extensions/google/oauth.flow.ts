@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
-import { isWSL2Sync } from "kaijibot/plugin-sdk/runtime-env";
+import { isWSL2Sync } from "allbot/plugin-sdk/runtime-env";
 import { resolveOAuthClientConfig } from "./oauth.credentials.js";
 import { AUTH_URL, REDIRECT_URI, SCOPES } from "./oauth.shared.js";
 
@@ -112,7 +112,7 @@ export async function waitForLocalCallback(params: {
         res.end(
           "<!doctype html><html><head><meta charset='utf-8'/></head>" +
             "<body><h2>Gemini CLI OAuth complete</h2>" +
-            "<p>You can close this window and return to KaijiBot.</p></body></html>",
+            "<p>You can close this window and return to AllBot.</p></body></html>",
         );
 
         finish(undefined, { code, state });

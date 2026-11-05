@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { logWarn } from "../logger.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import {
@@ -128,7 +128,7 @@ export async function materializeBundleMcpToolsForRun(params: {
 
 export async function createBundleMcpToolRuntime(params: {
   workspaceDir: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   reservedToolNames?: Iterable<string>;
 }): Promise<BundleMcpToolRuntime> {
   const runtime = createSessionMcpRuntime({

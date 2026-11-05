@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 import { discoverVeniceModels, VENICE_BASE_URL } from "./models.js";
 
 export async function buildVeniceProvider(): Promise<ModelProviderConfig> {

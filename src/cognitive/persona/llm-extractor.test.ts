@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import type { PersonaTree } from "../types.js";
 import type { LlmExtractorDeps } from "./llm-extractor.js";
 import { extractFromMessageLLM } from "./llm-extractor.js";
 
 type CompleteArgs = Parameters<LlmExtractorDeps["complete"]>;
 
-const stubConfig = {} as KaijiBotConfig;
+const stubConfig = {} as AllBotConfig;
 
 function makeSuccessDeps(
   responseText: string,

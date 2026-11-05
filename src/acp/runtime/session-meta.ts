@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import { resolveStorePath } from "../../config/sessions/paths.js";
 import { loadSessionStore } from "../../config/sessions/store-load.js";
@@ -21,7 +21,7 @@ function loadSessionStoreRuntime() {
 }
 
 export type AcpSessionStoreEntry = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   storePath: string;
   sessionKey: string;
   storeSessionKey: string;
@@ -52,8 +52,8 @@ function resolveStoreSessionKey(store: Record<string, SessionEntry>, sessionKey:
 
 export function resolveSessionStorePathForAcp(params: {
   sessionKey: string;
-  cfg?: KaijiBotConfig;
-}): { cfg: KaijiBotConfig; storePath: string } {
+  cfg?: AllBotConfig;
+}): { cfg: AllBotConfig; storePath: string } {
   const cfg = params.cfg ?? loadConfig();
   const parsed = parseAgentSessionKey(params.sessionKey);
   const storePath = resolveStorePath(cfg.session?.store, {
@@ -64,7 +64,7 @@ export function resolveSessionStorePathForAcp(params: {
 
 export function readAcpSessionEntry(params: {
   sessionKey: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): AcpSessionStoreEntry | null {
   const sessionKey = params.sessionKey.trim();
   if (!sessionKey) {
@@ -96,7 +96,7 @@ export function readAcpSessionEntry(params: {
 }
 
 export async function listAcpSessionEntries(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
 }): Promise<AcpSessionStoreEntry[]> {
   const cfg = params.cfg ?? loadConfig();
@@ -134,7 +134,7 @@ export async function listAcpSessionEntries(params: {
 
 export async function upsertAcpSessionMeta(params: {
   sessionKey: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   mutate: (
     current: SessionAcpMeta | undefined,
     entry: SessionEntry | undefined,

@@ -41,19 +41,19 @@ afterEach(() => {
 // CI: dynamically imports scripts/stage-bundled-plugin-runtime-deps.mjs which is not packaged on CI.
 describe.skipIf(process.env.CI)("stageBundledPluginRuntimeDeps", () => {
   it("drops Lark SDK type cargo while keeping runtime entrypoints", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-deps-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-deps-");
 
     writeRepoFile(
       repoRoot,
       "dist/extensions/feishu/package.json",
       JSON.stringify(
         {
-          name: "@kaijibot/feishu",
+          name: "@allbot/feishu",
           version: "2026.4.10",
           dependencies: {
             "@larksuiteoapi/node-sdk": "^1.60.0",
           },
-          kaijibot: {
+          allbot: {
             bundle: {
               stageRuntimeDependencies: true,
             },
@@ -114,29 +114,29 @@ describe.skipIf(process.env.CI)("stageBundledPluginRuntimeDeps", () => {
   });
 
   it("strips non-runtime dependency sections before temp npm staging", async () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-manifest-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-manifest-");
     writeRepoFile(
       repoRoot,
       "dist/extensions/amazon-bedrock/package.json",
       JSON.stringify(
         {
-          name: "@kaijibot/amazon-bedrock-provider",
+          name: "@allbot/amazon-bedrock-provider",
           version: "2026.4.10",
           dependencies: {
             "some-runtime-dep": "^1.0.0",
           },
           devDependencies: {
-            "@kaijibot/plugin-sdk": "workspace:*",
+            "@allbot/plugin-sdk": "workspace:*",
           },
           peerDependencies: {
-            kaijibot: "^0.0.0",
+            allbot: "^0.0.0",
           },
           peerDependenciesMeta: {
-            kaijibot: {
+            allbot: {
               optional: true,
             },
           },
-          kaijibot: {
+          allbot: {
             bundle: {
               stageRuntimeDependencies: true,
             },

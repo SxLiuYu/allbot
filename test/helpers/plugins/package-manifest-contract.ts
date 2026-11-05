@@ -8,7 +8,7 @@ import { bundledPluginFile } from "../bundled-plugin-paths.js";
 type PackageManifest = {
   dependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
-  kaijibot?: {
+  allbot?: {
     install?: {
       minHostVersion?: string;
     };
@@ -77,12 +77,12 @@ export function describePackageManifestContract(params: PackageManifestContractP
 
         const manifest = readJson<PackageManifest>(packagePath);
         const requirement = parseMinHostVersionRequirement(
-          manifest.kaijibot?.install?.minHostVersion ?? null,
+          manifest.allbot?.install?.minHostVersion ?? null,
         );
 
         expect(
           requirement,
-          `${packagePath} should declare kaijibot.install.minHostVersion`,
+          `${packagePath} should declare allbot.install.minHostVersion`,
         ).not.toBeNull();
         if (!requirement) {
           return;
@@ -96,7 +96,7 @@ export function describePackageManifestContract(params: PackageManifestContractP
 
         expect(
           isAtLeast(minimum, baseline),
-          `${packagePath} should require at least KaijiBot ${minHostVersionBaseline}`,
+          `${packagePath} should require at least AllBot ${minHostVersionBaseline}`,
         ).toBe(true);
       });
     }

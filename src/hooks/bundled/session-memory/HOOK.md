@@ -4,12 +4,12 @@ description: "Save session context to memory when /new or /reset command is issu
 homepage: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/automation/hooks.md#session-memory
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "💾",
         "events": ["command:new", "command:reset", "compaction:after"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with KaijiBot" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with AllBot" }],
       },
   }
 ---
@@ -81,7 +81,7 @@ Example configuration:
 
 The hook automatically:
 
-- Uses your workspace directory (`~/.kaijibot/workspace` by default)
+- Uses your workspace directory (`~/.allbot/workspace` by default)
 - Uses your configured LLM for slug generation
 - Falls back to timestamp slugs if LLM is unavailable
 
@@ -90,7 +90,7 @@ The hook automatically:
 To disable this hook:
 
 ```bash
-kaijibot hooks disable session-memory
+allbot hooks disable session-memory
 ```
 
 Or remove it from your config:

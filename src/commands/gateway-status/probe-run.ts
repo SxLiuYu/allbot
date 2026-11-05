@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/types.js";
+import type { AllBotConfig } from "../../config/types.js";
 import { probeGateway } from "../../gateway/probe.js";
 import {
   discoverGatewayBeacons,
@@ -25,7 +25,7 @@ export type GatewayStatusProbedTarget = {
 };
 
 export async function runGatewayStatusProbePass(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   opts: {
     token?: string;
     password?: string;

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { resolveKaijiBotAgentDir } from "./agent-paths.js";
+import { resolveAllBotAgentDir } from "./agent-paths.js";
 import {
   CUSTOM_PROXY_MODELS_CONFIG,
   installModelsConfigTestHooks,
@@ -86,7 +86,7 @@ installModelsConfigTestHooks();
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;
 let clearRuntimeConfigSnapshot: typeof import("../config/config.js").clearRuntimeConfigSnapshot;
 let clearRuntimeAuthProfileStoreSnapshots: typeof import("./auth-profiles/store.js").clearRuntimeAuthProfileStoreSnapshots;
-let ensureKaijiBotModelsJson: typeof import("./models-config.js").ensureKaijiBotModelsJson;
+let ensureAllBotModelsJson: typeof import("./models-config.js").ensureAllBotModelsJson;
 let resetModelsJsonReadyCacheForTest: typeof import("./models-config.js").resetModelsJsonReadyCacheForTest;
 
 type ParsedProviderConfig = {
@@ -104,9 +104,9 @@ async function runEnvProviderCase(params: {
   const previousValue = process.env[params.envVar];
   process.env[params.envVar] = params.envValue;
   try {
-    await ensureKaijiBotModelsJson({});
+    await ensureAllBotModelsJson({});
 
-    const modelPath = path.join(resolveKaijiBotAgentDir(), "models.json");
+    const modelPath = path.join(resolveAllBotAgentDir(), "models.json");
     const raw = await fs.readFile(modelPath, "utf8");
     const parsed = JSON.parse(raw) as { providers: Record<string, ParsedProviderConfig> };
     const provider = parsed.providers[params.providerKey];
@@ -125,7 +125,7 @@ describe("models-config", () => {
   beforeAll(async () => {
     ({ clearConfigCache, clearRuntimeConfigSnapshot } = await import("../config/config.js"));
     ({ clearRuntimeAuthProfileStoreSnapshots } = await import("./auth-profiles/store.js"));
-    ({ ensureKaijiBotModelsJson, resetModelsJsonReadyCacheForTest } =
+    ({ ensureAllBotModelsJson, resetModelsJsonReadyCacheForTest } =
       await import("./models-config.js"));
   });
 
@@ -150,10 +150,10 @@ describe("models-config", () => {
 
         const agentDir = path.join(home, "agent-empty");
         // ensureAuthProfileStore merges the main auth store into non-main dirs; point main at our temp dir.
-        process.env.KAIJIBOT_AGENT_DIR = agentDir;
+        process.env.ALLBOT_AGENT_DIR = agentDir;
         process.env.PI_CODING_AGENT_DIR = agentDir;
 
-        const result = await ensureKaijiBotModelsJson(
+        const result = await ensureAllBotModelsJson(
           {
             models: { providers: {} },
           },
@@ -174,9 +174,9 @@ describe("models-config", () => {
 
   it("writes models.json for configured providers", async () => {
     await withTempHome(async () => {
-      await ensureKaijiBotModelsJson(CUSTOM_PROXY_MODELS_CONFIG);
+      await ensureAllBotModelsJson(CUSTOM_PROXY_MODELS_CONFIG);
 
-      const modelPath = path.join(resolveKaijiBotAgentDir(), "models.json");
+      const modelPath = path.join(resolveAllBotAgentDir(), "models.json");
       const raw = await fs.readFile(modelPath, "utf8");
       const parsed = JSON.parse(raw) as {
         providers: Record<

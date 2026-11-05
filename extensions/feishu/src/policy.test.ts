@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/core";
+import type { AllBotConfig } from "allbot/plugin-sdk/core";
 import { describe, expect, it } from "vitest";
 import { FeishuConfigSchema } from "./config-schema.js";
 import {
@@ -9,12 +9,12 @@ import {
 } from "./policy.js";
 import type { FeishuConfig } from "./types.js";
 
-function createCfg(feishu: Record<string, unknown>): KaijiBotConfig {
+function createCfg(feishu: Record<string, unknown>): AllBotConfig {
   return {
     channels: {
       feishu,
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createFeishuConfig(overrides: Partial<FeishuConfig>): FeishuConfig {

@@ -1,1 +1,1 @@
-export type { MockFn } from "kaijibot/plugin-sdk/browser-setup-tools";
+export type { MockFn } from "allbot/plugin-sdk/browser-setup-tools";

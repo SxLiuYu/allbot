@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import fs from "node:fs/promises";
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   ensureContextEnginesInitialized,
   resolveContextEngine,
@@ -15,7 +15,7 @@ import { enqueueCommandInLane } from "../../process/command-queue.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import { sanitizeForLog } from "../../terminal/ansi.js";
 import { isMarkdownCapableMessageChannel } from "../../utils/message-channel.js";
-import { resolveKaijiBotAgentDir } from "../agent-paths.js";
+import { resolveAllBotAgentDir } from "../agent-paths.js";
 import { hasConfiguredModelFallbacks } from "../agent-scope.js";
 import {
   type AuthProfileFailureReason,
@@ -46,7 +46,7 @@ import {
   shouldPreferExplicitConfigApiKeyAuth,
 } from "../model-auth.js";
 import { normalizeProviderId } from "../model-selection.js";
-import { ensureKaijiBotModelsJson } from "../models-config.js";
+import { ensureAllBotModelsJson } from "../models-config.js";
 import { disposeSessionMcpRuntime } from "../pi-bundle-mcp-tools.js";
 import {
   classifyFailoverReason,
@@ -114,7 +114,7 @@ type ApiKeyInfo = ResolvedProviderAuth;
  * `cognitive.evolution.enabled=false` disables evolution signals entirely.
  * Default is enabled (undefined !== false).
  */
-export function isCognitiveEvolutionEnabled(config?: KaijiBotConfig): boolean {
+export function isCognitiveEvolutionEnabled(config?: AllBotConfig): boolean {
   return config?.cognitive?.evolution?.enabled !== false;
 }
 
@@ -123,7 +123,7 @@ export function isCognitiveEvolutionEnabled(config?: KaijiBotConfig): boolean {
  * The return value is normalized: whitespace-only inputs collapse to undefined, and
  * successful resolution returns a trimmed session key. This is a read-only lookup
  * with no side effects.
- * See: https://github.com/kaijibot/kaijibot/issues/60552
+ * See: https://github.com/allbot/allbot/issues/60552
  */
 function backfillSessionKey(params: {
   config: RunEmbeddedPiAgentParams["config"];
@@ -234,14 +234,14 @@ export async function runEmbeddedPiAgent(
 
       let provider = (params.provider ?? DEFAULT_PROVIDER).trim() || DEFAULT_PROVIDER;
       let modelId = (params.model ?? DEFAULT_MODEL).trim() || DEFAULT_MODEL;
-      const agentDir = params.agentDir ?? resolveKaijiBotAgentDir();
+      const agentDir = params.agentDir ?? resolveAllBotAgentDir();
       const normalizedSessionKey = params.sessionKey?.trim();
       const fallbackConfigured = hasConfiguredModelFallbacks({
         cfg: params.config,
         agentId: params.agentId,
         sessionKey: normalizedSessionKey,
       });
-      await ensureKaijiBotModelsJson(params.config, agentDir);
+      await ensureAllBotModelsJson(params.config, agentDir);
       const resolvedSessionKey = normalizedSessionKey;
       const hookRunner = getGlobalHookRunner();
       const hookCtx = {

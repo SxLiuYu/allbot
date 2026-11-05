@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { trimToUndefined, type ExplicitGatewayAuth } from "./credentials.js";
 
 export function hasExplicitGatewayConnectionAuth(auth?: ExplicitGatewayAuth): boolean {
@@ -6,7 +6,7 @@ export function hasExplicitGatewayConnectionAuth(auth?: ExplicitGatewayAuth): bo
 }
 
 export function canSkipGatewayConfigLoad(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   urlOverride?: string;
   explicitAuth?: ExplicitGatewayAuth;
 }): boolean {

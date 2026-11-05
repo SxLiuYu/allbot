@@ -30,17 +30,17 @@ async function loadFreshAuthProfilesModuleForTest() {
 
 function withAgentDirEnv(prefix: string, run: (agentDir: string) => void | Promise<void>) {
   const agentDir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-  const previousAgentDir = process.env.KAIJIBOT_AGENT_DIR;
+  const previousAgentDir = process.env.ALLBOT_AGENT_DIR;
   const previousPiAgentDir = process.env.PI_CODING_AGENT_DIR;
   try {
-    process.env.KAIJIBOT_AGENT_DIR = agentDir;
+    process.env.ALLBOT_AGENT_DIR = agentDir;
     process.env.PI_CODING_AGENT_DIR = agentDir;
     return run(agentDir);
   } finally {
     if (previousAgentDir === undefined) {
-      delete process.env.KAIJIBOT_AGENT_DIR;
+      delete process.env.ALLBOT_AGENT_DIR;
     } else {
-      process.env.KAIJIBOT_AGENT_DIR = previousAgentDir;
+      process.env.ALLBOT_AGENT_DIR = previousAgentDir;
     }
     if (previousPiAgentDir === undefined) {
       delete process.env.PI_CODING_AGENT_DIR;
@@ -86,7 +86,7 @@ describe("auth profile store cache", () => {
   });
 
   it("reuses the synced auth store while auth-profiles.json is unchanged", async () => {
-    await withAgentDirEnv("kaijibot-auth-store-cache-", (agentDir) => {
+    await withAgentDirEnv("allbot-auth-store-cache-", (agentDir) => {
       writeAuthStore(agentDir, "sk-test");
 
       ensureAuthProfileStore(agentDir);
@@ -97,7 +97,7 @@ describe("auth profile store cache", () => {
   });
 
   it("refreshes the cached auth store after auth-profiles.json changes", async () => {
-    await withAgentDirEnv("kaijibot-auth-store-refresh-", async (agentDir) => {
+    await withAgentDirEnv("allbot-auth-store-refresh-", async (agentDir) => {
       const authPath = writeAuthStore(agentDir, "sk-test-1");
 
       ensureAuthProfileStore(agentDir);
@@ -116,8 +116,8 @@ describe("auth profile store cache", () => {
   });
 
   it("re-syncs external CLI credentials after the cache ttl when auth-profiles.json is absent", () => {
-    const agentDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-auth-store-missing-"));
-    const previousAgentDir = process.env.KAIJIBOT_AGENT_DIR;
+    const agentDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-auth-store-missing-"));
+    const previousAgentDir = process.env.ALLBOT_AGENT_DIR;
     const previousPiAgentDir = process.env.PI_CODING_AGENT_DIR;
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-21T15:00:00.000Z"));
@@ -134,7 +134,7 @@ describe("auth profile store cache", () => {
       return true;
     });
     try {
-      process.env.KAIJIBOT_AGENT_DIR = agentDir;
+      process.env.ALLBOT_AGENT_DIR = agentDir;
       process.env.PI_CODING_AGENT_DIR = agentDir;
 
       const first = ensureAuthProfileStore(agentDir);
@@ -152,9 +152,9 @@ describe("auth profile store cache", () => {
       expect(third.profiles["openai-codex:default"]).toMatchObject({ access: "access-2" });
     } finally {
       if (previousAgentDir === undefined) {
-        delete process.env.KAIJIBOT_AGENT_DIR;
+        delete process.env.ALLBOT_AGENT_DIR;
       } else {
-        process.env.KAIJIBOT_AGENT_DIR = previousAgentDir;
+        process.env.ALLBOT_AGENT_DIR = previousAgentDir;
       }
       if (previousPiAgentDir === undefined) {
         delete process.env.PI_CODING_AGENT_DIR;

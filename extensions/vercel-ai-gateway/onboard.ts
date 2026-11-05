@@ -1,11 +1,11 @@
 import {
   applyAgentDefaultModelPrimary,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 
 export const VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF = "vercel-ai-gateway/anthropic/claude-opus-4.6";
 
-export function applyVercelAiGatewayProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyVercelAiGatewayProviderConfig(cfg: AllBotConfig): AllBotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF] = {
     ...models[VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF],
@@ -24,7 +24,7 @@ export function applyVercelAiGatewayProviderConfig(cfg: KaijiBotConfig): KaijiBo
   };
 }
 
-export function applyVercelAiGatewayConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyVercelAiGatewayConfig(cfg: AllBotConfig): AllBotConfig {
   return applyAgentDefaultModelPrimary(
     applyVercelAiGatewayProviderConfig(cfg),
     VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF,

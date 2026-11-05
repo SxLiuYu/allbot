@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveSecretInputRef,
   type SecretProviderConfig,
@@ -18,7 +18,7 @@ export type ConfigureCandidate = {
   path: string;
   pathSegments: string[];
   label: string;
-  configFile: "kaijibot.json" | "auth-profiles.json";
+  configFile: "allbot.json" | "auth-profiles.json";
   expectedResolvedValue: "string" | "string-or-object";
   existingRef?: SecretRef;
   isDerived?: boolean;
@@ -37,14 +37,14 @@ export type ConfigureProviderChanges = {
   deletes: string[];
 };
 
-function getSecretProviders(config: KaijiBotConfig): Record<string, SecretProviderConfig> {
+function getSecretProviders(config: AllBotConfig): Record<string, SecretProviderConfig> {
   if (!isRecord(config.secrets?.providers)) {
     return {};
   }
   return config.secrets.providers;
 }
 
-export function buildConfigureCandidates(config: KaijiBotConfig): ConfigureCandidate[] {
+export function buildConfigureCandidates(config: AllBotConfig): ConfigureCandidate[] {
   return buildConfigureCandidatesForScope({ config });
 }
 
@@ -53,7 +53,7 @@ function configureCandidateSortKey(candidate: ConfigureCandidate): string {
     const agentId = candidate.agentId ?? "";
     return `auth-profiles:${agentId}:${candidate.path}`;
   }
-  return `kaijibot:${candidate.path}`;
+  return `allbot:${candidate.path}`;
 }
 
 function resolveAuthProfileProvider(
@@ -73,19 +73,19 @@ function resolveAuthProfileProvider(
 }
 
 export function buildConfigureCandidatesForScope(params: {
-  config: KaijiBotConfig;
-  authoredKaijiBotConfig?: KaijiBotConfig;
+  config: AllBotConfig;
+  authoredAllBotConfig?: AllBotConfig;
   authProfiles?: {
     agentId: string;
     store: AuthProfileStore;
   };
 }): ConfigureCandidate[] {
-  const authoredConfig = params.authoredKaijiBotConfig ?? params.config;
+  const authoredConfig = params.authoredAllBotConfig ?? params.config;
 
   const hasPathInAuthoredConfig = (pathSegments: string[]): boolean =>
     hasPath(authoredConfig, pathSegments);
 
-  const kaijibotCandidates = discoverConfigSecretTargets(params.config)
+  const allbotCandidates = discoverConfigSecretTargets(params.config)
     .filter((entry) => entry.entry.includeInConfigure)
     .map((entry) => {
       const resolved = resolveSecretInputRef({
@@ -102,7 +102,7 @@ export function buildConfigureCandidatesForScope(params: {
         path: entry.path,
         pathSegments: [...entry.pathSegments],
         label: entry.path,
-        configFile: "kaijibot.json" as const,
+        configFile: "allbot.json" as const,
         expectedResolvedValue: entry.entry.expectedResolvedValue,
         ...(resolved.ref ? { existingRef: resolved.ref } : {}),
         ...(pathExists || refPathExists ? {} : { isDerived: true }),
@@ -143,7 +143,7 @@ export function buildConfigureCandidatesForScope(params: {
             };
           });
 
-  return [...kaijibotCandidates, ...authCandidates].toSorted((a, b) =>
+  return [...allbotCandidates, ...authCandidates].toSorted((a, b) =>
     configureCandidateSortKey(a).localeCompare(configureCandidateSortKey(b)),
   );
 }
@@ -184,8 +184,8 @@ function hasPath(root: unknown, segments: string[]): boolean {
 }
 
 export function collectConfigureProviderChanges(params: {
-  original: KaijiBotConfig;
-  next: KaijiBotConfig;
+  original: AllBotConfig;
+  next: AllBotConfig;
 }): ConfigureProviderChanges {
   const originalProviders = getSecretProviders(params.original);
   const nextProviders = getSecretProviders(params.next);
@@ -233,7 +233,7 @@ export function buildSecretsConfigurePlan(params: {
     version: 1,
     protocolVersion: 1,
     generatedAt: params.generatedAt ?? new Date().toISOString(),
-    generatedBy: "kaijibot secrets configure",
+    generatedBy: "allbot secrets configure",
     targets: [...params.selectedTargets.values()].map((entry) => ({
       type: entry.type,
       path: entry.path,

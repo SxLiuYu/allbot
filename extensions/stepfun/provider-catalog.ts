@@ -1,5 +1,5 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import manifest from "./kaijibot.plugin.json" with { type: "json" };
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
+import manifest from "./allbot.plugin.json" with { type: "json" };
 
 export const STEPFUN_PROVIDER_ID = "stepfun";
 export const STEPFUN_PLAN_PROVIDER_ID = "stepfun-plan";

@@ -10,7 +10,7 @@ import { resolveConfigPath, resolveStateDir } from "../config/paths.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import { acquireGatewayLock, GatewayLockError, type GatewayLockOptions } from "./gateway-lock.js";
 
-const fixtureRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-gateway-lock-" });
+const fixtureRootTracker = createSuiteTempRootTracker({ prefix: "allbot-gateway-lock-" });
 let fixtureRoot = "";
 const realNow = Date.now.bind(Date);
 
@@ -20,12 +20,12 @@ function resolveTestLockDir() {
 
 async function makeEnv() {
   const dir = await fixtureRootTracker.make("case");
-  const configPath = path.join(dir, "kaijibot.json");
+  const configPath = path.join(dir, "allbot.json");
   await fs.writeFile(configPath, "{}", "utf8");
   return {
     ...process.env,
-    KAIJIBOT_STATE_DIR: dir,
-    KAIJIBOT_CONFIG_PATH: configPath,
+    ALLBOT_STATE_DIR: dir,
+    ALLBOT_CONFIG_PATH: configPath,
   };
 }
 
@@ -179,7 +179,7 @@ describe("gateway lock", () => {
 
     const pending = acquireForTest(env, {
       timeoutMs: 15,
-      readProcessCmdline: () => ["kaijibot", "gateway", "run"],
+      readProcessCmdline: () => ["allbot", "gateway", "run"],
     });
     await expect(pending).rejects.toBeInstanceOf(GatewayLockError);
 
@@ -276,7 +276,7 @@ describe("gateway lock", () => {
         staleMs: 10_000,
         platform: "darwin",
         port: 18789,
-        readProcessCmdline: () => ["/usr/local/bin/kaijibot", "gateway", "run"],
+        readProcessCmdline: () => ["/usr/local/bin/allbot", "gateway", "run"],
       });
       await expect(pending).rejects.toBeInstanceOf(GatewayLockError);
     } finally {
@@ -287,7 +287,7 @@ describe("gateway lock", () => {
   it("returns null when multi-gateway override is enabled", async () => {
     const env = await makeEnv();
     const lock = await acquireGatewayLock({
-      env: { ...env, KAIJIBOT_ALLOW_MULTI_GATEWAY: "1", VITEST: "" },
+      env: { ...env, ALLBOT_ALLOW_MULTI_GATEWAY: "1", VITEST: "" },
       lockDir: resolveTestLockDir(),
     });
     expect(lock).toBeNull();
@@ -349,7 +349,7 @@ describe("gateway lock", () => {
       platform: "win32",
       port: 18789,
       readProcessCmdline: () => [
-        "C:\\Users\\me\\AppData\\Roaming\\npm\\kaijibot.cmd",
+        "C:\\Users\\me\\AppData\\Roaming\\npm\\allbot.cmd",
         "gateway",
         "run",
       ],
@@ -413,7 +413,7 @@ describe("gateway lock", () => {
       staleMs: 10_000,
       platform: "darwin",
       port: 18789,
-      readProcessCmdline: () => ["/usr/local/bin/kaijibot", "gateway", "run", "--port", "18789"],
+      readProcessCmdline: () => ["/usr/local/bin/allbot", "gateway", "run", "--port", "18789"],
     });
     await expect(pending).rejects.toBeInstanceOf(GatewayLockError);
 

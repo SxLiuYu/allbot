@@ -13,7 +13,7 @@ export type PluginRuntimeGatewayRequestScope = {
 };
 
 const PLUGIN_RUNTIME_GATEWAY_REQUEST_SCOPE_KEY: unique symbol = Symbol.for(
-  "kaijibot.pluginRuntimeGatewayRequestScope",
+  "allbot.pluginRuntimeGatewayRequestScope",
 );
 
 const pluginRuntimeGatewayRequestScope = resolveGlobalSingleton<

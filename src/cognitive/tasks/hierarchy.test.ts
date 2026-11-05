@@ -18,7 +18,7 @@ describe("task hierarchy storage (M3-R1)", () => {
   let store: TaskStore;
 
   beforeEach(() => {
-    storeDir = mkdtempSync(join(tmpdir(), "kaijibot-task-hierarchy-"));
+    storeDir = mkdtempSync(join(tmpdir(), "allbot-task-hierarchy-"));
     store = new TaskStore(storeDir);
   });
 

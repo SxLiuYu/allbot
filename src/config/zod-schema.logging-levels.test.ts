@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { KaijiBotSchema } from "./zod-schema.js";
+import { AllBotSchema } from "./zod-schema.js";
 
-describe("KaijiBotSchema logging levels", () => {
+describe("AllBotSchema logging levels", () => {
   it("accepts valid logging level values for level and consoleLevel", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         logging: {
           level: "debug",
           consoleLevel: "warn",
@@ -15,14 +15,14 @@ describe("KaijiBotSchema logging levels", () => {
 
   it("rejects invalid logging level values", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         logging: {
           level: "loud",
         },
       }),
     ).toThrow();
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         logging: {
           consoleLevel: "verbose",
         },

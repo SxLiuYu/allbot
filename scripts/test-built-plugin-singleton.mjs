@@ -12,15 +12,15 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const smokeEntryPath = path.join(repoRoot, "dist", "plugins", "build-smoke-entry.js");
 assert.ok(fs.existsSync(smokeEntryPath), `missing build output: ${smokeEntryPath}`);
 
-const { clearPluginCommands, getPluginCommandSpecs, loadKaijiBotPlugins, matchPluginCommand } =
+const { clearPluginCommands, getPluginCommandSpecs, loadAllBotPlugins, matchPluginCommand } =
   await import(pathToFileURL(smokeEntryPath).href);
 
-assert.equal(typeof loadKaijiBotPlugins, "function", "built loader export missing");
+assert.equal(typeof loadAllBotPlugins, "function", "built loader export missing");
 assert.equal(typeof clearPluginCommands, "function", "clearPluginCommands missing");
 assert.equal(typeof getPluginCommandSpecs, "function", "getPluginCommandSpecs missing");
 assert.equal(typeof matchPluginCommand, "function", "matchPluginCommand missing");
 
-const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-build-smoke-"));
+const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-build-smoke-"));
 
 function cleanup() {
   clearPluginCommands();
@@ -45,9 +45,9 @@ fs.writeFileSync(
   path.join(distPluginDir, "package.json"),
   JSON.stringify(
     {
-      name: "@kaijibot/build-smoke-plugin",
+      name: "@allbot/build-smoke-plugin",
       type: "module",
-      kaijibot: {
+      allbot: {
         extensions: ["./index.js"],
       },
     },
@@ -57,7 +57,7 @@ fs.writeFileSync(
   "utf8",
 );
 fs.writeFileSync(
-  path.join(distPluginDir, "kaijibot.plugin.json"),
+  path.join(distPluginDir, "allbot.plugin.json"),
   JSON.stringify(
     {
       id: pluginId,
@@ -75,7 +75,7 @@ fs.writeFileSync(
 fs.writeFileSync(
   path.join(distPluginDir, "index.js"),
   [
-    "import sdk from 'kaijibot/plugin-sdk';",
+    "import sdk from 'allbot/plugin-sdk';",
     "const { emptyPluginConfigSchema } = sdk;",
     "",
     "export default {",
@@ -110,13 +110,13 @@ assert.equal(
 
 clearPluginCommands();
 
-const registry = loadKaijiBotPlugins({
+const registry = loadAllBotPlugins({
   cache: false,
   workspaceDir: tempRoot,
   env: {
     ...process.env,
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: path.join(tempRoot, "dist-runtime", "extensions"),
-    KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+    ALLBOT_BUNDLED_PLUGINS_DIR: path.join(tempRoot, "dist-runtime", "extensions"),
+    ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
   },
   config: {
     plugins: {

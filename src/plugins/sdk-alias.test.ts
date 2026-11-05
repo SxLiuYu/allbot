@@ -39,7 +39,7 @@ async function getCreateJiti() {
 }
 
 const fixtureTempDirs: string[] = [];
-const fixtureRoot = makeTrackedTempDir("kaijibot-sdk-alias-root", fixtureTempDirs);
+const fixtureRoot = makeTrackedTempDir("allbot-sdk-alias-root", fixtureTempDirs);
 let tempDirIndex = 0;
 
 function makeTempDir() {
@@ -75,12 +75,12 @@ function createPluginSdkAliasFixture(params?: {
     params?.trustedRootIndicatorMode ??
     (params?.trustedRootIndicators === false ? "none" : "bin+marker");
   const packageJson: Record<string, unknown> = {
-    name: "kaijibot",
+    name: "allbot",
     type: "module",
   };
   if (trustedRootIndicatorMode === "bin+marker") {
     packageJson.bin = {
-      kaijibot: "kaijibot.mjs",
+      allbot: "allbot.mjs",
     };
   }
   if (params?.packageExports || trustedRootIndicatorMode === "cli-entry-only") {
@@ -96,7 +96,7 @@ function createPluginSdkAliasFixture(params?: {
   }
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify(packageJson, null, 2), "utf-8");
   if (trustedRootIndicatorMode === "bin+marker") {
-    fs.writeFileSync(path.join(root, "kaijibot.mjs"), "export {};\n", "utf-8");
+    fs.writeFileSync(path.join(root, "allbot.mjs"), "export {};\n", "utf-8");
   }
   fs.writeFileSync(srcFile, params?.srcBody ?? "export {};\n", "utf-8");
   fs.writeFileSync(distFile, params?.distBody ?? "export {};\n", "utf-8");
@@ -111,10 +111,10 @@ function createExtensionApiAliasFixture(params?: { srcBody?: string; distBody?: 
   mkdirSafeDir(path.dirname(distFile));
   fs.writeFileSync(
     path.join(root, "package.json"),
-    JSON.stringify({ name: "kaijibot", type: "module" }, null, 2),
+    JSON.stringify({ name: "allbot", type: "module" }, null, 2),
     "utf-8",
   );
-  fs.writeFileSync(path.join(root, "kaijibot.mjs"), "export {};\n", "utf-8");
+  fs.writeFileSync(path.join(root, "allbot.mjs"), "export {};\n", "utf-8");
   fs.writeFileSync(srcFile, params?.srcBody ?? "export {};\n", "utf-8");
   fs.writeFileSync(distFile, params?.distBody ?? "export {};\n", "utf-8");
   return { root, srcFile, distFile };
@@ -128,7 +128,7 @@ function createPluginRuntimeAliasFixture(params?: { srcBody?: string; distBody?:
   mkdirSafeDir(path.dirname(distFile));
   fs.writeFileSync(
     path.join(root, "package.json"),
-    JSON.stringify({ name: "kaijibot", type: "module" }, null, 2),
+    JSON.stringify({ name: "allbot", type: "module" }, null, 2),
     "utf-8",
   );
   fs.writeFileSync(
@@ -168,7 +168,7 @@ function writePluginEntry(root: string, relativePath: string) {
 
 function createUserInstalledPluginSdkAliasFixture() {
   const { fixture, sourceRootAlias } = createPluginSdkAliasTargetFixture();
-  const externalPluginRoot = path.join(makeTempDir(), ".kaijibot", "extensions", "demo");
+  const externalPluginRoot = path.join(makeTempDir(), ".allbot", "extensions", "demo");
   const externalPluginEntry = path.join(externalPluginRoot, "index.ts");
   mkdirSafeDir(externalPluginRoot);
   fs.writeFileSync(externalPluginEntry, 'export const plugin = "demo";\n', "utf-8");
@@ -222,17 +222,17 @@ function expectPluginSdkAliasTargets(
     channelRuntimePath?: string;
   },
 ) {
-  expect(fs.realpathSync(aliases["kaijibot/plugin-sdk"] ?? "")).toBe(
+  expect(fs.realpathSync(aliases["allbot/plugin-sdk"] ?? "")).toBe(
     fs.realpathSync(params.rootAliasPath),
   );
-  expect(fs.realpathSync(aliases["@kaijibot/plugin-sdk"] ?? "")).toBe(
+  expect(fs.realpathSync(aliases["@allbot/plugin-sdk"] ?? "")).toBe(
     fs.realpathSync(params.rootAliasPath),
   );
   if (params.channelRuntimePath) {
-    expect(fs.realpathSync(aliases["kaijibot/plugin-sdk/channel-runtime"] ?? "")).toBe(
+    expect(fs.realpathSync(aliases["allbot/plugin-sdk/channel-runtime"] ?? "")).toBe(
       fs.realpathSync(params.channelRuntimePath),
     );
-    expect(fs.realpathSync(aliases["@kaijibot/plugin-sdk/channel-runtime"] ?? "")).toBe(
+    expect(fs.realpathSync(aliases["@allbot/plugin-sdk/channel-runtime"] ?? "")).toBe(
       fs.realpathSync(params.channelRuntimePath),
     );
   }
@@ -303,7 +303,7 @@ function expectCwdFallbackPluginSdkAliasResolution(params: {
     resolvePluginSdkAlias({
       srcFile: "channel-runtime.ts",
       distFile: "channel-runtime.js",
-      modulePath: "/tmp/tsx-cache/kaijibot-loader.js",
+      modulePath: "/tmp/tsx-cache/allbot-loader.js",
       env: { NODE_ENV: undefined },
     }),
   );
@@ -391,8 +391,8 @@ describe("plugin sdk alias helpers", () => {
             "./plugin-sdk/index": { default: "./dist/plugin-sdk/index.js" },
           },
         }),
-      modulePath: () => "/tmp/tsx-cache/kaijibot-loader.js",
-      argv1: (root: string) => path.join(root, "kaijibot.mjs"),
+      modulePath: () => "/tmp/tsx-cache/allbot-loader.js",
+      argv1: (root: string) => path.join(root, "allbot.mjs"),
       srcFile: "index.ts",
       distFile: "index.js",
       env: { NODE_ENV: undefined },
@@ -425,8 +425,8 @@ describe("plugin sdk alias helpers", () => {
     },
     {
       name: "resolves extension-api alias from package root when loader runs from transpiler cache path",
-      modulePath: () => "/tmp/tsx-cache/kaijibot-loader.js",
-      argv1: (root: string) => path.join(root, "kaijibot.mjs"),
+      modulePath: () => "/tmp/tsx-cache/allbot-loader.js",
+      argv1: (root: string) => path.join(root, "allbot.mjs"),
       env: { NODE_ENV: undefined },
       expected: "src" as const,
     },
@@ -485,7 +485,7 @@ describe("plugin sdk alias helpers", () => {
 
   it.each([
     {
-      name: "does not derive plugin-sdk subpaths from cwd fallback when package root is not an KaijiBot root",
+      name: "does not derive plugin-sdk subpaths from cwd fallback when package root is not an AllBot root",
       fixture: () =>
         createPluginSdkAliasFixture({
           trustedRootIndicators: false,
@@ -513,7 +513,7 @@ describe("plugin sdk alias helpers", () => {
     expectExportedSubpaths({
       fixture,
       cwd: fixture.root,
-      modulePath: "/tmp/tsx-cache/kaijibot-loader.js",
+      modulePath: "/tmp/tsx-cache/allbot-loader.js",
       expected,
     });
   });
@@ -564,13 +564,13 @@ describe("plugin sdk alias helpers", () => {
     });
   });
 
-  it("resolves plugin-sdk aliases for user-installed plugins via the running kaijibot argv hint", () => {
+  it("resolves plugin-sdk aliases for user-installed plugins via the running allbot argv hint", () => {
     const { externalPluginEntry, externalPluginRoot, fixture, sourceRootAlias } =
       createUserInstalledPluginSdkAliasFixture();
 
     const aliases = withCwd(externalPluginRoot, () =>
       withEnv({ NODE_ENV: undefined }, () =>
-        buildPluginLoaderAliasMap(externalPluginEntry, path.join(fixture.root, "kaijibot.mjs")),
+        buildPluginLoaderAliasMap(externalPluginEntry, path.join(fixture.root, "allbot.mjs")),
       ),
     );
 
@@ -585,18 +585,18 @@ describe("plugin sdk alias helpers", () => {
       createUserInstalledPluginSdkAliasFixture();
 
     // Simulate loader.ts passing its own import.meta.url as the moduleUrl hint.
-    // This covers installations where argv1 does not resolve to the kaijibot root
+    // This covers installations where argv1 does not resolve to the allbot root
     // (e.g. single-binary distributions or custom process launchers).
-    // Use kaijibot.mjs which is created by createPluginSdkAliasFixture (bin+marker mode).
+    // Use allbot.mjs which is created by createPluginSdkAliasFixture (bin+marker mode).
     // Use fixture.root as cwd so process.cwd() fallback also resolves to fixture, not the
-    // real kaijibot repo root in the test runner environment.
-    const loaderModuleUrl = pathToFileURL(path.join(fixture.root, "kaijibot.mjs")).href;
+    // real allbot repo root in the test runner environment.
+    const loaderModuleUrl = pathToFileURL(path.join(fixture.root, "allbot.mjs")).href;
 
     // Use externalPluginRoot as cwd so process.cwd() fallback cannot accidentally
     // resolve to the fixture root — only the moduleUrl hint can bridge the gap.
     // Pass "" for argv1: undefined would trigger the STARTUP_ARGV1 default (the vitest
-    // runner binary, inside the kaijibot repo), which resolves before moduleUrl is checked.
-    // An empty string is falsy so resolveTrustedKaijiBotRootFromArgvHint returns null,
+    // runner binary, inside the allbot repo), which resolves before moduleUrl is checked.
+    // An empty string is falsy so resolveTrustedAllBotRootFromArgvHint returns null,
     // meaning only the moduleUrl hint can bridge the gap.
     const aliases = withCwd(externalPluginRoot, () =>
       withEnv({ NODE_ENV: undefined }, () =>
@@ -616,7 +616,7 @@ describe("plugin sdk alias helpers", () => {
 
   it.each([
     {
-      name: "does not resolve plugin-sdk alias files from cwd fallback when package root is not an KaijiBot root",
+      name: "does not resolve plugin-sdk alias files from cwd fallback when package root is not an AllBot root",
       fixture: () =>
         createPluginSdkAliasFixture({
           srcFile: "channel-runtime.ts",
@@ -758,13 +758,13 @@ describe("plugin sdk alias helpers", () => {
   it("returns plugin loader Jiti config with stable cache keys", () => {
     const first = resolvePluginLoaderJitiConfig({
       modulePath: `/repo/${bundledDistPluginFile("browser", "index.js")}`,
-      argv1: "/repo/kaijibot.mjs",
+      argv1: "/repo/allbot.mjs",
       moduleUrl: "file:///repo/src/plugins/public-surface-loader.ts",
       preferBuiltDist: true,
     });
     const second = resolvePluginLoaderJitiConfig({
       modulePath: `/repo/${bundledDistPluginFile("browser", "index.js")}`,
-      argv1: "/repo/kaijibot.mjs",
+      argv1: "/repo/allbot.mjs",
       moduleUrl: "file:///repo/src/plugins/public-surface-loader.ts",
       preferBuiltDist: true,
     });
@@ -776,19 +776,19 @@ describe("plugin sdk alias helpers", () => {
     expect(
       isBundledPluginExtensionPath({
         modulePath: "/repo/extensions/demo/api.js",
-        kaijiBotPackageRoot: "/repo",
+        allBotPackageRoot: "/repo",
       }),
     ).toBe(true);
     expect(
       isBundledPluginExtensionPath({
         modulePath: "/repo/dist/extensions/demo/api.js",
-        kaijiBotPackageRoot: "/repo",
+        allBotPackageRoot: "/repo",
       }),
     ).toBe(true);
     expect(
       isBundledPluginExtensionPath({
         modulePath: "/repo/vendor/demo/api.js",
-        kaijiBotPackageRoot: "/repo",
+        allBotPackageRoot: "/repo",
       }),
     ).toBe(false);
   });
@@ -822,7 +822,7 @@ describe("plugin sdk alias helpers", () => {
     fs.writeFileSync(jitiBaseFile, "export {};\n", "utf-8");
     fs.writeFileSync(
       path.join(copiedSourceDir, "channel.runtime.ts"),
-      `import { resolveOutboundSendDep } from "@kaijibot/plugin-sdk/infra-runtime";
+      `import { resolveOutboundSendDep } from "@allbot/plugin-sdk/infra-runtime";
 
 export const syntheticRuntimeMarker = {
   resolveOutboundSendDep,
@@ -851,8 +851,8 @@ export const syntheticRuntimeMarker = {
 
     const withAlias = createJiti(jitiBaseUrl, {
       ...buildPluginLoaderJitiOptions({
-        "kaijibot/plugin-sdk/infra-runtime": copiedChannelRuntimeShim,
-        "@kaijibot/plugin-sdk/infra-runtime": copiedChannelRuntimeShim,
+        "allbot/plugin-sdk/infra-runtime": copiedChannelRuntimeShim,
+        "@allbot/plugin-sdk/infra-runtime": copiedChannelRuntimeShim,
       }),
       tryNative: false,
     });
@@ -871,8 +871,8 @@ export const syntheticRuntimeMarker = {
     },
     {
       name: "resolves plugin runtime module from package root when loader runs from transpiler cache path",
-      modulePath: () => "/tmp/tsx-cache/kaijibot-loader.js",
-      argv1: (root: string) => path.join(root, "kaijibot.mjs"),
+      modulePath: () => "/tmp/tsx-cache/allbot-loader.js",
+      argv1: (root: string) => path.join(root, "allbot.mjs"),
       env: { NODE_ENV: undefined },
       expected: "src" as const,
     },

@@ -1,22 +1,22 @@
 import { Command } from "commander";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const mocks = vi.hoisted(() => ({
   memoryRegister: vi.fn(),
   otherRegister: vi.fn(),
   memoryListAction: vi.fn(),
-  loadKaijiBotPluginCliRegistry: vi.fn(),
-  loadKaijiBotPlugins: vi.fn(),
+  loadAllBotPluginCliRegistry: vi.fn(),
+  loadAllBotPlugins: vi.fn(),
   applyPluginAutoEnable: vi.fn(),
   loadConfig: vi.fn(),
   readConfigFileSnapshot: vi.fn(),
 }));
 
 vi.mock("./loader.js", () => ({
-  loadKaijiBotPluginCliRegistry: (...args: unknown[]) =>
-    mocks.loadKaijiBotPluginCliRegistry(...args),
-  loadKaijiBotPlugins: (...args: unknown[]) => mocks.loadKaijiBotPlugins(...args),
+  loadAllBotPluginCliRegistry: (...args: unknown[]) =>
+    mocks.loadAllBotPluginCliRegistry(...args),
+  loadAllBotPlugins: (...args: unknown[]) => mocks.loadAllBotPlugins(...args),
 }));
 
 vi.mock("../config/plugin-auto-enable.js", () => ({
@@ -86,7 +86,7 @@ function createAutoEnabledCliFixture() {
   const rawConfig = {
     plugins: {},
     channels: { demo: { enabled: true } },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
   const autoEnabledConfig = {
     ...rawConfig,
     plugins: {
@@ -94,20 +94,20 @@ function createAutoEnabledCliFixture() {
         demo: { enabled: true },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
   return { rawConfig, autoEnabledConfig };
 }
 
 function expectAutoEnabledCliLoad(params: {
-  rawConfig: KaijiBotConfig;
-  autoEnabledConfig: KaijiBotConfig;
+  rawConfig: AllBotConfig;
+  autoEnabledConfig: AllBotConfig;
   autoEnabledReasons?: Record<string, string[]>;
 }) {
   expect(mocks.applyPluginAutoEnable).toHaveBeenCalledWith({
     config: params.rawConfig,
     env: process.env,
   });
-  expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+  expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
     expect.objectContaining({
       config: params.autoEnabledConfig,
       activationSourceConfig: params.rawConfig,
@@ -137,10 +137,10 @@ describe("registerPluginCliCommands", () => {
       program.command("other").description("Other commands");
     });
     mocks.memoryListAction.mockReset();
-    mocks.loadKaijiBotPluginCliRegistry.mockReset();
-    mocks.loadKaijiBotPluginCliRegistry.mockResolvedValue(createCliRegistry());
-    mocks.loadKaijiBotPlugins.mockReset();
-    mocks.loadKaijiBotPlugins.mockReturnValue({
+    mocks.loadAllBotPluginCliRegistry.mockReset();
+    mocks.loadAllBotPluginCliRegistry.mockResolvedValue(createCliRegistry());
+    mocks.loadAllBotPlugins.mockReset();
+    mocks.loadAllBotPlugins.mockReturnValue({
       ...createCliRegistry(),
       diagnostics: [],
     });
@@ -151,7 +151,7 @@ describe("registerPluginCliCommands", () => {
       autoEnabledReasons: {},
     }));
     mocks.loadConfig.mockReset();
-    mocks.loadConfig.mockReturnValue({} as KaijiBotConfig);
+    mocks.loadConfig.mockReturnValue({} as AllBotConfig);
     mocks.readConfigFileSnapshot.mockReset();
     mocks.readConfigFileSnapshot.mockResolvedValue({
       valid: true,
@@ -162,18 +162,18 @@ describe("registerPluginCliCommands", () => {
   it("skips plugin CLI registrars when commands already exist", async () => {
     const program = createProgram("memory");
 
-    await registerPluginCliCommands(program, {} as KaijiBotConfig);
+    await registerPluginCliCommands(program, {} as AllBotConfig);
 
     expect(mocks.memoryRegister).not.toHaveBeenCalled();
     expect(mocks.otherRegister).toHaveBeenCalledTimes(1);
   });
 
   it("forwards an explicit env to plugin loading", async () => {
-    const env = { KAIJIBOT_HOME: "/srv/kaijibot-home" } as NodeJS.ProcessEnv;
+    const env = { ALLBOT_HOME: "/srv/allbot-home" } as NodeJS.ProcessEnv;
 
-    await registerPluginCliCommands(createProgram(), {} as KaijiBotConfig, env);
+    await registerPluginCliCommands(createProgram(), {} as AllBotConfig, env);
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         env,
       }),
@@ -215,7 +215,7 @@ describe("registerPluginCliCommands", () => {
         demo: ["demo configured"],
       },
     });
-    mocks.loadKaijiBotPluginCliRegistry.mockResolvedValue({
+    mocks.loadAllBotPluginCliRegistry.mockResolvedValue({
       cliRegistrars: [
         {
           pluginId: "matrix",
@@ -253,7 +253,7 @@ describe("registerPluginCliCommands", () => {
         hasSubcommands: true,
       },
     ]);
-    expect(mocks.loadKaijiBotPluginCliRegistry).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPluginCliRegistry).toHaveBeenCalledWith(
       expect.objectContaining({
         config: autoEnabledConfig,
         activationSourceConfig: rawConfig,
@@ -273,7 +273,7 @@ describe("registerPluginCliCommands", () => {
         demo: ["demo configured"],
       },
     });
-    mocks.loadKaijiBotPlugins.mockReturnValue(
+    mocks.loadAllBotPlugins.mockReturnValue(
       createCliRegistry({
         memoryCommands: ["legacy-channel"],
         memoryDescriptors: [
@@ -290,7 +290,7 @@ describe("registerPluginCliCommands", () => {
       mode: "lazy",
     });
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: autoEnabledConfig,
         activationSourceConfig: rawConfig,
@@ -299,7 +299,7 @@ describe("registerPluginCliCommands", () => {
         },
       }),
     );
-    expect(mocks.loadKaijiBotPluginCliRegistry).not.toHaveBeenCalled();
+    expect(mocks.loadAllBotPluginCliRegistry).not.toHaveBeenCalled();
   });
 
   it("falls back to awaited CLI metadata collection when runtime loading ignored async registration", async () => {
@@ -307,7 +307,7 @@ describe("registerPluginCliCommands", () => {
       const asyncCommand = program.command("async-cli").description("Async CLI");
       asyncCommand.command("run").action(mocks.memoryListAction);
     });
-    mocks.loadKaijiBotPlugins.mockReturnValue(
+    mocks.loadAllBotPlugins.mockReturnValue(
       createEmptyCliRegistry({
         diagnostics: [
           {
@@ -316,7 +316,7 @@ describe("registerPluginCliCommands", () => {
         ],
       }),
     );
-    mocks.loadKaijiBotPluginCliRegistry.mockResolvedValue({
+    mocks.loadAllBotPluginCliRegistry.mockResolvedValue({
       cliRegistrars: [
         {
           pluginId: "async-plugin",
@@ -337,11 +337,11 @@ describe("registerPluginCliCommands", () => {
     const program = createProgram();
     program.exitOverride();
 
-    await registerPluginCliCommands(program, {} as KaijiBotConfig, undefined, undefined, {
+    await registerPluginCliCommands(program, {} as AllBotConfig, undefined, undefined, {
       mode: "lazy",
     });
 
-    expect(mocks.loadKaijiBotPluginCliRegistry).toHaveBeenCalledTimes(1);
+    expect(mocks.loadAllBotPluginCliRegistry).toHaveBeenCalledTimes(1);
     await program.parseAsync(["async-cli", "run"], { from: "user" });
     expect(asyncRegistrar).toHaveBeenCalledTimes(1);
     expect(mocks.memoryListAction).toHaveBeenCalledTimes(1);
@@ -351,7 +351,7 @@ describe("registerPluginCliCommands", () => {
     const program = createProgram();
     program.exitOverride();
 
-    await registerPluginCliCommands(program, {} as KaijiBotConfig, undefined, undefined, {
+    await registerPluginCliCommands(program, {} as AllBotConfig, undefined, undefined, {
       mode: "lazy",
     });
 
@@ -366,7 +366,7 @@ describe("registerPluginCliCommands", () => {
   });
 
   it("falls back to eager registration when descriptors do not cover every command root", async () => {
-    mocks.loadKaijiBotPlugins.mockReturnValue(
+    mocks.loadAllBotPlugins.mockReturnValue(
       createCliRegistry({
         memoryCommands: ["memory", "memory-admin"],
         memoryDescriptors: [
@@ -383,7 +383,7 @@ describe("registerPluginCliCommands", () => {
       program.command("memory-admin");
     });
 
-    await registerPluginCliCommands(createProgram(), {} as KaijiBotConfig, undefined, undefined, {
+    await registerPluginCliCommands(createProgram(), {} as AllBotConfig, undefined, undefined, {
       mode: "lazy",
     });
 
@@ -394,7 +394,7 @@ describe("registerPluginCliCommands", () => {
     const program = createProgram();
     program.exitOverride();
 
-    await registerPluginCliCommands(program, {} as KaijiBotConfig, undefined, undefined, {
+    await registerPluginCliCommands(program, {} as AllBotConfig, undefined, undefined, {
       mode: "lazy",
       primary: "memory",
     });
@@ -418,7 +418,7 @@ describe("registerPluginCliCommands", () => {
   });
 
   it("loads validated plugin CLI config when the snapshot is valid", async () => {
-    const loadedConfig = { plugins: { enabled: true } } as KaijiBotConfig;
+    const loadedConfig = { plugins: { enabled: true } } as AllBotConfig;
     mocks.readConfigFileSnapshot.mockResolvedValueOnce({
       valid: true,
       config: loadedConfig,
@@ -436,6 +436,6 @@ describe("registerPluginCliCommands", () => {
     });
 
     await expect(registerPluginCliCommandsFromValidatedConfig(createProgram())).resolves.toBeNull();
-    expect(mocks.loadKaijiBotPlugins).not.toHaveBeenCalled();
+    expect(mocks.loadAllBotPlugins).not.toHaveBeenCalled();
   });
 });

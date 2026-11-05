@@ -1,4 +1,4 @@
-import type { MemoryEmbeddingProviderAdapter } from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
+import type { MemoryEmbeddingProviderAdapter } from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
 import {
   DEFAULT_OLLAMA_EMBEDDING_MODEL,
   createOllamaEmbeddingProvider,

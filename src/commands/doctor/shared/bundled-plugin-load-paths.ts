@@ -1,6 +1,6 @@
 import path from "node:path";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { resolveBundledPluginSources } from "../../../plugins/bundled-sources.js";
 import { sanitizeForLog } from "../../../terminal/ansi.js";
 import { resolveUserPath } from "../../../utils.js";
@@ -13,7 +13,7 @@ type BundledPluginLoadPathHit = {
   pathLabel: string;
 };
 
-function resolveBundledWorkspaceDir(cfg: KaijiBotConfig): string | undefined {
+function resolveBundledWorkspaceDir(cfg: AllBotConfig): string | undefined {
   return resolveAgentWorkspaceDir(cfg, resolveDefaultAgentId(cfg)) ?? undefined;
 }
 
@@ -49,7 +49,7 @@ function buildLegacyBundledPath(localPath: string): string | null {
 }
 
 export function scanBundledPluginLoadPathMigrations(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): BundledPluginLoadPathHit[] {
   const plugins = asObjectRecord(cfg.plugins);
@@ -116,10 +116,10 @@ export function collectBundledPluginLoadPathWarnings(params: {
 }
 
 export function maybeRepairBundledPluginLoadPaths(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changes: string[];
 } {
   const hits = scanBundledPluginLoadPathMigrations(cfg, env);

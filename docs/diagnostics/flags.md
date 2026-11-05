@@ -43,13 +43,13 @@ Restart the gateway after changing flags.
 ## Env override (one-off)
 
 ```bash
-KAIJIBOT_DIAGNOSTICS=telegram.http,telegram.payload
+ALLBOT_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 Disable all flags:
 
 ```bash
-KAIJIBOT_DIAGNOSTICS=0
+ALLBOT_DIAGNOSTICS=0
 ```
 
 ## Where logs go
@@ -57,7 +57,7 @@ KAIJIBOT_DIAGNOSTICS=0
 Flags emit logs into the standard diagnostics log file. By default:
 
 ```
-/tmp/kaijibot/kaijibot-YYYY-MM-DD.log
+/tmp/allbot/allbot-YYYY-MM-DD.log
 ```
 
 If you set `logging.file`, use that path instead. Logs are JSONL (one JSON object per line). Redaction still applies based on `logging.redactSensitive`.
@@ -67,22 +67,22 @@ If you set `logging.file`, use that path instead. Logs are JSONL (one JSON objec
 Pick the latest log file:
 
 ```bash
-ls -t /tmp/kaijibot/kaijibot-*.log | head -n 1
+ls -t /tmp/allbot/allbot-*.log | head -n 1
 ```
 
 Filter for Telegram HTTP diagnostics:
 
 ```bash
-rg "telegram http error" /tmp/kaijibot/kaijibot-*.log
+rg "telegram http error" /tmp/allbot/allbot-*.log
 ```
 
 Or tail while reproducing:
 
 ```bash
-tail -f /tmp/kaijibot/kaijibot-$(date +%F).log | rg "telegram http error"
+tail -f /tmp/allbot/allbot-$(date +%F).log | rg "telegram http error"
 ```
 
-For remote gateways, you can also use `kaijibot logs --follow` (see [/cli/logs](/cli/logs)).
+For remote gateways, you can also use `allbot logs --follow` (see [/cli/logs](/cli/logs)).
 
 ## Notes
 

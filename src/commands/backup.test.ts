@@ -29,12 +29,12 @@ describe("backup commands", () => {
 
   async function resetTempHome() {
     await fs.rm(tempHome.home, { recursive: true, force: true });
-    await fs.mkdir(path.join(tempHome.home, ".kaijibot"), { recursive: true });
-    delete process.env.KAIJIBOT_CONFIG_PATH;
+    await fs.mkdir(path.join(tempHome.home, ".allbot"), { recursive: true });
+    delete process.env.ALLBOT_CONFIG_PATH;
   }
 
   beforeAll(async () => {
-    tempHome = await createTempHomeEnv("kaijibot-backup-test-");
+    tempHome = await createTempHomeEnv("allbot-backup-test-");
   });
 
   beforeEach(async () => {
@@ -72,17 +72,17 @@ describe("backup commands", () => {
   }
 
   async function withInvalidWorkspaceBackupConfig<T>(fn: (runtime: RuntimeEnv) => Promise<T>) {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
+    const stateDir = path.join(tempHome.home, ".allbot");
     const configPath = path.join(tempHome.home, "custom-config.json");
-    process.env.KAIJIBOT_CONFIG_PATH = configPath;
-    await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+    process.env.ALLBOT_CONFIG_PATH = configPath;
+    await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
     await fs.writeFile(configPath, '{"agents": { defaults: { workspace: ', "utf8");
     const runtime = createRuntime();
 
     try {
       return await fn(runtime);
     } finally {
-      delete process.env.KAIJIBOT_CONFIG_PATH;
+      delete process.env.ALLBOT_CONFIG_PATH;
     }
   }
 
@@ -97,8 +97,8 @@ describe("backup commands", () => {
   }
 
   it("collapses default config, credentials, and workspace into the state backup root", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const configPath = path.join(stateDir, "kaijibot.json");
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const configPath = path.join(stateDir, "allbot.json");
     const oauthDir = path.join(stateDir, "credentials");
     const workspaceDir = path.join(stateDir, "workspace");
     await fs.writeFile(configPath, JSON.stringify({}), "utf8");
@@ -125,9 +125,9 @@ describe("backup commands", () => {
       return;
     }
 
-    const stateDir = path.join(tempHome.home, ".kaijibot");
+    const stateDir = path.join(tempHome.home, ".allbot");
     const workspaceDir = path.join(stateDir, "workspace");
-    const symlinkDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-link-"));
+    const symlinkDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-link-"));
     const workspaceLink = path.join(symlinkDir, "ws-link");
     try {
       await fs.mkdir(workspaceDir, { recursive: true });
@@ -135,7 +135,7 @@ describe("backup commands", () => {
       await fs.symlink(workspaceDir, workspaceLink);
       const plan = await resolveBackupPlanFromPaths({
         stateDir,
-        configPath: path.join(stateDir, "kaijibot.json"),
+        configPath: path.join(stateDir, "allbot.json"),
         oauthDir: path.join(stateDir, "credentials"),
         workspaceDirs: [workspaceLink],
         includeWorkspace: true,
@@ -150,17 +150,17 @@ describe("backup commands", () => {
   });
 
   it("creates an archive with a manifest and external workspace payload", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const externalWorkspace = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-"));
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const externalWorkspace = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-"));
     const configPath = path.join(tempHome.home, "custom-config.json");
-    const backupDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backups-"));
+    const backupDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backups-"));
     let capturedManifest: {
       assets: Array<{ kind: string; archivePath: string }>;
     } | null = null;
     let capturedEntryPaths: string[] = [];
     let capturedOnWriteEntry: ((entry: { path: string }) => void) | null = null;
     try {
-      process.env.KAIJIBOT_CONFIG_PATH = configPath;
+      process.env.ALLBOT_CONFIG_PATH = configPath;
       await fs.writeFile(
         configPath,
         JSON.stringify({
@@ -259,21 +259,21 @@ describe("backup commands", () => {
         ),
       );
     } finally {
-      delete process.env.KAIJIBOT_CONFIG_PATH;
+      delete process.env.ALLBOT_CONFIG_PATH;
       await fs.rm(externalWorkspace, { recursive: true, force: true });
       await fs.rm(backupDir, { recursive: true, force: true });
     }
   });
 
   it("rejects output paths that would be created inside a backed-up directory", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+    const stateDir = path.join(tempHome.home, ".allbot");
+    await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
 
     const runtime = createRuntime();
     vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
       await resolveBackupPlanFromPaths({
         stateDir,
-        configPath: path.join(stateDir, "kaijibot.json"),
+        configPath: path.join(stateDir, "allbot.json"),
         oauthDir: path.join(stateDir, "credentials"),
         includeWorkspace: false,
         configInsideState: true,
@@ -294,18 +294,18 @@ describe("backup commands", () => {
       return;
     }
 
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const symlinkDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-link-"));
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const symlinkDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-link-"));
     const symlinkPath = path.join(symlinkDir, "linked-state");
     try {
-      await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+      await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
       await fs.symlink(stateDir, symlinkPath);
 
       const runtime = createRuntime();
       vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
         await resolveBackupPlanFromPaths({
           stateDir,
-          configPath: path.join(stateDir, "kaijibot.json"),
+          configPath: path.join(stateDir, "allbot.json"),
           oauthDir: path.join(stateDir, "credentials"),
           includeWorkspace: false,
           configInsideState: true,
@@ -325,16 +325,16 @@ describe("backup commands", () => {
   });
 
   it("falls back to the home directory when cwd is inside a backed-up source tree", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
+    const stateDir = path.join(tempHome.home, ".allbot");
     const workspaceDir = path.join(stateDir, "workspace");
-    await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+    await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
     await fs.mkdir(workspaceDir, { recursive: true });
     await fs.writeFile(path.join(workspaceDir, "SOUL.md"), "# soul\n", "utf8");
     vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
     vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
       await resolveBackupPlanFromPaths({
         stateDir,
-        configPath: path.join(stateDir, "kaijibot.json"),
+        configPath: path.join(stateDir, "allbot.json"),
         oauthDir: path.join(stateDir, "credentials"),
         workspaceDirs: [workspaceDir],
         includeWorkspace: true,
@@ -360,12 +360,12 @@ describe("backup commands", () => {
       return;
     }
 
-    const stateDir = path.join(tempHome.home, ".kaijibot");
+    const stateDir = path.join(tempHome.home, ".allbot");
     const workspaceDir = path.join(stateDir, "workspace");
-    const linkParent = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-cwd-link-"));
+    const linkParent = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-cwd-link-"));
     const workspaceLink = path.join(linkParent, "workspace-link");
     try {
-      await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+      await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
       await fs.mkdir(workspaceDir, { recursive: true });
       await fs.writeFile(path.join(workspaceDir, "SOUL.md"), "# soul\n", "utf8");
       await fs.symlink(workspaceDir, workspaceLink);
@@ -373,7 +373,7 @@ describe("backup commands", () => {
       vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
         await resolveBackupPlanFromPaths({
           stateDir,
-          configPath: path.join(stateDir, "kaijibot.json"),
+          configPath: path.join(stateDir, "allbot.json"),
           oauthDir: path.join(stateDir, "credentials"),
           workspaceDirs: [workspaceDir],
           includeWorkspace: true,
@@ -398,14 +398,14 @@ describe("backup commands", () => {
   });
 
   it("allows dry-run preview even when the target archive already exists", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
+    const stateDir = path.join(tempHome.home, ".allbot");
     const existingArchive = path.join(tempHome.home, "existing-backup.tar.gz");
-    await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+    await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
     await fs.writeFile(existingArchive, "already here", "utf8");
     vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
       await resolveBackupPlanFromPaths({
         stateDir,
-        configPath: path.join(stateDir, "kaijibot.json"),
+        configPath: path.join(stateDir, "allbot.json"),
         oauthDir: path.join(stateDir, "credentials"),
         includeWorkspace: false,
         configInsideState: true,
@@ -448,8 +448,8 @@ describe("backup commands", () => {
   });
 
   it("backs up only the active config file when --only-config is requested", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const configPath = path.join(stateDir, "kaijibot.json");
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const configPath = path.join(stateDir, "allbot.json");
     await fs.mkdir(path.join(stateDir, "credentials"), { recursive: true });
     await fs.writeFile(configPath, JSON.stringify({ theme: "config-only" }), "utf8");
     await fs.writeFile(path.join(stateDir, "state.txt"), "state\n", "utf8");
@@ -482,7 +482,7 @@ describe("backup commands", () => {
 
   it("allows config-only backups even when the config file is invalid", async () => {
     const configPath = path.join(tempHome.home, "custom-config.json");
-    process.env.KAIJIBOT_CONFIG_PATH = configPath;
+    process.env.ALLBOT_CONFIG_PATH = configPath;
     await fs.writeFile(configPath, '{"agents": { defaults: { workspace: ', "utf8");
 
     const runtime = createRuntime();
@@ -496,7 +496,7 @@ describe("backup commands", () => {
       expect(result.assets).toHaveLength(1);
       expect(result.assets[0]?.kind).toBe("config");
     } finally {
-      delete process.env.KAIJIBOT_CONFIG_PATH;
+      delete process.env.ALLBOT_CONFIG_PATH;
     }
   });
 });

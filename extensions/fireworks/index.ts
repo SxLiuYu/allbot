@@ -1,11 +1,11 @@
-import type { ProviderResolveDynamicModelContext } from "kaijibot/plugin-sdk/plugin-entry";
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
+import type { ProviderResolveDynamicModelContext } from "allbot/plugin-sdk/plugin-entry";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
 import {
   buildProviderReplayFamilyHooks,
   cloneFirstTemplateModel,
   DEFAULT_CONTEXT_TOKENS,
   normalizeModelCompat,
-} from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/provider-model-shared";
 import { isFireworksKimiModelId } from "./model-id.js";
 import { applyFireworksConfig, FIREWORKS_DEFAULT_MODEL_REF } from "./onboard.js";
 import {

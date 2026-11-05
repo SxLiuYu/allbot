@@ -1,5 +1,5 @@
 // Gateway method dispatch surface for authenticated plugin request scopes.
-// KaijiBot uses handleGatewayRequest from server-methods instead of
+// AllBot uses handleGatewayRequest from server-methods instead of
 // the upstream dispatchGatewayMethodInProcessRaw from server-plugins.
 
 import { handleGatewayRequest } from "../gateway/server-methods.js";

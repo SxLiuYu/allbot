@@ -35,15 +35,15 @@ export function configureProgramHelp(program: Command, ctx: ProgramContext) {
     .version(ctx.programVersion)
     .option(
       "--container <name>",
-      "Run the CLI inside a running Podman/Docker container named <name> (default: env KAIJIBOT_CONTAINER)",
+      "Run the CLI inside a running Podman/Docker container named <name> (default: env ALLBOT_CONTAINER)",
     )
     .option(
       "--dev",
-      "Dev profile: isolate state under ~/.kaijibot-dev, default gateway port 19001, and shift derived ports (browser/canvas)",
+      "Dev profile: isolate state under ~/.allbot-dev, default gateway port 19001, and shift derived ports (browser/canvas)",
     )
     .option(
       "--profile <name>",
-      "Use a named profile (isolates KAIJIBOT_STATE_DIR/KAIJIBOT_CONFIG_PATH under ~/.kaijibot-<name>)",
+      "Use a named profile (isolates ALLBOT_STATE_DIR/ALLBOT_CONFIG_PATH under ~/.allbot-<name>)",
     )
     .option(
       "--log-level <level>",
@@ -103,7 +103,7 @@ export function configureProgramHelp(program: Command, ctx: ProgramContext) {
   ) {
     const commit = resolveCommitHash({ moduleUrl: import.meta.url });
     console.log(
-      commit ? `KaijiBot ${ctx.programVersion} (${commit})` : `KaijiBot ${ctx.programVersion}`,
+      commit ? `AllBot ${ctx.programVersion} (${commit})` : `AllBot ${ctx.programVersion}`,
     );
     process.exit(0);
   }

@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import type {
   GatewayAuthConfig,
   GatewayTailscaleConfig,
-  KaijiBotConfig,
+  AllBotConfig,
 } from "../config/config.js";
 import { replaceConfigFile } from "../config/config.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -66,7 +66,7 @@ export function mergeGatewayTailscaleConfig(
 }
 
 function resolveGatewayAuthFromConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   authOverride?: GatewayAuthConfig;
   tailscaleOverride?: GatewayTailscaleConfig;
@@ -101,11 +101,11 @@ function shouldPersistGeneratedToken(params: {
 }
 
 function hasGatewayTokenCandidate(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   authOverride?: GatewayAuthConfig;
 }): boolean {
-  const envToken = trimToUndefined(params.env.KAIJIBOT_GATEWAY_TOKEN);
+  const envToken = trimToUndefined(params.env.ALLBOT_GATEWAY_TOKEN);
   if (envToken) {
     return true;
   }
@@ -138,14 +138,14 @@ function hasGatewayPasswordOverrideCandidate(params: {
 }
 
 export async function ensureGatewayStartupAuth(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   authOverride?: GatewayAuthConfig;
   tailscaleOverride?: GatewayTailscaleConfig;
   persist?: boolean;
   baseHash?: string;
 }): Promise<{
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   auth: ReturnType<typeof resolveGatewayAuth>;
   generatedToken?: string;
   persistedGeneratedToken: boolean;
@@ -201,7 +201,7 @@ export async function ensureGatewayStartupAuth(params: {
   }
 
   const generatedToken = crypto.randomBytes(24).toString("hex");
-  const nextCfg: KaijiBotConfig = {
+  const nextCfg: AllBotConfig = {
     ...params.cfg,
     gateway: {
       ...params.cfg.gateway,
@@ -239,7 +239,7 @@ export async function ensureGatewayStartupAuth(params: {
 }
 
 export function assertHooksTokenSeparateFromGatewayAuth(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   auth: ResolvedGatewayAuth;
 }): void {
   if (params.cfg.hooks?.enabled !== true) {

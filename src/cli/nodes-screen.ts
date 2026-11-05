@@ -30,7 +30,7 @@ export function parseScreenRecordPayload(value: unknown): ScreenRecordPayload {
 
 export function screenRecordTempPath(opts: { ext: string; tmpDir?: string; id?: string }) {
   const { tmpDir, id, ext } = resolveTempPathParts(opts);
-  return path.join(tmpDir, `kaijibot-screen-record-${id}${ext}`);
+  return path.join(tmpDir, `allbot-screen-record-${id}${ext}`);
 }
 
 export async function writeScreenRecordToFile(filePath: string, base64: string) {

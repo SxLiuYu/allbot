@@ -1,9 +1,9 @@
 import type {
-  KaijiBotPluginApi,
-  KaijiBotPluginNodeHostCommand,
-  KaijiBotPluginToolContext,
-  KaijiBotPluginToolFactory,
-} from "kaijibot/plugin-sdk/plugin-entry";
+  AllBotPluginApi,
+  AllBotPluginNodeHostCommand,
+  AllBotPluginToolContext,
+  AllBotPluginToolFactory,
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   collectBrowserSecurityAuditFindings,
   createBrowserPluginService,
@@ -15,7 +15,7 @@ import {
 
 export const browserPluginReload = { restartPrefixes: ["browser"] };
 
-export const browserPluginNodeHostCommands: KaijiBotPluginNodeHostCommand[] = [
+export const browserPluginNodeHostCommands: AllBotPluginNodeHostCommand[] = [
   {
     command: "browser.proxy",
     cap: "browser",
@@ -25,14 +25,14 @@ export const browserPluginNodeHostCommands: KaijiBotPluginNodeHostCommand[] = [
 
 export const browserSecurityAuditCollectors = [collectBrowserSecurityAuditFindings];
 
-export function registerBrowserPlugin(api: KaijiBotPluginApi) {
-  api.registerTool(((ctx: KaijiBotPluginToolContext) =>
+export function registerBrowserPlugin(api: AllBotPluginApi) {
+  api.registerTool(((ctx: AllBotPluginToolContext) =>
     createBrowserTool({
       sandboxBridgeUrl: ctx.browser?.sandboxBridgeUrl,
       allowHostControl: ctx.browser?.allowHostControl,
       agentSessionKey: ctx.sessionKey,
       agentId: ctx.agentId,
-    })) as KaijiBotPluginToolFactory);
+    })) as AllBotPluginToolFactory);
   api.registerCli(({ program }) => registerBrowserCli(program), { commands: ["browser"] });
   api.registerGatewayMethod("browser.request", handleBrowserGatewayRequest, {
     scope: "operator.write",

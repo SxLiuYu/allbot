@@ -46,9 +46,9 @@ export type ApnsRelayRequestSender = (params: {
 }) => Promise<ApnsRelayPushResponse>;
 
 const DEFAULT_APNS_RELAY_TIMEOUT_MS = 10_000;
-const GATEWAY_DEVICE_ID_HEADER = "x-kaijibot-gateway-device-id";
-const GATEWAY_SIGNATURE_HEADER = "x-kaijibot-gateway-signature";
-const GATEWAY_SIGNED_AT_HEADER = "x-kaijibot-gateway-signed-at-ms";
+const GATEWAY_DEVICE_ID_HEADER = "x-allbot-gateway-device-id";
+const GATEWAY_SIGNATURE_HEADER = "x-allbot-gateway-signature";
+const GATEWAY_SIGNED_AT_HEADER = "x-allbot-gateway-signed-at-ms";
 
 function normalizeNonEmptyString(value: string | undefined): string | null {
   const trimmed = normalizeOptionalString(value) ?? "";
@@ -99,7 +99,7 @@ function buildRelayGatewaySignaturePayload(params: {
   bodyJson: string;
 }): string {
   return [
-    "kaijibot-relay-send-v1",
+    "allbot-relay-send-v1",
     params.gatewayDeviceId.trim(),
     String(Math.trunc(params.signedAtMs)),
     params.bodyJson,
@@ -111,17 +111,17 @@ export function resolveApnsRelayConfigFromEnv(
   gatewayConfig?: GatewayConfig,
 ): ApnsRelayConfigResolution {
   const configuredRelay = gatewayConfig?.push?.apns?.relay;
-  const envBaseUrl = normalizeNonEmptyString(env.KAIJIBOT_APNS_RELAY_BASE_URL);
+  const envBaseUrl = normalizeNonEmptyString(env.ALLBOT_APNS_RELAY_BASE_URL);
   const configBaseUrl = normalizeNonEmptyString(configuredRelay?.baseUrl);
   const baseUrl = envBaseUrl ?? configBaseUrl;
   const baseUrlSource = envBaseUrl
-    ? "KAIJIBOT_APNS_RELAY_BASE_URL"
+    ? "ALLBOT_APNS_RELAY_BASE_URL"
     : "gateway.push.apns.relay.baseUrl";
   if (!baseUrl) {
     return {
       ok: false,
       error:
-        "APNs relay config missing: set gateway.push.apns.relay.baseUrl or KAIJIBOT_APNS_RELAY_BASE_URL",
+        "APNs relay config missing: set gateway.push.apns.relay.baseUrl or ALLBOT_APNS_RELAY_BASE_URL",
     };
   }
 
@@ -133,9 +133,9 @@ export function resolveApnsRelayConfigFromEnv(
     if (!parsed.hostname) {
       throw new Error("host required");
     }
-    if (parsed.protocol === "http:" && !readAllowHttp(env.KAIJIBOT_APNS_RELAY_ALLOW_HTTP)) {
+    if (parsed.protocol === "http:" && !readAllowHttp(env.ALLBOT_APNS_RELAY_ALLOW_HTTP)) {
       throw new Error(
-        "http relay URLs require KAIJIBOT_APNS_RELAY_ALLOW_HTTP=true (development only)",
+        "http relay URLs require ALLBOT_APNS_RELAY_ALLOW_HTTP=true (development only)",
       );
     }
     if (parsed.protocol === "http:" && !isLoopbackRelayHostname(parsed.hostname)) {
@@ -152,7 +152,7 @@ export function resolveApnsRelayConfigFromEnv(
       value: {
         baseUrl: parsed.toString().replace(/\/+$/, ""),
         timeoutMs: normalizeTimeoutMs(
-          env.KAIJIBOT_APNS_RELAY_TIMEOUT_MS ?? configuredRelay?.timeoutMs,
+          env.ALLBOT_APNS_RELAY_TIMEOUT_MS ?? configuredRelay?.timeoutMs,
         ),
       },
     };

@@ -12,7 +12,7 @@
  */
 
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 
 // Feishu text_color values (1-7)
 const TEXT_COLOR: Record<string, number> = {

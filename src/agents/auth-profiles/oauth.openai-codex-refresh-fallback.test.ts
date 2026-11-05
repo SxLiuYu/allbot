@@ -104,8 +104,8 @@ function createExpiredOauthStore(params: {
 
 describe("resolveApiKeyForProfile openai-codex refresh fallback", () => {
   const envSnapshot = captureEnv([
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_AGENT_DIR",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
   ]);
   let tempRoot = "";
@@ -132,11 +132,11 @@ describe("resolveApiKeyForProfile openai-codex refresh fallback", () => {
     buildProviderAuthDoctorHintWithPluginMock.mockReset();
     buildProviderAuthDoctorHintWithPluginMock.mockResolvedValue(undefined);
     clearRuntimeAuthProfileStoreSnapshots();
-    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-codex-refresh-fallback-"));
+    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-codex-refresh-fallback-"));
     agentDir = path.join(tempRoot, "agents", "main", "agent");
     await fs.mkdir(agentDir, { recursive: true });
-    process.env.KAIJIBOT_STATE_DIR = tempRoot;
-    process.env.KAIJIBOT_AGENT_DIR = agentDir;
+    process.env.ALLBOT_STATE_DIR = tempRoot;
+    process.env.ALLBOT_AGENT_DIR = agentDir;
     process.env.PI_CODING_AGENT_DIR = agentDir;
   });
 

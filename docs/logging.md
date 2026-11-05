@@ -9,7 +9,7 @@ title: "Logging Overview"
 
 # Logging
 
-KaijiBot has two main log surfaces:
+AllBot has two main log surfaces:
 
 - **File logs** (JSON lines) written by the Gateway.
 - **Console output** shown in terminals and the Gateway Debug UI.
@@ -21,16 +21,16 @@ logs live, how to read them, and how to configure log levels and formats.
 
 By default, the Gateway writes a rolling log file under:
 
-`/tmp/kaijibot/kaijibot-YYYY-MM-DD.log`
+`/tmp/allbot/allbot-YYYY-MM-DD.log`
 
 The date uses the gateway host's local timezone.
 
-You can override this in `~/.kaijibot/kaijibot.json`:
+You can override this in `~/.allbot/allbot.json`:
 
 ```json
 {
   "logging": {
-    "file": "/path/to/kaijibot.log"
+    "file": "/path/to/allbot.log"
   }
 }
 ```
@@ -42,7 +42,7 @@ You can override this in `~/.kaijibot/kaijibot.json`:
 Use the CLI to tail the gateway log file via RPC:
 
 ```bash
-kaijibot logs --follow
+allbot logs --follow
 ```
 
 Useful current options:
@@ -70,14 +70,14 @@ In JSON mode, the CLI emits `type`-tagged objects:
 - `notice`: truncation / rotation hints
 - `raw`: unparsed log line
 
-If the local loopback Gateway asks for pairing, `kaijibot logs` falls back to
+If the local loopback Gateway asks for pairing, `allbot logs` falls back to
 the configured local log file automatically. Explicit `--url` targets do not
 use this fallback.
 
 If the Gateway is unreachable, the CLI prints a short hint to run:
 
 ```bash
-kaijibot doctor
+allbot doctor
 ```
 
 ### Control UI (web)
@@ -90,7 +90,7 @@ See [/web/control-ui](/web/control-ui) for how to open it.
 To filter channel activity (WhatsApp/Telegram/etc), use:
 
 ```bash
-kaijibot channels logs --channel whatsapp
+allbot channels logs --channel whatsapp
 ```
 
 ## Log formats
@@ -112,7 +112,7 @@ Console formatting is controlled by `logging.consoleStyle`.
 
 ### Gateway WebSocket logs
 
-`kaijibot gateway` also has WebSocket protocol logging for RPC traffic:
+`allbot gateway` also has WebSocket protocol logging for RPC traffic:
 
 - normal mode: only interesting results (errors, parse errors, slow calls)
 - `--verbose`: all request/response traffic
@@ -122,20 +122,20 @@ Console formatting is controlled by `logging.consoleStyle`.
 Examples:
 
 ```bash
-kaijibot gateway
-kaijibot gateway --verbose --ws-log compact
-kaijibot gateway --verbose --ws-log full
+allbot gateway
+allbot gateway --verbose --ws-log compact
+allbot gateway --verbose --ws-log full
 ```
 
 ## Configuring logging
 
-All logging configuration lives under `logging` in `~/.kaijibot/kaijibot.json`.
+All logging configuration lives under `logging` in `~/.allbot/allbot.json`.
 
 ```json
 {
   "logging": {
     "level": "info",
-    "file": "/tmp/kaijibot/kaijibot-YYYY-MM-DD.log",
+    "file": "/tmp/allbot/allbot-YYYY-MM-DD.log",
     "consoleLevel": "info",
     "consoleStyle": "pretty",
     "redactSensitive": "tools",
@@ -149,7 +149,7 @@ All logging configuration lives under `logging` in `~/.kaijibot/kaijibot.json`.
 - `logging.level`: **file logs** (JSONL) level.
 - `logging.consoleLevel`: **console** verbosity level.
 
-You can override both via the **`KAIJIBOT_LOG_LEVEL`** environment variable (e.g. `KAIJIBOT_LOG_LEVEL=debug`). The env var takes precedence over the config file, so you can raise verbosity for a single run without editing `kaijibot.json`. You can also pass the global CLI option **`--log-level <level>`** (for example, `kaijibot --log-level debug gateway run`), which overrides the environment variable for that command.
+You can override both via the **`ALLBOT_LOG_LEVEL`** environment variable (e.g. `ALLBOT_LOG_LEVEL=debug`). The env var takes precedence over the config file, so you can raise verbosity for a single run without editing `allbot.json`. You can also pass the global CLI option **`--log-level <level>`** (for example, `allbot --log-level debug gateway run`), which overrides the environment variable for that command.
 
 `--verbose` only affects console output and WS log verbosity; it does not change
 file log levels.
@@ -184,7 +184,7 @@ diagnostics + the exporter plugin are enabled.
 
 - **OpenTelemetry (OTel)**: the data model + SDKs for traces, metrics, and logs.
 - **OTLP**: the wire protocol used to export OTel data to a collector/backend.
-- KaijiBot exports via **OTLP/HTTP (protobuf)** today.
+- AllBot exports via **OTLP/HTTP (protobuf)** today.
 
 ### Signals exported
 
@@ -244,7 +244,7 @@ Flags are case-insensitive and support wildcards (e.g. `telegram.*` or `*`).
 Env override (one-off):
 
 ```
-KAIJIBOT_DIAGNOSTICS=telegram.http,telegram.payload
+ALLBOT_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
 Notes:
@@ -274,7 +274,7 @@ works with any OpenTelemetry collector/backend that accepts OTLP/HTTP.
       "enabled": true,
       "endpoint": "http://otel-collector:4318",
       "protocol": "http/protobuf",
-      "serviceName": "kaijibot-gateway",
+      "serviceName": "allbot-gateway",
       "traces": true,
       "metrics": true,
       "logs": true,
@@ -287,7 +287,7 @@ works with any OpenTelemetry collector/backend that accepts OTLP/HTTP.
 
 Notes:
 
-- You can also enable the plugin with `kaijibot plugins enable diagnostics-otel`.
+- You can also enable the plugin with `allbot plugins enable diagnostics-otel`.
 - `protocol` currently supports `http/protobuf` only. `grpc` is ignored.
 - Metrics include token usage, cost, context size, run duration, and message-flow
   counters/histograms (webhooks, queueing, session state, queue depth/wait).
@@ -301,60 +301,60 @@ Notes:
 
 Model usage:
 
-- `kaijibot.tokens` (counter, attrs: `kaijibot.token`, `kaijibot.channel`,
-  `kaijibot.provider`, `kaijibot.model`)
-- `kaijibot.cost.usd` (counter, attrs: `kaijibot.channel`, `kaijibot.provider`,
-  `kaijibot.model`)
-- `kaijibot.run.duration_ms` (histogram, attrs: `kaijibot.channel`,
-  `kaijibot.provider`, `kaijibot.model`)
-- `kaijibot.context.tokens` (histogram, attrs: `kaijibot.context`,
-  `kaijibot.channel`, `kaijibot.provider`, `kaijibot.model`)
+- `allbot.tokens` (counter, attrs: `allbot.token`, `allbot.channel`,
+  `allbot.provider`, `allbot.model`)
+- `allbot.cost.usd` (counter, attrs: `allbot.channel`, `allbot.provider`,
+  `allbot.model`)
+- `allbot.run.duration_ms` (histogram, attrs: `allbot.channel`,
+  `allbot.provider`, `allbot.model`)
+- `allbot.context.tokens` (histogram, attrs: `allbot.context`,
+  `allbot.channel`, `allbot.provider`, `allbot.model`)
 
 Message flow:
 
-- `kaijibot.webhook.received` (counter, attrs: `kaijibot.channel`,
-  `kaijibot.webhook`)
-- `kaijibot.webhook.error` (counter, attrs: `kaijibot.channel`,
-  `kaijibot.webhook`)
-- `kaijibot.webhook.duration_ms` (histogram, attrs: `kaijibot.channel`,
-  `kaijibot.webhook`)
-- `kaijibot.message.queued` (counter, attrs: `kaijibot.channel`,
-  `kaijibot.source`)
-- `kaijibot.message.processed` (counter, attrs: `kaijibot.channel`,
-  `kaijibot.outcome`)
-- `kaijibot.message.duration_ms` (histogram, attrs: `kaijibot.channel`,
-  `kaijibot.outcome`)
+- `allbot.webhook.received` (counter, attrs: `allbot.channel`,
+  `allbot.webhook`)
+- `allbot.webhook.error` (counter, attrs: `allbot.channel`,
+  `allbot.webhook`)
+- `allbot.webhook.duration_ms` (histogram, attrs: `allbot.channel`,
+  `allbot.webhook`)
+- `allbot.message.queued` (counter, attrs: `allbot.channel`,
+  `allbot.source`)
+- `allbot.message.processed` (counter, attrs: `allbot.channel`,
+  `allbot.outcome`)
+- `allbot.message.duration_ms` (histogram, attrs: `allbot.channel`,
+  `allbot.outcome`)
 
 Queues + sessions:
 
-- `kaijibot.queue.lane.enqueue` (counter, attrs: `kaijibot.lane`)
-- `kaijibot.queue.lane.dequeue` (counter, attrs: `kaijibot.lane`)
-- `kaijibot.queue.depth` (histogram, attrs: `kaijibot.lane` or
-  `kaijibot.channel=heartbeat`)
-- `kaijibot.queue.wait_ms` (histogram, attrs: `kaijibot.lane`)
-- `kaijibot.session.state` (counter, attrs: `kaijibot.state`, `kaijibot.reason`)
-- `kaijibot.session.stuck` (counter, attrs: `kaijibot.state`)
-- `kaijibot.session.stuck_age_ms` (histogram, attrs: `kaijibot.state`)
-- `kaijibot.run.attempt` (counter, attrs: `kaijibot.attempt`)
+- `allbot.queue.lane.enqueue` (counter, attrs: `allbot.lane`)
+- `allbot.queue.lane.dequeue` (counter, attrs: `allbot.lane`)
+- `allbot.queue.depth` (histogram, attrs: `allbot.lane` or
+  `allbot.channel=heartbeat`)
+- `allbot.queue.wait_ms` (histogram, attrs: `allbot.lane`)
+- `allbot.session.state` (counter, attrs: `allbot.state`, `allbot.reason`)
+- `allbot.session.stuck` (counter, attrs: `allbot.state`)
+- `allbot.session.stuck_age_ms` (histogram, attrs: `allbot.state`)
+- `allbot.run.attempt` (counter, attrs: `allbot.attempt`)
 
 ### Exported spans (names + key attributes)
 
-- `kaijibot.model.usage`
-  - `kaijibot.channel`, `kaijibot.provider`, `kaijibot.model`
-  - `kaijibot.sessionKey`, `kaijibot.sessionId`
-  - `kaijibot.tokens.*` (input/output/cache_read/cache_write/total)
-- `kaijibot.webhook.processed`
-  - `kaijibot.channel`, `kaijibot.webhook`, `kaijibot.chatId`
-- `kaijibot.webhook.error`
-  - `kaijibot.channel`, `kaijibot.webhook`, `kaijibot.chatId`,
-    `kaijibot.error`
-- `kaijibot.message.processed`
-  - `kaijibot.channel`, `kaijibot.outcome`, `kaijibot.chatId`,
-    `kaijibot.messageId`, `kaijibot.sessionKey`, `kaijibot.sessionId`,
-    `kaijibot.reason`
-- `kaijibot.session.stuck`
-  - `kaijibot.state`, `kaijibot.ageMs`, `kaijibot.queueDepth`,
-    `kaijibot.sessionKey`, `kaijibot.sessionId`
+- `allbot.model.usage`
+  - `allbot.channel`, `allbot.provider`, `allbot.model`
+  - `allbot.sessionKey`, `allbot.sessionId`
+  - `allbot.tokens.*` (input/output/cache_read/cache_write/total)
+- `allbot.webhook.processed`
+  - `allbot.channel`, `allbot.webhook`, `allbot.chatId`
+- `allbot.webhook.error`
+  - `allbot.channel`, `allbot.webhook`, `allbot.chatId`,
+    `allbot.error`
+- `allbot.message.processed`
+  - `allbot.channel`, `allbot.outcome`, `allbot.chatId`,
+    `allbot.messageId`, `allbot.sessionKey`, `allbot.sessionId`,
+    `allbot.reason`
+- `allbot.session.stuck`
+  - `allbot.state`, `allbot.ageMs`, `allbot.queueDepth`,
+    `allbot.sessionKey`, `allbot.sessionId`
 
 ### Sampling + flushing
 
@@ -378,7 +378,7 @@ Queues + sessions:
 
 ## Troubleshooting tips
 
-- **Gateway not reachable?** Run `kaijibot doctor` first.
+- **Gateway not reachable?** Run `allbot doctor` first.
 - **Logs empty?** Check that the Gateway is running and writing to the file path
   in `logging.file`.
 - **Need more detail?** Set `logging.level` to `debug` or `trace` and retry.

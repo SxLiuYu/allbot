@@ -470,7 +470,7 @@ export function buildBuiltinChatCommands(): ChatCommandDefinition[] {
     defineChatCommand({
       key: "mcp",
       nativeName: "mcp",
-      description: "Show or set KaijiBot MCP servers.",
+      description: "Show or set AllBot MCP servers.",
       textAlias: "/mcp",
       category: "management",
       args: [
@@ -571,7 +571,7 @@ export function buildBuiltinChatCommands(): ChatCommandDefinition[] {
     defineChatCommand({
       key: "restart",
       nativeName: "restart",
-      description: "Restart KaijiBot.",
+      description: "Restart AllBot.",
       textAlias: "/restart",
       category: "tools",
     }),

@@ -130,7 +130,7 @@ function generateMessageSid(): string {
   return generateId("wechat");
 }
 
-/** Inbound context passed to the KaijiBot core pipeline (matches MsgContext shape). */
+/** Inbound context passed to the AllBot core pipeline (matches MsgContext shape). */
 export type WeixinMsgContext = {
   Body: string;
   From: string;

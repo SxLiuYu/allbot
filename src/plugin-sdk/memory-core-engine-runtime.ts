@@ -1,5 +1,5 @@
 // Manual facade. Keep loader boundary explicit.
-type FacadeModule = typeof import("@kaijibot/memory-core/runtime-api.js");
+type FacadeModule = typeof import("@allbot/memory-core/runtime-api.js");
 import {
   createLazyFacadeObjectValue,
   loadActivatedBundledPluginPublicSurfaceModuleSync,
@@ -38,8 +38,8 @@ export const repairShortTermPromotionArtifacts: FacadeModule["repairShortTermPro
       ...args,
     )) as FacadeModule["repairShortTermPromotionArtifacts"];
 export type BuiltinMemoryEmbeddingProviderDoctorMetadata =
-  import("@kaijibot/memory-core/runtime-api.js").BuiltinMemoryEmbeddingProviderDoctorMetadata;
+  import("@allbot/memory-core/runtime-api.js").BuiltinMemoryEmbeddingProviderDoctorMetadata;
 export type RepairShortTermPromotionArtifactsResult =
-  import("@kaijibot/memory-core/runtime-api.js").RepairShortTermPromotionArtifactsResult;
+  import("@allbot/memory-core/runtime-api.js").RepairShortTermPromotionArtifactsResult;
 export type ShortTermAuditSummary =
-  import("@kaijibot/memory-core/runtime-api.js").ShortTermAuditSummary;
+  import("@allbot/memory-core/runtime-api.js").ShortTermAuditSummary;

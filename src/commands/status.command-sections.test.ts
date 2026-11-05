@@ -50,8 +50,8 @@ describe("status.command-sections", () => {
     expect(lines).toContain("    critical detail");
     expect(lines).toContain("    muted(Fix: fix it)");
     expect(lines).toContain("muted(… +1 more)");
-    expect(lines.at(-2)).toBe("muted(Full report: cmd:kaijibot security audit)");
-    expect(lines.at(-1)).toBe("muted(Deep probe: cmd:kaijibot security audit --deep)");
+    expect(lines.at(-2)).toBe("muted(Full report: cmd:allbot security audit)");
+    expect(lines.at(-1)).toBe("muted(Deep probe: cmd:allbot security audit --deep)");
   });
 
   it("builds verbose sessions rows and empty fallback rows", () => {
@@ -152,9 +152,9 @@ describe("status.command-sections", () => {
       "",
       "warn(upgrade ready)",
       "Next steps:",
-      "  Need to share?      cmd:kaijibot status --all",
-      "  Need to debug live? cmd:kaijibot logs --follow",
-      "  Fix reachability first: cmd:kaijibot gateway probe",
+      "  Need to share?      cmd:allbot status --all",
+      "  Need to debug live? cmd:allbot logs --follow",
+      "  Fix reachability first: cmd:allbot gateway probe",
     ]);
   });
 
@@ -182,9 +182,9 @@ describe("status.command-sections", () => {
       }),
     ).toEqual([
       "warn(Gateway pairing approval required.)",
-      "muted(Recovery: cmd:kaijibot devices approve req-123)",
-      "muted(Fallback: cmd:kaijibot devices approve --latest)",
-      "muted(Inspect: cmd:kaijibot devices list)",
+      "muted(Recovery: cmd:allbot devices approve req-123)",
+      "muted(Fallback: cmd:allbot devices approve --latest)",
+      "muted(Inspect: cmd:allbot devices list)",
     ]);
   });
 

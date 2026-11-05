@@ -5,11 +5,11 @@ import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import { captureEnv } from "../test-utils/env.js";
 import type { UpdateCheckResult } from "./update-check.js";
 
-vi.mock("./kaijibot-root.js", async () => {
-  const actual = await vi.importActual<typeof import("./kaijibot-root.js")>("./kaijibot-root.js");
+vi.mock("./allbot-root.js", async () => {
+  const actual = await vi.importActual<typeof import("./allbot-root.js")>("./allbot-root.js");
   return {
     ...actual,
-    resolveKaijiBotPackageRoot: vi.fn(),
+    resolveAllBotPackageRoot: vi.fn(),
   };
 });
 
@@ -44,11 +44,11 @@ vi.mock("../process/exec.js", () => ({
 }));
 
 describe("update-startup", () => {
-  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-update-check-suite-" });
+  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-update-check-suite-" });
   let tempDir: string;
   let envSnapshot: ReturnType<typeof captureEnv>;
 
-  let resolveKaijiBotPackageRoot: (typeof import("./kaijibot-root.js"))["resolveKaijiBotPackageRoot"];
+  let resolveAllBotPackageRoot: (typeof import("./allbot-root.js"))["resolveAllBotPackageRoot"];
   let checkUpdateStatus: (typeof import("./update-check.js"))["checkUpdateStatus"];
   let resolveNpmChannelTag: (typeof import("./update-check.js"))["resolveNpmChannelTag"];
   let runCommandWithTimeout: (typeof import("../process/exec.js"))["runCommandWithTimeout"];
@@ -66,8 +66,8 @@ describe("update-startup", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-17T10:00:00Z"));
     tempDir = await suiteRootTracker.make("case");
-    envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR", "NODE_ENV", "VITEST"]);
-    process.env.KAIJIBOT_STATE_DIR = tempDir;
+    envSnapshot = captureEnv(["ALLBOT_STATE_DIR", "NODE_ENV", "VITEST"]);
+    process.env.ALLBOT_STATE_DIR = tempDir;
 
     process.env.NODE_ENV = "test";
 
@@ -76,7 +76,7 @@ describe("update-startup", () => {
 
     // Perf: load mocked modules once (after timers/env are set up).
     if (!loaded) {
-      ({ resolveKaijiBotPackageRoot } = await import("./kaijibot-root.js"));
+      ({ resolveAllBotPackageRoot } = await import("./allbot-root.js"));
       ({ checkUpdateStatus, resolveNpmChannelTag } = await import("./update-check.js"));
       ({ runCommandWithTimeout } = await import("../process/exec.js"));
       ({
@@ -87,7 +87,7 @@ describe("update-startup", () => {
       } = await import("./update-startup.js"));
       loaded = true;
     }
-    vi.mocked(resolveKaijiBotPackageRoot).mockClear();
+    vi.mocked(resolveAllBotPackageRoot).mockClear();
     vi.mocked(checkUpdateStatus).mockClear();
     vi.mocked(resolveNpmChannelTag).mockClear();
     vi.mocked(runCommandWithTimeout).mockClear();
@@ -110,9 +110,9 @@ describe("update-startup", () => {
   }
 
   function mockPackageInstallStatus() {
-    vi.mocked(resolveKaijiBotPackageRoot).mockResolvedValue("/opt/kaijibot");
+    vi.mocked(resolveAllBotPackageRoot).mockResolvedValue("/opt/allbot");
     vi.mocked(checkUpdateStatus).mockResolvedValue({
-      root: "/opt/kaijibot",
+      root: "/opt/allbot",
       installKind: "package",
       packageManager: "npm",
     } satisfies UpdateCheckResult);
@@ -333,7 +333,7 @@ describe("update-startup", () => {
     expect(runAutoUpdate).toHaveBeenCalledWith({
       channel: "stable",
       timeoutMs: 45 * 60 * 1000,
-      root: "/opt/kaijibot",
+      root: "/opt/allbot",
     });
   });
 
@@ -350,7 +350,7 @@ describe("update-startup", () => {
     expect(runAutoUpdate).toHaveBeenCalledWith({
       channel: "beta",
       timeoutMs: 45 * 60 * 1000,
-      root: "/opt/kaijibot",
+      root: "/opt/allbot",
     });
   });
 
@@ -379,7 +379,7 @@ describe("update-startup", () => {
     });
 
     const originalArgv = process.argv.slice();
-    process.argv = [process.execPath, "/opt/kaijibot/dist/entry.js"];
+    process.argv = [process.execPath, "/opt/allbot/dist/entry.js"];
     try {
       await runAutoUpdateCheckWithDefaults({
         cfg: createBetaAutoUpdateConfig(),
@@ -391,7 +391,7 @@ describe("update-startup", () => {
     expect(runCommandWithTimeout).toHaveBeenCalledWith(
       [
         process.execPath,
-        "/opt/kaijibot/dist/entry.js",
+        "/opt/allbot/dist/entry.js",
         "update",
         "--yes",
         "--channel",
@@ -401,7 +401,7 @@ describe("update-startup", () => {
       expect.objectContaining({
         timeoutMs: 45 * 60 * 1000,
         env: expect.objectContaining({
-          KAIJIBOT_AUTO_UPDATE: "1",
+          ALLBOT_AUTO_UPDATE: "1",
         }),
       }),
     );

@@ -19,10 +19,10 @@ vi.mock("../logging/subsystem.js", () => {
 });
 
 vi.mock("../agents/workspace.js", () => ({
-  DEFAULT_AGENT_WORKSPACE_DIR: "/tmp/kaijibot-workspace",
+  DEFAULT_AGENT_WORKSPACE_DIR: "/tmp/allbot-workspace",
   DEFAULT_AGENTS_FILENAME: "AGENTS.md",
   DEFAULT_IDENTITY_FILENAME: "IDENTITY.md",
-  resolveDefaultAgentWorkspaceDir: () => "/tmp/kaijibot-workspace",
+  resolveDefaultAgentWorkspaceDir: () => "/tmp/allbot-workspace",
   ensureAgentWorkspace: vi.fn(async ({ dir }: { dir: string }) => ({ dir })),
 }));
 

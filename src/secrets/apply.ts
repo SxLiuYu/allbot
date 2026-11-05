@@ -7,7 +7,7 @@ import { loadAuthProfileStoreForSecretsRuntime } from "../agents/auth-profiles.j
 import { AUTH_STORE_VERSION } from "../agents/auth-profiles/constants.js";
 import { resolveAuthStorePath } from "../agents/auth-profiles/paths.js";
 import { normalizeProviderId } from "../agents/model-selection.js";
-import { resolveStateDir, type KaijiBotConfig } from "../config/config.js";
+import { resolveStateDir, type AllBotConfig } from "../config/config.js";
 import type { ConfigWriteOptions } from "../config/io.js";
 import type { SecretProviderConfig } from "../config/types.secrets.js";
 import { normalizeAgentId } from "../routing/session-key.js";
@@ -47,7 +47,7 @@ type ApplyWrite = {
 };
 
 type ProjectedState = {
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   configPath: string;
   configWriteOptions: ConfigWriteOptions;
   authStoreByPath: Map<string, Record<string, unknown>>;
@@ -152,7 +152,7 @@ function scrubEnvRaw(
 }
 
 function applyProviderPlanMutations(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   upserts: Record<string, SecretProviderConfig> | undefined;
   deletes: string[] | undefined;
 }): boolean {
@@ -284,7 +284,7 @@ async function projectPlanState(params: {
 
 function applyConfigTargetMutations(params: {
   planTargets: SecretsPlanTarget[];
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   stateDir: string;
   authStoreByPath: Map<string, Record<string, unknown>>;
   changedFiles: Set<string>;
@@ -365,7 +365,7 @@ function applyConfigTargetMutations(params: {
 }
 
 function scrubAuthStoresForProviderTargets(params: {
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   stateDir: string;
   providerTargets: Set<string>;
   scrubbedValues: Set<string>;
@@ -437,7 +437,7 @@ function ensureMutableAuthStore(
 
 function resolveAuthStoreForTarget(params: {
   target: SecretsPlanTarget;
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   stateDir: string;
   authStoreByPath: Map<string, Record<string, unknown>>;
 }): { path: string; store: MutableAuthProfileStore } {
@@ -457,12 +457,12 @@ function resolveAuthStoreForTarget(params: {
   return { path: authStorePath, store };
 }
 
-function asConfigPathRoot(store: MutableAuthProfileStore): KaijiBotConfig {
-  return store as unknown as KaijiBotConfig;
+function asConfigPathRoot(store: MutableAuthProfileStore): AllBotConfig {
+  return store as unknown as AllBotConfig;
 }
 
 function resolveAuthStorePathForAgent(params: {
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   stateDir: string;
   agentId: string;
 }): string {
@@ -537,7 +537,7 @@ function ensureAuthProfileContainer(params: {
 function applyAuthProfileTargetMutation(params: {
   target: SecretsPlanTarget;
   resolved: ResolvedPlanTargetEntry["resolved"];
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   stateDir: string;
   authStoreByPath: Map<string, Record<string, unknown>>;
   scrubbedValues: Set<string>;
@@ -652,7 +652,7 @@ function scrubEnvFiles(params: {
 
 async function validateProjectedSecretsState(params: {
   env: NodeJS.ProcessEnv;
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   resolvedTargets: ResolvedPlanTargetEntry[];
   authStoreByPath: Map<string, Record<string, unknown>>;
   write: boolean;
@@ -865,7 +865,7 @@ export const __testing = {
   async projectConfigForTest(params: {
     plan: SecretsApplyPlan;
     env?: NodeJS.ProcessEnv;
-  }): Promise<KaijiBotConfig> {
+  }): Promise<AllBotConfig> {
     const projected = await projectPlanState({
       plan: params.plan,
       env: params.env ?? process.env,

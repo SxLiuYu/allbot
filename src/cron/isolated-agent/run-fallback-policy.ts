@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { CronJob } from "../types.js";
 import { resolveEffectiveModelFallbacks } from "./run-execution.runtime.js";
 
 export function resolveCronFallbacksOverride(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   job: CronJob;
   agentId: string;
 }): string[] | undefined {

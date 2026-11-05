@@ -38,7 +38,7 @@ vi.mock("./subagent-orphan-recovery.js", () => ({
 }));
 
 describe("subagent registry persistence", () => {
-  const envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR"]);
+  const envSnapshot = captureEnv(["ALLBOT_STATE_DIR"]);
   let tempStateDir: string | null = null;
 
   const resolveAgentIdFromSessionKey = (sessionKey: string) => {
@@ -120,8 +120,8 @@ describe("subagent registry persistence", () => {
     persisted: Record<string, unknown>,
     opts?: { seedChildSessions?: boolean },
   ) => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-subagent-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-subagent-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
     const registryPath = path.join(tempStateDir, "subagents", "runs.json");
     await fs.mkdir(path.dirname(registryPath), { recursive: true });
     await fs.writeFile(registryPath, `${JSON.stringify(persisted)}\n`, "utf8");
@@ -206,8 +206,8 @@ describe("subagent registry persistence", () => {
   });
 
   it("persists completed subagent timing into the child session entry", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-subagent-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-subagent-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
 
     const now = Date.now();
     const startedAt = now;
@@ -243,8 +243,8 @@ describe("subagent registry persistence", () => {
   });
 
   it("skips cleanup when cleanupHandled was persisted", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-subagent-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-subagent-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
 
     const registryPath = path.join(tempStateDir, "subagents", "runs.json");
     const persisted = {
@@ -557,8 +557,8 @@ describe("subagent registry persistence", () => {
   });
 
   it("resume guard prunes orphan runs before announce retry", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-subagent-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-subagent-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
     const runId = "run-orphan-resume-guard";
     const childSessionKey = "agent:main:subagent:ghost-resume";
     const now = Date.now();
@@ -593,9 +593,9 @@ describe("subagent registry persistence", () => {
     expect(persisted.has(runId)).toBe(false);
   });
 
-  it("uses isolated temp state when KAIJIBOT_STATE_DIR is unset in tests", async () => {
-    delete process.env.KAIJIBOT_STATE_DIR;
+  it("uses isolated temp state when ALLBOT_STATE_DIR is unset in tests", async () => {
+    delete process.env.ALLBOT_STATE_DIR;
     const registryPath = resolveSubagentRegistryPath();
-    expect(registryPath).toContain(path.join(os.tmpdir(), "kaijibot-test-state"));
+    expect(registryPath).toContain(path.join(os.tmpdir(), "allbot-test-state"));
   });
 });

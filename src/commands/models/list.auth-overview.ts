@@ -12,7 +12,7 @@ import {
   resolveEnvApiKey,
   resolveUsableCustomProviderApiKey,
 } from "../../agents/model-auth.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
@@ -46,7 +46,7 @@ function formatProfileSecretLabel(params: {
 
 export function resolveProviderAuthOverview(params: {
   provider: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   store: AuthProfileStore;
   modelsPath: string;
 }): ProviderAuthOverview {

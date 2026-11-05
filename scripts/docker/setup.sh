@@ -1,5 +1,5 @@
 #!/bin/bash
-# 🧠 KaijiBot Docker 一键部署脚本
+# 🧠 AllBot Docker 一键部署脚本
 # 面向中国开发者 — 一条命令启动你的主动型 AI 助手
 set -euo pipefail
 
@@ -20,10 +20,10 @@ DIM='\033[2m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# 🧠 KaijiBot 标识
+# 🧠 AllBot 标识
 print_banner() {
   echo -e "${CYAN}"
-  echo "  🧠 KaijiBot — 主动型 AI 私人助手"
+  echo "  🧠 AllBot — 主动型 AI 私人助手"
   echo "  Docker 一键部署"
   echo -e "${NC}"
 }
@@ -127,7 +127,7 @@ create_env_file() {
 
     if [[ -f "$env_file" ]]; then
       zai_key=$(grep -E "^ZAI_API_KEY=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
-      gateway_token=$(grep -E "^KAIJIBOT_GATEWAY_TOKEN=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
+      gateway_token=$(grep -E "^ALLBOT_GATEWAY_TOKEN=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
     fi
 
     if [[ -n "$zai_key" && "$zai_key" != "your-zai-api-key" && "$zai_key" != "change-me-to-a-long-random-token" ]]; then
@@ -143,11 +143,11 @@ create_env_file() {
     else
       # 没有 .env.example 则创建最小的 .env
       cat > "$env_file" <<'ENVEOF'
-# KaijiBot 环境变量
+# AllBot 环境变量
 ZAI_API_KEY=your-zai-api-key
-KAIJIBOT_GATEWAY_TOKEN=change-me-to-a-long-random-token
-KAIJIBOT_CONFIG_DIR=
-KAIJIBOT_WORKSPACE_DIR=
+ALLBOT_GATEWAY_TOKEN=change-me-to-a-long-random-token
+ALLBOT_CONFIG_DIR=
+ALLBOT_WORKSPACE_DIR=
 ENVEOF
       print_success "已创建最小 .env 文件"
     fi
@@ -170,20 +170,20 @@ ENVEOF
     if [[ -n "$zai_input" ]]; then
       update_env_var "$env_file" "ZAI_API_KEY" "$zai_input"
     else
-      print_warning "未设置 Z.AI_API_KEY，KaijiBot 将无法启动。请稍后手动编辑 .env 文件。"
+      print_warning "未设置 Z.AI_API_KEY，AllBot 将无法启动。请稍后手动编辑 .env 文件。"
     fi
   fi
 
-  # KAIJIBOT_GATEWAY_TOKEN — 自动生成
+  # ALLBOT_GATEWAY_TOKEN — 自动生成
   local current_token=""
   if [[ -f "$env_file" ]]; then
-    current_token=$(grep -E "^KAIJIBOT_GATEWAY_TOKEN=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
+    current_token=$(grep -E "^ALLBOT_GATEWAY_TOKEN=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
   fi
   if [[ -z "$current_token" || "$current_token" == "change-me-to-a-long-random-token" ]]; then
     local auto_token
-    auto_token=$(openssl rand -hex 32 2>/dev/null || echo "kaijibot-$(date +%s)-$$")
-    update_env_var "$env_file" "KAIJIBOT_GATEWAY_TOKEN" "$auto_token"
-    print_success "已自动生成 KAIJIBOT_GATEWAY_TOKEN"
+    auto_token=$(openssl rand -hex 32 2>/dev/null || echo "allbot-$(date +%s)-$$")
+    update_env_var "$env_file" "ALLBOT_GATEWAY_TOKEN" "$auto_token"
+    print_success "已自动生成 ALLBOT_GATEWAY_TOKEN"
   fi
 
   # 可选的搜索 API
@@ -203,7 +203,7 @@ ENVEOF
   # 飞书机器人配置
   echo ""
   echo -e "${CYAN}📡 飞书机器人配置（必需）${NC}"
-  echo "  飞书是 KaijiBot 的消息渠道，不配置则机器人无法收发消息。"
+  echo "  飞书是 AllBot 的消息渠道，不配置则机器人无法收发消息。"
   echo ""
   echo -e "${DIM}  方式一：手动创建${NC}"
   echo -e "${DIM}    1. 打开 https://open.feishu.cn/${NC}"
@@ -211,7 +211,7 @@ ENVEOF
   echo -e "${DIM}    3. 机器人能力 → 开启「机器人」${NC}"
   echo -e "${DIM}    4. 事件订阅 → 选择 WebSocket 模式 → 添加 im.message.receive_v1${NC}"
   echo ""
-  echo -e "${DIM}  方式二：不填，启动后进入容器运行 kaijibot onboard 扫码创建${NC}"
+  echo -e "${DIM}  方式二：不填，启动后进入容器运行 allbot onboard 扫码创建${NC}"
   echo ""
 
   read -rp "  FEISHU_APP_ID（留空稍后配置）: " feishu_app_id
@@ -223,14 +223,14 @@ ENVEOF
       print_success "飞书凭证已写入 .env"
     fi
   else
-    print_warning "未配置飞书凭证。启动后可进入容器运行 kaijibot onboard 进行配置（支持扫码创建）。"
+    print_warning "未配置飞书凭证。启动后可进入容器运行 allbot onboard 进行配置（支持扫码创建）。"
   fi
 
   # 设置 Docker 卷路径
-  local config_dir="$HOME/.kaijibot"
-  local workspace_dir="$HOME/.kaijibot/workspace"
-  update_env_var "$env_file" "KAIJIBOT_STATE_DIR" "$config_dir"
-  update_env_var "$env_file" "KAIJIBOT_WORKSPACE_DIR" "$workspace_dir"
+  local config_dir="$HOME/.allbot"
+  local workspace_dir="$HOME/.allbot/workspace"
+  update_env_var "$env_file" "ALLBOT_STATE_DIR" "$config_dir"
+  update_env_var "$env_file" "ALLBOT_WORKSPACE_DIR" "$workspace_dir"
 
   print_success "环境变量配置完成"
 }
@@ -253,8 +253,8 @@ update_env_var() {
 create_config_dirs() {
   print_step "创建配置目录..."
 
-  local config_dir="$HOME/.kaijibot"
-  local workspace_dir="$HOME/.kaijibot/workspace"
+  local config_dir="$HOME/.allbot"
+  local workspace_dir="$HOME/.allbot/workspace"
 
   mkdir -p "$config_dir"
   mkdir -p "$workspace_dir"
@@ -264,23 +264,23 @@ create_config_dirs() {
 
 # ── 构建镜像 ──────────────────────────────────────────────────
 build_image() {
-  print_step "构建 KaijiBot Docker 镜像（首次构建约需 5-10 分钟）..."
+  print_step "构建 AllBot Docker 镜像（首次构建约需 5-10 分钟）..."
 
   local extensions="feishu zai openai ollama lmstudio exa tavily browser memory-core memory-lancedb knowledge-wiki speech-core talk-voice media-understanding-core image-generation-core diffs llm-task device-pair webhooks"
 
   cd "$PROJECT_ROOT"
 
   docker build \
-    --build-arg "KAIJIBOT_EXTENSIONS=${extensions}" \
-    -t kaijibot:local \
+    --build-arg "ALLBOT_EXTENSIONS=${extensions}" \
+    -t allbot:local \
     . || die "镜像构建失败。请检查上方错误信息。"
 
-  print_success "KaijiBot 镜像构建完成 (kaijibot:local)"
+  print_success "AllBot 镜像构建完成 (allbot:local)"
 }
 
 # ── 启动网关 ──────────────────────────────────────────────────
 start_gateway() {
-  print_step "启动 KaijiBot 网关..."
+  print_step "启动 AllBot 网关..."
 
   cd "$PROJECT_ROOT"
 
@@ -289,12 +289,12 @@ start_gateway() {
 
   $compose_cmd up -d || die "容器启动失败。请运行 'docker compose logs' 查看日志。"
 
-  print_success "KaijiBot 网关已启动"
+  print_success "AllBot 网关已启动"
 }
 
 # ── 显示状态 ──────────────────────────────────────────────────
 show_status() {
-  print_step "KaijiBot 运行状态"
+  print_step "AllBot 运行状态"
 
   cd "$PROJECT_ROOT"
 
@@ -310,8 +310,8 @@ show_status() {
   local gateway_port=""
   local bridge_port=""
   if [[ -f "$PROJECT_ROOT/.env" ]]; then
-    gateway_port=$(grep -E "^KAIJIBOT_GATEWAY_PORT=" "$PROJECT_ROOT/.env" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
-    bridge_port=$(grep -E "^KAIJIBOT_BRIDGE_PORT=" "$PROJECT_ROOT/.env" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
+    gateway_port=$(grep -E "^ALLBOT_GATEWAY_PORT=" "$PROJECT_ROOT/.env" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
+    bridge_port=$(grep -E "^ALLBOT_BRIDGE_PORT=" "$PROJECT_ROOT/.env" 2>/dev/null | head -1 | cut -d'=' -f2- || true)
   fi
   gateway_port="${gateway_port:-18789}"
   bridge_port="${bridge_port:-18790}"
@@ -340,13 +340,13 @@ show_status() {
     print_success "飞书凭证已通过 .env 配置"
   else
     echo "   方式一（推荐）：进入容器运行向导（支持扫码创建机器人）"
-    echo "   ${CYAN}${compose_cmd} exec kaijibot-gateway \\"
+    echo "   ${CYAN}${compose_cmd} exec allbot-gateway \\"
     echo "     node dist/index.js onboard --skip-deps --skip-build${NC}"
     echo ""
     echo "   方式二：手动设置凭证"
-    echo "   ${CYAN}${compose_cmd} exec kaijibot-gateway \\"
+    echo "   ${CYAN}${compose_cmd} exec allbot-gateway \\"
     echo "     node dist/index.js config set channels.feishu.appId \"你的AppID\"${NC}"
-    echo "   ${CYAN}${compose_cmd} exec kaijibot-gateway \\"
+    echo "   ${CYAN}${compose_cmd} exec allbot-gateway \\"
     echo "     node dist/index.js config set channels.feishu.appSecret \"你的AppSecret\"${NC}"
   fi
   echo ""
@@ -367,7 +367,7 @@ show_status() {
 
 # ── 停止容器 ──────────────────────────────────────────────────
 stop_gateway() {
-  print_step "停止 KaijiBot..."
+  print_step "停止 AllBot..."
 
   cd "$PROJECT_ROOT"
 
@@ -376,12 +376,12 @@ stop_gateway() {
 
   $compose_cmd down || die "停止容器失败。"
 
-  print_success "KaijiBot 已停止"
+  print_success "AllBot 已停止"
 }
 
 # ── 重启容器 ──────────────────────────────────────────────────
 restart_gateway() {
-  print_step "重启 KaijiBot..."
+  print_step "重启 AllBot..."
 
   cd "$PROJECT_ROOT"
 
@@ -390,7 +390,7 @@ restart_gateway() {
 
   $compose_cmd restart || die "重启容器失败。"
 
-  print_success "KaijiBot 已重启"
+  print_success "AllBot 已重启"
   show_status
 }
 
@@ -402,8 +402,8 @@ show_help() {
   echo "选项:"
   echo "  (无参数)       完整部署流程（检查依赖 → 配置环境 → 构建 → 启动 → 显示状态）"
   echo "  --build-only   仅构建 Docker 镜像，不启动服务"
-  echo "  --restart      重启 KaijiBot 容器"
-  echo "  --stop         停止 KaijiBot 容器"
+  echo "  --restart      重启 AllBot 容器"
+  echo "  --stop         停止 AllBot 容器"
   echo "  --status       显示运行状态和端口信息"
   echo "  --help         显示此帮助信息"
   echo ""

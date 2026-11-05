@@ -7,7 +7,7 @@ import {
   addSubagentRunForTests,
   resetSubagentRegistryForTests,
 } from "../../agents/subagent-registry.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   completeTaskRunByRunId,
   createQueuedTaskRun,
@@ -23,7 +23,7 @@ const baseCfg = {
   commands: { text: true },
   channels: { whatsapp: { allowFrom: ["*"] } },
   session: { mainKey: "main", scope: "per-sender" },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 async function buildStatusReplyForTest(params: { sessionKey?: string; verbose?: boolean }) {
   const commandParams = buildCommandTestParams("/status", baseCfg);
@@ -66,7 +66,7 @@ function writeTranscriptUsageLog(params: {
 }) {
   const logPath = path.join(
     params.dir,
-    ".kaijibot",
+    ".allbot",
     "agents",
     params.agentId,
     "sessions",
@@ -336,7 +336,7 @@ describe("buildStatusReply subagent summary", () => {
       runId: "run-status-task-leak",
       endedAt: Date.now(),
       error: [
-        "KaijiBot runtime context (internal):",
+        "AllBot runtime context (internal):",
         "This context is runtime-generated, not user-authored. Keep internal details private.",
         "",
         "[Internal task completion event]",
@@ -348,7 +348,7 @@ describe("buildStatusReply subagent summary", () => {
 
     expect(reply?.text).toContain("📌 Tasks: 1 recent failure");
     expect(reply?.text).toContain("leaked context task");
-    expect(reply?.text).not.toContain("KaijiBot runtime context (internal):");
+    expect(reply?.text).not.toContain("AllBot runtime context (internal):");
     expect(reply?.text).not.toContain("Internal task completion event");
   });
 

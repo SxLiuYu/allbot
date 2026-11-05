@@ -31,10 +31,10 @@ function readEntrypoints() {
 }
 
 function parsePluginSdkSubpath(specifier) {
-  if (!specifier.startsWith("kaijibot/plugin-sdk/")) {
+  if (!specifier.startsWith("allbot/plugin-sdk/")) {
     return null;
   }
-  const subpath = specifier.slice("kaijibot/plugin-sdk/".length);
+  const subpath = specifier.slice("allbot/plugin-sdk/".length);
   return subpath || null;
 }
 
@@ -105,12 +105,12 @@ async function collectViolations() {
 async function main() {
   const violations = await collectViolations();
   if (violations.length === 0) {
-    console.log("OK: all referenced kaijibot/plugin-sdk/<subpath> imports are exported.");
+    console.log("OK: all referenced allbot/plugin-sdk/<subpath> imports are exported.");
     return;
   }
 
   console.error(
-    "Rule: every referenced kaijibot/plugin-sdk/<subpath> must exist in the public package exports.",
+    "Rule: every referenced allbot/plugin-sdk/<subpath> must exist in the public package exports.",
   );
   for (const violation of violations) {
     console.error(

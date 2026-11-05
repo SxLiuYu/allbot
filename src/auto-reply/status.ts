@@ -14,7 +14,7 @@ import { describeToolForVerbose } from "../agents/tool-description-summary.js";
 import { normalizeToolName } from "../agents/tool-policy-shared.js";
 import type { EffectiveToolInventoryResult } from "../agents/tools-effective-inventory.js";
 import { resolveChannelModelOverride } from "../channels/model-overrides.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveMainSessionKey,
   resolveSessionFilePath,
@@ -51,7 +51,7 @@ import { resolveActiveFallbackState } from "./fallback-state.js";
 import { formatProviderModelRef, resolveSelectedAndActiveModel } from "./model-runtime.js";
 import type { ElevatedLevel, ReasoningLevel, ThinkLevel, VerboseLevel } from "./thinking.js";
 
-type AgentDefaults = NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>;
+type AgentDefaults = NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>;
 type AgentConfig = Partial<AgentDefaults> & {
   model?: AgentDefaults["model"] | string;
 };
@@ -68,7 +68,7 @@ type QueueStatus = {
 };
 
 type StatusArgs = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agent: AgentConfig;
   agentId?: string;
   runtimeContextTokens?: number;
@@ -125,7 +125,7 @@ function normalizeAuthMode(value?: string): NormalizedAuthMode | undefined {
 }
 
 function resolveConfiguredTextVerbosity(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   provider?: string | null;
   model?: string | null;
@@ -250,7 +250,7 @@ const readUsageFromSessionLog = (
       model?: string;
     }
   | undefined => {
-  // Transcripts are stored at the session file path (fallback: ~/.kaijibot/sessions/<SessionId>.jsonl)
+  // Transcripts are stored at the session file path (fallback: ~/.allbot/sessions/<SessionId>.jsonl)
   if (!sessionId) {
     return undefined;
   }
@@ -393,7 +393,7 @@ const formatMediaUnderstandingLine = (decisions?: ReadonlyArray<MediaUnderstandi
 };
 
 const formatVoiceModeLine = (
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
   sessionEntry?: SessionEntry,
 ): string | null => {
   if (!config) {
@@ -416,7 +416,7 @@ export function buildStatusMessage(args: StatusArgs): string {
     agents: {
       defaults: args.agent ?? {},
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
   const contextConfig = args.config
     ? ({
         ...args.config,
@@ -427,12 +427,12 @@ export function buildStatusMessage(args: StatusArgs): string {
             ...args.agent,
           },
         },
-      } as KaijiBotConfig)
+      } as AllBotConfig)
     : ({
         agents: {
           defaults: args.agent ?? {},
         },
-      } as KaijiBotConfig);
+      } as AllBotConfig);
   const resolved = resolveConfiguredModelRef({
     cfg: selectionConfig,
     defaultProvider: DEFAULT_PROVIDER,
@@ -809,7 +809,7 @@ export function buildStatusMessage(args: StatusArgs): string {
       } (${fallbackState.reason ?? "selected model unavailable"})`
     : null;
   const commit = resolveCommitHash({ moduleUrl: import.meta.url });
-  const versionLine = `👾 KaijiBot ${VERSION}${commit ? ` (${commit})` : ""}`;
+  const versionLine = `👾 AllBot ${VERSION}${commit ? ` (${commit})` : ""}`;
   const usagePair = formatUsagePair(inputTokens, outputTokens);
   const cacheLine = formatCacheLine(inputTokens, cacheRead, cacheWrite);
   const costLine = costLabel ? `💵 Cost: ${costLabel}` : null;

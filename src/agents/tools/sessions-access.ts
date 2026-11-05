@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { isSubagentSessionKey, resolveAgentIdFromSessionKey } from "../../routing/session-key.js";
 import {
   normalizeLowercaseStringOrEmpty,
@@ -24,7 +24,7 @@ export type SessionAccessResult =
   | { allowed: true }
   | { allowed: false; error: string; status: "forbidden" };
 
-export function resolveSessionToolsVisibility(cfg: KaijiBotConfig): SessionToolsVisibility {
+export function resolveSessionToolsVisibility(cfg: AllBotConfig): SessionToolsVisibility {
   const raw = (cfg.tools as { sessions?: { visibility?: unknown } } | undefined)?.sessions
     ?.visibility;
   const value = normalizeLowercaseStringOrEmpty(raw);
@@ -35,7 +35,7 @@ export function resolveSessionToolsVisibility(cfg: KaijiBotConfig): SessionTools
 }
 
 export function resolveEffectiveSessionToolsVisibility(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sandboxed: boolean;
 }): SessionToolsVisibility {
   const visibility = resolveSessionToolsVisibility(params.cfg);
@@ -49,12 +49,12 @@ export function resolveEffectiveSessionToolsVisibility(params: {
   return visibility;
 }
 
-export function resolveSandboxSessionToolsVisibility(cfg: KaijiBotConfig): "spawned" | "all" {
+export function resolveSandboxSessionToolsVisibility(cfg: AllBotConfig): "spawned" | "all" {
   return cfg.agents?.defaults?.sandbox?.sessionToolsVisibility ?? "spawned";
 }
 
 export function resolveSandboxedSessionToolContext(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentSessionKey?: string;
   sandboxed?: boolean;
 }): {
@@ -91,7 +91,7 @@ export function resolveSandboxedSessionToolContext(params: {
   };
 }
 
-export function createAgentToAgentPolicy(cfg: KaijiBotConfig): AgentToAgentPolicy {
+export function createAgentToAgentPolicy(cfg: AllBotConfig): AgentToAgentPolicy {
   const routingA2A = cfg.tools?.agentToAgent;
   const enabled = routingA2A?.enabled === true;
   const allowPatterns = Array.isArray(routingA2A?.allow) ? routingA2A.allow : [];

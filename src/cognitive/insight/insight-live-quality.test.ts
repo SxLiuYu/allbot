@@ -1,7 +1,7 @@
 /**
  * Live insight quality test — real LLM + real web search.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/insight/insight-live-quality.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/insight/insight-live-quality.test.ts
  */
 
 import { describe, it, expect } from "vitest";
@@ -45,7 +45,7 @@ const EXPECTED_PATTERN_INSIGHT = [
   "a restatement of one fragment as a bullet point.",
 ].join(" ");
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";

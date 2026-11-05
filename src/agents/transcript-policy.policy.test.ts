@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 vi.unmock("../plugins/provider-runtime.js");
 vi.unmock("../plugins/provider-runtime.runtime.js");
@@ -12,19 +12,19 @@ const MISTRAL_PLUGIN_CONFIG = {
       mistral: { enabled: true },
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 function createProviderRuntimeSmokeContext(): {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   workspaceDir: string;
 } {
   const env = { ...process.env };
-  delete env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-  delete env.KAIJIBOT_SKIP_PROVIDERS;
-  delete env.KAIJIBOT_SKIP_CHANNELS;
-  delete env.KAIJIBOT_SKIP_CRON;
-  delete env.KAIJIBOT_TEST_MINIMAL_GATEWAY;
+  delete env.ALLBOT_BUNDLED_PLUGINS_DIR;
+  delete env.ALLBOT_SKIP_PROVIDERS;
+  delete env.ALLBOT_SKIP_CHANNELS;
+  delete env.ALLBOT_SKIP_CRON;
+  delete env.ALLBOT_TEST_MINIMAL_GATEWAY;
   return {
     config: {},
     env,

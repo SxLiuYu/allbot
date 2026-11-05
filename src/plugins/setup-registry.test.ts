@@ -15,7 +15,7 @@ let resolvePluginSetupRegistry: typeof import("./setup-registry.js").resolvePlug
 let runPluginSetupConfigMigrations: typeof import("./setup-registry.js").runPluginSetupConfigMigrations;
 
 function makeTempDir(): string {
-  return makeTrackedTempDir("kaijibot-setup-registry", tempDirs);
+  return makeTrackedTempDir("allbot-setup-registry", tempDirs);
 }
 
 afterEach(() => {

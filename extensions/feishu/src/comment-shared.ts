@@ -4,7 +4,7 @@ import {
   isRecord as sharedIsRecord,
   normalizeOptionalString,
   readStringValue,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 
 export function encodeQuery(params: Record<string, string | undefined>): string {
   const query = new URLSearchParams();

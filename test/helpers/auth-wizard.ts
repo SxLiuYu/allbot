@@ -37,7 +37,7 @@ export function createWizardPrompter(
 }
 
 export async function setupAuthTestEnv(
-  prefix = "kaijibot-auth-",
+  prefix = "allbot-auth-",
   options?: { agentSubdir?: string },
 ): Promise<{
   stateDir: string;
@@ -45,8 +45,8 @@ export async function setupAuthTestEnv(
 }> {
   const stateDir = await makeTempWorkspace(prefix);
   const agentDir = path.join(stateDir, options?.agentSubdir ?? "agent");
-  process.env.KAIJIBOT_STATE_DIR = stateDir;
-  process.env.KAIJIBOT_AGENT_DIR = agentDir;
+  process.env.ALLBOT_STATE_DIR = stateDir;
+  process.env.ALLBOT_AGENT_DIR = agentDir;
   process.env.PI_CODING_AGENT_DIR = agentDir;
   await fs.mkdir(agentDir, { recursive: true });
   return { stateDir, agentDir };
@@ -74,10 +74,10 @@ export function createAuthTestLifecycle(envKeys: string[]): AuthTestLifecycle {
   };
 }
 
-export function requireKaijiBotAgentDir(): string {
-  const agentDir = process.env.KAIJIBOT_AGENT_DIR;
+export function requireAllBotAgentDir(): string {
+  const agentDir = process.env.ALLBOT_AGENT_DIR;
   if (!agentDir) {
-    throw new Error("KAIJIBOT_AGENT_DIR not set");
+    throw new Error("ALLBOT_AGENT_DIR not set");
   }
   return agentDir;
 }

@@ -1,7 +1,7 @@
 import type { Model, SimpleStreamOptions } from "@earendil-works/pi-ai";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPiAiStreamSimpleMock } from "../../../test/helpers/agents/pi-ai-stream-simple-mock.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 vi.mock("@earendil-works/pi-ai", async () =>
   createPiAiStreamSimpleMock(() =>
@@ -16,7 +16,7 @@ type ToolStreamCase = {
   applyProvider: string;
   applyModelId: string;
   model: Model<"openai-completions">;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   options?: SimpleStreamOptions;
 };
 

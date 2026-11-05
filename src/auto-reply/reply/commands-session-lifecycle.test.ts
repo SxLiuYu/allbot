@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionBindingRecord } from "../../infra/outbound/session-binding-service.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 import { parseInlineDirectives } from "./directive-handling.js";
@@ -271,7 +271,7 @@ vi.mock("../../infra/outbound/session-binding-service.js", () => {
 let handleSessionCommand: (typeof import("./commands-session.js"))["handleSessionCommand"];
 const baseCfg = {
   session: { mainKey: "main", scope: "per-sender" },
-} satisfies KaijiBotConfig;
+} satisfies AllBotConfig;
 
 function buildSessionCommandParams(
   commandBody: string,

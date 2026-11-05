@@ -75,7 +75,7 @@ import { generateUUID } from "./uuid.ts";
 
 declare global {
   interface Window {
-    __KAIJIBOT_CONTROL_UI_BASE_PATH__?: string;
+    __ALLBOT_CONTROL_UI_BASE_PATH__?: string;
   }
 }
 
@@ -94,7 +94,7 @@ function resolveOnboardingMode(): boolean {
   return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
 }
 
-export class KaijiBotApp extends LitElement {
+export class AllBotApp extends LitElement {
   private i18nController = new I18nController(this);
   clientInstanceId = generateUUID();
   connectGeneration = 0;
@@ -571,6 +571,6 @@ export class KaijiBotApp extends LitElement {
   }
 }
 
-if (!customElements.get("kaijibot-app")) {
-  customElements.define("kaijibot-app", KaijiBotApp);
+if (!customElements.get("allbot-app")) {
+  customElements.define("allbot-app", AllBotApp);
 }

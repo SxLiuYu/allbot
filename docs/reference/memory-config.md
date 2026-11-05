@@ -10,7 +10,7 @@ read_when:
 
 # Memory configuration reference
 
-This page lists every configuration knob for KaijiBot memory search. For
+This page lists every configuration knob for AllBot memory search. For
 conceptual overviews, see:
 
 - [Memory Overview](/concepts/memory) -- how memory works
@@ -19,7 +19,7 @@ conceptual overviews, see:
 - [Memory Search](/concepts/memory-search) -- search pipeline and tuning
 
 All memory search settings live under `agents.defaults.memorySearch` in
-`kaijibot.json` unless noted otherwise.
+`allbot.json` unless noted otherwise.
 
 ---
 
@@ -34,7 +34,7 @@ All memory search settings live under `agents.defaults.memorySearch` in
 
 ### Auto-detection order
 
-When `provider` is not set, KaijiBot selects the first available:
+When `provider` is not set, AllBot selects the first available:
 
 1. `local` -- if `memorySearch.local.modelPath` is configured and the file exists.
 2. `openai` -- if an OpenAI key can be resolved.
@@ -109,7 +109,7 @@ Changing model or `outputDimensionality` triggers an automatic full reindex.
 ## Bedrock embedding config
 
 Bedrock uses the AWS SDK default credential chain -- no API keys needed.
-If KaijiBot runs on EC2 with a Bedrock-enabled instance role, just set the
+If AllBot runs on EC2 with a Bedrock-enabled instance role, just set the
 provider and model:
 
 ```json5
@@ -348,7 +348,7 @@ boundary.
 | `store.vector.enabled`       | `boolean` | `true`  | Use sqlite-vec for vector queries |
 | `store.vector.extensionPath` | `string`  | bundled | Override sqlite-vec path          |
 
-When sqlite-vec is unavailable, KaijiBot falls back to in-process cosine
+When sqlite-vec is unavailable, AllBot falls back to in-process cosine
 similarity automatically.
 
 ---
@@ -357,7 +357,7 @@ similarity automatically.
 
 | Key                   | Type     | Default                               | Description                                 |
 | --------------------- | -------- | ------------------------------------- | ------------------------------------------- |
-| `store.path`          | `string` | `~/.kaijibot/memory/{agentId}.sqlite` | Index location (supports `{agentId}` token) |
+| `store.path`          | `string` | `~/.allbot/memory/{agentId}.sqlite` | Index location (supports `{agentId}` token) |
 | `store.fts.tokenizer` | `string` | `unicode61`                           | FTS5 tokenizer (`unicode61` or `trigram`)   |
 
 ---
@@ -377,11 +377,11 @@ Set `memory.backend = "qmd"` to enable. All QMD settings live under
 | `sessions.retentionDays` | `number`  | --       | Transcript retention                         |
 | `sessions.exportDir`     | `string`  | --       | Export directory                             |
 
-KaijiBot prefers the current QMD collection and MCP query shapes, but keeps
+AllBot prefers the current QMD collection and MCP query shapes, but keeps
 older QMD releases working by falling back to legacy `--mask` collection flags
 and older MCP tool names when needed.
 
-QMD model overrides stay on the QMD side, not KaijiBot config. If you need to
+QMD model overrides stay on the QMD side, not AllBot config. If you need to
 override QMD's models globally, set environment variables such as
 `QMD_EMBED_MODEL`, `QMD_RERANK_MODEL`, and `QMD_GENERATE_MODEL` in the gateway
 runtime environment.

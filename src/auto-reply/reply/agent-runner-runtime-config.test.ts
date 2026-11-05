@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../../config/config.js";
 import {
   buildEmbeddedRunBaseParams,
@@ -10,7 +10,7 @@ import {
 } from "./agent-runner-utils.js";
 import type { FollowupRun } from "./queue.js";
 
-function makeRun(config: KaijiBotConfig): FollowupRun["run"] {
+function makeRun(config: AllBotConfig): FollowupRun["run"] {
   return {
     sessionId: "session-1",
     agentId: "agent-1",
@@ -39,7 +39,7 @@ afterEach(() => {
 
 describe("buildEmbeddedRunBaseParams runtime config", () => {
   it("keeps an already-resolved run config instead of reverting to a stale runtime snapshot", () => {
-    const staleSnapshot: KaijiBotConfig = {
+    const staleSnapshot: AllBotConfig = {
       models: {
         providers: {
           openai: {
@@ -54,7 +54,7 @@ describe("buildEmbeddedRunBaseParams runtime config", () => {
         },
       },
     };
-    const resolvedRunConfig: KaijiBotConfig = {
+    const resolvedRunConfig: AllBotConfig = {
       models: {
         providers: {
           openai: {

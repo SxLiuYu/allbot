@@ -40,7 +40,7 @@ function createStoredTask(): TaskRecord {
 
 describe("task-registry store runtime", () => {
   afterEach(() => {
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_STATE_DIR;
     resetTaskRegistryForTests();
     resetTaskFlowRegistryForTests({ persist: false });
   });
@@ -230,8 +230,8 @@ describe("task-registry store runtime", () => {
     if (process.platform === "win32") {
       return;
     }
-    const stateDir = mkdtempSync(path.join(os.tmpdir(), "kaijibot-task-store-"));
-    process.env.KAIJIBOT_STATE_DIR = stateDir;
+    const stateDir = mkdtempSync(path.join(os.tmpdir(), "allbot-task-store-"));
+    process.env.ALLBOT_STATE_DIR = stateDir;
 
     createTaskRecord({
       runtime: "cron",
@@ -255,8 +255,8 @@ describe("task-registry store runtime", () => {
   });
 
   it("migrates legacy ownerless cron rows to system scope", () => {
-    const stateDir = mkdtempSync(path.join(os.tmpdir(), "kaijibot-task-store-legacy-"));
-    process.env.KAIJIBOT_STATE_DIR = stateDir;
+    const stateDir = mkdtempSync(path.join(os.tmpdir(), "allbot-task-store-legacy-"));
+    process.env.ALLBOT_STATE_DIR = stateDir;
     const sqlitePath = resolveTaskRegistrySqlitePath(process.env);
     mkdirSync(path.dirname(sqlitePath), { recursive: true });
     const { DatabaseSync } = requireNodeSqlite();
@@ -337,8 +337,8 @@ describe("task-registry store runtime", () => {
   });
 
   it("keeps legacy requester_session_key rows writable after restore", () => {
-    const stateDir = mkdtempSync(path.join(os.tmpdir(), "kaijibot-task-store-legacy-write-"));
-    process.env.KAIJIBOT_STATE_DIR = stateDir;
+    const stateDir = mkdtempSync(path.join(os.tmpdir(), "allbot-task-store-legacy-write-"));
+    process.env.ALLBOT_STATE_DIR = stateDir;
     const sqlitePath = resolveTaskRegistrySqlitePath(process.env);
     mkdirSync(path.dirname(sqlitePath), { recursive: true });
     const { DatabaseSync } = requireNodeSqlite();

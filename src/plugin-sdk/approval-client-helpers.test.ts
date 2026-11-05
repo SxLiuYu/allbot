@@ -4,11 +4,11 @@ import {
   isChannelExecApprovalClientEnabledFromConfig,
   isChannelExecApprovalTargetRecipient,
 } from "./approval-client-helpers.js";
-import type { KaijiBotConfig } from "./config-runtime.js";
+import type { AllBotConfig } from "./config-runtime.js";
 
 describe("isChannelExecApprovalTargetRecipient", () => {
   it("matches targets by channel and account", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       approvals: {
         exec: {
           enabled: true,
@@ -43,7 +43,7 @@ describe("isChannelExecApprovalTargetRecipient", () => {
   });
 
   it("normalizes the requested channel id before matching targets", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       approvals: {
         exec: {
           enabled: true,

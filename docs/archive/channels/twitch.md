@@ -1,19 +1,19 @@
 ---
 summary: "Twitch chat bot configuration and setup"
 read_when:
-  - Setting up Twitch chat integration for KaijiBot
+  - Setting up Twitch chat integration for AllBot
 title: "Twitch"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Twitch
 
-Twitch chat support via IRC connection. KaijiBot connects as a Twitch user (bot account) to receive and send messages in channels.
+Twitch chat support via IRC connection. AllBot connects as a Twitch user (bot account) to receive and send messages in channels.
 
 ## Bundled plugin
 
-Twitch ships as a bundled plugin in current KaijiBot releases, so normal
+Twitch ships as a bundled plugin in current AllBot releases, so normal
 packaged builds do not need a separate install.
 
 If you are on an older build or a custom install that excludes Twitch, install
@@ -22,13 +22,13 @@ it manually:
 Install via CLI (npm registry):
 
 ```bash
-kaijibot plugins install @kaijibot/twitch
+allbot plugins install @allbot/twitch
 ```
 
 Local checkout (when running from a git repo):
 
 ```bash
-kaijibot plugins install ./path/to/local/twitch-plugin
+allbot plugins install ./path/to/local/twitch-plugin
 ```
 
 Details: [Plugins](/tools/plugin)
@@ -36,7 +36,7 @@ Details: [Plugins](/tools/plugin)
 ## Quick setup (beginner)
 
 1. Ensure the Twitch plugin is available.
-   - Current packaged KaijiBot releases already bundle it.
+   - Current packaged AllBot releases already bundle it.
    - Older/custom installs can add it manually with the commands above.
 2. Create a dedicated Twitch account for the bot (or use an existing account).
 3. Generate credentials: [Twitch Token Generator](https://twitchtokengenerator.com/)
@@ -45,7 +45,7 @@ Details: [Plugins](/tools/plugin)
    - Copy the **Client ID** and **Access Token**
 4. Find your Twitch user ID: [https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/](https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/)
 5. Configure the token:
-   - Env: `KAIJIBOT_TWITCH_ACCESS_TOKEN=...` (default account only)
+   - Env: `ALLBOT_TWITCH_ACCESS_TOKEN=...` (default account only)
    - Or config: `channels.twitch.accessToken`
    - If both are set, config takes precedence (env fallback is default-account only).
 6. Start the gateway.
@@ -59,8 +59,8 @@ Minimal config:
   channels: {
     twitch: {
       enabled: true,
-      username: "kaijibot", // Bot's Twitch account
-      accessToken: "oauth:abc123...", // OAuth Access Token (or use KAIJIBOT_TWITCH_ACCESS_TOKEN env var)
+      username: "allbot", // Bot's Twitch account
+      accessToken: "oauth:abc123...", // OAuth Access Token (or use ALLBOT_TWITCH_ACCESS_TOKEN env var)
       clientId: "xyz789...", // Client ID from Token Generator
       channel: "vevisk", // Which Twitch channel's chat to join (required)
       allowFrom: ["123456789"], // (recommended) Your Twitch user ID only - get it from https://www.streamweasels.com/tools/convert-twitch-username-to-user-id/
@@ -93,7 +93,7 @@ No manual app registration needed. Tokens expire after several hours.
 **Env var (default account only):**
 
 ```bash
-KAIJIBOT_TWITCH_ACCESS_TOKEN=oauth:abc123...
+ALLBOT_TWITCH_ACCESS_TOKEN=oauth:abc123...
 ```
 
 **Or config:**
@@ -103,7 +103,7 @@ KAIJIBOT_TWITCH_ACCESS_TOKEN=oauth:abc123...
   channels: {
     twitch: {
       enabled: true,
-      username: "kaijibot",
+      username: "allbot",
       accessToken: "oauth:abc123...",
       clientId: "xyz789...",
       channel: "vevisk",
@@ -165,13 +165,13 @@ Example (one bot account in two channels):
     twitch: {
       accounts: {
         channel1: {
-          username: "kaijibot",
+          username: "allbot",
           accessToken: "oauth:abc123...",
           clientId: "xyz789...",
           channel: "vevisk",
         },
         channel2: {
-          username: "kaijibot",
+          username: "allbot",
           accessToken: "oauth:def456...",
           clientId: "uvw012...",
           channel: "secondchannel",
@@ -260,8 +260,8 @@ By default, `requireMention` is `true`. To disable and respond to all messages:
 First, run diagnostic commands:
 
 ```bash
-kaijibot doctor
-kaijibot channels status --probe
+allbot doctor
+allbot channels status --probe
 ```
 
 ### Bot does not respond to messages
@@ -326,7 +326,7 @@ Full example:
   channels: {
     twitch: {
       enabled: true,
-      username: "kaijibot",
+      username: "allbot",
       accessToken: "oauth:abc123...",
       clientId: "xyz789...",
       channel: "vevisk",

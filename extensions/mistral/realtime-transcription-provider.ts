@@ -6,9 +6,9 @@ import {
   type RealtimeTranscriptionSession,
   type RealtimeTranscriptionSessionCreateRequest,
   type RealtimeTranscriptionWebSocketTransport,
-} from "kaijibot/plugin-sdk/realtime-transcription";
-import { normalizeResolvedSecretInputString } from "kaijibot/plugin-sdk/secret-input";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/realtime-transcription";
+import { normalizeResolvedSecretInputString } from "allbot/plugin-sdk/secret-input";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 
 type MistralRealtimeTranscriptionEncoding =
   | "pcm_s16le"

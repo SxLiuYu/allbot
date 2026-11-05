@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export type RealtimeVoiceProviderId = string;
 
@@ -38,12 +38,12 @@ export type RealtimeVoiceBridgeCallbacks = {
 export type RealtimeVoiceProviderConfig = Record<string, unknown>;
 
 export type RealtimeVoiceProviderResolveConfigContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   rawConfig: RealtimeVoiceProviderConfig;
 };
 
 export type RealtimeVoiceProviderConfiguredContext = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerConfig: RealtimeVoiceProviderConfig;
 };
 

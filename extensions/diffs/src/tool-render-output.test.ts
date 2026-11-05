@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestPluginApi } from "../../../test/helpers/plugins/plugin-api.js";
-import type { KaijiBotPluginApi } from "../api.js";
+import type { AllBotPluginApi } from "../api.js";
 import type { DiffScreenshotter } from "./browser.js";
 import { DEFAULT_DIFFS_TOOL_DEFAULTS } from "./config.js";
 import { createDiffStoreHarness } from "./test-helpers.js";
@@ -27,7 +27,7 @@ describe("diffs tool rendered output guards", () => {
   beforeEach(async () => {
     renderDiffDocumentMock.mockReset();
     ({ store, cleanup: cleanupRootDir } = await createDiffStoreHarness(
-      "kaijibot-diffs-tool-render-output-",
+      "allbot-diffs-tool-render-output-",
     ));
   });
 
@@ -67,7 +67,7 @@ describe("diffs tool rendered output guards", () => {
   });
 });
 
-function createApi(): KaijiBotPluginApi {
+function createApi(): AllBotPluginApi {
   return createTestPluginApi({
     id: "diffs",
     name: "Diffs",
@@ -79,7 +79,7 @@ function createApi(): KaijiBotPluginApi {
         bind: "loopback",
       },
     },
-    runtime: {} as KaijiBotPluginApi["runtime"],
+    runtime: {} as AllBotPluginApi["runtime"],
   });
 }
 

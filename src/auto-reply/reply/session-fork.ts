@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 
 /**
@@ -8,7 +8,7 @@ import type { SessionEntry } from "../../config/sessions/types.js";
  */
 const DEFAULT_PARENT_FORK_MAX_TOKENS = 100_000;
 
-export function resolveParentForkMaxTokens(cfg: KaijiBotConfig): number {
+export function resolveParentForkMaxTokens(cfg: AllBotConfig): number {
   const configured = cfg.session?.parentForkMaxTokens;
   if (typeof configured === "number" && Number.isFinite(configured) && configured >= 0) {
     return Math.floor(configured);

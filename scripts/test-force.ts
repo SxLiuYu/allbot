@@ -26,13 +26,13 @@ function killGatewayListeners(port: number): PortProcess[] {
 
 function runTests() {
   const isolatedLock =
-    process.env.KAIJIBOT_GATEWAY_LOCK ??
-    path.join(os.tmpdir(), `kaijibot-gateway.lock.test.${Date.now()}`);
+    process.env.ALLBOT_GATEWAY_LOCK ??
+    path.join(os.tmpdir(), `allbot-gateway.lock.test.${Date.now()}`);
   const result = spawnSync("pnpm", ["exec", "vitest", "run", "--config", "vitest.config.ts"], {
     stdio: "inherit",
     env: {
       ...process.env,
-      KAIJIBOT_GATEWAY_LOCK: isolatedLock,
+      ALLBOT_GATEWAY_LOCK: isolatedLock,
     },
   });
   if (result.error) {

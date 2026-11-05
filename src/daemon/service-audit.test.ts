@@ -32,7 +32,7 @@ function createGatewayAudit({
       programArguments: ["/usr/bin/node", "gateway"],
       environment: {
         PATH: path,
-        ...(serviceToken ? { KAIJIBOT_GATEWAY_TOKEN: serviceToken } : {}),
+        ...(serviceToken ? { ALLBOT_GATEWAY_TOKEN: serviceToken } : {}),
       },
       ...(environmentValueSources ? { environmentValueSources } : {}),
     },
@@ -140,7 +140,7 @@ describe("auditGatewayServiceConfig", () => {
       expectedGatewayToken: "new-token",
       serviceToken: "old-token",
       environmentValueSources: {
-        KAIJIBOT_GATEWAY_TOKEN: "file",
+        ALLBOT_GATEWAY_TOKEN: "file",
       },
     });
     expectTokenAudit(audit, { embedded: false, mismatch: false });

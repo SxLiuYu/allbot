@@ -235,16 +235,16 @@ describe("OpenAIWebSocketManager", () => {
       await connectPromise;
     });
 
-    it("adds KaijiBot attribution headers on the native OpenAI websocket", async () => {
+    it("adds AllBot attribution headers on the native OpenAI websocket", async () => {
       const manager = buildManager();
       const connectPromise = manager.connect("sk-test-key");
 
       const sock = lastSocket();
       expect(sock.options).toMatchObject({
         headers: expect.objectContaining({
-          originator: "kaijibot",
+          originator: "allbot",
           version: expect.any(String),
-          "User-Agent": expect.stringMatching(/^kaijibot\//),
+          "User-Agent": expect.stringMatching(/^allbot\//),
         }),
       });
 
@@ -256,7 +256,7 @@ describe("OpenAIWebSocketManager", () => {
       const manager = buildManager({
         headers: {
           "x-client-request-id": "session-123",
-          "x-kaijibot-session-id": "session-123",
+          "x-allbot-session-id": "session-123",
         },
       });
       const connectPromise = manager.connect("sk-test-key");
@@ -265,7 +265,7 @@ describe("OpenAIWebSocketManager", () => {
       expect(sock.options).toMatchObject({
         headers: expect.objectContaining({
           "x-client-request-id": "session-123",
-          "x-kaijibot-session-id": "session-123",
+          "x-allbot-session-id": "session-123",
         }),
       });
 

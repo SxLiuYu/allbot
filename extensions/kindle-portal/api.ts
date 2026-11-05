@@ -1,13 +1,13 @@
 export {
   buildPluginConfigSchema,
   definePluginEntry,
-  type KaijiBotPluginApi,
-  type KaijiBotPluginConfigSchema,
-} from "kaijibot/plugin-sdk/plugin-entry";
+  type AllBotPluginApi,
+  type AllBotPluginConfigSchema,
+} from "allbot/plugin-sdk/plugin-entry";
 export {
-  type KaijiBotPluginService,
-  type KaijiBotPluginServiceContext,
+  type AllBotPluginService,
+  type AllBotPluginServiceContext,
   type PluginLogger,
   type PluginRuntime,
-} from "kaijibot/plugin-sdk/core";
-export { z } from "kaijibot/plugin-sdk/zod";
+} from "allbot/plugin-sdk/core";
+export { z } from "allbot/plugin-sdk/zod";

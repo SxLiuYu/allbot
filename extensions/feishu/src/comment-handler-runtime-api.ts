@@ -1,3 +1,3 @@
-export type { KaijiBotConfig as ClawdbotConfig } from "kaijibot/plugin-sdk/config-runtime";
-export type { RuntimeEnv } from "kaijibot/plugin-sdk/runtime";
-export { createChannelPairingController } from "kaijibot/plugin-sdk/channel-pairing";
+export type { AllBotConfig as ClawdbotConfig } from "allbot/plugin-sdk/config-runtime";
+export type { RuntimeEnv } from "allbot/plugin-sdk/runtime";
+export { createChannelPairingController } from "allbot/plugin-sdk/channel-pairing";

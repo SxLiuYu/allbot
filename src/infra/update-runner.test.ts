@@ -12,7 +12,7 @@ import { runGatewayUpdate } from "./update-runner.js";
 type CommandResponse = { stdout?: string; stderr?: string; code?: number | null };
 type CommandResult = { stdout: string; stderr: string; code: number | null };
 const WHATSAPP_LIGHT_RUNTIME_API = bundledDistPluginFile("whatsapp", "light-runtime-api.js");
-const fixtureRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-update-" });
+const fixtureRootTracker = createSuiteTempRootTracker({ prefix: "allbot-update-" });
 
 function toCommandResult(response?: CommandResponse): CommandResult {
   return {
@@ -34,7 +34,7 @@ function createRunner(responses: Record<string, CommandResponse>) {
 
 // CI: expects npm global install sidecar files (BUNDLED_RUNTIME_SIDECAR_PATHS) that are absent on CI runners.
 describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
-  const preflightPrefixPattern = /(?:kaijibot-update-preflight-|ocu-pf-)/;
+  const preflightPrefixPattern = /(?:allbot-update-preflight-|ocu-pf-)/;
 
   let tempDir: string;
 
@@ -48,7 +48,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
   beforeEach(async () => {
     tempDir = await fixtureRootTracker.make("case");
-    await fs.writeFile(path.join(tempDir, "kaijibot.mjs"), "export {};\n", "utf-8");
+    await fs.writeFile(path.join(tempDir, "allbot.mjs"), "export {};\n", "utf-8");
   });
 
   afterEach(async () => {
@@ -64,7 +64,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const calls: string[] = [];
     let uiBuildCount = 0;
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorKey = `${doctorNodePath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive --fix`;
+    const doctorKey = `${doctorNodePath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (argv: string[]) => {
       const key = argv.join(" ");
@@ -116,7 +116,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
   async function setupGitCheckout(options?: { packageManager?: string }) {
     await fs.mkdir(path.join(tempDir, ".git"));
-    const pkg: Record<string, string> = { name: "kaijibot", version: "1.0.0" };
+    const pkg: Record<string, string> = { name: "allbot", version: "1.0.0" };
     if (options?.packageManager) {
       pkg.packageManager = options.packageManager;
     }
@@ -228,7 +228,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     await fs.mkdir(pkgRoot, { recursive: true });
     await fs.writeFile(
       path.join(pkgRoot, "package.json"),
-      JSON.stringify({ name: "kaijibot", version }),
+      JSON.stringify({ name: "allbot", version }),
       "utf-8",
     );
     await writeBundledRuntimeSidecars(pkgRoot);
@@ -237,7 +237,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
   async function writeGlobalPackageVersion(pkgRoot: string, version = "2.0.0") {
     await fs.writeFile(
       path.join(pkgRoot, "package.json"),
-      JSON.stringify({ name: "kaijibot", version }),
+      JSON.stringify({ name: "allbot", version }),
       "utf-8",
     );
     await writeBundledRuntimeSidecars(pkgRoot);
@@ -253,7 +253,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
   async function createGlobalPackageFixture(rootDir: string) {
     const nodeModules = path.join(rootDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "kaijibot");
+    const pkgRoot = path.join(nodeModules, "allbot");
     await seedGlobalPackageRoot(pkgRoot);
     return { nodeModules, pkgRoot };
   }
@@ -264,9 +264,9 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     onBaseInstall?: () => Promise<CommandResult>;
     onOmitOptionalInstall?: () => Promise<CommandResult>;
   }) {
-    const baseInstallKey = "npm i -g kaijibot@latest --no-fund --no-audit --loglevel=error";
+    const baseInstallKey = "npm i -g allbot@latest --no-fund --no-audit --loglevel=error";
     const omitOptionalInstallKey =
-      "npm i -g kaijibot@latest --omit=optional --no-fund --no-audit --loglevel=error";
+      "npm i -g allbot@latest --omit=optional --no-fund --no-audit --loglevel=error";
 
     return async (argv: string[]): Promise<CommandResult> => {
       const key = argv.join(" ");
@@ -369,7 +369,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       "pnpm install": { stdout: "" },
       "pnpm build": { stdout: "" },
       "pnpm ui:build": { stdout: "" },
-      [`${doctorNodePath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive --fix`]: {
+      [`${doctorNodePath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive --fix`]: {
         stdout: "",
       },
     });
@@ -389,11 +389,11 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       installCommand: "pnpm install",
       buildCommand: "pnpm build",
       uiBuildCommand: "pnpm ui:build",
-      doctorCommand: `${process.execPath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive`,
+      doctorCommand: `${process.execPath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive`,
       onCommand: (key, options) => {
         if (key === "pnpm --version") {
           const envPath = options?.env?.PATH ?? options?.env?.Path ?? "";
-          if (envPath.includes("kaijibot-update-pnpm-")) {
+          if (envPath.includes("allbot-update-pnpm-")) {
             return { stdout: "10.0.0" };
           }
           throw new Error("spawn pnpm ENOENT");
@@ -430,7 +430,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       installCommand: "pnpm install",
       buildCommand: "pnpm build",
       uiBuildCommand: "pnpm ui:build",
-      doctorCommand: `${process.execPath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive`,
+      doctorCommand: `${process.execPath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive`,
       onCommand: (key) => {
         if (key === "pnpm --version") {
           pnpmVersionChecks += 1;
@@ -468,7 +468,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const pnpmEnvPaths: string[] = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive --fix`;
 
     const runCommand = async (
       argv: string[],
@@ -503,7 +503,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       }
       if (key === "pnpm --version") {
         const envPath = options?.env?.PATH ?? options?.env?.Path ?? "";
-        if (envPath.includes("kaijibot-update-pnpm-")) {
+        if (envPath.includes("allbot-update-pnpm-")) {
           pnpmEnvPaths.push(envPath);
           return { stdout: "10.0.0", stderr: "", code: 0 };
         }
@@ -572,7 +572,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     expect(calls).toContain("pnpm build");
     expect(calls).toContain("pnpm lint");
     expect(calls).toContain("pnpm ui:build");
-    expect(pnpmEnvPaths.some((value) => value.includes("kaijibot-update-pnpm-"))).toBe(true);
+    expect(pnpmEnvPaths.some((value) => value.includes("allbot-update-pnpm-"))).toBe(true);
   });
 
   it("retries windows pnpm git installs with --ignore-scripts for dev updates", async () => {
@@ -580,7 +580,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const calls: string[] = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive --fix`;
     let preflightInstallAttempts = 0;
     let preflightIgnoreScriptsAttempts = 0;
     let finalInstallAttempts = 0;
@@ -637,7 +637,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
           return { stdout: "", stderr: "", code: 0 };
         }
         if (key === "pnpm install") {
-          if (options?.cwd && /(?:kaijibot-update-preflight-|ocu-pf-)/.test(options.cwd)) {
+          if (options?.cwd && /(?:allbot-update-preflight-|ocu-pf-)/.test(options.cwd)) {
             preflightInstallAttempts += 1;
             return preflightInstallAttempts === 1
               ? { stdout: "", stderr: "sharp: Please add node-gyp to your dependencies", code: 1 }
@@ -651,7 +651,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
           }
         }
         if (key === "pnpm install --ignore-scripts") {
-          if (options?.cwd && /(?:kaijibot-update-preflight-|ocu-pf-)/.test(options.cwd)) {
+          if (options?.cwd && /(?:allbot-update-preflight-|ocu-pf-)/.test(options.cwd)) {
             preflightIgnoreScriptsAttempts += 1;
           }
           return { stdout: "", stderr: "", code: 0 };
@@ -698,7 +698,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const calls: string[] = [];
     const upstreamSha = "upstream123";
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive --fix`;
     const platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("win32");
 
     try {
@@ -797,7 +797,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const upstreamSha = "upstream123";
     const buildNodeOptions: string[] = [];
     const doctorNodePath = await resolveStableNodePath(process.execPath);
-    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "kaijibot.mjs")} doctor --non-interactive --fix`;
+    const doctorCommand = `${doctorNodePath} ${path.join(tempDir, "allbot.mjs")} doctor --non-interactive --fix`;
     const platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("win32");
 
     try {
@@ -951,7 +951,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
   it("skips update when no git root", async () => {
     await fs.writeFile(
       path.join(tempDir, "package.json"),
-      JSON.stringify({ name: "kaijibot", packageManager: "pnpm@8.0.0" }),
+      JSON.stringify({ name: "allbot", packageManager: "pnpm@8.0.0" }),
       "utf-8",
     );
     await fs.writeFile(path.join(tempDir, "pnpm-lock.yaml"), "", "utf-8");
@@ -975,7 +975,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     tag?: string;
   }): Promise<{ calls: string[]; result: Awaited<ReturnType<typeof runGatewayUpdate>> }> {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "kaijibot");
+    const pkgRoot = path.join(nodeModules, "allbot");
     await seedGlobalPackageRoot(pkgRoot);
 
     const { calls, runCommand } = createGlobalInstallHarness({
@@ -985,7 +985,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       onInstall: async () => {
         await fs.writeFile(
           path.join(pkgRoot, "package.json"),
-          JSON.stringify({ name: "kaijibot", version: "2.0.0" }),
+          JSON.stringify({ name: "allbot", version: "2.0.0" }),
           "utf-8",
         );
       },
@@ -1038,16 +1038,16 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
   it.each([
     {
       title: "updates global npm installs when detected",
-      expectedInstallCommand: "npm i -g kaijibot@latest --no-fund --no-audit --loglevel=error",
+      expectedInstallCommand: "npm i -g allbot@latest --no-fund --no-audit --loglevel=error",
     },
     {
       title: "uses update channel for global npm installs when tag is omitted",
-      expectedInstallCommand: "npm i -g kaijibot@beta --no-fund --no-audit --loglevel=error",
+      expectedInstallCommand: "npm i -g allbot@beta --no-fund --no-audit --loglevel=error",
       channel: "beta" as const,
     },
     {
       title: "updates global npm installs with tag override",
-      expectedInstallCommand: "npm i -g kaijibot@beta --no-fund --no-audit --loglevel=error",
+      expectedInstallCommand: "npm i -g allbot@beta --no-fund --no-audit --loglevel=error",
       tag: "beta",
     },
   ])("$title", async ({ expectedInstallCommand, channel, tag }) => {
@@ -1067,14 +1067,14 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
   it("updates global npm installs from the GitHub main package spec", async () => {
     const { calls, result } = await runNpmGlobalUpdateCase({
       expectedInstallCommand:
-        "npm i -g github:kaijibot/kaijibot#main --no-fund --no-audit --loglevel=error",
+        "npm i -g github:allbot/allbot#main --no-fund --no-audit --loglevel=error",
       tag: "main",
     });
 
     expect(result.status).toBe("ok");
     expect(result.mode).toBe("npm");
     expect(calls).toContain(
-      "npm i -g github:kaijibot/kaijibot#main --no-fund --no-audit --loglevel=error",
+      "npm i -g github:allbot/allbot#main --no-fund --no-audit --loglevel=error",
     );
   });
 
@@ -1083,7 +1083,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: "npm i -g kaijibot@latest --no-fund --no-audit --loglevel=error",
+      installCommand: "npm i -g allbot@latest --no-fund --no-audit --loglevel=error",
       gitRootMode: "missing",
       onInstall: async () => writeGlobalPackageVersion(pkgRoot),
     });
@@ -1092,13 +1092,13 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
     expect(result.status).toBe("ok");
     expect(result.mode).toBe("npm");
-    expect(calls).toContain("npm i -g kaijibot@latest --no-fund --no-audit --loglevel=error");
+    expect(calls).toContain("npm i -g allbot@latest --no-fund --no-audit --loglevel=error");
   });
 
   it("cleans stale npm rename dirs before global update", async () => {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "kaijibot");
-    const staleDir = path.join(nodeModules, ".kaijibot-stale");
+    const pkgRoot = path.join(nodeModules, "allbot");
+    const staleDir = path.join(nodeModules, ".allbot-stale");
     await fs.mkdir(staleDir, { recursive: true });
     await seedGlobalPackageRoot(pkgRoot);
 
@@ -1121,7 +1121,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
   it("retries global npm update with --omit=optional when initial install fails", async () => {
     const nodeModules = path.join(tempDir, "node_modules");
-    const pkgRoot = path.join(nodeModules, "kaijibot");
+    const pkgRoot = path.join(nodeModules, "allbot");
     await seedGlobalPackageRoot(pkgRoot);
 
     let firstAttempt = true;
@@ -1151,7 +1151,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
   it("fails global npm update when the installed version misses the requested correction", async () => {
     const { calls, result } = await runNpmGlobalUpdateCase({
-      expectedInstallCommand: "npm i -g kaijibot@2026.3.23-2 --no-fund --no-audit --loglevel=error",
+      expectedInstallCommand: "npm i -g allbot@2026.3.23-2 --no-fund --no-audit --loglevel=error",
       tag: "2026.3.23-2",
     });
 
@@ -1161,12 +1161,12 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     expect(result.steps.at(-1)?.stderrTail).toContain(
       "expected installed version 2026.3.23-2, found 2.0.0",
     );
-    expect(calls).toContain("npm i -g kaijibot@2026.3.23-2 --no-fund --no-audit --loglevel=error");
+    expect(calls).toContain("npm i -g allbot@2026.3.23-2 --no-fund --no-audit --loglevel=error");
   });
 
   it("fails global npm update when bundled runtime sidecars are missing after install", async () => {
     const { nodeModules, pkgRoot } = await createGlobalPackageFixture(tempDir);
-    const expectedInstallCommand = "npm i -g kaijibot@latest --no-fund --no-audit --loglevel=error";
+    const expectedInstallCommand = "npm i -g allbot@latest --no-fund --no-audit --loglevel=error";
     const { runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
@@ -1174,7 +1174,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       onInstall: async () => {
         await fs.writeFile(
           path.join(pkgRoot, "package.json"),
-          JSON.stringify({ name: "kaijibot", version: "2.0.0" }),
+          JSON.stringify({ name: "allbot", version: "2.0.0" }),
           "utf-8",
         );
         await fs.rm(path.join(pkgRoot, "dist"), { recursive: true, force: true });
@@ -1195,7 +1195,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const localAppData = path.join(tempDir, "local-app-data");
     const portableGitMingw = path.join(
       localAppData,
-      "KaijiBot",
+      "AllBot",
       "deps",
       "portable-git",
       "mingw64",
@@ -1203,7 +1203,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     );
     const portableGitUsr = path.join(
       localAppData,
-      "KaijiBot",
+      "AllBot",
       "deps",
       "portable-git",
       "usr",
@@ -1217,7 +1217,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     const { runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
-      installCommand: "npm i -g kaijibot@latest --no-fund --no-audit --loglevel=error",
+      installCommand: "npm i -g allbot@latest --no-fund --no-audit --loglevel=error",
       onInstall: async (options) => {
         installEnv = options?.env;
         await writeGlobalPackageVersion(pkgRoot);
@@ -1240,10 +1240,10 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     expect(installEnv?.NODE_LLAMA_CPP_SKIP_DOWNLOAD).toBe("1");
   });
 
-  it("uses KAIJIBOT_UPDATE_PACKAGE_SPEC for global package updates", async () => {
+  it("uses ALLBOT_UPDATE_PACKAGE_SPEC for global package updates", async () => {
     const { nodeModules, pkgRoot } = await createGlobalPackageFixture(tempDir);
     const expectedInstallCommand =
-      "npm i -g http://10.211.55.2:8138/kaijibot-next.tgz --no-fund --no-audit --loglevel=error";
+      "npm i -g http://10.211.55.2:8138/allbot-next.tgz --no-fund --no-audit --loglevel=error";
     const { calls, runCommand } = createGlobalInstallHarness({
       pkgRoot,
       npmRootOutput: nodeModules,
@@ -1252,7 +1252,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     });
 
     await withEnvAsync(
-      { KAIJIBOT_UPDATE_PACKAGE_SPEC: "http://10.211.55.2:8138/kaijibot-next.tgz" },
+      { ALLBOT_UPDATE_PACKAGE_SPEC: "http://10.211.55.2:8138/allbot-next.tgz" },
       async () => {
         const result = await runWithCommand(runCommand, { cwd: pkgRoot });
         expect(result.status).toBe("ok");
@@ -1271,7 +1271,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
       const { calls, runCommand } = createGlobalInstallHarness({
         pkgRoot,
-        installCommand: "bun add -g kaijibot@latest",
+        installCommand: "bun add -g allbot@latest",
         onInstall: async () => {
           await writeGlobalPackageVersion(pkgRoot);
         },
@@ -1283,11 +1283,11 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
       expect(result.mode).toBe("bun");
       expect(result.before?.version).toBe("1.0.0");
       expect(result.after?.version).toBe("2.0.0");
-      expect(calls.some((call) => call === "bun add -g kaijibot@latest")).toBe(true);
+      expect(calls.some((call) => call === "bun add -g allbot@latest")).toBe(true);
     });
   });
 
-  it("rejects git roots that are not a kaijibot checkout", async () => {
+  it("rejects git roots that are not a allbot checkout", async () => {
     await fs.mkdir(path.join(tempDir, ".git"));
     const cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(tempDir);
     const { runner, calls } = createRunner({
@@ -1299,13 +1299,13 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
     cwdSpy.mockRestore();
 
     expect(result.status).toBe("error");
-    expect(result.reason).toBe("not-kaijibot-root");
+    expect(result.reason).toBe("not-allbot-root");
     expect(calls.some((call) => call.includes("status --porcelain"))).toBe(false);
   });
 
-  it("fails with a clear reason when kaijibot.mjs is missing", async () => {
+  it("fails with a clear reason when allbot.mjs is missing", async () => {
     await setupGitCheckout({ packageManager: "pnpm@8.0.0" });
-    await fs.rm(path.join(tempDir, "kaijibot.mjs"), { force: true });
+    await fs.rm(path.join(tempDir, "allbot.mjs"), { force: true });
 
     const stableTag = "v1.0.1-1";
     const { runner } = createRunner({
@@ -1319,7 +1319,7 @@ describe.skipIf(process.env.CI)("runGatewayUpdate", () => {
 
     expect(result.status).toBe("error");
     expect(result.reason).toBe("doctor-entry-missing");
-    expect(result.steps.at(-1)?.name).toBe("kaijibot doctor entry");
+    expect(result.steps.at(-1)?.name).toBe("allbot doctor entry");
   });
 
   it("repairs UI assets when doctor run removes control-ui files", async () => {

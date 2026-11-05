@@ -10,7 +10,7 @@ import { hasExplicitOptions } from "../command-options.js";
 export function registerSetupCommand(program: Command) {
   program
     .command("setup")
-    .description("Initialize the active KaijiBot config and agent workspace")
+    .description("Initialize the active AllBot config and agent workspace")
     .addHelpText(
       "after",
       () =>
@@ -18,7 +18,7 @@ export function registerSetupCommand(program: Command) {
     )
     .option(
       "--workspace <dir>",
-      "Agent workspace directory (default: ~/.kaijibot/workspace; stored as agents.defaults.workspace)",
+      "Agent workspace directory (default: ~/.allbot/workspace; stored as agents.defaults.workspace)",
     )
     .option("--wizard", "Run interactive onboarding", false)
     .option("--non-interactive", "Run onboarding without prompts", false)

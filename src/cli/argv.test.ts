@@ -20,47 +20,47 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "help flag",
-      argv: ["node", "kaijibot", "--help"],
+      argv: ["node", "allbot", "--help"],
       expected: true,
     },
     {
       name: "version flag",
-      argv: ["node", "kaijibot", "-V"],
+      argv: ["node", "allbot", "-V"],
       expected: true,
     },
     {
       name: "normal command",
-      argv: ["node", "kaijibot", "status"],
+      argv: ["node", "allbot", "status"],
       expected: false,
     },
     {
       name: "root -v alias",
-      argv: ["node", "kaijibot", "-v"],
+      argv: ["node", "allbot", "-v"],
       expected: true,
     },
     {
       name: "root -v alias with profile",
-      argv: ["node", "kaijibot", "--profile", "work", "-v"],
+      argv: ["node", "allbot", "--profile", "work", "-v"],
       expected: true,
     },
     {
       name: "root -v alias with log-level",
-      argv: ["node", "kaijibot", "--log-level", "debug", "-v"],
+      argv: ["node", "allbot", "--log-level", "debug", "-v"],
       expected: true,
     },
     {
       name: "subcommand -v should not be treated as version",
-      argv: ["node", "kaijibot", "acp", "-v"],
+      argv: ["node", "allbot", "acp", "-v"],
       expected: false,
     },
     {
       name: "root -v alias with equals profile",
-      argv: ["node", "kaijibot", "--profile=work", "-v"],
+      argv: ["node", "allbot", "--profile=work", "-v"],
       expected: true,
     },
     {
       name: "subcommand path after global root flags should not be treated as version",
-      argv: ["node", "kaijibot", "--dev", "skills", "list", "-v"],
+      argv: ["node", "allbot", "--dev", "skills", "list", "-v"],
       expected: false,
     },
   ])("detects help/version flags: $name", ({ argv, expected }) => {
@@ -70,27 +70,27 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "root --version",
-      argv: ["node", "kaijibot", "--version"],
+      argv: ["node", "allbot", "--version"],
       expected: true,
     },
     {
       name: "root -V",
-      argv: ["node", "kaijibot", "-V"],
+      argv: ["node", "allbot", "-V"],
       expected: true,
     },
     {
       name: "root -v alias with profile",
-      argv: ["node", "kaijibot", "--profile", "work", "-v"],
+      argv: ["node", "allbot", "--profile", "work", "-v"],
       expected: true,
     },
     {
       name: "subcommand version flag",
-      argv: ["node", "kaijibot", "status", "--version"],
+      argv: ["node", "allbot", "status", "--version"],
       expected: false,
     },
     {
       name: "unknown root flag with version",
-      argv: ["node", "kaijibot", "--unknown", "--version"],
+      argv: ["node", "allbot", "--unknown", "--version"],
       expected: false,
     },
   ])("detects root-only version invocations: $name", ({ argv, expected }) => {
@@ -100,42 +100,42 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "root --help",
-      argv: ["node", "kaijibot", "--help"],
+      argv: ["node", "allbot", "--help"],
       expected: true,
     },
     {
       name: "root -h",
-      argv: ["node", "kaijibot", "-h"],
+      argv: ["node", "allbot", "-h"],
       expected: true,
     },
     {
       name: "root --help with profile",
-      argv: ["node", "kaijibot", "--profile", "work", "--help"],
+      argv: ["node", "allbot", "--profile", "work", "--help"],
       expected: true,
     },
     {
       name: "subcommand --help",
-      argv: ["node", "kaijibot", "status", "--help"],
+      argv: ["node", "allbot", "status", "--help"],
       expected: false,
     },
     {
       name: "help before subcommand token",
-      argv: ["node", "kaijibot", "--help", "status"],
+      argv: ["node", "allbot", "--help", "status"],
       expected: false,
     },
     {
       name: "help after -- terminator",
-      argv: ["node", "kaijibot", "nodes", "invoke", "--", "device.status", "--help"],
+      argv: ["node", "allbot", "nodes", "invoke", "--", "device.status", "--help"],
       expected: false,
     },
     {
       name: "unknown root flag before help",
-      argv: ["node", "kaijibot", "--unknown", "--help"],
+      argv: ["node", "allbot", "--unknown", "--help"],
       expected: false,
     },
     {
       name: "unknown root flag after help",
-      argv: ["node", "kaijibot", "--help", "--unknown"],
+      argv: ["node", "allbot", "--help", "--unknown"],
       expected: false,
     },
   ])("detects root-only help invocations: $name", ({ argv, expected }) => {
@@ -145,17 +145,17 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "single command with trailing flag",
-      argv: ["node", "kaijibot", "status", "--json"],
+      argv: ["node", "allbot", "status", "--json"],
       expected: ["status"],
     },
     {
       name: "two-part command",
-      argv: ["node", "kaijibot", "agents", "list"],
+      argv: ["node", "allbot", "agents", "list"],
       expected: ["agents", "list"],
     },
     {
       name: "terminator cuts parsing",
-      argv: ["node", "kaijibot", "status", "--", "ignored"],
+      argv: ["node", "allbot", "status", "--", "ignored"],
       expected: ["status"],
     },
   ])("extracts command path: $name", ({ argv, expected }) => {
@@ -167,7 +167,7 @@ describe("argv helpers", () => {
       getCommandPathWithRootOptions(
         [
           "node",
-          "kaijibot",
+          "allbot",
           "--profile",
           "work",
           "--container",
@@ -184,7 +184,7 @@ describe("argv helpers", () => {
   it("extracts routed config get positionals with interleaved root options", () => {
     expect(
       getCommandPositionalsWithRootOptions(
-        ["node", "kaijibot", "config", "get", "--log-level", "debug", "update.channel", "--json"],
+        ["node", "allbot", "config", "get", "--log-level", "debug", "update.channel", "--json"],
         {
           commandPath: ["config", "get"],
           booleanFlags: ["--json"],
@@ -196,7 +196,7 @@ describe("argv helpers", () => {
   it("extracts routed config unset positionals with interleaved root options", () => {
     expect(
       getCommandPositionalsWithRootOptions(
-        ["node", "kaijibot", "config", "unset", "--profile", "work", "update.channel"],
+        ["node", "allbot", "config", "unset", "--profile", "work", "update.channel"],
         {
           commandPath: ["config", "unset"],
         },
@@ -207,7 +207,7 @@ describe("argv helpers", () => {
   it("returns null when routed command sees unknown options", () => {
     expect(
       getCommandPositionalsWithRootOptions(
-        ["node", "kaijibot", "config", "get", "--mystery", "value", "update.channel"],
+        ["node", "allbot", "config", "get", "--mystery", "value", "update.channel"],
         {
           commandPath: ["config", "get"],
           booleanFlags: ["--json"],
@@ -219,17 +219,17 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "returns first command token",
-      argv: ["node", "kaijibot", "agents", "list"],
+      argv: ["node", "allbot", "agents", "list"],
       expected: "agents",
     },
     {
       name: "returns null when no command exists",
-      argv: ["node", "kaijibot"],
+      argv: ["node", "allbot"],
       expected: null,
     },
     {
       name: "skips known root option values",
-      argv: ["node", "kaijibot", "--log-level", "debug", "status"],
+      argv: ["node", "allbot", "--log-level", "debug", "status"],
       expected: "status",
     },
   ])("returns primary command: $name", ({ argv, expected }) => {
@@ -239,13 +239,13 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "detects flag before terminator",
-      argv: ["node", "kaijibot", "status", "--json"],
+      argv: ["node", "allbot", "status", "--json"],
       flag: "--json",
       expected: true,
     },
     {
       name: "ignores flag after terminator",
-      argv: ["node", "kaijibot", "--", "--json"],
+      argv: ["node", "allbot", "--", "--json"],
       flag: "--json",
       expected: false,
     },
@@ -256,27 +256,27 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "value in next token",
-      argv: ["node", "kaijibot", "status", "--timeout", "5000"],
+      argv: ["node", "allbot", "status", "--timeout", "5000"],
       expected: "5000",
     },
     {
       name: "value in equals form",
-      argv: ["node", "kaijibot", "status", "--timeout=2500"],
+      argv: ["node", "allbot", "status", "--timeout=2500"],
       expected: "2500",
     },
     {
       name: "missing value",
-      argv: ["node", "kaijibot", "status", "--timeout"],
+      argv: ["node", "allbot", "status", "--timeout"],
       expected: null,
     },
     {
       name: "next token is another flag",
-      argv: ["node", "kaijibot", "status", "--timeout", "--json"],
+      argv: ["node", "allbot", "status", "--timeout", "--json"],
       expected: null,
     },
     {
       name: "flag appears after terminator",
-      argv: ["node", "kaijibot", "--", "--timeout=99"],
+      argv: ["node", "allbot", "--", "--timeout=99"],
       expected: undefined,
     },
   ])("extracts flag values: $name", ({ argv, expected }) => {
@@ -284,9 +284,9 @@ describe("argv helpers", () => {
   });
 
   it("parses verbose flags", () => {
-    expect(getVerboseFlag(["node", "kaijibot", "status", "--verbose"])).toBe(true);
-    expect(getVerboseFlag(["node", "kaijibot", "status", "--debug"])).toBe(false);
-    expect(getVerboseFlag(["node", "kaijibot", "status", "--debug"], { includeDebug: true })).toBe(
+    expect(getVerboseFlag(["node", "allbot", "status", "--verbose"])).toBe(true);
+    expect(getVerboseFlag(["node", "allbot", "status", "--debug"])).toBe(false);
+    expect(getVerboseFlag(["node", "allbot", "status", "--debug"], { includeDebug: true })).toBe(
       true,
     );
   });
@@ -294,22 +294,22 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "missing flag",
-      argv: ["node", "kaijibot", "status"],
+      argv: ["node", "allbot", "status"],
       expected: undefined,
     },
     {
       name: "missing value",
-      argv: ["node", "kaijibot", "status", "--timeout"],
+      argv: ["node", "allbot", "status", "--timeout"],
       expected: null,
     },
     {
       name: "valid positive integer",
-      argv: ["node", "kaijibot", "status", "--timeout", "5000"],
+      argv: ["node", "allbot", "status", "--timeout", "5000"],
       expected: 5000,
     },
     {
       name: "invalid integer",
-      argv: ["node", "kaijibot", "status", "--timeout", "nope"],
+      argv: ["node", "allbot", "status", "--timeout", "nope"],
       expected: undefined,
     },
   ])("parses positive integer flag values: $name", ({ argv, expected }) => {
@@ -319,63 +319,63 @@ describe("argv helpers", () => {
   it.each([
     {
       name: "keeps plain node argv",
-      rawArgs: ["node", "kaijibot", "status"],
-      expected: ["node", "kaijibot", "status"],
+      rawArgs: ["node", "allbot", "status"],
+      expected: ["node", "allbot", "status"],
     },
     {
       name: "keeps version-suffixed node binary",
-      rawArgs: ["node-22", "kaijibot", "status"],
-      expected: ["node-22", "kaijibot", "status"],
+      rawArgs: ["node-22", "allbot", "status"],
+      expected: ["node-22", "allbot", "status"],
     },
     {
       name: "keeps windows versioned node exe",
-      rawArgs: ["node-22.2.0.exe", "kaijibot", "status"],
-      expected: ["node-22.2.0.exe", "kaijibot", "status"],
+      rawArgs: ["node-22.2.0.exe", "allbot", "status"],
+      expected: ["node-22.2.0.exe", "allbot", "status"],
     },
     {
       name: "keeps dotted node binary",
-      rawArgs: ["node-22.2", "kaijibot", "status"],
-      expected: ["node-22.2", "kaijibot", "status"],
+      rawArgs: ["node-22.2", "allbot", "status"],
+      expected: ["node-22.2", "allbot", "status"],
     },
     {
       name: "keeps dotted node exe",
-      rawArgs: ["node-22.2.exe", "kaijibot", "status"],
-      expected: ["node-22.2.exe", "kaijibot", "status"],
+      rawArgs: ["node-22.2.exe", "allbot", "status"],
+      expected: ["node-22.2.exe", "allbot", "status"],
     },
     {
       name: "keeps absolute versioned node path",
-      rawArgs: ["/usr/bin/node-22.2.0", "kaijibot", "status"],
-      expected: ["/usr/bin/node-22.2.0", "kaijibot", "status"],
+      rawArgs: ["/usr/bin/node-22.2.0", "allbot", "status"],
+      expected: ["/usr/bin/node-22.2.0", "allbot", "status"],
     },
     {
       name: "keeps node24 shorthand",
-      rawArgs: ["node24", "kaijibot", "status"],
-      expected: ["node24", "kaijibot", "status"],
+      rawArgs: ["node24", "allbot", "status"],
+      expected: ["node24", "allbot", "status"],
     },
     {
       name: "keeps absolute node24 shorthand",
-      rawArgs: ["/usr/bin/node24", "kaijibot", "status"],
-      expected: ["/usr/bin/node24", "kaijibot", "status"],
+      rawArgs: ["/usr/bin/node24", "allbot", "status"],
+      expected: ["/usr/bin/node24", "allbot", "status"],
     },
     {
       name: "keeps windows node24 exe",
-      rawArgs: ["node24.exe", "kaijibot", "status"],
-      expected: ["node24.exe", "kaijibot", "status"],
+      rawArgs: ["node24.exe", "allbot", "status"],
+      expected: ["node24.exe", "allbot", "status"],
     },
     {
       name: "keeps nodejs binary",
-      rawArgs: ["nodejs", "kaijibot", "status"],
-      expected: ["nodejs", "kaijibot", "status"],
+      rawArgs: ["nodejs", "allbot", "status"],
+      expected: ["nodejs", "allbot", "status"],
     },
     {
       name: "prefixes fallback when first arg is not a node launcher",
-      rawArgs: ["node-dev", "kaijibot", "status"],
-      expected: ["node", "kaijibot", "node-dev", "kaijibot", "status"],
+      rawArgs: ["node-dev", "allbot", "status"],
+      expected: ["node", "allbot", "node-dev", "allbot", "status"],
     },
     {
       name: "prefixes fallback when raw args start at program name",
-      rawArgs: ["kaijibot", "status"],
-      expected: ["node", "kaijibot", "status"],
+      rawArgs: ["allbot", "status"],
+      expected: ["node", "allbot", "status"],
     },
     {
       name: "keeps bun execution argv",
@@ -384,7 +384,7 @@ describe("argv helpers", () => {
     },
   ] as const)("builds parse argv from raw args: $name", ({ rawArgs, expected }) => {
     const parsed = buildParseArgv({
-      programName: "kaijibot",
+      programName: "allbot",
       rawArgs: [...rawArgs],
     });
     expect(parsed).toEqual([...expected]);
@@ -392,24 +392,24 @@ describe("argv helpers", () => {
 
   it("builds parse argv from fallback args", () => {
     const fallbackArgv = buildParseArgv({
-      programName: "kaijibot",
+      programName: "allbot",
       fallbackArgv: ["status"],
     });
-    expect(fallbackArgv).toEqual(["node", "kaijibot", "status"]);
+    expect(fallbackArgv).toEqual(["node", "allbot", "status"]);
   });
 
   it.each([
-    { argv: ["node", "kaijibot", "status"], expected: false },
-    { argv: ["node", "kaijibot", "health"], expected: false },
-    { argv: ["node", "kaijibot", "sessions"], expected: false },
-    { argv: ["node", "kaijibot", "config", "get", "update"], expected: false },
-    { argv: ["node", "kaijibot", "config", "unset", "update"], expected: false },
-    { argv: ["node", "kaijibot", "models", "list"], expected: false },
-    { argv: ["node", "kaijibot", "models", "status"], expected: false },
-    { argv: ["node", "kaijibot", "update", "status", "--json"], expected: false },
-    { argv: ["node", "kaijibot", "agent", "--message", "hi"], expected: false },
-    { argv: ["node", "kaijibot", "agents", "list"], expected: true },
-    { argv: ["node", "kaijibot", "message", "send"], expected: true },
+    { argv: ["node", "allbot", "status"], expected: false },
+    { argv: ["node", "allbot", "health"], expected: false },
+    { argv: ["node", "allbot", "sessions"], expected: false },
+    { argv: ["node", "allbot", "config", "get", "update"], expected: false },
+    { argv: ["node", "allbot", "config", "unset", "update"], expected: false },
+    { argv: ["node", "allbot", "models", "list"], expected: false },
+    { argv: ["node", "allbot", "models", "status"], expected: false },
+    { argv: ["node", "allbot", "update", "status", "--json"], expected: false },
+    { argv: ["node", "allbot", "agent", "--message", "hi"], expected: false },
+    { argv: ["node", "allbot", "agents", "list"], expected: true },
+    { argv: ["node", "allbot", "message", "send"], expected: true },
   ] as const)("decides when to migrate state: $argv", ({ argv, expected }) => {
     expect(shouldMigrateState([...argv])).toBe(expected);
   });

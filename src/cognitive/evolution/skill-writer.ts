@@ -444,7 +444,7 @@ export class SkillPersistenceWriter {
       `usageCount: 0`,
       ...(this.options.agentSkills !== false ? ["provenance: agent"] : []),
       "metadata:",
-      "  kaijibot:",
+      "  allbot:",
       "    generated: true",
       "    version: 1",
       "---",

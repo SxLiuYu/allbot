@@ -12,8 +12,8 @@ const dotenvState = vi.hoisted(() => {
   return {
     state,
     loadDotEnv: vi.fn(() => {
-      state.profileAtDotenvLoad = process.env.KAIJIBOT_PROFILE;
-      state.containerAtDotenvLoad = process.env.KAIJIBOT_CONTAINER;
+      state.profileAtDotenvLoad = process.env.ALLBOT_PROFILE;
+      state.containerAtDotenvLoad = process.env.ALLBOT_CONTAINER;
     }),
   };
 });
@@ -49,7 +49,7 @@ vi.mock("../infra/runtime-guard.js", () => ({
 }));
 
 vi.mock("../infra/path-env.js", () => ({
-  ensureKaijiBotCliOnPath: vi.fn(),
+  ensureAllBotCliOnPath: vi.fn(),
 }));
 
 vi.mock("./route.js", () => ({
@@ -72,24 +72,24 @@ vi.mock("./container-target.js", async () => {
 import { runCli } from "./run-main.js";
 
 describe("runCli profile env bootstrap", () => {
-  const originalProfile = process.env.KAIJIBOT_PROFILE;
-  const originalStateDir = process.env.KAIJIBOT_STATE_DIR;
-  const originalConfigPath = process.env.KAIJIBOT_CONFIG_PATH;
-  const originalContainer = process.env.KAIJIBOT_CONTAINER;
-  const originalGatewayPort = process.env.KAIJIBOT_GATEWAY_PORT;
-  const originalGatewayUrl = process.env.KAIJIBOT_GATEWAY_URL;
-  const originalGatewayToken = process.env.KAIJIBOT_GATEWAY_TOKEN;
-  const originalGatewayPassword = process.env.KAIJIBOT_GATEWAY_PASSWORD;
+  const originalProfile = process.env.ALLBOT_PROFILE;
+  const originalStateDir = process.env.ALLBOT_STATE_DIR;
+  const originalConfigPath = process.env.ALLBOT_CONFIG_PATH;
+  const originalContainer = process.env.ALLBOT_CONTAINER;
+  const originalGatewayPort = process.env.ALLBOT_GATEWAY_PORT;
+  const originalGatewayUrl = process.env.ALLBOT_GATEWAY_URL;
+  const originalGatewayToken = process.env.ALLBOT_GATEWAY_TOKEN;
+  const originalGatewayPassword = process.env.ALLBOT_GATEWAY_PASSWORD;
 
   beforeEach(() => {
-    delete process.env.KAIJIBOT_PROFILE;
-    delete process.env.KAIJIBOT_STATE_DIR;
-    delete process.env.KAIJIBOT_CONFIG_PATH;
-    delete process.env.KAIJIBOT_CONTAINER;
-    delete process.env.KAIJIBOT_GATEWAY_PORT;
-    delete process.env.KAIJIBOT_GATEWAY_URL;
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-    delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
+    delete process.env.ALLBOT_PROFILE;
+    delete process.env.ALLBOT_STATE_DIR;
+    delete process.env.ALLBOT_CONFIG_PATH;
+    delete process.env.ALLBOT_CONTAINER;
+    delete process.env.ALLBOT_GATEWAY_PORT;
+    delete process.env.ALLBOT_GATEWAY_URL;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_PASSWORD;
     dotenvState.state.profileAtDotenvLoad = undefined;
     dotenvState.state.containerAtDotenvLoad = undefined;
     dotenvState.loadDotEnv.mockClear();
@@ -99,131 +99,131 @@ describe("runCli profile env bootstrap", () => {
 
   afterEach(() => {
     if (originalProfile === undefined) {
-      delete process.env.KAIJIBOT_PROFILE;
+      delete process.env.ALLBOT_PROFILE;
     } else {
-      process.env.KAIJIBOT_PROFILE = originalProfile;
+      process.env.ALLBOT_PROFILE = originalProfile;
     }
     if (originalContainer === undefined) {
-      delete process.env.KAIJIBOT_CONTAINER;
+      delete process.env.ALLBOT_CONTAINER;
     } else {
-      process.env.KAIJIBOT_CONTAINER = originalContainer;
+      process.env.ALLBOT_CONTAINER = originalContainer;
     }
     if (originalStateDir === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = originalStateDir;
+      process.env.ALLBOT_STATE_DIR = originalStateDir;
     }
     if (originalConfigPath === undefined) {
-      delete process.env.KAIJIBOT_CONFIG_PATH;
+      delete process.env.ALLBOT_CONFIG_PATH;
     } else {
-      process.env.KAIJIBOT_CONFIG_PATH = originalConfigPath;
+      process.env.ALLBOT_CONFIG_PATH = originalConfigPath;
     }
     if (originalGatewayPort === undefined) {
-      delete process.env.KAIJIBOT_GATEWAY_PORT;
+      delete process.env.ALLBOT_GATEWAY_PORT;
     } else {
-      process.env.KAIJIBOT_GATEWAY_PORT = originalGatewayPort;
+      process.env.ALLBOT_GATEWAY_PORT = originalGatewayPort;
     }
     if (originalGatewayUrl === undefined) {
-      delete process.env.KAIJIBOT_GATEWAY_URL;
+      delete process.env.ALLBOT_GATEWAY_URL;
     } else {
-      process.env.KAIJIBOT_GATEWAY_URL = originalGatewayUrl;
+      process.env.ALLBOT_GATEWAY_URL = originalGatewayUrl;
     }
     if (originalGatewayToken === undefined) {
-      delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+      delete process.env.ALLBOT_GATEWAY_TOKEN;
     } else {
-      process.env.KAIJIBOT_GATEWAY_TOKEN = originalGatewayToken;
+      process.env.ALLBOT_GATEWAY_TOKEN = originalGatewayToken;
     }
     if (originalGatewayPassword === undefined) {
-      delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
+      delete process.env.ALLBOT_GATEWAY_PASSWORD;
     } else {
-      process.env.KAIJIBOT_GATEWAY_PASSWORD = originalGatewayPassword;
+      process.env.ALLBOT_GATEWAY_PASSWORD = originalGatewayPassword;
     }
   });
 
   it("applies --profile before dotenv loading", async () => {
     fileState.hasCliDotEnv = true;
-    await runCli(["node", "kaijibot", "--profile", "rawdog", "status"]);
+    await runCli(["node", "allbot", "--profile", "rawdog", "status"]);
 
     expect(dotenvState.loadDotEnv).toHaveBeenCalledOnce();
     expect(dotenvState.state.profileAtDotenvLoad).toBe("rawdog");
-    expect(process.env.KAIJIBOT_PROFILE).toBe("rawdog");
+    expect(process.env.ALLBOT_PROFILE).toBe("rawdog");
   });
 
   it("rejects --container combined with --profile", async () => {
     await expect(
-      runCli(["node", "kaijibot", "--container", "demo", "--profile", "rawdog", "status"]),
+      runCli(["node", "allbot", "--container", "demo", "--profile", "rawdog", "status"]),
     ).rejects.toThrow("--container cannot be combined with --profile/--dev");
 
     expect(dotenvState.loadDotEnv).not.toHaveBeenCalled();
-    expect(process.env.KAIJIBOT_PROFILE).toBe("rawdog");
+    expect(process.env.ALLBOT_PROFILE).toBe("rawdog");
   });
 
   it("rejects --container combined with interleaved --profile", async () => {
     await expect(
-      runCli(["node", "kaijibot", "status", "--container", "demo", "--profile", "rawdog"]),
+      runCli(["node", "allbot", "status", "--container", "demo", "--profile", "rawdog"]),
     ).rejects.toThrow("--container cannot be combined with --profile/--dev");
   });
 
   it("rejects --container combined with interleaved --dev", async () => {
     await expect(
-      runCli(["node", "kaijibot", "status", "--container", "demo", "--dev"]),
+      runCli(["node", "allbot", "status", "--container", "demo", "--dev"]),
     ).rejects.toThrow("--container cannot be combined with --profile/--dev");
   });
 
   it("does not let dotenv change container target resolution", async () => {
     fileState.hasCliDotEnv = true;
     dotenvState.loadDotEnv.mockImplementationOnce(() => {
-      process.env.KAIJIBOT_CONTAINER = "demo";
-      dotenvState.state.profileAtDotenvLoad = process.env.KAIJIBOT_PROFILE;
-      dotenvState.state.containerAtDotenvLoad = process.env.KAIJIBOT_CONTAINER;
+      process.env.ALLBOT_CONTAINER = "demo";
+      dotenvState.state.profileAtDotenvLoad = process.env.ALLBOT_PROFILE;
+      dotenvState.state.containerAtDotenvLoad = process.env.ALLBOT_CONTAINER;
     });
 
-    await runCli(["node", "kaijibot", "status"]);
+    await runCli(["node", "allbot", "status"]);
 
     expect(dotenvState.loadDotEnv).toHaveBeenCalledOnce();
-    expect(process.env.KAIJIBOT_CONTAINER).toBe("demo");
+    expect(process.env.ALLBOT_CONTAINER).toBe("demo");
     expect(dotenvState.state.containerAtDotenvLoad).toBe("demo");
-    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "kaijibot", "status"]);
+    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "allbot", "status"]);
     expect(maybeRunCliInContainerMock).toHaveReturnedWith({
       handled: false,
-      argv: ["node", "kaijibot", "status"],
+      argv: ["node", "allbot", "status"],
     });
   });
 
-  it("allows container mode when KAIJIBOT_PROFILE is already set in env", async () => {
-    process.env.KAIJIBOT_PROFILE = "work";
+  it("allows container mode when ALLBOT_PROFILE is already set in env", async () => {
+    process.env.ALLBOT_PROFILE = "work";
 
     await expect(
-      runCli(["node", "kaijibot", "--container", "demo", "status"]),
+      runCli(["node", "allbot", "--container", "demo", "status"]),
     ).resolves.toBeUndefined();
   });
 
   it.each([
-    ["KAIJIBOT_GATEWAY_PORT", "19001"],
-    ["KAIJIBOT_GATEWAY_URL", "ws://127.0.0.1:18789"],
-    ["KAIJIBOT_GATEWAY_TOKEN", "demo-token"],
-    ["KAIJIBOT_GATEWAY_PASSWORD", "demo-password"],
+    ["ALLBOT_GATEWAY_PORT", "19001"],
+    ["ALLBOT_GATEWAY_URL", "ws://127.0.0.1:18789"],
+    ["ALLBOT_GATEWAY_TOKEN", "demo-token"],
+    ["ALLBOT_GATEWAY_PASSWORD", "demo-password"],
   ])("allows container mode when %s is set in env", async (key, value) => {
     process.env[key] = value;
 
     await expect(
-      runCli(["node", "kaijibot", "--container", "demo", "status"]),
+      runCli(["node", "allbot", "--container", "demo", "status"]),
     ).resolves.toBeUndefined();
   });
 
-  it("allows container mode when only KAIJIBOT_STATE_DIR is set in env", async () => {
-    process.env.KAIJIBOT_STATE_DIR = "/tmp/kaijibot-host-state";
+  it("allows container mode when only ALLBOT_STATE_DIR is set in env", async () => {
+    process.env.ALLBOT_STATE_DIR = "/tmp/allbot-host-state";
 
     await expect(
-      runCli(["node", "kaijibot", "--container", "demo", "status"]),
+      runCli(["node", "allbot", "--container", "demo", "status"]),
     ).resolves.toBeUndefined();
   });
 
-  it("allows container mode when only KAIJIBOT_CONFIG_PATH is set in env", async () => {
-    process.env.KAIJIBOT_CONFIG_PATH = "/tmp/kaijibot-host-state/kaijibot.json";
+  it("allows container mode when only ALLBOT_CONFIG_PATH is set in env", async () => {
+    process.env.ALLBOT_CONFIG_PATH = "/tmp/allbot-host-state/allbot.json";
 
     await expect(
-      runCli(["node", "kaijibot", "--container", "demo", "status"]),
+      runCli(["node", "allbot", "--container", "demo", "status"]),
     ).resolves.toBeUndefined();
   });
 });

@@ -49,7 +49,7 @@ export type PluginModuleLoaderStatsSnapshot = {
 const DEFAULT_PLUGIN_MODULE_LOADER_CACHE_ENTRIES = 128;
 const MAX_TRACKED_SOURCE_TRANSFORM_TARGETS = 24;
 const PLUGIN_SDK_IMPORT_SPECIFIER_PATTERN =
-  /(?:\bfrom\s*["']|\bimport\s*\(\s*["']|\brequire\s*\(\s*["'])(?:kaijibot|@kaiji-z)\/plugin-sdk(?:\/[^"']*)?["']/u;
+  /(?:\bfrom\s*["']|\bimport\s*\(\s*["']|\brequire\s*\(\s*["'])(?:allbot|@allbot)\/plugin-sdk(?:\/[^"']*)?["']/u;
 const requireForJiti = createRequire(import.meta.url);
 let createJitiLoaderFactory: PluginModuleLoaderFactory | undefined;
 const pluginModuleLoaderStats = {
@@ -219,10 +219,10 @@ function shouldForceSourceTransformForPluginSdkAlias(params: {
   aliasMap: Record<string, string>;
 }): boolean {
   if (
-    !params.aliasMap["kaijibot/plugin-sdk"] &&
-    !params.aliasMap["@kaiji-z/plugin-sdk"] &&
+    !params.aliasMap["allbot/plugin-sdk"] &&
+    !params.aliasMap["@allbot/plugin-sdk"] &&
     !Object.keys(params.aliasMap).some(
-      (key) => key.startsWith("kaijibot/plugin-sdk/") || key.startsWith("@kaiji-z/plugin-sdk/"),
+      (key) => key.startsWith("allbot/plugin-sdk/") || key.startsWith("@allbot/plugin-sdk/"),
     )
   ) {
     return false;

@@ -30,8 +30,8 @@ describe("restart-helper", () => {
 
   function expectWindowsRestartWaitOrdering(content: string, _port = 18789) {
     expect(content).toContain("# POWERSHELL");
-    expect(content).toContain("Invoke-KaijiBotSchtasksWithTimeout");
-    expect(content).toContain("Get-KaijiBotListenerPids");
+    expect(content).toContain("Invoke-AllBotSchtasksWithTimeout");
+    expect(content).toContain("Get-AllBotListenerPids");
     expect(content).toContain("Start-Sleep -Seconds 2");
     expect(content).toContain("Get-NetTCPConnection");
     expect(content).not.toContain("timeout /t 3 /nobreak >nul");
@@ -39,7 +39,7 @@ describe("restart-helper", () => {
     expect(content).toContain("Remove-Item -LiteralPath $scriptFile");
     expect(content).toContain("Remove-Item -LiteralPath $scriptDir");
     expect(content).not.toContain('del "%~f0"');
-    expect(content).not.toContain('rmdir "%KAIJIBOT_RESTART_SCRIPT_DIR%"');
+    expect(content).not.toContain('rmdir "%ALLBOT_RESTART_SCRIPT_DIR%"');
     // CMD section should only have exit /b, not exit /b %status%
     expect(content).toContain("exit /b %ERRORLEVEL%");
     expect(content).not.toContain("exit /b %status%");
@@ -58,21 +58,21 @@ describe("restart-helper", () => {
     it("creates a systemd restart script on Linux", async () => {
       Object.defineProperty(process, "platform", { value: "linux" });
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
       });
       expect(scriptPath.endsWith(".sh")).toBe(true);
       expect(content).toContain("#!/bin/sh");
-      expect(content).toContain("systemctl --user restart 'kaijibot-gateway.service'");
+      expect(content).toContain("systemctl --user restart 'allbot-gateway.service'");
       // Script should self-cleanup
       expect(content).toContain('rm -f "$0"');
       await cleanupScript(scriptPath);
     });
 
-    it("uses KAIJIBOT_SYSTEMD_UNIT override for systemd scripts", async () => {
+    it("uses ALLBOT_SYSTEMD_UNIT override for systemd scripts", async () => {
       Object.defineProperty(process, "platform", { value: "linux" });
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "default",
-        KAIJIBOT_SYSTEMD_UNIT: "custom-gateway",
+        ALLBOT_PROFILE: "default",
+        ALLBOT_SYSTEMD_UNIT: "custom-gateway",
       });
       expect(content).toContain("systemctl --user restart 'custom-gateway.service'");
       await cleanupScript(scriptPath);
@@ -83,27 +83,27 @@ describe("restart-helper", () => {
       process.getuid = () => 501;
 
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
       });
       expect(scriptPath.endsWith(".sh")).toBe(true);
       expect(content).toContain("#!/bin/sh");
-      expect(content).toContain("launchctl kickstart -k 'gui/501/ai.kaijibot.gateway'");
+      expect(content).toContain("launchctl kickstart -k 'gui/501/ai.allbot.gateway'");
       // Should clear disabled state and fall back to bootstrap when kickstart fails.
-      expect(content).toContain("launchctl enable 'gui/501/ai.kaijibot.gateway'");
+      expect(content).toContain("launchctl enable 'gui/501/ai.allbot.gateway'");
       expect(content).toContain("launchctl bootstrap 'gui/501'");
       expect(content).toContain('rm -f "$0"');
       await cleanupScript(scriptPath);
     });
 
-    it("uses KAIJIBOT_LAUNCHD_LABEL override on macOS", async () => {
+    it("uses ALLBOT_LAUNCHD_LABEL override on macOS", async () => {
       Object.defineProperty(process, "platform", { value: "darwin" });
       process.getuid = () => 501;
 
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "default",
-        KAIJIBOT_LAUNCHD_LABEL: "com.custom.kaijibot",
+        ALLBOT_PROFILE: "default",
+        ALLBOT_LAUNCHD_LABEL: "com.custom.allbot",
       });
-      expect(content).toContain("launchctl kickstart -k 'gui/501/com.custom.kaijibot'");
+      expect(content).toContain("launchctl kickstart -k 'gui/501/com.custom.allbot'");
       await cleanupScript(scriptPath);
     });
 
@@ -111,24 +111,24 @@ describe("restart-helper", () => {
       Object.defineProperty(process, "platform", { value: "win32" });
 
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
       });
       expect(scriptPath.endsWith(".cmd")).toBe(true);
       expect(content).toContain("@echo off");
       expect(content).toContain("# POWERSHELL");
-      expect(content).toContain("Invoke-KaijiBotSchtasksWithTimeout");
+      expect(content).toContain("Invoke-AllBotSchtasksWithTimeout");
       expectWindowsRestartWaitOrdering(content);
       await cleanupScript(scriptPath);
     });
 
-    it("uses KAIJIBOT_WINDOWS_TASK_NAME override on Windows", async () => {
+    it("uses ALLBOT_WINDOWS_TASK_NAME override on Windows", async () => {
       Object.defineProperty(process, "platform", { value: "win32" });
 
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "default",
-        KAIJIBOT_WINDOWS_TASK_NAME: "KaijiBot Gateway (custom)",
+        ALLBOT_PROFILE: "default",
+        ALLBOT_WINDOWS_TASK_NAME: "AllBot Gateway (custom)",
       });
-      expect(content).toContain("'KaijiBot Gateway (custom)'");
+      expect(content).toContain("'AllBot Gateway (custom)'");
       expectWindowsRestartWaitOrdering(content);
       await cleanupScript(scriptPath);
     });
@@ -139,7 +139,7 @@ describe("restart-helper", () => {
 
       const { scriptPath, content } = await prepareAndReadScript(
         {
-          KAIJIBOT_PROFILE: "default",
+          ALLBOT_PROFILE: "default",
         },
         customPort,
       );
@@ -151,9 +151,9 @@ describe("restart-helper", () => {
     it("uses custom profile in service names", async () => {
       Object.defineProperty(process, "platform", { value: "linux" });
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "production",
+        ALLBOT_PROFILE: "production",
       });
-      expect(content).toContain("kaijibot-gateway-production.service");
+      expect(content).toContain("allbot-gateway-production.service");
       await cleanupScript(scriptPath);
     });
 
@@ -162,9 +162,9 @@ describe("restart-helper", () => {
       process.getuid = () => 502;
 
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "staging",
+        ALLBOT_PROFILE: "staging",
       });
-      expect(content).toContain("gui/502/ai.kaijibot.staging");
+      expect(content).toContain("gui/502/ai.allbot.staging");
       await cleanupScript(scriptPath);
     });
 
@@ -172,9 +172,9 @@ describe("restart-helper", () => {
       Object.defineProperty(process, "platform", { value: "win32" });
 
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "production",
+        ALLBOT_PROFILE: "production",
       });
-      expect(content).toContain("'KaijiBot Gateway (production)'");
+      expect(content).toContain("'AllBot Gateway (production)'");
       expectWindowsRestartWaitOrdering(content);
       await cleanupScript(scriptPath);
     });
@@ -192,7 +192,7 @@ describe("restart-helper", () => {
         .mockRejectedValueOnce(new Error("simulated write failure"));
 
       const scriptPath = await prepareRestartScript({
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
       });
 
       expect(scriptPath).toBeNull();
@@ -202,7 +202,7 @@ describe("restart-helper", () => {
     it("escapes single quotes in profile names for shell scripts", async () => {
       Object.defineProperty(process, "platform", { value: "linux" });
       const { scriptPath, content } = await prepareAndReadScript({
-        KAIJIBOT_PROFILE: "it's-a-test",
+        ALLBOT_PROFILE: "it's-a-test",
       });
       // Single quotes should be escaped with '\'' pattern
       expect(content).not.toContain("it's");
@@ -216,7 +216,7 @@ describe("restart-helper", () => {
 
       const { scriptPath, content } = await prepareAndReadScript({
         HOME: "/Users/testuser",
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
       });
       // The plist path must contain the resolved home dir, not literal $HOME
       expect(content).toMatch(/[\\/]Users[\\/]testuser[\\/]Library[\\/]LaunchAgents[\\/]/);
@@ -230,7 +230,7 @@ describe("restart-helper", () => {
 
       const { scriptPath, content } = await prepareAndReadScript({
         HOME: "/Users/envhome",
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
       });
       expect(content).toMatch(/[\\/]Users[\\/]envhome[\\/]Library[\\/]LaunchAgents[\\/]/);
       await cleanupScript(scriptPath);
@@ -242,17 +242,17 @@ describe("restart-helper", () => {
 
       const { scriptPath, content } = await prepareAndReadScript({
         HOME: "/Users/testuser",
-        KAIJIBOT_LAUNCHD_LABEL: "ai.kaijibot.it's-a-test",
+        ALLBOT_LAUNCHD_LABEL: "ai.allbot.it's-a-test",
       });
       // The plist path must also shell-escape the label to prevent injection
-      expect(content).toContain("ai.kaijibot.it'\\''s-a-test.plist");
+      expect(content).toContain("ai.allbot.it'\\''s-a-test.plist");
       await cleanupScript(scriptPath);
     });
 
     it("rejects unsafe batch profile names on Windows", async () => {
       Object.defineProperty(process, "platform", { value: "win32" });
       const scriptPath = await prepareRestartScript({
-        KAIJIBOT_PROFILE: "test&whoami",
+        ALLBOT_PROFILE: "test&whoami",
       });
 
       expect(scriptPath).toBeNull();

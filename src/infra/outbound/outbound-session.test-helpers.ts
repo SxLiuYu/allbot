@@ -1,5 +1,5 @@
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   buildChannelOutboundSessionRoute,
   stripChannelTargetPrefix,
@@ -44,7 +44,7 @@ function createSessionRouteTestPlugin(params: {
 }
 
 function buildThreadedChannelRoute(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   channel: string;
   accountId?: string | null;

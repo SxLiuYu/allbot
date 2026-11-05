@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core";
 import { describe, expect, it } from "vitest";
 import {
   buildMemoryFlushPlan,
@@ -54,7 +54,7 @@ describe.skipIf(process.env.CI)("buildPromptSection", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("buildMemoryFlushPlan", () => {
   const cfg = {
     agents: {
@@ -63,7 +63,7 @@ describe.skipIf(process.env.CI)("buildMemoryFlushPlan", () => {
         timeFormat: "12",
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 
   it("replaces YYYY-MM-DD using user timezone and appends current time", () => {
     const plan = buildMemoryFlushPlan({

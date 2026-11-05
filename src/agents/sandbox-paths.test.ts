@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { describe, expect, it, vi } from "vitest";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { resolveSandboxedMediaSource } from "./sandbox-paths.js";
 
 async function withSandboxRoot<T>(run: (sandboxDir: string) => Promise<T>) {
@@ -28,9 +28,9 @@ function makeTmpProbePath(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}.txt`;
 }
 
-async function withOutsideHardlinkInKaijiBotTmp<T>(
+async function withOutsideHardlinkInAllBotTmp<T>(
   params: {
-    kaijiBotTmpDir: string;
+    allBotTmpDir: string;
     hardlinkPrefix: string;
     symlinkPrefix?: string;
   },
@@ -38,16 +38,16 @@ async function withOutsideHardlinkInKaijiBotTmp<T>(
 ): Promise<void> {
   const outsideDir = await fs.mkdtemp(path.join(process.cwd(), "sandbox-media-hardlink-outside-"));
   const outsideFile = path.join(outsideDir, "outside-secret.txt");
-  const hardlinkPath = path.join(params.kaijiBotTmpDir, makeTmpProbePath(params.hardlinkPrefix));
+  const hardlinkPath = path.join(params.allBotTmpDir, makeTmpProbePath(params.hardlinkPrefix));
   const symlinkPath = params.symlinkPrefix
-    ? path.join(params.kaijiBotTmpDir, makeTmpProbePath(params.symlinkPrefix))
+    ? path.join(params.allBotTmpDir, makeTmpProbePath(params.symlinkPrefix))
     : undefined;
   try {
-    if (isPathInside(params.kaijiBotTmpDir, outsideFile)) {
+    if (isPathInside(params.allBotTmpDir, outsideFile)) {
       return;
     }
     await fs.writeFile(outsideFile, "secret", "utf8");
-    await fs.mkdir(params.kaijiBotTmpDir, { recursive: true });
+    await fs.mkdir(params.allBotTmpDir, { recursive: true });
     try {
       await fs.link(outsideFile, hardlinkPath);
     } catch (err) {
@@ -70,24 +70,24 @@ async function withOutsideHardlinkInKaijiBotTmp<T>(
 }
 
 describe("resolveSandboxedMediaSource", () => {
-  const kaijiBotTmpDir = resolvePreferredKaijiBotTmpDir();
+  const allBotTmpDir = resolvePreferredAllBotTmpDir();
 
   // Group 1: /tmp paths (the bug fix)
   it.each([
     {
-      name: "absolute paths under preferred KaijiBot tmp root",
-      media: path.join(kaijiBotTmpDir, "image.png"),
-      expected: path.join(kaijiBotTmpDir, "image.png"),
+      name: "absolute paths under preferred AllBot tmp root",
+      media: path.join(allBotTmpDir, "image.png"),
+      expected: path.join(allBotTmpDir, "image.png"),
     },
     {
-      name: "file:// URLs pointing to preferred KaijiBot tmp root",
-      media: pathToFileURL(path.join(kaijiBotTmpDir, "photo.png")).href,
-      expected: path.join(kaijiBotTmpDir, "photo.png"),
+      name: "file:// URLs pointing to preferred AllBot tmp root",
+      media: pathToFileURL(path.join(allBotTmpDir, "photo.png")).href,
+      expected: path.join(allBotTmpDir, "photo.png"),
     },
     {
-      name: "nested paths under preferred KaijiBot tmp root",
-      media: path.join(kaijiBotTmpDir, "subdir", "deep", "file.png"),
-      expected: path.join(kaijiBotTmpDir, "subdir", "deep", "file.png"),
+      name: "nested paths under preferred AllBot tmp root",
+      media: path.join(allBotTmpDir, "subdir", "deep", "file.png"),
+      expected: path.join(allBotTmpDir, "subdir", "deep", "file.png"),
     },
   ])("allows $name", async ({ media, expected }) => {
     await withSandboxRoot(async (sandboxDir) => {
@@ -144,12 +144,12 @@ describe("resolveSandboxedMediaSource", () => {
     },
     {
       name: "path traversal through tmpdir",
-      media: path.join(kaijiBotTmpDir, "..", "etc", "passwd"),
+      media: path.join(allBotTmpDir, "..", "etc", "passwd"),
       expected: /sandbox/i,
     },
     {
-      name: "absolute paths under host tmp outside kaijibot tmp root",
-      media: path.join(os.tmpdir(), "outside-kaijibot", "passwd"),
+      name: "absolute paths under host tmp outside allbot tmp root",
+      media: path.join(os.tmpdir(), "outside-allbot", "passwd"),
       expected: /sandbox/i,
     },
     {
@@ -178,19 +178,19 @@ describe("resolveSandboxedMediaSource", () => {
     });
   });
 
-  it("rejects symlinked KaijiBot tmp paths escaping tmp root", async () => {
+  it("rejects symlinked AllBot tmp paths escaping tmp root", async () => {
     if (process.platform === "win32") {
       return;
     }
     const outsideTmpTarget = path.resolve(process.cwd(), "package.json");
-    if (isPathInside(kaijiBotTmpDir, outsideTmpTarget)) {
+    if (isPathInside(allBotTmpDir, outsideTmpTarget)) {
       return;
     }
 
     await withSandboxRoot(async (sandboxDir) => {
       await fs.access(outsideTmpTarget);
-      await fs.mkdir(kaijiBotTmpDir, { recursive: true });
-      const symlinkPath = path.join(kaijiBotTmpDir, `tmp-link-escape-${process.pid}`);
+      await fs.mkdir(allBotTmpDir, { recursive: true });
+      const symlinkPath = path.join(allBotTmpDir, `tmp-link-escape-${process.pid}`);
       await fs.symlink(outsideTmpTarget, symlinkPath);
       try {
         await expectSandboxRejection(symlinkPath, sandboxDir, /symlink|sandbox/i);
@@ -220,13 +220,13 @@ describe("resolveSandboxedMediaSource", () => {
     });
   });
 
-  it("rejects hardlinked KaijiBot tmp paths to outside files", async () => {
+  it("rejects hardlinked AllBot tmp paths to outside files", async () => {
     if (process.platform === "win32") {
       return;
     }
-    await withOutsideHardlinkInKaijiBotTmp(
+    await withOutsideHardlinkInAllBotTmp(
       {
-        kaijiBotTmpDir,
+        allBotTmpDir,
         hardlinkPrefix: "sandbox-media-hardlink",
       },
       async ({ hardlinkPath }) => {
@@ -237,13 +237,13 @@ describe("resolveSandboxedMediaSource", () => {
     );
   });
 
-  it("rejects symlinked KaijiBot tmp paths to hardlinked outside files", async () => {
+  it("rejects symlinked AllBot tmp paths to hardlinked outside files", async () => {
     if (process.platform === "win32") {
       return;
     }
-    await withOutsideHardlinkInKaijiBotTmp(
+    await withOutsideHardlinkInAllBotTmp(
       {
-        kaijiBotTmpDir,
+        allBotTmpDir,
         hardlinkPrefix: "sandbox-media-hardlink-target",
         symlinkPrefix: "sandbox-media-hardlink-symlink",
       },

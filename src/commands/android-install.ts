@@ -25,18 +25,18 @@ const PROPS_FILE_MODE = 0o600;
 const BOOT_SCRIPT_BODY = [
   "#!/data/data/com.termux/files/usr/bin/bash",
   "termux-wake-lock",
-  `kaijibot gateway --port ${GATEWAY_PORT} >> ~/.kaijibot/gateway.log 2>&1 &`,
+  `allbot gateway --port ${GATEWAY_PORT} >> ~/.allbot/gateway.log 2>&1 &`,
   "",
 ].join("\n");
 
-const BASHRC_AUTOSTART_MARKER = "# >>> kaijibot autostart >>>";
-const BASHRC_AUTOSTART_END = "# <<< kaijibot autostart <<<";
+const BASHRC_AUTOSTART_MARKER = "# >>> allbot autostart >>>";
+const BASHRC_AUTOSTART_END = "# <<< allbot autostart <<<";
 const BASHRC_AUTOSTART_BODY = [
   BASHRC_AUTOSTART_MARKER,
-  'if ! pgrep -f "kaijibot gateway" > /dev/null 2>&1; then',
+  'if ! pgrep -f "allbot gateway" > /dev/null 2>&1; then',
   "  termux-wake-lock 2>/dev/null",
-  `  kaijibot gateway --port ${GATEWAY_PORT} >> ~/.kaijibot/gateway.log 2>&1 &`,
-  '  echo "KaijiBot gateway started (port ' + GATEWAY_PORT + ')"',
+  `  allbot gateway --port ${GATEWAY_PORT} >> ~/.allbot/gateway.log 2>&1 &`,
+  '  echo "AllBot gateway started (port ' + GATEWAY_PORT + ')"',
   "fi",
   BASHRC_AUTOSTART_END,
   "",
@@ -51,7 +51,7 @@ export async function runAndroidInstall(
   runtime: OutputRuntimeEnv,
   opts: AndroidInstallOptions = {},
 ): Promise<void> {
-  runtime.log(theme.heading("KaijiBot Android/Termux Setup"));
+  runtime.log(theme.heading("AllBot Android/Termux Setup"));
   runtime.log("");
 
   if (!isTermux()) {
@@ -66,7 +66,7 @@ export async function runAndroidInstall(
   await ensureTermuxUpToDate(runtime);
   await ensureNode(runtime);
   await ensureRequiredPackages(runtime);
-  await ensureKaijiBot(runtime);
+  await ensureAllBot(runtime);
   await installSharpWasm32(runtime);
   await writeBootScript(runtime);
   await writeBashrcAutostart(runtime);
@@ -249,22 +249,22 @@ function runPkg(runtime: OutputRuntimeEnv, args: readonly string[]): void {
   }
 }
 
-async function ensureKaijiBot(runtime: OutputRuntimeEnv): Promise<void> {
-  const version = runText("kaijibot", ["--version"]);
+async function ensureAllBot(runtime: OutputRuntimeEnv): Promise<void> {
+  const version = runText("allbot", ["--version"]);
   if (version.length > 0) {
-    runtime.log(`  ${theme.success("✓")} KaijiBot CLI present (${theme.muted(version)})`);
+    runtime.log(`  ${theme.success("✓")} AllBot CLI present (${theme.muted(version)})`);
     return;
   }
-  runtime.log(`  ${theme.warn("→")} KaijiBot CLI not found. Installing via npm...`);
-  const install = run("npm", ["install", "-g", "kaijibot", "--force"], { stdio: "inherit" });
+  runtime.log(`  ${theme.warn("→")} AllBot CLI not found. Installing via npm...`);
+  const install = run("npm", ["install", "-g", "allbot", "--force"], { stdio: "inherit" });
   if (install.error || install.status !== 0) {
     runtime.error(
-      `Failed to install KaijiBot. Run ${theme.command("npm install -g kaijibot --force")} manually.`,
+      `Failed to install AllBot. Run ${theme.command("npm install -g allbot --force")} manually.`,
     );
     runtime.exit(1);
     return;
   }
-  runtime.log(`  ${theme.success("✓")} KaijiBot installed`);
+  runtime.log(`  ${theme.success("✓")} AllBot installed`);
 }
 
 async function installSharpWasm32(runtime: OutputRuntimeEnv): Promise<void> {
@@ -284,7 +284,7 @@ async function installSharpWasm32(runtime: OutputRuntimeEnv): Promise<void> {
 
 async function writeBootScript(runtime: OutputRuntimeEnv): Promise<void> {
   const bootDir = path.join(os.homedir(), ".termux", "boot");
-  const bootPath = path.join(bootDir, "start-kaijibot.sh");
+  const bootPath = path.join(bootDir, "start-allbot.sh");
   await writeTextAtomic(bootPath, BOOT_SCRIPT_BODY, {
     mode: BOOT_SCRIPT_MODE,
     ensureDirMode: 0o755,
@@ -296,12 +296,12 @@ async function writeBootScript(runtime: OutputRuntimeEnv): Promise<void> {
   }
   runtime.log(`  ${theme.success("✓")} Boot script written: ${theme.accent(bootPath)}`);
 
-  const kaijiDir = path.join(os.homedir(), ".kaijibot");
-  const startScriptPath = path.join(kaijiDir, "start-gateway.sh");
+  const allbotDir = path.join(os.homedir(), ".allbot");
+  const startScriptPath = path.join(allbotDir, "start-gateway.sh");
   const startScriptBody = [
     "#!/data/data/com.termux/files/usr/bin/bash",
     "termux-wake-lock 2>/dev/null",
-    `nohup kaijibot gateway --port ${GATEWAY_PORT} >> ~/.kaijibot/gateway.log 2>&1 &`,
+    `nohup allbot gateway --port ${GATEWAY_PORT} >> ~/.allbot/gateway.log 2>&1 &`,
     "",
   ].join("\n");
   await writeTextAtomic(startScriptPath, startScriptBody, {
@@ -480,15 +480,15 @@ async function runOnboard(runtime: OutputRuntimeEnv, opts: AndroidInstallOptions
 
   if (opts.nonInteractive) {
     runtime.log(
-      `  Skipping onboard (--non-interactive). Run ${theme.command("kaijibot onboard")} later.`,
+      `  Skipping onboard (--non-interactive). Run ${theme.command("allbot onboard")} later.`,
     );
     return;
   }
 
-  const result = run("kaijibot", ["onboard"], { stdio: "inherit" });
+  const result = run("allbot", ["onboard"], { stdio: "inherit" });
   if (result.error || (result.status !== null && result.status !== 0)) {
     runtime.log(
-      `  ${theme.warn("⚠")} onboard exited with an error. Re-run: ${theme.command("kaijibot onboard")}`,
+      `  ${theme.warn("⚠")} onboard exited with an error. Re-run: ${theme.command("allbot onboard")}`,
     );
   }
 }
@@ -497,36 +497,36 @@ async function startGateway(runtime: OutputRuntimeEnv): Promise<void> {
   runtime.log("");
   runtime.log(theme.heading("Starting Gateway..."));
 
-  const existingPid = runText("pgrep", ["-f", "kaijibot"]);
+  const existingPid = runText("pgrep", ["-f", "allbot"]);
   if (existingPid.length > 0) {
     runtime.log(`  Stopping existing gateway (PID ${existingPid})...`);
     run("bash", [
       "-c",
-      "pkill -f kaijibot-gateway 2>/dev/null; pkill -f 'kaijibot gateway' 2>/dev/null",
+      "pkill -f allbot-gateway 2>/dev/null; pkill -f 'allbot gateway' 2>/dev/null",
     ]);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     runtime.log(`  ${theme.success("✓")} Stopped old gateway`);
   }
 
   spawnSync("termux-wake-lock", [], { stdio: "ignore" });
-  const logPath = path.join(os.homedir(), ".kaijibot", "gateway.log");
+  const logPath = path.join(os.homedir(), ".allbot", "gateway.log");
   spawnSync(
     "bash",
-    ["-c", `nohup kaijibot gateway --port ${GATEWAY_PORT} >> "${logPath}" 2>&1 &`],
+    ["-c", `nohup allbot gateway --port ${GATEWAY_PORT} >> "${logPath}" 2>&1 &`],
     {
       stdio: "ignore",
     },
   );
   await new Promise((resolve) => setTimeout(resolve, 3000));
-  const alive = runText("pgrep", ["-f", "kaijibot"]);
+  const alive = runText("pgrep", ["-f", "allbot"]);
   if (alive.length > 0) {
     runtime.log(`  ${theme.success("✓")} Gateway started on port ${GATEWAY_PORT}`);
-    runtime.log(`  ${theme.muted("    Logs: tail -f ~/.kaijibot/gateway.log")}`);
+    runtime.log(`  ${theme.muted("    Logs: tail -f ~/.allbot/gateway.log")}`);
   } else {
     runtime.log(`  ${theme.warn("⚠")} Gateway may not have started. Check logs:`);
-    runtime.log(`  ${theme.muted("    tail -20 ~/.kaijibot/gateway.log")}`);
+    runtime.log(`  ${theme.muted("    tail -20 ~/.allbot/gateway.log")}`);
     runtime.log(
-      `  ${theme.muted(`    Or start manually: kaijibot gateway --port ${GATEWAY_PORT}`)}`,
+      `  ${theme.muted(`    Or start manually: allbot gateway --port ${GATEWAY_PORT}`)}`,
     );
   }
 }

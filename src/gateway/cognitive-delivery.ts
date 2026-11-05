@@ -1,5 +1,5 @@
 import { OPERATOR_USER_ID } from "../cognitive/identity.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { loadSessionStore } from "../config/sessions/store-load.js";
 import { isCronSessionKey, isSubagentSessionKey } from "../sessions/session-key-utils.js";
@@ -12,7 +12,7 @@ export type CognitiveDeliveryTarget = {
 };
 
 export function findSessionKeyForUserId(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   userId: string,
   agentId: string = "main",
 ): string | undefined {
@@ -58,7 +58,7 @@ export function findSessionKeyForUserId(
  * exists or if the session has no channel binding (e.g. lastChannel missing).
  */
 export function resolveCognitiveDeliveryTarget(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   userId: string,
   agentId: string = "main",
 ): CognitiveDeliveryTarget | undefined {

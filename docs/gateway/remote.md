@@ -36,7 +36,7 @@ This is ideal when your laptop sleeps often but you want the agent always-on.
 
 The laptop does **not** run the agent. It connects remotely:
 
-- Use the macOS app’s **Remote over SSH** mode (Settings → General → “KaijiBot runs”).
+- Use the macOS app’s **Remote over SSH** mode (Settings → General → “AllBot runs”).
 - The app opens and manages the tunnel, so WebChat + health checks “just work.”
 
 Runbook: [macOS remote access](/platforms/mac/remote).
@@ -76,10 +76,10 @@ ssh -N -L 18789:127.0.0.1:18789 user@host
 
 With the tunnel up:
 
-- `kaijibot health` and `kaijibot status --deep` now reach the remote gateway via `ws://127.0.0.1:18789`.
-- `kaijibot gateway status`, `kaijibot gateway health`, `kaijibot gateway probe`, and `kaijibot gateway call` can also target the forwarded URL via `--url` when needed.
+- `allbot health` and `allbot status --deep` now reach the remote gateway via `ws://127.0.0.1:18789`.
+- `allbot gateway status`, `allbot gateway health`, `allbot gateway probe`, and `allbot gateway call` can also target the forwarded URL via `--url` when needed.
 
-Note: replace `18789` with your configured `gateway.port` (or `--port`/`KAIJIBOT_GATEWAY_PORT`).
+Note: replace `18789` with your configured `gateway.port` (or `--port`/`ALLBOT_GATEWAY_PORT`).
 Note: when you pass `--url`, the CLI does not fall back to config or environment credentials.
 Include `--token` or `--password` explicitly. Missing explicit credentials is an error.
 
@@ -108,16 +108,16 @@ Gateway credential resolution follows one shared contract across call/probe/stat
 - Explicit credentials (`--token`, `--password`, or tool `gatewayToken`) always win on call paths that accept explicit auth.
 - URL override safety:
   - CLI URL overrides (`--url`) never reuse implicit config/env credentials.
-  - Env URL overrides (`KAIJIBOT_GATEWAY_URL`) may use env credentials only (`KAIJIBOT_GATEWAY_TOKEN` / `KAIJIBOT_GATEWAY_PASSWORD`).
+  - Env URL overrides (`ALLBOT_GATEWAY_URL`) may use env credentials only (`ALLBOT_GATEWAY_TOKEN` / `ALLBOT_GATEWAY_PASSWORD`).
 - Local mode defaults:
-  - token: `KAIJIBOT_GATEWAY_TOKEN` -> `gateway.auth.token` -> `gateway.remote.token` (remote fallback applies only when local auth token input is unset)
-  - password: `KAIJIBOT_GATEWAY_PASSWORD` -> `gateway.auth.password` -> `gateway.remote.password` (remote fallback applies only when local auth password input is unset)
+  - token: `ALLBOT_GATEWAY_TOKEN` -> `gateway.auth.token` -> `gateway.remote.token` (remote fallback applies only when local auth token input is unset)
+  - password: `ALLBOT_GATEWAY_PASSWORD` -> `gateway.auth.password` -> `gateway.remote.password` (remote fallback applies only when local auth password input is unset)
 - Remote mode defaults:
-  - token: `gateway.remote.token` -> `KAIJIBOT_GATEWAY_TOKEN` -> `gateway.auth.token`
-  - password: `KAIJIBOT_GATEWAY_PASSWORD` -> `gateway.remote.password` -> `gateway.auth.password`
+  - token: `gateway.remote.token` -> `ALLBOT_GATEWAY_TOKEN` -> `gateway.auth.token`
+  - password: `ALLBOT_GATEWAY_PASSWORD` -> `gateway.remote.password` -> `gateway.auth.password`
 - Node-host local-mode exception: `gateway.remote.token` / `gateway.remote.password` are ignored.
 - Remote probe/status token checks are strict by default: they use `gateway.remote.token` only (no local token fallback) when targeting remote mode.
-- Gateway env overrides use `KAIJIBOT_GATEWAY_*` only.
+- Gateway env overrides use `ALLBOT_GATEWAY_*` only.
 
 ## Chat UI over SSH
 
@@ -138,7 +138,7 @@ Short version: **keep the Gateway loopback-only** unless you’re sure you need 
 
 - **Loopback + SSH/Tailscale Serve** is the safest default (no public exposure).
 - Plaintext `ws://` is loopback-only by default. For trusted private networks,
-  set `KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS=1` on the client process as break-glass.
+  set `ALLBOT_ALLOW_INSECURE_PRIVATE_WS=1` on the client process as break-glass.
 - **Non-loopback binds** (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) must use gateway auth: token, password, or an identity-aware reverse proxy with `gateway.auth.mode: "trusted-proxy"`.
 - `gateway.remote.token` / `.password` are client credential sources. They do **not** configure server auth by themselves.
 - Local call paths can use `gateway.remote.*` as fallback only when `gateway.auth.*` is unset.
@@ -184,12 +184,12 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 Store the token in config so it persists across restarts:
 
 ```bash
-kaijibot config set gateway.remote.token "<your-token>"
+allbot config set gateway.remote.token "<your-token>"
 ```
 
 #### Step 4: create the LaunchAgent
 
-Save this as `~/Library/LaunchAgents/ai.kaijibot.ssh-tunnel.plist`:
+Save this as `~/Library/LaunchAgents/ai.allbot.ssh-tunnel.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -197,7 +197,7 @@ Save this as `~/Library/LaunchAgents/ai.kaijibot.ssh-tunnel.plist`:
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>ai.kaijibot.ssh-tunnel</string>
+    <string>ai.allbot.ssh-tunnel</string>
     <key>ProgramArguments</key>
     <array>
         <string>/usr/bin/ssh</string>
@@ -215,12 +215,12 @@ Save this as `~/Library/LaunchAgents/ai.kaijibot.ssh-tunnel.plist`:
 #### Step 5: load the LaunchAgent
 
 ```bash
-launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.kaijibot.ssh-tunnel.plist
+launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.allbot.ssh-tunnel.plist
 ```
 
 The tunnel will start automatically at login, restart on crash, and keep the forwarded port live.
 
-Note: if you have a leftover `com.kaijibot.ssh-tunnel` LaunchAgent from an older setup, unload and delete it.
+Note: if you have a leftover `com.allbot.ssh-tunnel` LaunchAgent from an older setup, unload and delete it.
 
 #### Troubleshooting
 
@@ -234,13 +234,13 @@ lsof -i :18789
 Restart the tunnel:
 
 ```bash
-launchctl kickstart -k gui/$UID/ai.kaijibot.ssh-tunnel
+launchctl kickstart -k gui/$UID/ai.allbot.ssh-tunnel
 ```
 
 Stop the tunnel:
 
 ```bash
-launchctl bootout gui/$UID/ai.kaijibot.ssh-tunnel
+launchctl bootout gui/$UID/ai.allbot.ssh-tunnel
 ```
 
 | Config entry                         | What it does                                                 |

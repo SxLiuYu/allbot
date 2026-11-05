@@ -1,3 +1,3 @@
-import { describeModelStudioProviderDiscoveryContract } from "kaijibot/plugin-sdk/provider-test-contracts";
+import { describeModelStudioProviderDiscoveryContract } from "allbot/plugin-sdk/provider-test-contracts";
 
 describeModelStudioProviderDiscoveryContract();

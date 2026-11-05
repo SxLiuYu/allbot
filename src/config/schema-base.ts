@@ -11,7 +11,7 @@ import {
 import { FIELD_LABELS } from "./schema.labels.js";
 import { asSchemaObject, cloneSchema } from "./schema.shared.js";
 import { applyDerivedTags } from "./schema.tags.js";
-import { KaijiBotSchema } from "./zod-schema.js";
+import { AllBotSchema } from "./zod-schema.js";
 
 type ConfigSchema = Record<string, unknown>;
 
@@ -229,18 +229,18 @@ function computeBaseConfigSchemaStablePayload(): BaseConfigSchemaStablePayload {
       version: baseConfigSchemaStablePayload.version,
     };
   }
-  const schema = KaijiBotSchema.toJSONSchema({
+  const schema = AllBotSchema.toJSONSchema({
     target: "draft-07",
     unrepresentable: "any",
   });
-  schema.title = "KaijiBotConfig";
+  schema.title = "AllBotConfig";
   const schemaRoot = asJsonSchemaObject(schema);
   if (schemaRoot) {
     applyFieldDocumentation(schemaRoot, buildFieldDocumentation());
   }
-  const baseHints = mapSensitivePaths(KaijiBotSchema, "", buildBaseHints());
+  const baseHints = mapSensitivePaths(AllBotSchema, "", buildBaseHints());
   const sensitiveUrlPaths = collectMatchingSchemaPaths(
-    KaijiBotSchema,
+    AllBotSchema,
     "",
     isSensitiveUrlConfigPath,
   );

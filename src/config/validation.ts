@@ -34,9 +34,9 @@ import { GENERATED_BUNDLED_CHANNEL_CONFIG_METADATA } from "./bundled-channel-con
 import { collectChannelSchemaMetadata } from "./channel-config-metadata.js";
 import { findLegacyConfigIssues } from "./legacy.js";
 import { materializeRuntimeConfig } from "./materialize.js";
-import type { KaijiBotConfig, ConfigValidationIssue } from "./types.js";
+import type { AllBotConfig, ConfigValidationIssue } from "./types.js";
 import { coerceSecretRef } from "./types.secrets.js";
-import { KaijiBotSchema } from "./zod-schema.js";
+import { AllBotSchema } from "./zod-schema.js";
 
 const LEGACY_REMOVED_PLUGIN_IDS = new Set(["google-antigravity-auth", "google-gemini-cli-auth"]);
 
@@ -484,7 +484,7 @@ function isWorkspaceAvatarPath(value: string, workspaceDir: string): boolean {
   return isPathWithinRoot(workspaceRoot, resolved);
 }
 
-function validateIdentityAvatar(config: KaijiBotConfig): ConfigValidationIssue[] {
+function validateIdentityAvatar(config: AllBotConfig): ConfigValidationIssue[] {
   const agents = config.agents?.list;
   if (!Array.isArray(agents) || agents.length === 0) {
     return [];
@@ -534,7 +534,7 @@ function validateIdentityAvatar(config: KaijiBotConfig): ConfigValidationIssue[]
   return issues;
 }
 
-function validateGatewayTailscaleBind(config: KaijiBotConfig): ConfigValidationIssue[] {
+function validateGatewayTailscaleBind(config: AllBotConfig): ConfigValidationIssue[] {
   const tailscaleMode = config.gateway?.tailscale?.mode ?? "off";
   if (tailscaleMode !== "serve" && tailscaleMode !== "funnel") {
     return [];
@@ -567,7 +567,7 @@ function validateGatewayTailscaleBind(config: KaijiBotConfig): ConfigValidationI
  */
 export function validateConfigObjectRaw(
   raw: unknown,
-): { ok: true; config: KaijiBotConfig } | { ok: false; issues: ConfigValidationIssue[] } {
+): { ok: true; config: AllBotConfig } | { ok: false; issues: ConfigValidationIssue[] } {
   const policyIssues = collectUnsupportedSecretRefPolicyIssues(raw);
   const legacyIssues = findLegacyConfigIssues(
     raw,
@@ -583,7 +583,7 @@ export function validateConfigObjectRaw(
       })),
     };
   }
-  const validated = KaijiBotSchema.safeParse(raw);
+  const validated = AllBotSchema.safeParse(raw);
   if (!validated.success) {
     const schemaIssues = validated.error.issues.map((issue) => mapZodIssueToConfigIssue(issue));
     return {
@@ -594,7 +594,7 @@ export function validateConfigObjectRaw(
   if (policyIssues.length > 0) {
     return { ok: false, issues: policyIssues };
   }
-  const validatedConfig = validated.data as KaijiBotConfig;
+  const validatedConfig = validated.data as AllBotConfig;
   const duplicates = findDuplicateAgentDirs(validatedConfig);
   if (duplicates.length > 0) {
     return {
@@ -623,7 +623,7 @@ export function validateConfigObjectRaw(
 
 export function validateConfigObject(
   raw: unknown,
-): { ok: true; config: KaijiBotConfig } | { ok: false; issues: ConfigValidationIssue[] } {
+): { ok: true; config: AllBotConfig } | { ok: false; issues: ConfigValidationIssue[] } {
   const result = validateConfigObjectRaw(raw);
   if (!result.ok) {
     return result;
@@ -637,7 +637,7 @@ export function validateConfigObject(
 type ValidateConfigWithPluginsResult =
   | {
       ok: true;
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       warnings: ConfigValidationIssue[];
     }
   | {
@@ -697,7 +697,7 @@ function validateConfigObjectWithPluginsBase(
   };
 
   let registryInfo: RegistryInfo | null = null;
-  let compatConfig: KaijiBotConfig | null | undefined;
+  let compatConfig: AllBotConfig | null | undefined;
   let compatPluginIds: ReadonlySet<string> | null = null;
   let compatPluginIdsResolved = false;
 
@@ -734,7 +734,7 @@ function validateConfigObjectWithPluginsBase(
     return compatPluginIds;
   };
 
-  const ensureCompatConfig = (): KaijiBotConfig => {
+  const ensureCompatConfig = (): AllBotConfig => {
     if (compatConfig !== undefined) {
       return compatConfig ?? config;
     }
@@ -1130,7 +1130,7 @@ function validateConfigObjectWithPluginsBase(
           replacePluginEntryConfig(pluginId, res.value as Record<string, unknown>);
         }
       } else if (record.format === "bundle") {
-        // Compatible bundles currently expose no native KaijiBot config schema.
+        // Compatible bundles currently expose no native AllBot config schema.
         // Treat them as schema-less capability packs rather than failing validation.
       } else {
         issues.push({

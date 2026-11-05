@@ -4,7 +4,7 @@ import path from "node:path";
 import { inspect } from "node:util";
 import { cancel, isCancel } from "@clack/prompts";
 import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../agents/workspace.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { CONFIG_PATH } from "../config/config.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions.js";
@@ -39,7 +39,7 @@ export function guardCancel<T>(value: T | symbol, runtime: RuntimeEnv): T {
   return value;
 }
 
-export function summarizeExistingConfig(config: KaijiBotConfig): string {
+export function summarizeExistingConfig(config: AllBotConfig): string {
   const rows: string[] = [];
   const defaults = config.agents?.defaults;
   if (defaults?.workspace) {
@@ -102,22 +102,22 @@ export function validateGatewayPasswordInput(value: unknown): string | undefined
 
 export function printWizardHeader(runtime: RuntimeEnv) {
   const header = [
-    "██╗  ██╗ █████╗ ██╗     ██╗██╗██████╗  ██████╗ ████████╗",
-    "██║ ██╔╝██╔══██╗██║     ██║██║██╔══██╗██╔═══██╗╚══██╔══╝",
-    "█████╔╝ ███████║██║     ██║██║██████╔╝██║   ██║   ██║   ",
-    "██╔═██╗ ██╔══██║██║██   ██║██║██╔══██╗██║   ██║   ██║   ",
-    "██║  ██╗██║  ██║██║╚█████╔╝██║██████╔╝╚██████╔╝   ██║   ",
-    "╚═╝  ╚═╝╚═╝  ╚═╝╚═╝ ╚════╝ ╚═╝╚═════╝  ╚═════╝    ╚═╝ ",
-    "                    👾 KAIJIBOT 👾                      ",
+    " █████╗ ██╗     ██╗     ██████╗  ██████╗ ████████╗",
+    "██╔══██╗██║     ██║     ██╔══██╗██╔═══██╗╚══██╔══╝",
+    "███████║██║     ██║     ██████╔╝██║   ██║   ██║   ",
+    "██╔══██║██║     ██║     ██╔══██╗██║   ██║   ██║   ",
+    "██║  ██║███████╗███████╗██████╔╝╚██████╔╝   ██║   ",
+    "╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝    ╚═╝ ",
+    "                    👾 ALLBOT 👾                    ",
     " ",
   ].join("\n");
   runtime.log(header);
 }
 
 export function applyWizardMetadata(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params: { command: string; mode: OnboardMode },
-): KaijiBotConfig {
+): AllBotConfig {
   const commit =
     normalizeOptionalString(process.env.GIT_COMMIT) ?? normalizeOptionalString(process.env.GIT_SHA);
   return {

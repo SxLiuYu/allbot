@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export type DiagnosticSessionState = "idle" | "processing" | "waiting";
 
@@ -176,19 +176,19 @@ type DiagnosticEventsGlobalState = {
 
 function getDiagnosticEventsState(): DiagnosticEventsGlobalState {
   const globalStore = globalThis as typeof globalThis & {
-    __kaijibotDiagnosticEventsState?: DiagnosticEventsGlobalState;
+    __allbotDiagnosticEventsState?: DiagnosticEventsGlobalState;
   };
-  if (!globalStore.__kaijibotDiagnosticEventsState) {
-    globalStore.__kaijibotDiagnosticEventsState = {
+  if (!globalStore.__allbotDiagnosticEventsState) {
+    globalStore.__allbotDiagnosticEventsState = {
       seq: 0,
       listeners: new Set<(evt: DiagnosticEventPayload) => void>(),
       dispatchDepth: 0,
     };
   }
-  return globalStore.__kaijibotDiagnosticEventsState;
+  return globalStore.__allbotDiagnosticEventsState;
 }
 
-export function isDiagnosticsEnabled(config?: KaijiBotConfig): boolean {
+export function isDiagnosticsEnabled(config?: AllBotConfig): boolean {
   return config?.diagnostics?.enabled === true;
 }
 

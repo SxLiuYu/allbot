@@ -17,7 +17,7 @@ import {
   type MessageSentHookContext,
 } from "./internal-hooks.js";
 
-const INTERNAL_HOOK_HANDLERS_KEY = Symbol.for("kaijibot.internalHookHandlers");
+const INTERNAL_HOOK_HANDLERS_KEY = Symbol.for("allbot.internalHookHandlers");
 
 describe("hooks", () => {
   beforeEach(() => {

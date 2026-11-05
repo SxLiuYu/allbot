@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { readConfigFileSnapshot } from "../config/config.js";
 import { formatConfigIssueLines } from "../config/issue-format.js";
 import { note } from "../terminal/note.js";
@@ -14,8 +14,8 @@ async function maybeMigrateLegacyConfig(): Promise<string[]> {
     return changes;
   }
 
-  const targetDir = path.join(home, ".kaijibot");
-  const targetPath = path.join(targetDir, "kaijibot.json");
+  const targetDir = path.join(home, ".allbot");
+  const targetPath = path.join(targetDir, "allbot.json");
   try {
     await fs.access(targetPath);
     return changes;
@@ -55,7 +55,7 @@ async function maybeMigrateLegacyConfig(): Promise<string[]> {
 
 export type DoctorConfigPreflightResult = {
   snapshot: Awaited<ReturnType<typeof readConfigFileSnapshot>>;
-  baseConfig: KaijiBotConfig;
+  baseConfig: AllBotConfig;
 };
 
 export async function runDoctorConfigPreflight(

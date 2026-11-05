@@ -2,18 +2,18 @@ import { normalizeOptionalLowercaseString } from "../../shared/string-coerce.js"
 
 export const GATEWAY_CLIENT_IDS = {
   WEBCHAT_UI: "webchat-ui",
-  CONTROL_UI: "kaijibot-control-ui",
-  TUI: "kaijibot-tui",
+  CONTROL_UI: "allbot-control-ui",
+  TUI: "allbot-tui",
   WEBCHAT: "webchat",
   CLI: "cli",
   GATEWAY_CLIENT: "gateway-client",
-  MACOS_APP: "kaijibot-macos",
-  IOS_APP: "kaijibot-ios",
-  ANDROID_APP: "kaijibot-android",
+  MACOS_APP: "allbot-macos",
+  IOS_APP: "allbot-ios",
+  ANDROID_APP: "allbot-android",
   NODE_HOST: "node-host",
   TEST: "test",
   FINGERPRINT: "fingerprint",
-  PROBE: "kaijibot-probe",
+  PROBE: "allbot-probe",
 } as const;
 
 export type GatewayClientId = (typeof GATEWAY_CLIENT_IDS)[keyof typeof GATEWAY_CLIENT_IDS];

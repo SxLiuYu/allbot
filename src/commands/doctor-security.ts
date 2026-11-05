@@ -1,7 +1,7 @@
 import { listChannelPlugins } from "../channels/plugins/index.js";
 import type { ChannelId } from "../channels/plugins/types.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig, GatewayBindMode } from "../config/config.js";
+import type { AllBotConfig, GatewayBindMode } from "../config/config.js";
 import type { AgentConfig } from "../config/types.agents.js";
 import { hasConfiguredSecretInput } from "../config/types.secrets.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
@@ -14,7 +14,7 @@ import { normalizeOptionalString } from "../shared/string-coerce.js";
 import { note } from "../terminal/note.js";
 import { resolveDefaultChannelAccountContext } from "./channel-account-context.js";
 
-function collectImplicitHeartbeatDirectPolicyWarnings(cfg: KaijiBotConfig): string[] {
+function collectImplicitHeartbeatDirectPolicyWarnings(cfg: AllBotConfig): string[] {
   const warnings: string[] = [];
 
   const maybeWarn = (params: {
@@ -74,11 +74,11 @@ function execAskRank(value: ExecAsk): number {
   }
 }
 
-function collectExecPolicyConflictWarnings(cfg: KaijiBotConfig): string[] {
+function collectExecPolicyConflictWarnings(cfg: AllBotConfig): string[] {
   const warnings: string[] = [];
   const approvals = loadExecApprovals();
-  const defaultRequestedSecuritySource = "KaijiBot default (full)";
-  const defaultRequestedAskSource = "KaijiBot default (off)";
+  const defaultRequestedSecuritySource = "AllBot default (full)";
+  const defaultRequestedAskSource = "AllBot default (off)";
 
   const maybeWarn = (params: {
     scopeLabel: string;
@@ -136,7 +136,7 @@ function collectExecPolicyConflictWarnings(cfg: KaijiBotConfig): string[] {
         `  Host: ${hostParts.join(", ")}`,
         `  Effective host exec stays security="${snapshot.security.effective}" ask="${snapshot.ask.effective}" because the stricter side wins.`,
         "  Headless runs like isolated cron cannot answer approval prompts; align both files or enable Web UI, terminal UI, or chat exec approvals.",
-        `  Inspect with: ${formatCliCommand("kaijibot approvals get --gateway")}`,
+        `  Inspect with: ${formatCliCommand("allbot approvals get --gateway")}`,
       ].join("\n"),
     );
   };
@@ -158,20 +158,20 @@ function collectExecPolicyConflictWarnings(cfg: KaijiBotConfig): string[] {
   return warnings;
 }
 
-function collectDurableExecApprovalWarnings(cfg: KaijiBotConfig): string[] {
+function collectDurableExecApprovalWarnings(cfg: AllBotConfig): string[] {
   void cfg;
   return [];
 }
 
-export async function noteSecurityWarnings(cfg: KaijiBotConfig) {
+export async function noteSecurityWarnings(cfg: AllBotConfig) {
   const warnings: string[] = [];
-  const auditHint = `- Run: ${formatCliCommand("kaijibot security audit --deep")}`;
+  const auditHint = `- Run: ${formatCliCommand("allbot security audit --deep")}`;
 
   if (cfg.approvals?.exec?.enabled === false) {
     warnings.push(
       "- Note: approvals.exec.enabled=false disables approval forwarding only.",
-      "  Host exec gating still comes from ~/.kaijibot/exec-approvals.json.",
-      `  Check local policy with: ${formatCliCommand("kaijibot approvals get --gateway")}`,
+      "  Host exec gating still comes from ~/.allbot/exec-approvals.json.",
+      `  Check local policy with: ${formatCliCommand("allbot approvals get --gateway")}`,
     );
   }
 
@@ -225,19 +225,19 @@ export async function noteSecurityWarnings(cfg: KaijiBotConfig) {
       const authFixLines =
         resolvedAuth.mode === "password"
           ? [
-              `  Fix: ${formatCliCommand("kaijibot configure")} to set a password`,
-              `  Or switch to token: ${formatCliCommand("kaijibot config set gateway.auth.mode token")}`,
+              `  Fix: ${formatCliCommand("allbot configure")} to set a password`,
+              `  Or switch to token: ${formatCliCommand("allbot config set gateway.auth.mode token")}`,
             ]
           : [
-              `  Fix: ${formatCliCommand("kaijibot doctor --fix")} to generate a token`,
+              `  Fix: ${formatCliCommand("allbot doctor --fix")} to generate a token`,
               `  Or set token directly: ${formatCliCommand(
-                "kaijibot config set gateway.auth.mode token",
+                "allbot config set gateway.auth.mode token",
               )}`,
             ];
       warnings.push(
         `- CRITICAL: Gateway bound to ${bindDescriptor} without authentication.`,
         `  Anyone on your network (or internet if port-forwarded) can fully control your agent.`,
-        `  Fix: ${formatCliCommand("kaijibot config set gateway.bind loopback")}`,
+        `  Fix: ${formatCliCommand("allbot config set gateway.bind loopback")}`,
         ...saferRemoteAccessLines,
         ...authFixLines,
       );
@@ -297,7 +297,7 @@ export async function noteSecurityWarnings(cfg: KaijiBotConfig) {
     if (dmScope === "main" && isMultiUserDm) {
       warnings.push(
         `- ${params.label} DMs: multiple senders share the main session; run: ` +
-          formatCliCommand('kaijibot config set session.dmScope "per-channel-peer"') +
+          formatCliCommand('allbot config set session.dmScope "per-channel-peer"') +
           ' (or "per-account-channel-peer" for multi-account channels) to isolate sessions.',
       );
     }

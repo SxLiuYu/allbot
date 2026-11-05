@@ -238,7 +238,7 @@ export async function discoverLiveModels(
       return EMPTY_LIVE_RESULT;
     }
     // Gate 2: explicit disable
-    if (params.env?.KAIJIBOT_DISABLE_LIVE_MODEL_DISCOVERY === "1") {
+    if (params.env?.ALLBOT_DISABLE_LIVE_MODEL_DISCOVERY === "1") {
       return EMPTY_LIVE_RESULT;
     }
     // In-memory cache

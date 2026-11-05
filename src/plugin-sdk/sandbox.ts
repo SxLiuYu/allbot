@@ -19,7 +19,7 @@ export type {
   SshSandboxSession,
   SshSandboxSettings,
 } from "../agents/sandbox.js";
-export type { KaijiBotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
 
 export {
   buildExecRemoteCommand,
@@ -47,4 +47,4 @@ export {
   type PluginCommandRunOptions,
   type PluginCommandRunResult,
 } from "./run-command.js";
-export { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+export { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";

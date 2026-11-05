@@ -6,7 +6,7 @@ import { withTempHomeConfig } from "./test-helpers.js";
 
 describe("multi-agent agentDir validation", () => {
   it("rejects shared agents.list agentDir", async () => {
-    const shared = path.join(tmpdir(), "kaijibot-shared-agentdir");
+    const shared = path.join(tmpdir(), "allbot-shared-agentdir");
     const res = validateConfigObject({
       agents: {
         list: [
@@ -27,8 +27,8 @@ describe("multi-agent agentDir validation", () => {
       {
         agents: {
           list: [
-            { id: "a", agentDir: "~/.kaijibot/agents/shared/agent" },
-            { id: "b", agentDir: "~/.kaijibot/agents/shared/agent" },
+            { id: "a", agentDir: "~/.allbot/agents/shared/agent" },
+            { id: "b", agentDir: "~/.allbot/agents/shared/agent" },
           ],
         },
         bindings: [{ agentId: "a", match: { channel: "telegram" } }],

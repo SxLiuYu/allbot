@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/cerebras-provider",
+  "name": "@allbot/cerebras-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "KaijiBot Cerebras provider plugin",
+  "description": "AllBot Cerebras provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

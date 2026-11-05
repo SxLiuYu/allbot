@@ -1,8 +1,8 @@
 import {
   applyAgentDefaultModelPrimary,
   applyProviderConfigWithModelCatalogPreset,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   CHUTES_BASE_URL,
   CHUTES_DEFAULT_MODEL_REF,
@@ -16,7 +16,7 @@ export { CHUTES_DEFAULT_MODEL_REF };
  * Apply Chutes provider configuration without changing the default model.
  * Registers all catalog models and sets provider aliases (chutes-fast, etc.).
  */
-export function applyChutesProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyChutesProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return applyProviderConfigWithModelCatalogPreset(cfg, {
     providerId: "chutes",
     api: "openai-completions",
@@ -37,7 +37,7 @@ export function applyChutesProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
 /**
  * Apply Chutes provider configuration AND set Chutes as the default model.
  */
-export function applyChutesConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyChutesConfig(cfg: AllBotConfig): AllBotConfig {
   const next = applyChutesProviderConfig(cfg);
   return {
     ...next,
@@ -58,6 +58,6 @@ export function applyChutesConfig(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-export function applyChutesApiKeyConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyChutesApiKeyConfig(cfg: AllBotConfig): AllBotConfig {
   return applyAgentDefaultModelPrimary(applyChutesProviderConfig(cfg), CHUTES_DEFAULT_MODEL_REF);
 }

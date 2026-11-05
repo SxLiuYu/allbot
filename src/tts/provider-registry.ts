@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolvePluginCapabilityProviders } from "../plugins/capability-provider-runtime.js";
 import {
   buildCapabilityProviderMaps,
@@ -13,27 +13,27 @@ export function normalizeSpeechProviderId(
   return normalizeCapabilityProviderId(providerId);
 }
 
-function resolveSpeechProviderPluginEntries(cfg?: KaijiBotConfig): SpeechProviderPlugin[] {
+function resolveSpeechProviderPluginEntries(cfg?: AllBotConfig): SpeechProviderPlugin[] {
   return resolvePluginCapabilityProviders({
     key: "speechProviders",
     cfg,
   });
 }
 
-function buildProviderMaps(cfg?: KaijiBotConfig): {
+function buildProviderMaps(cfg?: AllBotConfig): {
   canonical: Map<string, SpeechProviderPlugin>;
   aliases: Map<string, SpeechProviderPlugin>;
 } {
   return buildCapabilityProviderMaps(resolveSpeechProviderPluginEntries(cfg));
 }
 
-export function listSpeechProviders(cfg?: KaijiBotConfig): SpeechProviderPlugin[] {
+export function listSpeechProviders(cfg?: AllBotConfig): SpeechProviderPlugin[] {
   return [...buildProviderMaps(cfg).canonical.values()];
 }
 
 export function getSpeechProvider(
   providerId: string | undefined,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): SpeechProviderPlugin | undefined {
   const normalized = normalizeSpeechProviderId(providerId);
   if (!normalized) {
@@ -44,7 +44,7 @@ export function getSpeechProvider(
 
 export function canonicalizeSpeechProviderId(
   providerId: string | undefined,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): SpeechProviderId | undefined {
   const normalized = normalizeSpeechProviderId(providerId);
   if (!normalized) {

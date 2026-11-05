@@ -4,4 +4,4 @@ export {
   resolvePinnedHostnameWithPolicy,
   type LookupFn,
   type SsrFPolicy,
-} from "kaijibot/plugin-sdk/browser-security-runtime";
+} from "allbot/plugin-sdk/browser-security-runtime";

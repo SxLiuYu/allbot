@@ -9,7 +9,7 @@ import {
   resolveProviderAuthAliasMap,
   resolveProviderIdForAuth,
 } from "../../../../src/agents/provider-auth-aliases.js";
-import type { KaijiBotConfig } from "../../../../src/config/config.js";
+import type { AllBotConfig } from "../../../../src/config/config.js";
 import type { SsrFPolicy } from "../../../../src/infra/net/ssrf.js";
 import type { EmbeddingProviderOptions } from "./embeddings.js";
 import { buildRemoteBaseUrlPolicy } from "./remote-http.js";
@@ -42,7 +42,7 @@ export type RemoteEmbeddingProviderId = "openai" | "voyage" | "mistral";
  */
 export function hasRemoteEmbeddingCredentialSignal(params: {
   provider: string;
-  config: KaijiBotConfig | undefined;
+  config: AllBotConfig | undefined;
   agentDir?: string;
   env?: NodeJS.ProcessEnv;
 }): boolean {

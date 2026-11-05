@@ -1,12 +1,12 @@
 import {
   parseAgentSessionKey,
   type MemoryCitationsMode,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
-import type { MemorySearchResult } from "kaijibot/plugin-sdk/memory-core-host-runtime-files";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-runtime-core";
+import type { MemorySearchResult } from "allbot/plugin-sdk/memory-core-host-runtime-files";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 
-export function resolveMemoryCitationsMode(cfg: KaijiBotConfig): MemoryCitationsMode {
+export function resolveMemoryCitationsMode(cfg: AllBotConfig): MemoryCitationsMode {
   const mode = cfg.memory?.citations;
   if (mode === "on" || mode === "off" || mode === "auto") {
     return mode;

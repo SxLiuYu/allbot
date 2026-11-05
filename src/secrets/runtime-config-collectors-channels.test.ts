@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ResolverContext } from "./runtime-shared.js";
 
 const getBootstrapChannelSecrets = vi.fn();
@@ -37,7 +37,7 @@ describe("runtime channel config collectors", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       defaults: undefined,
       context: {} as ResolverContext,
     });
@@ -61,7 +61,7 @@ describe("runtime channel config collectors", () => {
         channels: {
           legacy: {},
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       defaults: undefined,
       context: {} as ResolverContext,
     });

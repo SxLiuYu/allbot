@@ -412,13 +412,13 @@ function coerceRequest(val: unknown): OpenAiChatCompletionRequest {
 function resolveAgentResponseText(result: unknown): string {
   const payloads = (result as { payloads?: Array<{ text?: string }> } | null)?.payloads;
   if (!Array.isArray(payloads) || payloads.length === 0) {
-    return "No response from KaijiBot.";
+    return "No response from AllBot.";
   }
   const content = payloads
     .map((p) => (typeof p.text === "string" ? p.text : ""))
     .filter(Boolean)
     .join("\n\n");
-  return content || "No response from KaijiBot.";
+  return content || "No response from AllBot.";
 }
 
 export async function handleOpenAiHttpRequest(
@@ -451,7 +451,7 @@ export async function handleOpenAiHttpRequest(
 
   const payload = coerceRequest(handled.body);
   const stream = Boolean(payload.stream);
-  const model = typeof payload.model === "string" ? payload.model : "kaijibot";
+  const model = typeof payload.model === "string" ? payload.model : "allbot";
   const user = typeof payload.user === "string" ? payload.user : undefined;
 
   const { agentId, sessionKey, messageChannel } = resolveGatewayRequestContext({
@@ -527,7 +527,7 @@ export async function handleOpenAiHttpRequest(
 
       const content = resolveAgentResponseText(result);
 
-      const sessionResetRequested = req.headers["x-kaijibot-session-reset"] === "true";
+      const sessionResetRequested = req.headers["x-allbot-session-reset"] === "true";
       let memoryGenerated = false;
       if (sessionResetRequested) {
         try {
@@ -598,7 +598,7 @@ export async function handleOpenAiHttpRequest(
           },
         ],
         usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        ...(sessionResetRequested ? { x_kaijibot_memory_generated: memoryGenerated } : {}),
+        ...(sessionResetRequested ? { x_allbot_memory_generated: memoryGenerated } : {}),
       });
     } catch (err) {
       if (abortController.signal.aborted) {

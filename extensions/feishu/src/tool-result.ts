@@ -1,4 +1,4 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 
 export function jsonToolResult(data: unknown) {
   return {

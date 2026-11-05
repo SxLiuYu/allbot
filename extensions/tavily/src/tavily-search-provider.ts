@@ -5,7 +5,7 @@ import {
   setScopedCredentialValue,
   setProviderWebSearchPluginConfigValue,
   type WebSearchProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-web-search";
+} from "allbot/plugin-sdk/provider-web-search";
 import { Type } from "typebox";
 import { runTavilySearch } from "./tavily-client.js";
 

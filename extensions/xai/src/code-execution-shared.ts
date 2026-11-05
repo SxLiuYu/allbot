@@ -1,4 +1,4 @@
-import { postTrustedWebToolsJson } from "@kaijibot/plugin-sdk/provider-web-search";
+import { postTrustedWebToolsJson } from "@allbot/plugin-sdk/provider-web-search";
 import {
   buildXaiResponsesToolBody,
   resolveXaiResponseTextAndCitations,

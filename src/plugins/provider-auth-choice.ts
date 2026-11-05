@@ -1,4 +1,4 @@
-import { resolveKaijiBotAgentDir } from "../agents/agent-paths.js";
+import { resolveAllBotAgentDir } from "../agents/agent-paths.js";
 import {
   resolveDefaultAgentId,
   resolveAgentDir,
@@ -6,7 +6,7 @@ import {
 } from "../agents/agent-scope.js";
 import { upsertAuthProfile } from "../agents/auth-profiles.js";
 import { resolveDefaultAgentWorkspaceDir } from "../agents/workspace.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import { enablePluginInConfig } from "./enable.js";
@@ -23,7 +23,7 @@ import type { ProviderAuthMethod, ProviderAuthOptionBag } from "./types.js";
 
 export type ApplyProviderAuthChoiceParams = {
   authChoice: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
@@ -34,7 +34,7 @@ export type ApplyProviderAuthChoiceParams = {
 };
 
 export type ApplyProviderAuthChoiceResult = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentModelOverride?: string;
 };
 
@@ -47,9 +47,9 @@ export type PluginProviderAuthChoiceOptions = {
 };
 
 function restoreConfiguredPrimaryModel(
-  nextConfig: KaijiBotConfig,
-  originalConfig: KaijiBotConfig,
-): KaijiBotConfig {
+  nextConfig: AllBotConfig,
+  originalConfig: AllBotConfig,
+): AllBotConfig {
   const originalModel = originalConfig.agents?.defaults?.model;
   const nextAgents = nextConfig.agents;
   const nextDefaults = nextAgents?.defaults;
@@ -83,7 +83,7 @@ async function loadPluginProviderRuntime() {
 }
 
 export async function runProviderPluginAuthMethod(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   runtime: RuntimeEnv;
   prompter: WizardPrompter;
@@ -95,13 +95,13 @@ export async function runProviderPluginAuthMethod(params: {
   secretInputMode?: ProviderAuthOptionBag["secretInputMode"];
   allowSecretRefPrompt?: boolean;
   opts?: Partial<ProviderAuthOptionBag>;
-}): Promise<{ config: KaijiBotConfig; defaultModel?: string }> {
+}): Promise<{ config: AllBotConfig; defaultModel?: string }> {
   const agentId = params.agentId ?? resolveDefaultAgentId(params.config);
   const defaultAgentId = resolveDefaultAgentId(params.config);
   const agentDir =
     params.agentDir ??
     (agentId === defaultAgentId
-      ? resolveKaijiBotAgentDir()
+      ? resolveAllBotAgentDir()
       : resolveAgentDir(params.config, agentId));
   const workspaceDir =
     params.workspaceDir ??
@@ -245,7 +245,7 @@ export async function applyAuthChoicePluginProvider(
   const defaultAgentId = resolveDefaultAgentId(nextConfig);
   const agentDir =
     params.agentDir ??
-    (agentId === defaultAgentId ? resolveKaijiBotAgentDir() : resolveAgentDir(nextConfig, agentId));
+    (agentId === defaultAgentId ? resolveAllBotAgentDir() : resolveAgentDir(nextConfig, agentId));
   const workspaceDir =
     resolveAgentWorkspaceDir(nextConfig, agentId) ?? resolveDefaultAgentWorkspaceDir();
 

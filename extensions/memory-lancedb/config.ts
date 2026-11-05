@@ -25,7 +25,7 @@ const LEGACY_STATE_DIRS: string[] = [];
 
 function resolveDefaultDbPath(): string {
   const home = homedir();
-  const preferred = join(home, ".kaijibot", "memory", "lancedb");
+  const preferred = join(home, ".allbot", "memory", "lancedb");
   try {
     if (fs.existsSync(preferred)) {
       return preferred;
@@ -159,7 +159,7 @@ export const memoryConfigSchema = {
     },
     dbPath: {
       label: "Database Path",
-      placeholder: "~/.kaijibot/memory/lancedb",
+      placeholder: "~/.allbot/memory/lancedb",
       advanced: true,
     },
     autoCapture: {

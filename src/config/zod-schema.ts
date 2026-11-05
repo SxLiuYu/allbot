@@ -232,7 +232,7 @@ const McpConfigSchema = z
   .strict()
   .optional();
 
-export const KaijiBotSchema = z
+export const AllBotSchema = z
   .object({
     $schema: z.string().optional(),
     meta: z
@@ -395,7 +395,7 @@ export const KaijiBotSchema = z
                 cdpUrl: z.string().optional(),
                 userDataDir: z.string().optional(),
                 driver: z
-                  .union([z.literal("kaijibot"), z.literal("clawd"), z.literal("existing-session")])
+                  .union([z.literal("allbot"), z.literal("clawd"), z.literal("existing-session")])
                   .optional(),
                 attachOnly: z.boolean().optional(),
                 color: HexColorSchema,

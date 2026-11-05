@@ -42,7 +42,7 @@ export {
   extractSectionsByHeaders,
   extractSectionsByHeaderNames,
   extractMarkdownHeaders,
-  loadKaijiBotTemplate,
+  loadAllBotTemplate,
   rewriteStructuralFile,
   rewriteWorkspaceFile,
   STRUCTURAL_REWRITE_REGISTRY,
@@ -107,7 +107,7 @@ async function resolveSourceAndTarget(
   options: MigrationOptions,
 ): Promise<{ source: MigrationSource; targetDir: string }> {
   const home = os.homedir();
-  const targetDir = options.targetDir ?? path.join(home, ".kaijibot");
+  const targetDir = options.targetDir ?? path.join(home, ".allbot");
 
   if (options.source) {
     const resolvedSource = path.resolve(options.source);

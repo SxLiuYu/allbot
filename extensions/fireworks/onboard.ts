@@ -1,7 +1,7 @@
 import {
   createDefaultModelsPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildFireworksCatalogModels,
   buildFireworksProvider,
@@ -12,7 +12,7 @@ export const FIREWORKS_DEFAULT_MODEL_REF = `fireworks/${FIREWORKS_DEFAULT_MODEL_
 
 const fireworksPresetAppliers = createDefaultModelsPresetAppliers({
   primaryModelRef: FIREWORKS_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => {
+  resolveParams: (_cfg: AllBotConfig) => {
     const defaultProvider = buildFireworksProvider();
     return {
       providerId: "fireworks",
@@ -25,10 +25,10 @@ const fireworksPresetAppliers = createDefaultModelsPresetAppliers({
   },
 });
 
-export function applyFireworksProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyFireworksProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return fireworksPresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyFireworksConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyFireworksConfig(cfg: AllBotConfig): AllBotConfig {
   return fireworksPresetAppliers.applyConfig(cfg);
 }

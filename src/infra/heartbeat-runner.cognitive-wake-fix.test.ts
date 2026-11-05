@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { startHeartbeatRunner } from "./heartbeat-runner.js";
 import { requestHeartbeatNow, resetHeartbeatWakeStateForTests } from "./heartbeat-wake.js";
 
@@ -44,7 +44,7 @@ describe.skipIf(process.env.CI)(
           { id: "bot2", name: "Bot2" },
         ],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     afterEach(() => {
       resetHeartbeatWakeStateForTests();

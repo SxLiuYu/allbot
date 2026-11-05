@@ -5,5 +5,5 @@ export {
   writeConfigFile,
   type BrowserConfig,
   type BrowserProfileConfig,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/browser-config-runtime";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/browser-config-runtime";

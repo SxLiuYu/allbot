@@ -11,7 +11,7 @@ function writeJson(filePath: string, value: unknown) {
 
 describe("doctor bundled plugin runtime deps", () => {
   it("skips source checkouts", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-doctor-bundled-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-doctor-bundled-"));
     fs.mkdirSync(path.join(root, ".git"));
     fs.mkdirSync(path.join(root, "src"));
     fs.mkdirSync(path.join(root, "extensions"));
@@ -27,8 +27,8 @@ describe("doctor bundled plugin runtime deps", () => {
   });
 
   it("reports missing deps and conflicts", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-doctor-bundled-"));
-    writeJson(path.join(root, "package.json"), { name: "kaijibot" });
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-doctor-bundled-"));
+    writeJson(path.join(root, "package.json"), { name: "allbot" });
 
     writeJson(path.join(root, "dist", "extensions", "alpha", "package.json"), {
       dependencies: {

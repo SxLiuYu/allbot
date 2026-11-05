@@ -1,21 +1,21 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import type {
-  KaijiBotPluginApi,
+  AllBotPluginApi,
   ProviderAuthContext,
   ProviderAuthResult,
   ProviderCatalogContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   MINIMAX_OAUTH_MARKER,
   ensureAuthProfileStore,
   listProfilesForProvider,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { buildOauthProviderAuthResult } from "kaijibot/plugin-sdk/provider-auth";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
-import { fetchMinimaxUsage } from "kaijibot/plugin-sdk/provider-usage";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { buildOauthProviderAuthResult } from "allbot/plugin-sdk/provider-auth";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
+import { fetchMinimaxUsage } from "allbot/plugin-sdk/provider-usage";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { isMiniMaxModernModelId, MINIMAX_DEFAULT_MODEL_ID } from "./api.js";
 import type { MiniMaxRegion } from "./oauth.js";
 import { applyMinimaxApiConfig, applyMinimaxApiConfigCn } from "./onboard.js";
@@ -166,7 +166,7 @@ function createOAuthHandler(region: MiniMaxRegion) {
   };
 }
 
-export function registerMinimaxProviders(api: KaijiBotPluginApi) {
+export function registerMinimaxProviders(api: AllBotPluginApi) {
   api.registerProvider({
     id: API_PROVIDER_ID,
     label: PROVIDER_LABEL,

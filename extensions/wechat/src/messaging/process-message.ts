@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { createTypingCallbacks } from "kaijibot/plugin-sdk/channel-runtime";
+import { createTypingCallbacks } from "allbot/plugin-sdk/channel-runtime";
 import {
   resolveSenderCommandAuthorizationWithRuntime,
   resolveDirectDmAuthorizationOutcome,
-} from "kaijibot/plugin-sdk/command-auth";
-import type { PluginRuntime } from "kaijibot/plugin-sdk/core";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/infra-runtime";
+} from "allbot/plugin-sdk/command-auth";
+import type { PluginRuntime } from "allbot/plugin-sdk/core";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/infra-runtime";
 import { sendTyping } from "../api/api.js";
 import type { WeixinMessage } from "../api/types.js";
 import { MessageItemType, TypingStatus } from "../api/types.js";
@@ -34,14 +34,14 @@ import { sendMessageWeixin } from "./send.js";
 import { handleSlashCommand } from "./slash-commands.js";
 
 const MEDIA_OUTBOUND_TEMP_DIR = path.join(
-  resolvePreferredKaijiBotTmpDir(),
+  resolvePreferredAllBotTmpDir(),
   "weixin/media/outbound-temp",
 );
 
 /** Dependencies for processOneMessage, injected by the monitor loop. */
 export type ProcessMessageDeps = {
   accountId: string;
-  config: import("kaijibot/plugin-sdk/core").KaijiBotConfig;
+  config: import("allbot/plugin-sdk/core").AllBotConfig;
   channelRuntime: PluginRuntime["channel"];
   baseUrl: string;
   cdnBaseUrl: string;

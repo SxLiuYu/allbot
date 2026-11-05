@@ -1,4 +1,4 @@
-import { mapAllowFromEntries } from "kaijibot/plugin-sdk/channel-config-helpers";
+import { mapAllowFromEntries } from "allbot/plugin-sdk/channel-config-helpers";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 
 export function normalizeNonEmptyString(value: unknown): string | null {

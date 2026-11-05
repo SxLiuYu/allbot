@@ -20,13 +20,13 @@ creating them.
 
 ## `definePluginEntry`
 
-**Import:** `kaijibot/plugin-sdk/plugin-entry`
+**Import:** `allbot/plugin-sdk/plugin-entry`
 
 For provider plugins, tool plugins, hook plugins, and anything that is **not**
 a messaging channel.
 
 ```typescript
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 
 export default definePluginEntry({
   id: "my-plugin",
@@ -49,25 +49,25 @@ export default definePluginEntry({
 | `name`         | `string`                                                         | Yes      | —                   |
 | `description`  | `string`                                                         | Yes      | —                   |
 | `kind`         | `string`                                                         | No       | —                   |
-| `configSchema` | `KaijiBotPluginConfigSchema \| () => KaijiBotPluginConfigSchema` | No       | Empty object schema |
-| `register`     | `(api: KaijiBotPluginApi) => void`                               | Yes      | —                   |
+| `configSchema` | `AllBotPluginConfigSchema \| () => AllBotPluginConfigSchema` | No       | Empty object schema |
+| `register`     | `(api: AllBotPluginApi) => void`                               | Yes      | —                   |
 
-- `id` must match your `kaijibot.plugin.json` manifest.
+- `id` must match your `allbot.plugin.json` manifest.
 - `kind` is for exclusive slots: `"memory"` or `"context-engine"`.
 - `configSchema` can be a function for lazy evaluation.
-- KaijiBot resolves and memoizes that schema on first access, so expensive schema
+- AllBot resolves and memoizes that schema on first access, so expensive schema
   builders only run once.
 
 ## `defineChannelPluginEntry`
 
-**Import:** `kaijibot/plugin-sdk/channel-core`
+**Import:** `allbot/plugin-sdk/channel-core`
 
 Wraps `definePluginEntry` with channel-specific wiring. Automatically calls
 `api.registerChannel({ plugin })`, exposes an optional root-help CLI metadata
 seam, and gates `registerFull` on registration mode.
 
 ```typescript
-import { defineChannelPluginEntry } from "kaijibot/plugin-sdk/channel-core";
+import { defineChannelPluginEntry } from "allbot/plugin-sdk/channel-core";
 
 export default defineChannelPluginEntry({
   id: "my-channel",
@@ -90,10 +90,10 @@ export default defineChannelPluginEntry({
 | `name`                | `string`                                                         | Yes      | —                   |
 | `description`         | `string`                                                         | Yes      | —                   |
 | `plugin`              | `ChannelPlugin`                                                  | Yes      | —                   |
-| `configSchema`        | `KaijiBotPluginConfigSchema \| () => KaijiBotPluginConfigSchema` | No       | Empty object schema |
+| `configSchema`        | `AllBotPluginConfigSchema \| () => AllBotPluginConfigSchema` | No       | Empty object schema |
 | `setRuntime`          | `(runtime: PluginRuntime) => void`                               | No       | —                   |
-| `registerCliMetadata` | `(api: KaijiBotPluginApi) => void`                               | No       | —                   |
-| `registerFull`        | `(api: KaijiBotPluginApi) => void`                               | No       | —                   |
+| `registerCliMetadata` | `(api: AllBotPluginApi) => void`                               | No       | —                   |
+| `registerFull`        | `(api: AllBotPluginApi) => void`                               | No       | —                   |
 
 - `setRuntime` is called during registration so you can store the runtime reference
   (typically via `createPluginRuntimeStore`). It is skipped during CLI metadata
@@ -105,7 +105,7 @@ export default defineChannelPluginEntry({
   with full plugin loads.
 - `registerFull` only runs when `api.registrationMode === "full"`. It is skipped
   during setup-only loading.
-- Like `definePluginEntry`, `configSchema` can be a lazy factory and KaijiBot
+- Like `definePluginEntry`, `configSchema` can be a lazy factory and AllBot
   memoizes the resolved schema on first access.
 - For plugin-owned root CLI commands, prefer `api.registerCli(..., { descriptors: [...] })`
   when you want the command to stay lazy-loaded without disappearing from the
@@ -118,29 +118,29 @@ export default defineChannelPluginEntry({
 
 ## `defineSetupPluginEntry`
 
-**Import:** `kaijibot/plugin-sdk/channel-core`
+**Import:** `allbot/plugin-sdk/channel-core`
 
 For the lightweight `setup-entry.ts` file. Returns just `{ plugin }` with no
 runtime or CLI wiring.
 
 ```typescript
-import { defineSetupPluginEntry } from "kaijibot/plugin-sdk/channel-core";
+import { defineSetupPluginEntry } from "allbot/plugin-sdk/channel-core";
 
 export default defineSetupPluginEntry(myChannelPlugin);
 ```
 
-KaijiBot loads this instead of the full entry when a channel is disabled,
+AllBot loads this instead of the full entry when a channel is disabled,
 unconfigured, or when deferred loading is enabled. See
 [Setup and Config](/plugins/sdk-setup#setup-entry) for when this matters.
 
 In practice, pair `defineSetupPluginEntry(...)` with the narrow setup helper
 families:
 
-- `kaijibot/plugin-sdk/setup-runtime` for runtime-safe setup helpers such as
+- `allbot/plugin-sdk/setup-runtime` for runtime-safe setup helpers such as
   import-safe setup patch adapters, lookup-note output,
   `promptResolvedAllowFrom`, `splitSetupEntries`, and delegated setup proxies
-- `kaijibot/plugin-sdk/channel-setup` for optional-install setup surfaces
-- `kaijibot/plugin-sdk/setup-tools` for setup/install CLI/archive/docs helpers
+- `allbot/plugin-sdk/channel-setup` for optional-install setup surfaces
+- `allbot/plugin-sdk/setup-tools` for setup/install CLI/archive/docs helpers
 
 Keep heavy SDKs, CLI registration, and long-lived runtime services in the full
 entry.
@@ -183,14 +183,14 @@ provider/client SDK bootstraps still belong in `"full"`.
 For CLI registrars specifically:
 
 - use `descriptors` when the registrar owns one or more root commands and you
-  want KaijiBot to lazy-load the real CLI module on first invocation
+  want AllBot to lazy-load the real CLI module on first invocation
 - make sure those descriptors cover every top-level command root exposed by the
   registrar
 - use `commands` alone only for eager compatibility paths
 
 ## Plugin shapes
 
-KaijiBot classifies loaded plugins by their registration behavior:
+AllBot classifies loaded plugins by their registration behavior:
 
 | Shape                 | Description                                        |
 | --------------------- | -------------------------------------------------- |
@@ -199,7 +199,7 @@ KaijiBot classifies loaded plugins by their registration behavior:
 | **hook-only**         | Only hooks, no capabilities                        |
 | **non-capability**    | Tools/commands/services but no capabilities        |
 
-Use `kaijibot plugins inspect <id>` to see a plugin's shape.
+Use `allbot plugins inspect <id>` to see a plugin's shape.
 
 ## Related
 

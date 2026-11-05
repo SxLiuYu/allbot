@@ -44,7 +44,7 @@ function shouldResolveLocalGatewayPasswordSecret(
   cfg: ReturnType<typeof loadConfig>,
   env: NodeJS.ProcessEnv,
 ): boolean {
-  if (trimToUndefined(env.KAIJIBOT_GATEWAY_PASSWORD)) {
+  if (trimToUndefined(env.ALLBOT_GATEWAY_PASSWORD)) {
     return false;
   }
   const authMode = cfg.gateway?.auth?.mode;
@@ -54,7 +54,7 @@ function shouldResolveLocalGatewayPasswordSecret(
   if (authMode === "token" || authMode === "none" || authMode === "trusted-proxy") {
     return false;
   }
-  const envToken = trimToUndefined(env.KAIJIBOT_GATEWAY_TOKEN);
+  const envToken = trimToUndefined(env.ALLBOT_GATEWAY_TOKEN);
   const configTokenConfigured = hasConfiguredSecretInput(
     cfg.gateway?.auth?.token,
     cfg.secrets?.defaults,
@@ -233,7 +233,7 @@ export function registerQrCli(program: Command) {
 
         const lines: string[] = [
           theme.heading("Pairing QR"),
-          "Scan this with the KaijiBot mobile app (Onboarding -> Scan QR).",
+          "Scan this with the AllBot mobile app (Onboarding -> Scan QR).",
           "",
         ];
 
@@ -249,8 +249,8 @@ export function registerQrCli(program: Command) {
           `${theme.muted("Source:")} ${resolved.urlSource}`,
           "",
           "Approve after scan with:",
-          `  ${theme.command("kaijibot devices list")}`,
-          `  ${theme.command("kaijibot devices approve <requestId>")}`,
+          `  ${theme.command("allbot devices list")}`,
+          `  ${theme.command("allbot devices approve <requestId>")}`,
         );
 
         defaultRuntime.log(lines.join("\n"));

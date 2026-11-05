@@ -1,4 +1,4 @@
-import { resolveOAuthApiKeyMarker } from "kaijibot/plugin-sdk/provider-auth";
+import { resolveOAuthApiKeyMarker } from "allbot/plugin-sdk/provider-auth";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { registerSingleProviderPlugin } from "../../test/helpers/plugins/plugin-registration.js";
 import plugin from "./index.js";

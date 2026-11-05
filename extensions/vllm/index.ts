@@ -1,8 +1,8 @@
 import {
   definePluginEntry,
-  type KaijiBotPluginApi,
+  type AllBotPluginApi,
   type ProviderAuthMethodNonInteractiveContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   buildVllmProvider,
   VLLM_DEFAULT_API_KEY_ENV_VAR,
@@ -14,14 +14,14 @@ import {
 const PROVIDER_ID = "vllm";
 
 async function loadProviderSetup() {
-  return await import("kaijibot/plugin-sdk/provider-setup");
+  return await import("allbot/plugin-sdk/provider-setup");
 }
 
 export default definePluginEntry({
   id: "vllm",
   name: "vLLM Provider",
   description: "Bundled vLLM provider plugin",
-  register(api: KaijiBotPluginApi) {
+  register(api: AllBotPluginApi) {
     api.registerProvider({
       id: PROVIDER_ID,
       label: "vLLM",
@@ -87,7 +87,7 @@ export default definePluginEntry({
       },
       buildUnknownModelHint: () =>
         "vLLM requires authentication to be registered as a provider. " +
-        'Set VLLM_API_KEY (any value works) or run "kaijibot configure". ' +
+        'Set VLLM_API_KEY (any value works) or run "allbot configure". ' +
         "See: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/providers/vllm.md",
     });
   },

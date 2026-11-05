@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { ConfiguredBindingResolution } from "./binding-types.js";
 import { ensureStatefulTargetBuiltinsRegistered } from "./stateful-target-builtins.js";
 import {
@@ -7,7 +7,7 @@ import {
 } from "./stateful-target-drivers.js";
 
 export async function ensureConfiguredBindingTargetReady(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   bindingResolution: ConfiguredBindingResolution | null;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   await ensureStatefulTargetBuiltinsRegistered();
@@ -28,7 +28,7 @@ export async function ensureConfiguredBindingTargetReady(params: {
 }
 
 export async function resetConfiguredBindingTargetInPlace(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   reason: "new" | "reset";
   commandSource?: string;
@@ -51,7 +51,7 @@ export async function resetConfiguredBindingTargetInPlace(params: {
 }
 
 export async function ensureConfiguredBindingTargetSession(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   bindingResolution: ConfiguredBindingResolution;
 }): Promise<{ ok: true; sessionKey: string } | { ok: false; sessionKey: string; error: string }> {
   await ensureStatefulTargetBuiltinsRegistered();

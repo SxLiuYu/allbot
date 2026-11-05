@@ -28,7 +28,7 @@ const {
 
 let handlersByAccount = new Map<string, Record<string, (data: unknown) => Promise<void>>>();
 let runtimesByAccount = new Map<string, RuntimeEnv>();
-const originalStateDir = process.env.KAIJIBOT_STATE_DIR;
+const originalStateDir = process.env.ALLBOT_STATE_DIR;
 
 function createLifecycleConfig(): ClawdbotConfig {
   return {
@@ -135,7 +135,7 @@ describe("Feishu broadcast reply-once lifecycle", () => {
     vi.clearAllMocks();
     handlersByAccount = new Map();
     runtimesByAccount = new Map();
-    setFeishuLifecycleStateDir("kaijibot-feishu-broadcast");
+    setFeishuLifecycleStateDir("allbot-feishu-broadcast");
 
     createFeishuReplyDispatcherMock.mockReturnValue(createFeishuLifecycleReplyDispatcher());
 

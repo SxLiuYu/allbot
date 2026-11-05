@@ -37,7 +37,7 @@ describe("volcengine plugin", () => {
 
   it("declares its coding provider auth alias in the manifest", () => {
     const pluginJson = JSON.parse(
-      readFileSync(resolve(import.meta.dirname, "kaijibot.plugin.json"), "utf-8"),
+      readFileSync(resolve(import.meta.dirname, "allbot.plugin.json"), "utf-8"),
     );
 
     expect(pluginJson.providerAuthAliases).toEqual({

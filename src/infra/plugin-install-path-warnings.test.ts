@@ -27,7 +27,7 @@ async function detectMatrixCustomPathIssue(sourcePath: string | ((pluginPath: st
   });
 }
 
-const MATRIX_REPO_INSTALL_COMMAND = `kaijibot plugins install ${repoInstallSpec("matrix")}`;
+const MATRIX_REPO_INSTALL_COMMAND = `allbot plugins install ${repoInstallSpec("matrix")}`;
 
 describe("plugin install path warnings", () => {
   it("ignores non-path installs and blank path candidates", async () => {
@@ -54,32 +54,32 @@ describe("plugin install path warnings", () => {
       pluginId: "matrix",
       install: {
         source: "path",
-        sourcePath: "/tmp/kaijibot-matrix-missing",
-        installPath: "/tmp/kaijibot-matrix-missing",
+        sourcePath: "/tmp/allbot-matrix-missing",
+        installPath: "/tmp/allbot-matrix-missing",
       },
     });
 
     expect(issue).toEqual({
       kind: "missing-path",
       pluginId: "matrix",
-      path: "/tmp/kaijibot-matrix-missing",
+      path: "/tmp/allbot-matrix-missing",
     });
     expect(
       formatPluginInstallPathIssue({
         issue: issue!,
         pluginLabel: "Matrix",
-        defaultInstallCommand: "kaijibot plugins install @kaijibot/matrix",
+        defaultInstallCommand: "allbot plugins install @allbot/matrix",
         repoInstallCommand: MATRIX_REPO_INSTALL_COMMAND,
       }),
     ).toEqual([
-      "Matrix is installed from a custom path that no longer exists: /tmp/kaijibot-matrix-missing",
-      'Reinstall with "kaijibot plugins install @kaijibot/matrix".',
+      "Matrix is installed from a custom path that no longer exists: /tmp/allbot-matrix-missing",
+      'Reinstall with "allbot plugins install @allbot/matrix".',
       `If you are running from a repo checkout, you can also use "${MATRIX_REPO_INSTALL_COMMAND}".`,
     ]);
   });
 
   it("uses the second candidate path when the first one is stale", async () => {
-    const { issue, pluginPath } = await detectMatrixCustomPathIssue("/tmp/kaijibot-matrix-missing");
+    const { issue, pluginPath } = await detectMatrixCustomPathIssue("/tmp/allbot-matrix-missing");
     expect(issue).toEqual({
       kind: "custom-path",
       pluginId: "matrix",
@@ -107,14 +107,14 @@ describe("plugin install path warnings", () => {
           path: "/tmp/matrix-plugin",
         },
         pluginLabel: "Matrix",
-        defaultInstallCommand: "kaijibot plugins install @kaijibot/matrix",
+        defaultInstallCommand: "allbot plugins install @allbot/matrix",
         repoInstallCommand: MATRIX_REPO_INSTALL_COMMAND,
         formatCommand: (command) => `<${command}>`,
       }),
     ).toEqual([
       "Matrix is installed from a custom path: /tmp/matrix-plugin",
       "Main updates will not automatically replace that plugin with the repo's default Matrix package.",
-      'Reinstall with "<kaijibot plugins install @kaijibot/matrix>" when you want to return to the standard Matrix plugin.',
+      'Reinstall with "<allbot plugins install @allbot/matrix>" when you want to return to the standard Matrix plugin.',
       `If you are intentionally running from a repo checkout, reinstall that checkout explicitly with "<${MATRIX_REPO_INSTALL_COMMAND}>" after updates.`,
     ]);
   });
@@ -125,15 +125,15 @@ describe("plugin install path warnings", () => {
         issue: {
           kind: "missing-path",
           pluginId: "matrix",
-          path: "/tmp/kaijibot-matrix-missing",
+          path: "/tmp/allbot-matrix-missing",
         },
         pluginLabel: "Matrix",
-        defaultInstallCommand: "kaijibot plugins install @kaijibot/matrix",
+        defaultInstallCommand: "allbot plugins install @allbot/matrix",
         repoInstallCommand: null,
       }),
     ).toEqual([
-      "Matrix is installed from a custom path that no longer exists: /tmp/kaijibot-matrix-missing",
-      'Reinstall with "kaijibot plugins install @kaijibot/matrix".',
+      "Matrix is installed from a custom path that no longer exists: /tmp/allbot-matrix-missing",
+      'Reinstall with "allbot plugins install @allbot/matrix".',
     ]);
   });
 });

@@ -25,7 +25,7 @@ describe("sandbox explain command", () => {
         sandbox: { tools: { deny: ["browser"] } },
         elevated: { enabled: true, allowFrom: { whatsapp: ["*"] } },
       },
-      session: { store: "/tmp/kaijibot-test-sessions-{agentId}.json" },
+      session: { store: "/tmp/allbot-test-sessions-{agentId}.json" },
     };
 
     const logs: string[] = [];
@@ -75,7 +75,7 @@ describe("sandbox explain command", () => {
           },
         },
       },
-      session: { store: "/tmp/kaijibot-test-sessions-{agentId}.json" },
+      session: { store: "/tmp/allbot-test-sessions-{agentId}.json" },
     };
 
     const logs: string[] = [];

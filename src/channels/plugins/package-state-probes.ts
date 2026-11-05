@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import {
@@ -13,7 +13,7 @@ import {
 } from "./module-loader.js";
 
 type ChannelPackageStateChecker = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env?: NodeJS.ProcessEnv;
 }) => boolean;
 
@@ -115,7 +115,7 @@ export function listBundledChannelIdsForPackageState(
 export function hasBundledChannelPackageState(params: {
   metadataKey: ChannelPackageStateMetadataKey;
   channelId: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env?: NodeJS.ProcessEnv;
 }): boolean {
   const registry = getChannelPackageStateRegistry(params.metadataKey);

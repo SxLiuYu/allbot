@@ -1,15 +1,15 @@
-# KaijiBot Android Launcher
+# AllBot Android Launcher
 
-极简 Android 应用：内置 Termux + 一键引导安装 KaijiBot。
+极简 Android 应用：内置 Termux + 一键引导安装 AllBot。
 
-**下载**:[GitHub Release `launcher` tag](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) — `kaijibot-launcher.apk`(约 41MB,包含 Termux)
+**下载**:[GitHub Release `launcher` tag](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) — `allbot-launcher.apk`(约 41MB,包含 Termux)
 
 ## 用户体验
 
-1. 下载并安装 `kaijibot-launcher.apk`(允许"未知来源")
+1. 下载并安装 `allbot-launcher.apk`(允许"未知来源")
 2. 打开 Launcher → 点击「安装 Termux」(从 APK 内部解压内置的 termux.apk,无需联网下载)
 3. Termux 装好后,点击「复制命令并打开 Termux」→ 长按粘贴 → 回车
-4. KaijiBot 自动安装并启动 gateway,完成
+4. AllBot 自动安装并启动 gateway,完成
 
 ## 构建
 

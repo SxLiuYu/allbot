@@ -1,4 +1,4 @@
-import { definePluginEntry, type AnyAgentTool } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry, type AnyAgentTool } from "allbot/plugin-sdk/plugin-entry";
 import { createTavilyExtractTool } from "./src/tavily-extract-tool.js";
 import { createTavilyWebSearchProvider } from "./src/tavily-search-provider.js";
 import { createTavilySearchTool } from "./src/tavily-search-tool.js";

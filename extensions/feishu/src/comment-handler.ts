@@ -1,4 +1,4 @@
-import type { ResolvedAgentRoute } from "kaijibot/plugin-sdk/routing";
+import type { ResolvedAgentRoute } from "allbot/plugin-sdk/routing";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";
 import { createFeishuCommentReplyDispatcher } from "./comment-dispatcher.js";

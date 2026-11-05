@@ -77,14 +77,14 @@ export function registerDirectoryCli(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.help.heading.examples"))}\n${formatHelpExamples([
-          ["kaijibot directory self --channel feishu", "Show the connected account identity."],
+          ["allbot directory self --channel feishu", "Show the connected account identity."],
           [
-            'kaijibot directory peers list --channel feishu --query "kaiji"',
+            'allbot directory peers list --channel feishu --query "allbot"',
             "Search contact/user IDs by name.",
           ],
-          ["kaijibot directory groups list --channel feishu", "List available group chats."],
+          ["allbot directory groups list --channel feishu", "List available group chats."],
           [
-            "kaijibot directory groups members --channel feishu --group-id <chat-id>",
+            "allbot directory groups members --channel feishu --group-id <chat-id>",
             "List members for a specific group.",
           ],
         ])}\n\n${theme.muted(t("cli.help.heading.docs"))} ${formatDocsLink(

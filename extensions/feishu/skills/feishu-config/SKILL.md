@@ -6,9 +6,9 @@ description: |
 
 # Feishu Channel Configuration Reference
 
-All config lives under `channels.feishu` in `~/.kaijibot/kaijibot.json`.
+All config lives under `channels.feishu` in `~/.allbot/allbot.json`.
 
-Set via CLI: `kaijibot config set channels.feishu.<key> <value>`
+Set via CLI: `allbot config set channels.feishu.<key> <value>`
 
 ## Quick Reference
 
@@ -156,38 +156,38 @@ When `connectionMode: "webhook"`:
 ### Disable streaming cards
 
 ```bash
-kaijibot config set channels.feishu.streaming false
+allbot config set channels.feishu.streaming false
 ```
 
 ### Always use plain text replies
 
 ```bash
-kaijibot config set channels.feishu.renderMode raw
+allbot config set channels.feishu.renderMode raw
 ```
 
 ### Open group access (all groups, no mention required)
 
 ```bash
-kaijibot config set channels.feishu.groupPolicy open
-kaijibot config set channels.feishu.requireMention false
+allbot config set channels.feishu.groupPolicy open
+allbot config set channels.feishu.requireMention false
 ```
 
 ### Disable sensitive tools
 
 ```bash
-kaijibot config set channels.feishu.tools.perm false
+allbot config set channels.feishu.tools.perm false
 ```
 
 ### Per-group custom system prompt
 
 ```bash
-kaijibot config set channels.feishu.groups.oc_xxx.systemPrompt "You are a code review assistant."
+allbot config set channels.feishu.groups.oc_xxx.systemPrompt "You are a code review assistant."
 ```
 
 ### Change markdown table rendering
 
 ```bash
-kaijibot config set channels.feishu.markdown.tableMode ascii
+allbot config set channels.feishu.markdown.tableMode ascii
 ```
 
 ## Environment Variables
@@ -201,22 +201,22 @@ Credentials can be set via environment instead of config:
 | `FEISHU_VERIFICATION_TOKEN` | `channels.feishu.verificationToken` |
 | `FEISHU_ENCRYPT_KEY`        | `channels.feishu.encryptKey`        |
 
-Precedence: process env > `./.env` > `~/.kaijibot/.env` > `kaijibot.json` env block > config values.
+Precedence: process env > `./.env` > `~/.allbot/.env` > `allbot.json` env block > config values.
 
 ## Differences from Official openclaw-lark Plugin
 
-KaijiBot's feishu extension is based on the upstream openclaw-lark plugin with selective reliability improvements. Most config is identical, but note these differences:
+AllBot's feishu extension is based on the upstream openclaw-lark plugin with selective reliability improvements. Most config is identical, but note these differences:
 
-| Official (openclaw-lark)                          | KaijiBot                           | Notes                                                                                                                                 |
+| Official (openclaw-lark)                          | AllBot                           | Notes                                                                                                                                 |
 | ------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `openclaw config set`                             | `kaijibot config set`              | CLI command prefix differs                                                                                                            |
-| `threadSession: true/false`                       | `groupSessionScope: "group_topic"` | KaijiBot uses granular 4-value enum instead of boolean. `"enabled"` in deprecated `topicSessionMode` ≈ official `threadSession: true` |
-| `footer.elapsed`, `footer.status`                 | Not available                      | Footer metrics not in KaijiBot config schema                                                                                          |
+| `openclaw config set`                             | `allbot config set`              | CLI command prefix differs                                                                                                            |
+| `threadSession: true/false`                       | `groupSessionScope: "group_topic"` | AllBot uses granular 4-value enum instead of boolean. `"enabled"` in deprecated `topicSessionMode` ≈ official `threadSession: true` |
+| `footer.elapsed`, `footer.status`                 | Not available                      | Footer metrics not in AllBot config schema                                                                                          |
 | `/feishu start`, `/feishu doctor`, `/feishu auth` | Not available                      | Official plugin slash commands not present                                                                                            |
 
-### Streaming Card Reliability (KaijiBot-specific)
+### Streaming Card Reliability (AllBot-specific)
 
-KaijiBot has additional reliability improvements over upstream:
+AllBot has additional reliability improvements over upstream:
 
 - **CardPhase state machine**: 7-phase lifecycle (creating → updating → stable → aborting → aborted → flushing → error) with validated transitions. Prevents race conditions in concurrent card updates.
 - **FlushController**: Mutex-guarded flush with reflush support and configurable throttle. Ensures the final card content is always delivered even during aborts.

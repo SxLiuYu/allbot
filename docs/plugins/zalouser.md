@@ -1,14 +1,14 @@
 ---
 summary: "Zalo Personal plugin: QR login + messaging via native zca-js (plugin install + channel config + tool)"
 read_when:
-  - You want Zalo Personal (unofficial) support in KaijiBot
+  - You want Zalo Personal (unofficial) support in AllBot
   - You are configuring or developing the zalouser plugin
 title: "Zalo Personal Plugin"
 ---
 
 # Zalo Personal (plugin)
 
-Zalo Personal support for KaijiBot via a plugin, using native `zca-js` to automate a normal Zalo user account.
+Zalo Personal support for AllBot via a plugin, using native `zca-js` to automate a normal Zalo user account.
 
 > **Warning:** Unofficial automation may lead to account suspension/ban. Use at your own risk.
 
@@ -29,7 +29,7 @@ No external `zca`/`openzca` CLI binary is required.
 ### Option A: install from npm
 
 ```bash
-kaijibot plugins install @kaijibot/zalouser
+allbot plugins install @allbot/zalouser
 ```
 
 Restart the Gateway afterwards.
@@ -38,7 +38,7 @@ Restart the Gateway afterwards.
 
 ```bash
 PLUGIN_SRC=./path/to/local/zalouser-plugin
-kaijibot plugins install "$PLUGIN_SRC"
+allbot plugins install "$PLUGIN_SRC"
 cd "$PLUGIN_SRC" && pnpm install
 ```
 
@@ -62,11 +62,11 @@ Channel config lives under `channels.zalouser` (not `plugins.entries.*`):
 ## CLI
 
 ```bash
-kaijibot channels login --channel zalouser
-kaijibot channels logout --channel zalouser
-kaijibot channels status --probe
-kaijibot message send --channel zalouser --target <threadId> --message "Hello from KaijiBot"
-kaijibot directory peers list --channel zalouser --query "name"
+allbot channels login --channel zalouser
+allbot channels logout --channel zalouser
+allbot channels status --probe
+allbot message send --channel zalouser --target <threadId> --message "Hello from AllBot"
+allbot directory peers list --channel zalouser --query "name"
 ```
 
 ## Agent tool

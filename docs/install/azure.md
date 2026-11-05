@@ -1,22 +1,22 @@
 ---
-summary: "Run KaijiBot Gateway 24/7 on an Azure Linux VM with durable state"
+summary: "Run AllBot Gateway 24/7 on an Azure Linux VM with durable state"
 read_when:
-  - You want KaijiBot running 24/7 on Azure with Network Security Group hardening
-  - You want a production-grade, always-on KaijiBot Gateway on your own Azure Linux VM
+  - You want AllBot running 24/7 on Azure with Network Security Group hardening
+  - You want a production-grade, always-on AllBot Gateway on your own Azure Linux VM
   - You want secure administration with Azure Bastion SSH
 title: "Azure"
 ---
 
-# KaijiBot on Azure Linux VM
+# AllBot on Azure Linux VM
 
-This guide sets up an Azure Linux VM with the Azure CLI, applies Network Security Group (NSG) hardening, configures Azure Bastion for SSH access, and installs KaijiBot.
+This guide sets up an Azure Linux VM with the Azure CLI, applies Network Security Group (NSG) hardening, configures Azure Bastion for SSH access, and installs AllBot.
 
 ## What you will do
 
 - Create Azure networking (VNet, subnets, NSG) and compute resources with the Azure CLI
 - Apply Network Security Group rules so VM SSH is allowed only from Azure Bastion
 - Use Azure Bastion for SSH access (no public IP on the VM)
-- Install KaijiBot with the installer script
+- Install AllBot with the installer script
 - Verify the Gateway
 
 ## What you need
@@ -56,18 +56,18 @@ This guide sets up an Azure Linux VM with the Azure CLI, applies Network Securit
 
   <Step title="Set deployment variables">
     ```bash
-    RG="rg-kaijibot"
+    RG="rg-allbot"
     LOCATION="westus2"
-    VNET_NAME="vnet-kaijibot"
+    VNET_NAME="vnet-allbot"
     VNET_PREFIX="10.40.0.0/16"
-    VM_SUBNET_NAME="snet-kaijibot-vm"
+    VM_SUBNET_NAME="snet-allbot-vm"
     VM_SUBNET_PREFIX="10.40.2.0/24"
     BASTION_SUBNET_PREFIX="10.40.1.0/26"
-    NSG_NAME="nsg-kaijibot-vm"
-    VM_NAME="vm-kaijibot"
-    ADMIN_USERNAME="kaijibot"
-    BASTION_NAME="bas-kaijibot"
-    BASTION_PIP_NAME="pip-kaijibot-bastion"
+    NSG_NAME="nsg-allbot-vm"
+    VM_NAME="vm-allbot"
+    ADMIN_USERNAME="allbot"
+    BASTION_NAME="bas-allbot"
+    BASTION_PIP_NAME="pip-allbot-bastion"
     ```
 
     Adjust names and CIDR ranges to fit your environment. The Bastion subnet must be at least `/26`.
@@ -236,7 +236,7 @@ This guide sets up an Azure Linux VM with the Azure CLI, applies Network Securit
   </Step>
 </Steps>
 
-## Install KaijiBot
+## Install AllBot
 
 <Steps>
   <Step title="SSH into the VM through Azure Bastion">
@@ -254,15 +254,15 @@ This guide sets up an Azure Linux VM with the Azure CLI, applies Network Securit
 
   </Step>
 
-  <Step title="Install KaijiBot (in the VM shell)">
+  <Step title="Install AllBot (in the VM shell)">
     ```bash
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install
     pnpm build
     ```
 
-    This clones the source and builds KaijiBot. Node LTS and dependencies should already be present. Run `kaijibot onboard` to start the onboarding wizard. See [Install](/install) for details.
+    This clones the source and builds AllBot. Node LTS and dependencies should already be present. Run `allbot onboard` to start the onboarding wizard. See [Install](/install) for details.
 
   </Step>
 
@@ -270,10 +270,10 @@ This guide sets up an Azure Linux VM with the Azure CLI, applies Network Securit
     After onboarding completes:
 
     ```bash
-    kaijibot gateway status
+    allbot gateway status
     ```
 
-    Most enterprise Azure teams already have GitHub Copilot licenses. If that is your case, we recommend choosing the GitHub Copilot provider in the KaijiBot onboarding wizard. See [GitHub Copilot provider](/providers/github-copilot).
+    Most enterprise Azure teams already have GitHub Copilot licenses. If that is your case, we recommend choosing the GitHub Copilot provider in the AllBot onboarding wizard. See [GitHub Copilot provider](/providers/github-copilot).
 
   </Step>
 </Steps>
@@ -284,7 +284,7 @@ Azure Bastion Standard SKU runs approximately **\$140/month** and the VM (Standa
 
 To reduce costs:
 
-- **Deallocate the VM** when not in use (stops compute billing; disk charges remain). The KaijiBot Gateway will not be reachable while the VM is deallocated — restart it when you need it live again:
+- **Deallocate the VM** when not in use (stops compute billing; disk charges remain). The AllBot Gateway will not be reachable while the VM is deallocated — restart it when you need it live again:
 
   ```bash
   az vm deallocate -g "${RG}" -n "${VM_NAME}"
@@ -309,4 +309,4 @@ This removes the resource group and everything inside it (VM, VNet, NSG, Bastion
 - Set up messaging channels: [Channels](/channels)
 - Pair local devices as nodes: [Nodes](/nodes)
 - Configure the Gateway: [Gateway configuration](/gateway/configuration)
-- For more details on KaijiBot Azure deployment with the GitHub Copilot model provider: [KaijiBot on Azure with GitHub Copilot](https://github.com/johnsonshi/kaijibot-azure-github-copilot)
+- For more details on AllBot Azure deployment with the GitHub Copilot model provider: [AllBot on Azure with GitHub Copilot](https://github.com/johnsonshi/allbot-azure-github-copilot)

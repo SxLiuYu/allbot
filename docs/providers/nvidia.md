@@ -1,7 +1,7 @@
 ---
-summary: "Use NVIDIA's OpenAI-compatible API in KaijiBot"
+summary: "Use NVIDIA's OpenAI-compatible API in AllBot"
 read_when:
-  - You want to use open models in KaijiBot for free
+  - You want to use open models in AllBot for free
   - You need NVIDIA_API_KEY setup
 title: "NVIDIA"
 ---
@@ -16,8 +16,8 @@ Export the key once, then run onboarding and set an NVIDIA model:
 
 ```bash
 export NVIDIA_API_KEY="nvapi-..."
-kaijibot onboard --auth-choice skip
-kaijibot models set nvidia/nvidia/nemotron-3-super-120b-a12b
+allbot onboard --auth-choice skip
+allbot models set nvidia/nvidia/nemotron-3-super-120b-a12b
 ```
 
 If you still pass `--token`, remember it lands in shell history and `ps` output; prefer the env var when possible.

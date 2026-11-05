@@ -127,9 +127,9 @@ export const zhCN: TranslationMap = {
         preferredManagerUnavailableAction: "请手动安装缺失的包管理器，然后重新运行更新命令。",
         eaccesDetected:
           "检测到权限失败 (EACCES)。请使用可写的全局前缀或 sudo 重新运行（适用于系统管理的 Node 安装）。",
-        eaccesExample: "示例: npm config set prefix ~/.local && npm i -g kaijibot@latest",
+        eaccesExample: "示例: npm config set prefix ~/.local && npm i -g allbot@latest",
         nativeDepFailure: "检测到原生可选依赖构建失败。更新器会自动使用 --omit=optional 重试。",
-        nativeDepExample: "如果仍然失败: npm i -g kaijibot@latest --omit=optional",
+        nativeDepExample: "如果仍然失败: npm i -g allbot@latest --omit=optional",
       },
       result: {
         heading: "更新结果:",
@@ -142,7 +142,7 @@ export const zhCN: TranslationMap = {
         totalTime: "总时间",
       },
       wizard: {
-        requiresTty: "更新向导需要 TTY。请改用 `kaijibot update --channel <stable|beta|dev>`。",
+        requiresTty: "更新向导需要 TTY。请改用 `allbot update --channel <stable|beta|dev>`。",
         cancelled: "更新已取消。",
         channelSelect: "更新渠道",
         keepCurrent: "保持当前 ({channel})",
@@ -152,12 +152,12 @@ export const zhCN: TranslationMap = {
         betaHint: "预发布 (npm beta)",
         dev: "Dev",
         devHint: "Git main",
-        createGitCheckout: "在 {dir} 创建 git checkout？（可通过 KAIJIBOT_GIT_DIR 覆盖）",
+        createGitCheckout: "在 {dir} 创建 git checkout？（可通过 ALLBOT_GIT_DIR 覆盖）",
         restartPrompt: "更新后重启 gateway 服务？",
       },
     },
     banner: {
-      title: "👾 KaijiBot",
+      title: "👾 AllBot",
       commitUnknown: "未知",
     },
     help: {
@@ -170,39 +170,39 @@ export const zhCN: TranslationMap = {
       },
       example: {
         "0": {
-          command: "kaijibot models --help",
+          command: "allbot models --help",
           description: "查看 models 命令的详细帮助。",
         },
         "1": {
-          command: "kaijibot channels login --verbose",
+          command: "allbot channels login --verbose",
           description: "链接个人 WhatsApp Web，显示 QR 码和连接日志。",
         },
         "2": {
-          command: 'kaijibot message send --target +15555550123 --message "Hi" --json',
+          command: 'allbot message send --target +15555550123 --message "Hi" --json',
           description: "通过网页会话发送并以 JSON 格式输出结果。",
         },
         "3": {
-          command: "kaijibot gateway --port 18789",
+          command: "allbot gateway --port 18789",
           description: "在本地运行 WebSocket Gateway。",
         },
         "4": {
-          command: "kaijibot --dev gateway",
+          command: "allbot --dev gateway",
           description: "运行开发模式 Gateway（隔离状态/配置），地址 ws://127.0.0.1:19001。",
         },
         "5": {
-          command: "kaijibot gateway --force",
+          command: "allbot gateway --force",
           description: "终止占用默认 gateway 端口的进程，然后启动。",
         },
         "6": {
-          command: "kaijibot gateway ...",
+          command: "allbot gateway ...",
           description: "通过 WebSocket 控制 Gateway。",
         },
         "7": {
-          command: 'kaijibot agent --to +15555550123 --message "Run summary" --deliver',
+          command: 'allbot agent --to +15555550123 --message "Run summary" --deliver',
           description: "通过 Gateway 直接与 agent 对话；可选发送 WhatsApp 回复。",
         },
         "8": {
-          command: 'kaijibot message send --channel feishu --target ou_xxx --message "Hi"',
+          command: 'allbot message send --channel feishu --target ou_xxx --message "Hi"',
           description: "通过 Telegram bot 发送。",
         },
       },
@@ -214,7 +214,7 @@ export const zhCN: TranslationMap = {
       onboard: {
         description: "交互式引导配置 gateway、workspace 和 skills",
         options: {
-          workspace: "Agent workspace 目录（默认：~/.kaijibot/workspace）",
+          workspace: "Agent workspace 目录（默认：~/.allbot/workspace）",
           reset:
             "运行 onboard 前重置 config + credentials + sessions（仅 workspace 配合 --reset-scope full）",
           resetScope: "重置范围：config|config+creds+sessions|full",
@@ -240,7 +240,7 @@ export const zhCN: TranslationMap = {
           gatewayAuth: "Gateway 认证：token|password",
           gatewayToken: "Gateway token（token 认证）",
           gatewayTokenRefEnv:
-            "Gateway token SecretRef 环境变量名（token 认证；如 KAIJIBOT_GATEWAY_TOKEN）",
+            "Gateway token SecretRef 环境变量名（token 认证；如 ALLBOT_GATEWAY_TOKEN）",
           gatewayPassword: "Gateway 密码（password 认证）",
           remoteUrl: "远程 Gateway WebSocket URL",
           remoteToken: "远程 Gateway token（可选）",
@@ -266,7 +266,7 @@ export const zhCN: TranslationMap = {
         description: "非交互式 config 工具（get/set/unset/file/validate）。默认：启动引导式配置。",
       },
       backup: {
-        description: "为 KaijiBot 状态创建并验证本地备份归档",
+        description: "为 AllBot 状态创建并验证本地备份归档",
       },
       doctor: {
         description: "Gateway 和 channels 的健康检查 + 快速修复",
@@ -281,16 +281,16 @@ export const zhCN: TranslationMap = {
         description: "卸载 gateway service + 本地数据（CLI 保留）",
       },
       migrate: {
-        description: "从 OpenClaw 或旧版安装迁移数据到 KaijiBot",
+        description: "从 OpenClaw 或旧版安装迁移数据到 AllBot",
       },
       "android-install": {
-        description: "在 Android/Termux 上配置 KaijiBot（自动安装包、启动脚本、电池设置）",
+        description: "在 Android/Termux 上配置 AllBot（自动安装包、启动脚本、电池设置）",
       },
       message: {
         description: "发送、读取和管理消息",
       },
       mcp: {
-        description: "管理 KaijiBot MCP 配置和 channel bridge",
+        description: "管理 AllBot MCP 配置和 channel bridge",
       },
       agent: {
         description: "通过 Gateway 运行一轮 agent 对话",
@@ -359,7 +359,7 @@ export const zhCN: TranslationMap = {
         description: "用于广域发现的 DNS 工具（Tailscale + CoreDNS）",
       },
       docs: {
-        description: "搜索 KaijiBot 在线文档",
+        description: "搜索 AllBot 在线文档",
       },
       qa: {
         description: "运行 QA 场景并启动私有 QA 调试 UI",
@@ -380,7 +380,7 @@ export const zhCN: TranslationMap = {
         description: "安全 DM 配对（审批入站请求）",
       },
       plugins: {
-        description: "管理 KaijiBot plugins 和 extensions",
+        description: "管理 AllBot plugins 和 extensions",
       },
       channels: {
         description: "管理已连接的聊天 channels（Telegram、Discord 等）",
@@ -401,7 +401,7 @@ export const zhCN: TranslationMap = {
         description: "管理 soul presets（基于 MBTI 的人格档案）",
       },
       update: {
-        description: "更新 KaijiBot 并查看更新 channel 状态",
+        description: "更新 AllBot 并查看更新 channel 状态",
       },
       completion: {
         description: "生成 shell 补全脚本",
@@ -409,7 +409,7 @@ export const zhCN: TranslationMap = {
     },
     wizard: {
       welcome: {
-        body: "欢迎使用 KaijiBot 👾\n\nKaijiBot 是一个具备系统访问能力的 AI 助手：\n- 可以读写文件、执行命令、搜索网络\n- 会随对话逐渐学习你的偏好和兴趣（认知系统）\n- 可能会主动联系你分享有价值的洞察\n\n安全提示：\n- 请勿在不可信的网络环境中暴露 Gateway\n- 不要把 API Key 或敏感信息放在 agent 可访问的路径下",
+        body: "欢迎使用 AllBot 👾\n\nAllBot 是一个具备系统访问能力的 AI 助手：\n- 可以读写文件、执行命令、搜索网络\n- 会随对话逐渐学习你的偏好和兴趣（认知系统）\n- 可能会主动联系你分享有价值的洞察\n\n安全提示：\n- 请勿在不可信的网络环境中暴露 Gateway\n- 不要把 API Key 或敏感信息放在 agent 可访问的路径下",
         title: "安全须知",
         confirmPrompt: "我已了解以上内容，继续配置？",
       },
@@ -418,7 +418,7 @@ export const zhCN: TranslationMap = {
         title: "📋 配置前准备",
         confirmPrompt: "我已准备好以上条件，继续配置？",
       },
-      intro: "KaijiBot 配置向导",
+      intro: "AllBot 配置向导",
       cancelledOutro: "配置已取消。准备好后再来吧！",
       invalidConfigOutro: "配置无效。运行 `{doctorCmd}` 修复后重新执行配置。",
       flow: {
@@ -473,17 +473,17 @@ export const zhCN: TranslationMap = {
         tuiLabel: "在 TUI 中启动（推荐）",
         webLabel: "打开 Web 控制面板",
         laterLabel: "稍后再说",
-        tuiGreeting: "你好！我是你的 KaijiBot 助手。",
+        tuiGreeting: "你好！我是你的 AllBot 助手。",
       },
       security: {
         notice: "安全提示：不要将 Gateway 暴露在公网，API Key 不要放在 agent 可访问的路径下。",
         title: "安全须知",
       },
       whatNow: {
-        body: "接下来：探索 KaijiBot 的认知功能，与你的机器人开始对话。",
+        body: "接下来：探索 AllBot 的认知功能，与你的机器人开始对话。",
       },
       outro: {
-        opened: "配置完成。控制面板已打开，保持该标签页即可管理 KaijiBot。",
+        opened: "配置完成。控制面板已打开，保持该标签页即可管理 AllBot。",
         background: "配置完成。控制面板链接：",
         default: "配置完成。",
       },
@@ -511,8 +511,8 @@ export const zhCN: TranslationMap = {
         enableMessage: "启用 web_fetch（无需密钥的 HTTP 抓取）？",
       },
       intro: {
-        update: "KaijiBot 更新向导",
-        configure: "KaijiBot 配置",
+        update: "AllBot 更新向导",
+        configure: "AllBot 配置",
       },
       invalidConfigOutro: "配置无效。运行 `{doctorCmd}` 修复后重新执行配置。",
       gatewayLocation: {
@@ -652,10 +652,10 @@ export const zhCN: TranslationMap = {
         success: "已禁用 hook: {emoji} {name}",
       },
       install: {
-        deprecated: "`kaijibot hooks install` 已弃用；请使用 `kaijibot plugins install`。",
+        deprecated: "`allbot hooks install` 已弃用；请使用 `allbot plugins install`。",
       },
       update: {
-        deprecated: "`kaijibot hooks update` 已弃用；请使用 `kaijibot plugins update`。",
+        deprecated: "`allbot hooks update` 已弃用；请使用 `allbot plugins update`。",
       },
     },
     capability: {
@@ -761,7 +761,7 @@ export const zhCN: TranslationMap = {
       },
       run: {
         warningPassword:
-          "警告: --password 可能通过进程列表暴露。建议使用 --password-file 或 KAIJIBOT_GATEWAY_PASSWORD。",
+          "警告: --password 可能通过进程列表暴露。建议使用 --password-file 或 ALLBOT_GATEWAY_PASSWORD。",
         resetRequiresDev: "请将 --reset 与 --dev 一起使用。",
         invalidWsLog: '无效的 --ws-log（请使用 "auto"、"full"、"compact"）',
         invalidPort: "无效的端口",
@@ -788,14 +788,14 @@ export const zhCN: TranslationMap = {
         error: {
           passwordNotConfigured: "Gateway 认证设置为 password，但未配置密码。",
           passwordNotConfiguredHint:
-            "设置 gateway.auth.password（或 KAIJIBOT_GATEWAY_PASSWORD），或传递 --password。",
+            "设置 gateway.auth.password（或 ALLBOT_GATEWAY_PASSWORD），或传递 --password。",
           refusingBind: "拒绝在无认证的情况下将 gateway 绑定到 {bind}。",
           containerDetected:
             "检测到容器环境 — gateway 默认使用 bind=auto (0.0.0.0) 以兼容端口转发。",
           containerHint:
-            "设置 KAIJIBOT_GATEWAY_TOKEN 或 KAIJIBOT_GATEWAY_PASSWORD，或传递 --token/--password 以带认证启动。",
+            "设置 ALLBOT_GATEWAY_TOKEN 或 ALLBOT_GATEWAY_PASSWORD，或传递 --token/--password 以带认证启动。",
           bindHint:
-            "设置 gateway.auth.token/password（或 KAIJIBOT_GATEWAY_TOKEN/KAIJIBOT_GATEWAY_PASSWORD）或传递 --token/--password。",
+            "设置 gateway.auth.token/password（或 ALLBOT_GATEWAY_TOKEN/ALLBOT_GATEWAY_PASSWORD）或传递 --token/--password。",
           failedToStart:
             "Gateway 启动失败: {message}\n如果 gateway 被托管，请使用以下命令停止: {cmd}",
           failedToStartGeneric: "Gateway 启动失败: {message}",
@@ -862,7 +862,7 @@ export const zhCN: TranslationMap = {
       opt: {
         statusJson: "输出 JSON（`models status --json` 的别名）",
         statusPlain: "纯文本输出（`models status --plain` 的别名）",
-        agent: "要检查的 Agent id（覆盖 KAIJIBOT_AGENT_DIR/PI_CODING_AGENT_DIR）",
+        agent: "要检查的 Agent id（覆盖 ALLBOT_AGENT_DIR/PI_CODING_AGENT_DIR）",
         all: "显示完整 model catalog",
         local: "过滤本地 model",
         provider: "按 provider 过滤",
@@ -919,7 +919,7 @@ export const zhCN: TranslationMap = {
     dns: {
       setup: {
         title: "DNS 设置",
-        recommendedConfig: "推荐配置 ($KAIJIBOT_CONFIG_PATH, 默认 ~/.kaijibot/kaijibot.json):",
+        recommendedConfig: "推荐配置 ($ALLBOT_CONFIG_PATH, 默认 ~/.allbot/allbot.json):",
         tailscaleAdmin: "Tailscale 管理 (DNS → Nameservers):",
         addNameserver: "- 添加 nameserver: {ip}",
         thisMachineIpv4: "<本机的 tailnet IPv4>",
@@ -927,7 +927,7 @@ export const zhCN: TranslationMap = {
         runWithApply: "使用 --apply 运行以安装 CoreDNS 并配置。",
         startingCoreDNS: "正在启动 CoreDNS (sudo)…",
         noteEnableDiscovery:
-          "注意: 在活跃的 KaijiBot 配置 ($KAIJIBOT_CONFIG_PATH, 默认 ~/.kaijibot/kaijibot.json) 中启用 discovery.wideArea.enabled，并重启 gateway 使其写入 DNS-SD zone。",
+          "注意: 在活跃的 AllBot 配置 ($ALLBOT_CONFIG_PATH, 默认 ~/.allbot/allbot.json) 中启用 discovery.wideArea.enabled，并重启 gateway 使其写入 DNS-SD zone。",
       },
     },
     daemon: {
@@ -962,7 +962,7 @@ export const zhCN: TranslationMap = {
         rootCause:
           "根本原因：CLI 和 service 使用不同的 config 路径（可能是 profile/state-dir 不匹配）。",
         fixConfigMismatch:
-          "修复：从你期望的 --profile / KAIJIBOT_STATE_DIR 重新运行 `{gatewayInstallCmd}`。",
+          "修复：从你期望的 --profile / ALLBOT_STATE_DIR 重新运行 `{gatewayInstallCmd}`。",
         warmUp: "预热中：launch agent 可能需要几秒钟。请稍后重试。",
         rpcOk: "正常",
         rpcFailed: "失败",
@@ -1084,10 +1084,10 @@ export const zhCN: TranslationMap = {
       install: {
         linkedHookPack: "已链接 hook pack 路径: {path}",
         linkedPlugin: "已链接 plugin 路径: {path}",
-        configInvalid: "配置无效；请先运行 `kaijibot doctor --fix` 再安装 plugins。",
-        configUnparseable: "配置文件无法解析；请运行 `kaijibot doctor` 修复。",
+        configInvalid: "配置无效；请先运行 `allbot doctor --fix` 再安装 plugins。",
+        configUnparseable: "配置文件无法解析；请运行 `allbot doctor` 修复。",
         configInvalidBundledRecovery:
-          "在 bundled 恢复路径之外的配置无效（{plugin}）；请先运行 `kaijibot doctor --fix` 再重新安装。",
+          "在 bundled 恢复路径之外的配置无效（{plugin}）；请先运行 `allbot doctor --fix` 再重新安装。",
         linkNotMarketplace: "`--link` 不支持与 `--marketplace` 一起使用。",
         pinNotMarketplace: "`--pin` 不支持与 `--marketplace` 一起使用。",
         forceNotLink: "`--force` 不支持与 `--link` 一起使用。",
@@ -1179,7 +1179,7 @@ export const zhCN: TranslationMap = {
       },
     },
     runMain: {
-      uncaughtException: "[kaijibot] 未捕获的异常:",
+      uncaughtException: "[allbot] 未捕获的异常:",
     },
     prompt: {
       yesNo: " [Y/n] ",

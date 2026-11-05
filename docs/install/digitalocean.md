@@ -1,14 +1,14 @@
 ---
-summary: "Host KaijiBot on a DigitalOcean Droplet"
+summary: "Host AllBot on a DigitalOcean Droplet"
 read_when:
-  - Setting up KaijiBot on DigitalOcean
-  - Looking for a simple paid VPS for KaijiBot
+  - Setting up AllBot on DigitalOcean
+  - Looking for a simple paid VPS for AllBot
 title: "DigitalOcean"
 ---
 
 # DigitalOcean
 
-Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
+Run a persistent AllBot Gateway on a DigitalOcean Droplet.
 
 ## Prerequisites
 
@@ -45,18 +45,18 @@ Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
     curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt install -y nodejs
 
-    # Install KaijiBot
+    # Install AllBot
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install && pnpm build
-    kaijibot --version
+    allbot --version
     ```
 
   </Step>
 
   <Step title="Run onboarding">
     ```bash
-    kaijibot onboard --install-daemon
+    allbot onboard --install-daemon
     ```
 
     The wizard walks you through model auth, channel setup, gateway token generation, and daemon installation (systemd).
@@ -75,9 +75,9 @@ Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
 
   <Step title="Verify the gateway">
     ```bash
-    kaijibot status
-    systemctl --user status kaijibot-gateway.service
-    journalctl --user -u kaijibot-gateway.service -f
+    allbot status
+    systemctl --user status allbot-gateway.service
+    journalctl --user -u allbot-gateway.service -f
     ```
   </Step>
 
@@ -98,8 +98,8 @@ Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
     ```bash
     curl -fsSL https://tailscale.com/install.sh | sh
     tailscale up
-    kaijibot config set gateway.tailscale.mode serve
-    kaijibot gateway restart
+    allbot config set gateway.tailscale.mode serve
+    allbot gateway restart
     ```
 
     Then open `https://<magicdns>/` from any device on your tailnet.
@@ -107,8 +107,8 @@ Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
     **Option C: Tailnet bind (no Serve)**
 
     ```bash
-    kaijibot config set gateway.bind tailnet
-    kaijibot gateway restart
+    allbot config set gateway.bind tailnet
+    allbot gateway restart
     ```
 
     Then open `http://<tailscale-ip>:18789` (token required).
@@ -118,7 +118,7 @@ Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
 
 ## Troubleshooting
 
-**Gateway will not start** -- Run `kaijibot doctor --non-interactive` and check logs with `journalctl --user -u kaijibot-gateway.service -n 50`.
+**Gateway will not start** -- Run `allbot doctor --non-interactive` and check logs with `journalctl --user -u allbot-gateway.service -n 50`.
 
 **Port already in use** -- Run `lsof -i :18789` to find the process, then stop it.
 
@@ -128,4 +128,4 @@ Run a persistent KaijiBot Gateway on a DigitalOcean Droplet.
 
 - [Channels](/channels) -- connect Telegram, WhatsApp, Discord, and more
 - [Gateway configuration](/gateway/configuration) -- all config options
-- [Updating](/install/updating) -- keep KaijiBot up to date
+- [Updating](/install/updating) -- keep AllBot up to date

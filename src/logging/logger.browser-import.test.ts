@@ -8,24 +8,24 @@ const originalGetBuiltinModule = (
 ).getBuiltinModule;
 
 async function importBrowserSafeLogger(params?: {
-  resolvePreferredKaijiBotTmpDir?: ReturnType<typeof vi.fn>;
+  resolvePreferredAllBotTmpDir?: ReturnType<typeof vi.fn>;
 }): Promise<{
   module: LoggerModule;
-  resolvePreferredKaijiBotTmpDir: ReturnType<typeof vi.fn>;
+  resolvePreferredAllBotTmpDir: ReturnType<typeof vi.fn>;
 }> {
-  const resolvePreferredKaijiBotTmpDir =
-    params?.resolvePreferredKaijiBotTmpDir ??
+  const resolvePreferredAllBotTmpDir =
+    params?.resolvePreferredAllBotTmpDir ??
     vi.fn(() => {
-      throw new Error("resolvePreferredKaijiBotTmpDir should not run during browser-safe import");
+      throw new Error("resolvePreferredAllBotTmpDir should not run during browser-safe import");
     });
 
-  vi.doMock("../infra/tmp-kaijibot-dir.js", async () => {
-    const actual = await vi.importActual<typeof import("../infra/tmp-kaijibot-dir.js")>(
-      "../infra/tmp-kaijibot-dir.js",
+  vi.doMock("../infra/tmp-allbot-dir.js", async () => {
+    const actual = await vi.importActual<typeof import("../infra/tmp-allbot-dir.js")>(
+      "../infra/tmp-allbot-dir.js",
     );
     return {
       ...actual,
-      resolvePreferredKaijiBotTmpDir,
+      resolvePreferredAllBotTmpDir,
     };
   });
 
@@ -38,12 +38,12 @@ async function importBrowserSafeLogger(params?: {
     import.meta.url,
     "./logger.js?scope=browser-safe",
   );
-  return { module, resolvePreferredKaijiBotTmpDir };
+  return { module, resolvePreferredAllBotTmpDir };
 }
 
 describe("logging/logger browser-safe import", () => {
   afterEach(() => {
-    vi.doUnmock("../infra/tmp-kaijibot-dir.js");
+    vi.doUnmock("../infra/tmp-allbot-dir.js");
     Object.defineProperty(process, "getBuiltinModule", {
       configurable: true,
       value: originalGetBuiltinModule,
@@ -51,22 +51,22 @@ describe("logging/logger browser-safe import", () => {
   });
 
   it("does not resolve the preferred temp dir at import time when node fs is unavailable", async () => {
-    const { module, resolvePreferredKaijiBotTmpDir } = await importBrowserSafeLogger();
+    const { module, resolvePreferredAllBotTmpDir } = await importBrowserSafeLogger();
 
-    expect(resolvePreferredKaijiBotTmpDir).not.toHaveBeenCalled();
-    expect(module.DEFAULT_LOG_DIR).toBe("/tmp/kaijibot");
-    expect(module.DEFAULT_LOG_FILE).toBe("/tmp/kaijibot/kaijibot.log");
+    expect(resolvePreferredAllBotTmpDir).not.toHaveBeenCalled();
+    expect(module.DEFAULT_LOG_DIR).toBe("/tmp/allbot");
+    expect(module.DEFAULT_LOG_FILE).toBe("/tmp/allbot/allbot.log");
   });
 
   it("disables file logging when imported in a browser-like environment", async () => {
-    const { module, resolvePreferredKaijiBotTmpDir } = await importBrowserSafeLogger();
+    const { module, resolvePreferredAllBotTmpDir } = await importBrowserSafeLogger();
 
     expect(module.getResolvedLoggerSettings()).toMatchObject({
       level: "silent",
-      file: "/tmp/kaijibot/kaijibot.log",
+      file: "/tmp/allbot/allbot.log",
     });
     expect(module.isFileLogLevelEnabled("info")).toBe(false);
     expect(() => module.getLogger().info("browser-safe")).not.toThrow();
-    expect(resolvePreferredKaijiBotTmpDir).not.toHaveBeenCalled();
+    expect(resolvePreferredAllBotTmpDir).not.toHaveBeenCalled();
   });
 });

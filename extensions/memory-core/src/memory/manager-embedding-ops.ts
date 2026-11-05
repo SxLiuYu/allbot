@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   enforceEmbeddingMaxInputTokens,
   hasNonTextEmbeddingParts,
   type EmbeddingInput,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import { type SessionFileEntry } from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
+import { createSubsystemLogger } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import { type SessionFileEntry } from "allbot/plugin-sdk/memory-core-host-engine-qmd";
 import {
   buildMultimodalChunkForIndexing,
   chunkMarkdown,
@@ -15,7 +15,7 @@ import {
   type MemoryChunk,
   type MemoryFileEntry,
   type MemorySource,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 import {
   MEMORY_BATCH_FAILURE_LIMIT,
   recordMemoryBatchFailure,

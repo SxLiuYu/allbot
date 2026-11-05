@@ -1,5 +1,5 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-onboard";
-import { fetchWithSsrFGuard } from "kaijibot/plugin-sdk/ssrf-runtime";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-onboard";
+import { fetchWithSsrFGuard } from "allbot/plugin-sdk/ssrf-runtime";
 import {
   OLLAMA_DEFAULT_BASE_URL,
   OLLAMA_DEFAULT_CONTEXT_WINDOW,

@@ -25,20 +25,20 @@ describe("matchesExecAllowlistPattern", () => {
   });
 
   it("expands home-prefix patterns", () => {
-    const prevKaijiBotHome = process.env.KAIJIBOT_HOME;
+    const prevAllBotHome = process.env.ALLBOT_HOME;
     const prevHome = process.env.HOME;
-    process.env.KAIJIBOT_HOME = "/srv/kaijibot-home";
+    process.env.ALLBOT_HOME = "/srv/allbot-home";
     process.env.HOME = "/home/other";
-    const kaijiBotHome = path.join(path.resolve("/srv/kaijibot-home"), "bin", "tool");
+    const allBotHome = path.join(path.resolve("/srv/allbot-home"), "bin", "tool");
     const fallbackHome = path.join(path.resolve("/home/other"), "bin", "tool");
     try {
-      expect(matchesExecAllowlistPattern("~/bin/tool", kaijiBotHome)).toBe(true);
+      expect(matchesExecAllowlistPattern("~/bin/tool", allBotHome)).toBe(true);
       expect(matchesExecAllowlistPattern("~/bin/tool", fallbackHome)).toBe(false);
     } finally {
-      if (prevKaijiBotHome === undefined) {
-        delete process.env.KAIJIBOT_HOME;
+      if (prevAllBotHome === undefined) {
+        delete process.env.ALLBOT_HOME;
       } else {
-        process.env.KAIJIBOT_HOME = prevKaijiBotHome;
+        process.env.ALLBOT_HOME = prevAllBotHome;
       }
       if (prevHome === undefined) {
         delete process.env.HOME;

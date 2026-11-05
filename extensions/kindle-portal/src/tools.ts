@@ -9,7 +9,7 @@
  * `kindle_status` — reports whether the portal is enabled, the bind mode,
  *   the detected LAN IP, and whether the route is currently reachable.
  *
- * Both tools read/write `~/.kaijibot/kaijibot.json` directly (not injected)
+ * Both tools read/write `~/.allbot/allbot.json` directly (not injected)
  * because they need fresh values and must survive config hot-reloads.
  */
 
@@ -17,7 +17,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { get as httpGet } from "node:http";
 import { homedir, networkInterfaces } from "node:os";
 import path from "node:path";
-import type { AnyAgentTool } from "kaijibot/plugin-sdk/core";
+import type { AnyAgentTool } from "allbot/plugin-sdk/core";
 import { Type } from "typebox";
 
 // ── Constants ────────────────────────────────────────────────────────────
@@ -91,7 +91,7 @@ export function detectLanIp(): string | null {
 // ── Config file I/O ──────────────────────────────────────────────────────
 
 function configPath(): string {
-  return path.join(homedir(), ".kaijibot", "kaijibot.json");
+  return path.join(homedir(), ".allbot", "allbot.json");
 }
 
 async function readConfig(): Promise<Record<string, unknown>> {

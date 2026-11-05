@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const hoisted = vi.hoisted(() => ({
   completeMock: vi.fn(),
-  ensureKaijiBotModelsJsonMock: vi.fn(async () => {}),
+  ensureAllBotModelsJsonMock: vi.fn(async () => {}),
   getApiKeyForModelMock: vi.fn(async () => ({
     apiKey: "oauth-test", // pragma: allowlist secret
     source: "test",
@@ -20,7 +20,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 const {
   completeMock,
-  ensureKaijiBotModelsJsonMock,
+  ensureAllBotModelsJsonMock,
   getApiKeyForModelMock,
   resolveApiKeyForProviderMock,
   requireApiKeyMock,
@@ -42,7 +42,7 @@ vi.mock("../agents/models-config.js", async () => ({
   ...(await vi.importActual<typeof import("../agents/models-config.js")>(
     "../agents/models-config.js",
   )),
-  ensureKaijiBotModelsJson: ensureKaijiBotModelsJsonMock,
+  ensureAllBotModelsJson: ensureAllBotModelsJsonMock,
 }));
 
 vi.mock("../agents/model-auth.js", () => ({
@@ -93,7 +93,7 @@ describe("describeImageWithModel", () => {
   it("routes minimax-portal image models through the MiniMax VLM endpoint", async () => {
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       provider: "minimax-portal",
       model: "MiniMax-VL-01",
       buffer: Buffer.from("png-bytes"),
@@ -107,7 +107,7 @@ describe("describeImageWithModel", () => {
       text: "portal ok",
       model: "MiniMax-VL-01",
     });
-    expect(ensureKaijiBotModelsJsonMock).toHaveBeenCalled();
+    expect(ensureAllBotModelsJsonMock).toHaveBeenCalled();
     expect(getApiKeyForModelMock).toHaveBeenCalled();
     expect(requireApiKeyMock).toHaveBeenCalled();
     expect(setRuntimeApiKeyMock).toHaveBeenCalledWith("minimax-portal", "oauth-test");
@@ -118,7 +118,7 @@ describe("describeImageWithModel", () => {
         headers: {
           Authorization: "Bearer oauth-test",
           "Content-Type": "application/json",
-          "MM-API-Source": "KaijiBot",
+          "MM-API-Source": "AllBot",
         },
         body: JSON.stringify({
           prompt: "Describe the image.",
@@ -151,7 +151,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       provider: "minimax-portal",
       model: "custom-vision",
       buffer: Buffer.from("png-bytes"),
@@ -190,7 +190,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       provider: "openai-codex",
       model: "gpt-5.4",
       buffer: Buffer.from("png-bytes"),
@@ -254,7 +254,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       provider: "google",
       model: "gemini-3.1-flash-preview",
       profile: "google:default",
@@ -302,7 +302,7 @@ describe("describeImageWithModel", () => {
 
     const result = await describeImageWithModel({
       cfg: {},
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       provider: "google",
       model: "gemini-3.1-flash-lite",
       profile: "google:default",

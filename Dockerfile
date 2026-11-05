@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Opt-in extension dependencies at build time (space-separated directory names).
-# Example: docker build --build-arg KAIJIBOT_EXTENSIONS="diagnostics-otel matrix" .
+# Example: docker build --build-arg ALLBOT_EXTENSIONS="diagnostics-otel matrix" .
 #
 # Multi-stage build produces a minimal runtime image without build tools,
 # source code, or Bun. Works with Docker, Buildx, and Podman.
@@ -11,37 +11,37 @@
 #
 # Two runtime variants:
 #   Default (bookworm):      docker build .
-#   Slim (bookworm-slim):    docker build --build-arg KAIJIBOT_VARIANT=slim .
-ARG KAIJIBOT_EXTENSIONS=""
-ARG KAIJIBOT_VARIANT=default
-ARG KAIJIBOT_BUNDLED_PLUGIN_DIR=extensions
-ARG KAIJIBOT_DOCKER_APT_UPGRADE=1
-ARG KAIJIBOT_NODE_BOOKWORM_IMAGE="node:24-bookworm@sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a"
-ARG KAIJIBOT_NODE_BOOKWORM_DIGEST="sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a"
-ARG KAIJIBOT_NODE_BOOKWORM_SLIM_IMAGE="node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205"
-ARG KAIJIBOT_NODE_BOOKWORM_SLIM_DIGEST="sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205"
+#   Slim (bookworm-slim):    docker build --build-arg ALLBOT_VARIANT=slim .
+ARG ALLBOT_EXTENSIONS=""
+ARG ALLBOT_VARIANT=default
+ARG ALLBOT_BUNDLED_PLUGIN_DIR=extensions
+ARG ALLBOT_DOCKER_APT_UPGRADE=1
+ARG ALLBOT_NODE_BOOKWORM_IMAGE="node:24-bookworm@sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a"
+ARG ALLBOT_NODE_BOOKWORM_DIGEST="sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a"
+ARG ALLBOT_NODE_BOOKWORM_SLIM_IMAGE="node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205"
+ARG ALLBOT_NODE_BOOKWORM_SLIM_DIGEST="sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205"
 
 # Base images are pinned to SHA256 digests for reproducible builds.
 # Trade-off: digests must be updated manually when upstream tags move.
 # To update, run: docker buildx imagetools inspect node:24-bookworm (or podman)
 # and replace the digest below with the current multi-arch manifest list entry.
 
-FROM ${KAIJIBOT_NODE_BOOKWORM_IMAGE} AS ext-deps
-ARG KAIJIBOT_EXTENSIONS
-ARG KAIJIBOT_BUNDLED_PLUGIN_DIR
-COPY ${KAIJIBOT_BUNDLED_PLUGIN_DIR} /tmp/${KAIJIBOT_BUNDLED_PLUGIN_DIR}
+FROM ${ALLBOT_NODE_BOOKWORM_IMAGE} AS ext-deps
+ARG ALLBOT_EXTENSIONS
+ARG ALLBOT_BUNDLED_PLUGIN_DIR
+COPY ${ALLBOT_BUNDLED_PLUGIN_DIR} /tmp/${ALLBOT_BUNDLED_PLUGIN_DIR}
 # Copy package.json for opted-in extensions so pnpm resolves their deps.
 RUN mkdir -p /out && \
-    for ext in $KAIJIBOT_EXTENSIONS; do \
-      if [ -f "/tmp/${KAIJIBOT_BUNDLED_PLUGIN_DIR}/$ext/package.json" ]; then \
+    for ext in $ALLBOT_EXTENSIONS; do \
+      if [ -f "/tmp/${ALLBOT_BUNDLED_PLUGIN_DIR}/$ext/package.json" ]; then \
         mkdir -p "/out/$ext" && \
-        cp "/tmp/${KAIJIBOT_BUNDLED_PLUGIN_DIR}/$ext/package.json" "/out/$ext/package.json"; \
+        cp "/tmp/${ALLBOT_BUNDLED_PLUGIN_DIR}/$ext/package.json" "/out/$ext/package.json"; \
       fi; \
     done
 
 # ── Stage 2: Build ──────────────────────────────────────────────
-FROM ${KAIJIBOT_NODE_BOOKWORM_IMAGE} AS build
-ARG KAIJIBOT_BUNDLED_PLUGIN_DIR
+FROM ${ALLBOT_NODE_BOOKWORM_IMAGE} AS build
+ARG ALLBOT_BUNDLED_PLUGIN_DIR
 
 # bun.sh/install fetches release tarballs from GitHub, which may be
 # unreachable in some regions. Override with a GitHub release proxy for those
@@ -68,23 +68,23 @@ RUN corepack enable
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY kaijibot.mjs ./
+COPY allbot.mjs ./
 COPY ui/package.json ./ui/package.json
 COPY patches ./patches
 COPY scripts/postinstall-bundled-plugins.mjs scripts/npm-runner.mjs scripts/windows-cmd-helpers.mjs ./scripts/
 
-COPY --from=ext-deps /out/ ./${KAIJIBOT_BUNDLED_PLUGIN_DIR}/
+COPY --from=ext-deps /out/ ./${ALLBOT_BUNDLED_PLUGIN_DIR}/
 
 # Reduce OOM risk on low-memory hosts during dependency installation.
 # Docker builds on small VMs may otherwise fail with "Killed" (exit 137).
-RUN --mount=type=cache,id=kaijibot-pnpm-store,target=/root/.local/share/pnpm/store,sharing=locked \
+RUN --mount=type=cache,id=allbot-pnpm-store,target=/root/.local/share/pnpm/store,sharing=locked \
     NODE_OPTIONS=--max-old-space-size=2048 pnpm install --frozen-lockfile
 
 COPY . .
 
 # Normalize extension paths now so runtime COPY preserves safe modes
 # without adding a second full extensions layer.
-RUN for dir in /app/${KAIJIBOT_BUNDLED_PLUGIN_DIR} /app/.agent /app/.agents; do \
+RUN for dir in /app/${ALLBOT_BUNDLED_PLUGIN_DIR} /app/.agent /app/.agents; do \
       if [ -d "$dir" ]; then \
         find "$dir" -type d -exec chmod 755 {} +; \
         find "$dir" -type f -exec chmod 644 {} +; \
@@ -99,46 +99,46 @@ RUN pnpm canvas:a2ui:bundle || \
      mkdir -p src/canvas-host/a2ui && \
      echo "/* A2UI bundle unavailable in this build */" > src/canvas-host/a2ui/a2ui.bundle.js && \
      echo "stub" > src/canvas-host/a2ui/.bundle.hash && \
-     rm -rf vendor/a2ui apps/shared/KaijiBotKit/Tools/CanvasA2UI)
+     rm -rf vendor/a2ui apps/shared/AllBotKit/Tools/CanvasA2UI)
 RUN pnpm build:docker
 # Force pnpm for UI build (Bun may fail on ARM/Synology architectures)
-ENV KAIJIBOT_PREFER_PNPM=1
+ENV ALLBOT_PREFER_PNPM=1
 RUN pnpm ui:build
 
 # Prune dev dependencies and strip build-only metadata before copying
 # runtime assets into the final image.
 FROM build AS runtime-assets
-ARG KAIJIBOT_EXTENSIONS
-ARG KAIJIBOT_BUNDLED_PLUGIN_DIR
+ARG ALLBOT_EXTENSIONS
+ARG ALLBOT_BUNDLED_PLUGIN_DIR
 # Keep the install layer frozen, but allow prune to run against the full copied
 # workspace tree subset used during `pnpm install`. The build stage only copied
 # the root, `ui`, and opted-in plugin manifests into the install layer, so
 # prune must not rediscover unrelated workspaces from the later full source
 # copy.
 RUN printf 'packages:\n  - .\n  - ui\n' > /tmp/pnpm-workspace.runtime.yaml && \
-    for ext in $KAIJIBOT_EXTENSIONS; do \
-      printf '  - %s/%s\n' "$KAIJIBOT_BUNDLED_PLUGIN_DIR" "$ext" >> /tmp/pnpm-workspace.runtime.yaml; \
+    for ext in $ALLBOT_EXTENSIONS; do \
+      printf '  - %s/%s\n' "$ALLBOT_BUNDLED_PLUGIN_DIR" "$ext" >> /tmp/pnpm-workspace.runtime.yaml; \
     done && \
     cp /tmp/pnpm-workspace.runtime.yaml pnpm-workspace.yaml && \
     CI=true NPM_CONFIG_FROZEN_LOCKFILE=false pnpm prune --prod && \
     find dist -type f \( -name '*.d.ts' -o -name '*.d.mts' -o -name '*.d.cts' -o -name '*.map' \) -delete
 
 # ── Runtime base images ─────────────────────────────────────────
-FROM ${KAIJIBOT_NODE_BOOKWORM_IMAGE} AS base-default
-ARG KAIJIBOT_NODE_BOOKWORM_DIGEST
+FROM ${ALLBOT_NODE_BOOKWORM_IMAGE} AS base-default
+ARG ALLBOT_NODE_BOOKWORM_DIGEST
 LABEL org.opencontainers.image.base.name="docker.io/library/node:24-bookworm" \
-  org.opencontainers.image.base.digest="${KAIJIBOT_NODE_BOOKWORM_DIGEST}"
+  org.opencontainers.image.base.digest="${ALLBOT_NODE_BOOKWORM_DIGEST}"
 
-FROM ${KAIJIBOT_NODE_BOOKWORM_SLIM_IMAGE} AS base-slim
-ARG KAIJIBOT_NODE_BOOKWORM_SLIM_DIGEST
+FROM ${ALLBOT_NODE_BOOKWORM_SLIM_IMAGE} AS base-slim
+ARG ALLBOT_NODE_BOOKWORM_SLIM_DIGEST
 LABEL org.opencontainers.image.base.name="docker.io/library/node:24-bookworm-slim" \
-  org.opencontainers.image.base.digest="${KAIJIBOT_NODE_BOOKWORM_SLIM_DIGEST}"
+  org.opencontainers.image.base.digest="${ALLBOT_NODE_BOOKWORM_SLIM_DIGEST}"
 
 # ── Stage 3: Runtime ────────────────────────────────────────────
-FROM base-${KAIJIBOT_VARIANT}
-ARG KAIJIBOT_VARIANT
-ARG KAIJIBOT_BUNDLED_PLUGIN_DIR
-ARG KAIJIBOT_DOCKER_APT_UPGRADE
+FROM base-${ALLBOT_VARIANT}
+ARG ALLBOT_VARIANT
+ARG ALLBOT_BUNDLED_PLUGIN_DIR
+ARG ALLBOT_DOCKER_APT_UPGRADE
 
 # OCI base-image metadata for downstream image consumers.
 # If you change these annotations, also update:
@@ -148,8 +148,8 @@ LABEL org.opencontainers.image.source="https://github.com/Kaiji-Z/kaijibot" \
   org.opencontainers.image.url="https://github.com/Kaiji-Z/kaijibot" \
   org.opencontainers.image.documentation="https://github.com/Kaiji-Z/kaijibot/tree/main/docs/install/docker.md" \
   org.opencontainers.image.licenses="MIT" \
-  org.opencontainers.image.title="KaijiBot" \
-  org.opencontainers.image.description="KaijiBot gateway and CLI runtime container image"
+  org.opencontainers.image.title="AllBot" \
+  org.opencontainers.image.description="AllBot gateway and CLI runtime container image"
 
 WORKDIR /app
 
@@ -157,10 +157,10 @@ WORKDIR /app
 # On the full bookworm image these are already installed (apt-get is a no-op).
 # Smoke workflows can opt out of distro upgrades to cut repeated CI time while
 # keeping the default runtime image behavior unchanged.
-RUN --mount=type=cache,id=kaijibot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=kaijibot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=allbot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=allbot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
     apt-get update && \
-    if [ "${KAIJIBOT_DOCKER_APT_UPGRADE}" != "0" ]; then \
+    if [ "${ALLBOT_DOCKER_APT_UPGRADE}" != "0" ]; then \
       DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends; \
     fi && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -171,8 +171,8 @@ RUN chown node:node /app
 COPY --from=runtime-assets --chown=node:node /app/dist ./dist
 COPY --from=runtime-assets --chown=node:node /app/node_modules ./node_modules
 COPY --from=runtime-assets --chown=node:node /app/package.json .
-COPY --from=runtime-assets --chown=node:node /app/kaijibot.mjs .
-COPY --from=runtime-assets --chown=node:node /app/${KAIJIBOT_BUNDLED_PLUGIN_DIR} ./${KAIJIBOT_BUNDLED_PLUGIN_DIR}
+COPY --from=runtime-assets --chown=node:node /app/allbot.mjs .
+COPY --from=runtime-assets --chown=node:node /app/${ALLBOT_BUNDLED_PLUGIN_DIR} ./${ALLBOT_BUNDLED_PLUGIN_DIR}
 COPY --from=runtime-assets --chown=node:node /app/skills ./skills
 COPY --from=runtime-assets --chown=node:node /app/docs ./docs
 COPY --from=runtime-assets --chown=node:node /app/qa ./qa
@@ -195,23 +195,23 @@ RUN install -d -m 0755 "$COREPACK_HOME" && \
     chmod -R a+rX "$COREPACK_HOME"
 
 # Install additional system packages needed by your skills or extensions.
-# Example: docker build --build-arg KAIJIBOT_DOCKER_APT_PACKAGES="python3 wget" .
-ARG KAIJIBOT_DOCKER_APT_PACKAGES=""
-RUN --mount=type=cache,id=kaijibot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=kaijibot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
-    if [ -n "$KAIJIBOT_DOCKER_APT_PACKAGES" ]; then \
+# Example: docker build --build-arg ALLBOT_DOCKER_APT_PACKAGES="python3 wget" .
+ARG ALLBOT_DOCKER_APT_PACKAGES=""
+RUN --mount=type=cache,id=allbot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=allbot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
+    if [ -n "$ALLBOT_DOCKER_APT_PACKAGES" ]; then \
       apt-get update && \
-      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $KAIJIBOT_DOCKER_APT_PACKAGES; \
+      DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $ALLBOT_DOCKER_APT_PACKAGES; \
     fi
 
 # Optionally install Chromium and Xvfb for browser automation.
-# Build with: docker build --build-arg KAIJIBOT_INSTALL_BROWSER=1 ...
+# Build with: docker build --build-arg ALLBOT_INSTALL_BROWSER=1 ...
 # Adds ~300MB but eliminates the 60-90s Playwright install on every container start.
 # Must run after node_modules COPY so playwright-core is available.
-ARG KAIJIBOT_INSTALL_BROWSER=""
-RUN --mount=type=cache,id=kaijibot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=kaijibot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
-    if [ -n "$KAIJIBOT_INSTALL_BROWSER" ]; then \
+ARG ALLBOT_INSTALL_BROWSER=""
+RUN --mount=type=cache,id=allbot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=allbot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
+    if [ -n "$ALLBOT_INSTALL_BROWSER" ]; then \
       apt-get update && \
       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xvfb && \
       mkdir -p /home/node/.cache/ms-playwright && \
@@ -221,22 +221,22 @@ RUN --mount=type=cache,id=kaijibot-bookworm-apt-cache,target=/var/cache/apt,shar
     fi
 
 # Optionally install Docker CLI for sandbox container management.
-# Build with: docker build --build-arg KAIJIBOT_INSTALL_DOCKER_CLI=1 ...
+# Build with: docker build --build-arg ALLBOT_INSTALL_DOCKER_CLI=1 ...
 # Adds ~50MB. Only the CLI is installed — no Docker daemon.
 # Required for agents.defaults.sandbox to function in Docker deployments.
-ARG KAIJIBOT_INSTALL_DOCKER_CLI=""
-ARG KAIJIBOT_DOCKER_GPG_FINGERPRINT="9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
-RUN --mount=type=cache,id=kaijibot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=kaijibot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
-    if [ -n "$KAIJIBOT_INSTALL_DOCKER_CLI" ]; then \
+ARG ALLBOT_INSTALL_DOCKER_CLI=""
+ARG ALLBOT_DOCKER_GPG_FINGERPRINT="9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+RUN --mount=type=cache,id=allbot-bookworm-apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=allbot-bookworm-apt-lists,target=/var/lib/apt,sharing=locked \
+    if [ -n "$ALLBOT_INSTALL_DOCKER_CLI" ]; then \
       apt-get update && \
       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates curl gnupg && \
       install -m 0755 -d /etc/apt/keyrings && \
       # Verify Docker apt signing key fingerprint before trusting it as a root key.
-      # Update KAIJIBOT_DOCKER_GPG_FINGERPRINT when Docker rotates release keys.
+      # Update ALLBOT_DOCKER_GPG_FINGERPRINT when Docker rotates release keys.
       curl -fsSL https://download.docker.com/linux/debian/gpg -o /tmp/docker.gpg.asc && \
-      expected_fingerprint="$(printf '%s' "$KAIJIBOT_DOCKER_GPG_FINGERPRINT" | tr '[:lower:]' '[:upper:]' | tr -d '[:space:]')" && \
+      expected_fingerprint="$(printf '%s' "$ALLBOT_DOCKER_GPG_FINGERPRINT" | tr '[:lower:]' '[:upper:]' | tr -d '[:space:]')" && \
       actual_fingerprint="$(gpg --batch --show-keys --with-colons /tmp/docker.gpg.asc | awk -F: '$1 == "fpr" { print toupper($10); exit }')" && \
       if [ -z "$actual_fingerprint" ] || [ "$actual_fingerprint" != "$expected_fingerprint" ]; then \
         echo "ERROR: Docker apt key fingerprint mismatch (expected $expected_fingerprint, got ${actual_fingerprint:-<empty>})" >&2; \
@@ -253,8 +253,8 @@ RUN --mount=type=cache,id=kaijibot-bookworm-apt-cache,target=/var/cache/apt,shar
     fi
 
 # Expose the CLI binary without requiring npm global writes as non-root.
-RUN ln -sf /app/kaijibot.mjs /usr/local/bin/kaijibot \
- && chmod 755 /app/kaijibot.mjs
+RUN ln -sf /app/allbot.mjs /usr/local/bin/allbot \
+ && chmod 755 /app/allbot.mjs
 
 ENV NODE_ENV=production
 
@@ -277,4 +277,4 @@ USER node
 # For external access from host/ingress, override bind to "lan" and set auth.
 HEALTHCHECK --interval=3m --timeout=10s --start-period=15s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-CMD ["node", "kaijibot.mjs", "gateway", "--allow-unconfigured"]
+CMD ["node", "allbot.mjs", "gateway", "--allow-unconfigured"]

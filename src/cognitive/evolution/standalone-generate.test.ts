@@ -1,7 +1,7 @@
 import type { Api, Model } from "@earendil-works/pi-ai";
 import { describe, expect, it, vi } from "vitest";
 import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import {
   createStandaloneGenerateTextBatchWithDeps,
   runBatchGenerate,
@@ -282,7 +282,7 @@ describe("createStandaloneGenerateTextBatchWithDeps (config gate)", () => {
       makeBatchDeps({ run, http: { fetchFn: vi.fn() as unknown as typeof fetch } }),
       {},
     );
-    const fn = await factory({} as KaijiBotConfig);
+    const fn = await factory({} as AllBotConfig);
     const out = await fn("prompt");
     expect(out).toBe("batch result");
     expect(run).toHaveBeenCalledOnce();

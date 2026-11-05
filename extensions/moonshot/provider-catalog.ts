@@ -1,8 +1,8 @@
 import {
   applyProviderNativeStreamingUsageCompat,
   supportsNativeStreamingUsageCompat,
-} from "kaijibot/plugin-sdk/provider-catalog-shared";
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/provider-catalog-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 
 export const MOONSHOT_BASE_URL = "https://api.moonshot.ai/v1";
 export const MOONSHOT_CN_BASE_URL = "https://api.moonshot.cn/v1";

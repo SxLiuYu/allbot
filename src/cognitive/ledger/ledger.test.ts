@@ -34,7 +34,7 @@ function makeEntry(overrides: Partial<LedgerEntry> = {}): LedgerEntry {
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-decision-ledger-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-decision-ledger-"));
   ledger = createDecisionLedger({ dir: tempDir });
 });
 

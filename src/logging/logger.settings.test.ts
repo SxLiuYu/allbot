@@ -4,10 +4,10 @@ import { __test__ } from "./logger.js";
 describe("shouldSkipMutatingLoggingConfigRead", () => {
   it("matches config schema and validate invocations", () => {
     expect(
-      __test__.shouldSkipMutatingLoggingConfigRead(["node", "kaijibot", "config", "schema"]),
+      __test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "config", "schema"]),
     ).toBe(true);
     expect(
-      __test__.shouldSkipMutatingLoggingConfigRead(["node", "kaijibot", "config", "validate"]),
+      __test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "config", "validate"]),
     ).toBe(true);
   });
 
@@ -15,7 +15,7 @@ describe("shouldSkipMutatingLoggingConfigRead", () => {
     expect(
       __test__.shouldSkipMutatingLoggingConfigRead([
         "node",
-        "kaijibot",
+        "allbot",
         "--profile",
         "work",
         "--no-color",
@@ -28,9 +28,9 @@ describe("shouldSkipMutatingLoggingConfigRead", () => {
 
   it("does not match other commands", () => {
     expect(
-      __test__.shouldSkipMutatingLoggingConfigRead(["node", "kaijibot", "config", "get", "foo"]),
+      __test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "config", "get", "foo"]),
     ).toBe(false);
-    expect(__test__.shouldSkipMutatingLoggingConfigRead(["node", "kaijibot", "status"])).toBe(
+    expect(__test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "status"])).toBe(
       false,
     );
   });

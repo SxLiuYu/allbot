@@ -14,7 +14,7 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readJsonFileWithFallback, writeJsonFileAtomically } from "kaijibot/plugin-sdk/json-store";
+import { readJsonFileWithFallback, writeJsonFileAtomically } from "allbot/plugin-sdk/json-store";
 import {
   ASR_MODEL_MANIFESTS,
   RUNTIME_MANIFESTS,

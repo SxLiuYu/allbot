@@ -110,7 +110,7 @@ const loadCronStoreMock = vi.fn();
 vi.mock("../../cron/store.js", () => {
   return {
     loadCronStore: (...args: unknown[]) => loadCronStoreMock(...args),
-    resolveCronStorePath: (storePath?: string) => storePath ?? "/tmp/kaijibot-cron-store.json",
+    resolveCronStorePath: (storePath?: string) => storePath ?? "/tmp/allbot-cron-store.json",
   };
 });
 
@@ -230,7 +230,7 @@ describe("runReplyAgent auto-compaction token update", () => {
   }
 
   it("updates totalTokens from lastCallUsage even without compaction", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-usage-last-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-usage-last-"));
     const storePath = path.join(tmp, "sessions.json");
     const sessionKey = "main";
     const sessionEntry = {

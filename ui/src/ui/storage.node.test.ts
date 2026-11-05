@@ -17,15 +17,15 @@ function setControlUiBasePath(value: string | undefined) {
       "window",
       value == null
         ? ({} as Window & typeof globalThis)
-        : ({ __KAIJIBOT_CONTROL_UI_BASE_PATH__: value } as Window & typeof globalThis),
+        : ({ __ALLBOT_CONTROL_UI_BASE_PATH__: value } as Window & typeof globalThis),
     );
     return;
   }
   if (value == null) {
-    delete window.__KAIJIBOT_CONTROL_UI_BASE_PATH__;
+    delete window.__ALLBOT_CONTROL_UI_BASE_PATH__;
     return;
   }
-  Object.defineProperty(window, "__KAIJIBOT_CONTROL_UI_BASE_PATH__", {
+  Object.defineProperty(window, "__ALLBOT_CONTROL_UI_BASE_PATH__", {
     value,
     writable: true,
     configurable: true,
@@ -59,19 +59,19 @@ describe("loadSettings default gateway URL derivation", () => {
       host: "gateway.example:8443",
       pathname: "/ignored/path",
     });
-    setControlUiBasePath(" /kaijibot/ ");
+    setControlUiBasePath(" /allbot/ ");
 
-    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/kaijibot"));
+    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/allbot"));
   });
 
   it("infers base path from nested pathname when configured base path is not set", async () => {
     setTestLocation({
       protocol: "http:",
       host: "gateway.example:18789",
-      pathname: "/apps/kaijibot/chat",
+      pathname: "/apps/allbot/chat",
     });
 
-    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/apps/kaijibot"));
+    expect(loadSettings().gatewayUrl).toBe(expectedGatewayUrl("/apps/allbot"));
   });
 
   it("skips node sessionStorage accessors that warn without a storage file", async () => {
@@ -103,24 +103,24 @@ describe("loadSettings default gateway URL derivation", () => {
       host: "gateway.example:8443",
       pathname: "/",
     });
-    sessionStorage.setItem("kaijibot.control.token.v1", "legacy-session-token");
+    sessionStorage.setItem("allbot.control.token.v1", "legacy-session-token");
     localStorage.setItem(
-      "kaijibot.control.settings.v1",
+      "allbot.control.settings.v1",
       JSON.stringify({
-        gatewayUrl: "wss://gateway.example:8443/kaijibot",
+        gatewayUrl: "wss://gateway.example:8443/allbot",
         token: "persisted-token",
         sessionKey: "agent",
       }),
     );
 
     expect(loadSettings()).toMatchObject({
-      gatewayUrl: "wss://gateway.example:8443/kaijibot",
+      gatewayUrl: "wss://gateway.example:8443/allbot",
       token: "",
       sessionKey: "agent",
     });
-    const scopedKey = "kaijibot.control.settings.v1:wss://gateway.example:8443/kaijibot";
+    const scopedKey = "allbot.control.settings.v1:wss://gateway.example:8443/allbot";
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}")).toEqual({
-      gatewayUrl: "wss://gateway.example:8443/kaijibot",
+      gatewayUrl: "wss://gateway.example:8443/allbot",
       theme: "ink-jade",
       themeMode: "system",
       chatFocusMode: false,
@@ -132,7 +132,7 @@ describe("loadSettings default gateway URL derivation", () => {
       navGroupsCollapsed: {},
       borderRadius: 50,
       sessionsByGateway: {
-        "wss://gateway.example:8443/kaijibot": {
+        "wss://gateway.example:8443/allbot": {
           sessionKey: "agent",
           lastActiveSessionKey: "agent",
         },
@@ -250,7 +250,7 @@ describe("loadSettings default gateway URL derivation", () => {
       token: "memory-only-token",
     });
 
-    const scopedKey = `kaijibot.control.settings.v1:${gwUrl}`;
+    const scopedKey = `allbot.control.settings.v1:${gwUrl}`;
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}")).toEqual({
       gatewayUrl: gwUrl,
       theme: "ink-jade",
@@ -343,7 +343,7 @@ describe("loadSettings default gateway URL derivation", () => {
       borderRadius: 50,
     });
 
-    const scopedKey = `kaijibot.control.settings.v1:${gwUrl}`;
+    const scopedKey = `allbot.control.settings.v1:${gwUrl}`;
     expect(JSON.parse(localStorage.getItem(scopedKey) ?? "{}")).toMatchObject({
       theme: "glaze",
       themeMode: "light",
@@ -391,7 +391,7 @@ describe("loadSettings default gateway URL derivation", () => {
     });
 
     const gwUrl = expectedGatewayUrl("");
-    const scopedKey = `kaijibot.control.settings.v1:wss://gateway.example:8443`;
+    const scopedKey = `allbot.control.settings.v1:wss://gateway.example:8443`;
 
     // Pre-seed sessionsByGateway with 11 stale gateway entries so the next
     // saveSettings call pushes the total to 12 and triggers the cap (10).

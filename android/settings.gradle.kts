@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "KaijiBot"
+rootProject.name = "AllBot"
 include(":app")

@@ -162,7 +162,7 @@ function extractOutboundBlock(source: string, file: string): string {
   throw new Error(`Unable to parse outbound block in ${file}`);
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("outbound cfg-threading guard", () => {
   it("keeps outbound adapter entrypoints free of loadConfig calls", () => {
     const coreAdapterFiles = listCoreOutboundEntryFiles();

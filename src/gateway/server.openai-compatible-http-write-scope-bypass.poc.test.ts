@@ -35,10 +35,10 @@ describe("gateway OpenAI-compatible HTTP shared-secret auth", () => {
         headers: {
           authorization: "Bearer secret",
           "content-type": "application/json",
-          "x-kaijibot-scopes": "operator.approvals",
+          "x-allbot-scopes": "operator.approvals",
         },
         body: JSON.stringify({
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         }),
       });
@@ -64,7 +64,7 @@ describe("gateway OpenAI-compatible HTTP shared-secret auth", () => {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         }),
       });
@@ -92,10 +92,10 @@ describe("gateway OpenAI-compatible HTTP shared-secret auth", () => {
         headers: {
           authorization: "Bearer secret",
           "content-type": "application/json",
-          "x-kaijibot-scopes": "operator.write",
+          "x-allbot-scopes": "operator.write",
         },
         body: JSON.stringify({
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         }),
       });
@@ -134,11 +134,11 @@ describe("gateway OpenAI-compatible HTTP shared-secret auth", () => {
         headers: {
           authorization: "Bearer secret",
           "content-type": "application/json",
-          "x-kaijibot-scopes": "operator.approvals",
+          "x-allbot-scopes": "operator.approvals",
         },
         body: JSON.stringify({
           stream: false,
-          model: "kaijibot",
+          model: "allbot",
           input: "hi",
         }),
       });
@@ -174,11 +174,11 @@ describe("gateway OpenAI-compatible HTTP shared-secret auth", () => {
         headers: {
           authorization: "Bearer secret",
           "content-type": "application/json",
-          "x-kaijibot-scopes": "operator.write",
+          "x-allbot-scopes": "operator.write",
         },
         body: JSON.stringify({
           stream: false,
-          model: "kaijibot",
+          model: "allbot",
           input: "hi",
         }),
       });

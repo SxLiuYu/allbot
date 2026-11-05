@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { normalizeOptionalString, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import {
   executeActAction,
   executeConsoleAction,
@@ -351,7 +351,7 @@ function resolveBrowserBaseUrl(params: {
   }
   if (!resolved.enabled) {
     throw new Error(
-      "Browser control is disabled. Set browser.enabled=true in ~/.kaijibot/kaijibot.json.",
+      "Browser control is disabled. Set browser.enabled=true in ~/.allbot/allbot.json.",
     );
   }
   return undefined;
@@ -385,8 +385,8 @@ export function createBrowserTool(opts?: {
     label: "Browser",
     name: "browser",
     description: [
-      "Control the browser via KaijiBot's browser control server (status/start/stop/profiles/tabs/open/snapshot/screenshot/actions).",
-      "Browser choice: omit profile by default for the isolated KaijiBot-managed browser (`kaijibot`).",
+      "Control the browser via AllBot's browser control server (status/start/stop/profiles/tabs/open/snapshot/screenshot/actions).",
+      "Browser choice: omit profile by default for the isolated AllBot-managed browser (`allbot`).",
       'For the logged-in user browser on the local host, use profile="user". A supported Chromium-based browser (v144+) must be running. Use only when existing logins/cookies matter and the user is present.',
       "When browser.proxy.enabled is on and this agent has a persistent profile (agent-<id>), calls without an explicit profile route there. action=login opens a headed manual-login window for that profile — the user types credentials by hand; the agent never handles them.",
       'When a node-hosted browser proxy is available, the tool may auto-route to it. Pin a node with node=<id|name> or target="node".',
@@ -553,7 +553,7 @@ export function createBrowserTool(opts?: {
             return jsonResult({
               ok: false,
               error:
-                "browser.proxy.enabled is false — the login proxy is disabled. Enable it in ~/.kaijibot/kaijibot.json to use manual login sessions.",
+                "browser.proxy.enabled is false — the login proxy is disabled. Enable it in ~/.allbot/allbot.json to use manual login sessions.",
             });
           }
           if (!opts?.agentId) {

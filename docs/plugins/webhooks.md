@@ -9,7 +9,7 @@ title: "Webhooks Plugin"
 # Webhooks (plugin)
 
 The Webhooks plugin adds authenticated HTTP routes that bind external
-automation to KaijiBot TaskFlows.
+automation to AllBot TaskFlows.
 
 Use it when you want a trusted system such as Zapier, n8n, a CI job, or an
 internal service to create and drive managed TaskFlows without writing a custom
@@ -40,7 +40,7 @@ Set config under `plugins.entries.webhooks.config`:
               secret: {
                 source: "env",
                 provider: "default",
-                id: "KAIJIBOT_WEBHOOK_SECRET",
+                id: "ALLBOT_WEBHOOK_SECRET",
               },
               controllerId: "webhooks/zapier",
               description: "Zapier TaskFlow bridge",
@@ -96,7 +96,7 @@ The plugin applies:
 Send `POST` requests with:
 
 - `Content-Type: application/json`
-- `Authorization: Bearer <secret>` or `x-kaijibot-webhook-secret: <secret>`
+- `Authorization: Bearer <secret>` or `x-allbot-webhook-secret: <secret>`
 
 Example:
 

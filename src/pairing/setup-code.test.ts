@@ -180,9 +180,9 @@ describe("pairing setup code", () => {
   }
 
   beforeEach(() => {
-    vi.stubEnv("KAIJIBOT_GATEWAY_TOKEN", "");
-    vi.stubEnv("KAIJIBOT_GATEWAY_PASSWORD", "");
-    vi.stubEnv("KAIJIBOT_GATEWAY_PORT", "");
+    vi.stubEnv("ALLBOT_GATEWAY_TOKEN", "");
+    vi.stubEnv("ALLBOT_GATEWAY_PASSWORD", "");
+    vi.stubEnv("ALLBOT_GATEWAY_PORT", "");
   });
 
   beforeAll(async () => {
@@ -239,13 +239,13 @@ describe("pairing setup code", () => {
       expectedAuthLabel: "password",
     },
     {
-      name: "uses KAIJIBOT_GATEWAY_PASSWORD without resolving configured password SecretRef",
+      name: "uses ALLBOT_GATEWAY_PASSWORD without resolving configured password SecretRef",
       auth: {
         mode: "password",
         password: { source: "env", provider: "default", id: "MISSING_GW_PASSWORD" },
       } as const,
       env: {
-        KAIJIBOT_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+        ALLBOT_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
       },
       expectedAuthLabel: "password",
     },
@@ -308,7 +308,7 @@ describe("pairing setup code", () => {
       },
       {
         env: {
-          KAIJIBOT_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+          ALLBOT_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
         },
       },
     );
@@ -395,7 +395,7 @@ describe("pairing setup code", () => {
       } satisfies ResolveSetupConfig,
       options: {
         env: {
-          KAIJIBOT_GATEWAY_TOKEN: "new-token",
+          ALLBOT_GATEWAY_TOKEN: "new-token",
         },
       } satisfies ResolveSetupOptions,
       expected: {

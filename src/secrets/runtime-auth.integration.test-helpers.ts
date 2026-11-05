@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { expect, vi } from "vitest";
 import { ensureAuthProfileStore, type AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { clearConfigCache, clearRuntimeConfigSnapshot, loadConfig } from "../config/config.js";
 import { captureEnv } from "../test-utils/env.js";
 import { clearSecretsRuntimeSnapshot } from "./runtime.js";
@@ -38,8 +38,8 @@ export type SecretsRuntimeEnvSnapshot = ReturnType<typeof captureEnv>;
 
 const allowInsecureTempSecretFile = process.platform === "win32";
 
-export function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+export function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 export function loadAuthStoreWithProfiles(
@@ -52,7 +52,7 @@ export function loadAuthStoreWithProfiles(
 }
 
 export async function createOpenAIFileRuntimeFixture(home: string) {
-  const configDir = path.join(home, ".kaijibot");
+  const configDir = path.join(home, ".allbot");
   const secretFile = path.join(configDir, "secrets.json");
   const agentDir = path.join(configDir, "agents", "main", "agent");
   const authStorePath = path.join(agentDir, "auth-profiles.json");
@@ -90,7 +90,7 @@ export async function createOpenAIFileRuntimeFixture(home: string) {
   };
 }
 
-export function createOpenAIFileRuntimeConfig(secretFile: string): KaijiBotConfig {
+export function createOpenAIFileRuntimeConfig(secretFile: string): AllBotConfig {
   return asConfig({
     secrets: {
       providers: {
@@ -128,14 +128,14 @@ export function beginSecretsRuntimeIsolationForTest(): SecretsRuntimeEnvSnapshot
   secretsRuntimePluginMocks.resolvePluginWebSearchProvidersMock.mockReset();
   secretsRuntimePluginMocks.resolvePluginWebSearchProvidersMock.mockReturnValue([]);
   const envSnapshot = captureEnv([
-    "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-    "KAIJIBOT_DISABLE_BUNDLED_PLUGINS",
-    "KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE",
-    "KAIJIBOT_VERSION",
+    "ALLBOT_BUNDLED_PLUGINS_DIR",
+    "ALLBOT_DISABLE_BUNDLED_PLUGINS",
+    "ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE",
+    "ALLBOT_VERSION",
   ]);
-  delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-  process.env.KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE = "1";
-  delete process.env.KAIJIBOT_VERSION;
+  delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
+  process.env.ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE = "1";
+  delete process.env.ALLBOT_VERSION;
   return envSnapshot;
 }
 

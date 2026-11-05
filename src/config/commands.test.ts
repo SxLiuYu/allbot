@@ -60,7 +60,7 @@ beforeEach(() => {
   );
 });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe("resolveNativeSkillsEnabled", () => {
   it("returns false for auto when channel plugin is not bundled", () => {
     expect(

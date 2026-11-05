@@ -1,1 +1,1 @@
-export { hasProxyEnvConfigured } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { hasProxyEnvConfigured } from "allbot/plugin-sdk/browser-security-runtime";

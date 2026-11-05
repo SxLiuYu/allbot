@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import {
   resolveConsolidationConfig,
   resolveConsolidationWorkspaces,
@@ -102,7 +102,7 @@ describe("resolveConsolidationConfig", () => {
             userTimezone: "America/New_York",
           },
         },
-      } as unknown as KaijiBotConfig,
+      } as unknown as AllBotConfig,
     });
     expect(config.timezone).toBe("Europe/Berlin");
   });
@@ -118,7 +118,7 @@ describe("resolveConsolidationConfig", () => {
             userTimezone: "America/New_York",
           },
         },
-      } as unknown as KaijiBotConfig,
+      } as unknown as AllBotConfig,
     });
     expect(config.timezone).toBe("America/New_York");
   });
@@ -176,7 +176,7 @@ describe("resolveConsolidationConfig", () => {
 
 describe("resolveConsolidationWorkspaces", () => {
   it("uses default agent when no agents.list configured", () => {
-    const cfg = { agents: {} } as unknown as KaijiBotConfig;
+    const cfg = { agents: {} } as unknown as AllBotConfig;
     const workspaces = resolveConsolidationWorkspaces(cfg);
     expect(workspaces.length).toBeGreaterThanOrEqual(1);
     expect(workspaces[0]!.agentIds).toContain("main");
@@ -187,7 +187,7 @@ describe("resolveConsolidationWorkspaces", () => {
       agents: {
         list: [{ id: "my-agent" }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const workspaces = resolveConsolidationWorkspaces(cfg);
     expect(workspaces).toHaveLength(1);
     expect(workspaces[0]!.agentIds).toEqual(["my-agent"]);
@@ -201,7 +201,7 @@ describe("resolveConsolidationWorkspaces", () => {
           { id: "agent-b", workspace: "/shared/workspace" },
         ],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const workspaces = resolveConsolidationWorkspaces(cfg);
     // Both agents share the same explicit workspace dir
     expect(workspaces).toHaveLength(1);
@@ -216,7 +216,7 @@ describe("resolveConsolidationWorkspaces", () => {
           { id: "agent-b", workspace: "/workspace/b" },
         ],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const workspaces = resolveConsolidationWorkspaces(cfg);
     expect(workspaces).toHaveLength(2);
     const dirs = workspaces.map((ws) => ws.workspaceDir);
@@ -236,7 +236,7 @@ describe("resolveConsolidationWorkspaces", () => {
           42,
         ],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const workspaces = resolveConsolidationWorkspaces(cfg);
     // Only "valid-agent" should survive
     const allAgentIds = workspaces.flatMap((ws) => ws.agentIds);
@@ -248,7 +248,7 @@ describe("resolveConsolidationWorkspaces", () => {
       agents: {
         list: [{ id: "dup-agent" }, { id: "dup-agent" }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const workspaces = resolveConsolidationWorkspaces(cfg);
     const allAgentIds = workspaces.flatMap((ws) => ws.agentIds);
     expect(allAgentIds).toEqual(["dup-agent"]);

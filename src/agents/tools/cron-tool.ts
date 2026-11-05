@@ -15,7 +15,7 @@ import { optionalStringEnum, stringEnum } from "../schema/typebox.js";
 import { CRON_TOOL_DISPLAY_SUMMARY } from "../tool-description-presets.js";
 import { type AnyAgentTool, jsonResult, readStringParam } from "./common.js";
 import { callGatewayTool, readGatewayCallOptions, type GatewayCallOptions } from "./gateway.js";
-import { isKaijiBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
+import { isAllBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
 import { resolveInternalSessionKey, resolveMainSessionAlias } from "./sessions-helpers.js";
 
 // We spell out job/patch properties so that LLMs know what fields to send.
@@ -388,11 +388,11 @@ export function createCronTool(opts?: CronToolOptions, deps?: CronToolDeps): Any
   return {
     label: "Cron",
     name: "cron",
-    ownerOnly: isKaijiBotOwnerOnlyCoreToolName("cron"),
+    ownerOnly: isAllBotOwnerOnlyCoreToolName("cron"),
     displaySummary: CRON_TOOL_DISPLAY_SUMMARY,
     description: `Manage Gateway cron jobs (status/list/add/update/remove/run/runs) and send wake events. Use this for reminders, "check back later" requests, delayed follow-ups, and recurring tasks. Do not emulate scheduling with exec sleep or process polling.
 
-Main-session cron jobs enqueue system events for heartbeat handling. Isolated cron jobs create background task runs that appear in \`kaijibot tasks\`.
+Main-session cron jobs enqueue system events for heartbeat handling. Isolated cron jobs create background task runs that appear in \`allbot tasks\`.
 
 ACTIONS:
 - status: Check cron scheduler status
@@ -485,7 +485,7 @@ Use jobId as the canonical identifier; id is accepted for compatibility. Use con
           // job properties to the top level alongside `action` instead of nesting
           // them inside `job`. When `params.job` is missing or empty, reconstruct
           // a synthetic job object from any recognised top-level job fields.
-          // See: https://github.com/kaijibot/kaijibot/issues/11310
+          // See: https://github.com/allbot/allbot/issues/11310
           if (
             !params.job ||
             (typeof params.job === "object" &&

@@ -16,7 +16,7 @@ import {
 } from "./brand-rewrite.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-brand-rewrite-test-");
+const createTempDir = () => tempDirs.make("allbot-brand-rewrite-test-");
 
 afterEach(async () => {
   await tempDirs.cleanup();
@@ -25,61 +25,61 @@ afterEach(async () => {
 // ─── rewriteBrandReferences ──────────────────────────────────────────────────
 
 describe("rewriteBrandReferences", () => {
-  it("replaces OpenClaw with KaijiBot", () => {
-    expect(rewriteBrandReferences("Powered by OpenClaw")).toBe("Powered by KaijiBot");
+  it("replaces OpenClaw with AllBot", () => {
+    expect(rewriteBrandReferences("Powered by OpenClaw")).toBe("Powered by AllBot");
   });
 
-  it("replaces openclaw with kaijibot (lowercase)", () => {
-    expect(rewriteBrandReferences("config at ~/.openclaw/")).toBe("config at ~/.kaijibot/");
+  it("replaces openclaw with allbot (lowercase)", () => {
+    expect(rewriteBrandReferences("config at ~/.openclaw/")).toBe("config at ~/.allbot/");
   });
 
-  it("replaces ClawdBot with KaijiBot", () => {
-    expect(rewriteBrandReferences("ClawdBot is great")).toBe("KaijiBot is great");
+  it("replaces ClawdBot with AllBot", () => {
+    expect(rewriteBrandReferences("ClawdBot is great")).toBe("AllBot is great");
   });
 
-  it("replaces clawdbot with kaijibot (lowercase)", () => {
-    expect(rewriteBrandReferences("run clawdbot --help")).toBe("run kaijibot --help");
+  it("replaces clawdbot with allbot (lowercase)", () => {
+    expect(rewriteBrandReferences("run clawdbot --help")).toBe("run allbot --help");
   });
 
-  it("replaces MoltBot with KaijiBot", () => {
-    expect(rewriteBrandReferences("MoltBot rules")).toBe("KaijiBot rules");
+  it("replaces MoltBot with AllBot", () => {
+    expect(rewriteBrandReferences("MoltBot rules")).toBe("AllBot rules");
   });
 
-  it("replaces moltbot with kaijibot (lowercase)", () => {
-    expect(rewriteBrandReferences("moltbot gateway")).toBe("kaijibot gateway");
+  it("replaces moltbot with allbot (lowercase)", () => {
+    expect(rewriteBrandReferences("moltbot gateway")).toBe("allbot gateway");
   });
 
   it("replaces ~/.openclaw/ path prefix", () => {
-    expect(rewriteBrandReferences("~/.openclaw/workspace")).toBe("~/.kaijibot/workspace");
+    expect(rewriteBrandReferences("~/.openclaw/workspace")).toBe("~/.allbot/workspace");
   });
 
   it("replaces ~/.clawdbot/ path prefix", () => {
-    expect(rewriteBrandReferences("~/.clawdbot/config")).toBe("~/.kaijibot/config");
+    expect(rewriteBrandReferences("~/.clawdbot/config")).toBe("~/.allbot/config");
   });
 
   it("replaces ~/.moltbot/ path prefix", () => {
-    expect(rewriteBrandReferences("~/.moltbot/data")).toBe("~/.kaijibot/data");
+    expect(rewriteBrandReferences("~/.moltbot/data")).toBe("~/.allbot/data");
   });
 
   it("replaces avatars/openclaw.png", () => {
     expect(rewriteBrandReferences("img src='avatars/openclaw.png'")).toBe(
-      "img src='avatars/kaijibot.png'",
+      "img src='avatars/allbot.png'",
     );
   });
 
   it("replaces standalone openclaw.png", () => {
-    expect(rewriteBrandReferences("icon: openclaw.png")).toBe("icon: kaijibot.png");
+    expect(rewriteBrandReferences("icon: openclaw.png")).toBe("icon: allbot.png");
   });
 
   it("no-ops on clean content", () => {
-    const clean = "This is KaijiBot content with no old brands.";
+    const clean = "This is AllBot content with no old brands.";
     expect(rewriteBrandReferences(clean)).toBe(clean);
   });
 
   it("handles multiple occurrences", () => {
     const input = "OpenClaw uses ~/.openclaw/ and ClawdBot uses ~/.clawdbot/";
     const result = rewriteBrandReferences(input);
-    expect(result).toBe("KaijiBot uses ~/.kaijibot/ and KaijiBot uses ~/.kaijibot/");
+    expect(result).toBe("AllBot uses ~/.allbot/ and AllBot uses ~/.allbot/");
     expect(result).not.toContain("OpenClaw");
     expect(result).not.toContain("openclaw");
     expect(result).not.toContain("ClawdBot");
@@ -89,7 +89,7 @@ describe("rewriteBrandReferences", () => {
   it("handles all six brand names in one string", () => {
     const input = "OpenClaw openclaw ClawdBot clawdbot MoltBot moltbot";
     const result = rewriteBrandReferences(input);
-    expect(result).toBe("KaijiBot kaijibot KaijiBot kaijibot KaijiBot kaijibot");
+    expect(result).toBe("AllBot allbot AllBot allbot AllBot allbot");
   });
 });
 
@@ -200,7 +200,7 @@ describe("rewriteWorkspaceFile", () => {
 
   it("applies brand swap to MEMORY.md", async () => {
     const result = await rewriteWorkspaceFile("MEMORY.md", "# OpenClaw Memory", { dryRun: false });
-    expect(result.content).toBe("# KaijiBot Memory");
+    expect(result.content).toBe("# AllBot Memory");
     expect(result.wasRewritten).toBe(true);
   });
 
@@ -211,7 +211,7 @@ describe("rewriteWorkspaceFile", () => {
 
   it("applies brand swap to generic .md files", async () => {
     const result = await rewriteWorkspaceFile("NOTES.md", "OpenClaw notes", { dryRun: false });
-    expect(result.content).toBe("KaijiBot notes");
+    expect(result.content).toBe("AllBot notes");
     expect(result.wasRewritten).toBe(true);
   });
 
@@ -286,14 +286,14 @@ describe("rewriteStructuralFile section mode (AGENTS.md)", () => {
     expect(result.wasRewritten).toBe(true);
     // User section should be preserved but brand-swapped
     expect(result.content).toContain("My Custom Section");
-    expect(result.content).toContain("KaijiBot stuff here");
+    expect(result.content).toContain("AllBot stuff here");
     expect(result.content).not.toContain("OpenClaw stuff here");
   });
 
   it("applies brand swap to preamble", async () => {
     const src = "Welcome to OpenClaw!\n\n## Session Startup\nStartup content";
     const result = await rewriteStructuralFile("AGENTS.md", src, { dryRun: false });
-    expect(result.content).toContain("Welcome to KaijiBot!");
+    expect(result.content).toContain("Welcome to AllBot!");
     expect(result.content).not.toContain("Welcome to OpenClaw");
   });
 });
@@ -313,7 +313,7 @@ describe("BRAND_REFERENCES regex", () => {
 
   it("does not match clean content", () => {
     const re = new RegExp(BRAND_REFERENCES.source, BRAND_REFERENCES.flags);
-    expect(re.test("KaijiBot is the best")).toBe(false);
+    expect(re.test("AllBot is the best")).toBe(false);
   });
 });
 
@@ -351,8 +351,8 @@ describe("brand rewrite integration with migrateWorkspace", () => {
     });
 
     const written = await fs.readFile(path.join(targetDir, "workspace", "NOTES.md"), "utf-8");
-    expect(written).toContain("KaijiBot");
-    expect(written).toContain("~/.kaijibot/");
+    expect(written).toContain("AllBot");
+    expect(written).toContain("~/.allbot/");
     expect(written).not.toContain("OpenClaw");
     expect(written).not.toContain("~/.openclaw/");
   });
@@ -383,8 +383,8 @@ describe("brand rewrite integration with migrateWorkspace", () => {
     });
 
     const written = await fs.readFile(path.join(targetDir, "workspace", "MEMORY.md"), "utf-8");
-    expect(written).toContain("KaijiBot Config");
-    expect(written).toContain("~/.kaijibot/");
+    expect(written).toContain("AllBot Config");
+    expect(written).toContain("~/.allbot/");
     expect(written).not.toContain("OpenClaw");
   });
 
@@ -417,8 +417,8 @@ describe("brand rewrite integration with migrateWorkspace", () => {
       "utf-8",
     );
     expect(written).toContain("Migrated from OpenClaw");
-    expect(written).toContain("KaijiBot");
-    expect(written).toContain("~/.kaijibot/");
+    expect(written).toContain("AllBot");
+    expect(written).toContain("~/.allbot/");
     // Banner intentionally contains "OpenClaw"; body should be rewritten
     const bodyWithoutBanner = written.replace(/<!--.*?-->\n?/s, "");
     expect(bodyWithoutBanner).not.toMatch(/\bOpenClaw\b/);

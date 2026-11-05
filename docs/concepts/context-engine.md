@@ -1,7 +1,7 @@
 ---
 summary: "Context engine: pluggable context assembly, compaction, and subagent lifecycle"
 read_when:
-  - You want to understand how KaijiBot assembles model context
+  - You want to understand how AllBot assembles model context
   - You are switching between the legacy engine and a plugin engine
   - You are building a context engine plugin
 title: "Context Engine"
@@ -9,11 +9,11 @@ title: "Context Engine"
 
 # Context Engine
 
-A **context engine** controls how KaijiBot builds model context for each run.
+A **context engine** controls how AllBot builds model context for each run.
 It decides which messages to include, how to summarize older history, and how
 to manage context across subagent boundaries.
 
-KaijiBot ships with a built-in `legacy` engine. Plugins can register
+AllBot ships with a built-in `legacy` engine. Plugins can register
 alternative engines that replace the active context-engine lifecycle.
 
 ## Quick start
@@ -21,28 +21,28 @@ alternative engines that replace the active context-engine lifecycle.
 Check which engine is active:
 
 ```bash
-kaijibot doctor
+allbot doctor
 # or inspect config directly:
-cat ~/.kaijibot/kaijibot.json | jq '.plugins.slots.contextEngine'
+cat ~/.allbot/allbot.json | jq '.plugins.slots.contextEngine'
 ```
 
 ### Installing a context engine plugin
 
-Context engine plugins are installed like any other KaijiBot plugin. Install
+Context engine plugins are installed like any other AllBot plugin. Install
 first, then select the engine in the slot:
 
 ```bash
 # Install from npm
-kaijibot plugins install @martian-engineering/lossless-claw
+allbot plugins install @martian-engineering/lossless-claw
 
 # Or install from a local path (for development)
-kaijibot plugins install -l ./my-context-engine
+allbot plugins install -l ./my-context-engine
 ```
 
 Then enable the plugin and select it as the active engine in your config:
 
 ```json5
-// kaijibot.json
+// allbot.json
 {
   plugins: {
     slots: {
@@ -65,7 +65,7 @@ remove the key entirely — `"legacy"` is the default).
 
 ## How it works
 
-Every time KaijiBot runs a model prompt, the context engine participates at
+Every time AllBot runs a model prompt, the context engine participates at
 four lifecycle points:
 
 1. **Ingest** — called when a new message is added to the session. The engine
@@ -80,7 +80,7 @@ four lifecycle points:
 
 ### Subagent lifecycle (optional)
 
-KaijiBot currently calls one subagent lifecycle hook:
+AllBot currently calls one subagent lifecycle hook:
 
 - **onSubagentEnded** — clean up when a subagent session completes or is swept.
 
@@ -89,14 +89,14 @@ the runtime does not invoke it yet.
 
 ### System prompt addition
 
-The `assemble` method can return a `systemPromptAddition` string. KaijiBot
+The `assemble` method can return a `systemPromptAddition` string. AllBot
 prepends this to the system prompt for the run. This lets engines inject
 dynamic recall guidance, retrieval instructions, or context-aware hints
 without requiring static workspace files.
 
 ## The legacy engine
 
-The built-in `legacy` engine preserves KaijiBot's original behavior:
+The built-in `legacy` engine preserves AllBot's original behavior:
 
 - **Ingest**: no-op (the session manager handles message persistence directly).
 - **Assemble**: pass-through (the existing sanitize → validate → limit pipeline
@@ -115,7 +115,7 @@ engine is used automatically.
 A plugin can register a context engine using the plugin API:
 
 ```ts
-import { buildMemorySystemPromptAddition } from "kaijibot/plugin-sdk/core";
+import { buildMemorySystemPromptAddition } from "allbot/plugin-sdk/core";
 
 export default function register(api) {
   api.registerContextEngine("my-engine", () => ({
@@ -182,7 +182,7 @@ Required members:
 
 - `messages` — the ordered messages to send to the model.
 - `estimatedTokens` (required, `number`) — the engine's estimate of total
-  tokens in the assembled context. KaijiBot uses this for compaction threshold
+  tokens in the assembled context. AllBot uses this for compaction threshold
   decisions and diagnostic reporting.
 - `systemPromptAddition` (optional, `string`) — prepended to the system prompt.
 
@@ -202,7 +202,7 @@ Optional members:
 `ownsCompaction` controls whether Pi's built-in in-attempt auto-compaction stays
 enabled for the run:
 
-- `true` — the engine owns compaction behavior. KaijiBot disables Pi's built-in
+- `true` — the engine owns compaction behavior. AllBot disables Pi's built-in
   auto-compaction for that run, and the engine's `compact()` implementation is
   responsible for `/compact`, overflow recovery compaction, and any proactive
   compaction it wants to do in `afterTurn()`.
@@ -210,7 +210,7 @@ enabled for the run:
   execution, but the active engine's `compact()` method is still called for
   `/compact` and overflow recovery.
 
-`ownsCompaction: false` does **not** mean KaijiBot automatically falls back to
+`ownsCompaction: false` does **not** mean AllBot automatically falls back to
 the legacy engine's compaction path.
 
 That means there are two valid plugin patterns:
@@ -218,8 +218,8 @@ That means there are two valid plugin patterns:
 - **Owning mode** — implement your own compaction algorithm and set
   `ownsCompaction: true`.
 - **Delegating mode** — set `ownsCompaction: false` and have `compact()` call
-  `delegateCompactionToRuntime(...)` from `kaijibot/plugin-sdk/core` to use
-  KaijiBot's built-in compaction behavior.
+  `delegateCompactionToRuntime(...)` from `allbot/plugin-sdk/core` to use
+  AllBot's built-in compaction behavior.
 
 A no-op `compact()` is unsafe for an active non-owning engine because it
 disables the normal `/compact` and overflow-recovery compaction path for that
@@ -243,36 +243,36 @@ The slot is exclusive at run time — only one registered context engine is
 resolved for a given run or compaction operation. Other enabled
 `kind: "context-engine"` plugins can still load and run their registration
 code; `plugins.slots.contextEngine` only selects which registered engine id
-KaijiBot resolves when it needs a context engine.
+AllBot resolves when it needs a context engine.
 
 ## Relationship to compaction and memory
 
 - **Compaction** is one responsibility of the context engine. The legacy engine
-  delegates to KaijiBot's built-in summarization. Plugin engines can implement
+  delegates to AllBot's built-in summarization. Plugin engines can implement
   any compaction strategy (DAG summaries, vector retrieval, etc.).
 - **Memory plugins** (`plugins.slots.memory`) are separate from context engines.
   Memory plugins provide search/retrieval; context engines control what the
   model sees. They can work together — a context engine might use memory
   plugin data during assembly. Plugin engines that want the active memory
   prompt path should prefer `buildMemorySystemPromptAddition(...)` from
-  `kaijibot/plugin-sdk/core`, which converts the active memory prompt sections
+  `allbot/plugin-sdk/core`, which converts the active memory prompt sections
   into a ready-to-prepend `systemPromptAddition`. If an engine needs lower-level
   control, it can still pull raw lines from
-  `kaijibot/plugin-sdk/memory-host-core` via
+  `allbot/plugin-sdk/memory-host-core` via
   `buildActiveMemoryPromptSection(...)`.
 - **Session pruning** (trimming old tool results in-memory) still runs
   regardless of which context engine is active.
 
 ## Tips
 
-- Use `kaijibot doctor` to verify your engine is loading correctly.
+- Use `allbot doctor` to verify your engine is loading correctly.
 - If switching engines, existing sessions continue with their current history.
   The new engine takes over for future runs.
 - Engine errors are logged and surfaced in diagnostics. If a plugin engine
-  fails to register or the selected engine id cannot be resolved, KaijiBot
+  fails to register or the selected engine id cannot be resolved, AllBot
   does not fall back automatically; runs fail until you fix the plugin or
   switch `plugins.slots.contextEngine` back to `"legacy"`.
-- For development, use `kaijibot plugins install -l ./my-engine` to link a
+- For development, use `allbot plugins install -l ./my-engine` to link a
   local plugin directory without copying.
 
 See also: [Compaction](/concepts/compaction), [Context](/concepts/context),

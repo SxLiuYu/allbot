@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/exa",
+  "name": "@allbot/exa",
   "version": "2026.4.12",
   "private": true,
-  "description": "KaijiBot Exa plugin",
+  "description": "AllBot Exa plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

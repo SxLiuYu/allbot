@@ -1,5 +1,5 @@
 import { type Api, type Model } from "@earendil-works/pi-ai";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { AgentModelConfig } from "../../config/types.agents-shared.js";
 import { getDefaultLocalRoots } from "../../media/web-media.js";
 import { readSnakeCaseParamRaw } from "../../param-key.js";
@@ -50,38 +50,38 @@ type TaskRunDetailHandle = {
 };
 
 export function applyImageModelConfigDefaults(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   imageModelConfig: ImageModelConfig,
-): KaijiBotConfig | undefined {
+): AllBotConfig | undefined {
   return applyAgentDefaultModelConfig(cfg, "imageModel", imageModelConfig);
 }
 
 export function applyImageGenerationModelConfigDefaults(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   imageGenerationModelConfig: ToolModelConfig,
-): KaijiBotConfig | undefined {
+): AllBotConfig | undefined {
   return applyAgentDefaultModelConfig(cfg, "imageGenerationModel", imageGenerationModelConfig);
 }
 
 export function applyVideoGenerationModelConfigDefaults(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   videoGenerationModelConfig: ToolModelConfig,
-): KaijiBotConfig | undefined {
+): AllBotConfig | undefined {
   return applyAgentDefaultModelConfig(cfg, "videoGenerationModel", videoGenerationModelConfig);
 }
 
 export function applyMusicGenerationModelConfigDefaults(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   musicGenerationModelConfig: ToolModelConfig,
-): KaijiBotConfig | undefined {
+): AllBotConfig | undefined {
   return applyAgentDefaultModelConfig(cfg, "musicGenerationModel", musicGenerationModelConfig);
 }
 
 function applyAgentDefaultModelConfig(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   key: "imageModel" | "imageGenerationModel" | "videoGenerationModel" | "musicGenerationModel",
   modelConfig: ToolModelConfig,
-): KaijiBotConfig | undefined {
+): AllBotConfig | undefined {
   if (!cfg) {
     return undefined;
   }
@@ -101,7 +101,7 @@ type CapabilityProvider = {
   id: string;
   aliases?: string[];
   defaultModel?: string;
-  isConfigured?: (ctx: { cfg?: KaijiBotConfig; agentDir?: string }) => boolean;
+  isConfigured?: (ctx: { cfg?: AllBotConfig; agentDir?: string }) => boolean;
 };
 
 export function findCapabilityProviderById<T extends CapabilityProvider>(params: {
@@ -120,7 +120,7 @@ export function isCapabilityProviderConfigured<T extends CapabilityProvider>(par
   providers: T[];
   provider?: T;
   providerId?: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
 }): boolean {
   const provider =
@@ -161,7 +161,7 @@ export function resolveSelectedCapabilityProvider<T extends CapabilityProvider>(
 }
 
 export function resolveCapabilityModelCandidatesForTool<T extends CapabilityProvider>(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   providers: T[];
 }): string[] {
@@ -206,7 +206,7 @@ export function resolveCapabilityModelCandidatesForTool<T extends CapabilityProv
 }
 
 export function resolveCapabilityModelConfigForTool<T extends CapabilityProvider>(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   modelConfig?: AgentModelConfig;
   providers: T[];
@@ -409,7 +409,7 @@ export function resolveModelFromRegistry(params: {
 
 export async function resolveModelRuntimeApiKey(params: {
   model: Model<Api>;
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   agentDir: string;
   authStorage: {
     setRuntimeApiKey: (provider: string, apiKey: string) => void;

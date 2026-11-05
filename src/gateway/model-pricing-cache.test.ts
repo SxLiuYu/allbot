@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { modelKey } from "../agents/model-selection.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { normalizeProviderModelIdWithPlugin } from "../plugins/provider-runtime.js";
 import { withFetchPreconnect } from "../test-utils/fetch-mock.js";
 
@@ -75,7 +75,7 @@ describe("model-pricing-cache", () => {
           summaryModel: "openai/gpt-5.4",
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const refs = collectConfiguredModelPricingRefs(config).map((ref) =>
       modelKey(ref.provider, ref.model),
@@ -111,7 +111,7 @@ describe("model-pricing-cache", () => {
           },
         },
       },
-    } as KaijiBotConfig).map((ref) => modelKey(ref.provider, ref.model));
+    } as AllBotConfig).map((ref) => modelKey(ref.provider, ref.model));
 
     expect(refs).toContain("tavily/search-preview");
   });
@@ -132,7 +132,7 @@ describe("model-pricing-cache", () => {
       tools: {
         subagents: { model: { primary: "zai/glm-5" } },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const fetchImpl = withFetchPreconnect(
       async () =>
@@ -208,7 +208,7 @@ describe("model-pricing-cache", () => {
           model: { primary: "openrouter/auto" },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const fetchImpl = withFetchPreconnect(
       async () =>

@@ -2,7 +2,7 @@ import { type ChildProcess, type ChildProcessWithoutNullStreams, spawn } from "n
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import type { SsrFPolicy } from "../infra/net/ssrf.js";
 import { ensurePortAvailable } from "../infra/ports.js";
 import { rawDataToString } from "../infra/ws.js";
@@ -32,14 +32,14 @@ import {
   resolveBrowserExecutableForPlatform,
 } from "./chrome.executables.js";
 import {
-  decorateKaijiBotProfile,
+  decorateAllBotProfile,
   ensureProfileCleanExit,
   isProfileDecorated,
 } from "./chrome.profile-decoration.js";
 import type { ResolvedBrowserConfig, ResolvedBrowserProfile } from "./config.js";
 import {
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
 } from "./constants.js";
 
 const log = createSubsystemLogger("browser").child("chrome");
@@ -52,7 +52,7 @@ export {
   resolveBrowserExecutableForPlatform,
 } from "./chrome.executables.js";
 export {
-  decorateKaijiBotProfile,
+  decorateAllBotProfile,
   ensureProfileCleanExit,
   isProfileDecorated,
 } from "./chrome.profile-decoration.js";
@@ -78,7 +78,7 @@ function resolveBrowserExecutable(resolved: ResolvedBrowserConfig): BrowserExecu
   return resolveBrowserExecutableForPlatform(resolved, process.platform);
 }
 
-export function resolveKaijiBotUserDataDir(profileName = DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME) {
+export function resolveAllBotUserDataDir(profileName = DEFAULT_ALLBOT_BROWSER_PROFILE_NAME) {
   return path.join(CONFIG_DIR, "browser", profileName, "user-data");
 }
 
@@ -86,7 +86,7 @@ function cdpUrlForPort(cdpPort: number) {
   return `http://127.0.0.1:${cdpPort}`;
 }
 
-export function buildKaijiBotChromeLaunchArgs(params: {
+export function buildAllBotChromeLaunchArgs(params: {
   resolved: ResolvedBrowserConfig;
   profile: ResolvedBrowserProfile;
   userDataDir: string;
@@ -294,7 +294,7 @@ export async function isChromeCdpReady(
   return await canRunCdpHealthCommand(wsUrl, handshakeTimeoutMs);
 }
 
-export async function launchKaijiBotChrome(
+export async function launchAllBotChrome(
   resolved: ResolvedBrowserConfig,
   profile: ResolvedBrowserProfile,
 ): Promise<RunningChrome> {
@@ -310,18 +310,18 @@ export async function launchKaijiBotChrome(
     );
   }
 
-  const userDataDir = resolveKaijiBotUserDataDir(profile.name);
+  const userDataDir = resolveAllBotUserDataDir(profile.name);
   fs.mkdirSync(userDataDir, { recursive: true });
 
   const needsDecorate = !isProfileDecorated(
     userDataDir,
     profile.name,
-    (profile.color ?? DEFAULT_KAIJIBOT_BROWSER_COLOR).toUpperCase(),
+    (profile.color ?? DEFAULT_ALLBOT_BROWSER_COLOR).toUpperCase(),
   );
 
   // First launch to create preference files if missing, then decorate and relaunch.
   const spawnOnce = () => {
-    const args = buildKaijiBotChromeLaunchArgs({
+    const args = buildAllBotChromeLaunchArgs({
       resolved,
       profile,
       userDataDir,
@@ -373,20 +373,20 @@ export async function launchKaijiBotChrome(
 
   if (needsDecorate) {
     try {
-      decorateKaijiBotProfile(userDataDir, {
+      decorateAllBotProfile(userDataDir, {
         name: profile.name,
         color: profile.color,
       });
-      log.info(`🧠 kaijibot browser profile decorated (${profile.color})`);
+      log.info(`🧠 allbot browser profile decorated (${profile.color})`);
     } catch (err) {
-      log.warn(`kaijibot browser profile decoration failed: ${String(err)}`);
+      log.warn(`allbot browser profile decoration failed: ${String(err)}`);
     }
   }
 
   try {
     ensureProfileCleanExit(userDataDir);
   } catch (err) {
-    log.warn(`kaijibot browser clean-exit prefs failed: ${String(err)}`);
+    log.warn(`allbot browser clean-exit prefs failed: ${String(err)}`);
   }
 
   const proc = spawnOnce();
@@ -435,7 +435,7 @@ export async function launchKaijiBotChrome(
 
   const pid = proc.pid ?? -1;
   log.info(
-    `🧠 kaijibot browser started (${exe.kind}) profile "${profile.name}" on 127.0.0.1:${profile.cdpPort} (pid ${pid})`,
+    `🧠 allbot browser started (${exe.kind}) profile "${profile.name}" on 127.0.0.1:${profile.cdpPort} (pid ${pid})`,
   );
 
   return {
@@ -498,7 +498,7 @@ async function requestGracefulCdpClose(running: RunningChrome): Promise<boolean>
   }
 }
 
-export async function stopKaijiBotChrome(
+export async function stopAllBotChrome(
   running: RunningChrome,
   timeoutMs = CHROME_STOP_TIMEOUT_MS,
 ) {

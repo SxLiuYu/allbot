@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { startBrowserBridgeServer, stopBrowserBridgeServer } from "./bridge-server.js";
 import type { ResolvedBrowserConfig } from "./config.js";
 import {
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
 } from "./constants.js";
 
 function buildResolvedConfig(): ResolvedBrowserConfig {
@@ -19,16 +19,16 @@ function buildResolvedConfig(): ResolvedBrowserConfig {
     remoteCdpTimeoutMs: 1500,
     remoteCdpHandshakeTimeoutMs: 3000,
     extraArgs: [],
-    color: DEFAULT_KAIJIBOT_BROWSER_COLOR,
+    color: DEFAULT_ALLBOT_BROWSER_COLOR,
     executablePath: undefined,
     headless: true,
     noSandbox: false,
     attachOnly: true,
-    defaultProfile: DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+    defaultProfile: DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
     profiles: {
-      [DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME]: {
+      [DEFAULT_ALLBOT_BROWSER_PROFILE_NAME]: {
         cdpPort: 1,
-        color: DEFAULT_KAIJIBOT_BROWSER_COLOR,
+        color: DEFAULT_ALLBOT_BROWSER_COLOR,
       },
     },
   } as unknown as ResolvedBrowserConfig;
@@ -67,10 +67,10 @@ describe("startBrowserBridgeServer auth", () => {
     await expectAuthFlow({ authToken: "secret-token" }, { Authorization: "Bearer secret-token" });
   });
 
-  it("accepts x-kaijibot-password when authPassword is set", async () => {
+  it("accepts x-allbot-password when authPassword is set", async () => {
     await expectAuthFlow(
       { authPassword: "secret-password" },
-      { "x-kaijibot-password": "secret-password" },
+      { "x-allbot-password": "secret-password" },
     );
   });
 

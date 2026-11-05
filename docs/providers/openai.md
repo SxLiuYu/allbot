@@ -1,7 +1,7 @@
 ---
-summary: "Use OpenAI via API keys or Codex subscription in KaijiBot"
+summary: "Use OpenAI via API keys or Codex subscription in AllBot"
 read_when:
-  - You want to use OpenAI models in KaijiBot
+  - You want to use OpenAI models in AllBot
   - You want Codex subscription auth instead of API keys
 title: "OpenAI"
 ---
@@ -10,14 +10,14 @@ title: "OpenAI"
 
 OpenAI provides developer APIs for GPT models. Codex supports **ChatGPT sign-in** for subscription
 access or **API key** sign-in for usage-based access. Codex cloud requires ChatGPT sign-in.
-OpenAI explicitly supports subscription OAuth usage in external tools/workflows like KaijiBot.
+OpenAI explicitly supports subscription OAuth usage in external tools/workflows like AllBot.
 
 ## Default interaction style
 
-KaijiBot can add a small OpenAI-specific prompt overlay for both `openai/*` and
+AllBot can add a small OpenAI-specific prompt overlay for both `openai/*` and
 `openai-codex/*` runs. By default, the overlay keeps the assistant warm,
 collaborative, concise, direct, and a little more emotionally expressive
-without replacing the base KaijiBot system prompt. The friendly overlay also
+without replacing the base AllBot system prompt. The friendly overlay also
 permits the occasional emoji when it fits naturally, while keeping overall
 output concise.
 
@@ -29,7 +29,7 @@ Allowed values:
 
 - `"friendly"`: default; enable the OpenAI-specific overlay.
 - `"on"`: alias for `"friendly"`.
-- `"off"`: disable the overlay and use the base KaijiBot prompt only.
+- `"off"`: disable the overlay and use the base AllBot prompt only.
 
 Scope:
 
@@ -56,7 +56,7 @@ to survive future local config churn:
 
 ### Disable the OpenAI prompt overlay
 
-If you want the unmodified base KaijiBot prompt, set the overlay to `"off"`:
+If you want the unmodified base AllBot prompt, set the overlay to `"off"`:
 
 ```json5
 {
@@ -75,10 +75,10 @@ If you want the unmodified base KaijiBot prompt, set the overlay to `"off"`:
 You can also set it directly with the config CLI:
 
 ```bash
-kaijibot config set plugins.entries.openai.config.personality off
+allbot config set plugins.entries.openai.config.personality off
 ```
 
-KaijiBot normalizes this setting case-insensitively at runtime, so values like
+AllBot normalizes this setting case-insensitively at runtime, so values like
 `"Off"` still disable the friendly overlay.
 
 ## Option A: OpenAI API key (OpenAI Platform)
@@ -90,14 +90,14 @@ Route summary:
 
 - `openai/gpt-5.4` = direct OpenAI Platform API route
 - Requires `OPENAI_API_KEY` (or equivalent OpenAI provider config)
-- In KaijiBot, ChatGPT/Codex sign-in is routed through `openai-codex/*`, not `openai/*`
+- In AllBot, ChatGPT/Codex sign-in is routed through `openai-codex/*`, not `openai/*`
 
 ### CLI setup
 
 ```bash
-kaijibot onboard --auth-choice openai-api-key
+allbot onboard --auth-choice openai-api-key
 # or non-interactive
-kaijibot onboard --openai-api-key "$OPENAI_API_KEY"
+allbot onboard --openai-api-key "$OPENAI_API_KEY"
 ```
 
 ### Config snippet
@@ -110,13 +110,13 @@ kaijibot onboard --openai-api-key "$OPENAI_API_KEY"
 ```
 
 OpenAI's current API model docs list `gpt-5.4` and `gpt-5.4-pro` for direct
-OpenAI API usage. KaijiBot forwards both through the `openai/*` Responses path.
-KaijiBot intentionally suppresses the stale `openai/gpt-5.3-codex-spark` row,
+OpenAI API usage. AllBot forwards both through the `openai/*` Responses path.
+AllBot intentionally suppresses the stale `openai/gpt-5.3-codex-spark` row,
 because direct OpenAI API calls reject it in live traffic.
 
-KaijiBot does **not** expose `openai/gpt-5.3-codex-spark` on the direct OpenAI
+AllBot does **not** expose `openai/gpt-5.3-codex-spark` on the direct OpenAI
 API path. `pi-ai` still ships a built-in row for that model, but live OpenAI API
-requests currently reject it. Spark is treated as Codex-only in KaijiBot.
+requests currently reject it. Spark is treated as Codex-only in AllBot.
 
 ## Image generation
 
@@ -127,7 +127,7 @@ The bundled `openai` plugin also registers image generation through the shared
 - Generate: up to 4 images per request
 - Edit mode: enabled, up to 5 reference images
 - Supports `size`
-- Current OpenAI-specific caveat: KaijiBot does not forward `aspectRatio` or
+- Current OpenAI-specific caveat: AllBot does not forward `aspectRatio` or
   `resolution` overrides to the OpenAI Images API today
 
 To use OpenAI as the default image provider:
@@ -155,7 +155,7 @@ The bundled `openai` plugin also registers video generation through the shared
 - Default video model: `openai/sora-2`
 - Modes: text-to-video, image-to-video, and single-video reference/edit flows
 - Current limits: 1 image or 1 video reference input
-- Current OpenAI-specific caveat: KaijiBot currently only forwards `size`
+- Current OpenAI-specific caveat: AllBot currently only forwards `size`
   overrides for native OpenAI video generation. Unsupported optional overrides
   such as `aspectRatio`, `resolution`, `audio`, and `watermark` are ignored
   and reported back as a tool warning.
@@ -192,10 +192,10 @@ Route summary:
 
 ```bash
 # Run Codex OAuth in the wizard
-kaijibot onboard --auth-choice openai-codex
+allbot onboard --auth-choice openai-codex
 
 # Or run OAuth directly
-kaijibot models auth login --provider openai-codex
+allbot models auth login --provider openai-codex
 ```
 
 ### Config snippet (Codex subscription)
@@ -206,7 +206,7 @@ kaijibot models auth login --provider openai-codex
 }
 ```
 
-OpenAI's current Codex docs list `gpt-5.4` as the current Codex model. KaijiBot
+OpenAI's current Codex docs list `gpt-5.4` as the current Codex model. AllBot
 maps that to `openai-codex/gpt-5.4` for ChatGPT/Codex OAuth usage.
 
 This route is intentionally separate from `openai/gpt-5.4`. If you want the
@@ -214,26 +214,26 @@ direct OpenAI Platform API path, use `openai/*` with an API key. If you want
 ChatGPT/Codex sign-in, use `openai-codex/*`.
 
 If onboarding reuses an existing Codex CLI login, those credentials stay
-managed by Codex CLI. On expiry, KaijiBot re-reads the external Codex source
+managed by Codex CLI. On expiry, AllBot re-reads the external Codex source
 first and, when the provider can refresh it, writes the refreshed credential
-back to Codex storage instead of taking ownership in a separate KaijiBot-only
+back to Codex storage instead of taking ownership in a separate AllBot-only
 copy.
 
-If your Codex account is entitled to Codex Spark, KaijiBot also supports:
+If your Codex account is entitled to Codex Spark, AllBot also supports:
 
 - `openai-codex/gpt-5.3-codex-spark`
 
-KaijiBot treats Codex Spark as Codex-only. It does not expose a direct
+AllBot treats Codex Spark as Codex-only. It does not expose a direct
 `openai/gpt-5.3-codex-spark` API-key path.
 
-KaijiBot also preserves `openai-codex/gpt-5.3-codex-spark` when `pi-ai`
+AllBot also preserves `openai-codex/gpt-5.3-codex-spark` when `pi-ai`
 discovers it. Treat it as entitlement-dependent and experimental: Codex Spark is
 separate from GPT-5.4 `/fast`, and availability depends on the signed-in Codex /
 ChatGPT account.
 
 ### Codex context window cap
 
-KaijiBot treats the Codex model metadata and the runtime context cap as separate
+AllBot treats the Codex model metadata and the runtime context cap as separate
 values.
 
 For `openai-codex/gpt-5.4`:
@@ -268,31 +268,31 @@ metadata. Use `contextTokens` when you want to limit the runtime context budget.
 
 ### Transport default
 
-KaijiBot uses `pi-ai` for model streaming. For both `openai/*` and
+AllBot uses `pi-ai` for model streaming. For both `openai/*` and
 `openai-codex/*`, default transport is `"auto"` (WebSocket-first, then SSE
 fallback).
 
-In `"auto"` mode, KaijiBot also retries one early, retryable WebSocket failure
+In `"auto"` mode, AllBot also retries one early, retryable WebSocket failure
 before it falls back to SSE. Forced `"websocket"` mode still surfaces transport
 errors directly instead of hiding them behind fallback.
 
-After a connect or early-turn WebSocket failure in `"auto"` mode, KaijiBot marks
+After a connect or early-turn WebSocket failure in `"auto"` mode, AllBot marks
 that session's WebSocket path as degraded for about 60 seconds and sends
 subsequent turns over SSE during the cool-down instead of thrashing between
 transports.
 
 For native OpenAI-family endpoints (`openai/*`, `openai-codex/*`, and Azure
-OpenAI Responses), KaijiBot also attaches stable session and turn identity state
+OpenAI Responses), AllBot also attaches stable session and turn identity state
 to requests so retries, reconnects, and SSE fallback stay aligned to the same
 conversation identity. On native OpenAI-family routes this includes stable
 session/turn request identity headers plus matching transport metadata.
 
-KaijiBot also normalizes OpenAI usage counters across transport variants before
+AllBot also normalizes OpenAI usage counters across transport variants before
 they reach session/status surfaces. Native OpenAI/Codex Responses traffic may
 report usage as either `input_tokens` / `output_tokens` or
-`prompt_tokens` / `completion_tokens`; KaijiBot treats those as the same input
+`prompt_tokens` / `completion_tokens`; AllBot treats those as the same input
 and output counters for `/status`, `/usage`, and session logs. When native
-WebSocket traffic omits `total_tokens` (or reports `0`), KaijiBot falls back to
+WebSocket traffic omits `total_tokens` (or reports `0`), AllBot falls back to
 the normalized input + output total so session/status displays stay populated.
 
 You can set `agents.defaults.models.<provider/model>.params.transport`:
@@ -301,7 +301,7 @@ You can set `agents.defaults.models.<provider/model>.params.transport`:
 - `"websocket"`: force WebSocket
 - `"auto"`: try WebSocket, then fall back to SSE
 
-For `openai/*` (Responses API), KaijiBot also enables WebSocket warm-up by
+For `openai/*` (Responses API), AllBot also enables WebSocket warm-up by
 default (`openaiWsWarmup: true`) when WebSocket transport is used.
 
 Related OpenAI docs:
@@ -328,7 +328,7 @@ Related OpenAI docs:
 
 ### OpenAI WebSocket warm-up
 
-OpenAI docs describe warm-up as optional. KaijiBot enables it by default for
+OpenAI docs describe warm-up as optional. AllBot enables it by default for
 `openai/*` to reduce first-turn latency when using WebSocket transport.
 
 ### Disable warm-up
@@ -370,7 +370,7 @@ OpenAI docs describe warm-up as optional. KaijiBot enables it by default for
 ### OpenAI and Codex priority processing
 
 OpenAI's API exposes priority processing via `service_tier=priority`. In
-KaijiBot, set `agents.defaults.models["<provider>/<model>"].params.serviceTier`
+AllBot, set `agents.defaults.models["<provider>/<model>"].params.serviceTier`
 to pass that field through on native OpenAI/Codex Responses endpoints.
 
 ```json5
@@ -396,7 +396,7 @@ to pass that field through on native OpenAI/Codex Responses endpoints.
 
 Supported values are `auto`, `default`, `flex`, and `priority`.
 
-KaijiBot forwards `params.serviceTier` to both direct `openai/*` Responses
+AllBot forwards `params.serviceTier` to both direct `openai/*` Responses
 requests and `openai-codex/*` Codex Responses requests when those models point
 at the native OpenAI/Codex endpoints.
 
@@ -404,17 +404,17 @@ Important behavior:
 
 - direct `openai/*` must target `api.openai.com`
 - `openai-codex/*` must target `chatgpt.com/backend-api`
-- if you route either provider through another base URL or proxy, KaijiBot leaves `service_tier` untouched
+- if you route either provider through another base URL or proxy, AllBot leaves `service_tier` untouched
 
 ### OpenAI fast mode
 
-KaijiBot exposes a shared fast-mode toggle for both `openai/*` and
+AllBot exposes a shared fast-mode toggle for both `openai/*` and
 `openai-codex/*` sessions:
 
 - Chat/UI: `/fast status|on|off`
 - Config: `agents.defaults.models["<provider>/<model>"].params.fastMode`
 
-When fast mode is enabled, KaijiBot maps it to OpenAI priority processing:
+When fast mode is enabled, AllBot maps it to OpenAI priority processing:
 
 - direct `openai/*` Responses calls to `api.openai.com` send `service_tier = "priority"`
 - `openai-codex/*` Responses calls to `chatgpt.com/backend-api` also send `service_tier = "priority"`
@@ -455,13 +455,13 @@ returns the session to the configured default.
 
 ### Native OpenAI versus OpenAI-compatible routes
 
-KaijiBot treats direct OpenAI, Codex, and Azure OpenAI endpoints differently
+AllBot treats direct OpenAI, Codex, and Azure OpenAI endpoints differently
 from generic OpenAI-compatible `/v1` proxies:
 
 - native `openai/*`, `openai-codex/*`, and Azure OpenAI routes keep
   `reasoning: { effort: "none" }` intact when you explicitly disable reasoning
 - native OpenAI-family routes default tool schemas to strict mode
-- hidden KaijiBot attribution headers (`originator`, `version`, and
+- hidden AllBot attribution headers (`originator`, `version`, and
   `User-Agent`) are only attached on verified native OpenAI hosts
   (`api.openai.com`) and native Codex hosts (`chatgpt.com/backend-api`)
 - native OpenAI/Codex routes keep OpenAI-only request shaping such as
@@ -480,7 +480,7 @@ OpenAI-compatible shims onto third-party `/v1` backends.
 ### OpenAI Responses server-side compaction
 
 For direct OpenAI Responses models (`openai/*` using `api: "openai-responses"` with
-`baseUrl` on `api.openai.com`), KaijiBot now auto-enables OpenAI server-side
+`baseUrl` on `api.openai.com`), AllBot now auto-enables OpenAI server-side
 compaction payload hints:
 
 - Forces `store: true` (unless model compat sets `supportsStore: false`)

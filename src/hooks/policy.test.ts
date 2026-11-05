@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveHookEnableState, resolveHookEntries } from "./policy.js";
 import type { HookEntry, HookSource } from "./types.js";
 
@@ -28,7 +28,7 @@ function makeHookEntry(name: string, source: HookSource): HookEntry {
 describe("hook policy", () => {
   describe("resolveHookEnableState", () => {
     it("keeps workspace hooks disabled by default", () => {
-      const entry = makeHookEntry("workspace-hook", "kaijibot-workspace");
+      const entry = makeHookEntry("workspace-hook", "allbot-workspace");
       expect(resolveHookEnableState({ entry })).toEqual({
         enabled: false,
         reason: "workspace hook (disabled by default)",
@@ -36,8 +36,8 @@ describe("hook policy", () => {
     });
 
     it("allows workspace hooks when explicitly enabled", () => {
-      const entry = makeHookEntry("workspace-hook", "kaijibot-workspace");
-      const config: KaijiBotConfig = {
+      const entry = makeHookEntry("workspace-hook", "allbot-workspace");
+      const config: AllBotConfig = {
         hooks: {
           internal: {
             entries: {
@@ -52,35 +52,35 @@ describe("hook policy", () => {
     });
 
     it("keeps plugin hooks enabled without local hook toggles", () => {
-      const entry = makeHookEntry("plugin-hook", "kaijibot-plugin");
+      const entry = makeHookEntry("plugin-hook", "allbot-plugin");
       expect(resolveHookEnableState({ entry })).toEqual({ enabled: true });
     });
   });
 
   describe("resolveHookEntries", () => {
     it("lets managed hooks override bundled and plugin hooks", () => {
-      const bundled = makeHookEntry("shared", "kaijibot-bundled");
-      const plugin = makeHookEntry("shared", "kaijibot-plugin");
-      const managed = makeHookEntry("shared", "kaijibot-managed");
+      const bundled = makeHookEntry("shared", "allbot-bundled");
+      const plugin = makeHookEntry("shared", "allbot-plugin");
+      const managed = makeHookEntry("shared", "allbot-managed");
 
       const resolved = resolveHookEntries([bundled, plugin, managed]);
       expect(resolved).toHaveLength(1);
-      expect(resolved[0]?.hook.source).toBe("kaijibot-managed");
+      expect(resolved[0]?.hook.source).toBe("allbot-managed");
     });
 
     it("prevents workspace hooks from overriding non-workspace hooks", () => {
-      const managed = makeHookEntry("shared", "kaijibot-managed");
-      const workspace = makeHookEntry("shared", "kaijibot-workspace");
+      const managed = makeHookEntry("shared", "allbot-managed");
+      const workspace = makeHookEntry("shared", "allbot-workspace");
 
       const resolved = resolveHookEntries([managed, workspace]);
       expect(resolved).toHaveLength(1);
-      expect(resolved[0]?.hook.source).toBe("kaijibot-managed");
+      expect(resolved[0]?.hook.source).toBe("allbot-managed");
     });
 
     it("keeps later workspace entries for the same source/name", () => {
-      const first = makeHookEntry("shared", "kaijibot-workspace");
-      const second = makeHookEntry("shared", "kaijibot-workspace");
-      second.hook.handlerPath = "/tmp/kaijibot-workspace/shared/handler-2.js";
+      const first = makeHookEntry("shared", "allbot-workspace");
+      const second = makeHookEntry("shared", "allbot-workspace");
+      second.hook.handlerPath = "/tmp/allbot-workspace/shared/handler-2.js";
 
       const resolved = resolveHookEntries([first, second]);
       expect(resolved).toHaveLength(1);

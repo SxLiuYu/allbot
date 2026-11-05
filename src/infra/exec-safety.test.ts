@@ -5,8 +5,8 @@ describe("isSafeExecutableValue", () => {
   it.each([
     ["node", true],
     ["/usr/bin/node", true],
-    ["./bin/kaijibot", true],
-    ["C:\\Tools\\kaijibot.exe", true],
+    ["./bin/allbot", true],
+    ["C:\\Tools\\allbot.exe", true],
     [" tool ", true],
     [undefined, false],
     ["   ", false],

@@ -32,15 +32,15 @@ describe("resetCommand", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resolveCleanupPlanFromDisk.mockReturnValue({
-      stateDir: "/tmp/.kaijibot",
-      configPath: "/tmp/.kaijibot/kaijibot.json",
-      oauthDir: "/tmp/.kaijibot/credentials",
+      stateDir: "/tmp/.allbot",
+      configPath: "/tmp/.allbot/allbot.json",
+      oauthDir: "/tmp/.allbot/credentials",
       configInsideState: true,
       oauthInsideState: true,
-      workspaceDirs: ["/tmp/.kaijibot/workspace"],
+      workspaceDirs: ["/tmp/.allbot/workspace"],
     });
     removePath.mockResolvedValue({ ok: true });
-    listAgentSessionDirs.mockResolvedValue(["/tmp/.kaijibot/agents/main/sessions"]);
+    listAgentSessionDirs.mockResolvedValue(["/tmp/.allbot/agents/main/sessions"]);
     removeStateAndLinkedPaths.mockResolvedValue(undefined);
     removeWorkspaceDirs.mockResolvedValue(undefined);
     vi.spyOn(runtime, "log").mockImplementation(() => {});
@@ -55,7 +55,7 @@ describe("resetCommand", () => {
       dryRun: true,
     });
 
-    expect(runtime.log).toHaveBeenCalledWith(expect.stringContaining("kaijibot backup create"));
+    expect(runtime.log).toHaveBeenCalledWith(expect.stringContaining("allbot backup create"));
   });
 
   it("does not recommend backup for config-only reset", async () => {
@@ -66,6 +66,6 @@ describe("resetCommand", () => {
       dryRun: true,
     });
 
-    expect(runtime.log).not.toHaveBeenCalledWith(expect.stringContaining("kaijibot backup create"));
+    expect(runtime.log).not.toHaveBeenCalledWith(expect.stringContaining("allbot backup create"));
   });
 });

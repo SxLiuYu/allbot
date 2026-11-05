@@ -1,6 +1,6 @@
 export {
   definePluginEntry,
-  type KaijiBotPluginApi,
+  type AllBotPluginApi,
   type PluginLogger,
   type PluginRuntime,
-} from "kaijibot/plugin-sdk/core";
+} from "allbot/plugin-sdk/core";

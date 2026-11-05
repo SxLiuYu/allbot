@@ -1,4 +1,4 @@
-import type { GatewayAuthConfig, KaijiBotConfig } from "../config/config.js";
+import type { GatewayAuthConfig, AllBotConfig } from "../config/config.js";
 import { hasConfiguredSecretInput } from "../config/types.secrets.js";
 import { resolveRequiredConfiguredSecretRefInputString } from "./resolve-configured-secret-input-string.js";
 import {
@@ -13,7 +13,7 @@ export type GatewayAuthSecretInputPath = Extract<
 >;
 
 export type GatewayAuthSecretRefResolutionParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   mode?: GatewayAuthConfig["mode"];
   hasPasswordCandidate: boolean;
@@ -21,7 +21,7 @@ export type GatewayAuthSecretRefResolutionParams = {
 };
 
 export function hasConfiguredGatewayAuthSecretInput(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   path: GatewayAuthSecretInputPath,
 ): boolean {
   return hasConfiguredSecretInput(readGatewaySecretInputValue(cfg, path), cfg.secrets?.defaults);
@@ -73,7 +73,7 @@ export function shouldResolveGatewayPasswordSecretRef(
 }
 
 export async function resolveGatewayAuthSecretRefValue(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   path: GatewayAuthSecretInputPath;
   shouldResolve: boolean;
@@ -116,11 +116,11 @@ export async function resolveGatewayPasswordSecretRefValue(
 }
 
 export async function resolveGatewayAuthSecretRef(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   path: GatewayAuthSecretInputPath;
   shouldResolve: boolean;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const value = await resolveGatewayAuthSecretRefValue(params);
   if (!value) {
     return params.cfg;
@@ -137,12 +137,12 @@ export async function resolveGatewayAuthSecretRef(params: {
 }
 
 export async function resolveGatewayPasswordSecretRef(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   mode?: GatewayAuthConfig["mode"];
   hasPasswordCandidate: boolean;
   hasTokenCandidate: boolean;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   return resolveGatewayAuthSecretRef({
     cfg: params.cfg,
     env: params.env,
@@ -153,7 +153,7 @@ export async function resolveGatewayPasswordSecretRef(params: {
 
 export async function materializeGatewayAuthSecretRefs(
   params: GatewayAuthSecretRefResolutionParams,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   const cfgWithToken = await resolveGatewayAuthSecretRef({
     cfg: params.cfg,
     env: params.env,

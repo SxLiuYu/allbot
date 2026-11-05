@@ -4,13 +4,13 @@
 const shouldWarnCompatImport =
   process.env.VITEST !== "true" &&
   process.env.NODE_ENV !== "test" &&
-  process.env.KAIJIBOT_SUPPRESS_PLUGIN_SDK_COMPAT_WARNING !== "1";
+  process.env.ALLBOT_SUPPRESS_PLUGIN_SDK_COMPAT_WARNING !== "1";
 
 if (shouldWarnCompatImport) {
   process.emitWarning(
-    "kaijibot/plugin-sdk/compat is deprecated for new plugins. Migrate to focused kaijibot/plugin-sdk/<subpath> imports. See https://gitee.com/kaiji1126/kaijibot/blob/main/docs/plugins/sdk-migration.md",
+    "allbot/plugin-sdk/compat is deprecated for new plugins. Migrate to focused allbot/plugin-sdk/<subpath> imports. See https://gitee.com/kaiji1126/kaijibot/blob/main/docs/plugins/sdk-migration.md",
     {
-      code: "KAIJIBOT_PLUGIN_SDK_COMPAT_DEPRECATED",
+      code: "ALLBOT_PLUGIN_SDK_COMPAT_DEPRECATED",
       detail:
         "Bundled plugins must use scoped plugin-sdk subpaths. External plugins may keep compat temporarily while migrating. Migration guide: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/plugins/sdk-migration.md",
     },

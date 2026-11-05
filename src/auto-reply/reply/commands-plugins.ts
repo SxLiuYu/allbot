@@ -12,7 +12,7 @@ import {
   validateConfigObjectWithPlugins,
   writeConfigFile,
 } from "../../config/config.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PluginInstallRecord } from "../../config/types.plugins.js";
 import { resolveArchiveKind } from "../../infra/archive.js";
 import { parseClawHubPluginSpec } from "../../infra/clawhub.js";
@@ -47,7 +47,7 @@ function renderJsonBlock(label: string, value: unknown): string {
 
 function buildPluginInspectJson(params: {
   id: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   report: PluginStatusReport;
 }): {
   inspect: NonNullable<ReturnType<typeof buildPluginInspectReport>>;
@@ -78,7 +78,7 @@ function buildPluginInspectJson(params: {
 }
 
 function buildAllPluginInspectJson(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   report: PluginStatusReport;
 }): Array<{
   inspect: ReturnType<typeof buildAllPluginInspectReports>[number];
@@ -120,8 +120,8 @@ function formatPluginsList(report: PluginStatusReport): string {
     `🔌 Plugins (${loaded}/${report.plugins.length} loaded)`,
     ...report.plugins.map((plugin) => {
       const format = plugin.bundleFormat
-        ? `${plugin.format ?? "kaijibot"}/${plugin.bundleFormat}`
-        : (plugin.format ?? "kaijibot");
+        ? `${plugin.format ?? "allbot"}/${plugin.bundleFormat}`
+        : (plugin.format ?? "allbot");
       return `- ${formatPluginLabel(plugin)} [${plugin.status}] ${format}`;
     }),
   ];
@@ -158,7 +158,7 @@ function looksLikeLocalPluginInstallSpec(raw: string): boolean {
 
 async function installPluginFromPluginsCommand(params: {
   raw: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
 }): Promise<{ ok: true; pluginId: string } | { ok: false; error: string }> {
   const fileSpec = resolveFileNpmSpecToLocalPath(params.raw);
   if (fileSpec && !fileSpec.ok) {
@@ -283,7 +283,7 @@ async function loadPluginCommandState(
   | {
       ok: true;
       path: string;
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       report: PluginStatusReport;
     }
   | { ok: false; path: string; error: string }
@@ -309,7 +309,7 @@ async function loadPluginCommandState(
 }
 
 async function loadPluginCommandConfig(): Promise<
-  { ok: true; path: string; config: KaijiBotConfig } | { ok: false; path: string; error: string }
+  { ok: true; path: string; config: AllBotConfig } | { ok: false; path: string; error: string }
 > {
   const snapshot = await readConfigFileSnapshot();
   if (!snapshot.valid) {

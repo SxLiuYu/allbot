@@ -6,7 +6,7 @@
  */
 
 import { resolveConversationBindingContext } from "../channels/conversation-binding-context.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { logVerbose } from "../globals.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import {
@@ -30,7 +30,7 @@ import {
 } from "./conversation-binding.js";
 import { getActivePluginChannelRegistry } from "./runtime.js";
 import type {
-  KaijiBotPluginCommandDefinition,
+  AllBotPluginCommandDefinition,
   PluginCommandContext,
   PluginCommandResult,
 } from "./types.js";
@@ -114,7 +114,7 @@ function sanitizeArgs(args: string | undefined): string | undefined {
 }
 
 function resolveBindingConversationFromCommand(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   channel: string;
   from?: string;
   to?: string;
@@ -135,7 +135,7 @@ function resolveBindingConversationFromCommand(params: {
     return null;
   }
   return resolveConversationBindingContext({
-    cfg: params.config ?? ({} as KaijiBotConfig),
+    cfg: params.config ?? ({} as AllBotConfig),
     channel: params.channel,
     accountId: params.accountId,
     threadId: params.messageThreadId,
@@ -163,7 +163,7 @@ export async function executePluginCommand(params: {
   sessionKey?: PluginCommandContext["sessionKey"];
   sessionId?: PluginCommandContext["sessionId"];
   commandBody: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   from?: PluginCommandContext["from"];
   to?: PluginCommandContext["to"];
   accountId?: PluginCommandContext["accountId"];
@@ -280,7 +280,7 @@ export function listPluginCommands(): Array<{
   }));
 }
 
-function listPluginInvocationNames(command: KaijiBotPluginCommandDefinition): string[] {
+function listPluginInvocationNames(command: AllBotPluginCommandDefinition): string[] {
   return listPluginInvocationKeys(command);
 }
 

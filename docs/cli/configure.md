@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `kaijibot configure` (interactive configuration prompts)"
+summary: "CLI reference for `allbot configure` (interactive configuration prompts)"
 read_when:
   - You want to tweak credentials, devices, or agent defaults interactively
 title: "configure"
 ---
 
-# `kaijibot configure`
+# `allbot configure`
 
 Interactive prompt to set up credentials, devices, and agent defaults.
 
@@ -19,10 +19,10 @@ variants (`volcengine-plan/*`, `byteplus-plan/*`). If the preferred-provider
 filter would produce an empty list, configure falls back to the unfiltered
 catalog instead of showing a blank picker.
 
-Tip: `kaijibot config` without a subcommand opens the same wizard. Use
-`kaijibot config get|set|unset` for non-interactive edits.
+Tip: `allbot config` without a subcommand opens the same wizard. Use
+`allbot config get|set|unset` for non-interactive edits.
 
-For web search, `kaijibot configure --section web` lets you choose a provider
+For web search, `allbot configure --section web` lets you choose a provider
 and configure its credentials. Some providers also show provider-specific
 follow-up prompts:
 
@@ -63,8 +63,8 @@ Notes:
 ## Examples
 
 ```bash
-kaijibot configure
-kaijibot configure --section web
-kaijibot configure --section model --section channels
-kaijibot configure --section gateway --section daemon
+allbot configure
+allbot configure --section web
+allbot configure --section model --section channels
+allbot configure --section gateway --section daemon
 ```

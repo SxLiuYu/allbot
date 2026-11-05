@@ -180,7 +180,7 @@ export async function updateAuthProfileStoreWithLock(params: {
 }
 
 function shouldLogAuthStoreTiming(): boolean {
-  return process.env.KAIJIBOT_DEBUG_INGRESS_TIMING === "1";
+  return process.env.ALLBOT_DEBUG_INGRESS_TIMING === "1";
 }
 
 function syncExternalCliCredentialsTimed(
@@ -294,7 +294,7 @@ function loadAuthProfileStoreForAgent(
   if (shouldSyncExternalCliCredentials(options)) {
     syncExternalCliCredentialsTimed(store, { log: !readOnly });
   }
-  const forceReadOnly = process.env.KAIJIBOT_AUTH_STORE_READONLY === "1";
+  const forceReadOnly = process.env.ALLBOT_AUTH_STORE_READONLY === "1";
   const shouldWrite = !readOnly && !forceReadOnly && (legacy !== null || mergedOAuth);
   if (shouldWrite) {
     saveAuthProfileStore(store, agentDir);

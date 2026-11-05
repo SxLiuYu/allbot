@@ -1,5 +1,5 @@
 // Manual facade. Keep loader boundary explicit.
-type RuntimeFacadeModule = typeof import("@kaijibot/memory-core/runtime-api.js");
+type RuntimeFacadeModule = typeof import("@allbot/memory-core/runtime-api.js");
 import { loadBundledPluginPublicSurfaceModuleSync } from "./facade-loader.js";
 
 function loadRuntimeFacadeModule(): RuntimeFacadeModule {

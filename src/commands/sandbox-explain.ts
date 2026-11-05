@@ -2,7 +2,7 @@ import { resolveAgentConfig } from "../agents/agent-scope.js";
 import { resolveSandboxConfigForAgent } from "../agents/sandbox.js";
 import { resolveSandboxToolPolicyForAgent } from "../agents/sandbox/tool-policy.js";
 import { normalizeAnyChannelId } from "../channels/registry.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig } from "../config/config.js";
 import {
   loadSessionStore,
@@ -35,7 +35,7 @@ type SandboxExplainOptions = {
 const SANDBOX_DOCS_URL = "https://gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/sandbox.md";
 
 function normalizeExplainSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   session?: string;
 }): string {
@@ -59,7 +59,7 @@ function normalizeExplainSessionKey(params: {
 }
 
 function inferProviderFromSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
 }): string | undefined {
   const parsed = parseAgentSessionKey(params.sessionKey);
@@ -89,7 +89,7 @@ function inferProviderFromSessionKey(params: {
 }
 
 function resolveActiveChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   sessionKey: string;
 }): string | undefined {

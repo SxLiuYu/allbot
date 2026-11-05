@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   __resetGatewayModelPricingCacheForTest,
   __setGatewayModelPricingForTest,
@@ -16,21 +16,21 @@ import {
 } from "./usage-format.js";
 
 describe("usage-format", () => {
-  const originalAgentDir = process.env.KAIJIBOT_AGENT_DIR;
+  const originalAgentDir = process.env.ALLBOT_AGENT_DIR;
   let agentDir: string;
 
   beforeEach(async () => {
-    agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-usage-format-"));
-    process.env.KAIJIBOT_AGENT_DIR = agentDir;
+    agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-usage-format-"));
+    process.env.ALLBOT_AGENT_DIR = agentDir;
     __resetUsageFormatCachesForTest();
     __resetGatewayModelPricingCacheForTest();
   });
 
   afterEach(async () => {
     if (originalAgentDir === undefined) {
-      delete process.env.KAIJIBOT_AGENT_DIR;
+      delete process.env.ALLBOT_AGENT_DIR;
     } else {
-      process.env.KAIJIBOT_AGENT_DIR = originalAgentDir;
+      process.env.ALLBOT_AGENT_DIR = originalAgentDir;
     }
     __resetUsageFormatCachesForTest();
     __resetGatewayModelPricingCacheForTest();
@@ -66,7 +66,7 @@ describe("usage-format", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const cost = resolveModelCostConfig({
       provider: "test",
@@ -105,7 +105,7 @@ describe("usage-format", () => {
     ).toBeUndefined();
   });
 
-  it("prefers models.json pricing over kaijibot config and cached pricing", async () => {
+  it("prefers models.json pricing over allbot config and cached pricing", async () => {
     const config = {
       models: {
         providers: {
@@ -119,7 +119,7 @@ describe("usage-format", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     await fs.writeFile(
       path.join(agentDir, "models.json"),
@@ -164,7 +164,7 @@ describe("usage-format", () => {
     });
   });
 
-  it("falls back to kaijibot config pricing when models.json is absent", () => {
+  it("falls back to allbot config pricing when models.json is absent", () => {
     const config = {
       models: {
         providers: {
@@ -178,7 +178,7 @@ describe("usage-format", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     __setGatewayModelPricingForTest([
       {
@@ -238,7 +238,7 @@ describe("usage-format", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     expect(
       resolveModelCostConfig({

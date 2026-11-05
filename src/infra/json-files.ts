@@ -116,7 +116,7 @@ export function createAsyncLock() {
 }
 
 const scopedAsyncLocks = resolveGlobalMap<string, <T>(fn: () => Promise<T>) => Promise<T>>(
-  Symbol.for("kaijibot.scoped-async-locks"),
+  Symbol.for("allbot.scoped-async-locks"),
 );
 
 /**

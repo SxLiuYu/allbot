@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { extensionForMime } from "kaijibot/plugin-sdk/media-mime";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import { extensionForMime } from "allbot/plugin-sdk/media-mime";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   createProviderOperationDeadline,
@@ -10,14 +10,14 @@ import {
   resolveProviderOperationTimeoutMs,
   sanitizeConfiguredModelProviderRequest,
   waitProviderOperationPollInterval,
-} from "kaijibot/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import type {
   GeneratedVideoAsset,
   VideoGenerationProvider,
   VideoGenerationRequest,
   VideoGenerationSourceAsset,
-} from "kaijibot/plugin-sdk/video-generation";
+} from "allbot/plugin-sdk/video-generation";
 import { OPENROUTER_BASE_URL } from "./provider-catalog.js";
 import {
   fetchOpenRouterVideoGet,
@@ -37,7 +37,7 @@ const SUPPORTED_ASPECT_RATIOS = ["16:9", "9:16"] as const;
 const OPENROUTER_VIDEO_MALFORMED_RESPONSE = "OpenRouter video generation response malformed";
 const SUPPORTED_DURATION_SECONDS = [4, 6, 8] as const;
 // Runtime sets this after normalizing against live model capabilities.
-const SUPPORTED_DURATIONS_HINT = Symbol.for("kaijibot.videoGeneration.supportedDurations");
+const SUPPORTED_DURATIONS_HINT = Symbol.for("allbot.videoGeneration.supportedDurations");
 const SUPPORTED_RESOLUTIONS = ["720P", "1080P"] as const;
 
 type OpenRouterVideoResponse = {

@@ -3,11 +3,11 @@ import {
   mergeScopedSearchConfig,
   resolveProviderWebSearchPluginConfig,
   type WebSearchProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-web-search-config-contract";
+} from "allbot/plugin-sdk/provider-web-search-config-contract";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/string-coerce-runtime";
 
 export const DEFAULT_PERPLEXITY_BASE_URL = "https://openrouter.ai/api/v1";
 export const PERPLEXITY_DIRECT_BASE_URL = "https://api.perplexity.ai";

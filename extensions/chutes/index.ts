@@ -1,13 +1,13 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 import {
   resolveOAuthApiKeyMarker,
   type ProviderAuthContext,
   type ProviderAuthResult,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { buildOauthProviderAuthResult } from "kaijibot/plugin-sdk/provider-auth";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { loginChutes } from "kaijibot/plugin-sdk/provider-auth-login";
-import { normalizeOptionalString, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { buildOauthProviderAuthResult } from "allbot/plugin-sdk/provider-auth";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { loginChutes } from "allbot/plugin-sdk/provider-auth-login";
+import { normalizeOptionalString, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import {
   CHUTES_DEFAULT_MODEL_REF,
   applyChutesApiKeyConfig,

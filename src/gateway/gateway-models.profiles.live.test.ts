@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import type { Api, Model } from "@earendil-works/pi-ai";
 import { afterEach, describe, expect, it } from "vitest";
-import { resolveKaijiBotAgentDir } from "../agents/agent-paths.js";
+import { resolveAllBotAgentDir } from "../agents/agent-paths.js";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import {
   type AuthProfileStore,
@@ -30,11 +30,11 @@ import { isLiveProfileKeyModeEnabled, isLiveTestEnabled } from "../agents/live-t
 import { getApiKeyForModel, resolveEnvApiKey } from "../agents/model-auth.js";
 import { normalizeProviderId } from "../agents/model-selection.js";
 import { shouldSuppressBuiltInModel } from "../agents/model-suppression.js";
-import { ensureKaijiBotModelsJson } from "../agents/models-config.js";
+import { ensureAllBotModelsJson } from "../agents/models-config.js";
 import { isRateLimitErrorMessage } from "../agents/pi-embedded-helpers/errors.js";
 import { discoverAuthStorage, discoverModels } from "../agents/pi-model-discovery.js";
 import { clearRuntimeConfigSnapshot, loadConfig } from "../config/config.js";
-import type { ModelsConfig, KaijiBotConfig, ModelProviderConfig } from "../config/types.js";
+import type { ModelsConfig, AllBotConfig, ModelProviderConfig } from "../config/types.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { normalizeGoogleModelId } from "../plugin-sdk/google-model-id.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
@@ -51,11 +51,11 @@ import {
 import { startGatewayServer } from "./server.js";
 import { loadSessionEntry, readSessionMessages } from "./session-utils.js";
 
-const ZAI_FALLBACK = isTruthyEnvValue(process.env.KAIJIBOT_LIVE_GATEWAY_ZAI_FALLBACK);
+const ZAI_FALLBACK = isTruthyEnvValue(process.env.ALLBOT_LIVE_GATEWAY_ZAI_FALLBACK);
 const REQUIRE_PROFILE_KEYS = isLiveProfileKeyModeEnabled();
 const LIVE_CREDENTIAL_PRECEDENCE = REQUIRE_PROFILE_KEYS ? "profile-first" : "env-first";
-const PROVIDERS = parseFilter(process.env.KAIJIBOT_LIVE_GATEWAY_PROVIDERS);
-const GATEWAY_LIVE_SMOKE = isTruthyEnvValue(process.env.KAIJIBOT_LIVE_GATEWAY_SMOKE);
+const PROVIDERS = parseFilter(process.env.ALLBOT_LIVE_GATEWAY_PROVIDERS);
+const GATEWAY_LIVE_SMOKE = isTruthyEnvValue(process.env.ALLBOT_LIVE_GATEWAY_SMOKE);
 const THINKING_LEVEL = GATEWAY_LIVE_SMOKE ? "low" : "high";
 const ENABLE_EXTRA_TOOL_PROBES = !GATEWAY_LIVE_SMOKE;
 const ENABLE_EXTRA_IMAGE_PROBES = !GATEWAY_LIVE_SMOKE;
@@ -67,12 +67,12 @@ const GATEWAY_LIVE_UNBOUNDED_TIMEOUT_MS = 60 * 60 * 1000;
 const GATEWAY_LIVE_MAX_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 const GATEWAY_LIVE_PROBE_TIMEOUT_MS = Math.max(
   30_000,
-  toInt(process.env.KAIJIBOT_LIVE_GATEWAY_STEP_TIMEOUT_MS, 90_000),
+  toInt(process.env.ALLBOT_LIVE_GATEWAY_STEP_TIMEOUT_MS, 90_000),
 );
 const GATEWAY_LIVE_MODEL_TIMEOUT_MS = resolveGatewayLiveModelTimeoutMs();
 const GATEWAY_LIVE_HEARTBEAT_MS = Math.max(
   1_000,
-  toInt(process.env.KAIJIBOT_LIVE_GATEWAY_HEARTBEAT_MS, 30_000),
+  toInt(process.env.ALLBOT_LIVE_GATEWAY_HEARTBEAT_MS, 30_000),
 );
 const GATEWAY_LIVE_STRIP_SCAFFOLDING_MODEL_KEYS = new Set([
   "google/gemini-3-flash-preview",
@@ -88,9 +88,9 @@ const GATEWAY_LIVE_EXEC_READ_NONCE_MISS_SKIP_MODEL_KEYS = new Set([
 const GATEWAY_LIVE_TOOL_NONCE_MISS_SKIP_MODEL_KEYS = new Set(["google/gemini-3-flash-preview"]);
 const GATEWAY_LIVE_MAX_MODELS = resolveGatewayLiveMaxModels();
 const GATEWAY_LIVE_SUITE_TIMEOUT_MS = resolveGatewayLiveSuiteTimeoutMs(GATEWAY_LIVE_MAX_MODELS);
-const QUIET_LIVE_LOGS = process.env.KAIJIBOT_LIVE_TEST_QUIET !== "0";
+const QUIET_LIVE_LOGS = process.env.ALLBOT_LIVE_TEST_QUIET !== "0";
 
-const describeLive = isLiveTestEnabled(["KAIJIBOT_LIVE_GATEWAY"]) ? describe : describe.skip;
+const describeLive = isLiveTestEnabled(["ALLBOT_LIVE_GATEWAY"]) ? describe : describe.skip;
 
 function parseFilter(raw?: string): Set<string> | null {
   const trimmed = raw?.trim();
@@ -136,14 +136,14 @@ function toInt(value: string | undefined, fallback: number): number {
 }
 
 function resolveGatewayLiveMaxModels(): number {
-  const gatewayRaw = process.env.KAIJIBOT_LIVE_GATEWAY_MAX_MODELS?.trim();
+  const gatewayRaw = process.env.ALLBOT_LIVE_GATEWAY_MAX_MODELS?.trim();
   if (gatewayRaw) {
     return Math.max(0, toInt(gatewayRaw, 0));
   }
-  const rawModels = process.env.KAIJIBOT_LIVE_GATEWAY_MODELS?.trim();
+  const rawModels = process.env.ALLBOT_LIVE_GATEWAY_MODELS?.trim();
   const useExplicitModels = Boolean(rawModels) && rawModels !== "modern" && rawModels !== "all";
   return resolveHighSignalLiveModelLimit({
-    rawMaxModels: process.env.KAIJIBOT_LIVE_MAX_MODELS,
+    rawMaxModels: process.env.ALLBOT_LIVE_MAX_MODELS,
     useExplicitModels,
     defaultLimit: DEFAULT_HIGH_SIGNAL_LIVE_MODEL_LIMIT,
   });
@@ -162,8 +162,8 @@ function resolveGatewayLiveSuiteTimeoutMs(maxModels: number): number {
 }
 
 function resolveGatewayLiveModelTimeoutMs(
-  gatewayModelTimeoutRaw = process.env.KAIJIBOT_LIVE_GATEWAY_MODEL_TIMEOUT_MS,
-  liveModelTimeoutRaw = process.env.KAIJIBOT_LIVE_MODEL_TIMEOUT_MS,
+  gatewayModelTimeoutRaw = process.env.ALLBOT_LIVE_GATEWAY_MODEL_TIMEOUT_MS,
+  liveModelTimeoutRaw = process.env.ALLBOT_LIVE_MODEL_TIMEOUT_MS,
   stepTimeoutMs = GATEWAY_LIVE_PROBE_TIMEOUT_MS,
 ): number {
   const requested = toInt(gatewayModelTimeoutRaw, toInt(liveModelTimeoutRaw, 120_000));
@@ -475,9 +475,9 @@ describe("resolveGatewayLiveModelTimeoutMs", () => {
 });
 
 describe("resolveGatewayLiveMaxModels", () => {
-  const originalGatewayModels = process.env.KAIJIBOT_LIVE_GATEWAY_MODELS;
-  const originalGatewayMax = process.env.KAIJIBOT_LIVE_GATEWAY_MAX_MODELS;
-  const originalSharedMax = process.env.KAIJIBOT_LIVE_MAX_MODELS;
+  const originalGatewayModels = process.env.ALLBOT_LIVE_GATEWAY_MODELS;
+  const originalGatewayMax = process.env.ALLBOT_LIVE_GATEWAY_MAX_MODELS;
+  const originalSharedMax = process.env.ALLBOT_LIVE_MAX_MODELS;
   function restoreEnvValue(name: string, value: string | undefined): void {
     if (value === undefined) {
       delete process.env[name];
@@ -487,27 +487,27 @@ describe("resolveGatewayLiveMaxModels", () => {
   }
 
   afterEach(() => {
-    restoreEnvValue("KAIJIBOT_LIVE_GATEWAY_MODELS", originalGatewayModels);
-    restoreEnvValue("KAIJIBOT_LIVE_GATEWAY_MAX_MODELS", originalGatewayMax);
-    restoreEnvValue("KAIJIBOT_LIVE_MAX_MODELS", originalSharedMax);
+    restoreEnvValue("ALLBOT_LIVE_GATEWAY_MODELS", originalGatewayModels);
+    restoreEnvValue("ALLBOT_LIVE_GATEWAY_MAX_MODELS", originalGatewayMax);
+    restoreEnvValue("ALLBOT_LIVE_MAX_MODELS", originalSharedMax);
   });
 
   it("defaults modern gateway sweeps to the curated high-signal cap", () => {
-    delete process.env.KAIJIBOT_LIVE_GATEWAY_MODELS;
-    delete process.env.KAIJIBOT_LIVE_GATEWAY_MAX_MODELS;
-    delete process.env.KAIJIBOT_LIVE_MAX_MODELS;
+    delete process.env.ALLBOT_LIVE_GATEWAY_MODELS;
+    delete process.env.ALLBOT_LIVE_GATEWAY_MAX_MODELS;
+    delete process.env.ALLBOT_LIVE_MAX_MODELS;
 
     expect(resolveGatewayLiveMaxModels()).toBe(DEFAULT_HIGH_SIGNAL_LIVE_MODEL_LIMIT);
   });
 
   it("keeps explicit gateway model lists uncapped unless a cap is provided", () => {
-    process.env.KAIJIBOT_LIVE_GATEWAY_MODELS = "openai/gpt-5.4,anthropic/claude-opus-4-6";
-    delete process.env.KAIJIBOT_LIVE_GATEWAY_MAX_MODELS;
-    delete process.env.KAIJIBOT_LIVE_MAX_MODELS;
+    process.env.ALLBOT_LIVE_GATEWAY_MODELS = "openai/gpt-5.4,anthropic/claude-opus-4-6";
+    delete process.env.ALLBOT_LIVE_GATEWAY_MAX_MODELS;
+    delete process.env.ALLBOT_LIVE_MAX_MODELS;
 
     expect(resolveGatewayLiveMaxModels()).toBe(0);
 
-    process.env.KAIJIBOT_LIVE_GATEWAY_MAX_MODELS = "2";
+    process.env.ALLBOT_LIVE_GATEWAY_MAX_MODELS = "2";
     expect(resolveGatewayLiveMaxModels()).toBe(2);
   });
 });
@@ -1176,7 +1176,7 @@ async function requestGatewayAgentText(params: {
 
 type GatewayModelSuiteParams = {
   label: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   candidates: Array<Model<Api>>;
   allowNotFoundSkip: boolean;
   extraToolProbes: boolean;
@@ -1186,10 +1186,10 @@ type GatewayModelSuiteParams = {
 };
 
 function buildLiveGatewayConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   candidates: Array<Model<Api>>;
   providerOverrides?: Record<string, ModelProviderConfig>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const providerOverrides = params.providerOverrides ?? {};
   const lmstudioProvider = params.cfg.models?.providers?.lmstudio;
   const baseProviders = params.cfg.models?.providers ?? {};
@@ -1231,9 +1231,9 @@ function buildLiveGatewayConfig(params: {
 }
 
 function sanitizeAuthConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir: string;
-}): KaijiBotConfig["auth"] | undefined {
+}): AllBotConfig["auth"] | undefined {
   const auth = params.cfg.auth;
   if (!auth) {
     return auth;
@@ -1242,7 +1242,7 @@ function sanitizeAuthConfig(params: {
     allowKeychainPrompt: false,
   });
 
-  let profiles: NonNullable<KaijiBotConfig["auth"]>["profiles"] | undefined;
+  let profiles: NonNullable<AllBotConfig["auth"]>["profiles"] | undefined;
   if (auth.profiles) {
     profiles = {};
     for (const [profileId, profile] of Object.entries(auth.profiles)) {
@@ -1282,7 +1282,7 @@ function sanitizeAuthConfig(params: {
 }
 
 function buildMinimaxProviderOverride(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   api: "openai-completions" | "anthropic-messages";
   baseUrl: string;
 }): ModelProviderConfig | null {
@@ -1301,35 +1301,35 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
   clearRuntimeConfigSnapshot();
   const runtimeEnv = enterProductionEnvForLiveRun();
   const previous = {
-    configPath: process.env.KAIJIBOT_CONFIG_PATH,
-    token: process.env.KAIJIBOT_GATEWAY_TOKEN,
-    skipChannels: process.env.KAIJIBOT_SKIP_CHANNELS,
-    skipGmail: process.env.KAIJIBOT_SKIP_GMAIL_WATCHER,
-    skipCron: process.env.KAIJIBOT_SKIP_CRON,
-    skipCanvas: process.env.KAIJIBOT_SKIP_CANVAS_HOST,
-    disableBonjour: process.env.KAIJIBOT_DISABLE_BONJOUR,
-    logLevel: process.env.KAIJIBOT_LOG_LEVEL,
-    agentDir: process.env.KAIJIBOT_AGENT_DIR,
+    configPath: process.env.ALLBOT_CONFIG_PATH,
+    token: process.env.ALLBOT_GATEWAY_TOKEN,
+    skipChannels: process.env.ALLBOT_SKIP_CHANNELS,
+    skipGmail: process.env.ALLBOT_SKIP_GMAIL_WATCHER,
+    skipCron: process.env.ALLBOT_SKIP_CRON,
+    skipCanvas: process.env.ALLBOT_SKIP_CANVAS_HOST,
+    disableBonjour: process.env.ALLBOT_DISABLE_BONJOUR,
+    logLevel: process.env.ALLBOT_LOG_LEVEL,
+    agentDir: process.env.ALLBOT_AGENT_DIR,
     piAgentDir: process.env.PI_CODING_AGENT_DIR,
-    stateDir: process.env.KAIJIBOT_STATE_DIR,
+    stateDir: process.env.ALLBOT_STATE_DIR,
   };
   let tempAgentDir: string | undefined;
   let tempStateDir: string | undefined;
 
-  process.env.KAIJIBOT_SKIP_CHANNELS = "1";
-  process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = "1";
-  process.env.KAIJIBOT_SKIP_CRON = "1";
-  process.env.KAIJIBOT_SKIP_CANVAS_HOST = "1";
+  process.env.ALLBOT_SKIP_CHANNELS = "1";
+  process.env.ALLBOT_SKIP_GMAIL_WATCHER = "1";
+  process.env.ALLBOT_SKIP_CRON = "1";
+  process.env.ALLBOT_SKIP_CANVAS_HOST = "1";
   if (QUIET_LIVE_LOGS) {
-    process.env.KAIJIBOT_DISABLE_BONJOUR = "1";
-    process.env.KAIJIBOT_LOG_LEVEL = "silent";
+    process.env.ALLBOT_DISABLE_BONJOUR = "1";
+    process.env.ALLBOT_LOG_LEVEL = "silent";
   }
 
   const token = `test-${randomUUID()}`;
-  process.env.KAIJIBOT_GATEWAY_TOKEN = token;
+  process.env.ALLBOT_GATEWAY_TOKEN = token;
   const agentId = "dev";
 
-  const hostAgentDir = resolveKaijiBotAgentDir();
+  const hostAgentDir = resolveAllBotAgentDir();
   const hostStore = ensureAuthProfileStore(hostAgentDir, {
     allowKeychainPrompt: false,
   });
@@ -1342,26 +1342,26 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     lastGood: hostStore.lastGood ? { ...hostStore.lastGood } : undefined,
     usageStats: hostStore.usageStats ? { ...hostStore.usageStats } : undefined,
   });
-  tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-live-state-"));
-  process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+  tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-live-state-"));
+  process.env.ALLBOT_STATE_DIR = tempStateDir;
   tempAgentDir = path.join(tempStateDir, "agents", DEFAULT_AGENT_ID, "agent");
   saveAuthProfileStore(sanitizedStore, tempAgentDir);
   const tempSessionAgentDir = path.join(tempStateDir, "agents", agentId, "agent");
   if (tempSessionAgentDir !== tempAgentDir) {
     saveAuthProfileStore(sanitizedStore, tempSessionAgentDir);
   }
-  process.env.KAIJIBOT_AGENT_DIR = tempAgentDir;
+  process.env.ALLBOT_AGENT_DIR = tempAgentDir;
   process.env.PI_CODING_AGENT_DIR = tempAgentDir;
 
   const workspaceDir = resolveAgentWorkspaceDir(params.cfg, agentId);
   await fs.mkdir(workspaceDir, { recursive: true });
   const nonceA = randomUUID();
   const nonceB = randomUUID();
-  const toolProbePath = path.join(workspaceDir, `.kaijibot-live-tool-probe.${nonceA}.txt`);
+  const toolProbePath = path.join(workspaceDir, `.allbot-live-tool-probe.${nonceA}.txt`);
   await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
-  const agentDir = resolveKaijiBotAgentDir();
-  const sanitizedCfg: KaijiBotConfig = {
+  const agentDir = resolveAllBotAgentDir();
+  const sanitizedCfg: AllBotConfig = {
     ...params.cfg,
     auth: sanitizeAuthConfig({ cfg: params.cfg, agentDir }),
   };
@@ -1370,10 +1370,10 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
     candidates: params.candidates,
     providerOverrides: params.providerOverrides,
   });
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-live-"));
-  const tempConfigPath = path.join(tempDir, "kaijibot.json");
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-live-"));
+  const tempConfigPath = path.join(tempDir, "allbot.json");
   await fs.writeFile(tempConfigPath, `${JSON.stringify(nextCfg, null, 2)}\n`);
-  process.env.KAIJIBOT_CONFIG_PATH = tempConfigPath;
+  process.env.ALLBOT_CONFIG_PATH = tempConfigPath;
 
   const liveProviders = nextCfg.models?.providers;
   if (liveProviders && Object.keys(liveProviders).length > 0) {
@@ -1558,10 +1558,10 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
                   idempotencyKey: `idem-${runIdTool}-tool-${toolReadAttempt + 1}`,
                   modelKey,
                   message: strictReply
-                    ? "KaijiBot live tool probe (local, safe): " +
+                    ? "AllBot live tool probe (local, safe): " +
                       `use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolProbePath}"}. ` +
                       `Then reply with exactly: ${nonceA} ${nonceB}. No extra text.`
-                    : "KaijiBot live tool probe (local, safe): " +
+                    : "AllBot live tool probe (local, safe): " +
                       `use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolProbePath}"}. ` +
                       "Then reply with the two nonce values you read (include both).",
                   thinkingLevel: params.thinkingLevel,
@@ -1625,12 +1625,12 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
                     idempotencyKey: `idem-${runIdTool}-exec-read-${execReadAttempt + 1}`,
                     modelKey,
                     message: strictReply
-                      ? "KaijiBot live tool probe (local, safe): " +
+                      ? "AllBot live tool probe (local, safe): " +
                         "use the tool named `exec` (or `Exec`) to run this command: " +
                         `mkdir -p "${tempDir}" && printf '%s' '${nonceC}' > "${toolWritePath}". ` +
                         `Then use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolWritePath}"}. ` +
                         `Then reply with exactly: ${nonceC}. No extra text.`
-                      : "KaijiBot live tool probe (local, safe): " +
+                      : "AllBot live tool probe (local, safe): " +
                         "use the tool named `exec` (or `Exec`) to run this command: " +
                         `mkdir -p "${tempDir}" && printf '%s' '${nonceC}' > "${toolWritePath}". ` +
                         `Then use the tool named \`read\` (or \`Read\`) with JSON arguments {"path":"${toolWritePath}"}. ` +
@@ -2002,17 +2002,17 @@ async function runGatewayModelSuite(params: GatewayModelSuiteParams) {
       await fs.rm(tempStateDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 50 });
     }
 
-    process.env.KAIJIBOT_CONFIG_PATH = previous.configPath;
-    process.env.KAIJIBOT_GATEWAY_TOKEN = previous.token;
-    process.env.KAIJIBOT_SKIP_CHANNELS = previous.skipChannels;
-    process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
-    process.env.KAIJIBOT_SKIP_CRON = previous.skipCron;
-    process.env.KAIJIBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
-    process.env.KAIJIBOT_DISABLE_BONJOUR = previous.disableBonjour;
-    process.env.KAIJIBOT_LOG_LEVEL = previous.logLevel;
-    process.env.KAIJIBOT_AGENT_DIR = previous.agentDir;
+    process.env.ALLBOT_CONFIG_PATH = previous.configPath;
+    process.env.ALLBOT_GATEWAY_TOKEN = previous.token;
+    process.env.ALLBOT_SKIP_CHANNELS = previous.skipChannels;
+    process.env.ALLBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
+    process.env.ALLBOT_SKIP_CRON = previous.skipCron;
+    process.env.ALLBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
+    process.env.ALLBOT_DISABLE_BONJOUR = previous.disableBonjour;
+    process.env.ALLBOT_LOG_LEVEL = previous.logLevel;
+    process.env.ALLBOT_AGENT_DIR = previous.agentDir;
     process.env.PI_CODING_AGENT_DIR = previous.piAgentDir;
-    process.env.KAIJIBOT_STATE_DIR = previous.stateDir;
+    process.env.ALLBOT_STATE_DIR = previous.stateDir;
   }
 }
 
@@ -2023,14 +2023,14 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       await withSuppressedGatewayLiveWarnings(async () => {
         clearRuntimeConfigSnapshot();
         const cfg = loadConfig();
-        await ensureKaijiBotModelsJson(cfg);
+        await ensureAllBotModelsJson(cfg);
 
-        const agentDir = resolveKaijiBotAgentDir();
+        const agentDir = resolveAllBotAgentDir();
         const authStorage = discoverAuthStorage(agentDir);
         const modelRegistry = discoverModels(authStorage, agentDir);
         const all = modelRegistry.getAll();
 
-        const rawModels = process.env.KAIJIBOT_LIVE_GATEWAY_MODELS?.trim();
+        const rawModels = process.env.ALLBOT_LIVE_GATEWAY_MODELS?.trim();
         const useModern = !rawModels || rawModels === "modern" || rawModels === "all";
         const useExplicit = Boolean(rawModels) && !useModern;
         const filter = useExplicit ? parseFilter(rawModels) : null;
@@ -2092,7 +2092,7 @@ describeLive("gateway live (dev agent, profile keys)", () => {
         logProgress(`[all-models] selection=${useExplicit ? "explicit" : "high-signal"}`);
         if (selectedCandidates.length < candidates.length) {
           logProgress(
-            `[all-models] capped to ${selectedCandidates.length}/${candidates.length} via KAIJIBOT_LIVE_GATEWAY_MAX_MODELS=${maxModels}`,
+            `[all-models] capped to ${selectedCandidates.length}/${candidates.length} via ALLBOT_LIVE_GATEWAY_MAX_MODELS=${maxModels}`,
           );
         }
         const imageCandidates = selectedCandidates.filter((m) => m.input?.includes("image"));
@@ -2147,26 +2147,26 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     clearRuntimeConfigSnapshot();
     const runtimeEnv = enterProductionEnvForLiveRun();
     const previous = {
-      configPath: process.env.KAIJIBOT_CONFIG_PATH,
-      token: process.env.KAIJIBOT_GATEWAY_TOKEN,
-      skipChannels: process.env.KAIJIBOT_SKIP_CHANNELS,
-      skipGmail: process.env.KAIJIBOT_SKIP_GMAIL_WATCHER,
-      skipCron: process.env.KAIJIBOT_SKIP_CRON,
-      skipCanvas: process.env.KAIJIBOT_SKIP_CANVAS_HOST,
+      configPath: process.env.ALLBOT_CONFIG_PATH,
+      token: process.env.ALLBOT_GATEWAY_TOKEN,
+      skipChannels: process.env.ALLBOT_SKIP_CHANNELS,
+      skipGmail: process.env.ALLBOT_SKIP_GMAIL_WATCHER,
+      skipCron: process.env.ALLBOT_SKIP_CRON,
+      skipCanvas: process.env.ALLBOT_SKIP_CANVAS_HOST,
     };
 
-    process.env.KAIJIBOT_SKIP_CHANNELS = "1";
-    process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = "1";
-    process.env.KAIJIBOT_SKIP_CRON = "1";
-    process.env.KAIJIBOT_SKIP_CANVAS_HOST = "1";
+    process.env.ALLBOT_SKIP_CHANNELS = "1";
+    process.env.ALLBOT_SKIP_GMAIL_WATCHER = "1";
+    process.env.ALLBOT_SKIP_CRON = "1";
+    process.env.ALLBOT_SKIP_CANVAS_HOST = "1";
 
     const token = `test-${randomUUID()}`;
-    process.env.KAIJIBOT_GATEWAY_TOKEN = token;
+    process.env.ALLBOT_GATEWAY_TOKEN = token;
 
     const cfg = loadConfig();
-    await ensureKaijiBotModelsJson(cfg);
+    await ensureAllBotModelsJson(cfg);
 
-    const agentDir = resolveKaijiBotAgentDir();
+    const agentDir = resolveAllBotAgentDir();
     const authStorage = discoverAuthStorage(agentDir);
     const modelRegistry = discoverModels(authStorage, agentDir);
     const anthropic = modelRegistry.find("anthropic", "claude-opus-4-6") as Model<Api> | null;
@@ -2195,7 +2195,7 @@ describeLive("gateway live (dev agent, profile keys)", () => {
     await fs.mkdir(workspaceDir, { recursive: true });
     const nonceA = randomUUID();
     const nonceB = randomUUID();
-    const toolProbePath = path.join(workspaceDir, `.kaijibot-live-zai-fallback.${nonceA}.txt`);
+    const toolProbePath = path.join(workspaceDir, `.allbot-live-zai-fallback.${nonceA}.txt`);
     await fs.writeFile(toolProbePath, `nonceA=${nonceA}\nnonceB=${nonceB}\n`);
 
     let server: Awaited<ReturnType<typeof startGatewayServer>> | undefined;
@@ -2308,12 +2308,12 @@ describeLive("gateway live (dev agent, profile keys)", () => {
       await server.close({ reason: "live test complete" });
       await fs.rm(toolProbePath, { force: true });
 
-      process.env.KAIJIBOT_CONFIG_PATH = previous.configPath;
-      process.env.KAIJIBOT_GATEWAY_TOKEN = previous.token;
-      process.env.KAIJIBOT_SKIP_CHANNELS = previous.skipChannels;
-      process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
-      process.env.KAIJIBOT_SKIP_CRON = previous.skipCron;
-      process.env.KAIJIBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
+      process.env.ALLBOT_CONFIG_PATH = previous.configPath;
+      process.env.ALLBOT_GATEWAY_TOKEN = previous.token;
+      process.env.ALLBOT_SKIP_CHANNELS = previous.skipChannels;
+      process.env.ALLBOT_SKIP_GMAIL_WATCHER = previous.skipGmail;
+      process.env.ALLBOT_SKIP_CRON = previous.skipCron;
+      process.env.ALLBOT_SKIP_CANVAS_HOST = previous.skipCanvas;
     }
   }, 180_000);
 });

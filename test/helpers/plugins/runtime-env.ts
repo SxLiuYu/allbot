@@ -1,4 +1,4 @@
-import type { OutputRuntimeEnv } from "kaijibot/plugin-sdk/runtime";
+import type { OutputRuntimeEnv } from "allbot/plugin-sdk/runtime";
 import { vi } from "vitest";
 
 export function createRuntimeEnv(options?: { throwOnExit?: boolean }): OutputRuntimeEnv {

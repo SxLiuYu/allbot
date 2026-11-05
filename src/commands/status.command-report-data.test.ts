@@ -34,7 +34,7 @@ describe("buildStatusCommandReportData", () => {
         gatewayService: {
           label: "LaunchAgent",
           installed: true,
-          managedByKaijiBot: true,
+          managedByAllBot: true,
           loadedText: "loaded",
           runtimeShort: "running",
         },
@@ -119,7 +119,7 @@ describe("buildStatusCommandReportData", () => {
       Value: "macOS · node " + process.versions.node,
     });
     expect(result.taskMaintenanceHint).toBe(
-      "Task maintenance: cmd:kaijibot tasks maintenance --apply",
+      "Task maintenance: cmd:allbot tasks maintenance --apply",
     );
     expect(result.pluginCompatibilityLines).toEqual(["  warn(WARN) legacy"]);
     expect(result.pairingRecoveryLines[0]).toBe("warn(Gateway pairing approval required.)");
@@ -130,6 +130,6 @@ describe("buildStatusCommandReportData", () => {
       Status: "ok(reachable)",
       Detail: "42ms",
     });
-    expect(result.footerLines.at(-1)).toBe("  Need to test channels? cmd:kaijibot status --deep");
+    expect(result.footerLines.at(-1)).toBe("  Need to test channels? cmd:allbot status --deep");
   });
 });

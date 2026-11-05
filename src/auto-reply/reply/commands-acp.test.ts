@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AcpRuntimeError } from "../../acp/runtime/errors.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionBindingRecord } from "../../infra/outbound/session-binding-service.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
@@ -392,9 +392,9 @@ const baseCfg = {
       },
     },
   },
-} satisfies KaijiBotConfig;
+} satisfies AllBotConfig;
 
-function createDiscordParams(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+function createDiscordParams(commandBody: string, cfg: AllBotConfig = baseCfg) {
   const params = buildCommandTestParams(commandBody, cfg, {
     Provider: "discord",
     Surface: "discord",
@@ -525,7 +525,7 @@ function mockBoundThreadSession(options?: {
   );
 }
 
-function createThreadParams(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+function createThreadParams(commandBody: string, cfg: AllBotConfig = baseCfg) {
   const params = createDiscordParams(commandBody, cfg);
   params.ctx.MessageThreadId = defaultThreadId;
   return params;
@@ -544,7 +544,7 @@ type ConversationCommandFixture = {
 function createConversationParams(
   commandBody: string,
   fixture: ConversationCommandFixture,
-  cfg: KaijiBotConfig = baseCfg,
+  cfg: AllBotConfig = baseCfg,
 ) {
   const params = buildCommandTestParams(commandBody, cfg, {
     Provider: fixture.channel,
@@ -561,15 +561,15 @@ function createConversationParams(
   return params;
 }
 
-async function runDiscordAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runDiscordAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(createDiscordParams(commandBody, cfg), true);
 }
 
-async function runThreadAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runThreadAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(createThreadParams(commandBody, cfg), true);
 }
 
-async function runTelegramAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runTelegramAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -584,7 +584,7 @@ async function runTelegramAcpCommand(commandBody: string, cfg: KaijiBotConfig = 
   );
 }
 
-async function runTelegramDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runTelegramDmAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -598,7 +598,7 @@ async function runTelegramDmAcpCommand(commandBody: string, cfg: KaijiBotConfig 
   );
 }
 
-async function runSlackDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runSlackDmAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -613,7 +613,7 @@ async function runSlackDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = b
   );
 }
 
-function createMatrixThreadParams(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+function createMatrixThreadParams(commandBody: string, cfg: AllBotConfig = baseCfg) {
   const params = createConversationParams(
     commandBody,
     {
@@ -626,7 +626,7 @@ function createMatrixThreadParams(commandBody: string, cfg: KaijiBotConfig = bas
   return params;
 }
 
-async function runMatrixAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runMatrixAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -640,11 +640,11 @@ async function runMatrixAcpCommand(commandBody: string, cfg: KaijiBotConfig = ba
   );
 }
 
-async function runMatrixThreadAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runMatrixThreadAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(createMatrixThreadParams(commandBody, cfg), true);
 }
 
-async function runFeishuDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runFeishuDmAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -659,7 +659,7 @@ async function runFeishuDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = 
   );
 }
 
-async function runLineDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runLineDmAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -674,7 +674,7 @@ async function runLineDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = ba
   );
 }
 
-async function runBlueBubblesDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runBlueBubblesDmAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -688,7 +688,7 @@ async function runBlueBubblesDmAcpCommand(commandBody: string, cfg: KaijiBotConf
   );
 }
 
-async function runIMessageDmAcpCommand(commandBody: string, cfg: KaijiBotConfig = baseCfg) {
+async function runIMessageDmAcpCommand(commandBody: string, cfg: AllBotConfig = baseCfg) {
   return handleAcpCommand(
     createConversationParams(
       commandBody,
@@ -705,7 +705,7 @@ async function runIMessageDmAcpCommand(commandBody: string, cfg: KaijiBotConfig 
 async function runInternalAcpCommand(params: {
   commandBody: string;
   scopes: string[];
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }) {
   const commandParams = buildCommandTestParams(params.commandBody, params.cfg ?? baseCfg, {
     Provider: INTERNAL_MESSAGE_CHANNEL,
@@ -1065,7 +1065,7 @@ describe("/acp command", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runDiscordAcpCommand("/acp spawn codex --bind here", cfg);
 
@@ -1177,7 +1177,7 @@ describe("/acp command", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runMatrixAcpCommand("/acp spawn codex --bind here", cfg);
 
@@ -1205,7 +1205,7 @@ describe("/acp command", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runMatrixAcpCommand("/acp spawn codex", cfg);
 
@@ -1233,7 +1233,7 @@ describe("/acp command", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runMatrixThreadAcpCommand("/acp spawn codex --thread here", cfg);
 
@@ -1311,7 +1311,7 @@ describe("/acp command", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runDiscordAcpCommand("/acp spawn codex", cfg);
 
@@ -1335,7 +1335,7 @@ describe("/acp command", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runMatrixAcpCommand("/acp spawn codex", cfg);
 
@@ -1351,7 +1351,7 @@ describe("/acp command", () => {
           sandbox: { mode: "all" },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     const result = await runDiscordAcpCommand("/acp spawn codex", cfg);
 
@@ -1446,7 +1446,7 @@ describe("/acp command", () => {
           defaultAccount: "work",
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     hoisted.sessionBindingResolveByConversationMock.mockImplementation(
       (ref: {
         channel?: string;
@@ -1495,7 +1495,7 @@ describe("/acp command", () => {
         ...baseCfg.acp,
         dispatch: { enabled: false },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     const result = await runDiscordAcpCommand("/acp steer tighten logging", cfg);
     expect(result?.reply?.text).toContain("ACP dispatch is disabled by policy");
     expect(hoisted.runTurnMock).not.toHaveBeenCalled();
@@ -1613,7 +1613,7 @@ describe("/acp command", () => {
           lastUpdatedAt: Date.now(),
         },
         lastError: [
-          "KaijiBot runtime context (internal):",
+          "AllBot runtime context (internal):",
           "This context is runtime-generated, not user-authored. Keep internal details private.",
           "",
           "[Internal task completion event]",
@@ -1623,7 +1623,7 @@ describe("/acp command", () => {
     });
     hoisted.getStatusMock.mockResolvedValue({
       summary: [
-        "KaijiBot runtime context (internal):",
+        "AllBot runtime context (internal):",
         "This context is runtime-generated, not user-authored. Keep internal details private.",
         "",
         "[Internal task completion event]",
@@ -1631,7 +1631,7 @@ describe("/acp command", () => {
       ].join("\n"),
       details: {
         payload: [
-          "KaijiBot runtime context (internal):",
+          "AllBot runtime context (internal):",
           "This context is runtime-generated, not user-authored. Keep internal details private.",
           "",
           "[Internal task completion event]",
@@ -1652,7 +1652,7 @@ describe("/acp command", () => {
       runId: "acp-run-1",
       endedAt: Date.now(),
       error: [
-        "KaijiBot runtime context (internal):",
+        "AllBot runtime context (internal):",
         "This context is runtime-generated, not user-authored. Keep internal details private.",
         "",
         "[Internal task completion event]",
@@ -1665,7 +1665,7 @@ describe("/acp command", () => {
 
     expect(result?.reply?.text).toContain("ACP status:");
     expect(result?.reply?.text).toContain("taskSummary: Needs approval to continue.");
-    expect(result?.reply?.text).not.toContain("KaijiBot runtime context (internal):");
+    expect(result?.reply?.text).not.toContain("AllBot runtime context (internal):");
     expect(result?.reply?.text).not.toContain("Internal task completion event");
   });
 

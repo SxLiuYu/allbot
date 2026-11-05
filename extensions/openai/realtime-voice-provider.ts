@@ -4,8 +4,8 @@ import type {
   RealtimeVoiceProviderConfig,
   RealtimeVoiceProviderPlugin,
   RealtimeVoiceTool,
-} from "kaijibot/plugin-sdk/realtime-voice";
-import { normalizeResolvedSecretInputString } from "kaijibot/plugin-sdk/secret-input";
+} from "allbot/plugin-sdk/realtime-voice";
+import { normalizeResolvedSecretInputString } from "allbot/plugin-sdk/secret-input";
 import WebSocket from "ws";
 import {
   asFiniteNumber,

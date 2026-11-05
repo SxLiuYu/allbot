@@ -1,6 +1,6 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginRuntime } from "./runtime/types.js";
-import type { KaijiBotPluginApi, PluginLogger } from "./types.js";
+import type { AllBotPluginApi, PluginLogger } from "./types.js";
 
 export type BuildPluginApiParams = {
   id: string;
@@ -9,15 +9,15 @@ export type BuildPluginApiParams = {
   description?: string;
   source: string;
   rootDir?: string;
-  registrationMode: KaijiBotPluginApi["registrationMode"];
-  config: KaijiBotConfig;
+  registrationMode: AllBotPluginApi["registrationMode"];
+  config: AllBotConfig;
   pluginConfig?: Record<string, unknown>;
   runtime: PluginRuntime;
   logger: PluginLogger;
   resolvePath: (input: string) => string;
   handlers?: Partial<
     Pick<
-      KaijiBotPluginApi,
+      AllBotPluginApi,
       | "registerTool"
       | "registerHook"
       | "registerHttpRoute"
@@ -58,55 +58,55 @@ export type BuildPluginApiParams = {
   >;
 };
 
-const noopRegisterTool: KaijiBotPluginApi["registerTool"] = () => {};
-const noopRegisterHook: KaijiBotPluginApi["registerHook"] = () => {};
-const noopRegisterHttpRoute: KaijiBotPluginApi["registerHttpRoute"] = () => {};
-const noopRegisterChannel: KaijiBotPluginApi["registerChannel"] = () => {};
-const noopRegisterGatewayMethod: KaijiBotPluginApi["registerGatewayMethod"] = () => {};
-const noopRegisterCli: KaijiBotPluginApi["registerCli"] = () => {};
-const noopRegisterReload: KaijiBotPluginApi["registerReload"] = () => {};
-const noopRegisterNodeHostCommand: KaijiBotPluginApi["registerNodeHostCommand"] = () => {};
-const noopRegisterSecurityAuditCollector: KaijiBotPluginApi["registerSecurityAuditCollector"] =
+const noopRegisterTool: AllBotPluginApi["registerTool"] = () => {};
+const noopRegisterHook: AllBotPluginApi["registerHook"] = () => {};
+const noopRegisterHttpRoute: AllBotPluginApi["registerHttpRoute"] = () => {};
+const noopRegisterChannel: AllBotPluginApi["registerChannel"] = () => {};
+const noopRegisterGatewayMethod: AllBotPluginApi["registerGatewayMethod"] = () => {};
+const noopRegisterCli: AllBotPluginApi["registerCli"] = () => {};
+const noopRegisterReload: AllBotPluginApi["registerReload"] = () => {};
+const noopRegisterNodeHostCommand: AllBotPluginApi["registerNodeHostCommand"] = () => {};
+const noopRegisterSecurityAuditCollector: AllBotPluginApi["registerSecurityAuditCollector"] =
   () => {};
-const noopRegisterService: KaijiBotPluginApi["registerService"] = () => {};
-const noopRegisterCliBackend: KaijiBotPluginApi["registerCliBackend"] = () => {};
-const noopRegisterConfigMigration: KaijiBotPluginApi["registerConfigMigration"] = () => {};
-const noopRegisterAutoEnableProbe: KaijiBotPluginApi["registerAutoEnableProbe"] = () => {};
-const noopRegisterProvider: KaijiBotPluginApi["registerProvider"] = () => {};
-const noopRegisterSpeechProvider: KaijiBotPluginApi["registerSpeechProvider"] = () => {};
-const noopRegisterRealtimeTranscriptionProvider: KaijiBotPluginApi["registerRealtimeTranscriptionProvider"] =
+const noopRegisterService: AllBotPluginApi["registerService"] = () => {};
+const noopRegisterCliBackend: AllBotPluginApi["registerCliBackend"] = () => {};
+const noopRegisterConfigMigration: AllBotPluginApi["registerConfigMigration"] = () => {};
+const noopRegisterAutoEnableProbe: AllBotPluginApi["registerAutoEnableProbe"] = () => {};
+const noopRegisterProvider: AllBotPluginApi["registerProvider"] = () => {};
+const noopRegisterSpeechProvider: AllBotPluginApi["registerSpeechProvider"] = () => {};
+const noopRegisterRealtimeTranscriptionProvider: AllBotPluginApi["registerRealtimeTranscriptionProvider"] =
   () => {};
-const noopRegisterRealtimeVoiceProvider: KaijiBotPluginApi["registerRealtimeVoiceProvider"] =
+const noopRegisterRealtimeVoiceProvider: AllBotPluginApi["registerRealtimeVoiceProvider"] =
   () => {};
-const noopRegisterMediaUnderstandingProvider: KaijiBotPluginApi["registerMediaUnderstandingProvider"] =
+const noopRegisterMediaUnderstandingProvider: AllBotPluginApi["registerMediaUnderstandingProvider"] =
   () => {};
-const noopRegisterImageGenerationProvider: KaijiBotPluginApi["registerImageGenerationProvider"] =
+const noopRegisterImageGenerationProvider: AllBotPluginApi["registerImageGenerationProvider"] =
   () => {};
-const noopRegisterVideoGenerationProvider: KaijiBotPluginApi["registerVideoGenerationProvider"] =
+const noopRegisterVideoGenerationProvider: AllBotPluginApi["registerVideoGenerationProvider"] =
   () => {};
-const noopRegisterMusicGenerationProvider: KaijiBotPluginApi["registerMusicGenerationProvider"] =
+const noopRegisterMusicGenerationProvider: AllBotPluginApi["registerMusicGenerationProvider"] =
   () => {};
-const noopRegisterWebFetchProvider: KaijiBotPluginApi["registerWebFetchProvider"] = () => {};
-const noopRegisterWebSearchProvider: KaijiBotPluginApi["registerWebSearchProvider"] = () => {};
-const noopRegisterInteractiveHandler: KaijiBotPluginApi["registerInteractiveHandler"] = () => {};
-const noopOnConversationBindingResolved: KaijiBotPluginApi["onConversationBindingResolved"] =
+const noopRegisterWebFetchProvider: AllBotPluginApi["registerWebFetchProvider"] = () => {};
+const noopRegisterWebSearchProvider: AllBotPluginApi["registerWebSearchProvider"] = () => {};
+const noopRegisterInteractiveHandler: AllBotPluginApi["registerInteractiveHandler"] = () => {};
+const noopOnConversationBindingResolved: AllBotPluginApi["onConversationBindingResolved"] =
   () => {};
-const noopRegisterCommand: KaijiBotPluginApi["registerCommand"] = () => {};
-const noopRegisterContextEngine: KaijiBotPluginApi["registerContextEngine"] = () => {};
-const noopRegisterCompactionProvider: KaijiBotPluginApi["registerCompactionProvider"] = () => {};
-const noopRegisterMemoryCapability: KaijiBotPluginApi["registerMemoryCapability"] = () => {};
-const noopRegisterMemoryPromptSection: KaijiBotPluginApi["registerMemoryPromptSection"] = () => {};
-const noopRegisterMemoryPromptSupplement: KaijiBotPluginApi["registerMemoryPromptSupplement"] =
+const noopRegisterCommand: AllBotPluginApi["registerCommand"] = () => {};
+const noopRegisterContextEngine: AllBotPluginApi["registerContextEngine"] = () => {};
+const noopRegisterCompactionProvider: AllBotPluginApi["registerCompactionProvider"] = () => {};
+const noopRegisterMemoryCapability: AllBotPluginApi["registerMemoryCapability"] = () => {};
+const noopRegisterMemoryPromptSection: AllBotPluginApi["registerMemoryPromptSection"] = () => {};
+const noopRegisterMemoryPromptSupplement: AllBotPluginApi["registerMemoryPromptSupplement"] =
   () => {};
-const noopRegisterMemoryCorpusSupplement: KaijiBotPluginApi["registerMemoryCorpusSupplement"] =
+const noopRegisterMemoryCorpusSupplement: AllBotPluginApi["registerMemoryCorpusSupplement"] =
   () => {};
-const noopRegisterMemoryFlushPlan: KaijiBotPluginApi["registerMemoryFlushPlan"] = () => {};
-const noopRegisterMemoryRuntime: KaijiBotPluginApi["registerMemoryRuntime"] = () => {};
-const noopRegisterMemoryEmbeddingProvider: KaijiBotPluginApi["registerMemoryEmbeddingProvider"] =
+const noopRegisterMemoryFlushPlan: AllBotPluginApi["registerMemoryFlushPlan"] = () => {};
+const noopRegisterMemoryRuntime: AllBotPluginApi["registerMemoryRuntime"] = () => {};
+const noopRegisterMemoryEmbeddingProvider: AllBotPluginApi["registerMemoryEmbeddingProvider"] =
   () => {};
-const noopOn: KaijiBotPluginApi["on"] = () => {};
+const noopOn: AllBotPluginApi["on"] = () => {};
 
-export function buildPluginApi(params: BuildPluginApiParams): KaijiBotPluginApi {
+export function buildPluginApi(params: BuildPluginApiParams): AllBotPluginApi {
   const handlers = params.handlers ?? {};
   return {
     id: params.id,

@@ -131,10 +131,10 @@ describe("sttHandlers stt.transcribe", () => {
     await expect(fs.access(capturedPath)).rejects.toThrow();
   });
 
-  it("keeps temp files inside the preferred KaijiBot tmp dir", async () => {
+  it("keeps temp files inside the preferred AllBot tmp dir", async () => {
     await callHandler({ audioBase64: Buffer.from("x").toString("base64") });
     const call = mocks.transcribeAudioFile.mock.calls[0]?.[0] as unknown as { filePath: string };
     const expectedRoot = path.join(os.tmpdir());
-    expect(call.filePath.startsWith(expectedRoot) || call.filePath.includes("kaijibot")).toBe(true);
+    expect(call.filePath.startsWith(expectedRoot) || call.filePath.includes("allbot")).toBe(true);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   parseCaseFilter,
   parseCsvFilter,
@@ -45,7 +45,7 @@ describe("image-generation live-test helpers", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(resolveConfiguredLiveImageModels(cfg)).toEqual(
       new Map([

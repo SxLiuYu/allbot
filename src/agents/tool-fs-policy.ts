@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveAgentConfig } from "./agent-scope.js";
 import { pickSandboxToolPolicy } from "./sandbox-tool-policy.js";
 import { isToolAllowedByPolicies } from "./tool-policy-match.js";
@@ -14,7 +14,7 @@ export function createToolFsPolicy(params: { workspaceOnly?: boolean }): ToolFsP
   };
 }
 
-export function resolveToolFsConfig(params: { cfg?: KaijiBotConfig; agentId?: string }): {
+export function resolveToolFsConfig(params: { cfg?: AllBotConfig; agentId?: string }): {
   workspaceOnly?: boolean;
 } {
   const cfg = params.cfg;
@@ -27,14 +27,14 @@ export function resolveToolFsConfig(params: { cfg?: KaijiBotConfig; agentId?: st
 }
 
 export function resolveEffectiveToolFsWorkspaceOnly(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentId?: string;
 }): boolean {
   return resolveToolFsConfig(params).workspaceOnly === true;
 }
 
 export function resolveEffectiveToolFsRootExpansionAllowed(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentId?: string;
 }): boolean {
   const cfg = params.cfg;

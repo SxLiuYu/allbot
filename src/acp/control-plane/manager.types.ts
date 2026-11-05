@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type {
   SessionAcpIdentity,
   AcpSessionRuntimeOptions,
@@ -39,7 +39,7 @@ export type AcpSessionResolution =
     };
 
 export type AcpInitializeSessionInput = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   agent: string;
   mode: AcpRuntimeSessionMode;
@@ -54,7 +54,7 @@ export type AcpTurnAttachment = {
 };
 
 export type AcpRunTurnInput = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   text: string;
   attachments?: AcpTurnAttachment[];
@@ -65,7 +65,7 @@ export type AcpRunTurnInput = {
 };
 
 export type AcpCloseSessionInput = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   reason: string;
   discardPersistentState?: boolean;

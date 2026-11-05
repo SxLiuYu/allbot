@@ -1,9 +1,9 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 
 const log = createSubsystemLogger("chutes-models");
 

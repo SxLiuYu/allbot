@@ -4,7 +4,7 @@ import {
 } from "../../channels/plugins/index.js";
 import { resolveSessionConversationRef } from "../../channels/plugins/session-conversation.js";
 import { normalizeChannelId as normalizeChatChannelId } from "../../channels/registry.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { ANNOUNCE_SKIP_TOKEN, REPLY_SKIP_TOKEN } from "./sessions-send-tokens.js";
 export {
   ANNOUNCE_SKIP_TOKEN,
@@ -120,7 +120,7 @@ export function buildAgentToAgentAnnounceContext(params: {
   return lines.join("\n");
 }
 
-export function resolvePingPongTurns(cfg?: KaijiBotConfig) {
+export function resolvePingPongTurns(cfg?: AllBotConfig) {
   const raw = cfg?.session?.agentToAgent?.maxPingPongTurns;
   const fallback = DEFAULT_PING_PONG_TURNS;
   if (typeof raw !== "number" || !Number.isFinite(raw)) {

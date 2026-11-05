@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { ConversationRef } from "../../infra/outbound/session-binding-service.js";
 import type { ResolvedAgentRoute } from "../../routing/resolve-route.js";
 import { deriveLastRoutePolicy } from "../../routing/resolve-route.js";
@@ -41,7 +41,7 @@ function resolveConfiguredBindingConversationRef(
 
 export function resolveConfiguredBindingRoute(
   params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     route: ResolvedAgentRoute;
   } & ConfiguredBindingRouteConversationInput,
 ): ConfiguredBindingRouteResult {
@@ -84,7 +84,7 @@ export function resolveConfiguredBindingRoute(
 }
 
 export async function ensureConfiguredBindingRouteReady(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   bindingResolution: ConfiguredBindingResolution | null;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   return await ensureConfiguredBindingTargetReady(params);

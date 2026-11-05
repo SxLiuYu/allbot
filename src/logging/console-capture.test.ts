@@ -16,7 +16,7 @@ import {
 } from "./test-helpers/console-snapshot.js";
 
 let snapshot: ConsoleSnapshot;
-const logPathTracker = createSuiteLogPathTracker("kaijibot-log-");
+const logPathTracker = createSuiteLogPathTracker("allbot-log-");
 
 beforeAll(async () => {
   await logPathTracker.setup();

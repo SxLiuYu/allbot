@@ -1,6 +1,6 @@
-import { readConfiguredProviderCatalogEntries } from "kaijibot/plugin-sdk/provider-catalog-shared";
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
+import { readConfiguredProviderCatalogEntries } from "allbot/plugin-sdk/provider-catalog-shared";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
 import { applyDeepSeekConfig, DEEPSEEK_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildDeepSeekProvider } from "./provider-catalog.js";
 import { createDeepSeekV4ThinkingWrapper } from "./stream.js";

@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot cron` (schedule and run background jobs)"
+summary: "CLI reference for `allbot cron` (schedule and run background jobs)"
 read_when:
   - You want scheduled jobs and wakeups
   - You’re debugging cron execution and logs
 title: "cron"
 ---
 
-# `kaijibot cron`
+# `allbot cron`
 
 Manage cron jobs for the Gateway scheduler.
 
@@ -14,7 +14,7 @@ Related:
 
 - Cron jobs: [Cron jobs](/automation/cron-jobs)
 
-Tip: run `kaijibot cron --help` for the full command surface.
+Tip: run `allbot cron --help` for the full command surface.
 
 Note: isolated `cron add` jobs default to `--announce` delivery. Use `--no-deliver` to keep
 output internal. `--deliver` remains as a deprecated alias for `--announce`.
@@ -34,9 +34,9 @@ Note: for one-shot CLI jobs, offset-less `--at` datetimes are treated as UTC unl
 
 Note: recurring jobs now use exponential retry backoff after consecutive errors (30s → 1m → 5m → 15m → 60m), then return to normal schedule after the next successful run.
 
-Note: `kaijibot cron run` now returns as soon as the manual run is queued for execution. Successful responses include `{ ok: true, enqueued: true, runId }`; use `kaijibot cron runs --id <job-id>` to follow the eventual outcome.
+Note: `allbot cron run` now returns as soon as the manual run is queued for execution. Successful responses include `{ ok: true, enqueued: true, runId }`; use `allbot cron runs --id <job-id>` to follow the eventual outcome.
 
-Note: `kaijibot cron run <job-id>` force-runs by default. Use `--due` to keep the
+Note: `allbot cron run <job-id>` force-runs by default. Use `--due` to keep the
 older "only run if due" behavior.
 
 Note: isolated cron turns suppress stale acknowledgement-only replies. If the
@@ -74,10 +74,10 @@ announce target when no explicit failure destination is configured.
 Note: retention/pruning is controlled in config:
 
 - `cron.sessionRetention` (default `24h`) prunes completed isolated run sessions.
-- `cron.runLog.maxBytes` + `cron.runLog.keepLines` prune `~/.kaijibot/cron/runs/<jobId>.jsonl`.
+- `cron.runLog.maxBytes` + `cron.runLog.keepLines` prune `~/.allbot/cron/runs/<jobId>.jsonl`.
 
 Upgrade note: if you have older cron jobs from before the current delivery/store format, run
-`kaijibot doctor --fix`. Doctor now normalizes legacy cron fields (`jobId`, `schedule.cron`,
+`allbot doctor --fix`. Doctor now normalizes legacy cron fields (`jobId`, `schedule.cron`,
 top-level delivery fields including legacy `threadId`, payload `provider` delivery aliases) and migrates simple
 `notify: true` webhook fallback jobs to explicit webhook delivery when `cron.webhook` is
 configured.
@@ -87,31 +87,31 @@ configured.
 Update delivery settings without changing the message:
 
 ```bash
-kaijibot cron edit <job-id> --announce --channel telegram --to "123456789"
+allbot cron edit <job-id> --announce --channel telegram --to "123456789"
 ```
 
 Disable delivery for an isolated job:
 
 ```bash
-kaijibot cron edit <job-id> --no-deliver
+allbot cron edit <job-id> --no-deliver
 ```
 
 Enable lightweight bootstrap context for an isolated job:
 
 ```bash
-kaijibot cron edit <job-id> --light-context
+allbot cron edit <job-id> --light-context
 ```
 
 Announce to a specific channel:
 
 ```bash
-kaijibot cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
+allbot cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
 ```
 
 Create an isolated job with lightweight bootstrap context:
 
 ```bash
-kaijibot cron add \
+allbot cron add \
   --name "Lightweight morning brief" \
   --cron "0 7 * * *" \
   --session isolated \
@@ -135,27 +135,27 @@ Delivery ownership note:
 Manual run:
 
 ```bash
-kaijibot cron run <job-id>
-kaijibot cron run <job-id> --due
-kaijibot cron runs --id <job-id> --limit 50
+allbot cron run <job-id>
+allbot cron run <job-id> --due
+allbot cron runs --id <job-id> --limit 50
 ```
 
 Agent/session retargeting:
 
 ```bash
-kaijibot cron edit <job-id> --agent ops
-kaijibot cron edit <job-id> --clear-agent
-kaijibot cron edit <job-id> --session current
-kaijibot cron edit <job-id> --session "session:daily-brief"
+allbot cron edit <job-id> --agent ops
+allbot cron edit <job-id> --clear-agent
+allbot cron edit <job-id> --session current
+allbot cron edit <job-id> --session "session:daily-brief"
 ```
 
 Delivery tweaks:
 
 ```bash
-kaijibot cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
-kaijibot cron edit <job-id> --best-effort-deliver
-kaijibot cron edit <job-id> --no-best-effort-deliver
-kaijibot cron edit <job-id> --no-deliver
+allbot cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
+allbot cron edit <job-id> --best-effort-deliver
+allbot cron edit <job-id> --no-best-effort-deliver
+allbot cron edit <job-id> --no-deliver
 ```
 
 Failure-delivery note:

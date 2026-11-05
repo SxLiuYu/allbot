@@ -69,7 +69,7 @@ vi.mock("./targets.js", () => ({
   resolveSessionDeliveryTarget: mocks.resolveSessionDeliveryTarget,
 }));
 
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 let resolveAgentDeliveryPlan: typeof import("./agent-delivery.js").resolveAgentDeliveryPlan;
 let resolveAgentOutboundTarget: typeof import("./agent-delivery.js").resolveAgentOutboundTarget;
 
@@ -86,7 +86,7 @@ function expectDeliveryPlan(params: Parameters<typeof resolveAgentDeliveryPlan>[
   return resolveAgentDeliveryPlan(params);
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("agent delivery helpers", () => {
   it.each([
     {
@@ -177,7 +177,7 @@ describe.skipIf(process.env.CI)("agent delivery helpers", () => {
     });
 
     const resolved = resolveAgentOutboundTarget({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       plan,
       targetMode: "implicit",
     });
@@ -202,7 +202,7 @@ describe.skipIf(process.env.CI)("agent delivery helpers", () => {
 
     mocks.resolveOutboundTarget.mockClear();
     const resolved = resolveAgentOutboundTarget({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       plan,
       targetMode: "explicit",
       validateExplicitTarget: false,

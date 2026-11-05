@@ -21,7 +21,7 @@ function makeRegistry(
       origin: "config" as const,
       rootDir: `/fake/${plugin.id}`,
       source: `/fake/${plugin.id}/index.js`,
-      manifestPath: `/fake/${plugin.id}/kaijibot.plugin.json`,
+      manifestPath: `/fake/${plugin.id}/allbot.plugin.json`,
     })),
     diagnostics: [],
   };

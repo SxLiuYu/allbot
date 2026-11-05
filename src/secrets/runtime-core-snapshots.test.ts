@@ -4,7 +4,7 @@ import {
   clearConfigCache,
   clearRuntimeConfigSnapshot,
   loadConfig,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
@@ -40,8 +40,8 @@ const OPENAI_ENV_KEY_REF = {
 
 type SecretsRuntimeEnvSnapshot = ReturnType<typeof captureEnv>;
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function loadAuthStoreWithProfiles(profiles: AuthProfileStore["profiles"]): AuthProfileStore {
@@ -53,14 +53,14 @@ function loadAuthStoreWithProfiles(profiles: AuthProfileStore["profiles"]): Auth
 
 function beginSecretsRuntimeIsolationForTest(): SecretsRuntimeEnvSnapshot {
   const envSnapshot = captureEnv([
-    "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-    "KAIJIBOT_DISABLE_BUNDLED_PLUGINS",
-    "KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE",
-    "KAIJIBOT_VERSION",
+    "ALLBOT_BUNDLED_PLUGINS_DIR",
+    "ALLBOT_DISABLE_BUNDLED_PLUGINS",
+    "ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE",
+    "ALLBOT_VERSION",
   ]);
-  delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-  process.env.KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE = "1";
-  delete process.env.KAIJIBOT_VERSION;
+  delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
+  process.env.ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE = "1";
+  delete process.env.ALLBOT_VERSION;
   return envSnapshot;
 }
 
@@ -155,9 +155,9 @@ describe("secrets runtime snapshot core lanes", () => {
   async function prepareOpenAiRuntimeSnapshot(params?: { includeAuthStoreRefs?: boolean }) {
     return withEnvAsync(
       {
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-        KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-        KAIJIBOT_VERSION: undefined,
+        ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+        ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+        ALLBOT_VERSION: undefined,
       },
       async () =>
         prepareSecretsRuntimeSnapshot({
@@ -173,7 +173,7 @@ describe("secrets runtime snapshot core lanes", () => {
             },
           }),
           env: { OPENAI_API_KEY: "sk-runtime" },
-          agentDirs: ["/tmp/kaijibot-agent-main"],
+          agentDirs: ["/tmp/allbot-agent-main"],
           includeAuthStoreRefs: params?.includeAuthStoreRefs,
           loadablePluginOrigins: new Map(),
           loadAuthStore: () =>
@@ -284,7 +284,7 @@ describe("secrets runtime snapshot core lanes", () => {
         OPENAI_API_KEY: "sk-env-openai",
         GITHUB_TOKEN: "ghp-env-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadablePluginOrigins: new Map(),
       loadAuthStore: () =>
         loadAuthStoreWithProfiles({
@@ -305,8 +305,8 @@ describe("secrets runtime snapshot core lanes", () => {
 
     expect(snapshot.warnings.map((warning) => warning.path)).toEqual(
       expect.arrayContaining([
-        "/tmp/kaijibot-agent-main.auth-profiles.openai:default.key",
-        "/tmp/kaijibot-agent-main.auth-profiles.github-copilot:default.token",
+        "/tmp/allbot-agent-main.auth-profiles.openai:default.key",
+        "/tmp/allbot-agent-main.auth-profiles.github-copilot:default.token",
       ]),
     );
     expect(snapshot.authStores[0]?.store.profiles["openai:default"]).toMatchObject({
@@ -325,7 +325,7 @@ describe("secrets runtime snapshot core lanes", () => {
       env: {
         OPENAI_API_KEY: "sk-env-openai",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadablePluginOrigins: new Map(),
       loadAuthStore: () =>
         loadAuthStoreWithProfiles({
@@ -363,7 +363,7 @@ describe("secrets runtime snapshot core lanes", () => {
     activateSecretsRuntimeSnapshot(prepared);
 
     expect(
-      ensureAuthProfileStore("/tmp/kaijibot-agent-main").profiles["openai:default"],
+      ensureAuthProfileStore("/tmp/allbot-agent-main").profiles["openai:default"],
     ).toMatchObject({
       type: "api_key",
       key: "sk-runtime",

@@ -9,7 +9,7 @@ title: "Skills Config"
 # Skills Config
 
 Most skills loader/install configuration lives under `skills` in
-`~/.kaijibot/kaijibot.json`. Agent-specific skill visibility lives under
+`~/.allbot/allbot.json`. Agent-specific skill visibility lives under
 `agents.defaults.skills` and `agents.list[].skills`.
 
 ```json5
@@ -84,7 +84,7 @@ Rules:
 
 ## Fields
 
-- Built-in skill roots always include `~/.kaijibot/skills`, `~/.agents/skills`,
+- Built-in skill roots always include `~/.allbot/skills`, `~/.agents/skills`,
   `<workspace>/.agents/skills`, and `<workspace>/skills`.
 - `allowBundled`: optional allowlist for **bundled** skills only. When set, only
   bundled skills in the list are eligible (managed, agent, and workspace skills unaffected).
@@ -95,7 +95,7 @@ Rules:
 - `install.nodeManager`: node installer preference (`npm` | `pnpm` | `yarn` | `bun`, default: npm).
   This only affects **skill installs**; the Gateway runtime should still be Node
   (Bun not recommended for WhatsApp/Telegram).
-  - `kaijibot setup --node-manager` is narrower and currently accepts `npm`,
+  - `allbot setup --node-manager` is narrower and currently accepts `npm`,
     `pnpm`, or `bun`. Set `skills.install.nodeManager: "yarn"` manually if you
     want Yarn-backed skill installs.
 - `entries.<skillKey>`: per-skill overrides.
@@ -114,9 +114,9 @@ Per-skill fields:
 ## Notes
 
 - Keys under `entries` map to the skill name by default. If a skill defines
-  `metadata.kaijibot.skillKey`, use that key instead.
+  `metadata.allbot.skillKey`, use that key instead.
 - Load precedence is `<workspace>/skills` → `<workspace>/.agents/skills` →
-  `~/.agents/skills` → `~/.kaijibot/skills` → bundled skills →
+  `~/.agents/skills` → `~/.allbot/skills` → bundled skills →
   `skills.load.extraDirs`.
 - Changes to skills are picked up on the next agent turn when the watcher is enabled.
 

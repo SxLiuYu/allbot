@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { updateSessionStore } from "../config/sessions.js";
 import { buildSubagentList } from "./subagent-list.js";
 import {
@@ -14,7 +14,7 @@ import type { SubagentRunRecord } from "./subagent-registry.types.js";
 let testWorkspaceDir = os.tmpdir();
 
 beforeAll(async () => {
-  testWorkspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-subagent-list-"));
+  testWorkspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-subagent-list-"));
 });
 
 afterAll(async () => {
@@ -35,7 +35,7 @@ describe("buildSubagentList", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const list = buildSubagentList({
       cfg,
       runs: [],
@@ -63,7 +63,7 @@ describe("buildSubagentList", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const list = buildSubagentList({
       cfg,
       runs: [run],
@@ -105,7 +105,7 @@ describe("buildSubagentList", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const list = buildSubagentList({
       cfg,
       runs: [orchestratorRun],
@@ -144,7 +144,7 @@ describe("buildSubagentList", () => {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
       session: { store: storePath },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const list = buildSubagentList({
       cfg,
       runs: [run],

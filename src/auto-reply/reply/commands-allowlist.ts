@@ -1,7 +1,7 @@
 import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
 import { normalizeChannelId } from "../../channels/registry.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   readConfigFileSnapshot,
   validateConfigObjectWithPlugins,
@@ -59,7 +59,7 @@ const ACTIONS = new Set(["list", "add", "remove"]);
 const SCOPES = new Set<AllowlistScope>(["dm", "group", "all"]);
 
 function resolveAllowlistAccountId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId: ChannelId;
   parsedAccount?: string;
   ctxAccountId?: string;
@@ -170,7 +170,7 @@ function parseAllowlistCommand(raw: string): AllowlistCommand | null {
 }
 
 function normalizeAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId: ChannelId;
   accountId?: string | null;
   values: Array<string | number>;
@@ -234,7 +234,7 @@ function mapResolvedAllowlistNames(entries: ResolvedAllowlistName[]): Map<string
 }
 
 async function resolveAllowlistNames(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId: ChannelId;
   accountId?: string | null;
   scope: "dm" | "group";
@@ -251,7 +251,7 @@ async function resolveAllowlistNames(params: {
 }
 
 async function readAllowlistConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId: ChannelId;
   accountId?: string | null;
 }) {

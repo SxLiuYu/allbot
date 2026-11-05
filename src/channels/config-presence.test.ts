@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   hasMeaningfulChannelConfig,
   hasPotentialConfiguredChannels,
@@ -12,13 +12,13 @@ import {
 const tempDirs: string[] = [];
 
 function makeTempStateDir() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-channel-config-presence-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-config-presence-"));
   tempDirs.push(dir);
   return dir;
 }
 
 function expectPotentialConfiguredChannelCase(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   expectedIds: string[];
   expectedConfigured: boolean;
@@ -46,7 +46,7 @@ describe("config presence", () => {
 
   it("ignores enabled-only matrix config when listing configured channels", () => {
     const stateDir = makeTempStateDir();
-    const env = { KAIJIBOT_STATE_DIR: stateDir } as NodeJS.ProcessEnv;
+    const env = { ALLBOT_STATE_DIR: stateDir } as NodeJS.ProcessEnv;
     const cfg = { channels: { matrix: { enabled: false } } };
 
     expectPotentialConfiguredChannelCase({
@@ -60,7 +60,7 @@ describe("config presence", () => {
   it("detects env-only channel config", () => {
     const stateDir = makeTempStateDir();
     const env = {
-      KAIJIBOT_STATE_DIR: stateDir,
+      ALLBOT_STATE_DIR: stateDir,
       MATRIX_ACCESS_TOKEN: "token",
     } as NodeJS.ProcessEnv;
 
@@ -84,7 +84,7 @@ describe("config presence", () => {
       }),
       "utf8",
     );
-    const env = { KAIJIBOT_STATE_DIR: stateDir } as NodeJS.ProcessEnv;
+    const env = { ALLBOT_STATE_DIR: stateDir } as NodeJS.ProcessEnv;
 
     expectPotentialConfiguredChannelCase({
       cfg: {},

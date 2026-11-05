@@ -8,7 +8,7 @@ import { assertNoHardlinkedFinalPath } from "./hardlink-guards.js";
 async function withHardlinkFixture(
   cb: (context: { root: string; source: string; linked: string; dirPath: string }) => Promise<void>,
 ): Promise<void> {
-  await withTempDir({ prefix: "kaijibot-hardlink-guards-" }, async (root) => {
+  await withTempDir({ prefix: "allbot-hardlink-guards-" }, async (root) => {
     const dirPath = path.join(root, "dir");
     const source = path.join(root, "source.txt");
     const linked = path.join(root, "linked.txt");

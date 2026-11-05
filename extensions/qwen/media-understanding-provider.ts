@@ -8,12 +8,12 @@ import {
   type OpenAiCompatibleVideoPayload,
   type VideoDescriptionRequest,
   type VideoDescriptionResult,
-} from "kaijibot/plugin-sdk/media-understanding";
+} from "allbot/plugin-sdk/media-understanding";
 import {
   assertOkOrThrowHttpError,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
+} from "allbot/plugin-sdk/provider-http";
 import { QWEN_STANDARD_GLOBAL_BASE_URL } from "./models.js";
 
 const DEFAULT_QWEN_VIDEO_MODEL = "qwen-vl-max-latest";

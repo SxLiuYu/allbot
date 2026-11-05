@@ -35,7 +35,7 @@ export function registerUpdateCli(program: Command) {
   program.enablePositionalOptions();
   const update = program
     .command("update")
-    .description("Update KaijiBot and inspect update channel status")
+    .description("Update AllBot and inspect update channel status")
     .option("--json", "Output result as JSON", false)
     .option("--no-restart", "Skip restarting the gateway service after a successful update")
     .option("--dry-run", "Preview update actions without making changes", false)
@@ -48,17 +48,17 @@ export function registerUpdateCli(program: Command) {
     .option("--yes", "Skip confirmation prompts (non-interactive)", false)
     .addHelpText("after", () => {
       const examples = [
-        ["kaijibot update", "Update a source checkout (git)"],
-        ["kaijibot update --channel beta", "Switch to beta channel (git + npm)"],
-        ["kaijibot update --channel dev", "Switch to dev channel (git + npm)"],
-        ["kaijibot update --tag beta", "One-off update to a dist-tag or version"],
-        ["kaijibot update --tag main", "One-off package install from GitHub main"],
-        ["kaijibot update --dry-run", "Preview actions without changing anything"],
-        ["kaijibot update --no-restart", "Update without restarting the service"],
-        ["kaijibot update --json", "Output result as JSON"],
-        ["kaijibot update --yes", "Non-interactive (accept downgrade prompts)"],
-        ["kaijibot update wizard", "Interactive update wizard"],
-        ["kaijibot --update", "Shorthand for kaijibot update"],
+        ["allbot update", "Update a source checkout (git)"],
+        ["allbot update --channel beta", "Switch to beta channel (git + npm)"],
+        ["allbot update --channel dev", "Switch to dev channel (git + npm)"],
+        ["allbot update --tag beta", "One-off update to a dist-tag or version"],
+        ["allbot update --tag main", "One-off package install from GitHub main"],
+        ["allbot update --dry-run", "Preview actions without changing anything"],
+        ["allbot update --no-restart", "Update without restarting the service"],
+        ["allbot update --json", "Output result as JSON"],
+        ["allbot update --yes", "Non-interactive (accept downgrade prompts)"],
+        ["allbot update wizard", "Interactive update wizard"],
+        ["allbot --update", "Shorthand for allbot update"],
       ] as const;
       const fmtExamples = examples
         .map(([cmd, desc]) => `  ${theme.command(cmd)} ${theme.muted(`# ${desc}`)}`)
@@ -70,7 +70,7 @@ ${theme.heading("What this does:")}
 
 ${theme.heading("Switch channels:")}
   - Use --channel stable|beta|dev to persist the update channel in config
-  - Run kaijibot update status to see the active channel and source
+  - Run allbot update status to see the active channel and source
   - Use --tag <dist-tag|version|spec> for a one-off package update without persisting
 
 ${theme.heading("Non-interactive:")}
@@ -134,9 +134,9 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "gitee.com/kaiji1126/kai
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["kaijibot update status", "Show channel + version status."],
-          ["kaijibot update status --json", "JSON output."],
-          ["kaijibot update status --timeout 10", "Custom timeout."],
+          ["allbot update status", "Show channel + version status."],
+          ["allbot update status --json", "JSON output."],
+          ["allbot update status --timeout 10", "Custom timeout."],
         ])}\n\n${theme.heading("Notes:")}\n${theme.muted(
           "- Shows current update channel (stable/beta/dev) and source",
         )}\n${theme.muted("- Includes git tag/branch/SHA for source checkouts")}\n\n${theme.muted(

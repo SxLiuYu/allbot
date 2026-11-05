@@ -177,7 +177,7 @@ export const id: TranslationMap = {
     skills: "Skills dan kunci API.",
     nodes: "Perangkat yang dipasangkan dan perintah.",
     chat: "Chat Gateway untuk intervensi cepat.",
-    config: "Edit kaijibot.json.",
+    config: "Edit allbot.json.",
     communications: "Saluran, pesan, dan pengaturan audio.",
     appearance: "Tema, UI, dan pengaturan wizard penyiapan.",
     automation: "Perintah, hook, cron, dan plugin.",
@@ -235,7 +235,7 @@ export const id: TranslationMap = {
     pairing: {
       hint: "Perangkat ini memerlukan persetujuan pairing dari host gateway.",
       mobileHint:
-        "Di seluler? Salin URL lengkap (termasuk #token=...) dari kaijibot dashboard --no-open di desktop Anda.",
+        "Di seluler? Salin URL lengkap (termasuk #token=...) dari allbot dashboard --no-open di desktop Anda.",
     },
     insecure: {
       hint: "Halaman ini menggunakan HTTP, jadi browser memblokir identitas perangkat. Gunakan HTTPS (Tailscale Serve) atau buka {url} di host gateway.",

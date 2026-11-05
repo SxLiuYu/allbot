@@ -9,7 +9,7 @@ export {
 } from "./windows-spawn.js";
 export type {
   AnyAgentTool,
-  KaijiBotPluginApi,
-  KaijiBotPluginToolContext,
-  KaijiBotPluginToolFactory,
+  AllBotPluginApi,
+  AllBotPluginToolContext,
+  AllBotPluginToolFactory,
 } from "../plugins/types.js";

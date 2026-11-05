@@ -1,6 +1,6 @@
 export { ensureAuthProfileStore } from "../../agents/auth-profiles.runtime.js";
-export { ensureKaijiBotModelsJson } from "../../agents/models-config.js";
-export { resolveKaijiBotAgentDir } from "../../agents/agent-paths.js";
+export { ensureAllBotModelsJson } from "../../agents/models-config.js";
+export { resolveAllBotAgentDir } from "../../agents/agent-paths.js";
 export { listProfilesForProvider } from "../../agents/auth-profiles.js";
 export {
   hasUsableCustomProviderApiKey,

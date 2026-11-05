@@ -1,5 +1,5 @@
 import { statSync } from "node:fs";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { EdgeTTS } from "node-edge-tts";
 
 export function inferEdgeExtension(outputFormat: string): string {

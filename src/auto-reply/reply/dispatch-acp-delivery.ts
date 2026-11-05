@@ -1,5 +1,5 @@
-import { hasOutboundReplyContent } from "kaijibot/plugin-sdk/reply-payload";
-import type { KaijiBotConfig } from "../../config/config.js";
+import { hasOutboundReplyContent } from "allbot/plugin-sdk/reply-payload";
+import type { AllBotConfig } from "../../config/config.js";
 import type { TtsAutoMode } from "../../config/types.tts.js";
 import { logVerbose } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
@@ -90,7 +90,7 @@ async function shouldTreatDeliveredTextAsVisible(params: {
 
 async function maybeApplyAcpTts(params: {
   payload: ReplyPayload;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
   kind: ReplyDispatchKind;
   inboundAudio: boolean;
@@ -155,7 +155,7 @@ export type AcpDispatchDeliveryCoordinator = {
 };
 
 export function createAcpDispatchDeliveryCoordinator(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: FinalizedMsgContext;
   dispatcher: ReplyDispatcher;
   inboundAudio: boolean;

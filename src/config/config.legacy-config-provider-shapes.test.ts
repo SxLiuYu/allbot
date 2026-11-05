@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { readConfigFileSnapshot, validateConfigObject } from "./config.js";
-import { withTempHome, writeKaijiBotConfig } from "./test-helpers.js";
+import { withTempHome, writeAllBotConfig } from "./test-helpers.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("legacy provider-shaped config snapshots", () => {
   it("accepts a string map of voice aliases while still flagging legacy talk config", async () => {
     await withTempHome(async (home) => {
-      await writeKaijiBotConfig(home, {
+      await writeAllBotConfig(home, {
         talk: {
           voiceAliases: {
             Clawd: "VoiceAlias1234567890",

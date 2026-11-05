@@ -1,6 +1,6 @@
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import type { InterestInferenceDeps } from "./interest-inference.js";
 import {
@@ -115,13 +115,13 @@ function makeInput(overrides?: Partial<InsightEngineInput>): InsightEngineInput 
   };
 }
 
-function makeConfig(): KaijiBotConfig {
+function makeConfig(): AllBotConfig {
   return {
     cognitive: {
       insight: { sources: { webSearchProvider: "zai" } },
       persona: { extractionModel: "zai/glm-5.2" },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function validLLMResponse(): string {
@@ -534,7 +534,7 @@ describe("extractKeyTerms", () => {
   });
 
   it("removes trailing punctuation", () => {
-    const terms = extractKeyTerms("KaijiBot网关调试。。？！");
+    const terms = extractKeyTerms("AllBot网关调试。。？！");
     expect(terms.length).toBeGreaterThanOrEqual(1);
     expect(terms[0]).not.toMatch(/[。？！，]+$/);
   });
@@ -656,7 +656,7 @@ describe("buildSearchQuery", () => {
   it("produces a clean query instead of raw conversational text", () => {
     const input = makeInput({
       targetDomains: ["软件架构"],
-      recentFocus: ["需要我重启Gateway才能识别这个Chromium？ KaijiBot网关调试"],
+      recentFocus: ["需要我重启Gateway才能识别这个Chromium？ AllBot网关调试"],
     });
     const query = buildSearchQuery(input);
     expect(query).not.toContain("需要我");
@@ -1589,7 +1589,7 @@ describe("matchWebResultsToDomainsLLM", () => {
     const result = await matchWebResultsToDomainsLLM(
       webResults,
       makePersona(),
-      {} as KaijiBotConfig,
+      {} as AllBotConfig,
       deps,
     );
     expect(result.has("rust")).toBe(true);
@@ -1612,7 +1612,7 @@ describe("matchWebResultsToDomainsLLM", () => {
     const result = await matchWebResultsToDomainsLLM(
       webResults,
       makePersona(),
-      {} as KaijiBotConfig,
+      {} as AllBotConfig,
       deps,
     );
     expect(result).toBeDefined();
@@ -1624,7 +1624,7 @@ describe("matchWebResultsToDomainsLLM", () => {
       complete: vi.fn(),
       prepareModel: vi.fn().mockResolvedValue({ model: TEST_MODEL, auth: TEST_AUTH }),
     };
-    const result = await matchWebResultsToDomainsLLM([], makePersona(), {} as KaijiBotConfig, deps);
+    const result = await matchWebResultsToDomainsLLM([], makePersona(), {} as AllBotConfig, deps);
     expect(result.size).toBe(0);
     expect(deps.complete).not.toHaveBeenCalled();
   });

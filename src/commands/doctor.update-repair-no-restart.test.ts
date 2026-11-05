@@ -63,7 +63,7 @@ describe("doctor command update-mode repairs", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["node", "cli", "gateway", "--port", "18789"],
       environment: {
-        KAIJIBOT_GATEWAY_TOKEN: "stale-token",
+        ALLBOT_GATEWAY_TOKEN: "stale-token",
       },
     });
     auditGatewayServiceConfig.mockResolvedValueOnce({
@@ -71,7 +71,7 @@ describe("doctor command update-mode repairs", () => {
       issues: [
         {
           code: "gateway-token-mismatch",
-          message: "Gateway service KAIJIBOT_GATEWAY_TOKEN does not match gateway.auth.token",
+          message: "Gateway service ALLBOT_GATEWAY_TOKEN does not match gateway.auth.token",
           level: "recommended",
         },
       ],

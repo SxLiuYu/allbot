@@ -1,4 +1,4 @@
-import type { MemoryPromptSectionBuilder } from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
+import type { MemoryPromptSectionBuilder } from "allbot/plugin-sdk/memory-core-host-runtime-core";
 import { TOPIC_FILE_FORMAT_SECTION, VERIFICATION_PROMPT_SECTION } from "./memory-types.js";
 
 export const buildPromptSection: MemoryPromptSectionBuilder = ({

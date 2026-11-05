@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/vllm-provider",
+  "name": "@allbot/vllm-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot vLLM provider plugin",
+  "description": "AllBot vLLM provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

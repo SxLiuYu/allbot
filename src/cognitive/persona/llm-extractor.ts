@@ -2,7 +2,7 @@ import { completeSimple, type Api, type Model, type TextContent } from "@earendi
 import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { prepareSimpleCompletionModel } from "../../agents/simple-completion-runtime.js";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { PersonaTree, InsightCategory } from "../types.js";
 import { migrateInsightCategory } from "./curator.js";
@@ -13,7 +13,7 @@ const log = createSubsystemLogger("cognitive/persona-extractor");
 export type LlmExtractorDeps = {
   complete: typeof completeSimple;
   prepareModel: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     modelRef?: string,
   ) => Promise<{ model: Model<Api>; auth: ResolvedProviderAuth } | { error: string }>;
 };
@@ -76,7 +76,7 @@ export async function extractFromMessageLLM(
   userMessage: string,
   assistantMessage: string,
   existingPersona: PersonaTree | undefined,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmExtractorDeps,
   options?: LlmExtractorOptions,
 ): Promise<ExtractionResult> {

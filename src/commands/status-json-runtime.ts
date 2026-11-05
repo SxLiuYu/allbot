@@ -1,12 +1,12 @@
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import type { UpdateCheckResult } from "../infra/update-check.js";
 import { buildStatusJsonPayload } from "./status-json-payload.ts";
 import { buildStatusOverviewSurfaceFromScan } from "./status-overview-surface.ts";
 import { resolveStatusRuntimeSnapshot } from "./status-runtime-shared.ts";
 
 type StatusJsonScanLike = {
-  cfg: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig: AllBotConfig;
   summary: Record<string, unknown>;
   update: UpdateCheckResult;
   osSummary: unknown;

@@ -15,7 +15,7 @@ async function writeJsonSchema() {
   const rootSchema = {
     $schema: "http://json-schema.org/draft-07/schema#",
     $id: "https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/protocol.schema.json",
-    title: "KaijiBot Gateway Protocol",
+    title: "AllBot Gateway Protocol",
     description: "Handshake, request/response, and event frames for the Gateway WebSocket.",
     oneOf: [
       { $ref: "#/definitions/RequestFrame" },

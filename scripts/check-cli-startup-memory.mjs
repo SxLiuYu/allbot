@@ -14,10 +14,10 @@ if (!isLinux && !isMac) {
 }
 
 const repoRoot = process.cwd();
-const tmpHome = mkdtempSync(path.join(os.tmpdir(), "kaijibot-startup-memory-"));
+const tmpHome = mkdtempSync(path.join(os.tmpdir(), "allbot-startup-memory-"));
 const tmpDir = process.env.TMPDIR || process.env.TEMP || process.env.TMP || os.tmpdir();
 const rssHookPath = path.join(tmpHome, "measure-rss.mjs");
-const MAX_RSS_MARKER = "__KAIJIBOT_MAX_RSS_KB__=";
+const MAX_RSS_MARKER = "__ALLBOT_MAX_RSS_KB__=";
 
 writeFileSync(
   rssHookPath,
@@ -41,23 +41,23 @@ const cases = [
   {
     id: "help",
     label: "--help",
-    args: ["kaijibot.mjs", "--help"],
-    limitMb: Number(process.env.KAIJIBOT_STARTUP_MEMORY_HELP_MB ?? DEFAULT_LIMITS_MB.help),
+    args: ["allbot.mjs", "--help"],
+    limitMb: Number(process.env.ALLBOT_STARTUP_MEMORY_HELP_MB ?? DEFAULT_LIMITS_MB.help),
   },
   {
     id: "statusJson",
     label: "status --json",
-    args: ["kaijibot.mjs", "status", "--json"],
+    args: ["allbot.mjs", "status", "--json"],
     limitMb: Number(
-      process.env.KAIJIBOT_STARTUP_MEMORY_STATUS_JSON_MB ?? DEFAULT_LIMITS_MB.statusJson,
+      process.env.ALLBOT_STARTUP_MEMORY_STATUS_JSON_MB ?? DEFAULT_LIMITS_MB.statusJson,
     ),
   },
   {
     id: "gatewayStatus",
     label: "gateway status",
-    args: ["kaijibot.mjs", "gateway", "status"],
+    args: ["allbot.mjs", "gateway", "status"],
     limitMb: Number(
-      process.env.KAIJIBOT_STARTUP_MEMORY_GATEWAY_STATUS_MB ?? DEFAULT_LIMITS_MB.gatewayStatus,
+      process.env.ALLBOT_STARTUP_MEMORY_GATEWAY_STATUS_MB ?? DEFAULT_LIMITS_MB.gatewayStatus,
     ),
   },
 ];
@@ -73,7 +73,7 @@ function formatFixGuidance(testCase, details) {
     "2. If this is an RSS overage, compare the startup import graph against the last passing commit and look for newly eager imports, bootstrap side effects, or plugin loading on the command path.",
     "3. If this is a non-zero exit, inspect the first transitive import/config error in stderr and fix that root cause before re-checking memory.",
     "LLM prompt:",
-    `"KaijiBot startup-memory CI failed for '${testCase.label}'. Analyze this failure, identify the first runtime/import side effect that makes startup heavier or broken, and propose the smallest safe patch. Failure output:\n${details}"`,
+    `"AllBot startup-memory CI failed for '${testCase.label}'. Analyze this failure, identify the first runtime/import side effect that makes startup heavier or broken, and propose the smallest safe patch. Failure output:\n${details}"`,
   ];
   return `${guidance.join("\n")}\n`;
 }
@@ -127,7 +127,7 @@ function buildBenchEnv() {
   }
   // Keep the benchmark on a single process so RSS reflects the actual command
   // path rather than the warning-suppression respawn wrapper.
-  env.KAIJIBOT_NO_RESPAWN = "1";
+  env.ALLBOT_NO_RESPAWN = "1";
 
   return env;
 }

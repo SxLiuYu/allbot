@@ -1,5 +1,5 @@
 ---
-summary: "Overview of KaijiBot onboarding options and flows"
+summary: "Overview of AllBot onboarding options and flows"
 read_when:
   - Choosing an onboarding path
   - Setting up a new environment
@@ -9,7 +9,7 @@ sidebarTitle: "Onboarding Overview"
 
 # Onboarding Overview
 
-KaijiBot has two onboarding paths. Both configure auth, the Gateway, and
+AllBot has two onboarding paths. Both configure auth, the Gateway, and
 optional chat channels — they just differ in how you interact with the setup.
 
 ## Which path should I use?
@@ -20,7 +20,7 @@ optional chat channels — they just differ in how you interact with the setup.
 | **Interface**  | Terminal wizard                        |
 | **Best for**   | Servers, headless, full control        |
 | **Automation** | `--non-interactive` for scripts        |
-| **Command**    | `kaijibot onboard`                     |
+| **Command**    | `allbot onboard`                     |
 
 Most users should start with **CLI onboarding** — it works everywhere and gives
 you the most control.
@@ -41,18 +41,18 @@ Regardless of which path you choose, onboarding sets up:
 Run in any terminal:
 
 ```bash
-kaijibot onboard
+allbot onboard
 ```
 
 Add `--install-daemon` to also install the background service in one step.
 
 Full reference: [Onboarding (CLI)](/start/wizard)
-CLI command docs: [`kaijibot onboard`](/cli/onboard)
+CLI command docs: [`allbot onboard`](/cli/onboard)
 
 ## macOS / iOS app onboarding
 
-> **Note:** KaijiBot does not ship native macOS or iOS apps. Use CLI onboarding
-> (`kaijibot onboard`) on all platforms.
+> **Note:** AllBot does not ship native macOS or iOS apps. Use CLI onboarding
+> (`allbot onboard`) on all platforms.
 
 Full reference: [Onboarding (CLI)](/start/wizard)
 

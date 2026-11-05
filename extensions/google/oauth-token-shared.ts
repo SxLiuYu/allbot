@@ -1,4 +1,4 @@
-import { readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+import { readStringValue } from "allbot/plugin-sdk/text-runtime";
 
 type GoogleOauthApiKeyCredential = {
   type?: string;

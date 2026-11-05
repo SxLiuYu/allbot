@@ -308,7 +308,7 @@ export function renderMonitorHtml(
     '<meta http-equiv="refresh" content="' +
     sec +
     '">' +
-    "<title>KaijiBot</title>" +
+    "<title>AllBot</title>" +
     "<style>" +
     SHARED_CSS +
     "</style>" +
@@ -319,7 +319,7 @@ export function renderMonitorHtml(
     '<button type="button" class="zoom-btn" onclick="zoomOut()">A-</button>' +
     '<button type="button" class="zoom-btn" onclick="zoomIn()">A+</button>' +
     "</div>" +
-    '<div class="title">KaijiBot</div>' +
+    '<div class="title">AllBot</div>' +
     '<div class="meta">' +
     '<span class="badge"><span class="status-icon">' +
     stateIcon +

@@ -178,7 +178,7 @@ export const uk: TranslationMap = {
     skills: "Навички та API-ключі.",
     nodes: "Спарені пристрої та команди.",
     chat: "Чат шлюзу для швидких втручань.",
-    config: "Редагування kaijibot.json.",
+    config: "Редагування allbot.json.",
     communications: "Канали, повідомлення та налаштування аудіо.",
     appearance: "Тема, інтерфейс і налаштування майстра налаштування.",
     automation: "Команди, хуки, cron і плагіни.",
@@ -237,7 +237,7 @@ export const uk: TranslationMap = {
     pairing: {
       hint: "Цей пристрій потребує схвалення спарювання від хоста шлюзу.",
       mobileHint:
-        "На мобільному? Скопіюйте повний URL (включно з #token=...) з kaijibot dashboard --no-open на вашому комп’ютері.",
+        "На мобільному? Скопіюйте повний URL (включно з #token=...) з allbot dashboard --no-open на вашому комп’ютері.",
     },
     insecure: {
       hint: "Ця сторінка використовує HTTP, тому браузер блокує ідентичність пристрою. Використовуйте HTTPS (Tailscale Serve) або відкрийте {url} на хості шлюзу.",

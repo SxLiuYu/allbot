@@ -1,4 +1,4 @@
-import { resolveKaijiBotAgentDir } from "../agents/agent-paths.js";
+import { resolveAllBotAgentDir } from "../agents/agent-paths.js";
 import {
   listAgentIds,
   resolveAgentDir,
@@ -15,7 +15,7 @@ import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshotRefreshHandler,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import type { PluginOrigin } from "../plugins/types.js";
 import { resolveUserPath } from "../utils.js";
@@ -30,8 +30,8 @@ import type { RuntimeWebToolsMetadata } from "./runtime-web-tools.js";
 export type { SecretResolverWarning } from "./runtime-shared.js";
 
 export type PreparedSecretsRuntimeSnapshot = {
-  sourceConfig: KaijiBotConfig;
-  config: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  config: AllBotConfig;
   authStores: Array<{ agentDir: string; store: AuthProfileStore }>;
   warnings: SecretResolverWarning[];
   webTools: RuntimeWebToolsMetadata;
@@ -49,12 +49,12 @@ const RUNTIME_PATH_ENV_KEYS = [
   "USERPROFILE",
   "HOMEDRIVE",
   "HOMEPATH",
-  "KAIJIBOT_HOME",
-  "KAIJIBOT_STATE_DIR",
-  "KAIJIBOT_CONFIG_PATH",
-  "KAIJIBOT_AGENT_DIR",
+  "ALLBOT_HOME",
+  "ALLBOT_STATE_DIR",
+  "ALLBOT_CONFIG_PATH",
+  "ALLBOT_AGENT_DIR",
   "PI_CODING_AGENT_DIR",
-  "KAIJIBOT_TEST_FAST",
+  "ALLBOT_TEST_FAST",
 ] as const;
 
 let activeSnapshot: PreparedSecretsRuntimeSnapshot | null = null;
@@ -108,11 +108,11 @@ function clearActiveSecretsRuntimeState(): void {
 }
 
 function collectCandidateAgentDirs(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): string[] {
   const dirs = new Set<string>();
-  dirs.add(resolveUserPath(resolveKaijiBotAgentDir(env), env));
+  dirs.add(resolveUserPath(resolveAllBotAgentDir(env), env));
   for (const agentId of listAgentIds(config)) {
     dirs.add(resolveUserPath(resolveAgentDir(config, agentId, env), env));
   }
@@ -120,7 +120,7 @@ function collectCandidateAgentDirs(
 }
 
 function resolveRefreshAgentDirs(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   context: SecretsRuntimeRefreshContext,
 ): string[] {
   const configDerived = collectCandidateAgentDirs(config, context.env);
@@ -131,7 +131,7 @@ function resolveRefreshAgentDirs(
 }
 
 async function resolveLoadablePluginOrigins(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<ReadonlyMap<string, PluginOrigin>> {
   const workspaceDir = resolveAgentWorkspaceDir(
@@ -164,7 +164,7 @@ function mergeSecretsRuntimeEnv(
   return merged;
 }
 
-function hasConfiguredPluginEntries(config: KaijiBotConfig): boolean {
+function hasConfiguredPluginEntries(config: AllBotConfig): boolean {
   const entries = config.plugins?.entries;
   return (
     !!entries &&
@@ -175,7 +175,7 @@ function hasConfiguredPluginEntries(config: KaijiBotConfig): boolean {
 }
 
 export async function prepareSecretsRuntimeSnapshot(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   agentDirs?: string[];
   includeAuthStoreRefs?: boolean;

@@ -1,38 +1,38 @@
 ---
 summary: "Nostr DM channel via NIP-04 encrypted messages"
 read_when:
-  - You want KaijiBot to receive DMs via Nostr
+  - You want AllBot to receive DMs via Nostr
   - You're setting up decentralized messaging
 title: "Nostr"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Nostr
 
 **Status:** Optional bundled plugin (disabled by default until configured).
 
-Nostr is a decentralized protocol for social networking. This channel enables KaijiBot to receive and respond to encrypted direct messages (DMs) via NIP-04.
+Nostr is a decentralized protocol for social networking. This channel enables AllBot to receive and respond to encrypted direct messages (DMs) via NIP-04.
 
 ## Bundled plugin
 
-Current KaijiBot releases ship Nostr as a bundled plugin, so normal packaged
+Current AllBot releases ship Nostr as a bundled plugin, so normal packaged
 builds do not need a separate install.
 
 ### Older/custom installs
 
-- Onboarding (`kaijibot onboard`) and `kaijibot channels add` still surface
+- Onboarding (`allbot onboard`) and `allbot channels add` still surface
   Nostr from the shared channel catalog.
 - If your build excludes bundled Nostr, install it manually.
 
 ```bash
-kaijibot plugins install @kaijibot/nostr
+allbot plugins install @allbot/nostr
 ```
 
 Use a local checkout (dev workflows):
 
 ```bash
-kaijibot plugins install --link <path-to-local-nostr-plugin>
+allbot plugins install --link <path-to-local-nostr-plugin>
 ```
 
 Restart the Gateway after installing or enabling plugins.
@@ -40,8 +40,8 @@ Restart the Gateway after installing or enabling plugins.
 ### Non-interactive setup
 
 ```bash
-kaijibot channels add --channel nostr --private-key "$NOSTR_PRIVATE_KEY"
-kaijibot channels add --channel nostr --private-key "$NOSTR_PRIVATE_KEY" --relay-urls "wss://relay.damus.io,wss://relay.primal.net"
+allbot channels add --channel nostr --private-key "$NOSTR_PRIVATE_KEY"
+allbot channels add --channel nostr --private-key "$NOSTR_PRIVATE_KEY" --relay-urls "wss://relay.damus.io,wss://relay.primal.net"
 ```
 
 Use `--use-env` to keep `NOSTR_PRIVATE_KEY` in the environment instead of storing the key in config.
@@ -99,14 +99,14 @@ Example:
     nostr: {
       privateKey: "${NOSTR_PRIVATE_KEY}",
       profile: {
-        name: "kaijibot",
-        displayName: "KaijiBot",
+        name: "allbot",
+        displayName: "AllBot",
         about: "Personal assistant DM bot",
         picture: "https://example.com/avatar.png",
         banner: "https://example.com/banner.png",
         website: "https://example.com",
-        nip05: "kaijibot@example.com",
-        lud16: "kaijibot@example.com",
+        nip05: "allbot@example.com",
+        lud16: "allbot@example.com",
       },
     },
   },

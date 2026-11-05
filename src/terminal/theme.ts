@@ -1,5 +1,5 @@
 import chalk, { Chalk } from "chalk";
-import { KAIJIBOT_PALETTE } from "./palette.js";
+import { ALLBOT_PALETTE } from "./palette.js";
 
 const hasForceColor =
   typeof process.env.FORCE_COLOR === "string" &&
@@ -11,17 +11,17 @@ const baseChalk = process.env.NO_COLOR && !hasForceColor ? new Chalk({ level: 0 
 const hex = (value: string) => baseChalk.hex(value);
 
 export const theme = {
-  accent: hex(KAIJIBOT_PALETTE.accent),
-  accentBright: hex(KAIJIBOT_PALETTE.accentBright),
-  accentDim: hex(KAIJIBOT_PALETTE.accentDim),
-  info: hex(KAIJIBOT_PALETTE.info),
-  success: hex(KAIJIBOT_PALETTE.success),
-  warn: hex(KAIJIBOT_PALETTE.warn),
-  error: hex(KAIJIBOT_PALETTE.error),
-  muted: hex(KAIJIBOT_PALETTE.muted),
-  heading: baseChalk.bold.hex(KAIJIBOT_PALETTE.accent),
-  command: hex(KAIJIBOT_PALETTE.accentBright),
-  option: hex(KAIJIBOT_PALETTE.warn),
+  accent: hex(ALLBOT_PALETTE.accent),
+  accentBright: hex(ALLBOT_PALETTE.accentBright),
+  accentDim: hex(ALLBOT_PALETTE.accentDim),
+  info: hex(ALLBOT_PALETTE.info),
+  success: hex(ALLBOT_PALETTE.success),
+  warn: hex(ALLBOT_PALETTE.warn),
+  error: hex(ALLBOT_PALETTE.error),
+  muted: hex(ALLBOT_PALETTE.muted),
+  heading: baseChalk.bold.hex(ALLBOT_PALETTE.accent),
+  command: hex(ALLBOT_PALETTE.accentBright),
+  option: hex(ALLBOT_PALETTE.warn),
 } as const;
 
 export const isRich = () => Boolean(baseChalk.level > 0);

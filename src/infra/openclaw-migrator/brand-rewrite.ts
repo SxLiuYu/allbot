@@ -9,7 +9,7 @@ export const BRAND_REFERENCES = /\b(openclaw|OpenClaw|clawdbot|ClawdBot|moltbot|
 /** Banner prepended to skill files that had brand references rewritten. */
 export const MIGRATION_BANNER = "<!-- Migrated from OpenClaw. Review for brand references. -->\n";
 
-/** Brand home-dir prefixes that should be rewritten to ~/.kaijibot/ */
+/** Brand home-dir prefixes that should be rewritten to ~/.allbot/ */
 export const BRAND_HOME_PREFIXES = ["~/.openclaw/", "~/.clawdbot/", "~/.moltbot/"];
 
 // ─── Brand Replacement Map ───────────────────────────────────────────────────
@@ -20,17 +20,17 @@ interface BrandReplacement {
 }
 
 const BRAND_REPLACEMENTS: BrandReplacement[] = [
-  { pattern: /\bOpenClaw\b/g, replacement: "KaijiBot" },
-  { pattern: /\bopenclaw\b/g, replacement: "kaijibot" },
-  { pattern: /\bClawdBot\b/g, replacement: "KaijiBot" },
-  { pattern: /\bclawdbot\b/g, replacement: "kaijibot" },
-  { pattern: /\bMoltBot\b/g, replacement: "KaijiBot" },
-  { pattern: /\bmoltbot\b/g, replacement: "kaijibot" },
-  { pattern: /~\/\.openclaw\//g, replacement: "~/.kaijibot/" },
-  { pattern: /~\/\.clawdbot\//g, replacement: "~/.kaijibot/" },
-  { pattern: /~\/\.moltbot\//g, replacement: "~/.kaijibot/" },
-  { pattern: /avatars\/openclaw\.png/g, replacement: "avatars/kaijibot.png" },
-  { pattern: /\bopenclaw\.png\b/g, replacement: "kaijibot.png" },
+  { pattern: /\bOpenClaw\b/g, replacement: "AllBot" },
+  { pattern: /\bopenclaw\b/g, replacement: "allbot" },
+  { pattern: /\bClawdBot\b/g, replacement: "AllBot" },
+  { pattern: /\bclawdbot\b/g, replacement: "allbot" },
+  { pattern: /\bMoltBot\b/g, replacement: "AllBot" },
+  { pattern: /\bmoltbot\b/g, replacement: "allbot" },
+  { pattern: /~\/\.openclaw\//g, replacement: "~/.allbot/" },
+  { pattern: /~\/\.clawdbot\//g, replacement: "~/.allbot/" },
+  { pattern: /~\/\.moltbot\//g, replacement: "~/.allbot/" },
+  { pattern: /avatars\/openclaw\.png/g, replacement: "avatars/allbot.png" },
+  { pattern: /\bopenclaw\.png\b/g, replacement: "allbot.png" },
 ];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -195,8 +195,8 @@ export function extractMarkdownHeaders(content: string): string[] {
 
 // ─── Template Loading ────────────────────────────────────────────────────────
 
-/** Load a KaijiBot template file, stripping YAML front matter. */
-export async function loadKaijiBotTemplate(templateName: string): Promise<string> {
+/** Load a AllBot template file, stripping YAML front matter. */
+export async function loadAllBotTemplate(templateName: string): Promise<string> {
   const templateDir = await resolveWorkspaceTemplateDir();
   const filePath = `${templateDir}/${templateName}`;
   const raw = await fs.readFile(filePath, "utf-8");
@@ -205,7 +205,7 @@ export async function loadKaijiBotTemplate(templateName: string): Promise<string
 
 // ─── Structural Rewriting ────────────────────────────────────────────────────
 
-/** Rewrite a structural file (AGENTS.md, TOOLS.md, BOOTSTRAP.md) using KaijiBot templates. */
+/** Rewrite a structural file (AGENTS.md, TOOLS.md, BOOTSTRAP.md) using AllBot templates. */
 export async function rewriteStructuralFile(
   filename: string,
   srcContent: string,
@@ -219,10 +219,10 @@ export async function rewriteStructuralFile(
   const warnings: string[] = [];
 
   if (rule.mode === "full") {
-    const template = await loadKaijiBotTemplate(rule.templateName);
+    const template = await loadAllBotTemplate(rule.templateName);
     if (srcContent !== template) {
       warnings.push(
-        `${filename}: Replaced with KaijiBot template. User customizations may have been lost.`,
+        `${filename}: Replaced with AllBot template. User customizations may have been lost.`,
       );
     }
     return { content: template, warnings, wasRewritten: true };
@@ -231,7 +231,7 @@ export async function rewriteStructuralFile(
   // Section mode (AGENTS.md)
   const knownSet = new Set(rule.knownSections ?? []);
   const srcParsed = extractSectionsByHeaders(srcContent);
-  const templateParsed = extractSectionsByHeaders(await loadKaijiBotTemplate(rule.templateName));
+  const templateParsed = extractSectionsByHeaders(await loadAllBotTemplate(rule.templateName));
 
   // Build lookup from template sections by header name
   const templateByHeader = new Map<string, MarkdownSection>();

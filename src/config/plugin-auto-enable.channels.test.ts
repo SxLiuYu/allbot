@@ -41,7 +41,7 @@ afterEach(() => {
   resetPluginAutoEnableTestState();
 });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
   it("uses env-scoped catalog metadata for preferOver auto-enable decisions", () => {
     const stateDir = makeTempDir();
@@ -52,8 +52,8 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       JSON.stringify({
         entries: [
           {
-            name: "@kaijibot/env-secondary",
-            kaijibot: {
+            name: "@allbot/env-secondary",
+            allbot: {
               channel: {
                 id: "env-secondary",
                 label: "Env Secondary",
@@ -63,7 +63,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
                 preferOver: ["env-primary"],
               },
               install: {
-                npmSpec: "@kaijibot/env-secondary",
+                npmSpec: "@allbot/env-secondary",
               },
             },
           },
@@ -81,7 +81,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       },
       env: {
         ...makeIsolatedEnv(),
-        KAIJIBOT_STATE_DIR: stateDir,
+        ALLBOT_STATE_DIR: stateDir,
       },
       manifestRegistry: makeRegistry([]),
     });
@@ -162,7 +162,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       );
     });
 
-    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in AllBot
     it.skipIf(process.env.CI)(
       "prefers bluebubbles: skips imessage auto-configure when both are configured",
       () => {
@@ -179,7 +179,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       },
     );
 
-    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in AllBot
     it.skipIf(process.env.CI)(
       "keeps imessage enabled if already explicitly enabled (non-destructive)",
       () => {
@@ -192,7 +192,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       },
     );
 
-    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in AllBot
     it.skipIf(process.env.CI)(
       "allows imessage auto-configure when bluebubbles is explicitly disabled",
       () => {
@@ -206,7 +206,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       },
     );
 
-    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels (bluebubbles/imessage) not bundled in AllBot
     it.skipIf(process.env.CI)(
       "allows imessage auto-configure when bluebubbles is in deny list",
       () => {
@@ -219,7 +219,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
       },
     );
 
-    // Skip on CI: requires upstream-only channels (imessage) not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels (imessage) not bundled in AllBot
     it.skipIf(process.env.CI)("auto-enables imessage when only imessage is configured", () => {
       const result = applyPluginAutoEnable({
         config: {
@@ -245,9 +245,9 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable channels", () => {
         config: makeApnChannelConfig(),
         env: {
           ...makeIsolatedEnv(),
-          KAIJIBOT_HOME: undefined,
-          KAIJIBOT_STATE_DIR: stateDir,
-          KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+          ALLBOT_HOME: undefined,
+          ALLBOT_STATE_DIR: stateDir,
+          ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
         },
       });
 

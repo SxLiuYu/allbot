@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { expectGeneratedTokenPersistedToGatewayAuth } from "../test-utils/auth-token-assertions.js";
 
 const mocks = vi.hoisted(() => ({
-  replaceConfigFile: vi.fn(async (_params: { nextConfig: KaijiBotConfig }) => {}),
+  replaceConfigFile: vi.fn(async (_params: { nextConfig: AllBotConfig }) => {}),
 }));
 
 vi.mock("../config/config.js", async () => {
@@ -24,7 +24,7 @@ async function loadFreshStartupAuthModuleForTest() {
 }
 
 describe("ensureGatewayStartupAuth", () => {
-  async function expectEphemeralGeneratedTokenWhenOverridden(cfg: KaijiBotConfig) {
+  async function expectEphemeralGeneratedTokenWhenOverridden(cfg: AllBotConfig) {
     const result = await ensureGatewayStartupAuth({
       cfg,
       env: {} as NodeJS.ProcessEnv,
@@ -45,7 +45,7 @@ describe("ensureGatewayStartupAuth", () => {
     await loadFreshStartupAuthModuleForTest();
   });
 
-  async function expectNoTokenGeneration(cfg: KaijiBotConfig, mode: string) {
+  async function expectNoTokenGeneration(cfg: AllBotConfig, mode: string) {
     const result = await ensureGatewayStartupAuth({
       cfg,
       env: {} as NodeJS.ProcessEnv,
@@ -59,7 +59,7 @@ describe("ensureGatewayStartupAuth", () => {
   }
 
   async function expectResolvedToken(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     env: NodeJS.ProcessEnv;
     expectedToken: string;
     expectedConfiguredToken?: unknown;
@@ -80,7 +80,7 @@ describe("ensureGatewayStartupAuth", () => {
     expect(mocks.replaceConfigFile).not.toHaveBeenCalled();
   }
 
-  function createMissingGatewayTokenSecretRefConfig(): KaijiBotConfig {
+  function createMissingGatewayTokenSecretRefConfig(): AllBotConfig {
     return {
       gateway: {
         auth: {
@@ -108,7 +108,7 @@ describe("ensureGatewayStartupAuth", () => {
     expect(result.auth.mode).toBe("token");
     expect(mocks.replaceConfigFile).toHaveBeenCalledTimes(1);
     const persistedParams = mocks.replaceConfigFile.mock.calls[0]?.[0] as
-      | { nextConfig: KaijiBotConfig }
+      | { nextConfig: AllBotConfig }
       | undefined;
     expectGeneratedTokenPersistedToGatewayAuth({
       generatedToken: result.generatedToken,
@@ -209,23 +209,23 @@ describe("ensureGatewayStartupAuth", () => {
         gateway: {
           auth: {
             mode: "token",
-            token: "${KAIJIBOT_GATEWAY_TOKEN}",
+            token: "${ALLBOT_GATEWAY_TOKEN}",
           },
         },
       },
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "resolved-token",
+        ALLBOT_GATEWAY_TOKEN: "resolved-token",
       } as NodeJS.ProcessEnv,
       expectedToken: "resolved-token",
-      expectedConfiguredToken: "${KAIJIBOT_GATEWAY_TOKEN}",
+      expectedConfiguredToken: "${ALLBOT_GATEWAY_TOKEN}",
     });
   });
 
-  it("uses KAIJIBOT_GATEWAY_TOKEN without resolving configured token SecretRef", async () => {
+  it("uses ALLBOT_GATEWAY_TOKEN without resolving configured token SecretRef", async () => {
     await expectResolvedToken({
       cfg: createMissingGatewayTokenSecretRefConfig(),
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "token-from-env",
+        ALLBOT_GATEWAY_TOKEN: "token-from-env",
       } as NodeJS.ProcessEnv,
       expectedToken: "token-from-env",
     });
@@ -260,7 +260,7 @@ describe("ensureGatewayStartupAuth", () => {
     expect(mocks.replaceConfigFile).not.toHaveBeenCalled();
   });
 
-  it("uses KAIJIBOT_GATEWAY_PASSWORD without resolving configured password SecretRef", async () => {
+  it("uses ALLBOT_GATEWAY_PASSWORD without resolving configured password SecretRef", async () => {
     const result = await ensureGatewayStartupAuth({
       cfg: {
         gateway: {
@@ -276,7 +276,7 @@ describe("ensureGatewayStartupAuth", () => {
         },
       },
       env: {
-        KAIJIBOT_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
+        ALLBOT_GATEWAY_PASSWORD: "password-from-env", // pragma: allowlist secret
       } as NodeJS.ProcessEnv,
       persist: true,
     });
@@ -287,7 +287,7 @@ describe("ensureGatewayStartupAuth", () => {
   });
 
   it("does not resolve gateway.auth.password SecretRef when token mode is explicit", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -341,7 +341,7 @@ describe("ensureGatewayStartupAuth", () => {
   });
 
   it("treats undefined token override as no override", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -403,7 +403,7 @@ describe("ensureGatewayStartupAuth", () => {
           },
         },
         env: {
-          KAIJIBOT_GATEWAY_TOKEN: "shared-gateway-token-1234567890",
+          ALLBOT_GATEWAY_TOKEN: "shared-gateway-token-1234567890",
         } as NodeJS.ProcessEnv,
       }),
     ).rejects.toThrow(/hooks\.token must not match gateway auth token/i);

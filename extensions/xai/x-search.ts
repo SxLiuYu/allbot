@@ -1,4 +1,4 @@
-import { getRuntimeConfigSnapshot } from "kaijibot/plugin-sdk/config-runtime";
+import { getRuntimeConfigSnapshot } from "allbot/plugin-sdk/config-runtime";
 import {
   jsonResult,
   readCache,
@@ -7,7 +7,7 @@ import {
   resolveCacheTtlMs,
   resolveTimeoutSeconds,
   writeCache,
-} from "kaijibot/plugin-sdk/provider-web-search";
+} from "allbot/plugin-sdk/provider-web-search";
 import { isXaiToolEnabled, resolveXaiToolApiKey } from "./src/tool-auth-shared.js";
 import { resolveEffectiveXSearchConfig } from "./src/x-search-config.js";
 import {
@@ -30,7 +30,7 @@ class PluginToolInputError extends Error {
   }
 }
 
-const X_SEARCH_CACHE_KEY = Symbol.for("kaijibot.xai.x-search.cache");
+const X_SEARCH_CACHE_KEY = Symbol.for("allbot.xai.x-search.cache");
 
 type XSearchCacheEntry = {
   expiresAt: number;

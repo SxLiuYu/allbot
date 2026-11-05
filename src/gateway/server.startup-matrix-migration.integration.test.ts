@@ -21,10 +21,10 @@ installGatewayTestHooks({ scope: "suite" });
 // Skip on CI: matrix migration integration depends on upstream channel runtime
 describe.skipIf(process.env.CI)("gateway startup channel maintenance wiring", () => {
   it("runs startup channel maintenance with the resolved startup config", async () => {
-    const previousBundledPluginsDir = process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-    const previousSkipChannels = process.env.KAIJIBOT_SKIP_CHANNELS;
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = path.resolve(process.cwd(), "extensions");
-    process.env.KAIJIBOT_SKIP_CHANNELS = "0";
+    const previousBundledPluginsDir = process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
+    const previousSkipChannels = process.env.ALLBOT_SKIP_CHANNELS;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = path.resolve(process.cwd(), "extensions");
+    process.env.ALLBOT_SKIP_CHANNELS = "0";
     clearPluginDiscoveryCache();
     clearPluginManifestRegistryCache();
     runChannelPluginStartupMaintenanceMock.mockClear();
@@ -60,14 +60,14 @@ describe.skipIf(process.env.CI)("gateway startup channel maintenance wiring", ()
     } finally {
       await server?.close();
       if (previousBundledPluginsDir === undefined) {
-        delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+        delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
       } else {
-        process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = previousBundledPluginsDir;
+        process.env.ALLBOT_BUNDLED_PLUGINS_DIR = previousBundledPluginsDir;
       }
       if (previousSkipChannels === undefined) {
-        delete process.env.KAIJIBOT_SKIP_CHANNELS;
+        delete process.env.ALLBOT_SKIP_CHANNELS;
       } else {
-        process.env.KAIJIBOT_SKIP_CHANNELS = previousSkipChannels;
+        process.env.ALLBOT_SKIP_CHANNELS = previousSkipChannels;
       }
       clearPluginDiscoveryCache();
       clearPluginManifestRegistryCache();

@@ -3,15 +3,15 @@ import { parseBrowserHttpUrl, redactCdpUrl } from "./browser-cdp.js";
 import { resolveBrowserControlAuth } from "./browser-control-auth.js";
 import {
   DEFAULT_BROWSER_DEFAULT_PROFILE_NAME,
-  DEFAULT_KAIJIBOT_BROWSER_ENABLED,
+  DEFAULT_ALLBOT_BROWSER_ENABLED,
   resolveBrowserConfig,
 } from "./browser-profiles.js";
 
 describe("plugin-sdk browser subpaths", () => {
   it("keeps browser profile helpers available on the narrow subpath", () => {
     const resolved = resolveBrowserConfig(undefined, { gateway: { port: 18789 } });
-    expect(DEFAULT_KAIJIBOT_BROWSER_ENABLED).toBe(true);
-    expect(DEFAULT_BROWSER_DEFAULT_PROFILE_NAME).toBe("kaijibot");
+    expect(DEFAULT_ALLBOT_BROWSER_ENABLED).toBe(true);
+    expect(DEFAULT_BROWSER_DEFAULT_PROFILE_NAME).toBe("allbot");
     expect(resolved.controlPort).toBeTypeOf("number");
   });
 

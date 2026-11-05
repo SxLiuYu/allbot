@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { hasConfiguredSecretInput } from "../config/types.secrets.js";
 import { resolveRequiredHomeDir } from "../infra/home-dir.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -17,7 +17,7 @@ export async function noteMacLaunchAgentOverrides() {
     return;
   }
   const home = resolveRequiredHomeDir();
-  const markerCandidates = [path.join(home, ".kaijibot", "disable-launchagent")];
+  const markerCandidates = [path.join(home, ".allbot", "disable-launchagent")];
   const markerPath = markerCandidates.find((candidate) => fs.existsSync(candidate));
   if (!markerPath) {
     return;
@@ -42,7 +42,7 @@ async function launchctlGetenv(name: string): Promise<string | undefined> {
   }
 }
 
-function hasConfigGatewayCreds(cfg: KaijiBotConfig): boolean {
+function hasConfigGatewayCreds(cfg: AllBotConfig): boolean {
   const localPassword = cfg.gateway?.auth?.password;
   const remoteToken = cfg.gateway?.remote?.token;
   const remotePassword = cfg.gateway?.remote?.password;
@@ -55,7 +55,7 @@ function hasConfigGatewayCreds(cfg: KaijiBotConfig): boolean {
 }
 
 export async function noteMacLaunchctlGatewayEnvOverrides(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   deps?: {
     platform?: NodeJS.Platform;
     getenv?: (name: string) => Promise<string | undefined>;
@@ -72,10 +72,10 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
 
   const getenv = deps?.getenv ?? launchctlGetenv;
   const tokenEntries = [
-    ["KAIJIBOT_GATEWAY_TOKEN", await getenv("KAIJIBOT_GATEWAY_TOKEN")],
+    ["ALLBOT_GATEWAY_TOKEN", await getenv("ALLBOT_GATEWAY_TOKEN")],
   ] as const;
   const passwordEntries = [
-    ["KAIJIBOT_GATEWAY_PASSWORD", await getenv("KAIJIBOT_GATEWAY_PASSWORD")],
+    ["ALLBOT_GATEWAY_PASSWORD", await getenv("ALLBOT_GATEWAY_PASSWORD")],
   ] as const;
   const tokenEntry = tokenEntries.find(([, value]) => normalizeOptionalString(value));
   const passwordEntry = passwordEntries.find(([, value]) => normalizeOptionalString(value));
@@ -93,7 +93,7 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
       ? `- \`${envTokenKey}\` is set; it overrides config tokens.`
       : undefined,
     envPassword
-      ? `- \`${envPasswordKey ?? "KAIJIBOT_GATEWAY_PASSWORD"}\` is set; it overrides config passwords.`
+      ? `- \`${envPasswordKey ?? "ALLBOT_GATEWAY_PASSWORD"}\` is set; it overrides config passwords.`
       : undefined,
     "- Clear overrides and restart the app/gateway:",
     envTokenKey ? `  launchctl unsetenv ${envTokenKey}` : undefined,
@@ -143,7 +143,7 @@ export function noteStartupOptimizationHints(
   const noteFn = deps?.noteFn ?? note;
   const compileCache = normalizeOptionalString(env.NODE_COMPILE_CACHE) ?? "";
   const disableCompileCache = normalizeOptionalString(env.NODE_DISABLE_COMPILE_CACHE) ?? "";
-  const noRespawn = normalizeOptionalString(env.KAIJIBOT_NO_RESPAWN) ?? "";
+  const noRespawn = normalizeOptionalString(env.ALLBOT_NO_RESPAWN) ?? "";
   const lines: string[] = [];
 
   if (!compileCache) {
@@ -162,7 +162,7 @@ export function noteStartupOptimizationHints(
 
   if (noRespawn !== "1") {
     lines.push(
-      "- KAIJIBOT_NO_RESPAWN is not set to 1; set it to avoid extra startup overhead from self-respawn.",
+      "- ALLBOT_NO_RESPAWN is not set to 1; set it to avoid extra startup overhead from self-respawn.",
     );
   }
 
@@ -172,9 +172,9 @@ export function noteStartupOptimizationHints(
 
   const suggestions = [
     "- Suggested env for low-power hosts:",
-    "  export NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache",
-    "  mkdir -p /var/tmp/kaijibot-compile-cache",
-    "  export KAIJIBOT_NO_RESPAWN=1",
+    "  export NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache",
+    "  mkdir -p /var/tmp/allbot-compile-cache",
+    "  export ALLBOT_NO_RESPAWN=1",
     isTruthyEnvValue(disableCompileCache) ? "  unset NODE_DISABLE_COMPILE_CACHE" : undefined,
   ].filter((line): line is string => Boolean(line));
 

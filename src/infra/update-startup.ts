@@ -8,7 +8,7 @@ import { runCommandWithTimeout } from "../process/exec.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import { VERSION } from "../version.js";
 import { writeJsonAtomic } from "./json-files.js";
-import { resolveKaijiBotPackageRoot } from "./kaijibot-root.js";
+import { resolveAllBotPackageRoot } from "./allbot-root.js";
 import { normalizeUpdateChannel, DEFAULT_PACKAGE_CHANNEL } from "./update-channels.js";
 import { compareSemverStrings, resolveNpmChannelTag, checkUpdateStatus } from "./update-check.js";
 
@@ -266,14 +266,14 @@ async function runAutoUpdateCommand(params: {
     }
   }
   if (argv.length === 0) {
-    argv.push("kaijibot", ...baseArgs);
+    argv.push("allbot", ...baseArgs);
   }
 
   try {
     const res = await runCommandWithTimeout(argv, {
       timeoutMs: params.timeoutMs,
       env: {
-        KAIJIBOT_AUTO_UPDATE: "1",
+        ALLBOT_AUTO_UPDATE: "1",
       },
     });
     return {
@@ -345,7 +345,7 @@ export async function runGatewayUpdateCheck(params: {
     }
   }
 
-  const root = await resolveKaijiBotPackageRoot({
+  const root = await resolveAllBotPackageRoot({
     moduleUrl: import.meta.url,
     argv1: process.argv[1],
     cwd: process.cwd(),
@@ -401,7 +401,7 @@ export async function runGatewayUpdateCheck(params: {
       state.lastNotifiedVersion !== resolved.version || state.lastNotifiedTag !== tag;
     if (shouldRunUpdateHints && shouldNotify) {
       params.log.info(
-        `update available (${tag}): v${resolved.version} (current v${VERSION}). Run: ${formatCliCommand("kaijibot update")}`,
+        `update available (${tag}): v${resolved.version} (current v${VERSION}). Run: ${formatCliCommand("allbot update")}`,
       );
       nextState.lastNotifiedVersion = resolved.version;
       nextState.lastNotifiedTag = tag;

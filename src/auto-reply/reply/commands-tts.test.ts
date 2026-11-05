@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 const ttsMocks = vi.hoisted(() => ({
   getResolvedSpeechProviderConfig: vi.fn(),
@@ -37,7 +37,7 @@ const FALLBACK_TTS_PROVIDER = "backup-speech";
 
 function buildTtsParams(
   commandBodyNormalized: string,
-  cfg: KaijiBotConfig = {},
+  cfg: AllBotConfig = {},
 ): Parameters<typeof handleTtsCommands>[0] {
   return {
     cfg,
@@ -183,7 +183,7 @@ describe("handleTtsCommands status fallback reporting", () => {
     const result = await handleTtsCommands(
       buildTtsParams("/tts", {
         messages: { tts: { prefsPath: "/tmp/tts.json" } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
       true,
     );
     expect(result?.shouldContinue).toBe(false);

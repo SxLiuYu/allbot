@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   closeActiveMemorySearchManagers,
   getActiveMemorySearchManager,
@@ -24,7 +24,7 @@ describe("memory-host-search facade", () => {
   });
 
   it("delegates active manager lookup to the lazy runtime module", async () => {
-    const cfg = { agents: { list: [{ id: "main", default: true }] } } as KaijiBotConfig;
+    const cfg = { agents: { list: [{ id: "main", default: true }] } } as AllBotConfig;
     const expected = { manager: null, error: "unavailable" };
     getActiveMemorySearchManagerMock.mockResolvedValue(expected);
 
@@ -33,7 +33,7 @@ describe("memory-host-search facade", () => {
   });
 
   it("delegates runtime cleanup to the lazy runtime module", async () => {
-    const cfg = { agents: { list: [{ id: "main", default: true }] } } as KaijiBotConfig;
+    const cfg = { agents: { list: [{ id: "main", default: true }] } } as AllBotConfig;
 
     await closeActiveMemorySearchManagers(cfg);
 

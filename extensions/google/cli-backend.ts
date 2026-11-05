@@ -1,8 +1,8 @@
-import type { CliBackendPlugin } from "kaijibot/plugin-sdk/cli-backend";
+import type { CliBackendPlugin } from "allbot/plugin-sdk/cli-backend";
 import {
   CLI_FRESH_WATCHDOG_DEFAULTS,
   CLI_RESUME_WATCHDOG_DEFAULTS,
-} from "kaijibot/plugin-sdk/cli-backend";
+} from "allbot/plugin-sdk/cli-backend";
 
 const GEMINI_MODEL_ALIASES: Record<string, string> = {
   pro: "gemini-3.1-pro-preview",

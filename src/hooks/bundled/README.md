@@ -1,6 +1,6 @@
 # Bundled Hooks
 
-This directory contains hooks that ship with KaijiBot. These hooks are automatically discovered and can be enabled/disabled via CLI or configuration.
+This directory contains hooks that ship with AllBot. These hooks are automatically discovered and can be enabled/disabled via CLI or configuration.
 
 ## Available Hooks
 
@@ -10,12 +10,12 @@ Automatically saves session context to memory when you issue `/new` or `/reset`.
 
 **Events**: `command:new`, `command:reset`
 **What it does**: Creates a dated memory file with LLM-generated slug based on conversation content.
-**Output**: `<workspace>/memory/YYYY-MM-DD-slug.md` (defaults to `~/.kaijibot/workspace`)
+**Output**: `<workspace>/memory/YYYY-MM-DD-slug.md` (defaults to `~/.allbot/workspace`)
 
 **Enable**:
 
 ```bash
-kaijibot hooks enable session-memory
+allbot hooks enable session-memory
 ```
 
 ### 📎 bootstrap-extra-files
@@ -29,7 +29,7 @@ Injects extra bootstrap files (for example monorepo `AGENTS.md`/`TOOLS.md`) duri
 **Enable**:
 
 ```bash
-kaijibot hooks enable bootstrap-extra-files
+allbot hooks enable bootstrap-extra-files
 ```
 
 ### 📝 command-logger
@@ -38,12 +38,12 @@ Logs all command events to a centralized audit file.
 
 **Events**: `command` (all commands)
 **What it does**: Appends JSONL entries to command log file.
-**Output**: `~/.kaijibot/logs/commands.log`
+**Output**: `~/.allbot/logs/commands.log`
 
 **Enable**:
 
 ```bash
-kaijibot hooks enable command-logger
+allbot hooks enable command-logger
 ```
 
 ### 🚀 boot-md
@@ -57,7 +57,7 @@ Runs `BOOT.md` whenever the gateway starts (after channels start).
 **Enable**:
 
 ```bash
-kaijibot hooks enable boot-md
+allbot hooks enable boot-md
 ```
 
 ## Hook Structure
@@ -83,7 +83,7 @@ name: my-hook
 description: "Short description"
 homepage: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/automation/hooks.md#my-hook
 metadata:
-  { "kaijibot": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
+  { "allbot": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
 # Hook Title
 
@@ -107,7 +107,7 @@ Documentation goes here...
 To create your own hooks, place them in:
 
 - **Workspace hooks**: `<workspace>/hooks/` (highest precedence)
-- **Managed hooks**: `~/.kaijibot/hooks/` (shared across workspaces)
+- **Managed hooks**: `~/.allbot/hooks/` (shared across workspaces)
 
 Custom hooks follow the same structure as bundled hooks.
 
@@ -116,31 +116,31 @@ Custom hooks follow the same structure as bundled hooks.
 List all hooks:
 
 ```bash
-kaijibot hooks list
+allbot hooks list
 ```
 
 Show hook details:
 
 ```bash
-kaijibot hooks info session-memory
+allbot hooks info session-memory
 ```
 
 Check hook status:
 
 ```bash
-kaijibot hooks check
+allbot hooks check
 ```
 
 Enable/disable:
 
 ```bash
-kaijibot hooks enable session-memory
-kaijibot hooks disable command-logger
+allbot hooks enable session-memory
+allbot hooks disable command-logger
 ```
 
 ## Configuration
 
-Hooks can be configured in `~/.kaijibot/kaijibot.json`:
+Hooks can be configured in `~/.allbot/allbot.json`:
 
 ```json
 {
@@ -213,8 +213,8 @@ export default myHandler;
 Test your hooks by:
 
 1. Place hook in workspace hooks directory
-2. Restart gateway: `pkill -9 -f 'kaijibot.*gateway' && pnpm kaijibot gateway`
-3. Enable the hook: `kaijibot hooks enable my-hook`
+2. Restart gateway: `pkill -9 -f 'allbot.*gateway' && pnpm allbot gateway`
+3. Enable the hook: `allbot hooks enable my-hook`
 4. Trigger the event (e.g., send `/new` command)
 5. Check gateway logs for hook execution
 

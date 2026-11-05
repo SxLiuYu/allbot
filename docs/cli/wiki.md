@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot wiki` (memory-wiki vault status, search, compile, lint, apply, bridge, and Obsidian helpers)"
+summary: "CLI reference for `allbot wiki` (memory-wiki vault status, search, compile, lint, apply, bridge, and Obsidian helpers)"
 read_when:
   - You want to use the memory-wiki CLI
-  - You are documenting or changing `kaijibot wiki`
+  - You are documenting or changing `allbot wiki`
 title: "wiki"
 ---
 
-# `kaijibot wiki`
+# `allbot wiki`
 
 Inspect and maintain the `memory-wiki` vault.
 
@@ -20,7 +20,7 @@ Related:
 
 ## What it is for
 
-Use `kaijibot wiki` when you want a compiled knowledge vault with:
+Use `allbot wiki` when you want a compiled knowledge vault with:
 
 - wiki-native search and page reads
 - provenance-rich syntheses
@@ -31,32 +31,32 @@ Use `kaijibot wiki` when you want a compiled knowledge vault with:
 ## Common commands
 
 ```bash
-kaijibot wiki status
-kaijibot wiki doctor
-kaijibot wiki init
-kaijibot wiki ingest ./notes/alpha.md
-kaijibot wiki compile
-kaijibot wiki lint
-kaijibot wiki search "alpha"
-kaijibot wiki get entity.alpha --from 1 --lines 80
+allbot wiki status
+allbot wiki doctor
+allbot wiki init
+allbot wiki ingest ./notes/alpha.md
+allbot wiki compile
+allbot wiki lint
+allbot wiki search "alpha"
+allbot wiki get entity.alpha --from 1 --lines 80
 
-kaijibot wiki apply synthesis "Alpha Summary" \
+allbot wiki apply synthesis "Alpha Summary" \
   --body "Short synthesis body" \
   --source-id source.alpha
 
-kaijibot wiki apply metadata entity.alpha \
+allbot wiki apply metadata entity.alpha \
   --source-id source.alpha \
   --status review \
   --question "Still active?"
 
-kaijibot wiki bridge import
-kaijibot wiki unsafe-local import
+allbot wiki bridge import
+allbot wiki unsafe-local import
 
-kaijibot wiki obsidian status
-kaijibot wiki obsidian search "alpha"
-kaijibot wiki obsidian open syntheses/alpha-summary.md
-kaijibot wiki obsidian command workspace:quick-switcher
-kaijibot wiki obsidian daily
+allbot wiki obsidian status
+allbot wiki obsidian search "alpha"
+allbot wiki obsidian open syntheses/alpha-summary.md
+allbot wiki obsidian command workspace:quick-switcher
+allbot wiki obsidian daily
 ```
 
 ## Commands
@@ -101,8 +101,8 @@ Rebuild indexes, related blocks, dashboards, and compiled digests.
 
 This writes stable machine-facing artifacts under:
 
-- `.kaijibot-wiki/cache/agent-digest.json`
-- `.kaijibot-wiki/cache/claims.jsonl`
+- `.allbot-wiki/cache/agent-digest.json`
+- `.allbot-wiki/cache/claims.jsonl`
 
 If `render.createDashboards` is enabled, compile also refreshes report pages.
 
@@ -129,7 +129,7 @@ Behavior depends on config:
 - `search.corpus`: `wiki`, `memory`, or `all`
 
 Use `wiki search` when you want wiki-specific ranking or provenance details.
-For one broad shared recall pass, prefer `kaijibot memory search` when the
+For one broad shared recall pass, prefer `allbot memory search` when the
 active memory plugin exposes shared search.
 
 ### `wiki get <lookup>`
@@ -139,8 +139,8 @@ Read a wiki page by id or relative path.
 Examples:
 
 ```bash
-kaijibot wiki get entity.alpha
-kaijibot wiki get syntheses/alpha-summary.md --from 1 --lines 80
+allbot wiki get entity.alpha
+allbot wiki get syntheses/alpha-summary.md --from 1 --lines 80
 ```
 
 ### `wiki apply`
@@ -201,7 +201,7 @@ These require the official `obsidian` CLI on `PATH` when
 
 ## Configuration tie-ins
 
-`kaijibot wiki` behavior is shaped by:
+`allbot wiki` behavior is shaped by:
 
 - `plugins.entries.memory-wiki.config.vaultMode`
 - `plugins.entries.memory-wiki.config.search.backend`

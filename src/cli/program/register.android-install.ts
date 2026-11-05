@@ -9,16 +9,16 @@ export function registerAndroidInstallCommand(program: Command) {
   program
     .command("android-install")
     .description(
-      "Set up KaijiBot on Android/Termux (auto-installs packages, boot script, battery settings)",
+      "Set up AllBot on Android/Termux (auto-installs packages, boot script, battery settings)",
     )
     .option("--non-interactive", "Skip the onboard prompt and do not launch the wizard", false)
     .addHelpText(
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["kaijibot android-install", "Run the full Android/Termux setup flow interactively."],
+          ["allbot android-install", "Run the full Android/Termux setup flow interactively."],
           [
-            "kaijibot android-install --non-interactive",
+            "allbot android-install --non-interactive",
             "Run setup without launching the onboard wizard at the end.",
           ],
         ])}`,

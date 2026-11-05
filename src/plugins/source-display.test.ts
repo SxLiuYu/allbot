@@ -4,9 +4,9 @@ import { withPathResolutionEnv } from "../test-utils/env.js";
 import { formatPluginSourceForTable, resolvePluginSourceRoots } from "./source-display.js";
 
 const PLUGIN_SOURCE_ROOTS = {
-  stock: path.resolve(path.sep, "opt", "homebrew", "lib", "node_modules", "kaijibot", "extensions"),
-  global: path.resolve(path.sep, "Users", "x", ".kaijibot", "extensions"),
-  workspace: path.resolve(path.sep, "Users", "x", "ws", ".kaijibot", "extensions"),
+  stock: path.resolve(path.sep, "opt", "homebrew", "lib", "node_modules", "allbot", "extensions"),
+  global: path.resolve(path.sep, "Users", "x", ".allbot", "extensions"),
+  workspace: path.resolve(path.sep, "Users", "x", "ws", ".allbot", "extensions"),
 };
 
 function expectFormattedSource(params: {
@@ -72,18 +72,18 @@ describe("formatPluginSourceForTable", () => {
   ])("shortens $origin sources under the $sourceKey root", expectFormattedSourceCase);
 
   it("resolves source roots from an explicit env override", () => {
-    const homeDir = path.resolve(path.sep, "tmp", "kaijibot-home");
+    const homeDir = path.resolve(path.sep, "tmp", "allbot-home");
     expectResolvedSourceRoots({
       homeDir,
       env: {
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: "~/bundled",
-        KAIJIBOT_STATE_DIR: "~/state",
+        ALLBOT_BUNDLED_PLUGINS_DIR: "~/bundled",
+        ALLBOT_STATE_DIR: "~/state",
       } as NodeJS.ProcessEnv,
       workspaceDir: "~/ws",
       expected: {
         stock: path.join(homeDir, "bundled"),
         global: path.join(homeDir, "state", "extensions"),
-        workspace: path.join(homeDir, "ws", ".kaijibot", "extensions"),
+        workspace: path.join(homeDir, "ws", ".allbot", "extensions"),
       },
     });
   });

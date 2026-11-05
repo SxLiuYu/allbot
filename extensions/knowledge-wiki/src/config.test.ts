@@ -105,15 +105,15 @@ describe("resolveWikiConfig", () => {
 
 describe("resolveAgentVaultRoot", () => {
   it("derives vault from workspace directory", () => {
-    const vault = resolveAgentVaultRoot("/home/user/.kaijibot/workspace");
-    expect(vault).toBe("/home/user/.kaijibot/workspace/wiki");
+    const vault = resolveAgentVaultRoot("/home/user/.allbot/workspace");
+    expect(vault).toBe("/home/user/.allbot/workspace/wiki");
   });
 
   it("derives different vaults for different agent workspaces", () => {
-    const main = resolveAgentVaultRoot("/home/user/.kaijibot/workspace");
-    const ops = resolveAgentVaultRoot("/home/user/.kaijibot/workspace-ops");
-    expect(main).toBe("/home/user/.kaijibot/workspace/wiki");
-    expect(ops).toBe("/home/user/.kaijibot/workspace-ops/wiki");
+    const main = resolveAgentVaultRoot("/home/user/.allbot/workspace");
+    const ops = resolveAgentVaultRoot("/home/user/.allbot/workspace-ops");
+    expect(main).toBe("/home/user/.allbot/workspace/wiki");
+    expect(ops).toBe("/home/user/.allbot/workspace-ops/wiki");
     expect(main).not.toBe(ops);
   });
 });
@@ -127,8 +127,8 @@ describe("resolveEffectiveVaultRoot", () => {
 
   it("derives from workspace when vault.path is empty", () => {
     const config = resolveWikiConfig(undefined);
-    const vault = resolveEffectiveVaultRoot(config, "/home/user/.kaijibot/workspace");
-    expect(vault).toBe("/home/user/.kaijibot/workspace/wiki");
+    const vault = resolveEffectiveVaultRoot(config, "/home/user/.allbot/workspace");
+    expect(vault).toBe("/home/user/.allbot/workspace/wiki");
   });
 
   it("falls back to default when workspaceDir is undefined", () => {
@@ -140,8 +140,8 @@ describe("resolveEffectiveVaultRoot", () => {
 
   it("provides isolation: different workspaces get different vaults", () => {
     const config = resolveWikiConfig(undefined);
-    const main = resolveEffectiveVaultRoot(config, "/data/.kaijibot/workspace");
-    const ops = resolveEffectiveVaultRoot(config, "/data/.kaijibot/workspace-ops");
+    const main = resolveEffectiveVaultRoot(config, "/data/.allbot/workspace");
+    const ops = resolveEffectiveVaultRoot(config, "/data/.allbot/workspace-ops");
     expect(main).not.toBe(ops);
   });
 });

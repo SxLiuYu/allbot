@@ -12,8 +12,8 @@ describe("detectMacCloudSyncedStateDir", () => {
       "Library",
       "Mobile Documents",
       "com~apple~CloudDocs",
-      "KaijiBot",
-      ".kaijibot",
+      "AllBot",
+      ".allbot",
     );
 
     const result = detectMacCloudSyncedStateDir(stateDir, {
@@ -28,7 +28,7 @@ describe("detectMacCloudSyncedStateDir", () => {
   });
 
   it("detects state dir under Library/CloudStorage", () => {
-    const stateDir = path.join(home, "Library", "CloudStorage", "Dropbox", "KaijiBot", ".kaijibot");
+    const stateDir = path.join(home, "Library", "CloudStorage", "Dropbox", "AllBot", ".allbot");
 
     const result = detectMacCloudSyncedStateDir(stateDir, {
       platform: "darwin",
@@ -42,14 +42,14 @@ describe("detectMacCloudSyncedStateDir", () => {
   });
 
   it("detects cloud-synced target when state dir resolves via symlink", () => {
-    const symlinkPath = "/tmp/kaijibot-state";
+    const symlinkPath = "/tmp/allbot-state";
     const resolvedCloudPath = path.join(
       home,
       "Library",
       "CloudStorage",
       "OneDrive-Personal",
-      "KaijiBot",
-      ".kaijibot",
+      "AllBot",
+      ".allbot",
     );
 
     const result = detectMacCloudSyncedStateDir(symlinkPath, {
@@ -70,10 +70,10 @@ describe("detectMacCloudSyncedStateDir", () => {
       "Library",
       "CloudStorage",
       "OneDrive-Personal",
-      "KaijiBot",
-      ".kaijibot",
+      "AllBot",
+      ".allbot",
     );
-    const resolvedLocalPath = path.join(home, ".kaijibot");
+    const resolvedLocalPath = path.join(home, ".allbot");
 
     const result = detectMacCloudSyncedStateDir(symlinkPath, {
       platform: "darwin",
@@ -84,10 +84,10 @@ describe("detectMacCloudSyncedStateDir", () => {
     expect(result).toBeNull();
   });
 
-  it("anchors cloud detection to OS homedir when KAIJIBOT_HOME is overridden", () => {
-    const stateDir = path.join(home, "Library", "CloudStorage", "iCloud Drive", ".kaijibot");
-    const originalKaijiBotHome = process.env.KAIJIBOT_HOME;
-    process.env.KAIJIBOT_HOME = "/tmp/kaijibot-home-override";
+  it("anchors cloud detection to OS homedir when ALLBOT_HOME is overridden", () => {
+    const stateDir = path.join(home, "Library", "CloudStorage", "iCloud Drive", ".allbot");
+    const originalAllBotHome = process.env.ALLBOT_HOME;
+    process.env.ALLBOT_HOME = "/tmp/allbot-home-override";
     const homedirSpy = vi.spyOn(os, "homedir").mockReturnValue(home);
     try {
       const result = detectMacCloudSyncedStateDir(stateDir, {
@@ -100,10 +100,10 @@ describe("detectMacCloudSyncedStateDir", () => {
       });
     } finally {
       homedirSpy.mockRestore();
-      if (originalKaijiBotHome === undefined) {
-        delete process.env.KAIJIBOT_HOME;
+      if (originalAllBotHome === undefined) {
+        delete process.env.ALLBOT_HOME;
       } else {
-        process.env.KAIJIBOT_HOME = originalKaijiBotHome;
+        process.env.ALLBOT_HOME = originalAllBotHome;
       }
     }
   });
@@ -114,8 +114,8 @@ describe("detectMacCloudSyncedStateDir", () => {
       "Library",
       "Mobile Documents",
       "com~apple~CloudDocs",
-      "KaijiBot",
-      ".kaijibot",
+      "AllBot",
+      ".allbot",
     );
 
     const result = detectMacCloudSyncedStateDir(stateDir, {

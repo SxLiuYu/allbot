@@ -287,7 +287,7 @@ describe("PersonaStore", () => {
       mkdirSync(flatDir, { recursive: true });
       writeFileSync(join(flatDir, "main.json"), JSON.stringify(createDefaultPersona()), "utf-8");
       writeFileSync(
-        join(flatDir, "kaijibot-tui.json"),
+        join(flatDir, "allbot-tui.json"),
         JSON.stringify(createDefaultPersona()),
         "utf-8",
       );
@@ -296,7 +296,7 @@ describe("PersonaStore", () => {
 
       expect(result.migrated).toEqual([]);
       expect(result.skipped).toContain("main");
-      expect(result.skipped).toContain("kaijibot-tui");
+      expect(result.skipped).toContain("allbot-tui");
     });
 
     it("is idempotent — no-ops on second call", async () => {

@@ -1,13 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
-import { extensionForMime } from "kaijibot/plugin-sdk/media-runtime";
+import { extensionForMime } from "allbot/plugin-sdk/media-runtime";
 import type {
   GeneratedMusicAsset,
   MusicGenerationProvider,
   MusicGenerationRequest,
-} from "kaijibot/plugin-sdk/music-generation";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/music-generation";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { normalizeGoogleApiBaseUrl } from "./api.js";
 
 const DEFAULT_GOOGLE_MUSIC_MODEL = "lyria-3-clip-preview";

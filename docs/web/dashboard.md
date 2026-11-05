@@ -38,7 +38,7 @@ Prefer localhost, Tailscale Serve, or an SSH tunnel.
 ## Fast path (recommended)
 
 - After onboarding, the CLI auto-opens the dashboard and prints a clean (non-tokenized) link.
-- Re-open anytime: `kaijibot dashboard` (copies link, opens browser if possible, shows SSH hint if headless).
+- Re-open anytime: `allbot dashboard` (copies link, opens browser if possible, shows SSH hint if headless).
 - If the UI prompts for shared-secret auth, paste the configured token or
   password into Control UI settings.
 
@@ -46,18 +46,18 @@ Prefer localhost, Tailscale Serve, or an SSH tunnel.
 
 - **Localhost**: open `http://127.0.0.1:18789/`.
 - **Shared-secret token source**: `gateway.auth.token` (or
-  `KAIJIBOT_GATEWAY_TOKEN`); `kaijibot dashboard` can pass it via URL fragment
+  `ALLBOT_GATEWAY_TOKEN`); `allbot dashboard` can pass it via URL fragment
   for one-time bootstrap, and the Control UI keeps it in sessionStorage for the
   current browser tab session and selected gateway URL instead of localStorage.
-- If `gateway.auth.token` is SecretRef-managed, `kaijibot dashboard`
+- If `gateway.auth.token` is SecretRef-managed, `allbot dashboard`
   prints/copies/opens a non-tokenized URL by design. This avoids exposing
   externally managed tokens in shell logs, clipboard history, or browser-launch
   arguments.
 - If `gateway.auth.token` is configured as a SecretRef and is unresolved in your
-  current shell, `kaijibot dashboard` still prints a non-tokenized URL plus
+  current shell, `allbot dashboard` still prints a non-tokenized URL plus
   actionable auth setup guidance.
 - **Shared-secret password**: use the configured `gateway.auth.password` (or
-  `KAIJIBOT_GATEWAY_PASSWORD`). The dashboard does not persist passwords across
+  `ALLBOT_GATEWAY_PASSWORD`). The dashboard does not persist passwords across
   reloads.
 - **Identity-bearing modes**: Tailscale Serve can satisfy Control UI/WebSocket
   auth via identity headers when `gateway.auth.allowTailscale: true`, and a
@@ -75,7 +75,7 @@ Prefer localhost, Tailscale Serve, or an SSH tunnel.
 
 ## If you see "unauthorized" / 1008
 
-- Ensure the gateway is reachable (local: `kaijibot status`; remote: SSH tunnel `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`).
+- Ensure the gateway is reachable (local: `allbot status`; remote: SSH tunnel `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`).
 - For `AUTH_TOKEN_MISMATCH`, clients may do one trusted retry with a cached device token when the gateway returns retry hints. That cached-token retry reuses the token's cached approved scopes; explicit `deviceToken` / explicit `scopes` callers keep their requested scope set. If auth still fails after that retry, resolve token drift manually.
 - Outside that retry path, connect auth precedence is explicit shared token/password first, then explicit `deviceToken`, then stored device token, then bootstrap token.
 - On the async Tailscale Serve Control UI path, failed attempts for the same
@@ -83,12 +83,12 @@ Prefer localhost, Tailscale Serve, or an SSH tunnel.
   the second concurrent bad retry can already show `retry later`.
 - For token drift repair steps, follow [Token drift recovery checklist](/cli/devices#token-drift-recovery-checklist).
 - Retrieve or supply the shared secret from the gateway host:
-  - Token: `kaijibot config get gateway.auth.token`
+  - Token: `allbot config get gateway.auth.token`
   - Password: resolve the configured `gateway.auth.password` or
-    `KAIJIBOT_GATEWAY_PASSWORD`
+    `ALLBOT_GATEWAY_PASSWORD`
   - SecretRef-managed token: resolve the external secret provider or export
-    `KAIJIBOT_GATEWAY_TOKEN` in this shell, then rerun `kaijibot dashboard`
-  - No shared secret configured: `kaijibot doctor --generate-gateway-token`
+    `ALLBOT_GATEWAY_TOKEN` in this shell, then rerun `allbot dashboard`
+  - No shared secret configured: `allbot doctor --generate-gateway-token`
 - In the dashboard settings, paste the token or password into the auth field,
   then connect.
 - The UI language picker is in **Overview -> Gateway Access -> Language**.

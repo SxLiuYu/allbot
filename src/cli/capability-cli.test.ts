@@ -404,7 +404,7 @@ describe("capability cli", () => {
       ],
     });
 
-    const tempOutput = path.join(os.tmpdir(), `kaijibot-image-mismatch-${Date.now()}.png`);
+    const tempOutput = path.join(os.tmpdir(), `allbot-image-mismatch-${Date.now()}.png`);
     await fs.rm(tempOutput, { force: true });
     await fs.rm(tempOutput.replace(/\.png$/, ".jpg"), { force: true });
 

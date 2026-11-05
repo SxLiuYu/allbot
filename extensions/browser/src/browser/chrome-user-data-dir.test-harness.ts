@@ -9,7 +9,7 @@ type ChromeUserDataDirRef = {
 
 export function installChromeUserDataDirHooks(chromeUserDataDir: ChromeUserDataDirRef): void {
   beforeAll(async () => {
-    chromeUserDataDir.dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-chrome-user-data-"));
+    chromeUserDataDir.dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-chrome-user-data-"));
   });
 
   afterAll(async () => {

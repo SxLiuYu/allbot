@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { resolveKaijiBotPackageRoot } from "../../infra/kaijibot-root.js";
+import { resolveAllBotPackageRoot } from "../../infra/allbot-root.js";
 import { readPackageName, readPackageVersion } from "../../infra/package-json.js";
 import { normalizePackageTagInput } from "../../infra/package-tag.js";
 import { trimLogTail } from "../../infra/restart-sentinel.js";
@@ -54,14 +54,14 @@ export function parseTimeoutMsOrExit(timeout?: string): number | undefined | nul
   return timeoutMs;
 }
 
-const KAIJIBOT_REPO_URL = "https://gitee.com/kaiji1126/kaijibot.git";
+const ALLBOT_REPO_URL = "https://gitee.com/kaiji1126/kaijibot.git";
 const MAX_LOG_CHARS = 8000;
 
-export const DEFAULT_PACKAGE_NAME = "kaijibot";
+export const DEFAULT_PACKAGE_NAME = "allbot";
 const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME]);
 
 export function normalizeTag(value?: string | null): string | null {
-  return normalizePackageTagInput(value, ["kaijibot", DEFAULT_PACKAGE_NAME]);
+  return normalizePackageTagInput(value, ["allbot", DEFAULT_PACKAGE_NAME]);
 }
 
 export function normalizeVersionTag(tag: string): string | null {
@@ -114,7 +114,7 @@ export async function isEmptyDir(targetPath: string): Promise<boolean> {
 }
 
 export function resolveGitInstallDir(): string {
-  const override = process.env.KAIJIBOT_GIT_DIR?.trim();
+  const override = process.env.ALLBOT_GIT_DIR?.trim();
   if (override) {
     return path.resolve(override);
   }
@@ -124,9 +124,9 @@ export function resolveGitInstallDir(): string {
 function resolveDefaultGitDir(): string {
   const home = os.homedir();
   if (home.startsWith("/")) {
-    return path.posix.join(home, "kaijibot");
+    return path.posix.join(home, "allbot");
   }
-  return path.join(home, "kaijibot");
+  return path.join(home, "allbot");
 }
 
 export function resolveNodeRunner(): string {
@@ -139,7 +139,7 @@ export function resolveNodeRunner(): string {
 
 export async function resolveUpdateRoot(): Promise<string> {
   return (
-    (await resolveKaijiBotPackageRoot({
+    (await resolveAllBotPackageRoot({
       moduleUrl: import.meta.url,
       argv1: process.argv[1],
       cwd: process.cwd(),
@@ -204,7 +204,7 @@ export async function ensureGitCheckout(params: {
   if (!dirExists) {
     return await runUpdateStep({
       name: "git clone",
-      argv: ["git", "clone", KAIJIBOT_REPO_URL, params.dir],
+      argv: ["git", "clone", ALLBOT_REPO_URL, params.dir],
       env: gitEnv,
       timeoutMs: params.timeoutMs,
       progress: params.progress,
@@ -215,13 +215,13 @@ export async function ensureGitCheckout(params: {
     const empty = await isEmptyDir(params.dir);
     if (!empty) {
       throw new Error(
-        `KAIJIBOT_GIT_DIR points at a non-git directory: ${params.dir}. Set KAIJIBOT_GIT_DIR to an empty folder or an kaijibot checkout.`,
+        `ALLBOT_GIT_DIR points at a non-git directory: ${params.dir}. Set ALLBOT_GIT_DIR to an empty folder or an allbot checkout.`,
       );
     }
 
     return await runUpdateStep({
       name: "git clone",
-      argv: ["git", "clone", KAIJIBOT_REPO_URL, params.dir],
+      argv: ["git", "clone", ALLBOT_REPO_URL, params.dir],
       cwd: params.dir,
       env: gitEnv,
       timeoutMs: params.timeoutMs,
@@ -230,7 +230,7 @@ export async function ensureGitCheckout(params: {
   }
 
   if (!(await isCorePackage(params.dir))) {
-    throw new Error(`KAIJIBOT_GIT_DIR does not look like a core checkout: ${params.dir}.`);
+    throw new Error(`ALLBOT_GIT_DIR does not look like a core checkout: ${params.dir}.`);
   }
 
   return null;
@@ -259,7 +259,7 @@ export async function resolveGlobalManager(params: {
 }
 
 export async function tryWriteCompletionCache(root: string, jsonMode: boolean): Promise<void> {
-  const binPath = path.join(root, "kaijibot.mjs");
+  const binPath = path.join(root, "allbot.mjs");
   if (!(await pathExists(binPath))) {
     return;
   }

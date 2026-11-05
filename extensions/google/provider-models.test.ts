@@ -2,7 +2,7 @@ import type { ModelRegistry } from "@earendil-works/pi-coding-agent";
 import type {
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import { describe, expect, it } from "vitest";
 import { isModernGoogleModel, resolveGoogleGeminiForwardCompatModel } from "./provider-models.js";
 

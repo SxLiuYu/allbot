@@ -1,20 +1,20 @@
-import { sanitizeForPlainText } from "kaijibot/plugin-sdk/outbound-runtime";
+import { sanitizeForPlainText } from "allbot/plugin-sdk/outbound-runtime";
 import {
   resolvePayloadMediaUrls,
   sendPayloadMediaSequence,
   sendPayloadMediaSequenceAndFinalize,
   sendPayloadMediaSequenceOrFallback,
   sendTextMediaPayload,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 import { chunkText } from "../../../auto-reply/chunk.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import type { OutboundSendDeps } from "../../../infra/outbound/deliver.js";
 import type { OutboundMediaAccess } from "../../../media/load-options.js";
 import { resolveChannelMediaMaxBytes } from "../media-limits.js";
 import type { ChannelOutboundAdapter } from "../types.js";
 
 type DirectSendOptions = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   replyToId?: string | null;
   mediaUrl?: string;
@@ -37,12 +37,12 @@ export {
   sendPayloadMediaSequenceAndFinalize,
   sendPayloadMediaSequenceOrFallback,
   sendTextMediaPayload,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 
 export function resolveScopedChannelMediaMaxBytes(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
-  resolveChannelLimitMb: (params: { cfg: KaijiBotConfig; accountId: string }) => number | undefined;
+  resolveChannelLimitMb: (params: { cfg: AllBotConfig; accountId: string }) => number | undefined;
 }): number | undefined {
   return resolveChannelMediaMaxBytes({
     cfg: params.cfg,
@@ -52,7 +52,7 @@ export function resolveScopedChannelMediaMaxBytes(params: {
 }
 
 export function createScopedChannelMediaMaxBytesResolver(channel: string) {
-  return (params: { cfg: KaijiBotConfig; accountId?: string | null }) =>
+  return (params: { cfg: AllBotConfig; accountId?: string | null }) =>
     resolveScopedChannelMediaMaxBytes({
       cfg: params.cfg,
       accountId: params.accountId,
@@ -69,14 +69,14 @@ export function createDirectTextMediaOutbound<
   channel: string;
   resolveSender: (deps: OutboundSendDeps | undefined) => DirectSendFn<TOpts, TResult>;
   resolveMaxBytes: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
   }) => number | undefined;
   buildTextOptions: (params: DirectSendOptions) => TOpts;
   buildMediaOptions: (params: DirectSendOptions) => TOpts;
 }): ChannelOutboundAdapter {
   const sendDirect = async (sendParams: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     to: string;
     text: string;
     accountId?: string | null;

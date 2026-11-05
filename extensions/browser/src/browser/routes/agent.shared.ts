@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { toBrowserErrorResponse } from "../errors.js";
 import type { PwAiModule } from "../pw-ai-module.js";
 import { getPwAiModule as getPwAiModuleBase } from "../pw-ai-module.js";

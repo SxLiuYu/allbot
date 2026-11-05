@@ -52,6 +52,6 @@ export function resetLifecycleServiceMocks() {
 
 export function stubEmptyGatewayEnv() {
   vi.unstubAllEnvs();
-  vi.stubEnv("KAIJIBOT_GATEWAY_TOKEN", "");
-  vi.stubEnv("KAIJIBOT_GATEWAY_URL", "");
+  vi.stubEnv("ALLBOT_GATEWAY_TOKEN", "");
+  vi.stubEnv("ALLBOT_GATEWAY_URL", "");
 }

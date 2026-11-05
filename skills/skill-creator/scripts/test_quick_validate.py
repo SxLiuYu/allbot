@@ -51,7 +51,7 @@ allowed-tools:
   - gh
 metadata: |
   {
-    "owners": ["team-kaijibot"]
+    "owners": ["team-allbot"]
   }
 ---
 # Skill

@@ -6,8 +6,8 @@ import {
 } from "../../plugin-sdk/browser-bridge.js";
 import {
   DEFAULT_BROWSER_EVALUATE_ENABLED,
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
   resolveProfile,
   type ResolvedBrowserConfig,
 } from "../../plugin-sdk/browser-profiles.js";
@@ -44,7 +44,7 @@ import { validateNetworkMode } from "./validate-sandbox-security.js";
 import { appendWorkspaceMountArgs, SANDBOX_MOUNT_FORMAT_VERSION } from "./workspace-mounts.js";
 
 const HOT_BROWSER_WINDOW_MS = 5 * 60 * 1000;
-const CDP_SOURCE_RANGE_ENV_KEY = "KAIJIBOT_BROWSER_CDP_SOURCE_RANGE";
+const CDP_SOURCE_RANGE_ENV_KEY = "ALLBOT_BROWSER_CDP_SOURCE_RANGE";
 
 async function waitForSandboxCdp(params: { cdpPort: number; timeoutMs: number }): Promise<boolean> {
   const deadline = Date.now() + Math.max(0, params.timeoutMs);
@@ -88,17 +88,17 @@ function buildSandboxBrowserResolvedConfig(params: {
     cdpPortRangeEnd: cdpPortRange.end,
     remoteCdpTimeoutMs: 1500,
     remoteCdpHandshakeTimeoutMs: 3000,
-    color: DEFAULT_KAIJIBOT_BROWSER_COLOR,
+    color: DEFAULT_ALLBOT_BROWSER_COLOR,
     executablePath: undefined,
     headless: params.headless,
     noSandbox: false,
     attachOnly: true,
-    defaultProfile: DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+    defaultProfile: DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
     extraArgs: [],
     profiles: {
-      [DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME]: {
+      [DEFAULT_ALLBOT_BROWSER_PROFILE_NAME]: {
         cdpPort: params.cdpPort,
-        color: DEFAULT_KAIJIBOT_BROWSER_COLOR,
+        color: DEFAULT_ALLBOT_BROWSER_COLOR,
       },
     },
   };
@@ -191,7 +191,7 @@ export async function ensureSandboxBrowser(params: {
     }
     const registry = await readBrowserRegistry();
     const registryEntry = registry.entries.find((entry) => entry.containerName === containerName);
-    currentHash = await readDockerContainerLabel(containerName, "kaijibot.configHash");
+    currentHash = await readDockerContainerLabel(containerName, "allbot.configHash");
     hashMismatch = !currentHash || currentHash !== expectedHash;
     if (!currentHash) {
       currentHash = registryEntry?.configHash ?? null;
@@ -204,13 +204,13 @@ export async function ensureSandboxBrowser(params: {
       if (isHot) {
         const hint = (() => {
           if (params.cfg.scope === "session") {
-            return `kaijibot sandbox recreate --browser --session ${params.scopeKey}`;
+            return `allbot sandbox recreate --browser --session ${params.scopeKey}`;
           }
           if (params.cfg.scope === "agent") {
             const agentId = resolveSandboxAgentId(params.scopeKey) ?? "main";
-            return `kaijibot sandbox recreate --browser --agent ${agentId}`;
+            return `allbot sandbox recreate --browser --agent ${agentId}`;
           }
-          return "kaijibot sandbox recreate --browser --all";
+          return "allbot sandbox recreate --browser --all";
         })();
         defaultRuntime.log(
           `Sandbox browser config changed for ${containerName} (recently used). Recreate to apply: ${hint}`,
@@ -236,8 +236,8 @@ export async function ensureSandboxBrowser(params: {
       cfg: browserDockerCfg,
       scopeKey: params.scopeKey,
       labels: {
-        "kaijibot.sandboxBrowser": "1",
-        "kaijibot.browserConfigEpoch": SANDBOX_BROWSER_SECURITY_HASH_EPOCH,
+        "allbot.sandboxBrowser": "1",
+        "allbot.browserConfigEpoch": SANDBOX_BROWSER_SECURITY_HASH_EPOCH,
       },
       configHash: expectedHash,
       includeBinds: false,
@@ -259,18 +259,18 @@ export async function ensureSandboxBrowser(params: {
     if (noVncEnabled) {
       args.push("-p", `127.0.0.1::${params.cfg.browser.noVncPort}`);
     }
-    args.push("-e", `KAIJIBOT_BROWSER_HEADLESS=${params.cfg.browser.headless ? "1" : "0"}`);
-    args.push("-e", `KAIJIBOT_BROWSER_ENABLE_NOVNC=${params.cfg.browser.enableNoVnc ? "1" : "0"}`);
-    args.push("-e", `KAIJIBOT_BROWSER_CDP_PORT=${params.cfg.browser.cdpPort}`);
+    args.push("-e", `ALLBOT_BROWSER_HEADLESS=${params.cfg.browser.headless ? "1" : "0"}`);
+    args.push("-e", `ALLBOT_BROWSER_ENABLE_NOVNC=${params.cfg.browser.enableNoVnc ? "1" : "0"}`);
+    args.push("-e", `ALLBOT_BROWSER_CDP_PORT=${params.cfg.browser.cdpPort}`);
     if (cdpSourceRange) {
       args.push("-e", `${CDP_SOURCE_RANGE_ENV_KEY}=${cdpSourceRange}`);
     }
-    args.push("-e", `KAIJIBOT_BROWSER_VNC_PORT=${params.cfg.browser.vncPort}`);
-    args.push("-e", `KAIJIBOT_BROWSER_NOVNC_PORT=${params.cfg.browser.noVncPort}`);
+    args.push("-e", `ALLBOT_BROWSER_VNC_PORT=${params.cfg.browser.vncPort}`);
+    args.push("-e", `ALLBOT_BROWSER_NOVNC_PORT=${params.cfg.browser.noVncPort}`);
     // Chromium's setuid/namespace sandbox cannot work inside Docker containers
     // (PID namespace creation requires privileges Docker does not grant by default).
     // The container itself provides isolation, so --no-sandbox is safe here.
-    args.push("-e", "KAIJIBOT_BROWSER_NO_SANDBOX=1");
+    args.push("-e", "ALLBOT_BROWSER_NO_SANDBOX=1");
     if (noVncEnabled && noVncPassword) {
       args.push("-e", `${NOVNC_PASSWORD_ENV_KEY}=${noVncPassword}`);
     }
@@ -296,7 +296,7 @@ export async function ensureSandboxBrowser(params: {
 
   const existing = BROWSER_BRIDGES.get(params.scopeKey);
   const existingProfile = existing
-    ? resolveProfile(existing.bridge.state.resolved, DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME)
+    ? resolveProfile(existing.bridge.state.resolved, DEFAULT_ALLBOT_BROWSER_PROFILE_NAME)
     : null;
 
   let desiredAuthToken = normalizeOptionalString(params.bridgeAuth?.token);

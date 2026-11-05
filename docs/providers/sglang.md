@@ -1,7 +1,7 @@
 ---
-summary: "Run KaijiBot with SGLang (OpenAI-compatible self-hosted server)"
+summary: "Run AllBot with SGLang (OpenAI-compatible self-hosted server)"
 read_when:
-  - You want to run KaijiBot against a local SGLang server
+  - You want to run AllBot against a local SGLang server
   - You want OpenAI-compatible /v1 endpoints with your own models
 title: "SGLang"
 ---
@@ -9,9 +9,9 @@ title: "SGLang"
 # SGLang
 
 SGLang can serve open-source models via an **OpenAI-compatible** HTTP API.
-KaijiBot can connect to SGLang using the `openai-completions` API.
+AllBot can connect to SGLang using the `openai-completions` API.
 
-KaijiBot can also **auto-discover** available models from SGLang when you opt
+AllBot can also **auto-discover** available models from SGLang when you opt
 in with `SGLANG_API_KEY` (any value works if your server does not enforce auth)
 and you do not define an explicit `models.providers.sglang` entry.
 
@@ -33,7 +33,7 @@ export SGLANG_API_KEY="sglang-local"
 3. Run onboarding and choose `SGLang`, or set a model directly:
 
 ```bash
-kaijibot onboard
+allbot onboard
 ```
 
 ```json5
@@ -49,7 +49,7 @@ kaijibot onboard
 ## Model discovery (implicit provider)
 
 When `SGLANG_API_KEY` is set (or an auth profile exists) and you **do not**
-define `models.providers.sglang`, KaijiBot will query:
+define `models.providers.sglang`, AllBot will query:
 
 - `GET http://127.0.0.1:30000/v1/models`
 
@@ -111,5 +111,5 @@ native OpenAI endpoint.
 - native OpenAI-only request shaping does not apply here
 - no `service_tier`, no Responses `store`, no prompt-cache hints, and no
   OpenAI reasoning-compat payload shaping
-- hidden KaijiBot attribution headers (`originator`, `version`, `User-Agent`)
+- hidden AllBot attribution headers (`originator`, `version`, `User-Agent`)
   are not injected on custom SGLang base URLs

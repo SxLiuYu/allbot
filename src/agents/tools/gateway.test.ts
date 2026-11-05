@@ -17,7 +17,7 @@ let resolveGatewayOptions: typeof import("./gateway.js").resolveGatewayOptions;
 
 describe("gateway tool defaults", () => {
   const envSnapshot = {
-    kaijibot: process.env.KAIJIBOT_GATEWAY_TOKEN,
+    allbot: process.env.ALLBOT_GATEWAY_TOKEN,
   };
 
   beforeAll(async () => {
@@ -27,14 +27,14 @@ describe("gateway tool defaults", () => {
   beforeEach(() => {
     callGatewayMock.mockClear();
     configState.value = {};
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
   });
 
   afterAll(() => {
-    if (envSnapshot.kaijibot === undefined) {
-      delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+    if (envSnapshot.allbot === undefined) {
+      delete process.env.ALLBOT_GATEWAY_TOKEN;
     } else {
-      process.env.KAIJIBOT_GATEWAY_TOKEN = envSnapshot.kaijibot;
+      process.env.ALLBOT_GATEWAY_TOKEN = envSnapshot.allbot;
     }
   });
 
@@ -60,8 +60,8 @@ describe("gateway tool defaults", () => {
     );
   });
 
-  it("uses KAIJIBOT_GATEWAY_TOKEN for allowlisted local overrides", () => {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "env-token";
+  it("uses ALLBOT_GATEWAY_TOKEN for allowlisted local overrides", () => {
+    process.env.ALLBOT_GATEWAY_TOKEN = "env-token";
     const opts = resolveGatewayOptions({ gatewayUrl: "ws://127.0.0.1:18789" });
     expect(opts.url).toBe("ws://127.0.0.1:18789");
     expect(opts.token).toBe("env-token");
@@ -92,7 +92,7 @@ describe("gateway tool defaults", () => {
   });
 
   it("does not leak local env/config tokens to remote overrides", () => {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "local-env-token";
+    process.env.ALLBOT_GATEWAY_TOKEN = "local-env-token";
     configState.value = {
       gateway: {
         auth: { token: "local-config-token" },
@@ -127,7 +127,7 @@ describe("gateway tool defaults", () => {
   });
 
   it("explicit gatewayToken overrides fallback token resolution", () => {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "local-env-token";
+    process.env.ALLBOT_GATEWAY_TOKEN = "local-env-token";
     configState.value = {
       gateway: {
         remote: {

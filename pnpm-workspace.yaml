@@ -9,7 +9,7 @@ minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - "basic-ftp"
   - "hono"
-  - "kaijibot"
+  - "allbot"
   - "vite"
   - "@cloudflare/workers-types"
   - "@hono/node-server"

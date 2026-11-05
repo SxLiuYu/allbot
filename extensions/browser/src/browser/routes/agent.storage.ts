@@ -1,4 +1,4 @@
-import { normalizeOptionalString, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import type { BrowserRouteContext } from "../server-context.js";
 import {
   readBody,

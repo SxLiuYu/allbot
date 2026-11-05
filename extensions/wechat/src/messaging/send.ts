@@ -1,4 +1,4 @@
-import type { ReplyPayload } from "kaijibot/plugin-sdk/reply-runtime";
+import type { ReplyPayload } from "allbot/plugin-sdk/reply-runtime";
 import { sendMessage as sendMessageApi } from "../api/api.js";
 import type { WeixinApiOptions } from "../api/api.js";
 import type { MessageItem, SendMessageReq } from "../api/types.js";

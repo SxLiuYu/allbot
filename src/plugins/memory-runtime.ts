@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveRuntimePluginRegistry } from "./loader.js";
 import { getMemoryRuntime } from "./memory-state.js";
 import {
@@ -6,7 +6,7 @@ import {
   resolvePluginRuntimeLoadContext,
 } from "./runtime/load-context.js";
 
-function ensureMemoryRuntime(cfg?: KaijiBotConfig) {
+function ensureMemoryRuntime(cfg?: AllBotConfig) {
   const current = getMemoryRuntime();
   if (current || !cfg) {
     return current;
@@ -18,7 +18,7 @@ function ensureMemoryRuntime(cfg?: KaijiBotConfig) {
 }
 
 export async function getActiveMemorySearchManager(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   purpose?: "default" | "status";
 }) {
@@ -29,11 +29,11 @@ export async function getActiveMemorySearchManager(params: {
   return await runtime.getMemorySearchManager(params);
 }
 
-export function resolveActiveMemoryBackendConfig(params: { cfg: KaijiBotConfig; agentId: string }) {
+export function resolveActiveMemoryBackendConfig(params: { cfg: AllBotConfig; agentId: string }) {
   return ensureMemoryRuntime(params.cfg)?.resolveMemoryBackendConfig(params) ?? null;
 }
 
-export async function closeActiveMemorySearchManagers(cfg?: KaijiBotConfig): Promise<void> {
+export async function closeActiveMemorySearchManagers(cfg?: AllBotConfig): Promise<void> {
   void cfg;
   const runtime = getMemoryRuntime();
   await runtime?.closeAllMemorySearchManagers?.();

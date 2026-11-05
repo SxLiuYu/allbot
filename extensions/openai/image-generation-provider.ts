@@ -1,12 +1,12 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
-import type { ImageGenerationProvider } from "kaijibot/plugin-sdk/image-generation";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
+import type { ImageGenerationProvider } from "allbot/plugin-sdk/image-generation";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
+} from "allbot/plugin-sdk/provider-http";
 import { OPENAI_DEFAULT_IMAGE_MODEL as DEFAULT_OPENAI_IMAGE_MODEL } from "./default-models.js";
 import { resolveConfiguredOpenAIBaseUrl, toOpenAIDataUrl } from "./shared.js";
 
@@ -19,7 +19,7 @@ const MOCK_OPENAI_PROVIDER_ID = "mock-openai";
 
 function shouldAllowPrivateImageEndpoint(req: {
   provider: string;
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
 }) {
   if (req.provider === MOCK_OPENAI_PROVIDER_ID) {
     return true;
@@ -28,7 +28,7 @@ function shouldAllowPrivateImageEndpoint(req: {
   if (!baseUrl.startsWith("http://127.0.0.1:") && !baseUrl.startsWith("http://localhost:")) {
     return false;
   }
-  return process.env.KAIJIBOT_QA_ALLOW_LOCAL_IMAGE_PROVIDER === "1";
+  return process.env.ALLBOT_QA_ALLOW_LOCAL_IMAGE_PROVIDER === "1";
 }
 
 type OpenAIImageApiResponse = {

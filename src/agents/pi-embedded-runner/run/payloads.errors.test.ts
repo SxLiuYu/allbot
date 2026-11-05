@@ -248,7 +248,7 @@ describe("buildEmbeddedRunPayloads", () => {
             type: "toolCall",
             id: "toolu_01",
             name: "browser",
-            arguments: { action: "search", query: "kaijibot docs" },
+            arguments: { action: "search", query: "allbot docs" },
           },
         ],
       }),

@@ -1,5 +1,5 @@
 import { normalizeProviderId } from "../agents/model-selection.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { isBlockedObjectKey } from "../infra/prototype-keys.js";
 import { resolvePluginCapabilityProviders } from "../plugins/capability-provider-runtime.js";
 import type { VideoGenerationProviderPlugin } from "../plugins/types.js";
@@ -20,7 +20,7 @@ function isSafeVideoGenerationProviderId(id: string | undefined): id is string {
 }
 
 function resolvePluginVideoGenerationProviders(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): VideoGenerationProviderPlugin[] {
   return resolvePluginCapabilityProviders({
     key: "videoGenerationProviders",
@@ -28,7 +28,7 @@ function resolvePluginVideoGenerationProviders(
   });
 }
 
-function buildProviderMaps(cfg?: KaijiBotConfig): {
+function buildProviderMaps(cfg?: AllBotConfig): {
   canonical: Map<string, VideoGenerationProviderPlugin>;
   aliases: Map<string, VideoGenerationProviderPlugin>;
 } {
@@ -60,14 +60,14 @@ function buildProviderMaps(cfg?: KaijiBotConfig): {
 }
 
 export function listVideoGenerationProviders(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): VideoGenerationProviderPlugin[] {
   return [...buildProviderMaps(cfg).canonical.values()];
 }
 
 export function getVideoGenerationProvider(
   providerId: string | undefined,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): VideoGenerationProviderPlugin | undefined {
   const normalized = normalizeVideoGenerationProviderId(providerId);
   if (!normalized) {

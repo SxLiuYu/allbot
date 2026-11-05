@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveImageSanitizationLimits } from "./image-sanitization.js";
 
 describe("image sanitization config", () => {
   it("defaults when no config value exists", () => {
     expect(resolveImageSanitizationLimits(undefined)).toEqual({});
     expect(
-      resolveImageSanitizationLimits({ agents: { defaults: {} } } as unknown as KaijiBotConfig),
+      resolveImageSanitizationLimits({ agents: { defaults: {} } } as unknown as AllBotConfig),
     ).toEqual({});
   });
 
@@ -14,7 +14,7 @@ describe("image sanitization config", () => {
     expect(
       resolveImageSanitizationLimits({
         agents: { defaults: { imageMaxDimensionPx: 1600.9 } },
-      } as unknown as KaijiBotConfig),
+      } as unknown as AllBotConfig),
     ).toEqual({ maxDimensionPx: 1600 });
   });
 });

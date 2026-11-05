@@ -77,20 +77,20 @@ describe("readGatewayServiceState", () => {
     const service = createService({
       isLoaded: vi.fn(async () => true),
       readCommand: vi.fn(async () => ({
-        programArguments: ["kaijibot", "gateway", "run"],
-        environment: { KAIJIBOT_GATEWAY_PORT: "18789" },
+        programArguments: ["allbot", "gateway", "run"],
+        environment: { ALLBOT_GATEWAY_PORT: "18789" },
       })),
       readRuntime: vi.fn(async () => ({ status: "running" })),
     });
 
     const state = await readGatewayServiceState(service, {
-      env: { KAIJIBOT_GATEWAY_PORT: "1" },
+      env: { ALLBOT_GATEWAY_PORT: "1" },
     });
 
     expect(state.installed).toBe(true);
     expect(state.loaded).toBe(true);
     expect(state.running).toBe(true);
-    expect(state.env.KAIJIBOT_GATEWAY_PORT).toBe("18789");
+    expect(state.env.ALLBOT_GATEWAY_PORT).toBe("18789");
   });
 });
 
@@ -109,8 +109,8 @@ describe("startGatewayService", () => {
 
   it("restarts stopped installed services and returns post-start state", async () => {
     const readCommand = vi.fn(async () => ({
-      programArguments: ["kaijibot", "gateway", "run"],
-      environment: { KAIJIBOT_GATEWAY_PORT: "18789" },
+      programArguments: ["allbot", "gateway", "run"],
+      environment: { ALLBOT_GATEWAY_PORT: "18789" },
     }));
     const isLoaded = vi
       .fn<GatewayService["isLoaded"]>()
@@ -142,7 +142,7 @@ describe("startGatewayService", () => {
     const readCommand = vi
       .fn<GatewayService["readCommand"]>()
       .mockResolvedValueOnce({
-        programArguments: ["kaijibot", "gateway", "run"],
+        programArguments: ["allbot", "gateway", "run"],
       })
       .mockResolvedValueOnce(null);
     const service = createService({

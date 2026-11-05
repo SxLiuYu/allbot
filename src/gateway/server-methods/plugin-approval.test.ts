@@ -32,7 +32,7 @@ function createMockOptions(
   } as unknown as GatewayRequestHandlerOptions;
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("createPluginApprovalHandlers", () => {
   let manager: ExecApprovalManager<PluginApprovalRequestPayload>;
 
@@ -164,7 +164,7 @@ describe.skipIf(process.env.CI)("createPluginApprovalHandlers", () => {
       expect(hasExecApprovalClients).toHaveBeenCalledWith("backend-conn-42");
     });
 
-    // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
     it.skipIf(process.env.CI)(
       "keeps plugin approvals pending when the originating chat can handle /approve directly",
       async () => {

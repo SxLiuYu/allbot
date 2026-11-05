@@ -1,8 +1,8 @@
 import {
   createDefaultModelsPresetAppliers,
   type ModelApi,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildQianfanProvider,
   QIANFAN_BASE_URL,
@@ -11,7 +11,7 @@ import {
 
 export const QIANFAN_DEFAULT_MODEL_REF = `qianfan/${QIANFAN_DEFAULT_MODEL_ID}`;
 
-function resolveQianfanPreset(cfg: KaijiBotConfig): {
+function resolveQianfanPreset(cfg: AllBotConfig): {
   api: ModelApi;
   baseUrl: string;
   defaultModels: NonNullable<ReturnType<typeof buildQianfanProvider>["models"]>;
@@ -39,7 +39,7 @@ function resolveQianfanPreset(cfg: KaijiBotConfig): {
 
 const qianfanPresetAppliers = createDefaultModelsPresetAppliers({
   primaryModelRef: QIANFAN_DEFAULT_MODEL_REF,
-  resolveParams: (cfg: KaijiBotConfig) => {
+  resolveParams: (cfg: AllBotConfig) => {
     const preset = resolveQianfanPreset(cfg);
     return {
       providerId: "qianfan",
@@ -52,10 +52,10 @@ const qianfanPresetAppliers = createDefaultModelsPresetAppliers({
   },
 });
 
-export function applyQianfanProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyQianfanProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return qianfanPresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyQianfanConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyQianfanConfig(cfg: AllBotConfig): AllBotConfig {
   return qianfanPresetAppliers.applyConfig(cfg);
 }

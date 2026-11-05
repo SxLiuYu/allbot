@@ -91,8 +91,8 @@ describe("mcp loopback server", () => {
       headers: {
         "content-type": "application/json",
         "x-session-key": "agent:main:telegram:group:chat123",
-        "x-kaijibot-account-id": "work",
-        "x-kaijibot-message-channel": "telegram",
+        "x-allbot-account-id": "work",
+        "x-allbot-message-channel": "telegram",
       },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
     });
@@ -147,12 +147,12 @@ describe("createMcpLoopbackServerConfig", () => {
     const config = createMcpLoopbackServerConfig(23119) as {
       mcpServers?: Record<string, { url?: string; headers?: Record<string, string> }>;
     };
-    expect(config.mcpServers?.kaijibot?.url).toBe("http://127.0.0.1:23119/mcp");
-    expect(config.mcpServers?.kaijibot?.headers?.Authorization).toBe(
-      "Bearer ${KAIJIBOT_MCP_TOKEN}",
+    expect(config.mcpServers?.allbot?.url).toBe("http://127.0.0.1:23119/mcp");
+    expect(config.mcpServers?.allbot?.headers?.Authorization).toBe(
+      "Bearer ${ALLBOT_MCP_TOKEN}",
     );
-    expect(config.mcpServers?.kaijibot?.headers?.["x-kaijibot-message-channel"]).toBe(
-      "${KAIJIBOT_MCP_MESSAGE_CHANNEL}",
+    expect(config.mcpServers?.allbot?.headers?.["x-allbot-message-channel"]).toBe(
+      "${ALLBOT_MCP_MESSAGE_CHANNEL}",
     );
   });
 });

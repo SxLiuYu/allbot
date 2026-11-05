@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadPluginManifestRegistry } from "../plugins/manifest-registry.js";
 
 type ChannelEnvVarLookupParams = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 };

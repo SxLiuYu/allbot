@@ -1,12 +1,12 @@
 import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
-} from "kaijibot/plugin-sdk/provider-onboard";
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   createConfigWithFallbacks,
   createLegacyProviderConfig,
   EXPECTED_FALLBACKS,
-} from "kaijibot/plugin-sdk/provider-test-contracts";
+} from "allbot/plugin-sdk/provider-test-contracts";
 import { describe, expect, it } from "vitest";
 import { buildMistralModelDefinition as buildBundledMistralModelDefinition } from "./model-definitions.js";
 import {

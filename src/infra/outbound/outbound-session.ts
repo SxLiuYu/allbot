@@ -2,7 +2,7 @@ import type { MsgContext } from "../../auto-reply/templating.js";
 import type { ChatType } from "../../channels/chat-type.js";
 import { getChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   recordSessionMetaFromInbound,
   resolveStorePath,
@@ -24,7 +24,7 @@ export type OutboundSessionRoute = {
 };
 
 export type ResolveOutboundSessionRouteParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   agentId: string;
   accountId?: string | null;
@@ -78,7 +78,7 @@ function inferPeerKind(params: {
 }
 
 function buildBaseSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   channel: ChannelId;
   accountId?: string | null;
@@ -150,7 +150,7 @@ export async function resolveOutboundSessionRoute(
 }
 
 export async function ensureOutboundSessionEntry(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   accountId?: string | null;
   route: OutboundSessionRoute;

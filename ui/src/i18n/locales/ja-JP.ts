@@ -180,7 +180,7 @@ export const ja_JP: TranslationMap = {
     skills: "Skills と API キー。",
     nodes: "ペアリング済みデバイスとコマンド。",
     chat: "すばやく介入するための Gateway チャット。",
-    config: "kaijibot.json を編集。",
+    config: "allbot.json を編集。",
     communications: "チャンネル、メッセージ、音声設定。",
     appearance: "テーマ、UI、セットアップウィザードの設定。",
     automation: "コマンド、フック、cron、プラグイン。",
@@ -239,7 +239,7 @@ export const ja_JP: TranslationMap = {
     pairing: {
       hint: "このデバイスは Gateway ホストからのペアリング承認が必要です。",
       mobileHint:
-        "モバイルを使用していますか？ デスクトップで kaijibot dashboard --no-open から完全な URL（#token=... を含む）をコピーしてください。",
+        "モバイルを使用していますか？ デスクトップで allbot dashboard --no-open から完全な URL（#token=... を含む）をコピーしてください。",
     },
     insecure: {
       hint: "このページは HTTP のため、ブラウザーがデバイス ID をブロックしています。HTTPS（Tailscale Serve）を使用するか、Gateway ホストで {url} を開いてください。",

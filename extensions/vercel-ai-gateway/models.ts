@@ -1,5 +1,5 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
 
 export const VERCEL_AI_GATEWAY_PROVIDER_ID = "vercel-ai-gateway";
 export const VERCEL_AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh";

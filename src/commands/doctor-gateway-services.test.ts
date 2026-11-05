@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { createDoctorPrompter } from "./doctor-prompter.js";
 import {
@@ -109,7 +109,7 @@ import {
 } from "./doctor-gateway-services.js";
 
 const originalStdinIsTTY = process.stdin.isTTY;
-const originalUpdateInProgress = process.env.KAIJIBOT_UPDATE_IN_PROGRESS;
+const originalUpdateInProgress = process.env.ALLBOT_UPDATE_IN_PROGRESS;
 
 function makeDoctorIo() {
   return { log: vi.fn(), error: vi.fn(), exit: vi.fn() };
@@ -134,12 +134,12 @@ function makeDoctorPrompts() {
   };
 }
 
-async function runRepair(cfg: KaijiBotConfig) {
+async function runRepair(cfg: AllBotConfig) {
   await maybeRepairGatewayServiceConfig(cfg, "local", makeDoctorIo(), makeDoctorPrompts());
 }
 
 async function runNonInteractiveRepair(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   updateInProgress?: boolean;
 }) {
   Object.defineProperty(process.stdin, "isTTY", {
@@ -147,9 +147,9 @@ async function runNonInteractiveRepair(params: {
     configurable: true,
   });
   if (params.updateInProgress) {
-    process.env.KAIJIBOT_UPDATE_IN_PROGRESS = "1";
+    process.env.ALLBOT_UPDATE_IN_PROGRESS = "1";
   } else {
-    delete process.env.KAIJIBOT_UPDATE_IN_PROGRESS;
+    delete process.env.ALLBOT_UPDATE_IN_PROGRESS;
   }
   await maybeRepairGatewayServiceConfig(
     params.cfg ?? { gateway: {} },
@@ -167,7 +167,7 @@ async function runNonInteractiveRepair(params: {
 
 const gatewayProgramArguments = [
   "/usr/bin/node",
-  "/usr/local/bin/kaijibot",
+  "/usr/local/bin/allbot",
   "gateway",
   "--port",
   "18789",
@@ -209,7 +209,7 @@ function setupGatewayTokenRepairScenario() {
   mocks.readCommand.mockResolvedValue({
     programArguments: gatewayProgramArguments,
     environment: {
-      KAIJIBOT_GATEWAY_TOKEN: "stale-token",
+      ALLBOT_GATEWAY_TOKEN: "stale-token",
     },
   });
   mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -217,7 +217,7 @@ function setupGatewayTokenRepairScenario() {
     issues: [
       {
         code: "gateway-token-mismatch",
-        message: "Gateway service KAIJIBOT_GATEWAY_TOKEN does not match gateway.auth.token",
+        message: "Gateway service ALLBOT_GATEWAY_TOKEN does not match gateway.auth.token",
         level: "recommended",
       },
     ],
@@ -234,10 +234,10 @@ describe("maybeRepairGatewayServiceConfig", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     fsMocks.realpath.mockImplementation(async (value: string) => value);
-    mocks.resolveGatewayAuthTokenForService.mockImplementation(async (cfg: KaijiBotConfig, env) => {
+    mocks.resolveGatewayAuthTokenForService.mockImplementation(async (cfg: AllBotConfig, env) => {
       const configToken =
         typeof cfg.gateway?.auth?.token === "string" ? cfg.gateway.auth.token.trim() : undefined;
-      const envToken = env.KAIJIBOT_GATEWAY_TOKEN?.trim() || undefined;
+      const envToken = env.ALLBOT_GATEWAY_TOKEN?.trim() || undefined;
       return { token: configToken || envToken };
     });
   });
@@ -248,16 +248,16 @@ describe("maybeRepairGatewayServiceConfig", () => {
       configurable: true,
     });
     if (originalUpdateInProgress === undefined) {
-      delete process.env.KAIJIBOT_UPDATE_IN_PROGRESS;
+      delete process.env.ALLBOT_UPDATE_IN_PROGRESS;
     } else {
-      process.env.KAIJIBOT_UPDATE_IN_PROGRESS = originalUpdateInProgress;
+      process.env.ALLBOT_UPDATE_IN_PROGRESS = originalUpdateInProgress;
     }
   });
 
   it("treats gateway.auth.token as source of truth for service token repairs", async () => {
     setupGatewayTokenRepairScenario();
 
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -289,11 +289,11 @@ describe("maybeRepairGatewayServiceConfig", () => {
     expect(mocks.install).toHaveBeenCalledTimes(1);
   });
 
-  it("uses KAIJIBOT_GATEWAY_TOKEN when config token is missing", async () => {
-    await withEnvAsync({ KAIJIBOT_GATEWAY_TOKEN: "env-token" }, async () => {
+  it("uses ALLBOT_GATEWAY_TOKEN when config token is missing", async () => {
+    await withEnvAsync({ ALLBOT_GATEWAY_TOKEN: "env-token" }, async () => {
       setupGatewayTokenRepairScenario();
 
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         gateway: {},
       };
 
@@ -331,14 +331,14 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("does not flag entrypoint mismatch when symlink and realpath match", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/kaijibot/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/allbot/dist/index.js",
       installEntrypoint:
-        "/Users/test/Library/pnpm/global/5/node_modules/.pnpm/kaijibot@2026.3.12/node_modules/kaijibot/dist/index.js",
+        "/Users/test/Library/pnpm/global/5/node_modules/.pnpm/allbot@2026.3.12/node_modules/allbot/dist/index.js",
       realpath: async (value: string) => {
-        if (value.includes("/global/5/node_modules/kaijibot/")) {
+        if (value.includes("/global/5/node_modules/allbot/")) {
           return value.replace(
-            "/global/5/node_modules/kaijibot/",
-            "/global/5/node_modules/.pnpm/kaijibot@2026.3.12/node_modules/kaijibot/",
+            "/global/5/node_modules/allbot/",
+            "/global/5/node_modules/.pnpm/allbot@2026.3.12/node_modules/allbot/",
           );
         }
         return value;
@@ -357,8 +357,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("does not flag entrypoint mismatch when realpath fails but normalized absolute paths match", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/opt/kaijibot/../kaijibot/dist/index.js",
-      installEntrypoint: "/opt/kaijibot/dist/index.js",
+      currentEntrypoint: "/opt/allbot/../allbot/dist/index.js",
+      installEntrypoint: "/opt/allbot/dist/index.js",
       realpathError: new Error("no realpath"),
     });
 
@@ -375,8 +375,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("still flags entrypoint mismatch when canonicalized paths differ", async () => {
     setupGatewayEntrypointRepairScenario({
       currentEntrypoint:
-        "/Users/test/.nvm/versions/node/v22.0.0/lib/node_modules/kaijibot/dist/index.js",
-      installEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/kaijibot/dist/index.js",
+        "/Users/test/.nvm/versions/node/v22.0.0/lib/node_modules/allbot/dist/index.js",
+      installEntrypoint: "/Users/test/Library/pnpm/global/5/node_modules/allbot/dist/index.js",
     });
 
     await runRepair({ gateway: {} });
@@ -391,8 +391,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("repairs entrypoint mismatch in non-interactive fix mode", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/npm/node_modules/kaijibot/dist/entry.js",
-      installEntrypoint: "/Users/test/Library/npm/node_modules/kaijibot/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/npm/node_modules/allbot/dist/entry.js",
+      installEntrypoint: "/Users/test/Library/npm/node_modules/allbot/dist/index.js",
       installWorkingDirectory: "/tmp",
     });
 
@@ -411,8 +411,8 @@ describe("maybeRepairGatewayServiceConfig", () => {
 
   it("stages service config repairs during non-interactive update repairs", async () => {
     setupGatewayEntrypointRepairScenario({
-      currentEntrypoint: "/Users/test/Library/npm/node_modules/kaijibot/dist/entry.js",
-      installEntrypoint: "/Users/test/Library/npm/node_modules/kaijibot/dist/index.js",
+      currentEntrypoint: "/Users/test/Library/npm/node_modules/allbot/dist/entry.js",
+      installEntrypoint: "/Users/test/Library/npm/node_modules/allbot/dist/index.js",
       installWorkingDirectory: "/tmp",
     });
 
@@ -433,7 +433,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
     mocks.readCommand.mockResolvedValue({
       programArguments: gatewayProgramArguments,
       environment: {
-        KAIJIBOT_GATEWAY_TOKEN: "stale-token",
+        ALLBOT_GATEWAY_TOKEN: "stale-token",
       },
     });
     mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -447,14 +447,14 @@ describe("maybeRepairGatewayServiceConfig", () => {
     });
     mocks.install.mockResolvedValue(undefined);
 
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
           token: {
             source: "env",
             provider: "default",
-            id: "KAIJIBOT_GATEWAY_TOKEN",
+            id: "ALLBOT_GATEWAY_TOKEN",
           },
         },
       },
@@ -479,12 +479,12 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("falls back to embedded service token when config and env tokens are missing", async () => {
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_TOKEN: undefined,
       },
       async () => {
         setupGatewayTokenRepairScenario();
 
-        const cfg: KaijiBotConfig = {
+        const cfg: AllBotConfig = {
           gateway: {},
         };
 
@@ -526,16 +526,16 @@ describe("maybeRepairGatewayServiceConfig", () => {
       value: false,
       configurable: true,
     });
-    process.env.KAIJIBOT_UPDATE_IN_PROGRESS = "1";
+    process.env.ALLBOT_UPDATE_IN_PROGRESS = "1";
 
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_TOKEN: undefined,
       },
       async () => {
         setupGatewayTokenRepairScenario();
 
-        const cfg: KaijiBotConfig = {
+        const cfg: AllBotConfig = {
           gateway: {},
         };
 
@@ -562,16 +562,16 @@ describe("maybeRepairGatewayServiceConfig", () => {
   it("does not persist EnvironmentFile-backed service tokens into config", async () => {
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_TOKEN: undefined,
       },
       async () => {
         mocks.readCommand.mockResolvedValue({
           programArguments: gatewayProgramArguments,
           environment: {
-            KAIJIBOT_GATEWAY_TOKEN: "env-file-token",
+            ALLBOT_GATEWAY_TOKEN: "env-file-token",
           },
           environmentValueSources: {
-            KAIJIBOT_GATEWAY_TOKEN: "file",
+            ALLBOT_GATEWAY_TOKEN: "file",
           },
         });
         mocks.auditGatewayServiceConfig.mockResolvedValue({
@@ -585,7 +585,7 @@ describe("maybeRepairGatewayServiceConfig", () => {
         });
         mocks.install.mockResolvedValue(undefined);
 
-        const cfg: KaijiBotConfig = {
+        const cfg: AllBotConfig = {
           gateway: {},
         };
 
@@ -660,7 +660,7 @@ describe("maybeScanExtraGatewayServices", () => {
       "Legacy gateway removed",
     );
     expect(runtime.log).toHaveBeenCalledWith(
-      "Legacy gateway services removed. Installing KaijiBot gateway next.",
+      "Legacy gateway services removed. Installing AllBot gateway next.",
     );
   });
 });

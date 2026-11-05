@@ -1,5 +1,5 @@
-import type { ChannelAccountSnapshot } from "kaijibot/plugin-sdk/channel-contract";
-import type { PluginRuntime } from "kaijibot/plugin-sdk/core";
+import type { ChannelAccountSnapshot } from "allbot/plugin-sdk/channel-contract";
+import type { PluginRuntime } from "allbot/plugin-sdk/core";
 import { getUpdates, classifyFetchError } from "../api/api.js";
 import { WeixinConfigManager } from "../api/config-cache.js";
 import { STALE_TOKEN_ERRCODE, pauseSession, getRemainingPauseMs } from "../api/session-guard.js";
@@ -21,7 +21,7 @@ export type MonitorWeixinOpts = {
   accountId: string;
   /** When non-empty, only messages whose from_user_id is in this list are processed. */
   allowFrom?: string[];
-  config: import("kaijibot/plugin-sdk/core").KaijiBotConfig;
+  config: import("allbot/plugin-sdk/core").AllBotConfig;
   runtime?: { log?: (msg: string) => void; error?: (msg: string) => void };
   /**
    * Gateway-injected channel runtime surface (reply/routing/session/media/commands/...).

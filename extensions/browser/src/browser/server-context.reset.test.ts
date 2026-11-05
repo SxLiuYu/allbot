@@ -23,23 +23,23 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-function localKaijiBotProfile(): Parameters<typeof createProfileResetOps>[0]["profile"] {
+function localAllBotProfile(): Parameters<typeof createProfileResetOps>[0]["profile"] {
   return {
-    name: "kaijibot",
+    name: "allbot",
     cdpUrl: "http://127.0.0.1:18800",
     cdpHost: "127.0.0.1",
     cdpIsLoopback: true,
     cdpPort: 18800,
     color: "#f60",
-    driver: "kaijibot",
+    driver: "allbot",
     attachOnly: false,
   };
 }
 
-function createLocalKaijiBotResetOps(
+function createLocalAllBotResetOps(
   params: Omit<Parameters<typeof createProfileResetOps>[0], "profile">,
 ) {
-  return createProfileResetOps({ profile: localKaijiBotProfile(), ...params });
+  return createProfileResetOps({ profile: localAllBotProfile(), ...params });
 }
 
 function createStatelessResetOps(profile: Parameters<typeof createProfileResetOps>[0]["profile"]) {
@@ -48,14 +48,14 @@ function createStatelessResetOps(profile: Parameters<typeof createProfileResetOp
     getProfileState: () => ({ profile: {} as never, running: null }),
     stopRunningBrowser: vi.fn(async () => ({ stopped: false })),
     isHttpReachable: vi.fn(async () => false),
-    resolveKaijiBotUserDataDir: (name: string) => `/tmp/${name}`,
+    resolveAllBotUserDataDir: (name: string) => `/tmp/${name}`,
   });
 }
 
 describe("createProfileResetOps", () => {
   it("rejects remote non-extension profiles", async () => {
     const ops = createStatelessResetOps({
-      ...localKaijiBotProfile(),
+      ...localAllBotProfile(),
       name: "remote",
       cdpUrl: "https://browserless.example/chrome",
       cdpHost: "browserless.example",
@@ -68,8 +68,8 @@ describe("createProfileResetOps", () => {
   });
 
   it("stops local browser, closes playwright connection, and trashes profile dir", async () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-reset-"));
-    const profileDir = path.join(tempRoot, "kaijibot");
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-reset-"));
+    const profileDir = path.join(tempRoot, "allbot");
     fs.mkdirSync(profileDir, { recursive: true });
 
     const stopRunningBrowser = vi.fn(async () => ({ stopped: true }));
@@ -79,11 +79,11 @@ describe("createProfileResetOps", () => {
       running: { pid: 1 } as never,
     }));
 
-    const ops = createLocalKaijiBotResetOps({
+    const ops = createLocalAllBotResetOps({
       getProfileState,
       stopRunningBrowser,
       isHttpReachable,
-      resolveKaijiBotUserDataDir: () => profileDir,
+      resolveAllBotUserDataDir: () => profileDir,
     });
 
     const result = await ops.resetProfile();
@@ -101,16 +101,16 @@ describe("createProfileResetOps", () => {
   });
 
   it("forces playwright disconnect when loopback cdp is occupied by non-owned process", async () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-reset-no-own-"));
-    const profileDir = path.join(tempRoot, "kaijibot");
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-reset-no-own-"));
+    const profileDir = path.join(tempRoot, "allbot");
     fs.mkdirSync(profileDir, { recursive: true });
 
     const stopRunningBrowser = vi.fn(async () => ({ stopped: false }));
-    const ops = createLocalKaijiBotResetOps({
+    const ops = createLocalAllBotResetOps({
       getProfileState: () => ({ profile: {} as never, running: null }),
       stopRunningBrowser,
       isHttpReachable: vi.fn(async () => true),
-      resolveKaijiBotUserDataDir: () => profileDir,
+      resolveAllBotUserDataDir: () => profileDir,
     });
 
     await ops.resetProfile();

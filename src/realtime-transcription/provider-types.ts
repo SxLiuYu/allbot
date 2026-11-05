@@ -1,16 +1,16 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export type RealtimeTranscriptionProviderId = string;
 
 export type RealtimeTranscriptionProviderConfig = Record<string, unknown>;
 
 export type RealtimeTranscriptionProviderResolveConfigContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   rawConfig: RealtimeTranscriptionProviderConfig;
 };
 
 export type RealtimeTranscriptionProviderConfiguredContext = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerConfig: RealtimeTranscriptionProviderConfig;
 };
 

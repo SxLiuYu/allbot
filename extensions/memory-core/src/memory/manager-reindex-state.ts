@@ -2,7 +2,7 @@ import {
   hashText,
   normalizeExtraMemoryPaths,
   type MemorySource,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 export type MemoryIndexMeta = {
   model: string;

@@ -1,4 +1,4 @@
-import { installPinnedHostnameTestHooks } from "kaijibot/plugin-sdk/test-env";
+import { installPinnedHostnameTestHooks } from "allbot/plugin-sdk/test-env";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildGradiumSpeechProvider } from "./speech-provider.js";
 

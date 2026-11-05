@@ -7,7 +7,7 @@ import type { listChannelPlugins } from "../channels/plugins/index.js";
 import type { ChannelId } from "../channels/plugins/types.js";
 import { inspectReadOnlyChannelAccount } from "../channels/read-only-account-inspect.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { isDangerousNameMatchingEnabled } from "../config/dangerous-name-matching.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { resolveEffectiveDmScope } from "../routing/session-key.js";
@@ -53,7 +53,7 @@ function dedupeFindings(findings: SecurityAuditFinding[]): SecurityAuditFinding[
 }
 
 function hasExplicitProviderAccountConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   provider: string,
   accountId: string,
 ): boolean {
@@ -79,8 +79,8 @@ function formatChannelAccountNote(params: {
 }
 
 export async function collectChannelSecurityFindings(params: {
-  cfg: KaijiBotConfig;
-  sourceConfig?: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig?: AllBotConfig;
   plugins: ReturnType<typeof listChannelPlugins>;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
@@ -88,7 +88,7 @@ export async function collectChannelSecurityFindings(params: {
 
   const inspectChannelAccount = async (
     plugin: (typeof params.plugins)[number],
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     accountId: string,
   ) =>
     plugin.config.inspectAccount?.(cfg, accountId) ??
@@ -250,7 +250,7 @@ export async function collectChannelSecurityFindings(params: {
           "Multiple DM senders currently share the main session, which can leak context across users.",
         remediation:
           "Run: " +
-          formatCliCommand('kaijibot config set session.dmScope "per-channel-peer"') +
+          formatCliCommand('allbot config set session.dmScope "per-channel-peer"') +
           ' (or "per-account-channel-peer" for multi-account channels) to isolate DM sessions per sender.',
       });
     }

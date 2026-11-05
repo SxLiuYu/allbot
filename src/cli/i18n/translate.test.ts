@@ -28,9 +28,9 @@ describe("parseLocaleString", () => {
 });
 
 describe("resolveCliLocale", () => {
-  it("honors KAIJIBOT_CLI_LOCALE over everything else", () => {
-    expect(resolveCliLocale({ KAIJIBOT_CLI_LOCALE: "zh-CN", LANG: "en_US.UTF-8" })).toBe("zh-CN");
-    expect(resolveCliLocale({ KAIJIBOT_CLI_LOCALE: "en", LANG: "zh_CN.UTF-8" })).toBe("en");
+  it("honors ALLBOT_CLI_LOCALE over everything else", () => {
+    expect(resolveCliLocale({ ALLBOT_CLI_LOCALE: "zh-CN", LANG: "en_US.UTF-8" })).toBe("zh-CN");
+    expect(resolveCliLocale({ ALLBOT_CLI_LOCALE: "en", LANG: "zh_CN.UTF-8" })).toBe("en");
   });
 
   it("falls back through LC_ALL → LC_MESSAGES → LANG", () => {

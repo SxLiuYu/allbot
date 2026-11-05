@@ -9,7 +9,7 @@ import { normalizeTrimmedStringList } from "../shared/string-normalization.js";
 import { isRecord } from "../utils.js";
 import type { PluginConfigUiHint, PluginKind } from "./types.js";
 
-export const PLUGIN_MANIFEST_FILENAME = "kaijibot.plugin.json";
+export const PLUGIN_MANIFEST_FILENAME = "allbot.plugin.json";
 export const PLUGIN_MANIFEST_FILENAMES = [PLUGIN_MANIFEST_FILENAME] as const;
 
 export type PluginManifestChannelConfig = {
@@ -613,7 +613,7 @@ export function loadPluginManifest(
   };
 }
 
-// package.json "kaijibot" metadata (used for setup/catalog)
+// package.json "allbot" metadata (used for setup/catalog)
 export type PluginPackageChannel = {
   id?: string;
   label?: string;
@@ -658,7 +658,7 @@ export type PluginPackageInstall = {
   allowInvalidConfigRecovery?: boolean;
 };
 
-export type KaijiBotPackageStartup = {
+export type AllBotPackageStartup = {
   /**
    * Opt-in for channel plugins whose `setupEntry` fully covers the gateway
    * startup surface needed before the server starts listening.
@@ -666,12 +666,12 @@ export type KaijiBotPackageStartup = {
   deferConfiguredChannelFullLoadUntilAfterListen?: boolean;
 };
 
-export type KaijiBotPackageManifest = {
+export type AllBotPackageManifest = {
   extensions?: string[];
   setupEntry?: string;
   channel?: PluginPackageChannel;
   install?: PluginPackageInstall;
-  startup?: KaijiBotPackageStartup;
+  startup?: AllBotPackageStartup;
 };
 
 export const DEFAULT_PLUGIN_ENTRY_CANDIDATES = [
@@ -692,11 +692,11 @@ export type PackageManifest = {
   name?: string;
   version?: string;
   description?: string;
-} & Partial<Record<ManifestKey, KaijiBotPackageManifest>>;
+} & Partial<Record<ManifestKey, AllBotPackageManifest>>;
 
 export function getPackageManifestMetadata(
   manifest: PackageManifest | undefined,
-): KaijiBotPackageManifest | undefined {
+): AllBotPackageManifest | undefined {
   if (!manifest) {
     return undefined;
   }

@@ -60,4 +60,4 @@ jobs:
       - run: rm -rf node_modules/.vite node_modules/.vitest
       - run: pnpm test
         env:
-          KAIJIBOT_BUNDLED_PLUGINS_DIR: ${{ github.workspace }}/extensions
+          ALLBOT_BUNDLED_PLUGINS_DIR: ${{ github.workspace }}/extensions

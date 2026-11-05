@@ -1,16 +1,16 @@
 {
-  "name": "@kaijibot/openai-provider",
+  "name": "@allbot/openai-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot OpenAI provider plugins",
+  "description": "AllBot OpenAI provider plugins",
   "type": "module",
   "dependencies": {
     "ws": "^8.20.0"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

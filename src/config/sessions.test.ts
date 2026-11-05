@@ -17,7 +17,7 @@ import {
   updateSessionStoreEntry,
 } from "./sessions.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("sessions", () => {
   let fixtureRoot = "";
   let fixtureCount = 0;
@@ -29,7 +29,7 @@ describe.skipIf(process.env.CI)("sessions", () => {
   };
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-sessions-suite-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-sessions-suite-"));
   });
 
   afterAll(async () => {
@@ -37,7 +37,7 @@ describe.skipIf(process.env.CI)("sessions", () => {
   });
 
   const withStateDir = <T>(stateDir: string, fn: () => T): T =>
-    withEnv({ KAIJIBOT_STATE_DIR: stateDir }, fn);
+    withEnv({ ALLBOT_STATE_DIR: stateDir }, fn);
 
   async function createSessionStoreFixture(params: {
     prefix: string;
@@ -148,11 +148,11 @@ describe.skipIf(process.env.CI)("sessions", () => {
       buildGroupDisplayName({
         provider: "discord",
         groupChannel: "#general",
-        space: "friends-of-kaijibot",
+        space: "friends-of-allbot",
         id: "123",
         key: "discord:group:123",
       }),
-    ).toBe("discord:friends-of-kaijibot#general");
+    ).toBe("discord:friends-of-allbot#general");
   });
 
   const resolveSessionKeyCases = [
@@ -540,9 +540,9 @@ describe.skipIf(process.env.CI)("sessions", () => {
     expect(entry.lastProvider).toBeUndefined();
   });
 
-  it("derives session transcripts dir from KAIJIBOT_STATE_DIR", () => {
+  it("derives session transcripts dir from ALLBOT_STATE_DIR", () => {
     const dir = resolveSessionTranscriptsDir(
-      { KAIJIBOT_STATE_DIR: "/custom/state" } as NodeJS.ProcessEnv,
+      { ALLBOT_STATE_DIR: "/custom/state" } as NodeJS.ProcessEnv,
       () => "/home/ignored",
     );
     expect(dir).toBe(path.join(path.resolve("/custom/state"), "agents", "main", "sessions"));
@@ -585,7 +585,7 @@ describe.skipIf(process.env.CI)("sessions", () => {
     );
   });
 
-  it("resolves cross-agent paths when KAIJIBOT_STATE_DIR differs from stored paths", () => {
+  it("resolves cross-agent paths when ALLBOT_STATE_DIR differs from stored paths", () => {
     withStateDir(path.resolve("/different/state"), () => {
       const originalBase = path.resolve("/original/state");
       const bot2Session = path.join(originalBase, "agents", "bot2", "sessions", "sess-1.jsonl");
@@ -633,7 +633,7 @@ describe.skipIf(process.env.CI)("sessions", () => {
   });
 
   it("resolveSessionFilePathOptions keeps explicit agentId alongside absolute store path", () => {
-    const storePath = "/tmp/kaijibot/agents/main/sessions/sessions.json";
+    const storePath = "/tmp/allbot/agents/main/sessions/sessions.json";
     const resolved = resolveSessionFilePathOptions({
       agentId: "bot2",
       storePath,

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeResolvedSecretInputString } from "../../config/types.secrets.js";
 import {
   isDangerousHostEnvOverrideVarName,
@@ -25,7 +25,7 @@ type ActiveSkillEnvEntry = {
  * Tracks env var keys that are currently injected by skill overrides.
  * Used by ACP harness spawn to strip skill-injected keys so they don't
  * leak to child processes (e.g., OPENAI_API_KEY leaking to Codex CLI).
- * @see https://github.com/kaijibot/kaijibot/issues/36280
+ * @see https://github.com/allbot/allbot/issues/36280
  */
 const activeSkillEnvEntries = new Map<string, ActiveSkillEnvEntry>();
 
@@ -216,7 +216,7 @@ function createEnvReverter(updates: EnvUpdate[]) {
   };
 }
 
-export function applySkillEnvOverrides(params: { skills: SkillEntry[]; config?: KaijiBotConfig }) {
+export function applySkillEnvOverrides(params: { skills: SkillEntry[]; config?: AllBotConfig }) {
   const { skills } = params;
   const config = resolveSkillRuntimeConfig(params.config);
   const updates: EnvUpdate[] = [];
@@ -242,7 +242,7 @@ export function applySkillEnvOverrides(params: { skills: SkillEntry[]; config?: 
 
 export function applySkillEnvOverridesFromSnapshot(params: {
   snapshot?: SkillSnapshot;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }) {
   const { snapshot } = params;
   const config = resolveSkillRuntimeConfig(params.config);

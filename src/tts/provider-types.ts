@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { TalkProviderConfig } from "../config/types.gateway.js";
 
 export type SpeechProviderId = string;
@@ -35,14 +35,14 @@ export type TtsDirectiveParseResult = {
 };
 
 export type SpeechProviderConfiguredContext = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerConfig: SpeechProviderConfig;
   timeoutMs: number;
 };
 
 export type SpeechSynthesisRequest = {
   text: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerConfig: SpeechProviderConfig;
   target: SpeechSynthesisTarget;
   providerOverrides?: SpeechProviderOverrides;
@@ -58,7 +58,7 @@ export type SpeechSynthesisResult = {
 
 export type SpeechTelephonySynthesisRequest = {
   text: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerConfig: SpeechProviderConfig;
   timeoutMs: number;
 };
@@ -80,14 +80,14 @@ export type SpeechVoiceOption = {
 };
 
 export type SpeechListVoicesRequest = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerConfig?: SpeechProviderConfig;
   apiKey?: string;
   baseUrl?: string;
 };
 
 export type SpeechProviderResolveConfigContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   rawConfig: Record<string, unknown>;
   timeoutMs: number;
 };
@@ -107,7 +107,7 @@ export type SpeechDirectiveTokenParseResult = {
 };
 
 export type SpeechProviderResolveTalkConfigContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   baseTtsConfig: Record<string, unknown>;
   talkProviderConfig: TalkProviderConfig;
   timeoutMs: number;

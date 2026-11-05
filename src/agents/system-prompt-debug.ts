@@ -3,7 +3,7 @@ import type { ContextLayer } from "./system-prompt-debug-types.js";
 /**
  * Per-section token/char breakdown of an assembled system prompt.
  *
- * Used by the KAIJIBOT_DEBUG_CONTEXT=1 escape hatch to expose which sections
+ * Used by the ALLBOT_DEBUG_CONTEXT=1 escape hatch to expose which sections
  * are eating the context budget. Pure diagnostic — does not influence the
  * generated prompt.
  */
@@ -35,10 +35,10 @@ const SECTION_LAYER_MAP: Record<string, ContextLayer> = {
   "Tool Call Style": "L1",
   "Execution Bias": "L1",
   Safety: "L1",
-  "KaijiBot CLI Quick Reference": "L1",
+  "AllBot CLI Quick Reference": "L1",
   "Skills (mandatory)": "L1",
   "Available Skills": "L1", // subsection emitted by skillsPrompt inside Skills block
-  "KaijiBot Self-Update": "L1",
+  "AllBot Self-Update": "L1",
   "Model Aliases": "L1",
   Workspace: "L1",
   Sandbox: "L1",
@@ -94,7 +94,7 @@ function resolveSectionLayer(name: string): ContextLayer | "unknown" {
 /**
  * Estimate token count for a string.
  *
- * Heuristic tuned for typical KaijiBot content (mixed Chinese + English + JSON):
+ * Heuristic tuned for typical AllBot content (mixed Chinese + English + JSON):
  * - CJK ideographs and fullwidth forms: ~1.5 tokens each
  * - Other ASCII characters: ~0.25 tokens each (4 chars ≈ 1 token)
  *
@@ -131,7 +131,7 @@ export function approxTokensForText(text: string): number {
  * - `### ` and deeper headings do NOT start new sections — they stay in the
  *   current `## ` section.
  *
- * This matches KaijiBot's structure where every top-level section uses `##`
+ * This matches AllBot's structure where every top-level section uses `##`
  * (see src/agents/system-prompt.ts and src/cognitive/context-writer.ts).
  */
 export function analyzeSystemPromptSections(systemPrompt: string): SectionBreakdown[] {
@@ -214,7 +214,7 @@ export function summarizeByLayer(sections: SectionBreakdown[]): LayerSummary[] {
  *
  * Format:
  * ```
- * === KAIJIBOT CONTEXT BREAKDOWN ===
+ * === ALLBOT CONTEXT BREAKDOWN ===
  * Total: ~N tokens (M chars)
  * By layer: L1=… L2=… L3=… unknown=…
  * --- per-section ---
@@ -224,7 +224,7 @@ export function summarizeByLayer(sections: SectionBreakdown[]): LayerSummary[] {
  * === END BREAKDOWN ===
  * ```
  *
- * Activated only when `KAIJIBOT_DEBUG_CONTEXT=1`. No-op otherwise (the caller
+ * Activated only when `ALLBOT_DEBUG_CONTEXT=1`. No-op otherwise (the caller
  * is responsible for gating).
  */
 export function emitContextDebugBreakdown(systemPrompt: string): void {
@@ -234,7 +234,7 @@ export function emitContextDebugBreakdown(systemPrompt: string): void {
   const totalChars = sections.reduce((sum, s) => sum + s.chars, 0);
 
   const lines: string[] = [];
-  lines.push("=== KAIJIBOT CONTEXT BREAKDOWN ===");
+  lines.push("=== ALLBOT CONTEXT BREAKDOWN ===");
   lines.push(
     `Total: ~${totalTokens} tokens (${totalChars} chars) across ${sections.length} sections`,
   );

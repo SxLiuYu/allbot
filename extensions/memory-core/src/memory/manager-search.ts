@@ -1,9 +1,9 @@
 import type { DatabaseSync } from "node:sqlite";
-import { truncateUtf16Safe } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+import { truncateUtf16Safe } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import {
   cosineSimilarity,
   parseEmbedding,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 const vectorToBlob = (embedding: number[]): Buffer =>
   Buffer.from(new Float32Array(embedding).buffer);

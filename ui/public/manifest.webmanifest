@@ -1,7 +1,7 @@
 {
-  "name": "KaijiBot Control",
-  "short_name": "KaijiBot",
-  "description": "KaijiBot 网关控制面板 — 聊天、配置、认知洞察",
+  "name": "AllBot Control",
+  "short_name": "AllBot",
+  "description": "AllBot 网关控制面板 — 聊天、配置、认知洞察",
   "id": "/",
   "start_url": "./",
   "scope": "./",

@@ -2,7 +2,7 @@ import { AuthStorage, ModelRegistry } from "@earendil-works/pi-coding-agent";
 import {
   registerProviderPlugin,
   requireRegisteredProvider,
-} from "kaijibot/plugin-sdk/plugin-test-runtime";
+} from "allbot/plugin-sdk/plugin-test-runtime";
 import OpenAI from "openai";
 import { describe, expect, it } from "vitest";
 import plugin from "./index.js";
@@ -14,7 +14,7 @@ const LIVE_CACHE_MODEL_ID =
   process.env.OPENCLAW_LIVE_OPENROUTER_CACHE_MODEL?.trim() || "deepseek/deepseek-v3.2";
 const liveEnabled =
   OPENROUTER_API_KEY.trim().length > 0 &&
-  (process.env.KAIJIBOT_LIVE_TEST || process.env.OPENCLAW_LIVE_TEST) === "1";
+  (process.env.ALLBOT_LIVE_TEST || process.env.OPENCLAW_LIVE_TEST) === "1";
 const describeLive = liveEnabled ? describe : describe.skip;
 const describeCacheLive =
   liveEnabled && process.env.OPENCLAW_LIVE_CACHE_TEST === "1" ? describe : describe.skip;

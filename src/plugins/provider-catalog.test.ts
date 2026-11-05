@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ModelProviderConfig } from "../config/types.models.js";
 import {
   buildPairedProviderApiKeyCatalog,
@@ -18,7 +18,7 @@ function createProviderConfig(overrides: Partial<ModelProviderConfig> = {}): Mod
 }
 
 function createCatalogContext(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   apiKeys?: Record<string, string | undefined>;
 }): ProviderCatalogContext {
   return {

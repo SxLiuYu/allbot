@@ -1,15 +1,15 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { buildWorkspaceHookStatus } from "../hooks/hooks-status.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 
 export async function setupInternalHooks(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   // Discover available hooks using the hook discovery system
   const workspaceDir = resolveAgentWorkspaceDir(cfg, resolveDefaultAgentId(cfg));
   const report = buildWorkspaceHookStatus(workspaceDir, { config: cfg });
@@ -28,7 +28,7 @@ export async function setupInternalHooks(
     names.push(hook.name);
   }
 
-  const next: KaijiBotConfig = {
+  const next: AllBotConfig = {
     ...cfg,
     hooks: {
       ...cfg.hooks,
@@ -44,9 +44,9 @@ export async function setupInternalHooks(
       `Enabled ${names.length} hook${names.length > 1 ? "s" : ""}: ${names.join(", ")}`,
       "",
       "You can manage hooks later with:",
-      `  ${formatCliCommand("kaijibot hooks list")}`,
-      `  ${formatCliCommand("kaijibot hooks enable <name>")}`,
-      `  ${formatCliCommand("kaijibot hooks disable <name>")}`,
+      `  ${formatCliCommand("allbot hooks list")}`,
+      `  ${formatCliCommand("allbot hooks enable <name>")}`,
+      `  ${formatCliCommand("allbot hooks disable <name>")}`,
     ].join("\n"),
     "Hooks Configured",
   );

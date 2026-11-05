@@ -82,16 +82,16 @@ describe("logAcceptedEnvOption", () => {
       {
         VITEST: "",
         NODE_ENV: "development",
-        KAIJIBOT_TEST_ENV: "  line one\nline two  ",
+        ALLBOT_TEST_ENV: "  line one\nline two  ",
       },
       () => {
         logAcceptedEnvOption({
-          key: "KAIJIBOT_TEST_ENV",
+          key: "ALLBOT_TEST_ENV",
           description: "test option",
           redact: true,
         });
         logAcceptedEnvOption({
-          key: "KAIJIBOT_TEST_ENV",
+          key: "ALLBOT_TEST_ENV",
           description: "test option",
           redact: true,
         });
@@ -100,7 +100,7 @@ describe("logAcceptedEnvOption", () => {
 
     expect(loggerMocks.info).toHaveBeenCalledTimes(1);
     expect(loggerMocks.info).toHaveBeenCalledWith(
-      "env: KAIJIBOT_TEST_ENV=<redacted> (test option)",
+      "env: ALLBOT_TEST_ENV=<redacted> (test option)",
     );
   });
 
@@ -111,11 +111,11 @@ describe("logAcceptedEnvOption", () => {
       {
         VITEST: "1",
         NODE_ENV: "development",
-        KAIJIBOT_BLANK_ENV: "value",
+        ALLBOT_BLANK_ENV: "value",
       },
       () => {
         logAcceptedEnvOption({
-          key: "KAIJIBOT_BLANK_ENV",
+          key: "ALLBOT_BLANK_ENV",
           description: "skipped in vitest",
         });
       },
@@ -125,11 +125,11 @@ describe("logAcceptedEnvOption", () => {
       {
         VITEST: "",
         NODE_ENV: "development",
-        KAIJIBOT_BLANK_ENV: "   ",
+        ALLBOT_BLANK_ENV: "   ",
       },
       () => {
         logAcceptedEnvOption({
-          key: "KAIJIBOT_BLANK_ENV",
+          key: "ALLBOT_BLANK_ENV",
           description: "blank value",
         });
       },

@@ -45,7 +45,7 @@ const ADAPTIVE_READ_CONTEXT_SHARE = 0.2;
 const CHARS_PER_TOKEN_ESTIMATE = 4;
 const MAX_ADAPTIVE_READ_PAGES = 8;
 
-type KaijiBotReadToolOptions = {
+type AllBotReadToolOptions = {
   modelContextWindowTokens?: number;
   imageSanitization?: ImageSanitizationLimits;
 };
@@ -63,7 +63,7 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-function resolveAdaptiveReadMaxBytes(options?: KaijiBotReadToolOptions): number {
+function resolveAdaptiveReadMaxBytes(options?: AllBotReadToolOptions): number {
   const contextWindowTokens = options?.modelContextWindowTokens;
   if (
     typeof contextWindowTokens !== "number" ||
@@ -582,7 +582,7 @@ export function createSandboxedReadTool(params: SandboxToolParams) {
   const base = createReadTool(params.root, {
     operations: createSandboxReadOperations(params),
   }) as unknown as AnyAgentTool;
-  return createKaijiBotReadTool(base, {
+  return createAllBotReadTool(base, {
     modelContextWindowTokens: params.modelContextWindowTokens,
     imageSanitization: params.imageSanitization,
   });
@@ -625,9 +625,9 @@ export function createHostWorkspaceEditTool(root: string, options?: { workspaceO
   return wrapToolParamValidation(withRecovery, REQUIRED_PARAM_GROUPS.edit);
 }
 
-export function createKaijiBotReadTool(
+export function createAllBotReadTool(
   base: AnyAgentTool,
-  options?: KaijiBotReadToolOptions,
+  options?: AllBotReadToolOptions,
 ): AnyAgentTool {
   return {
     ...base,

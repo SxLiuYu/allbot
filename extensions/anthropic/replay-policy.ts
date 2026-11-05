@@ -1,8 +1,8 @@
 import type {
   ProviderReplayPolicy,
   ProviderReplayPolicyContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { buildNativeAnthropicReplayPolicyForModel } from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/plugin-entry";
+import { buildNativeAnthropicReplayPolicyForModel } from "allbot/plugin-sdk/provider-model-shared";
 
 /**
  * Returns the provider-owned replay policy for Anthropic transports.

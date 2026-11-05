@@ -33,7 +33,7 @@ describe("isChannelConfigured", () => {
     expect(
       isChannelConfigured({}, "irc", {
         IRC_HOST: "irc.example.com",
-        IRC_NICK: "kaijibot",
+        IRC_NICK: "allbot",
       }),
     ).toBe(false);
   });

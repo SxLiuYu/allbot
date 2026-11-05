@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 const hoisted = vi.hoisted(() => {
   const resolveAllAgentSessionStoreTargetsMock = vi.fn();
@@ -15,7 +15,7 @@ vi.mock("../../config/sessions/store-load.js", () => ({
 }));
 
 vi.mock("../../config/sessions/targets.js", () => ({
-  resolveAllAgentSessionStoreTargets: (cfg: KaijiBotConfig, opts: unknown) =>
+  resolveAllAgentSessionStoreTargets: (cfg: AllBotConfig, opts: unknown) =>
     hoisted.resolveAllAgentSessionStoreTargetsMock(cfg, opts),
 }));
 let listAcpSessionEntries: typeof import("./session-meta.js").listAcpSessionEntries;
@@ -34,7 +34,7 @@ describe("listAcpSessionEntries", () => {
       session: {
         store: "/custom/sessions/{agentId}.json",
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     hoisted.resolveAllAgentSessionStoreTargetsMock.mockResolvedValue([
       {
         agentId: "ops",

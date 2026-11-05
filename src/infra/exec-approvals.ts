@@ -170,8 +170,8 @@ const DEFAULT_SECURITY: ExecSecurity = "full";
 const DEFAULT_ASK: ExecAsk = "off";
 export const DEFAULT_EXEC_APPROVAL_ASK_FALLBACK: ExecSecurity = "full";
 const DEFAULT_AUTO_ALLOW_SKILLS = false;
-const DEFAULT_SOCKET = "~/.kaijibot/exec-approvals.sock";
-const DEFAULT_FILE = "~/.kaijibot/exec-approvals.json";
+const DEFAULT_SOCKET = "~/.allbot/exec-approvals.sock";
+const DEFAULT_FILE = "~/.allbot/exec-approvals.json";
 
 function hashExecApprovalsRaw(raw: string | null): string {
   return crypto

@@ -11,8 +11,8 @@ describe("canvas host state dir defaults", () => {
     ({ createCanvasHostHandler } = await import("./server.js"));
   });
 
-  it("uses KAIJIBOT_STATE_DIR for the default canvas root", async () => {
-    await withStateDirEnv("kaijibot-canvas-state-", async ({ stateDir }) => {
+  it("uses ALLBOT_STATE_DIR for the default canvas root", async () => {
+    await withStateDirEnv("allbot-canvas-state-", async ({ stateDir }) => {
       const handler = await createCanvasHostHandler({
         runtime: defaultRuntime,
         allowInTests: true,
@@ -24,7 +24,7 @@ describe("canvas host state dir defaults", () => {
         expect(actualRoot).toBe(expectedRoot);
         const indexPath = path.join(expectedRoot, "index.html");
         const indexContents = await fs.readFile(indexPath, "utf8");
-        expect(indexContents).toContain("KaijiBot Canvas");
+        expect(indexContents).toContain("AllBot Canvas");
       } finally {
         await handler.close();
       }

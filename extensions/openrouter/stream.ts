@@ -1,6 +1,6 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
-import type { ProviderWrapStreamFnContext } from "kaijibot/plugin-sdk/plugin-entry";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
+import type { ProviderWrapStreamFnContext } from "allbot/plugin-sdk/plugin-entry";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
 import { isOpenRouterDeepSeekV4ModelId } from "./models.js";
 import { normalizeOpenRouterBaseUrl, OPENROUTER_BASE_URL } from "./provider-catalog.js";
 

@@ -160,8 +160,8 @@ describe("skills.detail handler", () => {
         createdAt: 1700000000,
       },
       owner: {
-        handle: "kaijibot",
-        displayName: "KaijiBot",
+        handle: "allbot",
+        displayName: "AllBot",
       },
     };
     fetchClawHubSkillDetailMock.mockResolvedValue(detail);

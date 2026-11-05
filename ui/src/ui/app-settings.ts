@@ -1,6 +1,6 @@
 import { refreshChat, refreshFullCatalog } from "./app-chat.ts";
 import { scheduleChatScroll } from "./app-scroll.ts";
-import type { KaijiBotApp } from "./app.ts";
+import type { AllBotApp } from "./app.ts";
 import { loadAgentFiles } from "./controllers/agent-files.ts";
 import { loadAgentIdentities, loadAgentIdentity } from "./controllers/agent-identity.ts";
 import { loadAgents } from "./controllers/agents.ts";
@@ -115,7 +115,7 @@ export function applySettingsFromUrl(host: SettingsHost) {
     if (queryToken != null) {
       warnQueryToken = true;
       console.warn(
-        "[kaijibot] Auth token passed as query parameter (?token=). Use URL fragment instead: #token=<token>. Query parameters may appear in server logs.",
+        "[allbot] Auth token passed as query parameter (?token=). Use URL fragment instead: #token=<token>. Query parameters may appear in server logs.",
       );
     }
     if (token && gatewayUrlChanged) {
@@ -217,7 +217,7 @@ export function setThemeMode(
 async function ensurePersonaAndAutoSelect(
   host: SettingsHost,
 ): Promise<{ agentId: string; userId: string } | null> {
-  const app = host as unknown as KaijiBotApp;
+  const app = host as unknown as AllBotApp;
   if (!app.cognitivePersonaList) {
     await import("./controllers/cognitive.ts").then((c) =>
       c.loadPersonaList(app as Parameters<typeof c.loadPersonaList>[0]),
@@ -244,19 +244,19 @@ export async function refreshActiveTab(host: SettingsHost) {
     await loadCron(host);
   }
   if (host.tab === "agents") {
-    await loadAgents(host as unknown as KaijiBotApp);
-    await loadConfig(host as unknown as KaijiBotApp);
+    await loadAgents(host as unknown as AllBotApp);
+    await loadConfig(host as unknown as AllBotApp);
     void refreshFullCatalog(host as unknown as Parameters<typeof refreshFullCatalog>[0]);
     const agentIds = host.agentsList?.agents?.map((entry) => entry.id) ?? [];
     if (agentIds.length > 0) {
-      void loadAgentIdentities(host as unknown as KaijiBotApp, agentIds);
+      void loadAgentIdentities(host as unknown as AllBotApp, agentIds);
     }
     const agentId =
       host.agentsSelectedId ?? host.agentsList?.defaultId ?? host.agentsList?.agents?.[0]?.id;
     if (agentId) {
-      void loadAgentIdentity(host as unknown as KaijiBotApp, agentId);
+      void loadAgentIdentity(host as unknown as AllBotApp, agentId);
       if (host.agentsPanel === "files") {
-        void loadAgentFiles(host as unknown as KaijiBotApp, agentId);
+        void loadAgentFiles(host as unknown as AllBotApp, agentId);
       }
       if (host.agentsPanel === "cron") {
         void loadCron(host);
@@ -271,8 +271,8 @@ export async function refreshActiveTab(host: SettingsHost) {
     );
   }
   if (host.tab === "settings") {
-    await loadConfigSchema(host as unknown as KaijiBotApp);
-    await loadConfig(host as unknown as KaijiBotApp);
+    await loadConfigSchema(host as unknown as AllBotApp);
+    await loadConfig(host as unknown as AllBotApp);
     await refreshFullCatalog(host as unknown as Parameters<typeof refreshFullCatalog>[0]);
   }
   if (host.tab === "cognitive") {
@@ -281,7 +281,7 @@ export async function refreshActiveTab(host: SettingsHost) {
     });
   }
   if (host.tab === "corrections") {
-    const app = host as unknown as KaijiBotApp;
+    const app = host as unknown as AllBotApp;
     if (!app.correctionsAgentId || !app.correctionsUserId) {
       void ensurePersonaAndAutoSelect(host).then((ids) => {
         if (ids) {
@@ -295,7 +295,7 @@ export async function refreshActiveTab(host: SettingsHost) {
     }
   }
   if (host.tab === "tasks") {
-    const appTasks = host as unknown as KaijiBotApp;
+    const appTasks = host as unknown as AllBotApp;
     void import("./controllers/tasks.ts").then((c) => {
       void c.loadTasks(
         appTasks as Parameters<typeof c.loadTasks>[0],
@@ -304,7 +304,7 @@ export async function refreshActiveTab(host: SettingsHost) {
     });
   }
   if (host.tab === "insights") {
-    const app2 = host as unknown as KaijiBotApp;
+    const app2 = host as unknown as AllBotApp;
     if (!app2.insightsAgentId || !app2.insightsUserId) {
       void ensurePersonaAndAutoSelect(host).then((ids) => {
         if (ids) {
@@ -318,7 +318,7 @@ export async function refreshActiveTab(host: SettingsHost) {
     }
   }
   if (host.tab === "evolution") {
-    const app3 = host as unknown as KaijiBotApp;
+    const app3 = host as unknown as AllBotApp;
     if (!app3.evolutionAgentId || !app3.evolutionUserId) {
       void ensurePersonaAndAutoSelect(host).then((ids) => {
         if (ids) {
@@ -358,7 +358,7 @@ export function inferBasePath() {
   if (typeof window === "undefined") {
     return "";
   }
-  const configured = window.__KAIJIBOT_CONTROL_UI_BASE_PATH__;
+  const configured = window.__ALLBOT_CONTROL_UI_BASE_PATH__;
   const normalizedConfigured = normalizeOptionalString(configured);
   if (normalizedConfigured) {
     return normalizeBasePath(normalizedConfigured);
@@ -549,7 +549,7 @@ export function syncUrlWithSessionKey(host: SettingsHost, sessionKey: string, re
 }
 
 export async function loadCron(host: SettingsHost) {
-  const app = host as unknown as KaijiBotApp;
+  const app = host as unknown as AllBotApp;
   const activeCronJobId = app.cronRunsScope === "job" ? app.cronRunsJobId : null;
   await Promise.all([loadCronStatus(app), loadCronJobs(app), loadCronRuns(app, activeCronJobId)]);
 }

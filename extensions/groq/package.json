@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/groq-provider",
+  "name": "@allbot/groq-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "KaijiBot Groq media-understanding provider",
+  "description": "AllBot Groq media-understanding provider",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

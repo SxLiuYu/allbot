@@ -4,7 +4,7 @@ import {
   listOpenRouterVideoModelCatalog,
 } from "./video-generation-provider.js";
 
-const SUPPORTED_DURATIONS_HINT = Symbol.for("kaijibot.videoGeneration.supportedDurations");
+const SUPPORTED_DURATIONS_HINT = Symbol.for("allbot.videoGeneration.supportedDurations");
 
 const {
   assertOkOrThrowHttpErrorMock,
@@ -28,13 +28,13 @@ const {
   waitProviderOperationPollIntervalMock: vi.fn(async () => {}),
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("allbot/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: resolveApiKeyForProviderMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/provider-http")>(
-    "kaijibot/plugin-sdk/provider-http",
+vi.mock("allbot/plugin-sdk/provider-http", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/provider-http")>(
+    "allbot/plugin-sdk/provider-http",
   );
   return {
     ...actual,

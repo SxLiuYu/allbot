@@ -3,7 +3,7 @@ import type {
   ChannelApprovalKind,
   ChannelApprovalNativeAdapter,
 } from "../channels/plugins/types.adapters.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveApprovalOverGateway } from "./approval-gateway-resolver.js";
 import {
@@ -63,7 +63,7 @@ export type ChannelApprovalHandler<
 > = ExecApprovalChannelRuntime<TRequest, TResolved>;
 
 export type ChannelApprovalCapabilityHandlerContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   gatewayUrl?: string;
   context?: unknown;
@@ -613,7 +613,7 @@ export function createChannelApprovalNativeRuntimeAdapter<
 export type ChannelApprovalHandlerRuntimeSpec<TRequest extends ApprovalRequest> = {
   label: string;
   clientDisplayName: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   gatewayUrl?: string;
   eventKinds?: readonly ExecApprovalChannelRuntimeEventKind[];
   channel?: string;
@@ -776,7 +776,7 @@ export async function createChannelApprovalHandlerFromCapability(params: {
   clientDisplayName: string;
   channel: string;
   channelLabel: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   gatewayUrl?: string;
   context?: unknown;

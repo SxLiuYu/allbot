@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import {
   ErrorCodes,
   applyBrowserProxyPaths,

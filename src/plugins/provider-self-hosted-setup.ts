@@ -5,7 +5,7 @@ import {
   SELF_HOSTED_DEFAULT_COST,
   SELF_HOSTED_DEFAULT_MAX_TOKENS,
 } from "../agents/self-hosted-provider-defaults.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ModelDefinitionConfig } from "../config/types.models.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
@@ -94,7 +94,7 @@ export async function discoverOpenAICompatibleLocalModels(params: {
   }
 }
 
-export function applyProviderDefaultModel(cfg: KaijiBotConfig, modelRef: string): KaijiBotConfig {
+export function applyProviderDefaultModel(cfg: AllBotConfig, modelRef: string): AllBotConfig {
   const existingModel = cfg.agents?.defaults?.model;
   const fallbacks =
     existingModel && typeof existingModel === "object" && "fallbacks" in existingModel
@@ -117,7 +117,7 @@ export function applyProviderDefaultModel(cfg: KaijiBotConfig, modelRef: string)
 }
 
 function buildOpenAICompatibleSelfHostedProviderConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerId: string;
   baseUrl: string;
   providerApiKey: string;
@@ -126,7 +126,7 @@ function buildOpenAICompatibleSelfHostedProviderConfig(params: {
   reasoning?: boolean;
   contextWindow?: number;
   maxTokens?: number;
-}): { config: KaijiBotConfig; modelId: string; modelRef: string; profileId: string } {
+}): { config: AllBotConfig; modelId: string; modelRef: string; profileId: string } {
   const modelRef = `${params.providerId}/${params.modelId}`;
   const profileId = `${params.providerId}:default`;
   return {
@@ -163,7 +163,7 @@ function buildOpenAICompatibleSelfHostedProviderConfig(params: {
 }
 
 type OpenAICompatibleSelfHostedProviderSetupParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   providerId: string;
   providerLabel: string;
@@ -177,7 +177,7 @@ type OpenAICompatibleSelfHostedProviderSetupParams = {
 };
 
 type OpenAICompatibleSelfHostedProviderPromptResult = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   credential: AuthProfileCredential;
   modelId: string;
   modelRef: string;
@@ -312,7 +312,7 @@ export async function configureOpenAICompatibleSelfHostedProviderNonInteractive(
   reasoning?: boolean;
   contextWindow?: number;
   maxTokens?: number;
-}): Promise<KaijiBotConfig | null> {
+}): Promise<AllBotConfig | null> {
   const baseUrl = (
     normalizeOptionalSecretInput(params.ctx.opts.customBaseUrl) ?? params.defaultBaseUrl
   ).replace(/\/+$/, "");

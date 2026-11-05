@@ -1,4 +1,4 @@
-type FacadeModule = typeof import("@kaijibot/ollama/runtime-api.js");
+type FacadeModule = typeof import("@allbot/ollama/runtime-api.js");
 import { loadBundledPluginPublicSurfaceModuleSync } from "./facade-loader.js";
 
 function loadFacadeModule(): FacadeModule {
@@ -8,7 +8,7 @@ function loadFacadeModule(): FacadeModule {
   });
 }
 
-export type OllamaEmbeddingClient = import("@kaijibot/ollama/runtime-api.js").OllamaEmbeddingClient;
+export type OllamaEmbeddingClient = import("@allbot/ollama/runtime-api.js").OllamaEmbeddingClient;
 export const DEFAULT_OLLAMA_EMBEDDING_MODEL = "nomic-embed-text";
 export const buildAssistantMessage: FacadeModule["buildAssistantMessage"] = ((...args) =>
   loadFacadeModule().buildAssistantMessage(...args)) as FacadeModule["buildAssistantMessage"];

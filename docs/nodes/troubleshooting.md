@@ -13,19 +13,19 @@ Use this page when a node is visible in status but node tools fail.
 ## Command ladder
 
 ```bash
-kaijibot status
-kaijibot gateway status
-kaijibot logs --follow
-kaijibot doctor
-kaijibot channels status --probe
+allbot status
+allbot gateway status
+allbot logs --follow
+allbot doctor
+allbot channels status --probe
 ```
 
 Then run node specific checks:
 
 ```bash
-kaijibot nodes status
-kaijibot nodes describe --node <idOrNameOrIp>
-kaijibot approvals get --node <idOrNameOrIp>
+allbot nodes status
+allbot nodes describe --node <idOrNameOrIp>
+allbot approvals get --node <idOrNameOrIp>
 ```
 
 Healthy signals:
@@ -41,9 +41,9 @@ Healthy signals:
 Quick check and fix:
 
 ```bash
-kaijibot nodes describe --node <idOrNameOrIp>
-kaijibot nodes canvas snapshot --node <idOrNameOrIp>
-kaijibot logs --follow
+allbot nodes describe --node <idOrNameOrIp>
+allbot nodes canvas snapshot --node <idOrNameOrIp>
+allbot logs --follow
 ```
 
 If you see `NODE_BACKGROUND_UNAVAILABLE`, bring the node app to the foreground and retry.
@@ -68,17 +68,17 @@ These are different gates:
 Quick checks:
 
 ```bash
-kaijibot devices list
-kaijibot nodes status
-kaijibot approvals get --node <idOrNameOrIp>
-kaijibot approvals allowlist add --node <idOrNameOrIp> "/usr/bin/uname"
+allbot devices list
+allbot nodes status
+allbot approvals get --node <idOrNameOrIp>
+allbot approvals allowlist add --node <idOrNameOrIp> "/usr/bin/uname"
 ```
 
 If pairing is missing, approve the node device first.
 If `nodes describe` is missing a command, check the gateway node command policy and whether the node actually declared that command on connect.
 If pairing is fine but `system.run` fails, fix exec approvals/allowlist on that node.
 
-Node pairing is an identity/trust gate, not a per-command approval surface. For `system.run`, the per-node policy lives in that node's exec approvals file (`kaijibot approvals get --node ...`), not in the gateway pairing record.
+Node pairing is an identity/trust gate, not a per-command approval surface. For `system.run`, the per-node policy lives in that node's exec approvals file (`allbot approvals get --node ...`), not in the gateway pairing record.
 
 For approval-backed `host=node` runs, the gateway also binds execution to the
 prepared canonical `systemRunPlan`. If a later caller mutates command/cwd or
@@ -101,10 +101,10 @@ run as an approval mismatch instead of trusting the edited payload.
 ## Fast recovery loop
 
 ```bash
-kaijibot nodes status
-kaijibot nodes describe --node <idOrNameOrIp>
-kaijibot approvals get --node <idOrNameOrIp>
-kaijibot logs --follow
+allbot nodes status
+allbot nodes describe --node <idOrNameOrIp>
+allbot approvals get --node <idOrNameOrIp>
+allbot logs --follow
 ```
 
 If still stuck:

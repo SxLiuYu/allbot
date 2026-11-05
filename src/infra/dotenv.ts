@@ -25,44 +25,44 @@ const BLOCKED_WORKSPACE_DOTENV_KEYS = new Set([
   "NO_PROXY",
   "OPENAI_API_KEY",
   "OPENAI_API_KEYS",
-  "KAIJIBOT_AGENT_DIR",
-  "KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS",
-  "KAIJIBOT_ALLOW_PROJECT_LOCAL_BIN",
-  "KAIJIBOT_BROWSER_EXECUTABLE_PATH",
-  "KAIJIBOT_BROWSER_CONTROL_MODULE",
-  "KAIJIBOT_BUNDLED_HOOKS_DIR",
-  "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-  "KAIJIBOT_BUNDLED_SKILLS_DIR",
-  "KAIJIBOT_CACHE_TRACE",
-  "KAIJIBOT_CACHE_TRACE_FILE",
-  "KAIJIBOT_CACHE_TRACE_MESSAGES",
-  "KAIJIBOT_CACHE_TRACE_PROMPT",
-  "KAIJIBOT_CACHE_TRACE_SYSTEM",
-  "KAIJIBOT_CONFIG_PATH",
-  "KAIJIBOT_GATEWAY_PASSWORD",
-  "KAIJIBOT_GATEWAY_PORT",
-  "KAIJIBOT_GATEWAY_SECRET",
-  "KAIJIBOT_GATEWAY_TOKEN",
-  "KAIJIBOT_GATEWAY_URL",
-  "KAIJIBOT_HOME",
-  "KAIJIBOT_LIVE_ANTHROPIC_KEY",
-  "KAIJIBOT_LIVE_ANTHROPIC_KEYS",
-  "KAIJIBOT_LIVE_GEMINI_KEY",
-  "KAIJIBOT_LIVE_OPENAI_KEY",
-  "KAIJIBOT_MPM_CATALOG_PATHS",
-  "KAIJIBOT_NODE_EXEC_FALLBACK",
-  "KAIJIBOT_NODE_EXEC_HOST",
-  "KAIJIBOT_OAUTH_DIR",
-  "KAIJIBOT_PINNED_PYTHON",
-  "KAIJIBOT_PINNED_WRITE_PYTHON",
-  "KAIJIBOT_PLUGIN_CATALOG_PATHS",
-  "KAIJIBOT_PROFILE",
-  "KAIJIBOT_RAW_STREAM",
-  "KAIJIBOT_RAW_STREAM_PATH",
-  "KAIJIBOT_SHOW_SECRETS",
-  "KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER",
-  "KAIJIBOT_STATE_DIR",
-  "KAIJIBOT_TEST_TAILSCALE_BINARY",
+  "ALLBOT_AGENT_DIR",
+  "ALLBOT_ALLOW_INSECURE_PRIVATE_WS",
+  "ALLBOT_ALLOW_PROJECT_LOCAL_BIN",
+  "ALLBOT_BROWSER_EXECUTABLE_PATH",
+  "ALLBOT_BROWSER_CONTROL_MODULE",
+  "ALLBOT_BUNDLED_HOOKS_DIR",
+  "ALLBOT_BUNDLED_PLUGINS_DIR",
+  "ALLBOT_BUNDLED_SKILLS_DIR",
+  "ALLBOT_CACHE_TRACE",
+  "ALLBOT_CACHE_TRACE_FILE",
+  "ALLBOT_CACHE_TRACE_MESSAGES",
+  "ALLBOT_CACHE_TRACE_PROMPT",
+  "ALLBOT_CACHE_TRACE_SYSTEM",
+  "ALLBOT_CONFIG_PATH",
+  "ALLBOT_GATEWAY_PASSWORD",
+  "ALLBOT_GATEWAY_PORT",
+  "ALLBOT_GATEWAY_SECRET",
+  "ALLBOT_GATEWAY_TOKEN",
+  "ALLBOT_GATEWAY_URL",
+  "ALLBOT_HOME",
+  "ALLBOT_LIVE_ANTHROPIC_KEY",
+  "ALLBOT_LIVE_ANTHROPIC_KEYS",
+  "ALLBOT_LIVE_GEMINI_KEY",
+  "ALLBOT_LIVE_OPENAI_KEY",
+  "ALLBOT_MPM_CATALOG_PATHS",
+  "ALLBOT_NODE_EXEC_FALLBACK",
+  "ALLBOT_NODE_EXEC_HOST",
+  "ALLBOT_OAUTH_DIR",
+  "ALLBOT_PINNED_PYTHON",
+  "ALLBOT_PINNED_WRITE_PYTHON",
+  "ALLBOT_PLUGIN_CATALOG_PATHS",
+  "ALLBOT_PROFILE",
+  "ALLBOT_RAW_STREAM",
+  "ALLBOT_RAW_STREAM_PATH",
+  "ALLBOT_SHOW_SECRETS",
+  "ALLBOT_SKIP_BROWSER_CONTROL_SERVER",
+  "ALLBOT_STATE_DIR",
+  "ALLBOT_TEST_TAILSCALE_BINARY",
   "PI_CODING_AGENT_DIR",
   "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH",
   "UV_PYTHON",
@@ -74,10 +74,10 @@ const BLOCKED_WORKSPACE_DOTENV_PREFIXES = [
   "ANTHROPIC_API_KEY_",
   "CLAWHUB_",
   "OPENAI_API_KEY_",
-  "KAIJIBOT_CLAWHUB_",
-  "KAIJIBOT_DISABLE_",
-  "KAIJIBOT_SKIP_",
-  "KAIJIBOT_UPDATE_",
+  "ALLBOT_CLAWHUB_",
+  "ALLBOT_DISABLE_",
+  "ALLBOT_SKIP_",
+  "ALLBOT_UPDATE_",
 ];
 
 function shouldBlockWorkspaceRuntimeDotEnvKey(key: string): boolean {
@@ -85,7 +85,7 @@ function shouldBlockWorkspaceRuntimeDotEnvKey(key: string): boolean {
 }
 
 function shouldBlockRuntimeDotEnvKey(key: string): boolean {
-  // The global ~/.kaijibot/.env (or KAIJIBOT_STATE_DIR/.env) is a trusted
+  // The global ~/.allbot/.env (or ALLBOT_STATE_DIR/.env) is a trusted
   // operator-controlled runtime surface. Workspace .env is untrusted and gets
   // the strict blocklist, but the trusted global fallback is allowed to set
   // runtime vars like proxy/base-url/auth values.
@@ -236,11 +236,11 @@ export function loadGlobalRuntimeDotEnvFiles(opts?: { quiet?: boolean; stateEnvP
   const stateEnvPath = opts?.stateEnvPath ?? path.join(resolveConfigDir(process.env), ".env");
   const defaultStateEnvPath = path.join(
     resolveRequiredHomeDir(process.env, os.homedir),
-    ".kaijibot",
+    ".allbot",
     ".env",
   );
   const hasExplicitNonDefaultStateDir =
-    process.env.KAIJIBOT_STATE_DIR?.trim() !== undefined &&
+    process.env.ALLBOT_STATE_DIR?.trim() !== undefined &&
     path.resolve(stateEnvPath) !== path.resolve(defaultStateEnvPath);
   const parsedFiles = [
     readDotEnvFile({
@@ -255,7 +255,7 @@ export function loadGlobalRuntimeDotEnvFiles(opts?: { quiet?: boolean; stateEnvP
         filePath: path.join(
           resolveRequiredHomeDir(process.env, os.homedir),
           ".config",
-          "kaijibot",
+          "allbot",
           "gateway.env",
         ),
         shouldBlockKey: shouldBlockRuntimeDotEnvKey,
@@ -272,7 +272,7 @@ export function loadDotEnv(opts?: { quiet?: boolean }) {
   const cwdEnvPath = path.join(process.cwd(), ".env");
   loadWorkspaceDotEnvFile(cwdEnvPath, { quiet });
 
-  // Then load global fallback: ~/.kaijibot/.env (or KAIJIBOT_STATE_DIR/.env),
+  // Then load global fallback: ~/.allbot/.env (or ALLBOT_STATE_DIR/.env),
   // without overriding any env vars already present.
   loadGlobalRuntimeDotEnvFiles({ quiet });
 }

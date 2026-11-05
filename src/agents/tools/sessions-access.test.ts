@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   createAgentToAgentPolicy,
   createSessionVisibilityGuard,
@@ -12,11 +12,11 @@ import { __testing as sessionsResolutionTesting } from "./sessions-resolution.js
 
 describe("resolveSessionToolsVisibility", () => {
   it("defaults to tree when unset or invalid", () => {
-    expect(resolveSessionToolsVisibility({} as unknown as KaijiBotConfig)).toBe("tree");
+    expect(resolveSessionToolsVisibility({} as unknown as AllBotConfig)).toBe("tree");
     expect(
       resolveSessionToolsVisibility({
         tools: { sessions: { visibility: "invalid" } },
-      } as unknown as KaijiBotConfig),
+      } as unknown as AllBotConfig),
     ).toBe("tree");
   });
 
@@ -24,7 +24,7 @@ describe("resolveSessionToolsVisibility", () => {
     expect(
       resolveSessionToolsVisibility({
         tools: { sessions: { visibility: "ALL" } },
-      } as unknown as KaijiBotConfig),
+      } as unknown as AllBotConfig),
     ).toBe("all");
   });
 });
@@ -34,7 +34,7 @@ describe("resolveEffectiveSessionToolsVisibility", () => {
     const cfg = {
       tools: { sessions: { visibility: "all" } },
       agents: { defaults: { sandbox: { sessionToolsVisibility: "spawned" } } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     expect(resolveEffectiveSessionToolsVisibility({ cfg, sandboxed: true })).toBe("tree");
   });
 
@@ -42,21 +42,21 @@ describe("resolveEffectiveSessionToolsVisibility", () => {
     const cfg = {
       tools: { sessions: { visibility: "all" } },
       agents: { defaults: { sandbox: { sessionToolsVisibility: "all" } } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     expect(resolveEffectiveSessionToolsVisibility({ cfg, sandboxed: true })).toBe("all");
   });
 });
 
 describe("sandbox session-tools context", () => {
   it("defaults sandbox visibility clamp to spawned", () => {
-    expect(resolveSandboxSessionToolsVisibility({} as unknown as KaijiBotConfig)).toBe("spawned");
+    expect(resolveSandboxSessionToolsVisibility({} as unknown as AllBotConfig)).toBe("spawned");
   });
 
   it("restricts non-subagent sandboxed sessions to spawned visibility", () => {
     const cfg = {
       tools: { sessions: { visibility: "all" } },
       agents: { defaults: { sandbox: { sessionToolsVisibility: "spawned" } } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const context = resolveSandboxedSessionToolContext({
       cfg,
       agentSessionKey: "agent:main:main",
@@ -72,7 +72,7 @@ describe("sandbox session-tools context", () => {
     const cfg = {
       tools: { sessions: { visibility: "all" } },
       agents: { defaults: { sandbox: { sessionToolsVisibility: "spawned" } } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const context = resolveSandboxedSessionToolContext({
       cfg,
       agentSessionKey: "agent:main:subagent:abc",
@@ -86,7 +86,7 @@ describe("sandbox session-tools context", () => {
 
 describe("createAgentToAgentPolicy", () => {
   it("denies cross-agent access when disabled", () => {
-    const policy = createAgentToAgentPolicy({} as unknown as KaijiBotConfig);
+    const policy = createAgentToAgentPolicy({} as unknown as AllBotConfig);
     expect(policy.enabled).toBe(false);
     expect(policy.isAllowed("main", "main")).toBe(true);
     expect(policy.isAllowed("main", "ops")).toBe(false);
@@ -100,7 +100,7 @@ describe("createAgentToAgentPolicy", () => {
           allow: ["ops-*", "main"],
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     expect(policy.isAllowed("ops-a", "ops-b")).toBe(true);
     expect(policy.isAllowed("main", "ops-a")).toBe(true);
@@ -133,7 +133,7 @@ describe("createSessionVisibilityGuard", () => {
       action: "history",
       requesterSessionKey: "agent:main:main",
       visibility: "tree",
-      a2aPolicy: createAgentToAgentPolicy({} as unknown as KaijiBotConfig),
+      a2aPolicy: createAgentToAgentPolicy({} as unknown as AllBotConfig),
     });
 
     expect(guard.check("agent:main:subagent:worker-999")).toEqual({ allowed: true });
@@ -146,7 +146,7 @@ describe("createSessionVisibilityGuard", () => {
       action: "send",
       requesterSessionKey: "agent:main:main",
       visibility: "all",
-      a2aPolicy: createAgentToAgentPolicy({} as unknown as KaijiBotConfig),
+      a2aPolicy: createAgentToAgentPolicy({} as unknown as AllBotConfig),
     });
 
     expect(guard.check("agent:ops:main")).toEqual({
@@ -162,7 +162,7 @@ describe("createSessionVisibilityGuard", () => {
       action: "history",
       requesterSessionKey: "agent:main:main",
       visibility: "self",
-      a2aPolicy: createAgentToAgentPolicy({} as unknown as KaijiBotConfig),
+      a2aPolicy: createAgentToAgentPolicy({} as unknown as AllBotConfig),
     });
 
     expect(guard.check("agent:main:main")).toEqual({ allowed: true });

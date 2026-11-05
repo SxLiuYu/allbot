@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectAttackSurfaceSummaryFindings } from "./audit-extra.summary.js";
 
 describe("security audit attack surface summary", () => {
   it("includes an attack surface summary (info)", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: { whatsapp: { groupPolicy: "open" }, telegram: { groupPolicy: "allowlist" } },
       tools: { elevated: { enabled: true, allowFrom: { whatsapp: ["+1"] } } },
       hooks: { enabled: true },

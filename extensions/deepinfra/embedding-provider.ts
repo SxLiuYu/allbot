@@ -4,7 +4,7 @@ import {
   resolveRemoteEmbeddingClient,
   type MemoryEmbeddingProviderCreateOptions,
   type MemoryEmbeddingProviderCreateResult,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
 import {
   DEEPINFRA_BASE_URL,
   DEFAULT_DEEPINFRA_EMBEDDING_MODEL,

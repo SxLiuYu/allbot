@@ -163,7 +163,7 @@ export function execDockerRaw(
 }
 
 import { formatCliCommand } from "../../cli/command-format.js";
-import { markKaijiBotExecEnv } from "../../infra/kaijibot-exec-env.js";
+import { markAllBotExecEnv } from "../../infra/allbot-exec-env.js";
 import { defaultRuntime } from "../../runtime.js";
 import { computeSandboxConfigHash } from "./config-hash.js";
 import { DEFAULT_SANDBOX_IMAGE } from "./constants.js";
@@ -345,12 +345,12 @@ export function buildSandboxCreateArgs(params: {
 
   const createdAtMs = params.createdAtMs ?? Date.now();
   const args = ["create", "--name", params.name];
-  args.push("--label", "kaijibot.sandbox=1");
-  args.push("--label", `kaijibot.sessionKey=${params.scopeKey}`);
-  args.push("--label", `kaijibot.createdAtMs=${createdAtMs}`);
-  args.push("--label", `kaijibot.mountFormatVersion=${SANDBOX_MOUNT_FORMAT_VERSION}`);
+  args.push("--label", "allbot.sandbox=1");
+  args.push("--label", `allbot.sessionKey=${params.scopeKey}`);
+  args.push("--label", `allbot.createdAtMs=${createdAtMs}`);
+  args.push("--label", `allbot.mountFormatVersion=${SANDBOX_MOUNT_FORMAT_VERSION}`);
   if (params.configHash) {
-    args.push("--label", `kaijibot.configHash=${params.configHash}`);
+    args.push("--label", `allbot.configHash=${params.configHash}`);
   }
   for (const [key, value] of Object.entries(params.labels ?? {})) {
     if (key && value) {
@@ -376,7 +376,7 @@ export function buildSandboxCreateArgs(params: {
   if (envSanitization.warnings.length > 0) {
     log.warn(`Suspicious environment variables: ${envSanitization.warnings.join(", ")}`);
   }
-  for (const [key, value] of Object.entries(markKaijiBotExecEnv(envSanitization.allowed))) {
+  for (const [key, value] of Object.entries(markAllBotExecEnv(envSanitization.allowed))) {
     args.push("--env", `${key}=${value}`);
   }
   for (const cap of params.cfg.capDrop) {
@@ -476,18 +476,18 @@ async function createSandboxContainer(params: {
 }
 
 async function readContainerConfigHash(containerName: string): Promise<string | null> {
-  return await readDockerContainerLabel(containerName, "kaijibot.configHash");
+  return await readDockerContainerLabel(containerName, "allbot.configHash");
 }
 
 function formatSandboxRecreateHint(params: { scope: SandboxConfig["scope"]; sessionKey: string }) {
   if (params.scope === "session") {
-    return formatCliCommand(`kaijibot sandbox recreate --session ${params.sessionKey}`);
+    return formatCliCommand(`allbot sandbox recreate --session ${params.sessionKey}`);
   }
   if (params.scope === "agent") {
     const agentId = resolveSandboxAgentId(params.sessionKey) ?? "main";
-    return formatCliCommand(`kaijibot sandbox recreate --agent ${agentId}`);
+    return formatCliCommand(`allbot sandbox recreate --agent ${agentId}`);
   }
-  return formatCliCommand("kaijibot sandbox recreate --all");
+  return formatCliCommand("allbot sandbox recreate --all");
 }
 
 export async function ensureSandboxContainer(params: {

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { IncomingMessage } from "node:http";
 import { listAgentIds, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { listChannelPlugins } from "../channels/plugins/index.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { readJsonBodyWithLimit, requestBodyErrorToText } from "../infra/http-body.js";
 import { normalizeAgentId, parseAgentSessionKey } from "../routing/session-key.js";
 import type { HookExternalContentSource } from "../security/external-content.js";
@@ -40,7 +40,7 @@ export type HookSessionPolicyResolved = {
   allowedSessionKeyPrefixes?: string[];
 };
 
-export function resolveHooksConfig(cfg: KaijiBotConfig): HooksConfigResolved | null {
+export function resolveHooksConfig(cfg: AllBotConfig): HooksConfigResolved | null {
   if (cfg.hooks?.enabled !== true) {
     return null;
   }
@@ -100,7 +100,7 @@ export function resolveHooksConfig(cfg: KaijiBotConfig): HooksConfigResolved | n
   };
 }
 
-function resolveKnownAgentIds(cfg: KaijiBotConfig, defaultAgentId: string): Set<string> {
+function resolveKnownAgentIds(cfg: AllBotConfig, defaultAgentId: string): Set<string> {
   const known = new Set(listAgentIds(cfg));
   known.add(defaultAgentId);
   return known;
@@ -146,7 +146,7 @@ export function extractHookToken(req: IncomingMessage): string | undefined {
       return token;
     }
   }
-  const headerToken = normalizeOptionalString(req.headers["x-kaijibot-token"]) ?? "";
+  const headerToken = normalizeOptionalString(req.headers["x-allbot-token"]) ?? "";
   if (headerToken) {
     return headerToken;
   }
@@ -262,7 +262,7 @@ export function resolveHookIdempotencyKey(params: {
 }): string | undefined {
   return (
     resolveOptionalHookIdempotencyKey(params.headers?.["idempotency-key"]) ||
-    resolveOptionalHookIdempotencyKey(params.headers?.["x-kaijibot-idempotency-key"]) ||
+    resolveOptionalHookIdempotencyKey(params.headers?.["x-allbot-idempotency-key"]) ||
     resolveOptionalHookIdempotencyKey(params.payload.idempotencyKey)
   );
 }

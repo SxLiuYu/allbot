@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/types.js";
+import type { AllBotConfig } from "../../../config/types.js";
 import { applyPluginDoctorCompatibilityMigrations } from "../../../plugins/doctor-contract-registry.js";
 import { isRecord } from "./legacy-config-record-shared.js";
 
@@ -16,11 +16,11 @@ export function applyChannelDoctorCompatibilityMigrations(cfg: Record<string, un
   next: Record<string, unknown>;
   changes: string[];
 } {
-  const compat = applyPluginDoctorCompatibilityMigrations(cfg as KaijiBotConfig, {
+  const compat = applyPluginDoctorCompatibilityMigrations(cfg as AllBotConfig, {
     pluginIds: collectRelevantDoctorChannelIds(cfg),
   });
   return {
-    next: compat.config as KaijiBotConfig & Record<string, unknown>,
+    next: compat.config as AllBotConfig & Record<string, unknown>,
     changes: compat.changes,
   };
 }

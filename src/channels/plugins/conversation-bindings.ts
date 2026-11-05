@@ -1,10 +1,10 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { getChannelPlugin } from "./registry.js";
 import type { ChannelId } from "./types.js";
 
 export async function createChannelConversationBindingManager(params: {
   channelId: ChannelId;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): Promise<{ stop: () => void | Promise<void> } | null> {
   const createManager = getChannelPlugin(params.channelId)?.conversationBindings?.createManager;

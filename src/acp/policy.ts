@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import { AcpRuntimeError } from "./runtime/errors.js";
 
@@ -8,11 +8,11 @@ const ACP_DISPATCH_DISABLED_MESSAGE =
 
 export type AcpDispatchPolicyState = "enabled" | "acp_disabled" | "dispatch_disabled";
 
-export function isAcpEnabledByPolicy(cfg: KaijiBotConfig): boolean {
+export function isAcpEnabledByPolicy(cfg: AllBotConfig): boolean {
   return cfg.acp?.enabled !== false;
 }
 
-export function resolveAcpDispatchPolicyState(cfg: KaijiBotConfig): AcpDispatchPolicyState {
+export function resolveAcpDispatchPolicyState(cfg: AllBotConfig): AcpDispatchPolicyState {
   if (!isAcpEnabledByPolicy(cfg)) {
     return "acp_disabled";
   }
@@ -23,11 +23,11 @@ export function resolveAcpDispatchPolicyState(cfg: KaijiBotConfig): AcpDispatchP
   return "enabled";
 }
 
-export function isAcpDispatchEnabledByPolicy(cfg: KaijiBotConfig): boolean {
+export function isAcpDispatchEnabledByPolicy(cfg: AllBotConfig): boolean {
   return resolveAcpDispatchPolicyState(cfg) === "enabled";
 }
 
-export function resolveAcpDispatchPolicyMessage(cfg: KaijiBotConfig): string | null {
+export function resolveAcpDispatchPolicyMessage(cfg: AllBotConfig): string | null {
   const state = resolveAcpDispatchPolicyState(cfg);
   if (state === "acp_disabled") {
     return ACP_DISABLED_MESSAGE;
@@ -38,7 +38,7 @@ export function resolveAcpDispatchPolicyMessage(cfg: KaijiBotConfig): string | n
   return null;
 }
 
-export function resolveAcpDispatchPolicyError(cfg: KaijiBotConfig): AcpRuntimeError | null {
+export function resolveAcpDispatchPolicyError(cfg: AllBotConfig): AcpRuntimeError | null {
   const message = resolveAcpDispatchPolicyMessage(cfg);
   if (!message) {
     return null;
@@ -46,7 +46,7 @@ export function resolveAcpDispatchPolicyError(cfg: KaijiBotConfig): AcpRuntimeEr
   return new AcpRuntimeError("ACP_DISPATCH_DISABLED", message);
 }
 
-export function isAcpAgentAllowedByPolicy(cfg: KaijiBotConfig, agentId: string): boolean {
+export function isAcpAgentAllowedByPolicy(cfg: AllBotConfig, agentId: string): boolean {
   const allowed = (cfg.acp?.allowedAgents ?? [])
     .map((entry) => normalizeAgentId(entry))
     .filter(Boolean);
@@ -57,7 +57,7 @@ export function isAcpAgentAllowedByPolicy(cfg: KaijiBotConfig, agentId: string):
 }
 
 export function resolveAcpAgentPolicyError(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): AcpRuntimeError | null {
   if (isAcpAgentAllowedByPolicy(cfg, agentId)) {

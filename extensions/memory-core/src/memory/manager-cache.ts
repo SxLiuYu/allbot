@@ -1,4 +1,4 @@
-import { resolveGlobalSingleton } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+import { resolveGlobalSingleton } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 
 type Closable = {
   close?: () => Promise<void> | void;

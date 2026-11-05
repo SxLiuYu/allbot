@@ -9,7 +9,7 @@ import { formatHelpExamples } from "../help-format.js";
 export function registerMigrateCommand(program: Command) {
   program
     .command("migrate")
-    .description("Migrate data from OpenClaw or legacy installations to KaijiBot")
+    .description("Migrate data from OpenClaw or legacy installations to AllBot")
     .addHelpText(
       "after",
       () =>
@@ -25,13 +25,13 @@ export function registerMigrateCommand(program: Command) {
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["kaijibot migrate", "Auto-detect OpenClaw and preview migration."],
-          ["kaijibot migrate --dry-run", "Preview what would be migrated without writing."],
-          ["kaijibot migrate --source ~/.openclaw", "Migrate from an explicit source directory."],
-          ["kaijibot migrate --migrate-secrets", "Include credentials and API keys in migration."],
-          ["kaijibot migrate --overwrite", "Overwrite existing files."],
-          ["kaijibot migrate --scenario fresh", "Run fresh migration (new KaijiBot install)."],
-          ["kaijibot migrate --scenario import", "Import into existing KaijiBot installation."],
+          ["allbot migrate", "Auto-detect OpenClaw and preview migration."],
+          ["allbot migrate --dry-run", "Preview what would be migrated without writing."],
+          ["allbot migrate --source ~/.openclaw", "Migrate from an explicit source directory."],
+          ["allbot migrate --migrate-secrets", "Include credentials and API keys in migration."],
+          ["allbot migrate --overwrite", "Overwrite existing files."],
+          ["allbot migrate --scenario fresh", "Run fresh migration (new AllBot install)."],
+          ["allbot migrate --scenario import", "Import into existing AllBot installation."],
         ])}`,
     )
     .action(async (opts) => {

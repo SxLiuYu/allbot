@@ -19,12 +19,12 @@ const SUPPORTED_TRANSPORT_APIS = new Set<Api>([
 ]);
 
 const SIMPLE_TRANSPORT_API_ALIAS: Record<string, Api> = {
-  "openai-responses": "kaijibot-openai-responses-transport",
-  "openai-codex-responses": "kaijibot-openai-responses-transport",
-  "openai-completions": "kaijibot-openai-completions-transport",
-  "azure-openai-responses": "kaijibot-azure-openai-responses-transport",
-  "anthropic-messages": "kaijibot-anthropic-messages-transport",
-  "google-generative-ai": "kaijibot-google-generative-ai-transport",
+  "openai-responses": "allbot-openai-responses-transport",
+  "openai-codex-responses": "allbot-openai-responses-transport",
+  "openai-completions": "allbot-openai-completions-transport",
+  "azure-openai-responses": "allbot-azure-openai-responses-transport",
+  "anthropic-messages": "allbot-anthropic-messages-transport",
+  "google-generative-ai": "allbot-google-generative-ai-transport",
 };
 
 function createSupportedTransportStreamFn(api: Api): StreamFn | undefined {

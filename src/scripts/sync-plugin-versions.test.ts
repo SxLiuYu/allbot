@@ -16,23 +16,23 @@ describe("syncPluginVersions", () => {
     cleanupTempDirs(tempDirs);
   });
 
-  it("preserves workspace kaijibot devDependencies while bumping plugin host constraints", () => {
-    const rootDir = makeTempDir(tempDirs, "kaijibot-sync-plugin-versions-");
+  it("preserves workspace allbot devDependencies while bumping plugin host constraints", () => {
+    const rootDir = makeTempDir(tempDirs, "allbot-sync-plugin-versions-");
 
     writeJson(path.join(rootDir, "package.json"), {
-      name: "kaijibot",
+      name: "allbot",
       version: "2026.4.1",
     });
     writeJson(path.join(rootDir, "extensions/bluebubbles/package.json"), {
-      name: "@kaijibot/bluebubbles",
+      name: "@allbot/bluebubbles",
       version: "2026.3.30",
       devDependencies: {
-        kaijibot: "workspace:*",
+        allbot: "workspace:*",
       },
       peerDependencies: {
-        kaijibot: ">=2026.3.30",
+        allbot: ">=2026.3.30",
       },
-      kaijibot: {
+      allbot: {
         install: {
           minHostVersion: ">=2026.3.30",
         },
@@ -40,7 +40,7 @@ describe("syncPluginVersions", () => {
           pluginApi: ">=2026.3.30",
         },
         build: {
-          kaijibotVersion: "2026.3.30",
+          allbotVersion: "2026.3.30",
         },
       },
     });
@@ -52,7 +52,7 @@ describe("syncPluginVersions", () => {
       version?: string;
       devDependencies?: Record<string, string>;
       peerDependencies?: Record<string, string>;
-      kaijibot?: {
+      allbot?: {
         install?: {
           minHostVersion?: string;
         };
@@ -60,17 +60,17 @@ describe("syncPluginVersions", () => {
           pluginApi?: string;
         };
         build?: {
-          kaijibotVersion?: string;
+          allbotVersion?: string;
         };
       };
     };
 
-    expect(summary.updated).toContain("@kaijibot/bluebubbles");
+    expect(summary.updated).toContain("@allbot/bluebubbles");
     expect(updatedPackage.version).toBe("2026.4.1");
-    expect(updatedPackage.devDependencies?.kaijibot).toBe("workspace:*");
-    expect(updatedPackage.peerDependencies?.kaijibot).toBe(">=2026.4.1");
-    expect(updatedPackage.kaijibot?.install?.minHostVersion).toBe(">=2026.4.1");
-    expect(updatedPackage.kaijibot?.compat?.pluginApi).toBe(">=2026.4.1");
-    expect(updatedPackage.kaijibot?.build?.kaijibotVersion).toBe("2026.4.1");
+    expect(updatedPackage.devDependencies?.allbot).toBe("workspace:*");
+    expect(updatedPackage.peerDependencies?.allbot).toBe(">=2026.4.1");
+    expect(updatedPackage.allbot?.install?.minHostVersion).toBe(">=2026.4.1");
+    expect(updatedPackage.allbot?.compat?.pluginApi).toBe(">=2026.4.1");
+    expect(updatedPackage.allbot?.build?.allbotVersion).toBe("2026.4.1");
   });
 });

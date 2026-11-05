@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import type { AgentAcpBinding, AgentBinding, AgentRouteBinding } from "./types.agents.js";
 
 export type ConfiguredBindingRule = AgentBinding;
@@ -15,14 +15,14 @@ export function isAcpBinding(binding: AgentBinding): binding is AgentAcpBinding 
   return normalizeBindingType(binding) === "acp";
 }
 
-export function listConfiguredBindings(cfg: KaijiBotConfig): AgentBinding[] {
+export function listConfiguredBindings(cfg: AllBotConfig): AgentBinding[] {
   return Array.isArray(cfg.bindings) ? cfg.bindings : [];
 }
 
-export function listRouteBindings(cfg: KaijiBotConfig): AgentRouteBinding[] {
+export function listRouteBindings(cfg: AllBotConfig): AgentRouteBinding[] {
   return listConfiguredBindings(cfg).filter(isRouteBinding);
 }
 
-export function listAcpBindings(cfg: KaijiBotConfig): AgentAcpBinding[] {
+export function listAcpBindings(cfg: AllBotConfig): AgentAcpBinding[] {
   return listConfiguredBindings(cfg).filter(isAcpBinding);
 }

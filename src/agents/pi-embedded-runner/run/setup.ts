@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import type {
   PluginHookBeforeAgentStartResult,
   ProviderRuntimeModel,
@@ -100,7 +100,7 @@ export async function resolveHookModelSelection(params: {
 }
 
 export function resolveEffectiveRuntimeModel(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   provider: string;
   modelId: string;
   runtimeModel: ProviderRuntimeModel;

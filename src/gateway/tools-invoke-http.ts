@@ -226,11 +226,11 @@ export async function handleToolsInvokeHttpRequest(
 
   // Resolve message channel/account hints (optional headers) for policy inheritance.
   const messageChannel = normalizeMessageChannel(
-    getHeader(req, "x-kaijibot-message-channel") ?? "",
+    getHeader(req, "x-allbot-message-channel") ?? "",
   );
-  const accountId = normalizeOptionalString(getHeader(req, "x-kaijibot-account-id"));
-  const agentTo = normalizeOptionalString(getHeader(req, "x-kaijibot-message-to"));
-  const agentThreadId = normalizeOptionalString(getHeader(req, "x-kaijibot-thread-id"));
+  const accountId = normalizeOptionalString(getHeader(req, "x-allbot-account-id"));
+  const agentTo = normalizeOptionalString(getHeader(req, "x-allbot-message-to"));
+  const agentThreadId = normalizeOptionalString(getHeader(req, "x-allbot-thread-id"));
   const { agentId, tools } = resolveGatewayScopedTools({
     cfg,
     sessionKey,

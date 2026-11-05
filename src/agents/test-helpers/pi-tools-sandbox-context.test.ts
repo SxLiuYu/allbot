@@ -12,10 +12,10 @@ describe("createPiToolsSandboxContext", () => {
     expect(sandbox.workspaceDir).toBe("/tmp/sandbox");
     expect(sandbox.agentWorkspaceDir).toBe("/tmp/sandbox");
     expect(sandbox.workspaceAccess).toBe("rw");
-    expect(sandbox.containerName).toBe("kaijibot-sbx-test");
+    expect(sandbox.containerName).toBe("allbot-sbx-test");
     expect(sandbox.containerWorkdir).toBe("/workspace");
-    expect(sandbox.docker.image).toBe("kaijibot-sandbox:bookworm-slim");
-    expect(sandbox.docker.containerPrefix).toBe("kaijibot-sbx-");
+    expect(sandbox.docker.image).toBe("allbot-sandbox:bookworm-slim");
+    expect(sandbox.docker.containerPrefix).toBe("allbot-sbx-");
     expect(sandbox.tools).toEqual({ allow: [], deny: [] });
     expect(sandbox.browserAllowHostControl).toBe(false);
   });

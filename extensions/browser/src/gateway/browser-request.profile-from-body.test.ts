@@ -8,9 +8,9 @@ const { loadConfigMock, isNodeCommandAllowedMock, resolveNodeCommandAllowlistMoc
   }),
 );
 
-vi.mock("kaijibot/plugin-sdk/config-runtime", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/config-runtime")>(
-    "kaijibot/plugin-sdk/config-runtime",
+vi.mock("allbot/plugin-sdk/config-runtime", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/config-runtime")>(
+    "allbot/plugin-sdk/config-runtime",
   );
   return {
     ...actual,

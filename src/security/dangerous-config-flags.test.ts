@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectEnabledInsecureOrDangerousFlags } from "./dangerous-config-flags.js";
 
 const { loadPluginManifestRegistryMock } = vi.hoisted(() => ({
@@ -10,8 +10,8 @@ vi.mock("../plugins/manifest-registry.js", () => ({
   loadPluginManifestRegistry: loadPluginManifestRegistryMock,
 }));
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 describe("collectEnabledInsecureOrDangerousFlags", () => {

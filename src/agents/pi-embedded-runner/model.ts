@@ -1,6 +1,6 @@
 import type { Api, Model } from "@earendil-works/pi-ai";
 import type { AuthStorage, ModelRegistry } from "@earendil-works/pi-coding-agent";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   applyProviderResolvedModelCompatWithPlugins,
   applyProviderResolvedTransportWithPlugin,
@@ -13,7 +13,7 @@ import {
   shouldPreferProviderRuntimeResolvedModel,
 } from "../../plugins/provider-runtime.js";
 import type { ProviderRuntimeModel } from "../../plugins/types.js";
-import { resolveKaijiBotAgentDir } from "../agent-paths.js";
+import { resolveAllBotAgentDir } from "../agent-paths.js";
 import { DEFAULT_CONTEXT_TOKENS } from "../defaults.js";
 import { buildModelAliasLines } from "../model-alias-lines.js";
 import { normalizeStaticProviderModelId } from "../model-ref-shared.js";
@@ -98,7 +98,7 @@ function resolveRuntimeHooks(params?: {
 
 function applyResolvedTransportFallback(params: {
   provider: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   runtimeHooks: ProviderRuntimeHooks;
   model: Model<Api>;
 }): Model<Api> | undefined {
@@ -129,7 +129,7 @@ function applyResolvedTransportFallback(params: {
 function normalizeResolvedModel(params: {
   provider: string;
   model: Model<Api>;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   runtimeHooks?: ProviderRuntimeHooks;
 }): Model<Api> {
@@ -195,7 +195,7 @@ function resolveProviderTransport(params: {
   provider: string;
   api?: Api | null;
   baseUrl?: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   runtimeHooks?: ProviderRuntimeHooks;
 }): {
   api?: Api;
@@ -240,7 +240,7 @@ function findInlineModelMatch(params: {
 export { buildModelAliasLines, buildInlineProviderModels };
 
 function resolveConfiguredProviderConfig(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   provider: string,
 ): InlineProviderConfig | undefined {
   const configuredProviders = cfg?.models?.providers;
@@ -259,7 +259,7 @@ function applyConfiguredProviderOverrides(params: {
   discoveredModel: ProviderRuntimeModel;
   providerConfig?: InlineProviderConfig;
   modelId: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   runtimeHooks?: ProviderRuntimeHooks;
 }): ProviderRuntimeModel {
   const { discoveredModel, providerConfig, modelId } = params;
@@ -344,7 +344,7 @@ function resolveExplicitModelWithRegistry(params: {
   provider: string;
   modelId: string;
   modelRegistry: ModelRegistry;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   runtimeHooks?: ProviderRuntimeHooks;
 }): { kind: "resolved"; model: Model<Api> } | { kind: "suppressed" } | undefined {
@@ -425,7 +425,7 @@ function resolvePluginDynamicModelWithRegistry(params: {
   provider: string;
   modelId: string;
   modelRegistry: ModelRegistry;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   runtimeHooks?: ProviderRuntimeHooks;
@@ -469,7 +469,7 @@ function resolvePluginDynamicModelWithRegistry(params: {
 function resolveConfiguredFallbackModel(params: {
   provider: string;
   modelId: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   runtimeHooks?: ProviderRuntimeHooks;
 }): Model<Api> | undefined {
@@ -548,7 +548,7 @@ function resolveConfiguredFallbackModel(params: {
 function shouldCompareProviderRuntimeResolvedModel(params: {
   provider: string;
   modelId: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   runtimeHooks: ProviderRuntimeHooks;
@@ -586,7 +586,7 @@ export function resolveModelWithRegistry(params: {
   provider: string;
   modelId: string;
   modelRegistry: ModelRegistry;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   runtimeHooks?: ProviderRuntimeHooks;
 }): Model<Api> | undefined {
@@ -639,7 +639,7 @@ export function resolveModel(
   provider: string,
   modelId: string,
   agentDir?: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   options?: {
     authStorage?: AuthStorage;
     modelRegistry?: ModelRegistry;
@@ -656,7 +656,7 @@ export function resolveModel(
     provider,
     model: normalizeStaticProviderModelId(normalizeProviderId(provider), modelId),
   };
-  const resolvedAgentDir = agentDir ?? resolveKaijiBotAgentDir();
+  const resolvedAgentDir = agentDir ?? resolveAllBotAgentDir();
   const authStorage = options?.authStorage ?? discoverAuthStorage(resolvedAgentDir);
   const modelRegistry = options?.modelRegistry ?? discoverModels(authStorage, resolvedAgentDir);
   const runtimeHooks = resolveRuntimeHooks(options);
@@ -689,7 +689,7 @@ export async function resolveModelAsync(
   provider: string,
   modelId: string,
   agentDir?: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   options?: {
     authStorage?: AuthStorage;
     modelRegistry?: ModelRegistry;
@@ -707,7 +707,7 @@ export async function resolveModelAsync(
     provider,
     model: normalizeStaticProviderModelId(normalizeProviderId(provider), modelId),
   };
-  const resolvedAgentDir = agentDir ?? resolveKaijiBotAgentDir();
+  const resolvedAgentDir = agentDir ?? resolveAllBotAgentDir();
   const authStorage = options?.authStorage ?? discoverAuthStorage(resolvedAgentDir);
   const modelRegistry = options?.modelRegistry ?? discoverModels(authStorage, resolvedAgentDir);
   const runtimeHooks = resolveRuntimeHooks(options);
@@ -800,12 +800,12 @@ export async function resolveModelAsync(
  * providers before setup, the raw `Unknown model` error is too vague. Provider
  * plugins can append a targeted recovery hint here.
  *
- * See: https://github.com/kaijibot/kaijibot/issues/17328
+ * See: https://github.com/allbot/allbot/issues/17328
  */
 function buildUnknownModelError(params: {
   provider: string;
   modelId: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
   runtimeHooks?: ProviderRuntimeHooks;
 }): string {

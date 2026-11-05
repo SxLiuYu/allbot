@@ -14,7 +14,7 @@ A **node** is a companion device (macOS/iOS/Android/headless) that connects to t
 Legacy transport: [Bridge protocol](/gateway/bridge-protocol) (TCP JSONL;
 historical only for current nodes).
 
-macOS can also run in **node mode**: the menubar app connects to the Gateway’s WS server and exposes its local canvas/camera commands as a node (so `kaijibot nodes …` works against this Mac).
+macOS can also run in **node mode**: the menubar app connects to the Gateway’s WS server and exposes its local canvas/camera commands as a node (so `allbot nodes …` works against this Mac).
 
 Notes:
 
@@ -30,16 +30,16 @@ creates a device pairing request for `role: node`. Approve via the devices CLI (
 Quick CLI:
 
 ```bash
-kaijibot devices list
-kaijibot devices approve <requestId>
-kaijibot devices reject <requestId>
-kaijibot nodes status
-kaijibot nodes describe --node <idOrNameOrIp>
+allbot devices list
+allbot devices approve <requestId>
+allbot devices reject <requestId>
+allbot nodes status
+allbot nodes describe --node <idOrNameOrIp>
 ```
 
 If a node retries with changed auth details (role/scopes/public key), the prior
 pending request is superseded and a new `requestId` is created. Re-run
-`kaijibot devices list` before approving.
+`allbot devices list` before approving.
 
 Notes:
 
@@ -47,7 +47,7 @@ Notes:
 - The device pairing record is the durable approved-role contract. Token
   rotation stays inside that contract; it cannot upgrade a paired node into a
   different role that pairing approval never granted.
-- `node.pair.*` (CLI: `kaijibot nodes pending/approve/reject/rename`) is a separate gateway-owned
+- `node.pair.*` (CLI: `allbot nodes pending/approve/reject/rename`) is a separate gateway-owned
   node pairing store; it does **not** gate the WS `connect` handshake.
 - Approval scope follows the pending request's declared commands:
   - commandless request: `operator.pairing`
@@ -64,14 +64,14 @@ forwards `exec` calls to the **node host** when `host=node` is selected.
 
 - **Gateway host**: receives messages, runs the model, routes tool calls.
 - **Node host**: executes `system.run`/`system.which` on the node machine.
-- **Approvals**: enforced on the node host via `~/.kaijibot/exec-approvals.json`.
+- **Approvals**: enforced on the node host via `~/.allbot/exec-approvals.json`.
 
 Approval note:
 
 - Approval-backed node runs bind exact request context.
-- For direct shell/runtime file executions, KaijiBot also best-effort binds one concrete local
+- For direct shell/runtime file executions, AllBot also best-effort binds one concrete local
   file operand and denies the run if that file changes before execution.
-- If KaijiBot cannot identify exactly one concrete local file for an interpreter/runtime command,
+- If AllBot cannot identify exactly one concrete local file for an interpreter/runtime command,
   approval-backed execution is denied instead of pretending full runtime coverage. Use sandboxing,
   separate hosts, or an explicit trusted allowlist/full workflow for broader interpreter semantics.
 
@@ -80,7 +80,7 @@ Approval note:
 On the node machine:
 
 ```bash
-kaijibot node run --host <gateway-host> --port 18789 --display-name "Build Node"
+allbot node run --host <gateway-host> --port 18789 --display-name "Build Node"
 ```
 
 ### Remote gateway via SSH tunnel (loopback bind)
@@ -96,25 +96,25 @@ Example (node host -> gateway host):
 ssh -N -L 18790:127.0.0.1:18789 user@gateway-host
 
 # Terminal B: export the gateway token and connect through the tunnel
-export KAIJIBOT_GATEWAY_TOKEN="<gateway-token>"
-kaijibot node run --host 127.0.0.1 --port 18790 --display-name "Build Node"
+export ALLBOT_GATEWAY_TOKEN="<gateway-token>"
+allbot node run --host 127.0.0.1 --port 18790 --display-name "Build Node"
 ```
 
 Notes:
 
-- `kaijibot node run` supports token or password auth.
-- Env vars are preferred: `KAIJIBOT_GATEWAY_TOKEN` / `KAIJIBOT_GATEWAY_PASSWORD`.
+- `allbot node run` supports token or password auth.
+- Env vars are preferred: `ALLBOT_GATEWAY_TOKEN` / `ALLBOT_GATEWAY_PASSWORD`.
 - Config fallback is `gateway.auth.token` / `gateway.auth.password`.
 - In local mode, node host intentionally ignores `gateway.remote.token` / `gateway.remote.password`.
 - In remote mode, `gateway.remote.token` / `gateway.remote.password` are eligible per remote precedence rules.
 - If active local `gateway.auth.*` SecretRefs are configured but unresolved, node-host auth fails closed.
-- Node-host auth resolution only honors `KAIJIBOT_GATEWAY_*` env vars.
+- Node-host auth resolution only honors `ALLBOT_GATEWAY_*` env vars.
 
 ### Start a node host (service)
 
 ```bash
-kaijibot node install --host <gateway-host> --port 18789 --display-name "Build Node"
-kaijibot node restart
+allbot node install --host <gateway-host> --port 18789 --display-name "Build Node"
+allbot node restart
 ```
 
 ### Pair + name
@@ -122,38 +122,38 @@ kaijibot node restart
 On the gateway host:
 
 ```bash
-kaijibot devices list
-kaijibot devices approve <requestId>
-kaijibot nodes status
+allbot devices list
+allbot devices approve <requestId>
+allbot nodes status
 ```
 
-If the node retries with changed auth details, re-run `kaijibot devices list`
+If the node retries with changed auth details, re-run `allbot devices list`
 and approve the current `requestId`.
 
 Naming options:
 
-- `--display-name` on `kaijibot node run` / `kaijibot node install` (persists in `~/.kaijibot/node.json` on the node).
-- `kaijibot nodes rename --node <id|name|ip> --name "Build Node"` (gateway override).
+- `--display-name` on `allbot node run` / `allbot node install` (persists in `~/.allbot/node.json` on the node).
+- `allbot nodes rename --node <id|name|ip> --name "Build Node"` (gateway override).
 
 ### Allowlist the commands
 
 Exec approvals are **per node host**. Add allowlist entries from the gateway:
 
 ```bash
-kaijibot approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
-kaijibot approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
+allbot approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
+allbot approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
 ```
 
-Approvals live on the node host at `~/.kaijibot/exec-approvals.json`.
+Approvals live on the node host at `~/.allbot/exec-approvals.json`.
 
 ### Point exec at the node
 
 Configure defaults (gateway config):
 
 ```bash
-kaijibot config set tools.exec.host node
-kaijibot config set tools.exec.security allowlist
-kaijibot config set tools.exec.node "<id-or-name>"
+allbot config set tools.exec.host node
+allbot config set tools.exec.security allowlist
+allbot config set tools.exec.node "<id-or-name>"
 ```
 
 Or per session:
@@ -178,7 +178,7 @@ Related:
 Low-level (raw RPC):
 
 ```bash
-kaijibot nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
+allbot nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
 ```
 
 Higher-level helpers exist for the common “give the agent a MEDIA attachment” workflows.
@@ -190,17 +190,17 @@ If the node is showing the Canvas (WebView), `canvas.snapshot` returns `{ format
 CLI helper (writes to a temp file and prints `MEDIA:<path>`):
 
 ```bash
-kaijibot nodes canvas snapshot --node <idOrNameOrIp> --format png
-kaijibot nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
+allbot nodes canvas snapshot --node <idOrNameOrIp> --format png
+allbot nodes canvas snapshot --node <idOrNameOrIp> --format jpg --max-width 1200 --quality 0.9
 ```
 
 ### Canvas controls
 
 ```bash
-kaijibot nodes canvas present --node <idOrNameOrIp> --target https://example.com
-kaijibot nodes canvas hide --node <idOrNameOrIp>
-kaijibot nodes canvas navigate https://example.com --node <idOrNameOrIp>
-kaijibot nodes canvas eval --node <idOrNameOrIp> --js "document.title"
+allbot nodes canvas present --node <idOrNameOrIp> --target https://example.com
+allbot nodes canvas hide --node <idOrNameOrIp>
+allbot nodes canvas navigate https://example.com --node <idOrNameOrIp>
+allbot nodes canvas eval --node <idOrNameOrIp> --js "document.title"
 ```
 
 Notes:
@@ -211,9 +211,9 @@ Notes:
 ### A2UI (Canvas)
 
 ```bash
-kaijibot nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
-kaijibot nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
-kaijibot nodes canvas a2ui reset --node <idOrNameOrIp>
+allbot nodes canvas a2ui push --node <idOrNameOrIp> --text "Hello"
+allbot nodes canvas a2ui push --node <idOrNameOrIp> --jsonl ./payload.jsonl
+allbot nodes canvas a2ui reset --node <idOrNameOrIp>
 ```
 
 Notes:
@@ -225,16 +225,16 @@ Notes:
 Photos (`jpg`):
 
 ```bash
-kaijibot nodes camera list --node <idOrNameOrIp>
-kaijibot nodes camera snap --node <idOrNameOrIp>            # default: both facings (2 MEDIA lines)
-kaijibot nodes camera snap --node <idOrNameOrIp> --facing front
+allbot nodes camera list --node <idOrNameOrIp>
+allbot nodes camera snap --node <idOrNameOrIp>            # default: both facings (2 MEDIA lines)
+allbot nodes camera snap --node <idOrNameOrIp> --facing front
 ```
 
 Video clips (`mp4`):
 
 ```bash
-kaijibot nodes camera clip --node <idOrNameOrIp> --duration 10s
-kaijibot nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
+allbot nodes camera clip --node <idOrNameOrIp> --duration 10s
+allbot nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 ```
 
 Notes:
@@ -248,8 +248,8 @@ Notes:
 Supported nodes expose `screen.record` (mp4). Example:
 
 ```bash
-kaijibot nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
-kaijibot nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-audio
+allbot nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
+allbot nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-audio
 ```
 
 Notes:
@@ -266,8 +266,8 @@ Nodes expose `location.get` when Location is enabled in settings.
 CLI helper:
 
 ```bash
-kaijibot nodes location get --node <idOrNameOrIp>
-kaijibot nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15000 --location-timeout 10000
+allbot nodes location get --node <idOrNameOrIp>
+allbot nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 15000 --location-timeout 10000
 ```
 
 Notes:
@@ -283,7 +283,7 @@ Android nodes can expose `sms.send` when the user grants **SMS** permission and 
 Low-level invoke:
 
 ```bash
-kaijibot nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from KaijiBot"}'
+allbot nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from AllBot"}'
 ```
 
 Notes:
@@ -309,9 +309,9 @@ Available families:
 Example invokes:
 
 ```bash
-kaijibot nodes invoke --node <idOrNameOrIp> --command device.status --params '{}'
-kaijibot nodes invoke --node <idOrNameOrIp> --command notifications.list --params '{}'
-kaijibot nodes invoke --node <idOrNameOrIp> --command photos.latest --params '{"limit":1}'
+allbot nodes invoke --node <idOrNameOrIp> --command device.status --params '{}'
+allbot nodes invoke --node <idOrNameOrIp> --command notifications.list --params '{}'
+allbot nodes invoke --node <idOrNameOrIp> --command photos.latest --params '{"limit":1}'
 ```
 
 Notes:
@@ -326,8 +326,8 @@ The headless node host exposes `system.run`, `system.which`, and `system.execApp
 Examples:
 
 ```bash
-kaijibot nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway ready"
-kaijibot nodes invoke --node <idOrNameOrIp> --command system.which --params '{"name":"git"}'
+allbot nodes notify --node <idOrNameOrIp> --title "Ping" --body "Gateway ready"
+allbot nodes invoke --node <idOrNameOrIp> --command system.which --params '{"name":"git"}'
 ```
 
 Notes:
@@ -348,7 +348,7 @@ Notes:
 - Node hosts ignore `PATH` overrides and strip dangerous startup/shell keys (`DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`, `SHELLOPTS`, `PS4`). If you need extra PATH entries, configure the node host service environment (or install tools in standard locations) instead of passing `PATH` via `--env`.
 - On macOS node mode, `system.run` is gated by exec approvals in the macOS app (Settings → Exec approvals).
   Ask/allowlist/full behave the same as the headless node host; denied prompts return `SYSTEM_RUN_DENIED`.
-- On headless node host, `system.run` is gated by exec approvals (`~/.kaijibot/exec-approvals.json`).
+- On headless node host, `system.run` is gated by exec approvals (`~/.allbot/exec-approvals.json`).
 
 ## Exec node binding
 
@@ -358,21 +358,21 @@ This sets the default node for `exec host=node` (and can be overridden per agent
 Global default:
 
 ```bash
-kaijibot config set tools.exec.node "node-id-or-name"
+allbot config set tools.exec.node "node-id-or-name"
 ```
 
 Per-agent override:
 
 ```bash
-kaijibot config get agents.list
-kaijibot config set agents.list[0].tools.exec.node "node-id-or-name"
+allbot config get agents.list
+allbot config set agents.list[0].tools.exec.node "node-id-or-name"
 ```
 
 Unset to allow any node:
 
 ```bash
-kaijibot config unset tools.exec.node
-kaijibot config unset agents.list[0].tools.exec.node
+allbot config unset tools.exec.node
+allbot config unset agents.list[0].tools.exec.node
 ```
 
 ## Permissions map
@@ -381,28 +381,28 @@ Nodes may include a `permissions` map in `node.list` / `node.describe`, keyed by
 
 ## Headless node host (cross-platform)
 
-KaijiBot can run a **headless node host** (no UI) that connects to the Gateway
+AllBot can run a **headless node host** (no UI) that connects to the Gateway
 WebSocket and exposes `system.run` / `system.which`. This is useful on Linux/Windows
 or for running a minimal node alongside a server.
 
 Start it:
 
 ```bash
-kaijibot node run --host <gateway-host> --port 18789
+allbot node run --host <gateway-host> --port 18789
 ```
 
 Notes:
 
 - Pairing is still required (the Gateway will show a device pairing prompt).
-- The node host stores its node id, token, display name, and gateway connection info in `~/.kaijibot/node.json`.
-- Exec approvals are enforced locally via `~/.kaijibot/exec-approvals.json`
+- The node host stores its node id, token, display name, and gateway connection info in `~/.allbot/node.json`.
+- Exec approvals are enforced locally via `~/.allbot/exec-approvals.json`
   (see [Exec approvals](/tools/exec-approvals)).
 - On macOS, the headless node host executes `system.run` locally by default. Set
-  `KAIJIBOT_NODE_EXEC_HOST=app` to route `system.run` through the companion app exec host; add
-  `KAIJIBOT_NODE_EXEC_FALLBACK=0` to require the app host and fail closed if it is unavailable.
+  `ALLBOT_NODE_EXEC_HOST=app` to route `system.run` through the companion app exec host; add
+  `ALLBOT_NODE_EXEC_FALLBACK=0` to require the app host and fail closed if it is unavailable.
 - Add `--tls` / `--tls-fingerprint` when the Gateway WS uses TLS.
 
 ## Mac node mode
 
-- The macOS menubar app connects to the Gateway WS server as a node (so `kaijibot nodes …` works against this Mac).
+- The macOS menubar app connects to the Gateway WS server as a node (so `allbot nodes …` works against this Mac).
 - In remote mode, the app opens an SSH tunnel for the Gateway port and connects to `localhost`.

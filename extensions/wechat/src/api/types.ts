@@ -9,7 +9,7 @@ export interface BaseInfo {
   /**
    * Self-declared identity of the upstream bot/app, analogous to HTTP
    * `User-Agent`. Filled from `channels.wechat.botAgent` in
-   * kaijibot.json; defaults to `"KaijiBot"` when unset.
+   * allbot.json; defaults to `"AllBot"` when unset.
    *
    * Format: UA-style `Name/Version` tokens, optionally followed by
    * `(comment)`, multiple tokens space-separated. ASCII only, total

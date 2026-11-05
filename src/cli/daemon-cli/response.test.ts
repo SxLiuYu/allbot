@@ -5,18 +5,18 @@ describe("buildDaemonHintItems", () => {
   it("classifies common daemon hint kinds", () => {
     expect(
       buildDaemonHintItems([
-        "kaijibot gateway install",
-        "Restart the container or the service that manages it for kaijibot-demo-container.",
+        "allbot gateway install",
+        "Restart the container or the service that manages it for allbot-demo-container.",
         "systemd user services are unavailable; install/enable systemd or run the gateway under your supervisor.",
         "On a headless server (SSH/no desktop session): run `sudo loginctl enable-linger $(whoami)` to persist your systemd user session across logins.",
-        "If you're in a container, run the gateway in the foreground instead of `kaijibot gateway`.",
+        "If you're in a container, run the gateway in the foreground instead of `allbot gateway`.",
         "WSL2 needs systemd enabled: edit /etc/wsl.conf with [boot]\\nsystemd=true",
       ]),
     ).toEqual([
-      { kind: "install", text: "kaijibot gateway install" },
+      { kind: "install", text: "allbot gateway install" },
       {
         kind: "container-restart",
-        text: "Restart the container or the service that manages it for kaijibot-demo-container.",
+        text: "Restart the container or the service that manages it for allbot-demo-container.",
       },
       {
         kind: "systemd-unavailable",
@@ -28,7 +28,7 @@ describe("buildDaemonHintItems", () => {
       },
       {
         kind: "container-foreground",
-        text: "If you're in a container, run the gateway in the foreground instead of `kaijibot gateway`.",
+        text: "If you're in a container, run the gateway in the foreground instead of `allbot gateway`.",
       },
       {
         kind: "wsl-systemd",

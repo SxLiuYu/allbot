@@ -3,8 +3,8 @@
 
 export { definePluginEntry } from "./plugin-entry.js";
 export type {
-  KaijiBotPluginApi,
-  KaijiBotPluginCommandDefinition,
-  KaijiBotPluginService,
+  AllBotPluginApi,
+  AllBotPluginCommandDefinition,
+  AllBotPluginService,
   PluginCommandContext,
 } from "../plugins/types.js";

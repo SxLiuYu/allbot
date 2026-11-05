@@ -10,7 +10,7 @@ type ResetDeps = {
   getProfileState: () => ProfileRuntimeState;
   stopRunningBrowser: () => Promise<{ stopped: boolean }>;
   isHttpReachable: (timeoutMs?: number) => Promise<boolean>;
-  resolveKaijiBotUserDataDir: (profileName: string) => string;
+  resolveAllBotUserDataDir: (profileName: string) => string;
 };
 
 type ResetOps = {
@@ -31,7 +31,7 @@ export function createProfileResetOps({
   getProfileState,
   stopRunningBrowser,
   isHttpReachable,
-  resolveKaijiBotUserDataDir,
+  resolveAllBotUserDataDir,
 }: ResetDeps): ResetOps {
   const capabilities = getBrowserProfileCapabilities(profile);
   const resetProfile = async () => {
@@ -41,7 +41,7 @@ export function createProfileResetOps({
       );
     }
 
-    const userDataDir = resolveKaijiBotUserDataDir(profile.name);
+    const userDataDir = resolveAllBotUserDataDir(profile.name);
     const profileState = getProfileState();
     const httpReachable = await isHttpReachable(300);
     if (httpReachable && !profileState.running) {

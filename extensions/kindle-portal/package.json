@@ -1,8 +1,8 @@
 {
-  "name": "@kaijibot/kindle-portal",
+  "name": "@allbot/kindle-portal",
   "version": "2026.6.27",
   "private": true,
-  "description": "KaijiBot Kindle Portal — agent state monitor and cognitive map for Kindle e-ink displays.",
+  "description": "AllBot Kindle Portal — agent state monitor and cognitive map for Kindle e-ink displays.",
   "type": "module",
   "dependencies": {
     "@viz-js/viz": "^3.28.0",
@@ -11,9 +11,9 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "bundle": {
       "stageRuntimeDependencies": true
     },

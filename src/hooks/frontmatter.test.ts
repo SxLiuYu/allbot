@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   parseFrontmatter,
-  resolveKaijiBotMetadata,
+  resolveAllBotMetadata,
   resolveHookInvocationPolicy,
 } from "./frontmatter.js";
 
@@ -41,7 +41,7 @@ name: session-memory
 description: "Save session context"
 metadata:
   {
-    "kaijibot": {
+    "allbot": {
       "emoji": "💾",
       "events": ["command:new"]
     }
@@ -58,8 +58,8 @@ metadata:
 
     // Verify the metadata is valid JSON
     const parsed = JSON.parse(result.metadata);
-    expect(parsed.kaijibot.emoji).toBe("💾");
-    expect(parsed.kaijibot.events).toEqual(["command:new"]);
+    expect(parsed.allbot.emoji).toBe("💾");
+    expect(parsed.allbot.events).toEqual(["command:new"]);
   });
 
   it("parses multi-line metadata with complex nested structure", () => {
@@ -68,7 +68,7 @@ name: command-logger
 description: "Log all command events"
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "📝",
         "events": ["command"],
@@ -83,21 +83,21 @@ metadata:
     expect(result.metadata).toBeDefined();
 
     const parsed = JSON.parse(result.metadata);
-    expect(parsed.kaijibot.emoji).toBe("📝");
-    expect(parsed.kaijibot.events).toEqual(["command"]);
-    expect(parsed.kaijibot.requires.config).toEqual(["workspace.dir"]);
-    expect(parsed.kaijibot.install[0].kind).toBe("bundled");
+    expect(parsed.allbot.emoji).toBe("📝");
+    expect(parsed.allbot.events).toEqual(["command"]);
+    expect(parsed.allbot.requires.config).toEqual(["workspace.dir"]);
+    expect(parsed.allbot.install[0].kind).toBe("bundled");
   });
 
   it("handles single-line metadata (inline JSON)", () => {
     const content = `---
 name: simple-hook
-metadata: {"kaijibot": {"events": ["test"]}}
+metadata: {"allbot": {"events": ["test"]}}
 ---
 `;
     const result = parseFrontmatter(content);
     expect(result.name).toBe("simple-hook");
-    expect(result.metadata).toBe('{"kaijibot": {"events": ["test"]}}');
+    expect(result.metadata).toBe('{"allbot": {"events": ["test"]}}');
   });
 
   it("handles mixed single-line and multi-line values", () => {
@@ -107,7 +107,7 @@ description: "A hook with mixed values"
 homepage: https://example.com
 metadata:
   {
-    "kaijibot": {
+    "allbot": {
       "events": ["command:new"]
     }
   }
@@ -148,12 +148,12 @@ description: 'single-quoted'
   });
 });
 
-describe("resolveKaijiBotMetadata", () => {
-  it("extracts kaijibot metadata from parsed frontmatter", () => {
+describe("resolveAllBotMetadata", () => {
+  it("extracts allbot metadata from parsed frontmatter", () => {
     const frontmatter = {
       name: "test-hook",
       metadata: JSON.stringify({
-        kaijibot: {
+        allbot: {
           emoji: "🔥",
           events: ["command:new", "command:reset"],
           requires: {
@@ -164,7 +164,7 @@ describe("resolveKaijiBotMetadata", () => {
       }),
     };
 
-    const result = resolveKaijiBotMetadata(frontmatter);
+    const result = resolveAllBotMetadata(frontmatter);
     expect(result).toBeDefined();
     expect(result?.emoji).toBe("🔥");
     expect(result?.events).toEqual(["command:new", "command:reset"]);
@@ -174,15 +174,15 @@ describe("resolveKaijiBotMetadata", () => {
 
   it("returns undefined when metadata is missing", () => {
     const frontmatter = { name: "no-metadata" };
-    const result = resolveKaijiBotMetadata(frontmatter);
+    const result = resolveAllBotMetadata(frontmatter);
     expect(result).toBeUndefined();
   });
 
-  it("returns undefined when kaijibot key is missing", () => {
+  it("returns undefined when allbot key is missing", () => {
     const frontmatter = {
       metadata: JSON.stringify({ other: "data" }),
     };
-    const result = resolveKaijiBotMetadata(frontmatter);
+    const result = resolveAllBotMetadata(frontmatter);
     expect(result).toBeUndefined();
   });
 
@@ -190,41 +190,41 @@ describe("resolveKaijiBotMetadata", () => {
     const frontmatter = {
       metadata: "not valid json {",
     };
-    const result = resolveKaijiBotMetadata(frontmatter);
+    const result = resolveAllBotMetadata(frontmatter);
     expect(result).toBeUndefined();
   });
 
   it("handles install specs", () => {
     const frontmatter = {
       metadata: JSON.stringify({
-        kaijibot: {
+        allbot: {
           events: ["command"],
           install: [
-            { id: "bundled", kind: "bundled", label: "Bundled with KaijiBot" },
-            { id: "npm", kind: "npm", package: "@kaijibot/hook" },
+            { id: "bundled", kind: "bundled", label: "Bundled with AllBot" },
+            { id: "npm", kind: "npm", package: "@allbot/hook" },
           ],
         },
       }),
     };
 
-    const result = resolveKaijiBotMetadata(frontmatter);
+    const result = resolveAllBotMetadata(frontmatter);
     expect(result?.install).toHaveLength(2);
     expect(result?.install?.[0].kind).toBe("bundled");
     expect(result?.install?.[1].kind).toBe("npm");
-    expect(result?.install?.[1].package).toBe("@kaijibot/hook");
+    expect(result?.install?.[1].package).toBe("@allbot/hook");
   });
 
   it("handles os restrictions", () => {
     const frontmatter = {
       metadata: JSON.stringify({
-        kaijibot: {
+        allbot: {
           events: ["command"],
           os: ["darwin", "linux"],
         },
       }),
     };
 
-    const result = resolveKaijiBotMetadata(frontmatter);
+    const result = resolveAllBotMetadata(frontmatter);
     expect(result?.os).toEqual(["darwin", "linux"]);
   });
 
@@ -236,12 +236,12 @@ description: "Save session context to memory when /new or /reset command is issu
 homepage: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/automation/hooks.md#session-memory
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "💾",
         "events": ["command:new", "command:reset"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with KaijiBot" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with AllBot" }],
       },
   }
 ---
@@ -253,28 +253,28 @@ metadata:
     expect(frontmatter.name).toBe("session-memory");
     expect(frontmatter.metadata).toBeDefined();
 
-    const kaijibot = resolveKaijiBotMetadata(frontmatter);
-    expect(kaijibot).toBeDefined();
-    expect(kaijibot?.emoji).toBe("💾");
-    expect(kaijibot?.events).toEqual(["command:new", "command:reset"]);
-    expect(kaijibot?.requires?.config).toEqual(["workspace.dir"]);
-    expect(kaijibot?.install?.[0].kind).toBe("bundled");
+    const allbot = resolveAllBotMetadata(frontmatter);
+    expect(allbot).toBeDefined();
+    expect(allbot?.emoji).toBe("💾");
+    expect(allbot?.events).toEqual(["command:new", "command:reset"]);
+    expect(allbot?.requires?.config).toEqual(["workspace.dir"]);
+    expect(allbot?.install?.[0].kind).toBe("bundled");
   });
 
   it("parses YAML metadata map", () => {
     const content = `---
 name: yaml-metadata
 metadata:
-  kaijibot:
+  allbot:
     emoji: disk
     events:
       - command:new
 ---
 `;
     const frontmatter = parseFrontmatter(content);
-    const kaijibot = resolveKaijiBotMetadata(frontmatter);
-    expect(kaijibot?.emoji).toBe("disk");
-    expect(kaijibot?.events).toEqual(["command:new"]);
+    const allbot = resolveAllBotMetadata(frontmatter);
+    expect(allbot?.emoji).toBe("disk");
+    expect(allbot?.events).toEqual(["command:new"]);
   });
 });
 

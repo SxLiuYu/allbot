@@ -141,11 +141,11 @@ describe("R21: discoverLiveModels gates on VITEST env", () => {
 // R22 — explicit disable gate
 // ---------------------------------------------------------------------------
 
-describe("R22: discoverLiveModels gates on KAIJIBOT_DISABLE_LIVE_MODEL_DISCOVERY", () => {
+describe("R22: discoverLiveModels gates on ALLBOT_DISABLE_LIVE_MODEL_DISCOVERY", () => {
   it("returns EMPTY_LIVE_RESULT when disabled", async () => {
     const result = await discoverLiveModels({
       agentDir: "/nonexistent/agent-dir",
-      env: { KAIJIBOT_DISABLE_LIVE_MODEL_DISCOVERY: "1" },
+      env: { ALLBOT_DISABLE_LIVE_MODEL_DISCOVERY: "1" },
       existingCatalog: [],
       providerRuntimeInfo: new Map(),
     });

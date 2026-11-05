@@ -9,7 +9,7 @@ const logger = {
 };
 
 const mocks = vi.hoisted(() => ({
-  loadKaijiBotPlugins: vi.fn<typeof import("../plugins/loader.js").loadKaijiBotPlugins>(),
+  loadAllBotPlugins: vi.fn<typeof import("../plugins/loader.js").loadAllBotPlugins>(),
   getActivePluginRegistry: vi.fn<typeof import("../plugins/runtime.js").getActivePluginRegistry>(),
   resolveConfiguredChannelPluginIds:
     vi.fn<typeof import("../plugins/channel-plugin-ids.js").resolveConfiguredChannelPluginIds>(),
@@ -23,8 +23,8 @@ let ensurePluginRegistryLoaded: typeof import("./plugin-registry.js").ensurePlug
 let resetPluginRegistryLoadedForTests: typeof import("./plugin-registry.js").__testing.resetPluginRegistryLoadedForTests;
 
 vi.mock("../plugins/loader.js", () => ({
-  loadKaijiBotPlugins: (...args: Parameters<typeof mocks.loadKaijiBotPlugins>) =>
-    mocks.loadKaijiBotPlugins(...args),
+  loadAllBotPlugins: (...args: Parameters<typeof mocks.loadAllBotPlugins>) =>
+    mocks.loadAllBotPlugins(...args),
 }));
 
 vi.mock("../plugins/runtime.js", () => ({
@@ -73,7 +73,7 @@ describe("ensurePluginRegistryLoaded", () => {
   });
 
   beforeEach(() => {
-    mocks.loadKaijiBotPlugins.mockReset();
+    mocks.loadAllBotPlugins.mockReset();
     mocks.getActivePluginRegistry.mockReset();
     mocks.resolveConfiguredChannelPluginIds.mockReset();
     mocks.resolveChannelPluginIds.mockReset();
@@ -140,7 +140,7 @@ describe("ensurePluginRegistryLoaded", () => {
         workspaceDir: "/tmp/workspace",
       }),
     );
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: autoEnabledConfig,
         activationSourceConfig: baseConfig,
@@ -175,15 +175,15 @@ describe("ensurePluginRegistryLoaded", () => {
     ensurePluginRegistryLoaded({ scope: "configured-channels" });
     ensurePluginRegistryLoaded({ scope: "channels" });
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledTimes(2);
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenNthCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledTimes(2);
+    expect(mocks.loadAllBotPlugins).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({
         onlyPluginIds: ["demo-channel-a"],
         throwOnLoadError: true,
       }),
     );
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenNthCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
         onlyPluginIds: ["demo-channel-a", "demo-channel-b"],
@@ -215,8 +215,8 @@ describe("ensurePluginRegistryLoaded", () => {
 
     ensurePluginRegistryLoaded({ scope: "all" });
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledTimes(1);
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledTimes(1);
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
         throwOnLoadError: true,
@@ -249,8 +249,8 @@ describe("ensurePluginRegistryLoaded", () => {
 
     ensurePluginRegistryLoaded({ scope: "configured-channels" });
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledTimes(1);
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledTimes(1);
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
         onlyPluginIds: ["demo-channel-a"],
@@ -288,8 +288,8 @@ describe("ensurePluginRegistryLoaded", () => {
     } as never);
     ensurePluginRegistryLoaded({ scope: "configured-channels" });
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledTimes(1);
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledTimes(1);
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
         onlyPluginIds: ["demo-channel-a"],

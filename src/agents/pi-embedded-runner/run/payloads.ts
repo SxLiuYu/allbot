@@ -1,10 +1,10 @@
 import type { AssistantMessage } from "@earendil-works/pi-ai";
-import { hasOutboundReplyContent } from "kaijibot/plugin-sdk/reply-payload";
+import { hasOutboundReplyContent } from "allbot/plugin-sdk/reply-payload";
 import { parseReplyDirectives } from "../../../auto-reply/reply/reply-directives.js";
 import type { ReasoningLevel, VerboseLevel } from "../../../auto-reply/thinking.js";
 import { isSilentReplyPayloadText, SILENT_REPLY_TOKEN } from "../../../auto-reply/tokens.js";
 import { formatToolAggregate } from "../../../auto-reply/tool-meta.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { isCronSessionKey } from "../../../routing/session-key.js";
 import {
   normalizeOptionalLowercaseString,
@@ -110,7 +110,7 @@ export function buildEmbeddedRunPayloads(params: {
   toolMetas: ToolMetaEntry[];
   lastAssistant: AssistantMessage | undefined;
   lastToolError?: ToolErrorSummary;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   isCronTrigger?: boolean;
   sessionKey: string;
   provider?: string;

@@ -3,7 +3,7 @@ import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
 import { DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { resolveEnvApiKey } from "../agents/model-auth-env.js";
 import type { FallbackAttempt } from "../agents/model-fallback.types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
@@ -50,7 +50,7 @@ const IMAGE_RESOLUTION_ORDER = ["1K", "2K", "4K"] as const;
 type CapabilityProviderCandidate = {
   id: string;
   defaultModel?: string | null;
-  isConfigured?: (ctx: { cfg?: KaijiBotConfig; agentDir?: string }) => boolean;
+  isConfigured?: (ctx: { cfg?: AllBotConfig; agentDir?: string }) => boolean;
 };
 
 type ParsedAspectRatio = {
@@ -66,7 +66,7 @@ type ParsedSize = {
   area: number;
 };
 
-function resolveCurrentDefaultProviderId(cfg?: KaijiBotConfig): string {
+function resolveCurrentDefaultProviderId(cfg?: AllBotConfig): string {
   const configured = resolveAgentModelPrimaryValue(cfg?.agents?.defaults?.model);
   const trimmed = normalizeOptionalString(configured);
   if (!trimmed) {
@@ -82,7 +82,7 @@ function resolveCurrentDefaultProviderId(cfg?: KaijiBotConfig): string {
 
 function isCapabilityProviderConfigured(params: {
   provider: CapabilityProviderCandidate;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
 }): boolean {
   if (params.provider.isConfigured) {
@@ -105,9 +105,9 @@ function isCapabilityProviderConfigured(params: {
 }
 
 function resolveAutoCapabilityFallbackRefs(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
-  listProviders: (cfg?: KaijiBotConfig) => CapabilityProviderCandidate[];
+  listProviders: (cfg?: AllBotConfig) => CapabilityProviderCandidate[];
 }): string[] {
   const providerDefaults = new Map<string, string>();
   for (const provider of params.listProviders(params.cfg)) {
@@ -142,12 +142,12 @@ function resolveAutoCapabilityFallbackRefs(params: {
 }
 
 export function resolveCapabilityModelCandidates(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   modelConfig: AgentModelConfig | undefined;
   modelOverride?: string;
   parseModelRef: (raw: string | undefined) => ParsedProviderModelRef | null;
   agentDir?: string;
-  listProviders?: (cfg?: KaijiBotConfig) => CapabilityProviderCandidate[];
+  listProviders?: (cfg?: AllBotConfig) => CapabilityProviderCandidate[];
   autoProviderFallback?: boolean;
 }): ParsedProviderModelRef[] {
   const candidates: ParsedProviderModelRef[] = [];

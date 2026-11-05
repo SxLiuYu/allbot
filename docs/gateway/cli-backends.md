@@ -9,10 +9,10 @@ title: "CLI Backends"
 
 # CLI backends (fallback runtime)
 
-KaijiBot can run **local AI CLIs** as a **text-only fallback** when API providers are down,
+AllBot can run **local AI CLIs** as a **text-only fallback** when API providers are down,
 rate-limited, or temporarily misbehaving. This is intentionally conservative:
 
-- **KaijiBot tools are not injected directly**, but backends with `bundleMcp: true`
+- **AllBot tools are not injected directly**, but backends with `bundleMcp: true`
   can receive gateway tools via a loopback MCP bridge.
 - **JSONL streaming** for CLIs that support it.
 - **Sessions are supported** (so follow-up turns stay coherent).
@@ -31,7 +31,7 @@ You can use Codex CLI **without any config** (the bundled OpenAI plugin
 registers a default backend):
 
 ```bash
-kaijibot agent --message "hi" --model codex-cli/gpt-5.4
+allbot agent --message "hi" --model codex-cli/gpt-5.4
 ```
 
 If your gateway runs under launchd/systemd and PATH is minimal, add just the
@@ -54,7 +54,7 @@ command path:
 That’s it. No keys, no extra auth config needed beyond the CLI itself.
 
 If you use a bundled CLI backend as the **primary message provider** on a
-gateway host, KaijiBot now auto-loads the owning bundled plugin when your config
+gateway host, AllBot now auto-loads the owning bundled plugin when your config
 explicitly references that backend in a model ref or under
 `agents.defaults.cliBackends`.
 
@@ -82,7 +82,7 @@ Add a CLI backend to your fallback list so it only runs when primary models fail
 Notes:
 
 - If you use `agents.defaults.models` (allowlist), you must include your CLI backend models there too.
-- If the primary provider fails (auth, rate limits, timeouts), KaijiBot will
+- If the primary provider fails (auth, rate limits, timeouts), AllBot will
   try the CLI backend next.
 
 ## Configuration overview
@@ -141,22 +141,22 @@ The provider id becomes the left side of your model ref:
 ## How it works
 
 1. **Selects a backend** based on the provider prefix (`codex-cli/...`).
-2. **Builds a system prompt** using the same KaijiBot prompt + workspace context.
+2. **Builds a system prompt** using the same AllBot prompt + workspace context.
 3. **Executes the CLI** with a session id (if supported) so history stays consistent.
 4. **Parses output** (JSON or plain text) and returns the final text.
 5. **Persists session ids** per backend, so follow-ups reuse the same CLI session.
 
 <Note>
 The bundled Anthropic `claude-cli` backend is supported again. Anthropic staff
-told us KaijiBot-style Claude CLI usage is allowed again, so KaijiBot treats
+told us AllBot-style Claude CLI usage is allowed again, so AllBot treats
 `claude -p` usage as sanctioned for this integration unless Anthropic publishes
 a new policy.
 </Note>
 
-The bundled OpenAI `codex-cli` backend passes KaijiBot's system prompt through
+The bundled OpenAI `codex-cli` backend passes AllBot's system prompt through
 Codex's `model_instructions_file` config override (`-c
 model_instructions_file="..."`). Codex does not expose a Claude-style
-`--append-system-prompt` flag, so KaijiBot writes the assembled prompt to a
+`--append-system-prompt` flag, so AllBot writes the assembled prompt to a
 temporary file for each fresh Codex CLI session.
 
 ## Sessions
@@ -176,7 +176,7 @@ Serialization notes:
 
 - `serialize: true` keeps same-lane runs ordered.
 - Most CLIs serialize on one provider lane.
-- KaijiBot drops stored CLI session reuse when the backend auth state changes, including relogin, token rotation, or a changed auth profile credential.
+- AllBot drops stored CLI session reuse when the backend auth state changes, including relogin, token rotation, or a changed auth profile credential.
 
 ## Images (pass-through)
 
@@ -187,15 +187,15 @@ imageArg: "--image",
 imageMode: "repeat"
 ```
 
-KaijiBot will write base64 images to temp files. If `imageArg` is set, those
-paths are passed as CLI args. If `imageArg` is missing, KaijiBot appends the
+AllBot will write base64 images to temp files. If `imageArg` is set, those
+paths are passed as CLI args. If `imageArg` is missing, AllBot appends the
 file paths to the prompt (path injection), which is enough for CLIs that auto-
 load local files from plain paths.
 
 ## Inputs / outputs
 
 - `output: "json"` (default) tries to parse JSON and extract text + session id.
-- For Gemini CLI JSON output, KaijiBot reads reply text from `response` and
+- For Gemini CLI JSON output, AllBot reads reply text from `response` and
   usage from `stats` when `usage` is missing or empty.
 - `output: "jsonl"` parses JSONL streams (for example Codex CLI `--json`) and extracts the final agent message plus session
   identifiers when present.
@@ -239,8 +239,8 @@ Gemini CLI JSON notes:
 
 - Reply text is read from the JSON `response` field.
 - Usage falls back to `stats` when `usage` is absent or empty.
-- `stats.cached` is normalized into KaijiBot `cacheRead`.
-- If `stats.input` is missing, KaijiBot derives input tokens from
+- `stats.cached` is normalized into AllBot `cacheRead`.
+- If `stats.input` is missing, AllBot derives input tokens from
   `stats.input_tokens - stats.cached`.
 
 Override only if needed (common: absolute `command` path).
@@ -257,7 +257,7 @@ CLI backend defaults are now part of the plugin surface:
 
 ## Bundle MCP overlays
 
-CLI backends do **not** receive KaijiBot tool calls directly, but a backend can
+CLI backends do **not** receive AllBot tool calls directly, but a backend can
 opt into a generated MCP config overlay with `bundleMcp: true`.
 
 Current bundled behavior:
@@ -266,28 +266,28 @@ Current bundled behavior:
 - `codex-cli`: inline config overrides for `mcp_servers`
 - `google-gemini-cli`: generated Gemini system settings file
 
-When bundle MCP is enabled, KaijiBot:
+When bundle MCP is enabled, AllBot:
 
 - spawns a loopback HTTP MCP server that exposes gateway tools to the CLI process
-- authenticates the bridge with a per-session token (`KAIJIBOT_MCP_TOKEN`)
+- authenticates the bridge with a per-session token (`ALLBOT_MCP_TOKEN`)
 - scopes tool access to the current session, account, and channel context
 - loads enabled bundle-MCP servers for the current workspace
 - merges them with any existing backend MCP config/settings shape
 - rewrites the launch config using the backend-owned integration mode from the owning extension
 
-If no MCP servers are enabled, KaijiBot still injects a strict config when a
+If no MCP servers are enabled, AllBot still injects a strict config when a
 backend opts into bundle MCP so background runs stay isolated.
 
 ## Limitations
 
-- **No direct KaijiBot tool calls.** KaijiBot does not inject tool calls into
+- **No direct AllBot tool calls.** AllBot does not inject tool calls into
   the CLI backend protocol. Backends only see gateway tools when they opt into
   `bundleMcp: true`.
 - **Streaming is backend-specific.** Some backends stream JSONL; others buffer
   until exit.
 - **Structured outputs** depend on the CLI’s JSON format.
 - **Codex CLI sessions** resume via text output (no JSONL), which is less
-  structured than the initial `--json` run. KaijiBot sessions still work
+  structured than the initial `--json` run. AllBot sessions still work
   normally.
 
 ## Troubleshooting

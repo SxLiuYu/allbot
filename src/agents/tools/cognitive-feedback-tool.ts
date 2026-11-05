@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { stringEnum } from "../schema/typebox.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
@@ -16,7 +16,7 @@ export const CognitiveFeedbackSchema = Type.Object({
 });
 
 export function createCognitiveFeedbackTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   agentId?: string;
 }): AnyAgentTool | null {

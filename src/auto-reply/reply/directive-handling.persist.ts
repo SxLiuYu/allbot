@@ -6,7 +6,7 @@ import {
 import { resolveContextTokensForModel } from "../../agents/context.js";
 import { DEFAULT_CONTEXT_TOKENS } from "../../agents/defaults.js";
 import type { ModelAliasIndex } from "../../agents/model-selection.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { updateSessionStore } from "../../config/sessions/store.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import { enqueueSystemEvent } from "../../infra/system-events.js";
@@ -24,7 +24,7 @@ import type { ElevatedLevel, ReasoningLevel } from "./directives.js";
 export async function persistInlineDirectives(params: {
   directives: InlineDirectives;
   effectiveModelDirective?: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   sessionEntry?: SessionEntry;
   sessionStore?: Record<string, SessionEntry>;
@@ -40,7 +40,7 @@ export async function persistInlineDirectives(params: {
   model: string;
   initialModelLabel: string;
   formatModelSwitchEvent: (label: string, alias?: string) => string;
-  agentCfg: NonNullable<KaijiBotConfig["agents"]>["defaults"] | undefined;
+  agentCfg: NonNullable<AllBotConfig["agents"]>["defaults"] | undefined;
   messageProvider?: string;
   surface?: string;
   gatewayClientScopes?: string[];

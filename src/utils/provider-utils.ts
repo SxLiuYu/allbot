@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveProviderReasoningOutputModeWithPlugin } from "../plugins/provider-runtime.js";
 import type { ProviderRuntimeModel } from "../plugins/types.js";
 import {
@@ -16,7 +16,7 @@ const BUILTIN_REASONING_OUTPUT_MODES = {
 
 export function resolveReasoningOutputMode(params: {
   provider: string | undefined | null;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   modelId?: string;
@@ -66,7 +66,7 @@ export function resolveReasoningOutputMode(params: {
 export function isReasoningTagProvider(
   provider: string | undefined | null,
   options?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
     modelId?: string;

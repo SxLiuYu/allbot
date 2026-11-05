@@ -1,15 +1,15 @@
 import {
   applyAgentDefaultModelPrimary,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import { DEEPINFRA_BASE_URL, DEEPINFRA_DEFAULT_MODEL_REF } from "./provider-models.js";
 
 export { DEEPINFRA_BASE_URL, DEEPINFRA_DEFAULT_MODEL_REF };
 
 export function applyDeepInfraProviderConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   modelRef: string = DEEPINFRA_DEFAULT_MODEL_REF,
-): KaijiBotConfig {
+): AllBotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[modelRef] = {
     ...models[modelRef],
@@ -29,8 +29,8 @@ export function applyDeepInfraProviderConfig(
 }
 
 export function applyDeepInfraConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   modelRef: string = DEEPINFRA_DEFAULT_MODEL_REF,
-): KaijiBotConfig {
+): AllBotConfig {
   return applyAgentDefaultModelPrimary(applyDeepInfraProviderConfig(cfg, modelRef), modelRef);
 }

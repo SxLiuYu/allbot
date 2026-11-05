@@ -439,19 +439,19 @@ describe("exec-command-resolution", () => {
     expect(
       resolveAllowlistCandidatePath(
         {
-          rawExecutable: String.raw`:\Users\demo\AI\system\kaijibot`,
-          executableName: "kaijibot",
+          rawExecutable: String.raw`:\Users\demo\AI\system\allbot`,
+          executableName: "allbot",
         },
-        String.raw`C:\Users\demo\AI\system\kaijibot`,
+        String.raw`C:\Users\demo\AI\system\allbot`,
       ),
     ).toBeUndefined();
     expect(
       resolveAllowlistCandidatePath(
         {
-          rawExecutable: String.raw`:/Users/demo/AI/system/kaijibot`,
-          executableName: "kaijibot",
+          rawExecutable: String.raw`:/Users/demo/AI/system/allbot`,
+          executableName: "allbot",
         },
-        String.raw`C:\Users\demo\AI\system\kaijibot`,
+        String.raw`C:\Users\demo\AI\system\allbot`,
       ),
     ).toBeUndefined();
   });

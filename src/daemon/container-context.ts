@@ -4,8 +4,8 @@ export function resolveDaemonContainerContext(
   env: Record<string, string | undefined> = process.env,
 ): string | null {
   return (
-    normalizeOptionalString(env.KAIJIBOT_CONTAINER_HINT) ||
-    normalizeOptionalString(env.KAIJIBOT_CONTAINER) ||
+    normalizeOptionalString(env.ALLBOT_CONTAINER_HINT) ||
+    normalizeOptionalString(env.ALLBOT_CONTAINER) ||
     null
   );
 }

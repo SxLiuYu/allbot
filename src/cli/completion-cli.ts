@@ -48,7 +48,7 @@ export function resolveShellFromEnv(env: NodeJS.ProcessEnv = process.env): Compl
 function sanitizeCompletionBasename(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) {
-    return "kaijibot";
+    return "allbot";
   }
   return trimmed.replace(/[^a-zA-Z0-9._-]/g, "-");
 }
@@ -68,7 +68,7 @@ export function resolveCompletionCachePath(shell: CompletionShell, binName: stri
 /** Check if the completion cache file exists for the given shell. */
 export async function completionCacheExists(
   shell: CompletionShell,
-  binName = "kaijibot",
+  binName = "allbot",
 ): Promise<boolean> {
   const cachePath = resolveCompletionCachePath(shell, binName);
   return pathExists(cachePath);
@@ -113,7 +113,7 @@ function formatCompletionSourceLine(
 }
 
 function isCompletionProfileHeader(line: string): boolean {
-  return line.trim() === "# KaijiBot Completion";
+  return line.trim() === "# AllBot Completion";
 }
 
 function isCompletionProfileLine(line: string, binName: string, cachePath: string | null): boolean {
@@ -128,7 +128,7 @@ function isCompletionProfileLine(line: string, binName: string, cachePath: strin
 
 /** Check if a line uses the slow dynamic completion pattern (source <(...)) */
 function isSlowDynamicCompletionLine(line: string, binName: string): boolean {
-  // Matches patterns like: source <(kaijibot completion --shell zsh)
+  // Matches patterns like: source <(allbot completion --shell zsh)
   return (
     line.includes(`<(${binName} completion`) ||
     (line.includes(`${binName} completion`) && line.includes("| source"))
@@ -160,7 +160,7 @@ function updateCompletionProfile(
   }
 
   const trimmed = filtered.join("\n").trimEnd();
-  const block = `# KaijiBot Completion\n${sourceLine}`;
+  const block = `# AllBot Completion\n${sourceLine}`;
   const next = trimmed ? `${trimmed}\n\n${block}\n` : `${block}\n`;
   return { next, changed: next !== content, hadExisting };
 }
@@ -190,7 +190,7 @@ function getShellProfilePath(shell: CompletionShell): string {
 
 export async function isCompletionInstalled(
   shell: CompletionShell,
-  binName = "kaijibot",
+  binName = "allbot",
 ): Promise<boolean> {
   const profilePath = getShellProfilePath(shell);
 
@@ -208,11 +208,11 @@ export async function isCompletionInstalled(
 
 /**
  * Check if the profile uses the slow dynamic completion pattern.
- * Returns true if profile has `source <(kaijibot completion ...)` instead of cached file.
+ * Returns true if profile has `source <(allbot completion ...)` instead of cached file.
  */
 export async function usesSlowDynamicCompletion(
   shell: CompletionShell,
-  binName = "kaijibot",
+  binName = "allbot",
 ): Promise<boolean> {
   const profilePath = getShellProfilePath(shell);
 
@@ -250,7 +250,7 @@ export function registerCompletionCli(program: Command) {
     .option("-i, --install", "Install completion script to shell profile")
     .option(
       "--write-state",
-      "Write completion scripts to $KAIJIBOT_STATE_DIR/completions (no stdout)",
+      "Write completion scripts to $ALLBOT_STATE_DIR/completions (no stdout)",
     )
     .option("-y, --yes", "Skip confirmation (non-interactive)", false)
     .action(async (options) => {
@@ -310,7 +310,7 @@ export function registerCompletionCli(program: Command) {
     });
 }
 
-export async function installCompletion(shell: string, yes: boolean, binName = "kaijibot") {
+export async function installCompletion(shell: string, yes: boolean, binName = "allbot") {
   const home = process.env.HOME || os.homedir();
   let profilePath = "";
   let sourceLine = "";

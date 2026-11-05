@@ -27,7 +27,7 @@ function makeCorrection(overrides: Partial<CorrectionRecord> = {}): CorrectionRe
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-correction-test-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-correction-test-"));
   store = new CorrectionStore(tempDir);
 });
 

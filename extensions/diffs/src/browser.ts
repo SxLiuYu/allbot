@@ -1,9 +1,9 @@
 import { constants as fsConstants } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import { chromium } from "playwright-core";
-import type { KaijiBotConfig } from "../api.js";
+import type { AllBotConfig } from "../api.js";
 import type { DiffRenderOptions, DiffTheme } from "./types.js";
 import { VIEWER_ASSET_PREFIX, getServedViewerAsset } from "./viewer-assets.js";
 
@@ -47,10 +47,10 @@ let sharedBrowserState: SharedBrowserState | null = null;
 let executablePathCache: ExecutablePathCache | null = null;
 
 export class PlaywrightDiffScreenshotter implements DiffScreenshotter {
-  private readonly config: KaijiBotConfig;
+  private readonly config: AllBotConfig;
   private readonly browserIdleMs: number;
 
-  constructor(params: { config: KaijiBotConfig; browserIdleMs?: number }) {
+  constructor(params: { config: AllBotConfig; browserIdleMs?: number }) {
     this.config = params.config;
     this.browserIdleMs = params.browserIdleMs ?? DEFAULT_BROWSER_IDLE_MS;
   }
@@ -116,10 +116,10 @@ export class PlaywrightDiffScreenshotter implements DiffScreenshotter {
         await page.setContent(injectBaseHref(params.html), { waitUntil: "load" });
         await page.waitForFunction(
           () => {
-            if (document.documentElement.dataset.kaijibotDiffsReady === "true") {
+            if (document.documentElement.dataset.allbotDiffsReady === "true") {
               return true;
             }
-            return [...document.querySelectorAll("[data-kaijibot-diff-host]")].every((element) => {
+            return [...document.querySelectorAll("[data-allbot-diff-host]")].every((element) => {
               return (
                 element instanceof HTMLElement && element.shadowRoot?.querySelector("[data-diffs]")
               );
@@ -280,11 +280,11 @@ function injectBaseHref(html: string): string {
   return html.replace("<head>", `<head><base href="${LOCAL_VIEWER_BASE_HREF}" />`);
 }
 
-async function resolveBrowserExecutablePath(config: KaijiBotConfig): Promise<string | undefined> {
+async function resolveBrowserExecutablePath(config: AllBotConfig): Promise<string | undefined> {
   const cacheKey = JSON.stringify({
     configPath: config.browser?.executablePath?.trim() || "",
     env: [
-      process.env.KAIJIBOT_BROWSER_EXECUTABLE_PATH ?? "",
+      process.env.ALLBOT_BROWSER_EXECUTABLE_PATH ?? "",
       process.env.BROWSER_EXECUTABLE_PATH ?? "",
       process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ?? "",
     ],
@@ -309,7 +309,7 @@ async function resolveBrowserExecutablePath(config: KaijiBotConfig): Promise<str
 }
 
 async function resolveBrowserExecutablePathUncached(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
 ): Promise<string | undefined> {
   const configPath = config.browser?.executablePath?.trim();
   if (configPath) {
@@ -318,7 +318,7 @@ async function resolveBrowserExecutablePathUncached(
   }
 
   const envCandidates = [
-    process.env.KAIJIBOT_BROWSER_EXECUTABLE_PATH,
+    process.env.ALLBOT_BROWSER_EXECUTABLE_PATH,
     process.env.BROWSER_EXECUTABLE_PATH,
     process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
   ]
@@ -341,7 +341,7 @@ async function resolveBrowserExecutablePathUncached(
 }
 
 async function acquireSharedBrowser(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   idleMs: number;
 }): Promise<BrowserLease> {
   const executablePath = await resolveBrowserExecutablePath(params.config);

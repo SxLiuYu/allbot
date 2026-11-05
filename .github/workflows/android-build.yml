@@ -48,22 +48,22 @@ jobs:
       - name: Rename APK
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk \
-            kaijibot-launcher.apk
+            allbot-launcher.apk
 
       - name: Upload to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if ! gh release view launcher > /dev/null 2>&1; then
-            gh release create launcher --title "KaijiBot Launcher APK" --latest --notes "Android 一键安装包（内置 Termux）。安装后打开，按提示操作即可。不需要更新此 APK — 它会自动安装最新版 KaijiBot。"
+            gh release create launcher --title "AllBot Launcher APK" --latest --notes "Android 一键安装包（内置 Termux）。安装后打开，按提示操作即可。不需要更新此 APK — 它会自动安装最新版 AllBot。"
           else
             gh release edit launcher --latest
           fi
-          gh release upload launcher kaijibot-launcher.apk --clobber
+          gh release upload launcher allbot-launcher.apk --clobber
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kaijibot-launcher
-          path: kaijibot-launcher.apk
+          name: allbot-launcher
+          path: allbot-launcher.apk
           retention-days: 90

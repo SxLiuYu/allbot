@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { buildGatewayConnectionDetailsWithResolvers } from "../gateway/connection-details.js";
 import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
 import { resolveGatewayProbeTarget } from "../gateway/probe-target.js";
@@ -54,7 +54,7 @@ export type GatewayProbeSnapshot = {
   };
 };
 
-export function hasExplicitMemorySearchConfig(cfg: KaijiBotConfig, agentId: string): boolean {
+export function hasExplicitMemorySearchConfig(cfg: AllBotConfig, agentId: string): boolean {
   if (
     cfg.agents?.defaults &&
     Object.prototype.hasOwnProperty.call(cfg.agents.defaults, "memorySearch")
@@ -67,7 +67,7 @@ export function hasExplicitMemorySearchConfig(cfg: KaijiBotConfig, agentId: stri
   );
 }
 
-export function resolveMemoryPluginStatus(cfg: KaijiBotConfig): MemoryPluginStatus {
+export function resolveMemoryPluginStatus(cfg: AllBotConfig): MemoryPluginStatus {
   const pluginsEnabled = cfg.plugins?.enabled !== false;
   if (!pluginsEnabled) {
     return { enabled: false, slot: null, reason: "plugins disabled" };
@@ -80,7 +80,7 @@ export function resolveMemoryPluginStatus(cfg: KaijiBotConfig): MemoryPluginStat
 }
 
 export async function resolveGatewayProbeSnapshot(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   opts: {
     timeoutMs?: number;
     all?: boolean;
@@ -163,12 +163,12 @@ export function buildTailscaleHttpsUrl(params: {
 }
 
 export async function resolveSharedMemoryStatusSnapshot(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentStatus: { defaultId?: string | null };
   memoryPlugin: MemoryPluginStatus;
-  resolveMemoryConfig: (cfg: KaijiBotConfig, agentId: string) => { store: { path: string } } | null;
+  resolveMemoryConfig: (cfg: AllBotConfig, agentId: string) => { store: { path: string } } | null;
   getMemorySearchManager: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     purpose: "status";
   }) => Promise<{

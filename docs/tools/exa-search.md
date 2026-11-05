@@ -9,7 +9,7 @@ title: "Exa Search"
 
 # Exa Search
 
-KaijiBot supports [Exa AI](https://exa.ai/) as a `web_search` provider. Exa
+AllBot supports [Exa AI](https://exa.ai/) as a `web_search` provider. Exa
 offers neural, keyword, and hybrid search modes with built-in content
 extraction (highlights, text, summaries).
 
@@ -24,7 +24,7 @@ extraction (highlights, text, summaries).
     Set `EXA_API_KEY` in the Gateway environment, or configure via:
 
     ```bash
-    kaijibot configure --section web
+    allbot configure --section web
     ```
 
   </Step>
@@ -56,7 +56,7 @@ extraction (highlights, text, summaries).
 ```
 
 **Environment alternative:** set `EXA_API_KEY` in the Gateway environment.
-For a gateway install, put it in `~/.kaijibot/.env`.
+For a gateway install, put it in `~/.allbot/.env`.
 
 ## Tool parameters
 

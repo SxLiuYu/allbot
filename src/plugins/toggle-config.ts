@@ -1,15 +1,15 @@
 import { normalizeChatChannelId } from "../channels/ids.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export function setPluginEnabledInConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   pluginId: string,
   enabled: boolean,
-): KaijiBotConfig {
+): AllBotConfig {
   const builtInChannelId = normalizeChatChannelId(pluginId);
   const resolvedId = builtInChannelId ?? pluginId;
 
-  const next: KaijiBotConfig = {
+  const next: AllBotConfig = {
     ...config,
     plugins: {
       ...config.plugins,

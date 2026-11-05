@@ -1,11 +1,11 @@
 import {
   resolveProviderHttpRequestConfig,
   type ProviderRequestTransportOverrides,
-} from "kaijibot/plugin-sdk/provider-http";
+} from "allbot/plugin-sdk/provider-http";
 import {
   applyAgentDefaultModelPrimary,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import { parseGoogleOauthApiKey } from "./oauth-token-shared.js";
 import { DEFAULT_GOOGLE_API_BASE_URL, normalizeGoogleApiBaseUrl } from "./provider-policy.js";
 export { normalizeAntigravityModelId, normalizeGoogleModelId } from "./model-id.js";
@@ -64,8 +64,8 @@ export function resolveGoogleGenerativeAiHttpRequestConfig(params: {
 
 export const GOOGLE_GEMINI_DEFAULT_MODEL = "google/gemini-3.1-pro-preview";
 
-export function applyGoogleGeminiModelDefault(cfg: KaijiBotConfig): {
-  next: KaijiBotConfig;
+export function applyGoogleGeminiModelDefault(cfg: AllBotConfig): {
+  next: AllBotConfig;
   changed: boolean;
 } {
   const current = cfg.agents?.defaults?.model as unknown;

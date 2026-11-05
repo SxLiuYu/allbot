@@ -13,10 +13,10 @@ import {
 import { createOpenShellSandboxBackendFactory } from "./backend.js";
 import { resolveOpenShellPluginConfig } from "./config.js";
 
-const KAIJIBOT_OPENSHELL_E2E = process.env.KAIJIBOT_E2E_OPENSHELL === "1";
-const KAIJIBOT_OPENSHELL_E2E_TIMEOUT_MS = 12 * 60_000;
-const KAIJIBOT_OPENSHELL_COMMAND =
-  process.env.KAIJIBOT_E2E_OPENSHELL_COMMAND?.trim() || "openshell";
+const ALLBOT_OPENSHELL_E2E = process.env.ALLBOT_E2E_OPENSHELL === "1";
+const ALLBOT_OPENSHELL_E2E_TIMEOUT_MS = 12 * 60_000;
+const ALLBOT_OPENSHELL_COMMAND =
+  process.env.ALLBOT_E2E_OPENSHELL_COMMAND?.trim() || "openshell";
 
 const CUSTOM_IMAGE_DOCKERFILE = `FROM python:3.13-slim
 
@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \\
 RUN groupadd -g 1000 sandbox && \\
     useradd -m -u 1000 -g sandbox sandbox
 
-RUN echo "kaijibot-openshell-e2e" > /opt/openshell-e2e-marker.txt
+RUN echo "allbot-openshell-e2e" > /opt/openshell-e2e-marker.txt
 
 WORKDIR /sandbox
 CMD ["sleep", "infinity"]
@@ -328,18 +328,18 @@ async function runBackendExec(params: {
 }
 
 describe("openshell sandbox backend e2e", () => {
-  it.runIf(process.platform !== "win32" && KAIJIBOT_OPENSHELL_E2E)(
+  it.runIf(process.platform !== "win32" && ALLBOT_OPENSHELL_E2E)(
     "creates a remote-canonical sandbox through OpenShell and executes over SSH",
-    { timeout: KAIJIBOT_OPENSHELL_E2E_TIMEOUT_MS },
+    { timeout: ALLBOT_OPENSHELL_E2E_TIMEOUT_MS },
     async () => {
       if (!(await dockerReady())) {
         return;
       }
-      if (!(await commandAvailable(KAIJIBOT_OPENSHELL_COMMAND))) {
+      if (!(await commandAvailable(ALLBOT_OPENSHELL_COMMAND))) {
         return;
       }
 
-      const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-openshell-e2e-"));
+      const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-openshell-e2e-"));
       const env = openshellEnv(rootDir);
       const previousHome = process.env.HOME;
       const previousXdgConfigHome = process.env.XDG_CONFIG_HOME;
@@ -350,9 +350,9 @@ describe("openshell sandbox backend e2e", () => {
       const denyPolicyPath = path.join(rootDir, "deny-policy.yaml");
       const allowPolicyPath = path.join(rootDir, "allow-policy.yaml");
       const scopeSuffix = `${process.pid}-${Date.now()}`;
-      const gatewayName = `kaijibot-e2e-${scopeSuffix}`;
+      const gatewayName = `allbot-e2e-${scopeSuffix}`;
       const scopeKey = `session:openshell-e2e-deny:${scopeSuffix}`;
-      const allowSandboxName = `kaijibot-policy-allow-${scopeSuffix}`;
+      const allowSandboxName = `allbot-policy-allow-${scopeSuffix}`;
       const gatewayPort = await allocatePort();
       let hostPolicyServer: HostPolicyServer | null = null;
       const sandboxCfg = {
@@ -362,8 +362,8 @@ describe("openshell sandbox backend e2e", () => {
         workspaceAccess: "rw" as const,
         workspaceRoot: path.join(rootDir, "sandboxes"),
         docker: {
-          image: "kaijibot-sandbox:bookworm-slim",
-          containerPrefix: "kaijibot-sbx-",
+          image: "allbot-sandbox:bookworm-slim",
+          containerPrefix: "allbot-sbx-",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp"],
@@ -371,14 +371,14 @@ describe("openshell sandbox backend e2e", () => {
           capDrop: ["ALL"],
           env: {},
         },
-        ssh: createSandboxSshConfig("/tmp/kaijibot-sandboxes"),
+        ssh: createSandboxSshConfig("/tmp/allbot-sandboxes"),
         browser: createSandboxBrowserConfig(),
         tools: { allow: [], deny: [] },
         prune: createSandboxPruneConfig(),
       };
 
       const pluginConfig = resolveOpenShellPluginConfig({
-        command: KAIJIBOT_OPENSHELL_COMMAND,
+        command: ALLBOT_OPENSHELL_COMMAND,
         gateway: gatewayName,
         from: dockerfilePath,
         mode: "remote",
@@ -424,7 +424,7 @@ describe("openshell sandbox backend e2e", () => {
         );
 
         await runCommand({
-          command: KAIJIBOT_OPENSHELL_COMMAND,
+          command: ALLBOT_OPENSHELL_COMMAND,
           args: [
             "gateway",
             "start",
@@ -447,7 +447,7 @@ describe("openshell sandbox backend e2e", () => {
         expect(execResult.code).toBe(0);
         const stdout = execResult.stdout.trim();
         expect(stdout).toContain("/sandbox");
-        expect(stdout).toContain("kaijibot-openshell-e2e");
+        expect(stdout).toContain("allbot-openshell-e2e");
         expect(stdout).toContain("seed-from-local");
 
         const curlPathResult = await runBackendExec({
@@ -483,7 +483,7 @@ describe("openshell sandbox backend e2e", () => {
         );
 
         const verifyResult = await runCommand({
-          command: KAIJIBOT_OPENSHELL_COMMAND,
+          command: ALLBOT_OPENSHELL_COMMAND,
           args: ["sandbox", "ssh-config", backend.runtimeId],
           env,
           timeoutMs: 60_000,
@@ -501,7 +501,7 @@ describe("openshell sandbox backend e2e", () => {
         expect(`${blockedGetResult.stdout}\n${blockedGetResult.stderr}`).toMatch(/403|deny/i);
 
         const allowedGetResult = await runCommand({
-          command: KAIJIBOT_OPENSHELL_COMMAND,
+          command: ALLBOT_OPENSHELL_COMMAND,
           args: [
             "sandbox",
             "create",
@@ -529,21 +529,21 @@ describe("openshell sandbox backend e2e", () => {
         expect(allowedGetResult.stdout).toContain('"message":"hello-from-host"');
       } finally {
         await runCommand({
-          command: KAIJIBOT_OPENSHELL_COMMAND,
+          command: ALLBOT_OPENSHELL_COMMAND,
           args: ["sandbox", "delete", backend.runtimeId],
           env,
           allowFailure: true,
           timeoutMs: 2 * 60_000,
         });
         await runCommand({
-          command: KAIJIBOT_OPENSHELL_COMMAND,
+          command: ALLBOT_OPENSHELL_COMMAND,
           args: ["sandbox", "delete", allowSandboxName],
           env,
           allowFailure: true,
           timeoutMs: 2 * 60_000,
         });
         await runCommand({
-          command: KAIJIBOT_OPENSHELL_COMMAND,
+          command: ALLBOT_OPENSHELL_COMMAND,
           args: ["gateway", "destroy", "--name", gatewayName],
           env,
           allowFailure: true,

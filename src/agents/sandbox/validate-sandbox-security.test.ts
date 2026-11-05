@@ -53,9 +53,9 @@ describe("getBlockedBindReason", () => {
     }
   });
 
-  it("still blocks OS-home credential paths when KAIJIBOT_HOME points elsewhere", () => {
+  it("still blocks OS-home credential paths when ALLBOT_HOME points elsewhere", () => {
     vi.stubEnv("HOME", "/home/tester");
-    vi.stubEnv("KAIJIBOT_HOME", "/srv/kaijibot-home");
+    vi.stubEnv("ALLBOT_HOME", "/srv/allbot-home");
 
     expect(getBlockedBindReason("/home/tester/.gnupg/secring.gpg:/mnt/gnupg:ro")).toEqual(
       expect.objectContaining({
@@ -70,7 +70,7 @@ describe("getBlockedBindReason", () => {
       return;
     }
 
-    const dir = mkdtempSync(join(tmpdir(), "kaijibot-home-"));
+    const dir = mkdtempSync(join(tmpdir(), "allbot-home-"));
     const realHome = join(dir, "real-home");
     const aliasHome = join(dir, "alias-home");
     mkdirSync(join(realHome, ".ssh"), { recursive: true });
@@ -178,7 +178,7 @@ describe("validateBindMounts", () => {
       return;
     }
 
-    const dir = mkdtempSync(join(tmpdir(), "kaijibot-home-"));
+    const dir = mkdtempSync(join(tmpdir(), "allbot-home-"));
     const realHome = join(dir, "real-home");
     const aliasHome = join(dir, "alias-home");
     mkdirSync(join(realHome, ".docker"), { recursive: true });
@@ -196,14 +196,14 @@ describe("validateBindMounts", () => {
       // SeCreateSymbolicLinkPrivilege on Windows.  The Windows branch of this
       // test does not need a real symlink — it only asserts that Windows source
       // paths are rejected as non-POSIX.
-      const dir = mkdtempSync(join(tmpdir(), "kaijibot-sbx-"));
+      const dir = mkdtempSync(join(tmpdir(), "allbot-sbx-"));
       const fakePath = join(dir, "etc-link", "passwd");
       const run = () => validateBindMounts([`${fakePath}:/mnt/passwd:ro`]);
       expect(run).toThrow(/non-absolute source path/);
       return;
     }
 
-    const dir = mkdtempSync(join(tmpdir(), "kaijibot-sbx-"));
+    const dir = mkdtempSync(join(tmpdir(), "allbot-sbx-"));
     const link = join(dir, "etc-link");
     symlinkSync("/etc", link);
     const run = () => validateBindMounts([`${link}/passwd:/mnt/passwd:ro`]);
@@ -215,7 +215,7 @@ describe("validateBindMounts", () => {
       // Windows source paths (e.g. C:\\...) are intentionally rejected as non-POSIX.
       return;
     }
-    const dir = mkdtempSync(join(tmpdir(), "kaijibot-sbx-"));
+    const dir = mkdtempSync(join(tmpdir(), "allbot-sbx-"));
     const workspace = join(dir, "workspace");
     const outside = join(dir, "outside");
     mkdirSync(workspace, { recursive: true });
@@ -235,12 +235,12 @@ describe("validateBindMounts", () => {
       // Windows source paths (e.g. C:\\...) are intentionally rejected as non-POSIX.
       return;
     }
-    const dir = mkdtempSync(join(tmpdir(), "kaijibot-sbx-"));
+    const dir = mkdtempSync(join(tmpdir(), "allbot-sbx-"));
     const workspace = join(dir, "workspace");
     mkdirSync(workspace, { recursive: true });
     const link = join(workspace, "run-link");
     symlinkSync("/var/run", link);
-    const missingLeaf = join(link, "kaijibot-not-created");
+    const missingLeaf = join(link, "allbot-not-created");
     expect(() =>
       validateBindMounts([`${missingLeaf}:/mnt/run:ro`], {
         allowedSourceRoots: [workspace],
@@ -354,7 +354,7 @@ describe("validateSeccompProfile", () => {
 
 describe("validateApparmorProfile", () => {
   it("allows named profile/undefined", () => {
-    expect(() => validateApparmorProfile("kaijibot-sandbox")).not.toThrow();
+    expect(() => validateApparmorProfile("allbot-sandbox")).not.toThrow();
     expect(() => validateApparmorProfile(undefined)).not.toThrow();
   });
 });
@@ -384,7 +384,7 @@ describe("validateSandboxSecurity", () => {
         binds: ["/home/user/src:/src:rw"],
         network: "none",
         seccompProfile: "/tmp/seccomp.json",
-        apparmorProfile: "kaijibot-sandbox",
+        apparmorProfile: "allbot-sandbox",
       }),
     ).not.toThrow();
   });

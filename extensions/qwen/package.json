@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/qwen-provider",
+  "name": "@allbot/qwen-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "KaijiBot Qwen Cloud provider plugin",
+  "description": "AllBot Qwen Cloud provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

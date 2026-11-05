@@ -630,7 +630,7 @@ html.theme-transition::view-transition-new(theme) {
   }
 }
 
-kaijibot-app {
+allbot-app {
   display: block;
   position: relative;
   z-index: 1;

@@ -2,7 +2,7 @@ import {
   getOAuthApiKey as getOAuthApiKeyFromPi,
   refreshOpenAICodexToken as refreshOpenAICodexTokenFromPi,
 } from "@earendil-works/pi-ai/oauth";
-import { ensureGlobalUndiciEnvProxyDispatcher } from "kaijibot/plugin-sdk/runtime-env";
+import { ensureGlobalUndiciEnvProxyDispatcher } from "allbot/plugin-sdk/runtime-env";
 
 export async function getOAuthApiKey(
   ...args: Parameters<typeof getOAuthApiKeyFromPi>

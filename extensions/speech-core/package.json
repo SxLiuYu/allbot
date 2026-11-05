@@ -1,10 +1,10 @@
 {
-  "name": "@kaijibot/speech-core",
+  "name": "@allbot/speech-core",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot speech runtime package",
+  "description": "AllBot speech runtime package",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   }
 }

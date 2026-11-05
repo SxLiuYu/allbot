@@ -1,11 +1,11 @@
-import type { KaijiBotConfig } from "../../../config/types.js";
+import type { AllBotConfig } from "../../../config/types.js";
 import { validateConfigObjectWithPlugins } from "../../../config/validation.js";
 import { applyLegacyDoctorMigrations } from "./legacy-config-compat.js";
 
 export { applyLegacyDoctorMigrations } from "./legacy-config-compat.js";
 
 export function migrateLegacyConfig(raw: unknown): {
-  config: KaijiBotConfig | null;
+  config: AllBotConfig | null;
   changes: string[];
 } {
   const { next, changes } = applyLegacyDoctorMigrations(raw);

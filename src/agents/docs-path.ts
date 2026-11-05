@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveKaijiBotPackageRoot } from "../infra/kaijibot-root.js";
+import { resolveAllBotPackageRoot } from "../infra/allbot-root.js";
 
-export async function resolveKaijiBotDocsPath(params: {
+export async function resolveAllBotDocsPath(params: {
   workspaceDir?: string;
   argv1?: string;
   cwd?: string;
@@ -16,7 +16,7 @@ export async function resolveKaijiBotDocsPath(params: {
     }
   }
 
-  const packageRoot = await resolveKaijiBotPackageRoot({
+  const packageRoot = await resolveAllBotPackageRoot({
     cwd: params.cwd,
     argv1: params.argv1,
     moduleUrl: params.moduleUrl,

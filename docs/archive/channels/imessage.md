@@ -6,9 +6,9 @@ read_when:
 title: "iMessage"
 ---
 
-> ⚠️ **此频道在 KaijiBot 中无打包代码。** This channel has **no bundled code** in KaijiBot — the page is preserved as upstream OpenClaw reference only. KaijiBot's first-class channels are Feishu (飞书) and WeChat (微信); see the [channels hub](/channels) for the full list.
+> ⚠️ **此频道在 AllBot 中无打包代码。** This channel has **no bundled code** in AllBot — the page is preserved as upstream OpenClaw reference only. AllBot's first-class channels are Feishu (飞书) and WeChat (微信); see the [channels hub](/channels) for the full list.
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # iMessage (legacy: imsg)
 
@@ -46,7 +46,7 @@ imsg rpc --help
 
       </Step>
 
-      <Step title="Configure KaijiBot">
+      <Step title="Configure AllBot">
 
 ```json5
 {
@@ -65,7 +65,7 @@ imsg rpc --help
       <Step title="Start gateway">
 
 ```bash
-kaijibot gateway
+allbot gateway
 ```
 
       </Step>
@@ -73,8 +73,8 @@ kaijibot gateway
       <Step title="Approve first DM pairing (default dmPolicy)">
 
 ```bash
-kaijibot pairing list imessage
-kaijibot pairing approve imessage <CODE>
+allbot pairing list imessage
+allbot pairing approve imessage <CODE>
 ```
 
         Pairing requests expire after 1 hour.
@@ -84,7 +84,7 @@ kaijibot pairing approve imessage <CODE>
   </Tab>
 
   <Tab title="Remote Mac over SSH">
-    KaijiBot only requires a stdio-compatible `cliPath`, so you can point `cliPath` at a wrapper script that SSHes to a remote Mac and runs `imsg`.
+    AllBot only requires a stdio-compatible `cliPath`, so you can point `cliPath` at a wrapper script that SSHes to a remote Mac and runs `imsg`.
 
 ```bash
 #!/usr/bin/env bash
@@ -98,7 +98,7 @@ exec ssh -T gateway-host imsg "$@"
   channels: {
     imessage: {
       enabled: true,
-      cliPath: "~/.kaijibot/scripts/imsg-ssh",
+      cliPath: "~/.allbot/scripts/imsg-ssh",
       remoteHost: "user@gateway-host", // used for SCP attachment fetches
       includeAttachments: true,
       // Optional: override allowed attachment roots.
@@ -110,9 +110,9 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-    If `remoteHost` is not set, KaijiBot attempts to auto-detect it by parsing the SSH wrapper script.
+    If `remoteHost` is not set, AllBot attempts to auto-detect it by parsing the SSH wrapper script.
     `remoteHost` must be `host` or `user@host` (no spaces or SSH options).
-    KaijiBot uses strict host-key checking for SCP, so the relay host key must already exist in `~/.ssh/known_hosts`.
+    AllBot uses strict host-key checking for SCP, so the relay host key must already exist in `~/.ssh/known_hosts`.
     Attachment paths are validated against allowed roots (`attachmentRoots` / `remoteAttachmentRoots`).
 
   </Tab>
@@ -121,7 +121,7 @@ exec ssh -T gateway-host imsg "$@"
 ## Requirements and permissions (macOS)
 
 - Messages must be signed in on the Mac running `imsg`.
-- Full Disk Access is required for the process context running KaijiBot/`imsg` (Messages DB access).
+- Full Disk Access is required for the process context running AllBot/`imsg` (Messages DB access).
 - Automation permission is required to send messages through Messages.app.
 
 <Tip>
@@ -183,7 +183,7 @@ imsg send <handle> "test"
     Group-ish thread behavior:
 
     Some multi-participant iMessage threads can arrive with `is_group=false`.
-    If that `chat_id` is explicitly configured under `channels.imessage.groups`, KaijiBot treats it as group traffic (group gating + group session isolation).
+    If that `chat_id` is explicitly configured under `channels.imessage.groups`, AllBot treats it as group traffic (group gating + group session isolation).
 
   </Tab>
 </Tabs>
@@ -251,7 +251,7 @@ See [ACP Agents](/tools/acp-agents) for shared ACP binding behavior.
     1. Create/sign in a dedicated macOS user.
     2. Sign into Messages with the bot Apple ID in that user.
     3. Install `imsg` in that user.
-    4. Create SSH wrapper so KaijiBot can run `imsg` in that user context.
+    4. Create SSH wrapper so AllBot can run `imsg` in that user context.
     5. Point `channels.imessage.accounts.<id>.cliPath` and `.dbPath` to that user profile.
 
     First run may require GUI approvals (Automation + Full Disk Access) in that bot user session.
@@ -273,7 +273,7 @@ See [ACP Agents](/tools/acp-agents) for shared ACP binding behavior.
   channels: {
     imessage: {
       enabled: true,
-      cliPath: "~/.kaijibot/scripts/imsg-ssh",
+      cliPath: "~/.allbot/scripts/imsg-ssh",
       remoteHost: "bot@mac-mini.tailnet-1234.ts.net",
       includeAttachments: true,
       dbPath: "/Users/bot/Library/Messages/chat.db",
@@ -365,7 +365,7 @@ Disable:
 
 ```bash
 imsg rpc --help
-kaijibot channels status --probe
+allbot channels status --probe
 ```
 
     If probe reports RPC unsupported, update `imsg`.
@@ -377,7 +377,7 @@ kaijibot channels status --probe
 
     - `channels.imessage.dmPolicy`
     - `channels.imessage.allowFrom`
-    - pairing approvals (`kaijibot pairing list imessage`)
+    - pairing approvals (`allbot pairing list imessage`)
 
   </Accordion>
 
@@ -410,7 +410,7 @@ imsg chats --limit 1
 imsg send <handle> "test"
 ```
 
-    Confirm Full Disk Access + Automation are granted for the process context that runs KaijiBot/`imsg`.
+    Confirm Full Disk Access + Automation are granted for the process context that runs AllBot/`imsg`.
 
   </Accordion>
 </AccordionGroup>

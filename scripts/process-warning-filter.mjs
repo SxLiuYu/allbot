@@ -1,4 +1,4 @@
-const warningFilterKey = Symbol.for("kaijibot.warning-filter");
+const warningFilterKey = Symbol.for("allbot.warning-filter");
 
 export function installProcessWarningFilter() {
   if (globalThis[warningFilterKey]?.installed) {

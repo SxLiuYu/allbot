@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { installedPluginRoot } from "../../test/helpers/bundled-plugin-paths.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { initCliI18n } from "./i18n/translate.js";
 import {
   buildPluginDiagnosticsReport,
@@ -15,7 +15,7 @@ import {
   writeConfigFile,
 } from "./plugins-cli-test-helpers.js";
 
-const CLI_STATE_ROOT = "/tmp/kaijibot-state";
+const CLI_STATE_ROOT = "/tmp/allbot-state";
 const ALPHA_INSTALL_PATH = installedPluginRoot(CLI_STATE_ROOT, "alpha");
 
 describe("plugins cli uninstall", () => {
@@ -43,7 +43,7 @@ describe("plugins cli uninstall", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     buildPluginDiagnosticsReport.mockReturnValue({
       plugins: [{ id: "alpha", name: "alpha" }],
       diagnostics: [],
@@ -70,13 +70,13 @@ describe("plugins cli uninstall", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const nextConfig = {
       plugins: {
         entries: {},
         installs: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     loadConfig.mockReturnValue(baseConfig);
     buildPluginDiagnosticsReport.mockReturnValue({
@@ -115,7 +115,7 @@ describe("plugins cli uninstall", () => {
         entries: {},
         installs: {},
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     buildPluginDiagnosticsReport.mockReturnValue({
       plugins: [{ id: "alpha", name: "alpha" }],
       diagnostics: [],
@@ -143,7 +143,7 @@ describe("plugins cli uninstall", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     buildPluginDiagnosticsReport.mockReturnValue({
       plugins: [{ id: "linkmind-context", name: "linkmind-context" }],
       diagnostics: [],
@@ -174,7 +174,7 @@ describe("plugins cli uninstall", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     buildPluginDiagnosticsReport.mockReturnValue({
       plugins: [{ id: "linkmind-context", name: "linkmind-context" }],
       diagnostics: [],

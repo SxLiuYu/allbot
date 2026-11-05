@@ -1,4 +1,4 @@
-import { loadKaijiBotPlugins } from "./loader.js";
+import { loadAllBotPlugins } from "./loader.js";
 import type { PluginLoadOptions } from "./loader.js";
 import { type PluginManifestRecord } from "./manifest-registry.js";
 import type { PluginWebSearchProviderEntry } from "./types.js";
@@ -45,7 +45,7 @@ function resolveWebSearchCandidatePluginIds(params: {
 }
 
 function mapRegistryWebSearchProviders(params: {
-  registry: ReturnType<typeof loadKaijiBotPlugins>;
+  registry: ReturnType<typeof loadAllBotPlugins>;
   onlyPluginIds?: readonly string[];
 }): PluginWebSearchProviderEntry[] {
   return mapRegistryProviders({

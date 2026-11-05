@@ -1,7 +1,7 @@
 import { getChannelPlugin, listChannelPlugins } from "../channels/plugins/index.js";
 import type { ChannelId, ChannelPlugin } from "../channels/plugins/types.js";
 import { normalizeAnyChannelId } from "../channels/registry.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -51,7 +51,7 @@ type OwnerAuthorizationState = {
 
 function resolveProviderFromContext(
   ctx: MsgContext,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): { providerId: ChannelId | undefined; hadResolutionError: boolean } {
   const explicitMessageChannels = [ctx.Surface, ctx.OriginatingChannel, ctx.Provider]
     .map((value) => normalizeMessageChannel(value))
@@ -103,7 +103,7 @@ function resolveProviderFromContext(
   };
 }
 
-function probeInferredProviders(ctx: MsgContext, cfg: KaijiBotConfig): InferredProviderProbe {
+function probeInferredProviders(ctx: MsgContext, cfg: AllBotConfig): InferredProviderProbe {
   let droppedResolutionError = false;
   const candidates = listChannelPlugins()
     .map((plugin) => {
@@ -132,7 +132,7 @@ function probeInferredProviders(ctx: MsgContext, cfg: KaijiBotConfig): InferredP
 
 function formatAllowFromList(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   allowFrom: Array<string | number>;
 }): string[] {
@@ -148,7 +148,7 @@ function formatAllowFromList(params: {
 
 function normalizeAllowFromEntry(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   value: string;
 }): string[] {
@@ -175,7 +175,7 @@ function stripWildcardAllowFrom(list: string[]): string[] {
 
 function resolveProviderAllowFrom(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): {
   allowFrom: Array<string | number>;
@@ -224,7 +224,7 @@ function resolveProviderAllowFrom(params: {
 
 function buildProviderAllowFromResolution(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   providerId?: ChannelId;
   forceFallbackResolutionError?: boolean;
@@ -265,7 +265,7 @@ function describeAllowFromResolutionError(err: unknown): string {
 
 function resolveOwnerAllowFromList(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   providerId?: ChannelId;
   allowFrom?: Array<string | number>;
@@ -312,7 +312,7 @@ function resolveOwnerAllowFromList(params: {
  */
 function resolveCommandsAllowFromList(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   providerId?: ChannelId;
 }): string[] | null {
@@ -342,7 +342,7 @@ function resolveCommandsAllowFromList(params: {
 
 function resolveOwnerCandidatesForCommands(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   to?: string;
   allowAll: boolean;
@@ -366,7 +366,7 @@ function resolveOwnerCandidatesForCommands(params: {
 
 function resolveOwnerAuthorizationState(params: {
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   providerId?: ChannelId;
   to?: string;
@@ -481,7 +481,7 @@ function shouldUseFromAsSenderFallback(params: {
 function resolveSenderCandidates(params: {
   plugin?: ChannelPlugin;
   providerId?: ChannelId;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   senderId?: string | null;
   senderE164?: string | null;
@@ -524,7 +524,7 @@ function resolveSenderCandidates(params: {
 }
 
 function resolveFallbackAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerId?: ChannelId;
   accountId?: string | null;
 }): Array<string | number> {
@@ -621,7 +621,7 @@ function resolveFallbackDefaultAccountConfig(
 
 export function resolveCommandAuthorization(params: {
   ctx: MsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   commandAuthorized: boolean;
 }): CommandAuthorization {
   const { ctx, cfg, commandAuthorized } = params;

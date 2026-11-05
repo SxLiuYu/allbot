@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { resolvePluginInstallDir } from "./install.js";
@@ -19,7 +19,7 @@ export type UninstallActions = {
 export type UninstallPluginResult =
   | {
       ok: true;
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       pluginId: string;
       actions: UninstallActions;
       warnings: string[];
@@ -90,10 +90,10 @@ export function resolveUninstallChannelConfigKeys(
  * and owned channel config.
  */
 export function removePluginFromConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   pluginId: string,
   opts?: { channelIds?: string[] },
-): { config: KaijiBotConfig; actions: Omit<UninstallActions, "directory"> } {
+): { config: AllBotConfig; actions: Omit<UninstallActions, "directory"> } {
   const actions: Omit<UninstallActions, "directory"> = {
     entry: false,
     install: false,
@@ -202,17 +202,17 @@ export function removePluginFromConfig(
     }
   }
 
-  const config: KaijiBotConfig = {
+  const config: AllBotConfig = {
     ...cfg,
     plugins: Object.keys(cleanedPlugins).length > 0 ? cleanedPlugins : undefined,
-    channels: channels as KaijiBotConfig["channels"],
+    channels: channels as AllBotConfig["channels"],
   };
 
   return { config, actions };
 }
 
 export type UninstallPluginParams = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   pluginId: string;
   channelIds?: string[];
   deleteFiles?: boolean;

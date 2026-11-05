@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
 import { withEnv } from "../test-utils/env.js";
-import { loadKaijiBotPlugins } from "./loader.js";
+import { loadAllBotPlugins } from "./loader.js";
 import {
   cleanupPluginLoaderFixturesForTest,
   loadBundleFixture,
@@ -13,7 +13,7 @@ import {
 } from "./loader.test-fixtures.js";
 
 function expectNoUnwiredBundleDiagnostic(
-  registry: ReturnType<typeof loadKaijiBotPlugins>,
+  registry: ReturnType<typeof loadAllBotPlugins>,
   pluginId: string,
 ) {
   expect(
@@ -38,7 +38,7 @@ describe("bundle plugins", () => {
     useNoBundledPlugins();
     const workspaceDir = makeTempDir();
     const stateDir = makeTempDir();
-    const bundleRoot = path.join(workspaceDir, ".kaijibot", "extensions", "sample-bundle");
+    const bundleRoot = path.join(workspaceDir, ".allbot", "extensions", "sample-bundle");
     mkdirSafe(path.join(bundleRoot, ".codex-plugin"));
     mkdirSafe(path.join(bundleRoot, "skills"));
     fs.writeFileSync(
@@ -55,8 +55,8 @@ describe("bundle plugins", () => {
       "---\ndescription: fixture\n---\n",
     );
 
-    const registry = withEnv({ KAIJIBOT_STATE_DIR: stateDir }, () =>
-      loadKaijiBotPlugins({
+    const registry = withEnv({ ALLBOT_STATE_DIR: stateDir }, () =>
+      loadAllBotPlugins({
         workspaceDir,
         onlyPluginIds: ["sample-bundle"],
         config: {
@@ -162,7 +162,7 @@ describe("bundle plugins", () => {
     const registry = loadBundleFixture({
       pluginId: "claude-mcp-url",
       env: {
-        KAIJIBOT_HOME: stateDir,
+        ALLBOT_HOME: stateDir,
       },
       build: (bundleRoot) => {
         mkdirSafe(path.join(bundleRoot, ".claude-plugin"));

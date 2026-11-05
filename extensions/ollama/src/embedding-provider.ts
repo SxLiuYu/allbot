@@ -1,15 +1,15 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/provider-auth";
-import { normalizeOptionalSecretInput } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveEnvApiKey } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/provider-auth";
+import { normalizeOptionalSecretInput } from "allbot/plugin-sdk/provider-auth";
+import { resolveEnvApiKey } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   hasConfiguredSecretInput,
   normalizeResolvedSecretInputString,
-} from "kaijibot/plugin-sdk/secret-input";
+} from "allbot/plugin-sdk/secret-input";
 import {
   fetchWithSsrFGuard,
   formatErrorMessage,
   type SsrFPolicy,
-} from "kaijibot/plugin-sdk/ssrf-runtime";
+} from "allbot/plugin-sdk/ssrf-runtime";
 import { resolveOllamaApiBase } from "./provider-models.js";
 
 export type OllamaEmbeddingProvider = {
@@ -21,7 +21,7 @@ export type OllamaEmbeddingProvider = {
 };
 
 type OllamaEmbeddingOptions = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   provider?: string;
   remote?: {

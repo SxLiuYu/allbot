@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot directory` (self, peers, groups)"
+summary: "CLI reference for `allbot directory` (self, peers, groups)"
 read_when:
   - You want to look up contacts/groups/self ids for a channel
   - You are developing a channel directory adapter
 title: "directory"
 ---
 
-# `kaijibot directory`
+# `allbot directory`
 
 Directory lookups for channels that support it (contacts/peers, groups, and “me”).
 
@@ -18,15 +18,15 @@ Directory lookups for channels that support it (contacts/peers, groups, and “m
 
 ## Notes
 
-- `directory` is meant to help you find IDs you can paste into other commands (especially `kaijibot message send --target ...`).
+- `directory` is meant to help you find IDs you can paste into other commands (especially `allbot message send --target ...`).
 - For many channels, results are config-backed (allowlists / configured groups) rather than a live provider directory.
 - Default output is `id` (and sometimes `name`) separated by a tab; use `--json` for scripting.
 
 ## Using results with `message send`
 
 ```bash
-kaijibot directory peers list --channel slack --query "U0"
-kaijibot message send --channel slack --target user:U012ABCDEF --message "hello"
+allbot directory peers list --channel slack --query "U0"
+allbot message send --channel slack --target user:U012ABCDEF --message "hello"
 ```
 
 ## ID formats (by channel)
@@ -43,21 +43,21 @@ kaijibot message send --channel slack --target user:U012ABCDEF --message "hello"
 ## Self ("me")
 
 ```bash
-kaijibot directory self --channel zalouser
+allbot directory self --channel zalouser
 ```
 
 ## Peers (contacts/users)
 
 ```bash
-kaijibot directory peers list --channel zalouser
-kaijibot directory peers list --channel zalouser --query "name"
-kaijibot directory peers list --channel zalouser --limit 50
+allbot directory peers list --channel zalouser
+allbot directory peers list --channel zalouser --query "name"
+allbot directory peers list --channel zalouser --limit 50
 ```
 
 ## Groups
 
 ```bash
-kaijibot directory groups list --channel zalouser
-kaijibot directory groups list --channel zalouser --query "work"
-kaijibot directory groups members --channel zalouser --group-id <id>
+allbot directory groups list --channel zalouser
+allbot directory groups list --channel zalouser --query "work"
+allbot directory groups members --channel zalouser --group-id <id>
 ```

@@ -66,7 +66,7 @@ export async function setupWizardCommand(
       [
         "Non-interactive setup requires explicit risk acknowledgement.",
         "Read: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/security.md",
-        `Re-run with: ${formatCliCommand("kaijibot onboard --non-interactive --accept-risk ...")}`,
+        `Re-run with: ${formatCliCommand("allbot onboard --non-interactive --accept-risk ...")}`,
       ].join("\n"),
     );
     runtime.exit(1);
@@ -85,7 +85,7 @@ export async function setupWizardCommand(
   if (process.platform === "win32") {
     runtime.log(
       [
-        "Windows detected - KaijiBot runs great on WSL2!",
+        "Windows detected - AllBot runs great on WSL2!",
         "Native Windows might be trickier.",
         "Quick setup: wsl --install (one command, one reboot)",
         "Guide: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/platforms/windows.md",

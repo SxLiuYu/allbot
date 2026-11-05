@@ -20,7 +20,7 @@ const {
   })),
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
+vi.mock("allbot/plugin-sdk/provider-http", () => ({
   assertOkOrThrowHttpError: assertOkOrThrowHttpErrorMock,
   postJsonRequest: postJsonRequestMock,
   readProviderBinaryResponse: readProviderBinaryResponseMock,
@@ -28,7 +28,7 @@ vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
 }));
 
 afterAll(() => {
-  vi.doUnmock("kaijibot/plugin-sdk/provider-http");
+  vi.doUnmock("allbot/plugin-sdk/provider-http");
   vi.resetModules();
 });
 

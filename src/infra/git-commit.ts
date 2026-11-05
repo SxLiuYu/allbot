@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import { resolveGitHeadPath } from "./git-root.js";
-import { resolveKaijiBotPackageRootSync } from "./kaijibot-root.js";
+import { resolveAllBotPackageRootSync } from "./allbot-root.js";
 
 const formatCommit = (value?: string | null) => {
   if (!value) {
@@ -202,7 +202,7 @@ export const resolveCommitHash = (
   if (cachedGitCommitBySearchDir.has(searchDir)) {
     return cachedGitCommitBySearchDir.get(searchDir) ?? null;
   }
-  const packageRoot = resolveKaijiBotPackageRootSync({
+  const packageRoot = resolveAllBotPackageRootSync({
     cwd: options.cwd,
     moduleUrl: options.moduleUrl,
   });

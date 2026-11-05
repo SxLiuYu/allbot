@@ -1,15 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
-import { withFileLock } from "kaijibot/plugin-sdk/infra-runtime";
+import { withFileLock } from "allbot/plugin-sdk/infra-runtime";
 import { resolveStateDir } from "../storage/state-dir.js";
 import { logger } from "../util/logger.js";
 
 /**
  * Resolve the framework credentials directory (mirrors core resolveOAuthDir).
- * Path: $KAIJIBOT_OAUTH_DIR || $KAIJIBOT_STATE_DIR/credentials || ~/.kaijibot/credentials
+ * Path: $ALLBOT_OAUTH_DIR || $ALLBOT_STATE_DIR/credentials || ~/.allbot/credentials
  */
 function resolveCredentialsDir(): string {
-  const override = process.env.KAIJIBOT_OAUTH_DIR?.trim();
+  const override = process.env.ALLBOT_OAUTH_DIR?.trim();
   if (override) {
     return override;
   }

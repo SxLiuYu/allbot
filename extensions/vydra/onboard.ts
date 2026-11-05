@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/provider-onboard";
+import type { AllBotConfig } from "allbot/plugin-sdk/provider-onboard";
 
 export const VYDRA_DEFAULT_IMAGE_MODEL_REF = "vydra/grok-imagine";
 
-export function applyVydraConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyVydraConfig(cfg: AllBotConfig): AllBotConfig {
   if (cfg.agents?.defaults?.imageGenerationModel) {
     return cfg;
   }

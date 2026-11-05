@@ -3,7 +3,7 @@ import { resolveSandboxToolPolicyForAgent } from "../agents/sandbox/tool-policy.
 import type { SandboxToolPolicy } from "../agents/sandbox/types.js";
 import { isToolAllowedByPolicies } from "../agents/tool-policy-match.js";
 import { resolveToolProfilePolicy } from "../agents/tool-policy.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
@@ -25,7 +25,7 @@ const SMALL_MODEL_PARAM_B_MAX = 300;
 
 type ModelRef = { id: string; source: string };
 
-function summarizeGroupPolicy(cfg: KaijiBotConfig): {
+function summarizeGroupPolicy(cfg: AllBotConfig): {
   open: number;
   allowlist: number;
   other: number;
@@ -65,7 +65,7 @@ function addModel(models: ModelRef[], raw: unknown, source: string) {
   models.push({ id, source });
 }
 
-function collectModels(cfg: KaijiBotConfig): ModelRef[] {
+function collectModels(cfg: AllBotConfig): ModelRef[] {
   const out: ModelRef[] = [];
   addModel(
     out,
@@ -113,7 +113,7 @@ function extractAgentIdFromSource(source: string): string | null {
 }
 
 function resolveToolPolicies(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentTools?: AgentToolsConfig;
   sandboxMode?: "off" | "non-main" | "all";
   agentId?: string | null;
@@ -142,7 +142,7 @@ function resolveToolPolicies(params: {
   return policies;
 }
 
-function hasWebSearchKey(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): boolean {
+function hasWebSearchKey(cfg: AllBotConfig, env: NodeJS.ProcessEnv): boolean {
   return hasConfiguredWebSearchCredential({
     config: cfg,
     env,
@@ -151,7 +151,7 @@ function hasWebSearchKey(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): boolean {
   });
 }
 
-function isWebSearchEnabled(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): boolean {
+function isWebSearchEnabled(cfg: AllBotConfig, env: NodeJS.ProcessEnv): boolean {
   const enabled = cfg.tools?.web?.search?.enabled;
   if (enabled === false) {
     return false;
@@ -162,7 +162,7 @@ function isWebSearchEnabled(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): boolea
   return hasWebSearchKey(cfg, env);
 }
 
-function isWebFetchEnabled(cfg: KaijiBotConfig): boolean {
+function isWebFetchEnabled(cfg: AllBotConfig): boolean {
   const enabled = cfg.tools?.web?.fetch?.enabled;
   if (enabled === false) {
     return false;
@@ -170,11 +170,11 @@ function isWebFetchEnabled(cfg: KaijiBotConfig): boolean {
   return true;
 }
 
-function isBrowserEnabled(cfg: KaijiBotConfig): boolean {
+function isBrowserEnabled(cfg: AllBotConfig): boolean {
   return cfg.browser?.enabled !== false;
 }
 
-export function collectAttackSurfaceSummaryFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectAttackSurfaceSummaryFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const group = summarizeGroupPolicy(cfg);
   const elevated = cfg.tools?.elevated?.enabled !== false;
   const webhooksEnabled = cfg.hooks?.enabled === true;
@@ -205,7 +205,7 @@ export function collectAttackSurfaceSummaryFindings(cfg: KaijiBotConfig): Securi
 }
 
 export function collectSmallModelRiskFindings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
 }): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];

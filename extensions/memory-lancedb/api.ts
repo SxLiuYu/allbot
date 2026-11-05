@@ -1,1 +1,1 @@
-export * from "kaijibot/plugin-sdk/memory-lancedb";
+export * from "allbot/plugin-sdk/memory-lancedb";

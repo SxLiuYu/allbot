@@ -1,8 +1,8 @@
 import { resolveActiveTalkProviderConfig } from "../../config/talk.js";
-import type { KaijiBotConfig } from "../../config/types.js";
+import type { AllBotConfig } from "../../config/types.js";
 
 export { resolveActiveTalkProviderConfig };
 
-export function getRuntimeConfigSnapshot(): KaijiBotConfig | null {
+export function getRuntimeConfigSnapshot(): AllBotConfig | null {
   return null;
 }

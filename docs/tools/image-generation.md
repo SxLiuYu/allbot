@@ -68,9 +68,9 @@ Use `action: "list"` to inspect available providers and models at runtime:
 | `count`       | number   | Number of images to generate (1–4)                                                    |
 | `filename`    | string   | Output filename hint                                                                  |
 
-Not all providers support all parameters. When a fallback provider supports a nearby geometry option instead of the exact requested one, KaijiBot remaps to the closest supported size, aspect ratio, or resolution before submission. Truly unsupported overrides are still reported in the tool result.
+Not all providers support all parameters. When a fallback provider supports a nearby geometry option instead of the exact requested one, AllBot remaps to the closest supported size, aspect ratio, or resolution before submission. Truly unsupported overrides are still reported in the tool result.
 
-Tool results report the applied settings. When KaijiBot remaps geometry during provider fallback, the returned `size`, `aspectRatio`, and `resolution` values reflect what was actually sent, and `details.normalization` captures the requested-to-applied translation.
+Tool results report the applied settings. When AllBot remaps geometry during provider fallback, the returned `size`, `aspectRatio`, and `resolution` values reflect what was actually sent, and `details.normalization` captures the requested-to-applied translation.
 
 ## Configuration
 
@@ -91,7 +91,7 @@ Tool results report the applied settings. When KaijiBot remaps geometry during p
 
 ### Provider selection order
 
-When generating an image, KaijiBot tries providers in this order:
+When generating an image, AllBot tries providers in this order:
 
 1. **`model` parameter** from the tool call (if the agent specifies one)
 2. **`imageGenerationModel.primary`** from config
@@ -105,7 +105,7 @@ If a provider fails (auth error, rate limit, etc.), the next candidate is tried 
 Notes:
 
 - Auto-detection is auth-aware. A provider default only enters the candidate list
-  when KaijiBot can actually authenticate that provider.
+  when AllBot can actually authenticate that provider.
 - Auto-detection is enabled by default. Set
   `agents.defaults.mediaGenerationAutoProviderFallback: false` if you want image
   generation to use only the explicit `model`, `primary`, and `fallbacks`

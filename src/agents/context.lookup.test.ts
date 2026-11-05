@@ -7,7 +7,7 @@ const contextTestState = vi.hoisted(() => {
   const state = {
     loadConfigImpl: () => ({}) as unknown,
     discoveredModels: [] as DiscoveredModel[],
-    ensureKaijiBotModelsJson: vi.fn(async () => {}),
+    ensureAllBotModelsJson: vi.fn(async () => {}),
     discoverAuthStorage: vi.fn(() => ({})),
     discoverModels: vi.fn(() => ({
       getAll: () => state.discoveredModels,
@@ -21,11 +21,11 @@ vi.mock("../config/config.js", () => ({
 }));
 
 vi.mock("./models-config.js", () => ({
-  ensureKaijiBotModelsJson: contextTestState.ensureKaijiBotModelsJson,
+  ensureAllBotModelsJson: contextTestState.ensureAllBotModelsJson,
 }));
 
 vi.mock("./agent-paths.js", () => ({
-  resolveKaijiBotAgentDir: () => "/tmp/kaijibot-agent",
+  resolveAllBotAgentDir: () => "/tmp/allbot-agent",
 }));
 
 vi.mock("./pi-model-discovery-runtime.js", () => ({
@@ -39,8 +39,8 @@ function mockContextDeps(params: {
 }) {
   contextTestState.loadConfigImpl = params.loadConfig;
   contextTestState.discoveredModels = params.discoveredModels ?? [];
-  contextTestState.ensureKaijiBotModelsJson.mockClear();
-  return { ensureKaijiBotModelsJson: contextTestState.ensureKaijiBotModelsJson };
+  contextTestState.ensureAllBotModelsJson.mockClear();
+  return { ensureAllBotModelsJson: contextTestState.ensureAllBotModelsJson };
 }
 
 function mockContextModuleDeps(loadConfigImpl: () => unknown) {
@@ -105,7 +105,7 @@ describe("lookupContextTokens", () => {
   beforeEach(() => {
     contextTestState.loadConfigImpl = () => ({});
     contextTestState.discoveredModels = [];
-    contextTestState.ensureKaijiBotModelsJson.mockClear();
+    contextTestState.ensureAllBotModelsJson.mockClear();
     contextTestState.discoverAuthStorage.mockClear();
     contextTestState.discoverModels.mockClear();
     contextModule.resetContextWindowCacheForTest();
@@ -195,24 +195,24 @@ describe("lookupContextTokens", () => {
     expect(secondLoadConfigMock).not.toHaveBeenCalled();
   });
 
-  it("only warms eagerly for real kaijibot startup commands that need model metadata", async () => {
+  it("only warms eagerly for real allbot startup commands that need model metadata", async () => {
     const argvSnapshot = process.argv;
     try {
       for (const scenario of [
         {
-          argv: ["node", "kaijibot", "chat"],
+          argv: ["node", "allbot", "chat"],
           expectedCalls: 1,
         },
         {
-          argv: ["node", "kaijibot", "--profile", "--", "config", "validate"],
+          argv: ["node", "allbot", "--profile", "--", "config", "validate"],
           expectedCalls: 0,
         },
         {
-          argv: ["node", "kaijibot", "logs", "--limit", "5"],
+          argv: ["node", "allbot", "logs", "--limit", "5"],
           expectedCalls: 0,
         },
         {
-          argv: ["node", "kaijibot", "status", "--json"],
+          argv: ["node", "allbot", "status", "--json"],
           expectedCalls: 0,
         },
         {
@@ -221,11 +221,11 @@ describe("lookupContextTokens", () => {
         },
       ]) {
         const loadConfigMock = vi.fn(() => ({ models: {} }));
-        const { ensureKaijiBotModelsJson } = mockContextModuleDeps(loadConfigMock);
+        const { ensureAllBotModelsJson } = mockContextModuleDeps(loadConfigMock);
         process.argv = scenario.argv;
         await importFreshContextModule();
         expect(loadConfigMock).toHaveBeenCalledTimes(scenario.expectedCalls);
-        expect(ensureKaijiBotModelsJson).toHaveBeenCalledTimes(scenario.expectedCalls);
+        expect(ensureAllBotModelsJson).toHaveBeenCalledTimes(scenario.expectedCalls);
       }
     } finally {
       process.argv = argvSnapshot;

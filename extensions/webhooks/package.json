@@ -1,16 +1,16 @@
 {
-  "name": "@kaijibot/webhooks",
+  "name": "@allbot/webhooks",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot webhook bridge plugin",
+  "description": "AllBot webhook bridge plugin",
   "type": "module",
   "dependencies": {
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "bundle": {
       "stageRuntimeDependencies": true
     },

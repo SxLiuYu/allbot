@@ -37,9 +37,9 @@ export type SessionLockInspection = {
 
 const CLEANUP_SIGNALS = ["SIGINT", "SIGTERM", "SIGQUIT", "SIGABRT"] as const;
 type CleanupSignal = (typeof CLEANUP_SIGNALS)[number];
-const CLEANUP_STATE_KEY = Symbol.for("kaijibot.sessionWriteLockCleanupState");
-const HELD_LOCKS_KEY = Symbol.for("kaijibot.sessionWriteLockHeldLocks");
-const WATCHDOG_STATE_KEY = Symbol.for("kaijibot.sessionWriteLockWatchdogState");
+const CLEANUP_STATE_KEY = Symbol.for("allbot.sessionWriteLockCleanupState");
+const HELD_LOCKS_KEY = Symbol.for("allbot.sessionWriteLockHeldLocks");
+const WATCHDOG_STATE_KEY = Symbol.for("allbot.sessionWriteLockWatchdogState");
 
 const DEFAULT_STALE_MS = 30 * 60 * 1000;
 const DEFAULT_MAX_HOLD_MS = 5 * 60 * 1000;

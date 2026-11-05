@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import { normalizeProviderId } from "../../../agents/model-selection.js";
 import { resolveSingleAccountKeysToMove } from "../../../channels/plugins/setup-helpers.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { resolveNormalizedProviderModelMaxTokens } from "../../../config/defaults.js";
 import { normalizeTalkSection } from "../../../config/talk.js";
 import { DEFAULT_GOOGLE_API_BASE_URL } from "../../../infra/google-api-base-url.js";
@@ -25,9 +25,9 @@ function buildLegacyTalkProviderCompat(
 }
 
 export function normalizeLegacyBrowserConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   changes: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const rawBrowser = cfg.browser;
   if (!isRecord(rawBrowser)) {
     return cfg;
@@ -105,14 +105,14 @@ export function normalizeLegacyBrowserConfig(
 
   return {
     ...cfg,
-    browser: browser as KaijiBotConfig["browser"],
+    browser: browser as AllBotConfig["browser"],
   };
 }
 
 export function seedMissingDefaultAccountsFromSingleAccountBase(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   changes: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const channels = cfg.channels as Record<string, unknown> | undefined;
   if (!channels) {
     return cfg;
@@ -175,19 +175,19 @@ export function seedMissingDefaultAccountsFromSingleAccountBase(
 
   return {
     ...cfg,
-    channels: nextChannels as KaijiBotConfig["channels"],
+    channels: nextChannels as AllBotConfig["channels"],
   };
 }
 
 type ModelProviderEntry = Partial<
-  NonNullable<NonNullable<KaijiBotConfig["models"]>["providers"]>[string]
+  NonNullable<NonNullable<AllBotConfig["models"]>["providers"]>[string]
 >;
-type ModelsConfigPatch = Partial<NonNullable<KaijiBotConfig["models"]>>;
+type ModelsConfigPatch = Partial<NonNullable<AllBotConfig["models"]>>;
 
 export function normalizeLegacyNanoBananaSkill(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   changes: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const NANO_BANANA_SKILL_KEY = "nano-banana-pro";
   const NANO_BANANA_MODEL = "google/gemini-3-pro-image-preview";
   const rawSkills = cfg.skills;
@@ -286,10 +286,10 @@ export function normalizeLegacyNanoBananaSkill(
       rawGoogle.models = [];
     }
     rawProviders.google = rawGoogle;
-    rawModels.providers = rawProviders as NonNullable<KaijiBotConfig["models"]>["providers"];
+    rawModels.providers = rawProviders as NonNullable<AllBotConfig["models"]>["providers"];
     next = {
       ...next,
-      models: rawModels as KaijiBotConfig["models"],
+      models: rawModels as AllBotConfig["models"],
     };
     changes.push(
       `Moved skills.entries.${NANO_BANANA_SKILL_KEY}.${legacyEnvApiKey ? "env.GEMINI_API_KEY" : "apiKey"} → models.providers.google.apiKey.`,
@@ -320,13 +320,13 @@ export function normalizeLegacyNanoBananaSkill(
   };
 }
 
-export function normalizeLegacyTalkConfig(cfg: KaijiBotConfig, changes: string[]): KaijiBotConfig {
+export function normalizeLegacyTalkConfig(cfg: AllBotConfig, changes: string[]): AllBotConfig {
   const rawTalk = cfg.talk;
   if (!isRecord(rawTalk)) {
     return cfg;
   }
 
-  const normalizedTalk = normalizeTalkSection(rawTalk as KaijiBotConfig["talk"]) ?? {};
+  const normalizedTalk = normalizeTalkSection(rawTalk as AllBotConfig["talk"]) ?? {};
   const legacyProviderCompat = buildLegacyTalkProviderCompat(rawTalk);
   if (legacyProviderCompat) {
     normalizedTalk.providers = {
@@ -351,9 +351,9 @@ export function normalizeLegacyTalkConfig(cfg: KaijiBotConfig, changes: string[]
 }
 
 export function normalizeLegacyCrossContextMessageConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   changes: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const rawTools = cfg.tools;
   if (!isRecord(rawTools)) {
     return cfg;
@@ -445,9 +445,9 @@ function migrateLegacyDeepgramCompat(params: {
 }
 
 export function normalizeLegacyMediaProviderOptions(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   changes: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const rawTools = cfg.tools;
   if (!isRecord(rawTools)) {
     return cfg;
@@ -517,15 +517,15 @@ export function normalizeLegacyMediaProviderOptions(
     ...cfg,
     tools: {
       ...cfg.tools,
-      media: nextMedia as NonNullable<KaijiBotConfig["tools"]>["media"],
+      media: nextMedia as NonNullable<AllBotConfig["tools"]>["media"],
     },
   };
 }
 
 export function normalizeLegacyMistralModelMaxTokens(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   changes: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const rawProviders = cfg.models?.providers;
   if (!isRecord(rawProviders)) {
     return cfg;
@@ -599,7 +599,7 @@ export function normalizeLegacyMistralModelMaxTokens(
     ...cfg,
     models: {
       ...cfg.models,
-      providers: nextProviders as NonNullable<KaijiBotConfig["models"]>["providers"],
+      providers: nextProviders as NonNullable<AllBotConfig["models"]>["providers"],
     },
   };
 }

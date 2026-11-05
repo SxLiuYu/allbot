@@ -1,10 +1,10 @@
 import type { DatabaseSync } from "node:sqlite";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import type { MemorySyncProgressUpdate } from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import type { MemorySyncProgressUpdate } from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 const log = createSubsystemLogger("memory");
 
@@ -174,7 +174,7 @@ export function enqueueMemoryTargetedSessionSync(
 export function _createMemorySyncControlConfigForTests(
   workspaceDir: string,
   indexPath: string,
-): KaijiBotConfig {
+): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -190,5 +190,5 @@ export function _createMemorySyncControlConfigForTests(
       },
       list: [{ id: "main", default: true }],
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }

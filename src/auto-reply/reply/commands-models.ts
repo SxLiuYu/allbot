@@ -9,7 +9,7 @@ import {
   resolveModelRefFromString,
 } from "../../agents/model-selection.js";
 import { getChannelPlugin } from "../../channels/plugins/index.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import {
   normalizeLowercaseStringOrEmpty,
@@ -35,7 +35,7 @@ export type ModelsProviderData = {
  * Exported for reuse by callback handlers.
  */
 export async function buildModelsProviderData(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId?: string,
 ): Promise<ModelsProviderData> {
   const resolvedDefault = resolveDefaultModelForAgent({
@@ -194,7 +194,7 @@ function parseModelsArgs(raw: string): {
 
 function resolveProviderLabel(params: {
   provider: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   sessionEntry?: SessionEntry;
 }): string {
@@ -213,7 +213,7 @@ function resolveProviderLabel(params: {
 export function formatModelsAvailableHeader(params: {
   provider: string;
   total: number;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   sessionEntry?: SessionEntry;
 }): string {
@@ -227,7 +227,7 @@ export function formatModelsAvailableHeader(params: {
 }
 
 export async function resolveModelsCommandReply(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   commandBodyNormalized: string;
   surface?: string;
   currentModel?: string;

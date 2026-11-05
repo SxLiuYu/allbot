@@ -1,6 +1,6 @@
 /**
  * Plugin wiring: connect the Kindle Portal's state, service, and HTTP routes
- * to the KaijiBot plugin runtime.
+ * to the AllBot plugin runtime.
  *
  * This is the only file that calls `api.runtime.*`. All route handlers receive
  * their dependencies via {@link RouterContext}, keeping them runtime-free and
@@ -18,7 +18,7 @@
  *     grouped `{ agents: [{ agentId, sessions }] }` shape the portal expects.
  */
 import path from "node:path";
-import type { KaijiBotPluginApi } from "../api.js";
+import type { AllBotPluginApi } from "../api.js";
 import type { KindleConfig } from "./config.js";
 import {
   createKindleHttpHandler,
@@ -42,7 +42,7 @@ const DEFAULT_AGENT_ID = "main";
  * Register the Kindle Portal plugin: HTTP route `/kindle/*` + a background
  * service that feeds the live fleet state from the agent event stream.
  */
-export function registerKindlePortalPlugin(api: KaijiBotPluginApi, cfg: KindleConfig): void {
+export function registerKindlePortalPlugin(api: AllBotPluginApi, cfg: KindleConfig): void {
   // 1. Resolve directories from the runtime.
   const stateDir = api.runtime.state.resolveStateDir();
   const workspaceDir = resolveWorkspaceDir(api);
@@ -117,7 +117,7 @@ export function registerKindlePortalPlugin(api: KaijiBotPluginApi, cfg: KindleCo
 
 // ── Helpers ──
 
-function resolveWorkspaceDir(api: KaijiBotPluginApi): string {
+function resolveWorkspaceDir(api: AllBotPluginApi): string {
   const fallback = path.join(api.runtime.state.resolveStateDir(), "workspace");
   try {
     return api.runtime.agent.resolveAgentWorkspaceDir(api.config, DEFAULT_AGENT_ID);

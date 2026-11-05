@@ -71,7 +71,7 @@ async function downloadFile(params: {
   timeoutMs: number;
 }): Promise<{ bytes: number }> {
   const destPath = path.resolve(params.rootDir, params.relativePath);
-  const stagingDir = path.join(params.rootDir, ".kaijibot-download-staging");
+  const stagingDir = path.join(params.rootDir, ".allbot-download-staging");
   await ensureDir(stagingDir);
   await assertCanonicalPathWithinBase({
     baseDir: params.rootDir,

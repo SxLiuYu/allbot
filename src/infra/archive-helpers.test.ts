@@ -12,7 +12,7 @@ import {
 } from "./archive.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-archive-helper-test-");
+const createTempDir = () => tempDirs.make("allbot-archive-helper-test-");
 
 function expectTarPreflightError(
   checker: ReturnType<typeof createTarEntryPreflightChecker>,

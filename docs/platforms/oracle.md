@@ -1,19 +1,19 @@
 ---
-summary: "KaijiBot on Oracle Cloud (Always Free ARM)"
+summary: "AllBot on Oracle Cloud (Always Free ARM)"
 read_when:
-  - Setting up KaijiBot on Oracle Cloud
-  - Looking for low-cost VPS hosting for KaijiBot
-  - Want 24/7 KaijiBot on a small server
+  - Setting up AllBot on Oracle Cloud
+  - Looking for low-cost VPS hosting for AllBot
+  - Want 24/7 AllBot on a small server
 title: "Oracle Cloud (Platform)"
 ---
 
-# KaijiBot on Oracle Cloud (OCI)
+# AllBot on Oracle Cloud (OCI)
 
 ## Goal
 
-Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier.
+Run a persistent AllBot Gateway on Oracle Cloud's **Always Free** ARM tier.
 
-Oracle’s free tier can be a great fit for KaijiBot (especially if you already have an OCI account), but it comes with tradeoffs:
+Oracle’s free tier can be a great fit for AllBot (especially if you already have an OCI account), but it comes with tradeoffs:
 
 - ARM architecture (most things work, but some binaries may be x86-only)
 - Capacity and signup can be finicky
@@ -41,7 +41,7 @@ Oracle’s free tier can be a great fit for KaijiBot (especially if you already 
 1. Log into [Oracle Cloud Console](https://cloud.oracle.com/)
 2. Navigate to **Compute → Instances → Create Instance**
 3. Configure:
-   - **Name:** `kaijibot`
+   - **Name:** `allbot`
    - **Image:** Ubuntu 24.04 (aarch64)
    - **Shape:** `VM.Standard.A1.Flex` (Ampere ARM)
    - **OCPUs:** 2 (or up to 4)
@@ -70,7 +70,7 @@ sudo apt install -y build-essential
 
 ```bash
 # Set hostname
-sudo hostnamectl set-hostname kaijibot
+sudo hostnamectl set-hostname allbot
 
 # Set password for ubuntu user
 sudo passwd ubuntu
@@ -83,10 +83,10 @@ sudo loginctl enable-linger ubuntu
 
 ```bash
 curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale up --ssh --hostname=kaijibot
+sudo tailscale up --ssh --hostname=allbot
 ```
 
-This enables Tailscale SSH, so you can connect via `ssh kaijibot` from any device on your tailnet — no public IP needed.
+This enables Tailscale SSH, so you can connect via `ssh allbot` from any device on your tailnet — no public IP needed.
 
 Verify:
 
@@ -94,13 +94,13 @@ Verify:
 tailscale status
 ```
 
-**From now on, connect via Tailscale:** `ssh ubuntu@kaijibot` (or use the Tailscale IP).
+**From now on, connect via Tailscale:** `ssh ubuntu@allbot` (or use the Tailscale IP).
 
-## 5) Install KaijiBot
+## 5) Install AllBot
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot
-cd kaijibot
+cd allbot
 pnpm install && pnpm build
 source ~/.bashrc
 ```
@@ -115,17 +115,17 @@ Use token auth as the default. It’s predictable and avoids needing any “inse
 
 ```bash
 # Keep the Gateway private on the VM
-kaijibot config set gateway.bind loopback
+allbot config set gateway.bind loopback
 
 # Require auth for the Gateway + Control UI
-kaijibot config set gateway.auth.mode token
-kaijibot doctor --generate-gateway-token
+allbot config set gateway.auth.mode token
+allbot doctor --generate-gateway-token
 
 # Expose over Tailscale Serve (HTTPS + tailnet access)
-kaijibot config set gateway.tailscale.mode serve
-kaijibot config set gateway.trustedProxies '["127.0.0.1"]'
+allbot config set gateway.tailscale.mode serve
+allbot config set gateway.trustedProxies '["127.0.0.1"]'
 
-systemctl --user restart kaijibot-gateway.service
+systemctl --user restart allbot-gateway.service
 ```
 
 `gateway.trustedProxies=["127.0.0.1"]` here is only for the local Tailscale Serve proxy's forwarded-IP/local-client handling. It is **not** `gateway.auth.mode: "trusted-proxy"`. Diff viewer routes keep fail-closed behavior in this setup: raw `127.0.0.1` viewer requests without forwarded proxy headers can return `Diff not found`. Use `mode=file` / `mode=both` for attachments, or intentionally enable remote viewers and set `plugins.entries.diffs.config.viewerBaseUrl` (or pass a proxy `baseUrl`) if you need shareable viewer links.
@@ -134,10 +134,10 @@ systemctl --user restart kaijibot-gateway.service
 
 ```bash
 # Check version
-kaijibot --version
+allbot --version
 
 # Check daemon status
-systemctl --user status kaijibot-gateway.service
+systemctl --user status allbot-gateway.service
 
 # Check Tailscale Serve
 tailscale serve status
@@ -165,7 +165,7 @@ This blocks SSH on port 22, HTTP, HTTPS, and everything else at the network edge
 From any device on your Tailscale network:
 
 ```
-https://kaijibot.<tailnet-name>.ts.net/
+https://allbot.<tailnet-name>.ts.net/
 ```
 
 Replace `<tailnet-name>` with your tailnet name (visible in `tailscale status`).
@@ -182,7 +182,7 @@ No SSH tunnel needed. Tailscale provides:
 
 With the VCN locked down (only UDP 41641 open) and the Gateway bound to loopback, you get strong defense-in-depth: public traffic is blocked at the network edge, and admin access happens over your tailnet.
 
-This setup often removes the _need_ for extra host-based firewall rules purely to stop Internet-wide SSH brute force — but you should still keep the OS updated, run `kaijibot security audit`, and verify you aren’t accidentally listening on public interfaces.
+This setup often removes the _need_ for extra host-based firewall rules purely to stop Internet-wide SSH brute force — but you should still keep the OS updated, run `allbot security audit`, and verify you aren’t accidentally listening on public interfaces.
 
 ### Already protected
 
@@ -197,8 +197,8 @@ This setup often removes the _need_ for extra host-based firewall rules purely t
 
 ### Still Recommended
 
-- **Credential permissions:** `chmod 700 ~/.kaijibot`
-- **Security audit:** `kaijibot security audit`
+- **Credential permissions:** `chmod 700 ~/.allbot`
+- **Security audit:** `allbot security audit`
 - **System updates:** `sudo apt update && sudo apt upgrade` regularly
 - **Monitor Tailscale:** Review devices in [Tailscale admin console](https://login.tailscale.com/admin)
 
@@ -223,7 +223,7 @@ If Tailscale Serve isn't working, use an SSH tunnel:
 
 ```bash
 # From your local machine (via Tailscale)
-ssh -L 18789:127.0.0.1:18789 ubuntu@kaijibot
+ssh -L 18789:127.0.0.1:18789 ubuntu@allbot
 ```
 
 Then open `http://localhost:18789`.
@@ -247,15 +247,15 @@ Free tier ARM instances are popular. Try:
 sudo tailscale status
 
 # Re-authenticate
-sudo tailscale up --ssh --hostname=kaijibot --reset
+sudo tailscale up --ssh --hostname=allbot --reset
 ```
 
 ### Gateway will not start
 
 ```bash
-kaijibot gateway status
-kaijibot doctor --non-interactive
-journalctl --user -u kaijibot-gateway.service -n 50
+allbot gateway status
+allbot doctor --non-interactive
+journalctl --user -u allbot-gateway.service -n 50
 ```
 
 ### Cannot reach Control UI
@@ -268,7 +268,7 @@ tailscale serve status
 curl http://localhost:18789
 
 # Restart if needed
-systemctl --user restart kaijibot-gateway.service
+systemctl --user restart allbot-gateway.service
 ```
 
 ### ARM binary issues
@@ -287,13 +287,13 @@ Most npm packages work fine. For binaries, look for `linux-arm64` or `aarch64` r
 
 All state lives in:
 
-- `~/.kaijibot/` — `kaijibot.json`, per-agent `auth-profiles.json`, channel/provider state, and session data
-- `~/.kaijibot/workspace/` — workspace (SOUL.md, memory, artifacts)
+- `~/.allbot/` — `allbot.json`, per-agent `auth-profiles.json`, channel/provider state, and session data
+- `~/.allbot/workspace/` — workspace (SOUL.md, memory, artifacts)
 
 Back up periodically:
 
 ```bash
-kaijibot backup create
+allbot backup create
 ```
 
 ---

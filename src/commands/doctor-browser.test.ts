@@ -8,7 +8,7 @@ describe("doctor browser readiness", () => {
       {
         browser: {
           profiles: {
-            kaijibot: { color: "#FF4500" },
+            allbot: { color: "#FF4500" },
           },
         },
       },

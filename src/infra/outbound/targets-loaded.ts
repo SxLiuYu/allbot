@@ -1,6 +1,6 @@
 import { getLoadedChannelPlugin } from "../../channels/plugins/index.js";
 import type { ChannelOutboundTargetMode, ChannelPlugin } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { GatewayMessageChannel } from "../../utils/message-channel.js";
 import {
   isDeliverableMessageChannel,
@@ -24,7 +24,7 @@ export function tryResolveLoadedOutboundTarget(params: {
   channel: GatewayMessageChannel;
   to?: string;
   allowFrom?: string[];
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   accountId?: string | null;
   mode?: ChannelOutboundTargetMode;
 }): OutboundTargetResolution | undefined {

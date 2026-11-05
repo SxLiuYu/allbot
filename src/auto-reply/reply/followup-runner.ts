@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import {
   hasOutboundReplyContent,
   resolveSendableOutboundReplyParts,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 import { resolveRunModelFallbacksOverride } from "../../agents/agent-scope.js";
 import { resolveBootstrapWarningSignaturesSeen } from "../../agents/bootstrap-budget.js";
 import { resolveContextTokensForModel } from "../../agents/context.js";

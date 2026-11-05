@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import {
   collectAllowlistProviderGroupPolicyWarnings,
   collectAllowlistProviderRestrictSendersWarnings,
@@ -49,13 +49,13 @@ describe("group policy warning builders", () => {
   });
 
   it("projects cfg-only warning collector inputs", () => {
-    const collect = projectConfigWarningCollector<{ cfg: KaijiBotConfig; accountId: string }>(
+    const collect = projectConfigWarningCollector<{ cfg: AllBotConfig; accountId: string }>(
       ({ cfg }) => [cfg.channels ? "configured" : "none"],
     );
 
     expect(
       collect({
-        cfg: { channels: { slack: {} } } as KaijiBotConfig,
+        cfg: { channels: { slack: {} } } as AllBotConfig,
         accountId: "acct-1",
       }),
     ).toEqual(["configured"]);
@@ -63,14 +63,14 @@ describe("group policy warning builders", () => {
 
   it("projects cfg+accountId warning collector inputs", () => {
     const collect = projectConfigAccountIdWarningCollector<{
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       accountId?: string | null;
       account: { accountId: string };
     }>(({ accountId }) => [accountId ?? "default"]);
 
     expect(
       collect({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         accountId: "acct-1",
         account: { accountId: "ignored" },
       }),
@@ -90,16 +90,16 @@ describe("group policy warning builders", () => {
     const collect = projectAccountConfigWarningCollector<
       { accountId: string },
       Record<string, unknown>,
-      { account: { accountId: string }; cfg: KaijiBotConfig }
+      { account: { accountId: string }; cfg: AllBotConfig }
     >(
-      (cfg: KaijiBotConfig) => cfg.channels ?? {},
+      (cfg: AllBotConfig) => cfg.channels ?? {},
       ({ account, cfg }) => [String(account.accountId), Object.keys(cfg).join(",") || "none"],
     );
 
     expect(
       collect({
         account: { accountId: "acct-1" },
-        cfg: { channels: { slack: {} } } as KaijiBotConfig,
+        cfg: { channels: { slack: {} } } as AllBotConfig,
       }),
     ).toEqual(["acct-1", "slack"]);
   });

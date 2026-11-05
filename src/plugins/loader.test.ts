@@ -11,7 +11,7 @@ import { createHookRunner } from "./hooks.js";
 import {
   __testing,
   clearPluginLoaderCache,
-  loadKaijiBotPlugins,
+  loadAllBotPlugins,
   PluginLoadReentryError,
   resolveRuntimePluginRegistry,
 } from "./loader.js";
@@ -101,7 +101,7 @@ function writeBundledPlugin(params: {
     filename: params.filename ?? "index.cjs",
     body: params.body ?? simplePluginBody(params.id),
   });
-  process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+  process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledDir;
   return { bundledDir, plugin };
 }
 
@@ -112,7 +112,7 @@ function writeWorkspacePlugin(params: {
   workspaceDir?: string;
 }) {
   const workspaceDir = params.workspaceDir ?? makeTempDir();
-  const workspacePluginDir = path.join(workspaceDir, ".kaijibot", "extensions", params.id);
+  const workspacePluginDir = path.join(workspaceDir, ".allbot", "extensions", params.id);
   mkdirSafe(workspacePluginDir);
   const plugin = writePlugin({
     id: params.id,
@@ -125,7 +125,7 @@ function writeWorkspacePlugin(params: {
 
 function withStateDir<T>(run: (stateDir: string) => T) {
   const stateDir = makeTempDir();
-  return withEnv({ KAIJIBOT_STATE_DIR: stateDir }, () => run(stateDir));
+  return withEnv({ ALLBOT_STATE_DIR: stateDir }, () => run(stateDir));
 }
 
 function loadBundledMemoryPluginRegistry(options?: {
@@ -134,8 +134,8 @@ function loadBundledMemoryPluginRegistry(options?: {
   pluginFilename?: string;
 }) {
   if (!options && cachedBundledMemoryDir) {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = cachedBundledMemoryDir;
-    return loadKaijiBotPlugins({
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = cachedBundledMemoryDir;
+    return loadAllBotPlugins({
       cache: false,
       workspaceDir: cachedBundledMemoryDir,
       config: {
@@ -163,7 +163,7 @@ function loadBundledMemoryPluginRegistry(options?: {
           name: options.packageMeta.name,
           version: options.packageMeta.version,
           description: options.packageMeta.description,
-          kaijibot: { extensions: [`./${pluginFilename}`] },
+          allbot: { extensions: [`./${pluginFilename}`] },
         },
         null,
         2,
@@ -183,9 +183,9 @@ function loadBundledMemoryPluginRegistry(options?: {
   if (!options) {
     cachedBundledMemoryDir = bundledDir;
   }
-  process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+  process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
-  return loadKaijiBotPlugins({
+  return loadAllBotPlugins({
     cache: false,
     workspaceDir: bundledDir,
     config: {
@@ -208,10 +208,10 @@ function setupBundledTelegramPlugin() {
       filename: "telegram.cjs",
     });
   }
-  process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = cachedBundledTelegramDir;
+  process.env.ALLBOT_BUNDLED_PLUGINS_DIR = cachedBundledTelegramDir;
 }
 
-function expectTelegramLoaded(registry: ReturnType<typeof loadKaijiBotPlugins>) {
+function expectTelegramLoaded(registry: ReturnType<typeof loadAllBotPlugins>) {
   const telegram = registry.plugins.find((entry) => entry.id === "telegram");
   expect(telegram?.status).toBe("loaded");
   expect(registry.channels.some((entry) => entry.plugin.id === "telegram")).toBe(true);
@@ -221,10 +221,10 @@ function loadRegistryFromSinglePlugin(params: {
   plugin: TempPlugin;
   pluginConfig?: Record<string, unknown>;
   includeWorkspaceDir?: boolean;
-  options?: Omit<Parameters<typeof loadKaijiBotPlugins>[0], "cache" | "workspaceDir" | "config">;
+  options?: Omit<Parameters<typeof loadAllBotPlugins>[0], "cache" | "workspaceDir" | "config">;
 }) {
   const pluginConfig = params.pluginConfig ?? {};
-  return loadKaijiBotPlugins({
+  return loadAllBotPlugins({
     cache: false,
     ...(params.includeWorkspaceDir === false ? {} : { workspaceDir: params.plugin.dir }),
     ...params.options,
@@ -239,9 +239,9 @@ function loadRegistryFromSinglePlugin(params: {
 
 function loadRegistryFromAllowedPlugins(
   plugins: TempPlugin[],
-  options?: Omit<Parameters<typeof loadKaijiBotPlugins>[0], "cache" | "config">,
+  options?: Omit<Parameters<typeof loadAllBotPlugins>[0], "cache" | "config">,
 ) {
-  return loadKaijiBotPlugins({
+  return loadAllBotPlugins({
     cache: false,
     ...options,
     config: {
@@ -454,7 +454,7 @@ function createEscapingEntryFixture(params: { id: string; sourceBody: string }) 
   const linkedEntry = path.join(pluginDir, "entry.cjs");
   fs.writeFileSync(outsideEntry, params.sourceBody, "utf-8");
   fs.writeFileSync(
-    path.join(pluginDir, "kaijibot.plugin.json"),
+    path.join(pluginDir, "allbot.plugin.json"),
     JSON.stringify(
       {
         id: params.id,
@@ -469,7 +469,7 @@ function createEscapingEntryFixture(params: { id: string; sourceBody: string }) 
 }
 
 function resolveLoadedPluginSource(
-  registry: ReturnType<typeof loadKaijiBotPlugins>,
+  registry: ReturnType<typeof loadAllBotPlugins>,
   pluginId: string,
 ) {
   return fs.realpathSync(registry.plugins.find((entry) => entry.id === pluginId)?.source ?? "");
@@ -477,8 +477,8 @@ function resolveLoadedPluginSource(
 
 function expectCachePartitionByPluginSource(params: {
   pluginId: string;
-  loadFirst: () => ReturnType<typeof loadKaijiBotPlugins>;
-  loadSecond: () => ReturnType<typeof loadKaijiBotPlugins>;
+  loadFirst: () => ReturnType<typeof loadAllBotPlugins>;
+  loadSecond: () => ReturnType<typeof loadAllBotPlugins>;
   expectedFirstSource: string;
   expectedSecondSource: string;
 }) {
@@ -495,8 +495,8 @@ function expectCachePartitionByPluginSource(params: {
 }
 
 function expectCacheMissThenHit(params: {
-  loadFirst: () => ReturnType<typeof loadKaijiBotPlugins>;
-  loadVariant: () => ReturnType<typeof loadKaijiBotPlugins>;
+  loadFirst: () => ReturnType<typeof loadAllBotPlugins>;
+  loadVariant: () => ReturnType<typeof loadAllBotPlugins>;
 }) {
   const first = params.loadFirst();
   const second = params.loadVariant();
@@ -529,7 +529,7 @@ function createSetupEntryChannelPluginFixture(params: {
     JSON.stringify(
       {
         name: params.packageName,
-        kaijibot: {
+        allbot: {
           extensions: ["./index.cjs"],
           setupEntry: "./setup-entry.cjs",
           ...(params.startupDeferConfiguredChannelFullLoadUntilAfterListen
@@ -547,7 +547,7 @@ function createSetupEntryChannelPluginFixture(params: {
     "utf-8",
   );
   fs.writeFileSync(
-    path.join(pluginDir, "kaijibot.plugin.json"),
+    path.join(pluginDir, "allbot.plugin.json"),
     JSON.stringify(
       {
         id: params.id,
@@ -616,10 +616,10 @@ module.exports = {
 
 function createEnvResolvedPluginFixture(pluginId: string) {
   useNoBundledPlugins();
-  const kaijibotHome = makeTempDir();
+  const allbotHome = makeTempDir();
   const ignoredHome = makeTempDir();
   const stateDir = makeTempDir();
-  const pluginDir = path.join(kaijibotHome, "plugins", pluginId);
+  const pluginDir = path.join(allbotHome, "plugins", pluginId);
   mkdirSafe(pluginDir);
   const plugin = writePlugin({
     id: pluginId,
@@ -629,10 +629,10 @@ function createEnvResolvedPluginFixture(pluginId: string) {
   });
   const env = {
     ...process.env,
-    KAIJIBOT_HOME: kaijibotHome,
+    ALLBOT_HOME: allbotHome,
     HOME: ignoredHome,
-    KAIJIBOT_STATE_DIR: stateDir,
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+    ALLBOT_STATE_DIR: stateDir,
+    ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
   };
   return { plugin, env };
 }
@@ -663,7 +663,7 @@ function expectEscapingEntryRejected(params: {
     throw err;
   }
 
-  const registry = loadKaijiBotPlugins({
+  const registry = loadAllBotPlugins({
     cache: false,
     config: {
       plugins: {
@@ -689,7 +689,7 @@ afterAll(() => {
   cachedBundledMemoryDir = "";
 });
 
-describe("loadKaijiBotPlugins", () => {
+describe("loadAllBotPlugins", () => {
   it("disables bundled plugins by default", () => {
     const bundledDir = makeTempDir();
     writePlugin({
@@ -698,9 +698,9 @@ describe("loadKaijiBotPlugins", () => {
       dir: bundledDir,
       filename: "bundled.cjs",
     });
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       config: {
         plugins: {
@@ -714,7 +714,7 @@ describe("loadKaijiBotPlugins", () => {
   });
 
   // Skipped: telegram (and the other 17 inherited channel bundles) has no
-  // kaijibot.plugin.json with a `channel` declaration, so the manifest-based
+  // allbot.plugin.json with a `channel` declaration, so the manifest-based
   // channel-id set never recognizes it → channel-config enablement can't load
   // it. Re-enable once inherited channel bundles ship proper manifests.
   it.skip.each([
@@ -728,7 +728,7 @@ describe("loadKaijiBotPlugins", () => {
           },
         },
       } satisfies PluginLoadConfig,
-      assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+      assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
         expectTelegramLoaded(registry);
       },
     },
@@ -744,7 +744,7 @@ describe("loadKaijiBotPlugins", () => {
           enabled: true,
         },
       } satisfies PluginLoadConfig,
-      assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+      assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
         expectTelegramLoaded(registry);
       },
     },
@@ -760,7 +760,7 @@ describe("loadKaijiBotPlugins", () => {
           allow: ["browser"],
         },
       } satisfies PluginLoadConfig,
-      assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+      assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
         const telegram = registry.plugins.find((entry) => entry.id === "telegram");
         expect(telegram?.status).toBe("loaded");
         expect(telegram?.error).toBeUndefined();
@@ -781,7 +781,7 @@ describe("loadKaijiBotPlugins", () => {
           },
         },
       } satisfies PluginLoadConfig,
-      assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+      assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
         const telegram = registry.plugins.find((entry) => entry.id === "telegram");
         expect(telegram?.status).toBe("disabled");
         expect(telegram?.error).toBe("disabled in config");
@@ -791,7 +791,7 @@ describe("loadKaijiBotPlugins", () => {
     "handles bundled telegram plugin enablement and override rules: $name",
     ({ config, assert }) => {
       setupBundledTelegramPlugin();
-      const registry = loadKaijiBotPlugins({
+      const registry = loadAllBotPlugins({
         cache: false,
         workspaceDir: cachedBundledTelegramDir,
         config,
@@ -817,7 +817,7 @@ describe("loadKaijiBotPlugins", () => {
       env: {},
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: cachedBundledTelegramDir,
       config: autoEnabled.config,
@@ -851,7 +851,7 @@ describe("loadKaijiBotPlugins", () => {
       env: {},
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: cachedBundledTelegramDir,
       config: autoEnabled.config,
@@ -877,7 +877,7 @@ describe("loadKaijiBotPlugins", () => {
       },
     } satisfies PluginLoadConfig;
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: cachedBundledTelegramDir,
       config: {
@@ -919,7 +919,7 @@ describe("loadKaijiBotPlugins", () => {
       },
     } satisfies PluginLoadConfig;
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: bundledDir,
       config,
@@ -937,7 +937,7 @@ describe("loadKaijiBotPlugins", () => {
   it("preserves package.json metadata for bundled memory plugins", () => {
     const registry = loadBundledMemoryPluginRegistry({
       packageMeta: {
-        name: "@kaijibot/memory-core",
+        name: "@allbot/memory-core",
         version: "1.2.3",
         description: "Memory plugin package",
       },
@@ -955,7 +955,7 @@ describe("loadKaijiBotPlugins", () => {
     {
       label: "loads plugins from config paths",
       run: () => {
-        process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+        process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
         const plugin = writePlugin({
           id: "allowed-config-path",
           filename: "allowed-config-path.cjs",
@@ -967,7 +967,7 @@ describe("loadKaijiBotPlugins", () => {
 };`,
         });
 
-        const registry = loadKaijiBotPlugins({
+        const registry = loadAllBotPlugins({
           cache: false,
           workspaceDir: plugin.dir,
           config: {
@@ -1002,7 +1002,7 @@ describe("loadKaijiBotPlugins", () => {
 };`,
         });
 
-        const registry = loadKaijiBotPlugins({
+        const registry = loadAllBotPlugins({
           cache: false,
           workspaceDir: plugin.dir,
           config: {
@@ -1041,7 +1041,7 @@ describe("loadKaijiBotPlugins", () => {
 module.exports = { id: "skipped-scoped-only", register() { throw new Error("skipped plugin should not load"); } };`,
         });
 
-        const registry = loadKaijiBotPlugins({
+        const registry = loadAllBotPlugins({
           cache: false,
           config: {
             plugins: {
@@ -1068,7 +1068,7 @@ module.exports = { id: "skipped-scoped-only", register() { throw new Error("skip
 module.exports = { id: "manifest-only-plugin", register() { throw new Error("manifest-only snapshot should not register"); } };`,
         });
 
-        const registry = loadKaijiBotPlugins({
+        const registry = loadAllBotPlugins({
           cache: false,
           activate: false,
           loadModules: false,
@@ -1108,7 +1108,7 @@ module.exports = { id: "manifest-only-plugin", register() { throw new Error("man
 };`,
         });
         fs.writeFileSync(
-          path.join(memoryPlugin.dir, "kaijibot.plugin.json"),
+          path.join(memoryPlugin.dir, "allbot.plugin.json"),
           JSON.stringify(
             {
               id: "memory-demo",
@@ -1121,7 +1121,7 @@ module.exports = { id: "manifest-only-plugin", register() { throw new Error("man
           "utf-8",
         );
 
-        const registry = loadKaijiBotPlugins({
+        const registry = loadAllBotPlugins({
           cache: false,
           activate: false,
           loadModules: false,
@@ -1157,7 +1157,7 @@ module.exports = { id: "manifest-only-plugin", register() { throw new Error("man
       label: "tracks plugins as imported when module evaluation throws after top-level execution",
       run: () => {
         useNoBundledPlugins();
-        const importMarker = "__kaijibot_loader_import_throw_marker";
+        const importMarker = "__allbot_loader_import_throw_marker";
         Reflect.deleteProperty(globalThis, importMarker);
 
         const plugin = writePlugin({
@@ -1168,7 +1168,7 @@ throw new Error("boom after import");
 module.exports = { id: "throws-after-import", register() {} };`,
         });
 
-        const registry = loadKaijiBotPlugins({
+        const registry = loadAllBotPlugins({
           cache: false,
           activate: false,
           config: {
@@ -1199,13 +1199,13 @@ module.exports = { id: "throws-after-import", register() {} };`,
       label: "fails loudly when a plugin reenters the same snapshot load during register",
       run: () => {
         useNoBundledPlugins();
-        const marker = "__kaijibot_loader_reentry_error";
-        const reenterFnMarker = "__kaijibot_loader_reentry_fn";
+        const marker = "__allbot_loader_reentry_error";
+        const reenterFnMarker = "__allbot_loader_reentry_fn";
         Reflect.deleteProperty(globalThis, marker);
         Reflect.set(
           globalThis,
           reenterFnMarker,
-          (options: Parameters<typeof loadKaijiBotPlugins>[0]) => loadKaijiBotPlugins(options),
+          (options: Parameters<typeof loadAllBotPlugins>[0]) => loadAllBotPlugins(options),
         );
         const pluginDir = makeTempDir();
         const pluginFile = path.join(pluginDir, "reentrant-snapshot.cjs");
@@ -1219,7 +1219,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
               allow: ["reentrant-snapshot"],
             },
           },
-        } satisfies Parameters<typeof loadKaijiBotPlugins>[0];
+        } satisfies Parameters<typeof loadAllBotPlugins>[0];
         writePlugin({
           id: "reentrant-snapshot",
           dir: pluginDir,
@@ -1240,7 +1240,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 };`,
         });
 
-        const registry = loadKaijiBotPlugins(nestedOptions);
+        const registry = loadAllBotPlugins(nestedOptions);
 
         try {
           expect(Reflect.get(globalThis, marker)).toMatchObject({
@@ -1264,8 +1264,8 @@ module.exports = { id: "throws-after-import", register() {} };`,
       label: "lets resolveRuntimePluginRegistry short-circuit during same snapshot load",
       run: () => {
         useNoBundledPlugins();
-        const marker = "__kaijibot_runtime_registry_reentry_marker";
-        const resolverMarker = "__kaijibot_runtime_registry_reentry_fn";
+        const marker = "__allbot_runtime_registry_reentry_marker";
+        const resolverMarker = "__allbot_runtime_registry_reentry_fn";
         Reflect.deleteProperty(globalThis, marker);
         Reflect.set(
           globalThis,
@@ -1285,7 +1285,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
               allow: ["runtime-registry-reentry"],
             },
           },
-        } satisfies Parameters<typeof loadKaijiBotPlugins>[0];
+        } satisfies Parameters<typeof loadAllBotPlugins>[0];
         writePlugin({
           id: "runtime-registry-reentry",
           dir: pluginDir,
@@ -1299,7 +1299,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 };`,
         });
 
-        const registry = loadKaijiBotPlugins(nestedOptions);
+        const registry = loadAllBotPlugins(nestedOptions);
 
         try {
           expect(Reflect.get(globalThis, marker)).toBe("undefined");
@@ -1337,12 +1337,12 @@ module.exports = { id: "throws-after-import", register() {} };`,
           },
         };
 
-        const full = loadKaijiBotPlugins(options);
-        const scoped = loadKaijiBotPlugins({
+        const full = loadAllBotPlugins(options);
+        const scoped = loadAllBotPlugins({
           ...options,
           onlyPluginIds: ["allowed-cache-scope"],
         });
-        const scopedAgain = loadKaijiBotPlugins({
+        const scopedAgain = loadAllBotPlugins({
           ...options,
           onlyPluginIds: ["allowed-cache-scope"],
         });
@@ -1369,7 +1369,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
         setActivePluginRegistry(previousRegistry, "existing-registry");
         resetGlobalHookRunner();
 
-        const scoped = loadKaijiBotPlugins({
+        const scoped = loadAllBotPlugins({
           cache: false,
           activate: false,
           workspaceDir: plugin.dir,
@@ -1411,7 +1411,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
     });
     clearPluginCommands();
 
-    const scoped = loadKaijiBotPlugins({
+    const scoped = loadAllBotPlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -1428,7 +1428,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
     expect(scoped.commands.map((entry) => entry.command.name)).toEqual(["pair"]);
     expect(getPluginCommandSpecs("telegram")).toEqual([]);
 
-    const active = loadKaijiBotPlugins({
+    const active = loadAllBotPlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -1466,7 +1466,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
     });
 
     clearInternalHooks();
-    const scoped = loadKaijiBotPlugins({
+    const scoped = loadAllBotPlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -1491,7 +1491,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
   it("can scope bundled provider loads to deepseek without hanging", () => {
     resetPluginLoaderTestStateForTest();
 
-    const scoped = loadKaijiBotPlugins({
+    const scoped = loadAllBotPlugins({
       cache: false,
       activate: false,
       pluginSdkResolution: "dist",
@@ -1570,7 +1570,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
       };`,
     });
 
-    const scoped = loadKaijiBotPlugins({
+    const scoped = loadAllBotPlugins({
       cache: false,
       activate: false,
       workspaceDir: plugin.dir,
@@ -1635,7 +1635,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
       };`,
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {
@@ -1657,16 +1657,16 @@ module.exports = { id: "throws-after-import", register() {} };`,
   });
 
   it("throws when activate:false is used without cache:false", () => {
-    expect(() => loadKaijiBotPlugins({ activate: false })).toThrow(
+    expect(() => loadAllBotPlugins({ activate: false })).toThrow(
       "activate:false requires cache:false",
     );
-    expect(() => loadKaijiBotPlugins({ activate: false, cache: true })).toThrow(
+    expect(() => loadAllBotPlugins({ activate: false, cache: true })).toThrow(
       "activate:false requires cache:false",
     );
   });
 
   it("re-initializes global hook runner when serving registry from cache", () => {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "cache-hook-runner",
       filename: "cache-hook-runner.cjs",
@@ -1683,13 +1683,13 @@ module.exports = { id: "throws-after-import", register() {} };`,
       },
     };
 
-    const first = loadKaijiBotPlugins(options);
+    const first = loadAllBotPlugins(options);
     expect(getGlobalHookRunner()).not.toBeNull();
 
     resetGlobalHookRunner();
     expect(getGlobalHookRunner()).toBeNull();
 
-    const second = loadKaijiBotPlugins(options);
+    const second = loadAllBotPlugins(options);
     expect(second).toBe(first);
     expect(getGlobalHookRunner()).not.toBeNull();
 
@@ -1731,19 +1731,19 @@ module.exports = { id: "throws-after-import", register() {} };`,
           expectedFirstSource: pluginA.file,
           expectedSecondSource: pluginB.file,
           loadFirst: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               env: {
                 ...process.env,
-                KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledA,
+                ALLBOT_BUNDLED_PLUGINS_DIR: bundledA,
               },
             }),
           loadSecond: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               env: {
                 ...process.env,
-                KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledB,
+                ALLBOT_BUNDLED_PLUGINS_DIR: bundledB,
               },
             }),
         };
@@ -1788,25 +1788,25 @@ module.exports = { id: "throws-after-import", register() {} };`,
           expectedFirstSource: pluginA.file,
           expectedSecondSource: pluginB.file,
           loadFirst: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               env: {
                 ...process.env,
                 HOME: homeA,
-                KAIJIBOT_HOME: undefined,
-                KAIJIBOT_STATE_DIR: stateDir,
-                KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledDir,
+                ALLBOT_HOME: undefined,
+                ALLBOT_STATE_DIR: stateDir,
+                ALLBOT_BUNDLED_PLUGINS_DIR: bundledDir,
               },
             }),
           loadSecond: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               env: {
                 ...process.env,
                 HOME: homeB,
-                KAIJIBOT_HOME: undefined,
-                KAIJIBOT_STATE_DIR: stateDir,
-                KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledDir,
+                ALLBOT_HOME: undefined,
+                ALLBOT_STATE_DIR: stateDir,
+                ALLBOT_BUNDLED_PLUGINS_DIR: bundledDir,
               },
             }),
         };
@@ -1828,10 +1828,10 @@ module.exports = { id: "throws-after-import", register() {} };`,
       name: "does not reuse cached registries when env-resolved install paths change",
       setup: () => {
         useNoBundledPlugins();
-        const kaijibotHome = makeTempDir();
+        const allbotHome = makeTempDir();
         const ignoredHome = makeTempDir();
         const stateDir = makeTempDir();
-        const pluginDir = path.join(kaijibotHome, "plugins", "tracked-install-cache");
+        const pluginDir = path.join(allbotHome, "plugins", "tracked-install-cache");
         mkdirSafe(pluginDir);
         const plugin = writePlugin({
           id: "tracked-install-cache",
@@ -1859,25 +1859,25 @@ module.exports = { id: "throws-after-import", register() {} };`,
         const secondHome = makeTempDir();
         return {
           loadFirst: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               env: {
                 ...process.env,
-                KAIJIBOT_HOME: kaijibotHome,
+                ALLBOT_HOME: allbotHome,
                 HOME: ignoredHome,
-                KAIJIBOT_STATE_DIR: stateDir,
-                KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+                ALLBOT_STATE_DIR: stateDir,
+                ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
               },
             }),
           loadVariant: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               env: {
                 ...process.env,
-                KAIJIBOT_HOME: secondHome,
+                ALLBOT_HOME: secondHome,
                 HOME: ignoredHome,
-                KAIJIBOT_STATE_DIR: stateDir,
-                KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+                ALLBOT_STATE_DIR: stateDir,
+                ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
               },
             }),
         };
@@ -1906,9 +1906,9 @@ module.exports = { id: "throws-after-import", register() {} };`,
         };
 
         return {
-          loadFirst: () => loadKaijiBotPlugins(options),
+          loadFirst: () => loadAllBotPlugins(options),
           loadVariant: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               pluginSdkResolution: "workspace" as PluginSdkResolutionPreference,
             }),
@@ -1938,9 +1938,9 @@ module.exports = { id: "throws-after-import", register() {} };`,
         };
 
         return {
-          loadFirst: () => loadKaijiBotPlugins(options),
+          loadFirst: () => loadAllBotPlugins(options),
           loadVariant: () =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               ...options,
               runtimeOptions: {
                 allowGatewaySubagentBinding: true,
@@ -1967,11 +1967,11 @@ module.exports = { id: "throws-after-import", register() {} };`,
     );
 
     const loadWithStateDir = (stateDir: string) =>
-      loadKaijiBotPlugins({
+      loadAllBotPlugins({
         env: {
           ...process.env,
-          KAIJIBOT_STATE_DIR: stateDir,
-          KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+          ALLBOT_STATE_DIR: stateDir,
+          ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
         },
         config: {
           plugins: {
@@ -2011,12 +2011,12 @@ module.exports = { id: "throws-after-import", register() {} };`,
       body: `module.exports = { id: "tilde-bundled", register() {} };`,
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       env: {
         ...process.env,
         HOME: homeDir,
-        KAIJIBOT_HOME: undefined,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: override,
+        ALLBOT_HOME: undefined,
+        ALLBOT_BUNDLED_PLUGINS_DIR: override,
       },
       config: {
         plugins: {
@@ -2033,34 +2033,34 @@ module.exports = { id: "throws-after-import", register() {} };`,
     ).toBe(fs.realpathSync(plugin.file));
   });
 
-  it("prefers KAIJIBOT_HOME over HOME for env-expanded load paths", () => {
+  it("prefers ALLBOT_HOME over HOME for env-expanded load paths", () => {
     const ignoredHome = makeTempDir();
-    const kaijibotHome = makeTempDir();
+    const allbotHome = makeTempDir();
     const stateDir = makeTempDir();
     const bundledDir = makeTempDir();
     const plugin = writePlugin({
-      id: "kaijibot-home-demo",
-      dir: path.join(kaijibotHome, "plugins", "kaijibot-home-demo"),
+      id: "allbot-home-demo",
+      dir: path.join(allbotHome, "plugins", "allbot-home-demo"),
       filename: "index.cjs",
-      body: `module.exports = { id: "kaijibot-home-demo", register() {} };`,
+      body: `module.exports = { id: "allbot-home-demo", register() {} };`,
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       env: {
         ...process.env,
         HOME: ignoredHome,
-        KAIJIBOT_HOME: kaijibotHome,
-        KAIJIBOT_STATE_DIR: stateDir,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledDir,
+        ALLBOT_HOME: allbotHome,
+        ALLBOT_STATE_DIR: stateDir,
+        ALLBOT_BUNDLED_PLUGINS_DIR: bundledDir,
       },
       config: {
         plugins: {
-          allow: ["kaijibot-home-demo"],
+          allow: ["allbot-home-demo"],
           entries: {
-            "kaijibot-home-demo": { enabled: true },
+            "allbot-home-demo": { enabled: true },
           },
           load: {
-            paths: ["~/plugins/kaijibot-home-demo"],
+            paths: ["~/plugins/allbot-home-demo"],
           },
         },
       },
@@ -2068,7 +2068,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 
     expect(
       fs.realpathSync(
-        registry.plugins.find((entry) => entry.id === "kaijibot-home-demo")?.source ?? "",
+        registry.plugins.find((entry) => entry.id === "allbot-home-demo")?.source ?? "",
       ),
     ).toBe(fs.realpathSync(plugin.file));
   });
@@ -2148,7 +2148,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
     });
 
     expect(() =>
-      loadKaijiBotPlugins({
+      loadAllBotPlugins({
         cache: false,
         throwOnLoadError: true,
         config: {
@@ -2225,7 +2225,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
     }
   });
 } };`,
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const channel = registry.channels.find((entry) => entry.plugin.id === "demo");
           expect(channel).toBeDefined();
         },
@@ -2271,7 +2271,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
     }
   });
 } };`,
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expect(registry.channels.filter((entry) => entry.plugin.id === "demo")).toHaveLength(1);
           expectRegistryErrorDiagnostic({
             registry,
@@ -2286,7 +2286,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
         body: `module.exports = { id: "context-engine-core-collision", register(api) {
   api.registerContextEngine("legacy", () => ({}));
 } };`,
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expectRegistryErrorDiagnostic({
             registry,
             pluginId: "context-engine-core-collision",
@@ -2300,7 +2300,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
         body: `module.exports = { id: "cli-missing-metadata", register(api) {
   api.registerCli(() => {});
 } };`,
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expect(registry.cliRegistrars).toHaveLength(0);
           expectRegistryErrorDiagnostic({
             registry,
@@ -2359,7 +2359,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
         buildBody: (ownerId: string) => `module.exports = { id: "${ownerId}", register(api) {
   api.registerHook("gateway:startup", () => {}, { name: "shared-hook" });
 } };`,
-        selectCount: (registry: ReturnType<typeof loadKaijiBotPlugins>) =>
+        selectCount: (registry: ReturnType<typeof loadAllBotPlugins>) =>
           registry.hooks.filter((entry) => entry.entry.hook.name === "shared-hook").length,
         duplicateMessage: "hook already registered: shared-hook (hook-owner-a)",
         assert: expectDuplicateRegistrationResult,
@@ -2371,7 +2371,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
         buildBody: (ownerId: string) => `module.exports = { id: "${ownerId}", register(api) {
   api.registerService({ id: "shared-service", start() {} });
 } };`,
-        selectCount: (registry: ReturnType<typeof loadKaijiBotPlugins>) =>
+        selectCount: (registry: ReturnType<typeof loadAllBotPlugins>) =>
           registry.services.filter((entry) => entry.service.id === "shared-service").length,
         duplicateMessage: "service already registered: shared-service (service-owner-a)",
         assert: expectDuplicateRegistrationResult,
@@ -2395,10 +2395,10 @@ module.exports = { id: "throws-after-import", register() {} };`,
         buildBody: (ownerId: string) => `module.exports = { id: "${ownerId}", register(api) {
   api.registerCli(() => {}, { commands: ["shared-cli"] });
 } };`,
-        selectCount: (registry: ReturnType<typeof loadKaijiBotPlugins>) =>
+        selectCount: (registry: ReturnType<typeof loadAllBotPlugins>) =>
           registry.cliRegistrars.length,
         duplicateMessage: "cli command already registered: shared-cli (cli-owner-a)",
-        assertPrimaryOwner: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assertPrimaryOwner: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expect(registry.cliRegistrars[0]?.pluginId).toBe("cli-owner-a");
         },
         assert: expectDuplicateRegistrationResult,
@@ -2493,7 +2493,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 } };`,
           }),
         ],
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expect(
             registry.httpRoutes.find((entry) => entry.pluginId === "http-route-missing-auth"),
           ).toBeUndefined();
@@ -2516,7 +2516,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 } };`,
           }),
         ],
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const routes = registry.httpRoutes.filter(
             (entry) => entry.pluginId === "http-route-replace-self",
           );
@@ -2543,7 +2543,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 } };`,
           }),
         ],
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const route = registry.httpRoutes.find((entry) => entry.path === "/demo");
           expect(route?.pluginId).toBe("http-route-owner-a");
           expect(
@@ -2565,7 +2565,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 } };`,
           }),
         ],
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const routes = registry.httpRoutes.filter(
             (entry) => entry.pluginId === "http-route-overlap",
           );
@@ -2590,7 +2590,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
 } };`,
           }),
         ],
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const routes = registry.httpRoutes.filter(
             (entry) => entry.pluginId === "http-route-overlap-same-auth",
           );
@@ -2606,13 +2606,13 @@ module.exports = { id: "throws-after-import", register() {} };`,
   });
 
   it("respects explicit disable in config", () => {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
     const plugin = writePlugin({
       id: "config-disable",
       body: `module.exports = { id: "config-disable", register() {} };`,
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       config: {
         plugins: {
@@ -2641,7 +2641,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
       body: `module.exports = { id: "unrelated-plugin", register() { throw new Error("unrelated plugin should not load"); } };`,
     });
     fs.writeFileSync(
-      path.join(unrelated.dir, "kaijibot.plugin.json"),
+      path.join(unrelated.dir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "unrelated-plugin",
@@ -2654,7 +2654,7 @@ module.exports = { id: "throws-after-import", register() {} };`,
       "utf-8",
     );
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       config: {
         plugins: {
@@ -2704,7 +2704,7 @@ module.exports = {
 };`,
     });
     fs.writeFileSync(
-      path.join(plugin.dir, "kaijibot.plugin.json"),
+      path.join(plugin.dir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "lazy-channel-plugin",
@@ -2726,7 +2726,7 @@ module.exports = {
       },
     };
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       config,
     });
@@ -2737,7 +2737,7 @@ module.exports = {
       "disabled",
     );
 
-    const broadSetupRegistry = loadKaijiBotPlugins({
+    const broadSetupRegistry = loadAllBotPlugins({
       cache: false,
       config,
       includeSetupOnlyChannelPlugins: true,
@@ -2750,7 +2750,7 @@ module.exports = {
       broadSetupRegistry.plugins.find((entry) => entry.id === "lazy-channel-plugin")?.status,
     ).toBe("disabled");
 
-    const scopedSetupRegistry = loadKaijiBotPlugins({
+    const scopedSetupRegistry = loadAllBotPlugins({
       cache: false,
       config,
       includeSetupOnlyChannelPlugins: true,
@@ -2771,13 +2771,13 @@ module.exports = {
       fixture: {
         id: "setup-entry-test",
         label: "Setup Entry Test",
-        packageName: "@kaijibot/setup-entry-test",
+        packageName: "@allbot/setup-entry-test",
         fullBlurb: "full entry should not run in setup-only mode",
         setupBlurb: "setup entry",
         configured: false,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadKaijiBotPlugins({
+        loadAllBotPlugins({
           cache: false,
           config: {
             plugins: {
@@ -2800,13 +2800,13 @@ module.exports = {
       fixture: {
         id: "setup-runtime-test",
         label: "Setup Runtime Test",
-        packageName: "@kaijibot/setup-runtime-test",
+        packageName: "@allbot/setup-runtime-test",
         fullBlurb: "full entry should not run while unconfigured",
         setupBlurb: "setup runtime",
         configured: false,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadKaijiBotPlugins({
+        loadAllBotPlugins({
           cache: false,
           config: {
             plugins: {
@@ -2824,13 +2824,13 @@ module.exports = {
       fixture: {
         id: "setup-runtime-not-preferred-test",
         label: "Setup Runtime Not Preferred Test",
-        packageName: "@kaijibot/setup-runtime-not-preferred-test",
+        packageName: "@allbot/setup-runtime-not-preferred-test",
         fullBlurb: "full entry should still load without explicit startup opt-in",
         setupBlurb: "setup runtime not preferred",
         configured: true,
       },
       load: ({ pluginDir }: { pluginDir: string }) =>
-        loadKaijiBotPlugins({
+        loadAllBotPlugins({
           cache: false,
           preferSetupRuntimeForChannelPlugins: true,
           config: {
@@ -3001,7 +3001,7 @@ module.exports = {
       {
         label: "enforces memory slot selection",
         loadRegistry: () => {
-          process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+          process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
           const memoryA = writePlugin({
             id: "memory-a",
             body: memoryPluginBody("memory-a"),
@@ -3011,7 +3011,7 @@ module.exports = {
             body: memoryPluginBody("memory-b"),
           });
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             config: {
               plugins: {
@@ -3021,7 +3021,7 @@ module.exports = {
             },
           });
         },
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const a = registry.plugins.find((entry) => entry.id === "memory-a");
           const b = registry.plugins.find((entry) => entry.id === "memory-b");
           expect(b?.status).toBe("loaded");
@@ -3049,7 +3049,7 @@ module.exports = {
             body: memoryPluginBody("memory-b"),
           });
           fs.writeFileSync(
-            path.join(memoryADir, "kaijibot.plugin.json"),
+            path.join(memoryADir, "allbot.plugin.json"),
             JSON.stringify(
               {
                 id: "memory-a",
@@ -3062,7 +3062,7 @@ module.exports = {
             "utf-8",
           );
           fs.writeFileSync(
-            path.join(memoryBDir, "kaijibot.plugin.json"),
+            path.join(memoryBDir, "allbot.plugin.json"),
             JSON.stringify(
               {
                 id: "memory-b",
@@ -3074,9 +3074,9 @@ module.exports = {
             ),
             "utf-8",
           );
-          process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+          process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledDir;
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             config: {
               plugins: {
@@ -3090,7 +3090,7 @@ module.exports = {
             },
           });
         },
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const a = registry.plugins.find((entry) => entry.id === "memory-a");
           const b = registry.plugins.find((entry) => entry.id === "memory-b");
           expect(a?.status).toBe("disabled");
@@ -3101,13 +3101,13 @@ module.exports = {
       {
         label: "disables memory plugins when slot is none",
         loadRegistry: () => {
-          process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+          process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
           const memory = writePlugin({
             id: "memory-off",
             body: memoryPluginBody("memory-off"),
           });
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             config: {
               plugins: {
@@ -3117,7 +3117,7 @@ module.exports = {
             },
           });
         },
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           const entry = registry.plugins.find((item) => item.id === "memory-off");
           expect(entry?.status).toBe("disabled");
         },
@@ -3145,7 +3145,7 @@ module.exports = {
             body: simplePluginBody("shadow"),
           });
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             config: {
               plugins: {
@@ -3180,7 +3180,7 @@ module.exports = {
               filename: "index.cjs",
             });
 
-            return loadKaijiBotPlugins({
+            return loadAllBotPlugins({
               cache: false,
               config: {
                 plugins: {
@@ -3217,7 +3217,7 @@ module.exports = {
               filename: "index.cjs",
             });
 
-            return loadKaijiBotPlugins({
+            return loadAllBotPlugins({
               cache: false,
               config: {
                 plugins: {
@@ -3260,7 +3260,7 @@ module.exports = {
             id: "warn-open-allow-config",
             body: simplePluginBody("warn-open-allow-config"),
           });
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             logger: createWarningLogger(warnings),
             config: {
@@ -3281,7 +3281,7 @@ module.exports = {
             id: "warn-open-allow-workspace",
           });
           return (warnings: string[]) =>
-            loadKaijiBotPlugins({
+            loadAllBotPlugins({
               cache: false,
               workspaceDir,
               logger: createWarningLogger(warnings),
@@ -3322,7 +3322,7 @@ module.exports = {
             id: "workspace-helper",
           });
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             workspaceDir,
             config: {
@@ -3332,7 +3332,7 @@ module.exports = {
             },
           });
         },
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expectPluginOriginAndStatus({
             registry,
             pluginId: "workspace-helper",
@@ -3351,7 +3351,7 @@ module.exports = {
             id: "workspace-helper",
           });
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             workspaceDir,
             config: {
@@ -3362,7 +3362,7 @@ module.exports = {
             },
           });
         },
-        assert: (registry: ReturnType<typeof loadKaijiBotPlugins>) => {
+        assert: (registry: ReturnType<typeof loadAllBotPlugins>) => {
           expectPluginOriginAndStatus({
             registry,
             pluginId: "workspace-helper",
@@ -3386,7 +3386,7 @@ module.exports = {
             id: "shadowed",
           });
 
-          return loadKaijiBotPlugins({
+          return loadAllBotPlugins({
             cache: false,
             workspaceDir,
             config: {
@@ -3421,7 +3421,7 @@ module.exports = {
       body: simplePluginBody("profile-aware"),
     });
     fs.writeFileSync(
-      path.join(plugin.dir, "kaijibot.plugin.json"),
+      path.join(plugin.dir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "profile-aware",
@@ -3434,7 +3434,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: bundledDir,
       config: {
@@ -3462,7 +3462,7 @@ module.exports = {
       filename: "unscoped.cjs",
     });
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       config: {
         plugins: {
@@ -3496,7 +3496,7 @@ module.exports = {
             });
 
             const warnings: string[] = [];
-            const registry = loadKaijiBotPlugins({
+            const registry = loadAllBotPlugins({
               cache: false,
               logger: createWarningLogger(warnings),
               config: {
@@ -3514,7 +3514,7 @@ module.exports = {
         label: "warns when loaded non-bundled plugin has no provenance and no allowlist is set",
         loadRegistry: () => {
           const stateDir = makeTempDir();
-          return withEnv({ KAIJIBOT_STATE_DIR: stateDir }, () => {
+          return withEnv({ ALLBOT_STATE_DIR: stateDir }, () => {
             const globalDir = path.join(stateDir, "extensions", "rogue");
             mkdirSafe(globalDir);
             writePlugin({
@@ -3525,7 +3525,7 @@ module.exports = {
             });
 
             const warnings: string[] = [];
-            const registry = loadKaijiBotPlugins({
+            const registry = loadAllBotPlugins({
               cache: false,
               logger: createWarningLogger(warnings),
               config: {
@@ -3544,7 +3544,7 @@ module.exports = {
         loadRegistry: () => {
           const { plugin, env } = createEnvResolvedPluginFixture("tracked-load-path");
           const warnings: string[] = [];
-          const registry = loadKaijiBotPlugins({
+          const registry = loadAllBotPlugins({
             cache: false,
             logger: createWarningLogger(warnings),
             env,
@@ -3570,7 +3570,7 @@ module.exports = {
         loadRegistry: () => {
           const { plugin, env } = createEnvResolvedPluginFixture("tracked-install-path");
           const warnings: string[] = [];
-          const registry = loadKaijiBotPlugins({
+          const registry = loadAllBotPlugins({
             cache: false,
             logger: createWarningLogger(warnings),
             env,
@@ -3668,8 +3668,8 @@ module.exports = {
       throw err;
     }
 
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledDir;
-    const registry = loadKaijiBotPlugins({
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledDir;
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: bundledDir,
       config: {
@@ -3710,7 +3710,7 @@ module.exports = {
 } };`,
     });
 
-    const registry = withEnv({ KAIJIBOT_STATE_DIR: stateDir }, () =>
+    const registry = withEnv({ ALLBOT_STATE_DIR: stateDir }, () =>
       loadRegistryFromSinglePlugin({
         plugin,
         pluginConfig: {
@@ -3733,13 +3733,13 @@ module.exports = {
       filename: "legacy-root-import.cjs",
       body: `module.exports = {
   id: "legacy-root-import",
-  configSchema: (require("kaijibot/plugin-sdk").emptyPluginConfigSchema)(),
+  configSchema: (require("allbot/plugin-sdk").emptyPluginConfigSchema)(),
         register() {},
       };`,
     });
 
-    const registry = withEnv({ KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins" }, () =>
-      loadKaijiBotPlugins({
+    const registry = withEnv({ ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins" }, () =>
+      loadAllBotPlugins({
         cache: false,
         workspaceDir: plugin.dir,
         config: {
@@ -3756,7 +3756,7 @@ module.exports = {
 
   it("supports legacy plugins subscribing to diagnostic events from the root sdk", async () => {
     useNoBundledPlugins();
-    const seenKey = "__kaijibotLegacyRootDiagnosticSeen";
+    const seenKey = "__allbotLegacyRootDiagnosticSeen";
     delete (globalThis as Record<string, unknown>)[seenKey];
 
     const plugin = writePlugin({
@@ -3764,9 +3764,9 @@ module.exports = {
       filename: "legacy-root-diagnostic-listener.cjs",
       body: `module.exports = {
   id: "legacy-root-diagnostic-listener",
-  configSchema: (require("kaijibot/plugin-sdk").emptyPluginConfigSchema)(),
+  configSchema: (require("allbot/plugin-sdk").emptyPluginConfigSchema)(),
   register() {
-    const { onDiagnosticEvent } = require("kaijibot/plugin-sdk");
+    const { onDiagnosticEvent } = require("allbot/plugin-sdk");
     if (typeof onDiagnosticEvent !== "function") {
       throw new Error("missing onDiagnosticEvent root export");
     }
@@ -3783,9 +3783,9 @@ module.exports = {
 
     try {
       const registry = withEnv(
-        { KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins" },
+        { ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins" },
         () =>
-          loadKaijiBotPlugins({
+          loadAllBotPlugins({
             cache: false,
             workspaceDir: plugin.dir,
             config: {
@@ -3821,7 +3821,7 @@ module.exports = {
   it("suppresses trust warning logs for non-activating snapshot loads", () => {
     useNoBundledPlugins();
     const stateDir = makeTempDir();
-    withEnv({ KAIJIBOT_STATE_DIR: stateDir }, () => {
+    withEnv({ ALLBOT_STATE_DIR: stateDir }, () => {
       const globalDir = path.join(stateDir, "extensions", "rogue");
       mkdirSafe(globalDir);
       writePlugin({
@@ -3832,7 +3832,7 @@ module.exports = {
       });
 
       const warnings: string[] = [];
-      const registry = loadKaijiBotPlugins({
+      const registry = loadAllBotPlugins({
         activate: false,
         cache: false,
         logger: createWarningLogger(warnings),
@@ -3879,7 +3879,7 @@ export const runtimeValue = helperValue;`,
       "utf-8",
     );
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       workspaceDir: plugin.dir,
       config: {

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentModelListConfig } from "../config/types.js";
 
 export function resolvePrimaryModel(model?: AgentModelListConfig | string): string | undefined {
@@ -12,10 +12,10 @@ export function resolvePrimaryModel(model?: AgentModelListConfig | string): stri
 }
 
 export function applyAgentDefaultPrimaryModel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   model: string;
   legacyModels?: Set<string>;
-}): { next: KaijiBotConfig; changed: boolean } {
+}): { next: AllBotConfig; changed: boolean } {
   const current = resolvePrimaryModel(params.cfg.agents?.defaults?.model)?.trim();
   const normalizedCurrent = current && params.legacyModels?.has(current) ? params.model : current;
   if (normalizedCurrent === params.model) {
@@ -44,7 +44,7 @@ export function applyAgentDefaultPrimaryModel(params: {
   };
 }
 
-export function applyPrimaryModel(cfg: KaijiBotConfig, model: string): KaijiBotConfig {
+export function applyPrimaryModel(cfg: AllBotConfig, model: string): AllBotConfig {
   const defaults = cfg.agents?.defaults;
   const existingModel = defaults?.model;
   const existingModels = defaults?.models;

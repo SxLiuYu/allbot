@@ -1,13 +1,13 @@
 import {
   definePluginEntry,
-  KaijiBotConfig,
-  type KaijiBotPluginApi,
+  AllBotConfig,
+  type AllBotPluginApi,
   type ProviderAuthContext,
   type ProviderAuthMethodNonInteractiveContext,
   type ProviderAuthResult,
   type ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { CUSTOM_LOCAL_AUTH_MARKER } from "kaijibot/plugin-sdk/provider-auth";
+} from "allbot/plugin-sdk/plugin-entry";
+import { CUSTOM_LOCAL_AUTH_MARKER } from "allbot/plugin-sdk/provider-auth";
 import {
   LMSTUDIO_DEFAULT_API_KEY_ENV_VAR,
   LMSTUDIO_LOCAL_API_KEY_PLACEHOLDER,
@@ -24,7 +24,7 @@ const PROVIDER_ID = "lmstudio";
 // Intentional: dynamic models are cached per LM Studio endpoint (`baseUrl`) only.
 const cachedDynamicModels = new Map<string, ProviderRuntimeModel[]>();
 
-function resolveLmstudioAugmentedCatalogEntries(config: KaijiBotConfig | undefined) {
+function resolveLmstudioAugmentedCatalogEntries(config: AllBotConfig | undefined) {
   if (!config) {
     return [];
   }
@@ -51,7 +51,7 @@ export default definePluginEntry({
   id: PROVIDER_ID,
   name: "LM Studio Provider",
   description: "Bundled LM Studio provider plugin",
-  register(api: KaijiBotPluginApi) {
+  register(api: AllBotPluginApi) {
     api.registerProvider({
       id: PROVIDER_ID,
       label: "LM Studio",

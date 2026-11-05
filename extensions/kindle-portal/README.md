@@ -1,6 +1,6 @@
 # Kindle Portal
 
-E-ink dashboard for KaijiBot: a live agent monitor and cognitive map rendered as 16-gray PNG, served on the gateway HTTP port and designed for Kindle's experimental browser.
+E-ink dashboard for AllBot: a live agent monitor and cognitive map rendered as 16-gray PNG, served on the gateway HTTP port and designed for Kindle's experimental browser.
 
 ## What It Does
 
@@ -20,7 +20,7 @@ A server-rendered PNG showing the user's persona domains and (optionally) knowle
    sudo apt install graphviz
    ```
 
-2. Enable the plugin and set an access token. Edit `~/.kaijibot/kaijibot.json`:
+2. Enable the plugin and set an access token. Edit `~/.allbot/allbot.json`:
 
    ```json
    {
@@ -55,7 +55,7 @@ A server-rendered PNG showing the user's persona domains and (optionally) knowle
 
 ## Configuration
 
-All keys live under `plugins.entries.kindle-portal.config` in `~/.kaijibot/kaijibot.json`.
+All keys live under `plugins.entries.kindle-portal.config` in `~/.allbot/allbot.json`.
 
 | Key                      | Type    | Default         | Description                                                                                      |
 | ------------------------ | ------- | --------------- | ------------------------------------------------------------------------------------------------ |
@@ -124,7 +124,7 @@ Install graphviz if you can. The other tiers exist so the plugin works out of th
 
 The map pulls from two live sources:
 
-**PersonaStore**: reads `~/.kaijibot/cognitive/persona/{agentId}/{userId}.json` to extract domain nodes, interest phases, and domain connection strengths. The `scope` and `userId` config keys control which user's data is shown.
+**PersonaStore**: reads `~/.allbot/cognitive/persona/{agentId}/{userId}.json` to extract domain nodes, interest phases, and domain connection strengths. The `scope` and `userId` config keys control which user's data is shown.
 
 **knowledge-wiki vault**: when `showWiki` is true and a wiki vault exists at `{workspace}/wiki/`, the plugin extracts concept and entity pages and overlays them as a second node cluster on the map. Cross-references between persona domains and wiki concepts appear as edges between the two clusters.
 
@@ -157,7 +157,7 @@ The dashboard targets Kindle firmware 5.16.3 and earlier, which use an older Web
 
 **Map is blank or shows no nodes**
 
-- The map needs persona data. Chat with KaijiBot a few times so the cognitive system builds a persona profile. Check that `~/.kaijibot/cognitive/persona/` has JSON files for your user.
+- The map needs persona data. Chat with AllBot a few times so the cognitive system builds a persona profile. Check that `~/.allbot/cognitive/persona/` has JSON files for your user.
 - If `scope` is `specific-user`, verify that `userId` is set to the correct Feishu open_id.
 
 **E-ink ghosting on the map**

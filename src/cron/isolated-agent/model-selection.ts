@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { CronJob } from "../types.js";
 import {
   DEFAULT_MODEL,
@@ -17,8 +17,8 @@ type CronSessionModelOverrides = {
 };
 
 export type ResolveCronModelSelectionParams = {
-  cfg: KaijiBotConfig;
-  cfgWithAgentDefaults: KaijiBotConfig;
+  cfg: AllBotConfig;
+  cfgWithAgentDefaults: AllBotConfig;
   agentConfigOverride?: {
     model?: unknown;
     subagents?: {

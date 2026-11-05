@@ -1,5 +1,5 @@
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 
 export type OutboundSessionContext = {
@@ -10,7 +10,7 @@ export type OutboundSessionContext = {
 };
 
 export function buildOutboundSessionContext(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey?: string | null;
   agentId?: string | null;
 }): OutboundSessionContext | undefined {

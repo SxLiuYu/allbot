@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { formatErrorMessage } from "../errors.js";
 import {
   ackDelivery,
@@ -18,7 +18,7 @@ export type RecoverySummary = {
 
 export type DeliverFn = (
   params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
   } & QueuedDeliveryPayload & {
       skipQueue?: boolean;
     },
@@ -99,7 +99,7 @@ function releaseRecoveryEntry(entryId: string): void {
   entriesInProgress.delete(entryId);
 }
 
-function buildRecoveryDeliverParams(entry: QueuedDelivery, cfg: KaijiBotConfig) {
+function buildRecoveryDeliverParams(entry: QueuedDelivery, cfg: AllBotConfig) {
   return {
     cfg,
     channel: entry.channel,
@@ -181,7 +181,7 @@ export function isPermanentDeliveryError(error: string): boolean {
 
 export async function drainReconnectQueue(opts: {
   accountId: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   log: RecoveryLogger;
   stateDir?: string;
   deliver?: DeliverFn;
@@ -265,7 +265,7 @@ export async function drainReconnectQueue(opts: {
 export async function recoverPendingDeliveries(opts: {
   deliver: DeliverFn;
   log: RecoveryLogger;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   stateDir?: string;
   /** Maximum wall-clock time for recovery in ms. Remaining entries are deferred to next startup. Default: 60 000. */
   maxRecoveryMs?: number;

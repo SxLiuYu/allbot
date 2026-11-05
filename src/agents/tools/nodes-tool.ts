@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { OperatorScope } from "../../gateway/method-scopes.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { resolveNodePairApprovalScopes } from "../../infra/node-pairing-authz.js";
@@ -14,7 +14,7 @@ import { callGatewayTool, readGatewayCallOptions } from "./gateway.js";
 import { executeNodeCommandAction, type NodeCommandAction } from "./nodes-tool-commands.js";
 import { executeNodeMediaAction, MEDIA_INVOKE_ACTIONS } from "./nodes-tool-media.js";
 import { resolveNodeId } from "./nodes-utils.js";
-import { isKaijiBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
+import { isAllBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
 
 const NODES_TOOL_ACTIONS = [
   "status",
@@ -138,7 +138,7 @@ export function createNodesTool(options?: {
   agentAccountId?: string;
   currentChannelId?: string;
   currentThreadTs?: string | number;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   modelHasVision?: boolean;
   allowMediaInvokeCommands?: boolean;
 }): AnyAgentTool {
@@ -150,7 +150,7 @@ export function createNodesTool(options?: {
   return {
     label: "Nodes",
     name: "nodes",
-    ownerOnly: isKaijiBotOwnerOnlyCoreToolName("nodes"),
+    ownerOnly: isAllBotOwnerOnlyCoreToolName("nodes"),
     description:
       "Discover and control paired nodes (status/describe/pairing/notify/camera/photos/screen/location/notifications/invoke).",
     parameters: NodesToolSchema,

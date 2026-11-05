@@ -2,7 +2,7 @@ import type { ModelRegistry } from "@earendil-works/pi-coding-agent";
 import type {
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import { describe, expect, it } from "vitest";
 import { resolveProviderPluginChoice } from "../../src/plugins/provider-auth-choice.runtime.js";
 import { registerSingleProviderPlugin } from "../../test/helpers/plugins/plugin-registration.js";

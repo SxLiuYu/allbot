@@ -4,7 +4,7 @@ import readline from "node:readline";
 import type { NormalizedUsage, UsageLike } from "../agents/usage.js";
 import { normalizeUsage } from "../agents/usage.js";
 import { stripInboundMetadata } from "../auto-reply/reply/strip-inbound-meta.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   isPrimarySessionTranscriptFileName,
   isSessionArchiveArtifactName,
@@ -240,7 +240,7 @@ async function* readJsonlRecords(filePath: string): AsyncGenerator<Record<string
 
 async function scanTranscriptFile(params: {
   filePath: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   onEntry: (entry: ParsedTranscriptEntry) => void;
 }): Promise<void> {
   for await (const parsed of readJsonlRecords(params.filePath)) {
@@ -264,7 +264,7 @@ async function scanTranscriptFile(params: {
 
 async function scanUsageFile(params: {
   filePath: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   onEntry: (entry: ParsedUsageEntry) => void;
 }): Promise<void> {
   await scanTranscriptFile({
@@ -353,7 +353,7 @@ export async function loadCostUsageSummary(params?: {
   startMs?: number;
   endMs?: number;
   days?: number; // Deprecated, for backwards compatibility
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
 }): Promise<CostUsageSummary> {
   const now = new Date();
@@ -545,7 +545,7 @@ export async function loadSessionCostSummary(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   startMs?: number;
   endMs?: number;
@@ -817,7 +817,7 @@ export async function loadSessionUsageTimeSeries(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   maxPoints?: number;
 }): Promise<SessionUsageTimeSeries | null> {
@@ -920,7 +920,7 @@ export async function loadSessionLogs(params: {
   sessionId?: string;
   sessionEntry?: SessionEntry;
   sessionFile?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   limit?: number;
 }): Promise<SessionLogEntry[] | null> {

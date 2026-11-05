@@ -6,7 +6,7 @@ read_when:
 title: "Signal"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Signal (signal-cli)
 
@@ -14,7 +14,7 @@ Status: external CLI integration. Gateway talks to `signal-cli` over HTTP JSON-R
 
 ## Prerequisites
 
-- KaijiBot installed on your server (Linux flow below tested on Ubuntu 24).
+- AllBot installed on your server (Linux flow below tested on Ubuntu 24).
 - `signal-cli` available on the host where the gateway runs.
 - A phone number that can receive one verification SMS (for SMS registration path).
 - Browser access for Signal captcha (`signalcaptchas.org`) during registration.
@@ -24,10 +24,10 @@ Status: external CLI integration. Gateway talks to `signal-cli` over HTTP JSON-R
 1. Use a **separate Signal number** for the bot (recommended).
 2. Install `signal-cli` (Java required if you use the JVM build).
 3. Choose one setup path:
-   - **Path A (QR link):** `signal-cli link -n "KaijiBot"` and scan with Signal.
+   - **Path A (QR link):** `signal-cli link -n "AllBot"` and scan with Signal.
    - **Path B (SMS register):** register a dedicated number with captcha + SMS verification.
-4. Configure KaijiBot and restart the gateway.
-5. Send a first DM and approve pairing (`kaijibot pairing approve signal <CODE>`).
+4. Configure AllBot and restart the gateway.
+5. Send a first DM and approve pairing (`allbot pairing approve signal <CODE>`).
 
 Minimal config:
 
@@ -82,7 +82,7 @@ Disable with:
 
 1. Install `signal-cli` (JVM or native build).
 2. Link a bot account:
-   - `signal-cli link -n "KaijiBot"` then scan the QR in Signal.
+   - `signal-cli link -n "AllBot"` then scan the QR in Signal.
 3. Configure Signal and start the gateway.
 
 Example:
@@ -140,20 +140,20 @@ signal-cli -a +<BOT_PHONE_NUMBER> register --captcha '<SIGNALCAPTCHA_URL>'
 signal-cli -a +<BOT_PHONE_NUMBER> verify <VERIFICATION_CODE>
 ```
 
-4. Configure KaijiBot, restart gateway, verify channel:
+4. Configure AllBot, restart gateway, verify channel:
 
 ```bash
 # If you run the gateway as a user systemd service:
-systemctl --user restart kaijibot-gateway.service
+systemctl --user restart allbot-gateway.service
 
 # Then verify:
-kaijibot doctor
-kaijibot channels status --probe
+allbot doctor
+allbot channels status --probe
 ```
 
 5. Pair your DM sender:
    - Send any message to the bot number.
-   - Approve code on the server: `kaijibot pairing approve signal <PAIRING_CODE>`.
+   - Approve code on the server: `allbot pairing approve signal <PAIRING_CODE>`.
    - Save the bot number as a contact on your phone to avoid "Unknown contact".
 
 Important: registering a phone number account with `signal-cli` can de-authenticate the main Signal app session for that number. Prefer a dedicated bot number, or use QR link mode if you need to keep your existing phone app setup.
@@ -166,7 +166,7 @@ Upstream references:
 
 ## External daemon mode (httpUrl)
 
-If you want to manage `signal-cli` yourself (slow JVM cold starts, container init, or shared CPUs), run the daemon separately and point KaijiBot at it:
+If you want to manage `signal-cli` yourself (slow JVM cold starts, container init, or shared CPUs), run the daemon separately and point AllBot at it:
 
 ```json5
 {
@@ -179,7 +179,7 @@ If you want to manage `signal-cli` yourself (slow JVM cold starts, container ini
 }
 ```
 
-This skips auto-spawn and the startup wait inside KaijiBot. For slow starts when auto-spawning, set `channels.signal.startupTimeoutMs`.
+This skips auto-spawn and the startup wait inside AllBot. For slow starts when auto-spawning, set `channels.signal.startupTimeoutMs`.
 
 ## Access control (DMs + groups)
 
@@ -188,8 +188,8 @@ DMs:
 - Default: `channels.signal.dmPolicy = "pairing"`.
 - Unknown senders receive a pairing code; messages are ignored until approved (codes expire after 1 hour).
 - Approve via:
-  - `kaijibot pairing list signal`
-  - `kaijibot pairing approve signal <CODE>`
+  - `allbot pairing list signal`
+  - `allbot pairing approve signal <CODE>`
 - Pairing is the default token exchange for Signal DMs. Details: [Pairing](/channels/pairing)
 - UUID-only senders (from `sourceUuid`) are stored as `uuid:<id>` in `channels.signal.allowFrom`.
 
@@ -218,8 +218,8 @@ Groups:
 
 ## Typing + read receipts
 
-- **Typing indicators**: KaijiBot sends typing signals via `signal-cli sendTyping` and refreshes them while a reply is running.
-- **Read receipts**: when `channels.signal.sendReadReceipts` is true, KaijiBot forwards read receipts for allowed DMs.
+- **Typing indicators**: AllBot sends typing signals via `signal-cli sendTyping` and refreshes them while a reply is running.
+- **Read receipts**: when `channels.signal.sendReadReceipts` is true, AllBot forwards read receipts for allowed DMs.
 - Signal-cli does not expose read receipts for groups.
 
 ## Reactions (message tool)
@@ -257,17 +257,17 @@ Config:
 Run this ladder first:
 
 ```bash
-kaijibot status
-kaijibot gateway status
-kaijibot logs --follow
-kaijibot doctor
-kaijibot channels status --probe
+allbot status
+allbot gateway status
+allbot logs --follow
+allbot doctor
+allbot channels status --probe
 ```
 
 Then confirm DM pairing state if needed:
 
 ```bash
-kaijibot pairing list signal
+allbot pairing list signal
 ```
 
 Common failures:
@@ -275,15 +275,15 @@ Common failures:
 - Daemon reachable but no replies: verify account/daemon settings (`httpUrl`, `account`) and receive mode.
 - DMs ignored: sender is pending pairing approval.
 - Group messages ignored: group sender/mention gating blocks delivery.
-- Config validation errors after edits: run `kaijibot doctor --fix`.
+- Config validation errors after edits: run `allbot doctor --fix`.
 - Signal missing from diagnostics: confirm `channels.signal.enabled: true`.
 
 Extra checks:
 
 ```bash
-kaijibot pairing list signal
+allbot pairing list signal
 pgrep -af signal-cli
-grep -i "signal" "/tmp/kaijibot/kaijibot-$(date +%Y-%m-%d).log" | tail -20
+grep -i "signal" "/tmp/allbot/allbot-$(date +%Y-%m-%d).log" | tail -20
 ```
 
 For triage flow: [/channels/troubleshooting](/channels/troubleshooting).

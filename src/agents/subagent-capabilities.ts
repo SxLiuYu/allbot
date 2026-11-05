@@ -1,5 +1,5 @@
 import { DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH } from "../config/agent-limits.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadSessionStore, resolveStorePath } from "../config/sessions.js";
 import { isSubagentSessionKey, parseAgentSessionKey } from "../routing/session-key.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
@@ -56,7 +56,7 @@ function findEntryBySessionId(
 
 function resolveSessionCapabilityEntry(params: {
   sessionKey: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store?: Record<string, SessionCapabilityEntry>;
 }): SessionCapabilityEntry | undefined {
   if (params.store) {
@@ -110,7 +110,7 @@ export function resolveSubagentCapabilities(params: { depth: number; maxSpawnDep
 export function resolveStoredSubagentCapabilities(
   sessionKey: string | undefined | null,
   opts?: {
-    cfg?: KaijiBotConfig;
+    cfg?: AllBotConfig;
     store?: Record<string, SessionCapabilityEntry>;
   },
 ) {

@@ -1,8 +1,8 @@
-import type { CliBackendPlugin } from "kaijibot/plugin-sdk/cli-backend";
+import type { CliBackendPlugin } from "allbot/plugin-sdk/cli-backend";
 import {
   CLI_FRESH_WATCHDOG_DEFAULTS,
   CLI_RESUME_WATCHDOG_DEFAULTS,
-} from "kaijibot/plugin-sdk/cli-backend";
+} from "allbot/plugin-sdk/cli-backend";
 import {
   CLAUDE_CLI_BACKEND_ID,
   CLAUDE_CLI_DEFAULT_MODEL_REF,

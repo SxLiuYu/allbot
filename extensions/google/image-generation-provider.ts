@@ -1,8 +1,8 @@
-import type { ImageGenerationProvider } from "kaijibot/plugin-sdk/image-generation";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
-import { assertOkOrThrowHttpError, postJsonRequest } from "kaijibot/plugin-sdk/provider-http";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import type { ImageGenerationProvider } from "allbot/plugin-sdk/image-generation";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
+import { assertOkOrThrowHttpError, postJsonRequest } from "allbot/plugin-sdk/provider-http";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { normalizeGoogleModelId, resolveGoogleGenerativeAiHttpRequestConfig } from "./api.js";
 
 const DEFAULT_GOOGLE_IMAGE_MODEL = "gemini-3.1-flash-image-preview";

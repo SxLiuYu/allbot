@@ -1,5 +1,5 @@
 import util from "node:util";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { isVerbose } from "../global-state.js";
 import { stripAnsi } from "../terminal/ansi.js";
 import { readLoggingConfig, shouldSkipMutatingLoggingConfigRead } from "./config.js";
@@ -19,12 +19,12 @@ type ConsoleSettings = {
 export type ConsoleLoggerSettings = ConsoleSettings;
 
 const requireConfig = resolveNodeRequireFromMeta(import.meta.url);
-type ConsoleConfigLoader = () => KaijiBotConfig["logging"] | undefined;
+type ConsoleConfigLoader = () => AllBotConfig["logging"] | undefined;
 const loadConfigFallbackDefault: ConsoleConfigLoader = () => {
   try {
     const loaded = requireConfig?.("../config/config.js") as
       | {
-          loadConfig?: () => KaijiBotConfig;
+          loadConfig?: () => AllBotConfig;
         }
       | undefined;
     return loaded?.loadConfig?.().logging;
@@ -42,7 +42,7 @@ function normalizeConsoleLevel(level?: string): LogLevel {
   if (isVerbose()) {
     return "debug";
   }
-  if (!level && process.env.VITEST === "true" && process.env.KAIJIBOT_TEST_CONSOLE !== "1") {
+  if (!level && process.env.VITEST === "true" && process.env.ALLBOT_TEST_CONSOLE !== "1") {
     return "silent";
   }
   return normalizeLogLevel(level, "info");
@@ -64,7 +64,7 @@ function resolveConsoleSettings(): ConsoleSettings {
   // Skip config-file and full config fallback reads in this fast path.
   if (
     process.env.VITEST === "true" &&
-    process.env.KAIJIBOT_TEST_CONSOLE !== "1" &&
+    process.env.ALLBOT_TEST_CONSOLE !== "1" &&
     !isVerbose() &&
     !envLevel &&
     !loggingState.overrideSettings
@@ -72,7 +72,7 @@ function resolveConsoleSettings(): ConsoleSettings {
     return { level: "silent", style: normalizeConsoleStyle(undefined) };
   }
 
-  let cfg: KaijiBotConfig["logging"] | undefined =
+  let cfg: AllBotConfig["logging"] | undefined =
     (loggingState.overrideSettings as LoggerSettings | null) ?? readLoggingConfig();
   if (!cfg && !shouldSkipMutatingLoggingConfigRead()) {
     if (loggingState.resolvingConsoleSettings) {

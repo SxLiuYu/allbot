@@ -53,7 +53,7 @@ async function expectSyncedSkillConfinement(params: {
 }
 
 beforeAll(async () => {
-  fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-skills-sync-suite-"));
+  fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-skills-sync-suite-"));
   syncSourceTemplateDir = await createCaseDir("source-template");
   await writeSkill({
     dir: path.join(syncSourceTemplateDir, ".extra", "demo-skill"),
@@ -268,7 +268,7 @@ describe("buildWorkspaceSkillsPrompt", () => {
       name: "image-lab",
       description: "Generates images",
       metadata:
-        '{"kaijibot":{"requires":{"env":["GEMINI_API_KEY"]},"primaryEnv":"GEMINI_API_KEY"}}',
+        '{"allbot":{"requires":{"env":["GEMINI_API_KEY"]},"primaryEnv":"GEMINI_API_KEY"}}',
       body: "# Image Lab\n",
     });
 
@@ -322,7 +322,7 @@ describe("buildWorkspaceSkillsPrompt", () => {
       dir: path.join(sourceWorkspace, "skills", "remote-only"),
       name: "remote-only",
       description: "Sandbox-only bin",
-      metadata: '{"kaijibot":{"requires":{"anyBins":["missingbin","sandboxbin"]}}}',
+      metadata: '{"allbot":{"requires":{"anyBins":["missingbin","sandboxbin"]}}}',
     });
 
     await withEnv({ HOME: sourceWorkspace, PATH: "" }, () =>

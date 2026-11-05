@@ -215,7 +215,7 @@ function createScopedCliClient(
     version: string;
   }> = {},
 ) {
-  const id = client.id ?? "kaijibot-cli";
+  const id = client.id ?? "allbot-cli";
   return {
     connect: {
       scopes,
@@ -348,7 +348,7 @@ async function runNonStreamingChatSend(params: {
   return chatCall?.[1];
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)(
   "chat directive tag stripping for non-streaming final payloads",
   () => {
@@ -370,7 +370,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("registers tool-event recipients for clients advertising tool-events capability", async () => {
-      createTranscriptFixture("kaijibot-chat-send-tool-events-");
+      createTranscriptFixture("allbot-chat-send-tool-events-");
       mockState.finalText = "ok";
       mockState.triggerAgentRunStart = true;
       mockState.agentRunId = "run-current";
@@ -409,7 +409,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("does not register tool-event recipients without tool-events capability", async () => {
-      createTranscriptFixture("kaijibot-chat-send-tool-events-off-");
+      createTranscriptFixture("allbot-chat-send-tool-events-off-");
       mockState.finalText = "ok";
       mockState.triggerAgentRunStart = true;
       mockState.agentRunId = "run-no-cap";
@@ -432,7 +432,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.inject keeps message defined when directive tag is the only content", async () => {
-      createTranscriptFixture("kaijibot-chat-inject-directive-only-");
+      createTranscriptFixture("allbot-chat-inject-directive-only-");
       const respond = vi.fn();
       const context = createChatContext();
 
@@ -461,7 +461,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send non-streaming final keeps message defined for directive-only assistant text", async () => {
-      createTranscriptFixture("kaijibot-chat-send-directive-only-");
+      createTranscriptFixture("allbot-chat-send-directive-only-");
       mockState.finalText = "[[reply_to_current]]";
       const respond = vi.fn();
       const context = createChatContext();
@@ -483,7 +483,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("rejects oversized chat.send session keys before dispatch", async () => {
-      createTranscriptFixture("kaijibot-chat-send-session-key-too-long-");
+      createTranscriptFixture("allbot-chat-send-session-key-too-long-");
       const respond = vi.fn();
       const context = createChatContext();
 
@@ -511,7 +511,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.inject strips external untrusted wrapper metadata from final payload text", async () => {
-      createTranscriptFixture("kaijibot-chat-inject-untrusted-meta-");
+      createTranscriptFixture("allbot-chat-inject-untrusted-meta-");
       const respond = vi.fn();
       const context = createChatContext();
 
@@ -534,7 +534,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.inject broadcasts and routes on the canonical session key", async () => {
-      createTranscriptFixture("kaijibot-chat-inject-canonical-key-");
+      createTranscriptFixture("allbot-chat-inject-canonical-key-");
       mockState.sessionEntry = {
         canonicalKey: "agent:main:canon",
       };
@@ -570,7 +570,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send non-streaming final strips external untrusted wrapper metadata from final payload text", async () => {
-      createTranscriptFixture("kaijibot-chat-send-untrusted-meta-");
+      createTranscriptFixture("allbot-chat-send-untrusted-meta-");
       mockState.finalText = `hello\n\n${UNTRUSTED_CONTEXT_SUFFIX}`;
       const respond = vi.fn();
       const context = createChatContext();
@@ -584,7 +584,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send non-streaming final broadcasts and routes on the canonical session key", async () => {
-      createTranscriptFixture("kaijibot-chat-send-canonical-key-");
+      createTranscriptFixture("allbot-chat-send-canonical-key-");
       mockState.sessionEntry = {
         canonicalKey: "agent:main:canon",
       };
@@ -613,11 +613,11 @@ describe.skipIf(process.env.CI)(
       );
     });
 
-    // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
     it.skipIf(process.env.CI)(
       "chat.send keeps explicit delivery routes for channel-scoped sessions",
       async () => {
-        createTranscriptFixture("kaijibot-chat-send-origin-routing-");
+        createTranscriptFixture("allbot-chat-send-origin-routing-");
         mockState.finalText = "ok";
         mockState.sessionEntry = {
           deliveryContext: {
@@ -656,7 +656,7 @@ describe.skipIf(process.env.CI)(
     );
 
     it("chat.send keeps explicit delivery routes for Feishu channel-scoped sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-feishu-origin-routing-");
+      createTranscriptFixture("allbot-chat-send-feishu-origin-routing-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -690,11 +690,11 @@ describe.skipIf(process.env.CI)(
       );
     });
 
-    // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
     it.skipIf(process.env.CI)(
       "chat.send keeps explicit delivery routes for per-account channel-peer sessions",
       async () => {
-        createTranscriptFixture("kaijibot-chat-send-per-account-channel-peer-routing-");
+        createTranscriptFixture("allbot-chat-send-per-account-channel-peer-routing-");
         mockState.finalText = "ok";
         mockState.sessionEntry = {
           deliveryContext: {
@@ -729,11 +729,11 @@ describe.skipIf(process.env.CI)(
       },
     );
 
-    // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
     it.skipIf(process.env.CI)(
       "chat.send keeps explicit delivery routes for legacy channel-peer sessions",
       async () => {
-        createTranscriptFixture("kaijibot-chat-send-legacy-channel-peer-routing-");
+        createTranscriptFixture("allbot-chat-send-legacy-channel-peer-routing-");
         mockState.finalText = "ok";
         mockState.sessionEntry = {
           deliveryContext: {
@@ -768,11 +768,11 @@ describe.skipIf(process.env.CI)(
       },
     );
 
-    // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+    // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
     it.skipIf(process.env.CI)(
       "chat.send keeps explicit delivery routes for legacy thread sessions",
       async () => {
-        createTranscriptFixture("kaijibot-chat-send-legacy-thread-channel-peer-routing-");
+        createTranscriptFixture("allbot-chat-send-legacy-thread-channel-peer-routing-");
         mockState.finalText = "ok";
         mockState.sessionEntry = {
           deliveryContext: {
@@ -811,7 +811,7 @@ describe.skipIf(process.env.CI)(
     );
 
     it("chat.send does not inherit external delivery context for shared main sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-main-no-cross-route-");
+      createTranscriptFixture("allbot-chat-send-main-no-cross-route-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -845,7 +845,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send does not inherit external delivery context for UI clients on main sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-main-ui-routes-");
+      createTranscriptFixture("allbot-chat-send-main-ui-routes-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -868,7 +868,7 @@ describe.skipIf(process.env.CI)(
           connect: {
             client: {
               mode: GATEWAY_CLIENT_MODES.UI,
-              id: "kaijibot-tui",
+              id: "allbot-tui",
             },
           },
         } as unknown,
@@ -886,7 +886,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send does not inherit external delivery context for UI clients on main sessions when deliver is enabled", async () => {
-      createTranscriptFixture("kaijibot-chat-send-main-ui-deliver-no-route-");
+      createTranscriptFixture("allbot-chat-send-main-ui-deliver-no-route-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -909,7 +909,7 @@ describe.skipIf(process.env.CI)(
           connect: {
             client: {
               mode: GATEWAY_CLIENT_MODES.UI,
-              id: "kaijibot-tui",
+              id: "allbot-tui",
             },
           },
         } as unknown,
@@ -929,7 +929,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send inherits external delivery context for CLI clients on configured main sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-config-main-cli-routes-");
+      createTranscriptFixture("allbot-chat-send-config-main-cli-routes-");
       mockState.mainSessionKey = "work";
       mockState.finalText = "ok";
       mockState.sessionEntry = {
@@ -972,7 +972,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send falls back to origin provider metadata for configured main CLI delivery inheritance", async () => {
-      createTranscriptFixture("kaijibot-chat-send-config-main-origin-provider-routes-");
+      createTranscriptFixture("allbot-chat-send-config-main-origin-provider-routes-");
       mockState.mainSessionKey = "work";
       mockState.finalText = "ok";
       mockState.sessionEntry = {
@@ -1012,7 +1012,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send falls back to origin thread metadata for configured main CLI delivery inheritance", async () => {
-      createTranscriptFixture("kaijibot-chat-send-config-main-origin-thread-routes-");
+      createTranscriptFixture("allbot-chat-send-config-main-origin-thread-routes-");
       mockState.mainSessionKey = "work";
       mockState.finalText = "ok";
       mockState.sessionEntry = {
@@ -1055,7 +1055,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send keeps configured main delivery inheritance when connect metadata omits client details", async () => {
-      createTranscriptFixture("kaijibot-chat-send-config-main-connect-no-client-");
+      createTranscriptFixture("allbot-chat-send-config-main-connect-no-client-");
       mockState.mainSessionKey = "work";
       mockState.finalText = "ok";
       mockState.sessionEntry = {
@@ -1093,7 +1093,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send does not inherit external delivery context for non-channel custom sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-custom-no-cross-route-");
+      createTranscriptFixture("allbot-chat-send-custom-no-cross-route-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -1128,7 +1128,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send keeps replies on the internal surface when deliver is not enabled", async () => {
-      createTranscriptFixture("kaijibot-chat-send-no-deliver-internal-surface-");
+      createTranscriptFixture("allbot-chat-send-no-deliver-internal-surface-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -1162,7 +1162,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send does not inherit external routes for webchat clients on channel-scoped sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-webchat-channel-scoped-no-inherit-");
+      createTranscriptFixture("allbot-chat-send-webchat-channel-scoped-no-inherit-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -1187,7 +1187,7 @@ describe.skipIf(process.env.CI)(
           connect: {
             client: {
               mode: GATEWAY_CLIENT_MODES.WEBCHAT,
-              id: "kaijibot-webchat",
+              id: "allbot-webchat",
             },
           },
         } as unknown,
@@ -1207,7 +1207,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send still inherits external routes for UI clients on channel-scoped sessions", async () => {
-      createTranscriptFixture("kaijibot-chat-send-ui-channel-scoped-inherit-");
+      createTranscriptFixture("allbot-chat-send-ui-channel-scoped-inherit-");
       mockState.finalText = "ok";
       mockState.sessionEntry = {
         deliveryContext: {
@@ -1230,7 +1230,7 @@ describe.skipIf(process.env.CI)(
           connect: {
             client: {
               mode: GATEWAY_CLIENT_MODES.UI,
-              id: "kaijibot-tui",
+              id: "allbot-tui",
             },
           },
         } as unknown,
@@ -1250,7 +1250,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("chat.send accepts admin-scoped synthetic originating routes without external delivery", async () => {
-      createTranscriptFixture("kaijibot-chat-send-synthetic-origin-admin-");
+      createTranscriptFixture("allbot-chat-send-synthetic-origin-admin-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1282,7 +1282,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("rejects synthetic originating routes when the caller lacks admin scope", async () => {
-      createTranscriptFixture("kaijibot-chat-send-synthetic-origin-reject-");
+      createTranscriptFixture("allbot-chat-send-synthetic-origin-reject-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1309,7 +1309,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("rejects reserved system provenance fields for non-ACP clients", async () => {
-      createTranscriptFixture("kaijibot-chat-send-system-provenance-reject-");
+      createTranscriptFixture("allbot-chat-send-system-provenance-reject-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1320,7 +1320,7 @@ describe.skipIf(process.env.CI)(
         idempotencyKey: "idem-system-provenance-reject",
         requestParams: {
           systemInputProvenance: { kind: "external_user", sourceChannel: "acp" },
-          systemProvenanceReceipt: "[Source Receipt]\nbridge=kaijibot-acp\n[/Source Receipt]",
+          systemProvenanceReceipt: "[Source Receipt]\nbridge=allbot-acp\n[/Source Receipt]",
         },
         expectBroadcast: false,
         waitForCompletion: false,
@@ -1335,7 +1335,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("rejects forged ACP metadata when the caller lacks admin scope", async () => {
-      createTranscriptFixture("kaijibot-chat-send-system-provenance-spoof-reject-");
+      createTranscriptFixture("allbot-chat-send-system-provenance-spoof-reject-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1354,10 +1354,10 @@ describe.skipIf(process.env.CI)(
             kind: "external_user",
             originSessionId: "acp-session-spoof",
             sourceChannel: "acp",
-            sourceTool: "kaijibot_acp",
+            sourceTool: "allbot_acp",
           },
           systemProvenanceReceipt:
-            "[Source Receipt]\nbridge=kaijibot-acp\noriginSessionId=acp-session-spoof\n[/Source Receipt]",
+            "[Source Receipt]\nbridge=allbot-acp\noriginSessionId=acp-session-spoof\n[/Source Receipt]",
         },
         expectBroadcast: false,
         waitForCompletion: false,
@@ -1372,7 +1372,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("allows admin-scoped clients to inject system provenance without ACP metadata", async () => {
-      createTranscriptFixture("kaijibot-chat-send-system-provenance-admin-");
+      createTranscriptFixture("allbot-chat-send-system-provenance-admin-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1390,10 +1390,10 @@ describe.skipIf(process.env.CI)(
             kind: "external_user",
             originSessionId: "admin-session-1",
             sourceChannel: "acp",
-            sourceTool: "kaijibot_acp",
+            sourceTool: "allbot_acp",
           },
           systemProvenanceReceipt:
-            "[Source Receipt]\nbridge=kaijibot-acp\noriginSessionId=admin-session-1\n[/Source Receipt]",
+            "[Source Receipt]\nbridge=allbot-acp\noriginSessionId=admin-session-1\n[/Source Receipt]",
         },
         expectBroadcast: false,
       });
@@ -1402,17 +1402,17 @@ describe.skipIf(process.env.CI)(
         kind: "external_user",
         originSessionId: "admin-session-1",
         sourceChannel: "acp",
-        sourceTool: "kaijibot_acp",
+        sourceTool: "allbot_acp",
       });
       expect(mockState.lastDispatchCtx?.Body).toBe(
-        "[Source Receipt]\nbridge=kaijibot-acp\noriginSessionId=admin-session-1\n[/Source Receipt]\n\nops update",
+        "[Source Receipt]\nbridge=allbot-acp\noriginSessionId=admin-session-1\n[/Source Receipt]\n\nops update",
       );
       expect(mockState.lastDispatchCtx?.RawBody).toBe("ops update");
       expect(mockState.lastDispatchCtx?.CommandBody).toBe("ops update");
     });
 
     it("forwards gateway caller scopes into the dispatch context", async () => {
-      createTranscriptFixture("kaijibot-chat-send-gateway-client-scopes-");
+      createTranscriptFixture("allbot-chat-send-gateway-client-scopes-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1434,7 +1434,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("injects ACP system provenance into the agent-visible body", async () => {
-      createTranscriptFixture("kaijibot-chat-send-system-provenance-acp-");
+      createTranscriptFixture("allbot-chat-send-system-provenance-acp-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1454,10 +1454,10 @@ describe.skipIf(process.env.CI)(
             kind: "external_user",
             originSessionId: "acp-session-1",
             sourceChannel: "acp",
-            sourceTool: "kaijibot_acp",
+            sourceTool: "allbot_acp",
           },
           systemProvenanceReceipt:
-            "[Source Receipt]\nbridge=kaijibot-acp\noriginSessionId=acp-session-1\n[/Source Receipt]",
+            "[Source Receipt]\nbridge=allbot-acp\noriginSessionId=acp-session-1\n[/Source Receipt]",
         },
         expectBroadcast: false,
       });
@@ -1466,17 +1466,17 @@ describe.skipIf(process.env.CI)(
         kind: "external_user",
         originSessionId: "acp-session-1",
         sourceChannel: "acp",
-        sourceTool: "kaijibot_acp",
+        sourceTool: "allbot_acp",
       });
       expect(mockState.lastDispatchCtx?.Body).toBe(
-        "[Source Receipt]\nbridge=kaijibot-acp\noriginSessionId=acp-session-1\n[/Source Receipt]\n\nbench update",
+        "[Source Receipt]\nbridge=allbot-acp\noriginSessionId=acp-session-1\n[/Source Receipt]\n\nbench update",
       );
       expect(mockState.lastDispatchCtx?.RawBody).toBe("bench update");
       expect(mockState.lastDispatchCtx?.CommandBody).toBe("bench update");
     });
 
     it("emits a user transcript update when chat.send starts an agent run", async () => {
-      createTranscriptFixture("kaijibot-chat-send-user-transcript-agent-run-");
+      createTranscriptFixture("allbot-chat-send-user-transcript-agent-run-");
       mockState.finalText = "ok";
       mockState.triggerAgentRunStart = true;
       const respond = vi.fn();
@@ -1508,7 +1508,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("adds persisted media paths to the user transcript update", async () => {
-      createTranscriptFixture("kaijibot-chat-send-user-transcript-images-");
+      createTranscriptFixture("allbot-chat-send-user-transcript-images-");
       mockState.finalText = "ok";
       mockState.triggerAgentRunStart = true;
       mockState.savedMediaResults = [
@@ -1585,7 +1585,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("skips transcript media notes for ACP bridge clients", async () => {
-      createTranscriptFixture("kaijibot-chat-send-user-transcript-acp-images-");
+      createTranscriptFixture("allbot-chat-send-user-transcript-acp-images-");
       mockState.finalText = "ok";
       mockState.triggerAgentRunStart = true;
       mockState.savedMediaResults = [
@@ -1639,7 +1639,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("waits for the user transcript update before final broadcast on non-agent attachment sends", async () => {
-      createTranscriptFixture("kaijibot-chat-send-no-agent-images-order-");
+      createTranscriptFixture("allbot-chat-send-no-agent-images-order-");
       mockState.finalText = "ok";
       mockState.savedMediaResults = [
         { path: "/tmp/chat-send-image-a.png", contentType: "image/png" },
@@ -1683,7 +1683,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("persists chat.send attachments one at a time", async () => {
-      createTranscriptFixture("kaijibot-chat-send-image-serial-save-");
+      createTranscriptFixture("allbot-chat-send-image-serial-save-");
       mockState.finalText = "ok";
       mockState.savedMediaResults = [
         { path: "/tmp/chat-send-image-a.png", contentType: "image/png" },
@@ -1731,7 +1731,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("emits a user transcript update when chat.send completes without an agent run", async () => {
-      createTranscriptFixture("kaijibot-chat-send-user-transcript-no-run-");
+      createTranscriptFixture("allbot-chat-send-user-transcript-no-run-");
       mockState.finalText = "ok";
       const respond = vi.fn();
       const context = createChatContext();
@@ -1762,7 +1762,7 @@ describe.skipIf(process.env.CI)(
     });
 
     it("emits a user transcript update when chat.send fails before an agent run starts", async () => {
-      createTranscriptFixture("kaijibot-chat-send-user-transcript-error-no-run-");
+      createTranscriptFixture("allbot-chat-send-user-transcript-error-no-run-");
       mockState.dispatchError = new Error("upstream unavailable");
       const respond = vi.fn();
       const context = createChatContext();

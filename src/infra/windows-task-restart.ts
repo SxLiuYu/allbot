@@ -8,17 +8,17 @@ import { resolveGatewayRestartLogPath } from "../daemon/restart-logs.js";
 import { resolveTaskScriptPath } from "../daemon/schtasks.js";
 import { formatErrorMessage } from "./errors.js";
 import type { RestartAttempt } from "./restart.types.js";
-import { resolvePreferredKaijiBotTmpDir } from "./tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "./tmp-allbot-dir.js";
 
 const TASK_RESTART_RETRY_LIMIT = 12;
 const TASK_RESTART_RETRY_DELAY_SEC = 1;
 
 function resolveWindowsTaskName(env: NodeJS.ProcessEnv): string {
-  const override = env.KAIJIBOT_WINDOWS_TASK_NAME?.trim();
+  const override = env.ALLBOT_WINDOWS_TASK_NAME?.trim();
   if (override) {
     return override;
   }
-  return resolveGatewayWindowsTaskName(env.KAIJIBOT_PROFILE);
+  return resolveGatewayWindowsTaskName(env.ALLBOT_PROFILE);
 }
 
 function buildScheduledTaskRestartScript(
@@ -35,7 +35,7 @@ function buildScheduledTaskRestartScript(
     "@echo off",
     "setlocal",
     `if not exist ${quotedLogDir} mkdir ${quotedLogDir} >nul 2>&1`,
-    `>> ${quotedRestartLogPath} 2>&1 echo [%DATE% %TIME%] kaijibot task restart log initialized`,
+    `>> ${quotedRestartLogPath} 2>&1 echo [%DATE% %TIME%] allbot task restart log initialized`,
     `schtasks /Query /TN ${quotedTaskName} >nul 2>&1`,
     "if errorlevel 1 goto fallback",
     "set /a attempts=0",
@@ -60,8 +60,8 @@ export function relaunchGatewayScheduledTask(env: NodeJS.ProcessEnv = process.en
   const taskName = resolveWindowsTaskName(env);
   const taskScriptPath = resolveTaskScriptPath(env);
   const scriptPath = path.join(
-    resolvePreferredKaijiBotTmpDir(),
-    `kaijibot-schtasks-restart-${randomUUID()}.cmd`,
+    resolvePreferredAllBotTmpDir(),
+    `allbot-schtasks-restart-${randomUUID()}.cmd`,
   );
   const quotedScriptPath = quoteCmdScriptArg(scriptPath);
   try {

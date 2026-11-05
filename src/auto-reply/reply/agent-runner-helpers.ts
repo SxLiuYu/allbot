@@ -1,7 +1,7 @@
 import {
   hasOutboundReplyContent,
   resolveSendableOutboundReplyParts,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 import { loadSessionStore } from "../../config/sessions.js";
 import { isAudioFileName } from "../../media/mime.js";
 import { normalizeVerboseLevel, type VerboseLevel } from "../thinking.js";

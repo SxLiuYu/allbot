@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/ollama-provider",
+  "name": "@allbot/ollama-provider",
   "version": "2026.4.12",
   "private": true,
-  "description": "KaijiBot Ollama provider plugin",
+  "description": "AllBot Ollama provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

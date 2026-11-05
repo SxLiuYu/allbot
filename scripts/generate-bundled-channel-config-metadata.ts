@@ -81,19 +81,19 @@ function resolveChannelConfigSchemaModulePath(rootDir: string): string | null {
 }
 
 function resolvePackageChannelMeta(source: BundledPluginSource) {
-  const kaijibotMeta =
+  const allbotMeta =
     source.packageJson &&
     typeof source.packageJson === "object" &&
     !Array.isArray(source.packageJson) &&
-    "kaijibot" in source.packageJson
-      ? (source.packageJson.kaijibot as Record<string, unknown> | undefined)
+    "allbot" in source.packageJson
+      ? (source.packageJson.allbot as Record<string, unknown> | undefined)
       : undefined;
   const channelMeta =
-    kaijibotMeta &&
-    typeof kaijibotMeta.channel === "object" &&
-    kaijibotMeta.channel &&
-    !Array.isArray(kaijibotMeta.channel)
-      ? (kaijibotMeta.channel as Record<string, unknown>)
+    allbotMeta &&
+    typeof allbotMeta.channel === "object" &&
+    allbotMeta.channel &&
+    !Array.isArray(allbotMeta.channel)
+      ? (allbotMeta.channel as Record<string, unknown>)
       : undefined;
   return channelMeta;
 }

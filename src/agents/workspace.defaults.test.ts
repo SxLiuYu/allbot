@@ -7,13 +7,13 @@ afterEach(() => {
 });
 
 describe("DEFAULT_AGENT_WORKSPACE_DIR", () => {
-  it("uses KAIJIBOT_HOME when resolving the default workspace dir", () => {
-    const home = path.join(path.sep, "srv", "kaijibot-home");
-    vi.stubEnv("KAIJIBOT_HOME", home);
+  it("uses ALLBOT_HOME when resolving the default workspace dir", () => {
+    const home = path.join(path.sep, "srv", "allbot-home");
+    vi.stubEnv("ALLBOT_HOME", home);
     vi.stubEnv("HOME", path.join(path.sep, "home", "other"));
 
     expect(resolveDefaultAgentWorkspaceDir()).toBe(
-      path.join(path.resolve(home), ".kaijibot", "workspace"),
+      path.join(path.resolve(home), ".allbot", "workspace"),
     );
   });
 });

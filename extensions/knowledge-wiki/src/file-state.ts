@@ -6,7 +6,7 @@ import type { FileStateEntry, FileStateMap } from "./types.js";
 const STATE_FILE = "file-state.json";
 
 function stateFilePath(vaultRoot: string): string {
-  return path.join(vaultRoot, ".kaijibot-wiki", STATE_FILE);
+  return path.join(vaultRoot, ".allbot-wiki", STATE_FILE);
 }
 
 export function computeContentHash(content: string): string {

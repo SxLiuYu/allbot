@@ -104,5 +104,5 @@ export const pluginSdkDocEntrypoints = Object.keys(
 ) as PluginSdkDocEntrypoint[];
 
 export function resolvePluginSdkDocImportSpecifier(entrypoint: PluginSdkDocEntrypoint): string {
-  return entrypoint === "index" ? "kaijibot/plugin-sdk" : `kaijibot/plugin-sdk/${entrypoint}`;
+  return entrypoint === "index" ? "allbot/plugin-sdk" : `allbot/plugin-sdk/${entrypoint}`;
 }

@@ -2,7 +2,7 @@
  * HTTP router for `/kindle/*`.
  *
  * Entry point produced by {@link createKindleHttpHandler}: a single function
- * matching the {@link KaijiBotPluginHttpRouteHandler} contract. It:
+ * matching the {@link AllBotPluginHttpRouteHandler} contract. It:
  *   1. Matches the `/kindle` path prefix; non-matching paths return `false`
  *      so the gateway can fall through to the next route.
  *   2. Rejects path-traversal attempts (`..`, NUL bytes) — both raw and

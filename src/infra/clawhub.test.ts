@@ -20,10 +20,10 @@ describe("clawhub helpers", () => {
   const originalHome = process.env.HOME;
 
   afterEach(() => {
-    delete process.env.KAIJIBOT_CLAWHUB_TOKEN;
+    delete process.env.ALLBOT_CLAWHUB_TOKEN;
     delete process.env.CLAWHUB_TOKEN;
     delete process.env.CLAWHUB_AUTH_TOKEN;
-    delete process.env.KAIJIBOT_CLAWHUB_CONFIG_PATH;
+    delete process.env.ALLBOT_CLAWHUB_CONFIG_PATH;
     delete process.env.CLAWHUB_CONFIG_PATH;
     delete process.env.CLAWDHUB_CONFIG_PATH;
     delete process.env.XDG_CONFIG_HOME;
@@ -89,7 +89,7 @@ describe("clawhub helpers", () => {
 
   it("checks min gateway versions with loose host labels", () => {
     expect(satisfiesGatewayMinimum("2026.3.22", "2026.3.0")).toBe(true);
-    expect(satisfiesGatewayMinimum("KaijiBot 2026.3.22", "2026.3.0")).toBe(true);
+    expect(satisfiesGatewayMinimum("AllBot 2026.3.22", "2026.3.0")).toBe(true);
     expect(satisfiesGatewayMinimum("2026.2.9", "2026.3.0")).toBe(false);
     expect(satisfiesGatewayMinimum("unknown", "2026.3.0")).toBe(false);
   });
@@ -113,9 +113,9 @@ describe("clawhub helpers", () => {
   });
 
   it("resolves ClawHub auth token from config.json", async () => {
-    await withTempDir({ prefix: "kaijibot-clawhub-config-" }, async (configRoot) => {
+    await withTempDir({ prefix: "allbot-clawhub-config-" }, async (configRoot) => {
       const configPath = path.join(configRoot, "clawhub", "config.json");
-      process.env.KAIJIBOT_CLAWHUB_CONFIG_PATH = configPath;
+      process.env.ALLBOT_CLAWHUB_CONFIG_PATH = configPath;
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.writeFile(configPath, JSON.stringify({ auth: { token: "cfg-token-123" } }), "utf8");
 
@@ -124,7 +124,7 @@ describe("clawhub helpers", () => {
   });
 
   it("resolves ClawHub auth token from the legacy config path override", async () => {
-    await withTempDir({ prefix: "kaijibot-clawdhub-config-" }, async (configRoot) => {
+    await withTempDir({ prefix: "allbot-clawdhub-config-" }, async (configRoot) => {
       const configPath = path.join(configRoot, "config.json");
       process.env.CLAWDHUB_CONFIG_PATH = configPath;
       await fs.writeFile(configPath, JSON.stringify({ token: "legacy-token-123" }), "utf8");
@@ -136,7 +136,7 @@ describe("clawhub helpers", () => {
   it.runIf(process.platform === "darwin")(
     "resolves ClawHub auth token from the macOS Application Support path",
     async () => {
-      await withTempDir({ prefix: "kaijibot-clawhub-home-" }, async (fakeHome) => {
+      await withTempDir({ prefix: "allbot-clawhub-home-" }, async (fakeHome) => {
         const configPath = path.join(
           fakeHome,
           "Library",
@@ -160,8 +160,8 @@ describe("clawhub helpers", () => {
   it.runIf(process.platform === "darwin")(
     "falls back to XDG_CONFIG_HOME on macOS when Application Support has no config",
     async () => {
-      await withTempDir({ prefix: "kaijibot-clawhub-home-" }, async (fakeHome) => {
-        await withTempDir({ prefix: "kaijibot-clawhub-xdg-" }, async (xdgRoot) => {
+      await withTempDir({ prefix: "allbot-clawhub-home-" }, async (fakeHome) => {
+        await withTempDir({ prefix: "allbot-clawhub-xdg-" }, async (xdgRoot) => {
           const configPath = path.join(xdgRoot, "clawhub", "config.json");
           const homedirSpy = vi.spyOn(os, "homedir").mockReturnValue(fakeHome);
           process.env.XDG_CONFIG_HOME = xdgRoot;
@@ -179,7 +179,7 @@ describe("clawhub helpers", () => {
   );
 
   it("injects resolved auth token into ClawHub requests", async () => {
-    process.env.KAIJIBOT_CLAWHUB_TOKEN = "env-token-123";
+    process.env.ALLBOT_CLAWHUB_TOKEN = "env-token-123";
     const fetchImpl = async (input: string | URL | Request, init?: RequestInit) => {
       const url = input instanceof Request ? input.url : String(input);
       expect(url).toContain("/api/v1/search");

@@ -1,17 +1,17 @@
 ---
-summary: "KaijiBot on Raspberry Pi (budget self-hosted setup)"
+summary: "AllBot on Raspberry Pi (budget self-hosted setup)"
 read_when:
-  - Setting up KaijiBot on a Raspberry Pi
-  - Running KaijiBot on ARM devices
+  - Setting up AllBot on a Raspberry Pi
+  - Running AllBot on ARM devices
   - Building a cheap always-on personal AI
 title: "Raspberry Pi (Platform)"
 ---
 
-# KaijiBot on Raspberry Pi
+# AllBot on Raspberry Pi
 
 ## Goal
 
-Run a persistent, always-on KaijiBot Gateway on a Raspberry Pi for **~$35-80** one-time cost (no monthly fees).
+Run a persistent, always-on AllBot Gateway on a Raspberry Pi for **~$35-80** one-time cost (no monthly fees).
 
 Perfect for:
 
@@ -107,13 +107,13 @@ echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 ```
 
-## 6) Install KaijiBot
+## 6) Install AllBot
 
 ### Option A: Standard Install (Recommended)
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot
-cd kaijibot
+cd allbot
 pnpm install && pnpm build
 ```
 
@@ -121,7 +121,7 @@ pnpm install && pnpm build
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 pnpm install
 pnpm build
 ```
@@ -131,7 +131,7 @@ The hackable install gives you direct access to logs and code — useful for deb
 ## 7) Run Onboarding
 
 ```bash
-kaijibot onboard --install-daemon
+allbot onboard --install-daemon
 ```
 
 Follow the wizard:
@@ -145,23 +145,23 @@ Follow the wizard:
 
 ```bash
 # Check status
-kaijibot status
+allbot status
 
 # Check service (standard install = systemd user unit)
-systemctl --user status kaijibot-gateway.service
+systemctl --user status allbot-gateway.service
 
 # View logs
-journalctl --user -u kaijibot-gateway.service -f
+journalctl --user -u allbot-gateway.service -f
 ```
 
-## 9) Access the KaijiBot Dashboard
+## 9) Access the AllBot Dashboard
 
 Replace `user@gateway-host` with your Pi username and hostname or IP address.
 
 On your computer, ask the Pi to print a fresh dashboard URL:
 
 ```bash
-ssh user@gateway-host 'kaijibot dashboard --no-open'
+ssh user@gateway-host 'allbot dashboard --no-open'
 ```
 
 The command prints `Dashboard URL:`. Depending on how `gateway.auth.token`
@@ -178,7 +178,7 @@ Then open the printed Dashboard URL in your local browser.
 
 If the UI asks for shared-secret auth, paste the configured token or password
 into Control UI settings. For token auth, use `gateway.auth.token` (or
-`KAIJIBOT_GATEWAY_TOKEN`).
+`ALLBOT_GATEWAY_TOKEN`).
 
 For always-on remote access, see [Tailscale](/gateway/tailscale).
 
@@ -202,10 +202,10 @@ See [Pi USB boot guide](https://www.raspberrypi.com/documentation/computers/rasp
 On lower-power Pi hosts, enable Node's module compile cache so repeated CLI runs are faster:
 
 ```bash
-grep -q 'NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF' # pragma: allowlist secret
-export NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache
-mkdir -p /var/tmp/kaijibot-compile-cache
-export KAIJIBOT_NO_RESPAWN=1
+grep -q 'NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF' # pragma: allowlist secret
+export NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache
+mkdir -p /var/tmp/allbot-compile-cache
+export ALLBOT_NO_RESPAWN=1
 EOF
 source ~/.bashrc
 ```
@@ -214,22 +214,22 @@ Notes:
 
 - `NODE_COMPILE_CACHE` speeds up subsequent runs (`status`, `health`, `--help`).
 - `/var/tmp` survives reboots better than `/tmp`.
-- `KAIJIBOT_NO_RESPAWN=1` avoids extra startup cost from CLI self-respawn.
+- `ALLBOT_NO_RESPAWN=1` avoids extra startup cost from CLI self-respawn.
 - First run warms the cache; later runs benefit most.
 
 ### systemd startup tuning (optional)
 
-If this Pi is mostly running KaijiBot, add a service drop-in to reduce restart
+If this Pi is mostly running AllBot, add a service drop-in to reduce restart
 jitter and keep startup env stable:
 
 ```bash
-systemctl --user edit kaijibot-gateway.service
+systemctl --user edit allbot-gateway.service
 ```
 
 ```ini
 [Service]
-Environment=KAIJIBOT_NO_RESPAWN=1
-Environment=NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache
+Environment=ALLBOT_NO_RESPAWN=1
+Environment=NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache
 Restart=always
 RestartSec=2
 TimeoutStartSec=90
@@ -239,10 +239,10 @@ Then apply:
 
 ```bash
 systemctl --user daemon-reload
-systemctl --user restart kaijibot-gateway.service
+systemctl --user restart allbot-gateway.service
 ```
 
-If possible, keep KaijiBot state/cache on SSD-backed storage to avoid SD-card
+If possible, keep AllBot state/cache on SSD-backed storage to avoid SD-card
 random-I/O bottlenecks during cold starts.
 
 If this is a headless Pi, enable lingering once so the user service survives
@@ -284,7 +284,7 @@ htop
 
 ### Binary Compatibility
 
-Most KaijiBot features work on ARM64, but some external binaries may need ARM builds:
+Most AllBot features work on ARM64, but some external binaries may need ARM builds:
 
 | Tool               | ARM64 Status | Notes                               |
 | ------------------ | ------------ | ----------------------------------- |
@@ -334,13 +334,13 @@ Onboarding sets this up, but to verify:
 
 ```bash
 # Check service is enabled
-systemctl --user is-enabled kaijibot-gateway.service
+systemctl --user is-enabled allbot-gateway.service
 
 # Enable if not
-systemctl --user enable kaijibot-gateway.service
+systemctl --user enable allbot-gateway.service
 
 # Start on boot
-systemctl --user start kaijibot-gateway.service
+systemctl --user start allbot-gateway.service
 ```
 
 ---
@@ -367,12 +367,12 @@ free -h
 
 ```bash
 # Check logs
-journalctl --user -u kaijibot-gateway.service --no-pager -n 100
+journalctl --user -u allbot-gateway.service --no-pager -n 100
 
 # Common fix: rebuild
-cd ~/kaijibot  # if using hackable install
+cd ~/allbot  # if using hackable install
 npm run build
-systemctl --user restart kaijibot-gateway.service
+systemctl --user restart allbot-gateway.service
 ```
 
 ### ARM Binary Issues

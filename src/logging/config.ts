@@ -1,8 +1,8 @@
 import { getCommandPathWithRootOptions } from "../cli/argv.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveNodeRequireFromMeta } from "./node-require.js";
 
-type LoggingConfig = KaijiBotConfig["logging"];
+type LoggingConfig = AllBotConfig["logging"];
 
 const requireConfig = resolveNodeRequireFromMeta(import.meta.url);
 
@@ -18,7 +18,7 @@ export function readLoggingConfig(): LoggingConfig | undefined {
   try {
     const loaded = requireConfig?.("../config/config.js") as
       | {
-          loadConfig?: () => KaijiBotConfig;
+          loadConfig?: () => AllBotConfig;
         }
       | undefined;
     const parsed = loaded?.loadConfig?.();

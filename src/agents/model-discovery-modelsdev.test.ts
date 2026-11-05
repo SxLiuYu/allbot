@@ -57,7 +57,7 @@ describe("model-discovery-modelsdev", () => {
 
   beforeEach(() => {
     resetModelsDevCacheForTest();
-    tmpRoot = mkdtempSync(path.join(os.tmpdir(), "kaijibot-modelsdev-"));
+    tmpRoot = mkdtempSync(path.join(os.tmpdir(), "allbot-modelsdev-"));
     cachePath = path.join(tmpRoot, "cache", "models-dev.json");
   });
 

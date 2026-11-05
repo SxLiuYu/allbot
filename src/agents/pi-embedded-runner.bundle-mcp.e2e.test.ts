@@ -179,7 +179,7 @@ let workspaceDir: string;
 beforeAll(async () => {
   vi.useRealTimers();
   ({ runEmbeddedPiAgent } = await import("./pi-embedded-runner/run.js"));
-  e2eWorkspace = await createEmbeddedPiRunnerTestWorkspace("kaijibot-bundle-mcp-pi-");
+  e2eWorkspace = await createEmbeddedPiRunnerTestWorkspace("allbot-bundle-mcp-pi-");
   ({ agentDir, workspaceDir } = e2eWorkspace);
 }, 180_000);
 

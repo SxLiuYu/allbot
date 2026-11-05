@@ -4,13 +4,13 @@ import {
   normalizeEnvVarKey,
 } from "../infra/host-env-security.js";
 import { containsEnvVarReference } from "./env-substitution.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
 function isBlockedConfigEnvVar(key: string): boolean {
   return isDangerousHostEnvVarName(key) || isDangerousHostEnvOverrideVarName(key);
 }
 
-function collectConfigEnvVarsByTarget(cfg?: KaijiBotConfig): Record<string, string> {
+function collectConfigEnvVarsByTarget(cfg?: AllBotConfig): Record<string, string> {
   const envConfig = cfg?.env;
   if (!envConfig) {
     return {};
@@ -54,21 +54,21 @@ function collectConfigEnvVarsByTarget(cfg?: KaijiBotConfig): Record<string, stri
   return entries;
 }
 
-export function collectConfigRuntimeEnvVars(cfg?: KaijiBotConfig): Record<string, string> {
+export function collectConfigRuntimeEnvVars(cfg?: AllBotConfig): Record<string, string> {
   return collectConfigEnvVarsByTarget(cfg);
 }
 
-export function collectConfigServiceEnvVars(cfg?: KaijiBotConfig): Record<string, string> {
+export function collectConfigServiceEnvVars(cfg?: AllBotConfig): Record<string, string> {
   return collectConfigEnvVarsByTarget(cfg);
 }
 
 /** @deprecated Use `collectConfigRuntimeEnvVars` or `collectConfigServiceEnvVars`. */
-export function collectConfigEnvVars(cfg?: KaijiBotConfig): Record<string, string> {
+export function collectConfigEnvVars(cfg?: AllBotConfig): Record<string, string> {
   return collectConfigRuntimeEnvVars(cfg);
 }
 
 export function createConfigRuntimeEnv(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   baseEnv: NodeJS.ProcessEnv = process.env,
 ): NodeJS.ProcessEnv {
   const env = { ...baseEnv };
@@ -77,7 +77,7 @@ export function createConfigRuntimeEnv(
 }
 
 export function applyConfigEnvVars(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): void {
   const entries = collectConfigRuntimeEnvVars(cfg);
@@ -87,7 +87,7 @@ export function applyConfigEnvVars(
     }
     // Skip values containing unresolved ${VAR} references — applyConfigEnvVars runs
     // before env substitution, so these would pollute process.env with literal placeholders
-    // (e.g. process.env.KAIJIBOT_GATEWAY_TOKEN = "${VAULT_TOKEN}") which downstream auth
+    // (e.g. process.env.ALLBOT_GATEWAY_TOKEN = "${VAULT_TOKEN}") which downstream auth
     // resolution would accept as valid credentials.
     if (containsEnvVarReference(value)) {
       continue;

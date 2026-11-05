@@ -47,7 +47,7 @@ node-llama-cpp).
 
 ## How search works
 
-KaijiBot runs two retrieval paths in parallel and merges the results:
+AllBot runs two retrieval paths in parallel and merges the results:
 
 ```mermaid
 flowchart LR
@@ -61,7 +61,7 @@ flowchart LR
 ```
 
 - **Vector search** finds notes with similar meaning ("gateway host" matches
-  "the machine running KaijiBot").
+  "the machine running AllBot").
 - **BM25 keyword search** finds exact matches (IDs, error strings, config
   keys).
 
@@ -127,14 +127,14 @@ earlier conversations. This is opt-in via
 
 ## Troubleshooting
 
-**No results?** Run `kaijibot memory status` to check the index. If empty, run
-`kaijibot memory index --force`.
+**No results?** Run `allbot memory status` to check the index. If empty, run
+`allbot memory index --force`.
 
 **Only keyword matches?** Your embedding provider may not be configured. Check
-`kaijibot memory status --deep`.
+`allbot memory status --deep`.
 
 **CJK text not found?** Rebuild the FTS index with
-`kaijibot memory index --force`.
+`allbot memory index --force`.
 
 ## Further reading
 

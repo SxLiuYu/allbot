@@ -3,13 +3,13 @@ import path from "node:path";
 import {
   getRuntimeConfigSourceSnapshot,
   projectConfigOntoRuntimeSourceSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
   loadConfig,
 } from "../config/config.js";
 import { createConfigRuntimeEnv } from "../config/env-vars.js";
-import { resolveKaijiBotAgentDir } from "./agent-paths.js";
+import { resolveAllBotAgentDir } from "./agent-paths.js";
 import { MODELS_JSON_STATE } from "./models-config-state.js";
-import { planKaijiBotModelsJson } from "./models-config.plan.js";
+import { planAllBotModelsJson } from "./models-config.plan.js";
 
 export { resetModelsJsonReadyCacheForTest } from "./models-config-state.js";
 
@@ -38,8 +38,8 @@ function stableStringify(value: unknown): string {
 }
 
 async function buildModelsJsonFingerprint(params: {
-  config: KaijiBotConfig;
-  sourceConfigForSecrets: KaijiBotConfig;
+  config: AllBotConfig;
+  sourceConfigForSecrets: AllBotConfig;
   agentDir: string;
 }): Promise<string> {
   const authProfilesMtimeMs = await readFileMtimeMs(
@@ -97,9 +97,9 @@ export async function writeModelsFileAtomicForModelsJson(
   await fs.rename(tempPath, targetPath);
 }
 
-function resolveModelsConfigInput(config?: KaijiBotConfig): {
-  config: KaijiBotConfig;
-  sourceConfigForSecrets: KaijiBotConfig;
+function resolveModelsConfigInput(config?: AllBotConfig): {
+  config: AllBotConfig;
+  sourceConfigForSecrets: AllBotConfig;
 } {
   const runtimeSource = getRuntimeConfigSourceSnapshot();
   if (!config) {
@@ -143,13 +143,13 @@ async function withModelsJsonWriteLock<T>(targetPath: string, run: () => Promise
   }
 }
 
-export async function ensureKaijiBotModelsJson(
-  config?: KaijiBotConfig,
+export async function ensureAllBotModelsJson(
+  config?: AllBotConfig,
   agentDirOverride?: string,
 ): Promise<{ agentDir: string; wrote: boolean }> {
   const resolved = resolveModelsConfigInput(config);
   const cfg = resolved.config;
-  const agentDir = agentDirOverride?.trim() ? agentDirOverride.trim() : resolveKaijiBotAgentDir();
+  const agentDir = agentDirOverride?.trim() ? agentDirOverride.trim() : resolveAllBotAgentDir();
   const targetPath = path.join(agentDir, "models.json");
   const fingerprint = await buildModelsJsonFingerprint({
     config: cfg,
@@ -170,7 +170,7 @@ export async function ensureKaijiBotModelsJson(
     // are available to provider discovery without mutating process.env.
     const env = createConfigRuntimeEnv(cfg);
     const existingModelsFile = await readExistingModelsFile(targetPath);
-    const plan = await planKaijiBotModelsJson({
+    const plan = await planAllBotModelsJson({
       cfg,
       sourceConfigForSecrets: resolved.sourceConfigForSecrets,
       agentDir,

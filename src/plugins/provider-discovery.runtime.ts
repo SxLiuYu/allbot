@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 import { resolveDiscoveredProviderPluginIds } from "./providers.js";
 import { resolvePluginProviders } from "./providers.runtime.js";
@@ -38,7 +38,7 @@ function normalizeDiscoveryModule(value: ProviderDiscoveryModule): ProviderPlugi
 }
 
 function resolveProviderDiscoveryEntryPlugins(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   onlyPluginIds?: string[];
@@ -72,7 +72,7 @@ function resolveProviderDiscoveryEntryPlugins(params: {
 }
 
 export function resolvePluginDiscoveryProvidersRuntime(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   onlyPluginIds?: string[];

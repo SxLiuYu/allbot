@@ -1,1 +1,1 @@
-export * from "kaijibot/plugin-sdk/image-generation-core";
+export * from "allbot/plugin-sdk/image-generation-core";

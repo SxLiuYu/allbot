@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { getSubagentDepth, parseAgentSessionKey } from "../sessions/session-key-utils.js";
 import { parseJsonWithJson5Fallback } from "../utils/parse-json-compat.js";
@@ -40,7 +40,7 @@ function readSessionStore(storePath: string): Record<string, SessionDepthEntry> 
   return {};
 }
 
-function buildKeyCandidates(rawKey: string, cfg?: KaijiBotConfig): string[] {
+function buildKeyCandidates(rawKey: string, cfg?: AllBotConfig): string[] {
   if (!cfg) {
     return [rawKey];
   }
@@ -74,7 +74,7 @@ function findEntryBySessionId(
 
 function resolveEntryForSessionKey(params: {
   sessionKey: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store?: Record<string, SessionDepthEntry>;
   cache: Map<string, Record<string, SessionDepthEntry>>;
 }): SessionDepthEntry | undefined {
@@ -117,7 +117,7 @@ function resolveEntryForSessionKey(params: {
 export function getSubagentDepthFromSessionStore(
   sessionKey: string | undefined | null,
   opts?: {
-    cfg?: KaijiBotConfig;
+    cfg?: AllBotConfig;
     store?: Record<string, SessionDepthEntry>;
   },
 ): number {

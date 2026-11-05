@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import {
   withBundledPluginAllowlistCompat,
@@ -25,10 +25,10 @@ export type PluginActivationBundledCompatMode = {
 };
 
 export type PluginActivationInputs = {
-  rawConfig?: KaijiBotConfig;
-  config?: KaijiBotConfig;
+  rawConfig?: AllBotConfig;
+  config?: AllBotConfig;
   normalized: NormalizedPluginsConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  activationSourceConfig?: AllBotConfig;
   activationSource: PluginActivationConfigSource;
   autoEnabledReasons: Record<string, string[]>;
 };
@@ -48,9 +48,9 @@ export type BundledPluginCompatibleActivationInputs = PluginActivationInputs & {
 };
 
 export function withActivatedPluginIds(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   pluginIds: readonly string[];
-}): KaijiBotConfig | undefined {
+}): AllBotConfig | undefined {
   if (params.pluginIds.length === 0) {
     return params.config;
   }
@@ -82,10 +82,10 @@ export function withActivatedPluginIds(params: {
 }
 
 export function applyPluginCompatibilityOverrides(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   compat?: PluginActivationCompatConfig;
   env: NodeJS.ProcessEnv;
-}): KaijiBotConfig | undefined {
+}): AllBotConfig | undefined {
   const allowlistCompat = params.compat?.allowlistPluginIds?.length
     ? withBundledPluginAllowlistCompat({
         config: params.config,
@@ -109,8 +109,8 @@ export function applyPluginCompatibilityOverrides(params: {
 }
 
 export function resolvePluginActivationSnapshot(params: {
-  rawConfig?: KaijiBotConfig;
-  resolvedConfig?: KaijiBotConfig;
+  rawConfig?: AllBotConfig;
+  resolvedConfig?: AllBotConfig;
   autoEnabledReasons?: Record<string, string[]>;
   env?: NodeJS.ProcessEnv;
   applyAutoEnable?: boolean;
@@ -142,8 +142,8 @@ export function resolvePluginActivationSnapshot(params: {
 }
 
 export function resolvePluginActivationInputs(params: {
-  rawConfig?: KaijiBotConfig;
-  resolvedConfig?: KaijiBotConfig;
+  rawConfig?: AllBotConfig;
+  resolvedConfig?: AllBotConfig;
   autoEnabledReasons?: Record<string, string[]>;
   env?: NodeJS.ProcessEnv;
   compat?: PluginActivationCompatConfig;
@@ -174,8 +174,8 @@ export function resolvePluginActivationInputs(params: {
 }
 
 export function resolveBundledPluginCompatibleActivationInputs(params: {
-  rawConfig?: KaijiBotConfig;
-  resolvedConfig?: KaijiBotConfig;
+  rawConfig?: AllBotConfig;
+  resolvedConfig?: AllBotConfig;
   autoEnabledReasons?: Record<string, string[]>;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
@@ -183,7 +183,7 @@ export function resolveBundledPluginCompatibleActivationInputs(params: {
   applyAutoEnable?: boolean;
   compatMode: PluginActivationBundledCompatMode;
   resolveCompatPluginIds: (params: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
     onlyPluginIds?: readonly string[];

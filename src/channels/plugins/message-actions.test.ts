@@ -1,6 +1,6 @@
 import { Type } from "typebox";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { defaultRuntime } from "../../runtime.js";
 import {
@@ -80,14 +80,14 @@ describe("message action capability checks", () => {
   it("aggregates capabilities across plugins", () => {
     activateMessageActionTestRegistry();
 
-    expect(listChannelMessageCapabilities({} as KaijiBotConfig).toSorted()).toEqual([
+    expect(listChannelMessageCapabilities({} as AllBotConfig).toSorted()).toEqual([
       "buttons",
       "cards",
       "interactive",
     ]);
-    expect(channelSupportsMessageCapability({} as KaijiBotConfig, "interactive")).toBe(true);
-    expect(channelSupportsMessageCapability({} as KaijiBotConfig, "buttons")).toBe(true);
-    expect(channelSupportsMessageCapability({} as KaijiBotConfig, "cards")).toBe(true);
+    expect(channelSupportsMessageCapability({} as AllBotConfig, "interactive")).toBe(true);
+    expect(channelSupportsMessageCapability({} as AllBotConfig, "buttons")).toBe(true);
+    expect(channelSupportsMessageCapability({} as AllBotConfig, "cards")).toBe(true);
   });
 
   it("checks per-channel capabilities", () => {
@@ -95,47 +95,47 @@ describe("message action capability checks", () => {
 
     expect(
       listChannelMessageCapabilitiesForChannel({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         channel: "demo-buttons",
       }),
     ).toEqual(["interactive", "buttons"]);
     expect(
       listChannelMessageCapabilitiesForChannel({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         channel: "demo-cards",
       }),
     ).toEqual(["cards"]);
     expect(
       channelSupportsMessageCapabilityForChannel(
-        { cfg: {} as KaijiBotConfig, channel: "demo-buttons" },
+        { cfg: {} as AllBotConfig, channel: "demo-buttons" },
         "interactive",
       ),
     ).toBe(true);
     expect(
       channelSupportsMessageCapabilityForChannel(
-        { cfg: {} as KaijiBotConfig, channel: "demo-cards" },
+        { cfg: {} as AllBotConfig, channel: "demo-cards" },
         "interactive",
       ),
     ).toBe(false);
     expect(
       channelSupportsMessageCapabilityForChannel(
-        { cfg: {} as KaijiBotConfig, channel: "demo-buttons" },
+        { cfg: {} as AllBotConfig, channel: "demo-buttons" },
         "buttons",
       ),
     ).toBe(true);
     expect(
       channelSupportsMessageCapabilityForChannel(
-        { cfg: {} as KaijiBotConfig, channel: "demo-cards" },
+        { cfg: {} as AllBotConfig, channel: "demo-cards" },
         "buttons",
       ),
     ).toBe(false);
     expect(
       channelSupportsMessageCapabilityForChannel(
-        { cfg: {} as KaijiBotConfig, channel: "demo-cards" },
+        { cfg: {} as AllBotConfig, channel: "demo-cards" },
         "cards",
       ),
     ).toBe(true);
-    expect(channelSupportsMessageCapabilityForChannel({ cfg: {} as KaijiBotConfig }, "cards")).toBe(
+    expect(channelSupportsMessageCapabilityForChannel({ cfg: {} as AllBotConfig }, "cards")).toBe(
       false,
     );
   });
@@ -157,7 +157,7 @@ describe("message action capability checks", () => {
 
     expect(
       listChannelMessageCapabilitiesForChannel({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         channel: "demo-cards-alias",
       }),
     ).toEqual(["cards"]);
@@ -189,11 +189,11 @@ describe("message action capability checks", () => {
       createTestRegistry([{ pluginId: "demo-unified", source: "test", plugin: unifiedPlugin }]),
     );
 
-    expect(listChannelMessageActions({} as KaijiBotConfig)).toEqual(["send", "broadcast", "react"]);
-    expect(listChannelMessageCapabilities({} as KaijiBotConfig)).toEqual(["interactive"]);
+    expect(listChannelMessageActions({} as AllBotConfig)).toEqual(["send", "broadcast", "react"]);
+    expect(listChannelMessageCapabilities({} as AllBotConfig)).toEqual(["interactive"]);
     expect(
       resolveChannelMessageToolSchemaProperties({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         channel: "demo-unified",
       }),
     ).toHaveProperty("components");
@@ -219,12 +219,12 @@ describe("message action capability checks", () => {
       createTestRegistry([{ pluginId: "demo-crashing", source: "test", plugin: crashingPlugin }]),
     );
 
-    expect(listChannelMessageActions({} as KaijiBotConfig)).toEqual(["send", "broadcast"]);
-    expect(listChannelMessageCapabilities({} as KaijiBotConfig)).toEqual([]);
+    expect(listChannelMessageActions({} as AllBotConfig)).toEqual(["send", "broadcast"]);
+    expect(listChannelMessageCapabilities({} as AllBotConfig)).toEqual([]);
     expect(errorSpy).toHaveBeenCalledTimes(1);
 
-    expect(listChannelMessageActions({} as KaijiBotConfig)).toEqual(["send", "broadcast"]);
-    expect(listChannelMessageCapabilities({} as KaijiBotConfig)).toEqual([]);
+    expect(listChannelMessageActions({} as AllBotConfig)).toEqual(["send", "broadcast"]);
+    expect(listChannelMessageCapabilities({} as AllBotConfig)).toEqual([]);
     expect(errorSpy).toHaveBeenCalledTimes(1);
   });
 });

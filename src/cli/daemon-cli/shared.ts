@@ -106,11 +106,11 @@ export function pickProbeHostForBind(
 }
 
 const SAFE_DAEMON_ENV_KEYS = [
-  "KAIJIBOT_PROFILE",
-  "KAIJIBOT_STATE_DIR",
-  "KAIJIBOT_CONFIG_PATH",
-  "KAIJIBOT_GATEWAY_PORT",
-  "KAIJIBOT_NIX_MODE",
+  "ALLBOT_PROFILE",
+  "ALLBOT_STATE_DIR",
+  "ALLBOT_CONFIG_PATH",
+  "ALLBOT_GATEWAY_PORT",
+  "ALLBOT_NIX_MODE",
 ];
 
 export function filterDaemonEnv(env: Record<string, string> | undefined): Record<string, string> {
@@ -154,7 +154,7 @@ export function renderRuntimeHints(
   const hints: string[] = [];
   const fileLog = logFile ?? null;
   if (runtime.missingUnit) {
-    hints.push(`Service not installed. Run: ${formatCliCommand("kaijibot gateway install", env)}`);
+    hints.push(`Service not installed. Run: ${formatCliCommand("allbot gateway install", env)}`);
     if (fileLog) {
       hints.push(`File logs: ${fileLog}`);
     }
@@ -167,8 +167,8 @@ export function renderRuntimeHints(
     hints.push(
       ...buildPlatformRuntimeLogHints({
         env,
-        systemdServiceName: resolveGatewaySystemdServiceName(env.KAIJIBOT_PROFILE),
-        windowsTaskName: resolveGatewayWindowsTaskName(env.KAIJIBOT_PROFILE),
+        systemdServiceName: resolveGatewaySystemdServiceName(env.ALLBOT_PROFILE),
+        windowsTaskName: resolveGatewayWindowsTaskName(env.ALLBOT_PROFILE),
       }),
     );
   }
@@ -176,11 +176,11 @@ export function renderRuntimeHints(
 }
 
 export function renderGatewayServiceStartHints(env: NodeJS.ProcessEnv = process.env): string[] {
-  const profile = env.KAIJIBOT_PROFILE;
+  const profile = env.ALLBOT_PROFILE;
   const container = resolveDaemonContainerContext(env);
   const hints = buildPlatformServiceStartHints({
-    installCommand: formatCliCommand("kaijibot gateway install", env),
-    startCommand: formatCliCommand("kaijibot gateway", env),
+    installCommand: formatCliCommand("allbot gateway install", env),
+    startCommand: formatCliCommand("allbot gateway", env),
     launchAgentPlistPath: `~/Library/LaunchAgents/${resolveGatewayLaunchAgentLabel(profile)}.plist`,
     systemdServiceName: resolveGatewaySystemdServiceName(profile),
     windowsTaskName: resolveGatewayWindowsTaskName(profile),

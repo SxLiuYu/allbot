@@ -1,6 +1,6 @@
 import { getSafeLocalStorage } from "../../local-storage.ts";
 
-const PREFIX = "kaijibot:deleted:";
+const PREFIX = "allbot:deleted:";
 
 export class DeletedMessages {
   private key: string;

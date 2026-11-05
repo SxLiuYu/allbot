@@ -3,4 +3,4 @@ export {
   escapeRegExp,
   resolveUserPath,
   shortenHomePath,
-} from "kaijibot/plugin-sdk/browser-config-support";
+} from "allbot/plugin-sdk/browser-config-support";

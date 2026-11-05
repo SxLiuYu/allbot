@@ -1,21 +1,21 @@
 ---
-summary: "Delegate architecture: running KaijiBot as a named agent on behalf of an organization"
+summary: "Delegate architecture: running AllBot as a named agent on behalf of an organization"
 title: Delegate Architecture
 read_when: "You want an agent with its own identity that acts on behalf of humans in an organization."
 status: active
 ---
 
-> 💡 **KaijiBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。KaijiBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
+> 💡 **AllBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。AllBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
 
 # Delegate Architecture
 
-Goal: run KaijiBot as a **named delegate** — an agent with its own identity that acts "on behalf of" people in an organization. The agent never impersonates a human. It sends, reads, and schedules under its own account with explicit delegation permissions.
+Goal: run AllBot as a **named delegate** — an agent with its own identity that acts "on behalf of" people in an organization. The agent never impersonates a human. It sends, reads, and schedules under its own account with explicit delegation permissions.
 
 This extends [Multi-Agent Routing](/concepts/multi-agent) from personal use into organizational deployments.
 
 ## What is a delegate?
 
-A **delegate** is an KaijiBot agent that:
+A **delegate** is an AllBot agent that:
 
 - Has its **own identity** (email address, display name, calendar).
 - Acts **on behalf of** one or more humans — never pretends to be them.
@@ -26,7 +26,7 @@ The delegate model maps directly to how executive assistants work: they have the
 
 ## Why delegates?
 
-KaijiBot's default mode is a **personal assistant** — one human, one agent. Delegates extend this to organizations:
+AllBot's default mode is a **personal assistant** — one human, one agent. Delegates extend this to organizations:
 
 | Personal mode               | Delegate mode                                  |
 | --------------------------- | ---------------------------------------------- |
@@ -38,7 +38,7 @@ KaijiBot's default mode is a **personal assistant** — one human, one agent. De
 Delegates solve two problems:
 
 1. **Accountability**: messages sent by the agent are clearly from the agent, not a human.
-2. **Scope control**: the identity provider enforces what the delegate can access, independent of KaijiBot's own tool policy.
+2. **Scope control**: the identity provider enforces what the delegate can access, independent of AllBot's own tool policy.
 
 ## Capability tiers
 
@@ -98,7 +98,7 @@ Use per-agent tool policy (v2026.1.6+) to enforce boundaries at the Gateway leve
 ```json5
 {
   id: "delegate",
-  workspace: "~/.kaijibot/workspace-delegate",
+  workspace: "~/.allbot/workspace-delegate",
   tools: {
     allow: ["read", "exec", "message", "cron"],
     deny: ["write", "edit", "apply_patch", "browser", "canvas"],
@@ -113,7 +113,7 @@ For high-security deployments, sandbox the delegate agent so it cannot access th
 ```json5
 {
   id: "delegate",
-  workspace: "~/.kaijibot/workspace-delegate",
+  workspace: "~/.allbot/workspace-delegate",
   sandbox: {
     mode: "all",
     scope: "agent",
@@ -127,11 +127,11 @@ See [Sandboxing](/gateway/sandboxing) and [Multi-Agent Sandbox & Tools](/tools/m
 
 Configure logging before the delegate handles any real data:
 
-- Cron run history: `~/.kaijibot/cron/runs/<jobId>.jsonl`
-- Session transcripts: `~/.kaijibot/agents/delegate/sessions`
+- Cron run history: `~/.allbot/cron/runs/<jobId>.jsonl`
+- Session transcripts: `~/.allbot/agents/delegate/sessions`
 - Identity provider audit logs (Exchange, Google Workspace)
 
-All delegate actions flow through KaijiBot's session store. For compliance, ensure these logs are retained and reviewed.
+All delegate actions flow through AllBot's session store. For compliance, ensure these logs are retained and reviewed.
 
 ## Setting up a delegate
 
@@ -142,14 +142,14 @@ With hardening in place, proceed to grant the delegate its identity and permissi
 Use the multi-agent wizard to create an isolated agent for the delegate:
 
 ```bash
-kaijibot agents add delegate
+allbot agents add delegate
 ```
 
 This creates:
 
-- Workspace: `~/.kaijibot/workspace-delegate`
-- State: `~/.kaijibot/agents/delegate/agent`
-- Sessions: `~/.kaijibot/agents/delegate/sessions`
+- Workspace: `~/.allbot/workspace-delegate`
+- State: `~/.allbot/agents/delegate/agent`
+- Sessions: `~/.allbot/agents/delegate/sessions`
 
 Configure the delegate's personality in its workspace files:
 
@@ -210,10 +210,10 @@ Route inbound messages to the delegate agent using [Multi-Agent Routing](/concep
 {
   agents: {
     list: [
-      { id: "main", workspace: "~/.kaijibot/workspace" },
+      { id: "main", workspace: "~/.allbot/workspace" },
       {
         id: "delegate",
-        workspace: "~/.kaijibot/workspace-delegate",
+        workspace: "~/.allbot/workspace-delegate",
         tools: {
           deny: ["browser", "canvas"],
         },
@@ -243,7 +243,7 @@ Copy or create auth profiles for the delegate's `agentDir`:
 
 ```bash
 # Delegate reads from its own auth store
-~/.kaijibot/agents/delegate/agent/auth-profiles.json
+~/.allbot/agents/delegate/agent/auth-profiles.json
 ```
 
 Never share the main agent's `agentDir` with the delegate. See [Multi-Agent Routing](/concepts/multi-agent) for auth isolation details.
@@ -256,12 +256,12 @@ A complete delegate configuration for an organizational assistant that handles e
 {
   agents: {
     list: [
-      { id: "main", default: true, workspace: "~/.kaijibot/workspace" },
+      { id: "main", default: true, workspace: "~/.allbot/workspace" },
       {
         id: "org-assistant",
         name: "[Organization] Assistant",
-        workspace: "~/.kaijibot/workspace-org",
-        agentDir: "~/.kaijibot/agents/org-assistant/agent",
+        workspace: "~/.allbot/workspace-org",
+        agentDir: "~/.allbot/agents/org-assistant/agent",
         identity: { name: "[Organization] Assistant" },
         tools: {
           allow: ["read", "exec", "message", "cron", "sessions_list", "sessions_history"],
@@ -285,7 +285,7 @@ A complete delegate configuration for an organizational assistant that handles e
 The delegate's `AGENTS.md` defines its autonomous authority — what it may do without asking, what requires approval, and what is forbidden. [Cron Jobs](/automation/cron-jobs) drive its daily schedule.
 
 If you grant `sessions_history`, remember it is a bounded, safety-filtered
-recall view. KaijiBot redacts credential/token-like text, truncates long
+recall view. AllBot redacts credential/token-like text, truncates long
 content, strips thinking tags / `<relevant-memories>` scaffolding / plain-text
 tool-call XML payloads (including `<tool_call>...</tool_call>`,
 `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`,

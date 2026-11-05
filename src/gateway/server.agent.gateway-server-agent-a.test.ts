@@ -28,7 +28,7 @@ beforeAll(async () => {
   server = started.server;
   ws = started.ws;
   await connectOk(ws);
-  sharedSessionStoreDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-gw-session-"));
+  sharedSessionStoreDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-gw-session-"));
   sharedSessionStorePath = path.join(sharedSessionStoreDir, "sessions.json");
 });
 

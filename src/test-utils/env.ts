@@ -34,10 +34,10 @@ const PATH_RESOLUTION_ENV_KEYS = [
   "USERPROFILE",
   "HOMEDRIVE",
   "HOMEPATH",
-  "KAIJIBOT_HOME",
-  "KAIJIBOT_STATE_DIR",
-  "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-  "KAIJIBOT_DISABLE_BUNDLED_PLUGINS",
+  "ALLBOT_HOME",
+  "ALLBOT_STATE_DIR",
+  "ALLBOT_BUNDLED_PLUGINS_DIR",
+  "ALLBOT_DISABLE_BUNDLED_PLUGINS",
 ] as const;
 
 function resolveWindowsHomeParts(homeDir: string): { homeDrive?: string; homePath?: string } {
@@ -63,10 +63,10 @@ export function createPathResolutionEnv(
     ...process.env,
     HOME: resolvedHome,
     USERPROFILE: resolvedHome,
-    KAIJIBOT_HOME: undefined,
-    KAIJIBOT_STATE_DIR: undefined,
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-    KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+    ALLBOT_HOME: undefined,
+    ALLBOT_STATE_DIR: undefined,
+    ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+    ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
   };
 
   const windowsHome = resolveWindowsHomeParts(resolvedHome);

@@ -19,7 +19,7 @@ function createStore(profiles: AuthProfileStore["profiles"] = {}): AuthProfileSt
 async function withTempHome<T>(
   run: (params: { homeDir: string; workspaceDir: string }) => Promise<T> | T,
 ): Promise<T> {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-doctor-claude-cli-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-doctor-claude-cli-"));
   const homeDir = path.join(root, "home");
   const workspaceDir = path.join(root, "workspace");
   fs.mkdirSync(homeDir, { recursive: true });
@@ -35,11 +35,11 @@ describe("resolveClaudeCliProjectDirForWorkspace", () => {
   it("matches Claude's sanitized workspace project dir shape", () => {
     expect(
       resolveClaudeCliProjectDirForWorkspace({
-        workspaceDir: "/Users/vincentkoc/GIT/_Perso/kaijibot/.kaijibot/workspace",
+        workspaceDir: "/Users/vincentkoc/GIT/_Perso/allbot/.allbot/workspace",
         homeDir: "/Users/vincentkoc",
       }),
     ).toBe(
-      "/Users/vincentkoc/.claude/projects/-Users-vincentkoc-GIT--Perso-kaijibot--kaijibot-workspace",
+      "/Users/vincentkoc/.claude/projects/-Users-vincentkoc-GIT--Perso-allbot--allbot-workspace",
     );
   });
 });
@@ -103,7 +103,7 @@ describe("noteClaudeCliHealth", () => {
       expect(body).toContain("Binary: /opt/homebrew/bin/claude.");
       expect(body).toContain("Headless Claude auth: OK (oauth).");
       expect(body).toContain(
-        `KaijiBot auth profile: ${CLAUDE_CLI_PROFILE_ID} (provider claude-cli).`,
+        `AllBot auth profile: ${CLAUDE_CLI_PROFILE_ID} (provider claude-cli).`,
       );
       expect(body).toContain("Workspace:");
       expect(body).toContain("(writable).");
@@ -138,9 +138,9 @@ describe("noteClaudeCliHealth", () => {
 
       const body = String(noteFn.mock.calls[0]?.[0]);
       expect(body).toContain("Headless Claude auth: OK (oauth).");
-      expect(body).toContain(`KaijiBot auth profile: missing (${CLAUDE_CLI_PROFILE_ID})`);
+      expect(body).toContain(`AllBot auth profile: missing (${CLAUDE_CLI_PROFILE_ID})`);
       expect(body).toContain(
-        "kaijibot models auth login --provider anthropic --method cli --set-default",
+        "allbot models auth login --provider anthropic --method cli --set-default",
       );
       expect(body).toContain(
         "not created yet; it appears after the first Claude CLI turn in this workspace",

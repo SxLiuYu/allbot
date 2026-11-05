@@ -38,7 +38,7 @@ title: "Retry Policy"
 
 ## Configuration
 
-Set retry policy per provider in `~/.kaijibot/kaijibot.json`:
+Set retry policy per provider in `~/.allbot/allbot.json`:
 
 ```json5
 {

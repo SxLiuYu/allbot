@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { runHeartbeatOnce } from "./heartbeat-runner.js";
 
 describe("heartbeat runner cognitive delivery bypass", () => {
@@ -11,7 +11,7 @@ describe("heartbeat runner cognitive delivery bypass", () => {
         { id: "bot2", name: "Bot2" },
       ],
     },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 
   it("skips non-default agent for normal heartbeat reason", async () => {
     const result = await runHeartbeatOnce({

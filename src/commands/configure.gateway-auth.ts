@@ -1,6 +1,6 @@
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
 import { resolveDefaultAgentWorkspaceDir } from "../agents/workspace.js";
-import type { KaijiBotConfig, GatewayAuthConfig } from "../config/config.js";
+import type { AllBotConfig, GatewayAuthConfig } from "../config/config.js";
 import { isSecretRef, type SecretInput } from "../config/types.secrets.js";
 import { resolveProviderPluginChoice } from "../plugins/provider-wizard.js";
 import { resolvePluginProviders } from "../plugins/providers.runtime.js";
@@ -34,7 +34,7 @@ function sanitizeTokenValue(value: unknown): string | undefined {
 
 function resolveProviderChoiceModelAllowlist(params: {
   authChoice: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }):
@@ -95,10 +95,10 @@ export function buildGatewayAuthConfig(params: {
 }
 
 export async function promptAuthConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   const authChoice = await promptAuthChoiceGrouped({
     prompter,
     store: ensureAuthProfileStore(undefined, {

@@ -2,13 +2,13 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolvePdfModelConfigForTool } from "./pdf-tool.model-config.js";
 
 const ANTHROPIC_PDF_MODEL = "anthropic/claude-opus-4-6";
 
 async function withTempAgentDir<T>(run: (agentDir: string) => Promise<T>): Promise<T> {
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-pdf-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-pdf-"));
   try {
     return await run(agentDir);
   } finally {
@@ -30,10 +30,10 @@ function resetAuthEnv() {
   vi.stubEnv("GITHUB_TOKEN", "");
 }
 
-function withDefaultModel(primary: string): KaijiBotConfig {
+function withDefaultModel(primary: string): AllBotConfig {
   return {
     agents: { defaults: { model: { primary } } },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("resolvePdfModelConfigForTool", () => {
@@ -61,7 +61,7 @@ describe("resolvePdfModelConfigForTool", () => {
             pdfModel: { primary: ANTHROPIC_PDF_MODEL },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
       expect(resolvePdfModelConfigForTool({ cfg, agentDir })).toEqual({
         primary: ANTHROPIC_PDF_MODEL,
       });
@@ -77,7 +77,7 @@ describe("resolvePdfModelConfigForTool", () => {
             imageModel: { primary: "openai/gpt-5.4-mini" },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
       expect(resolvePdfModelConfigForTool({ cfg, agentDir })).toEqual({
         primary: "openai/gpt-5.4-mini",
       });

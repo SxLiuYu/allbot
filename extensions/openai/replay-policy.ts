@@ -1,7 +1,7 @@
 import type {
   ProviderReplayPolicy,
   ProviderReplayPolicyContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 
 /**
  * Returns the provider-owned replay policy for OpenAI-family transports.

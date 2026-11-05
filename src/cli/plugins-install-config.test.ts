@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
-import type { ConfigFileSnapshot } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/config.js";
+import type { ConfigFileSnapshot } from "../config/types.allbot.js";
 import { type PluginInstallRequestContext } from "./plugin-install-config-policy.js";
 import { loadConfigForInstall } from "./plugins-install-command.js";
 
 const hoisted = vi.hoisted(() => ({
-  loadConfigMock: vi.fn<() => KaijiBotConfig>(),
+  loadConfigMock: vi.fn<() => AllBotConfig>(),
   readConfigFileSnapshotMock: vi.fn<() => Promise<ConfigFileSnapshot>>(),
   collectChannelDoctorStaleConfigMutationsMock: vi.fn(),
 }));
@@ -21,7 +21,7 @@ vi.mock("../config/config.js", () => ({
 }));
 
 vi.mock("../commands/doctor/shared/channel-doctor.js", () => ({
-  collectChannelDoctorStaleConfigMutations: (cfg: KaijiBotConfig) =>
+  collectChannelDoctorStaleConfigMutations: (cfg: AllBotConfig) =>
     collectChannelDoctorStaleConfigMutationsMock(cfg),
 }));
 
@@ -32,10 +32,10 @@ function makeSnapshot(overrides: Partial<ConfigFileSnapshot> = {}): ConfigFileSn
     raw: '{ "plugins": {} }',
     parsed: { plugins: {} },
     sourceConfig: { plugins: {} } as ConfigFileSnapshot["sourceConfig"],
-    resolved: { plugins: {} } as KaijiBotConfig,
+    resolved: { plugins: {} } as AllBotConfig,
     valid: false,
     runtimeConfig: { plugins: {} } as ConfigFileSnapshot["runtimeConfig"],
-    config: { plugins: {} } as KaijiBotConfig,
+    config: { plugins: {} } as AllBotConfig,
     hash: "abc",
     issues: [{ path: "plugins.installs.matrix", message: "stale path" }],
     warnings: [],
@@ -46,8 +46,8 @@ function makeSnapshot(overrides: Partial<ConfigFileSnapshot> = {}): ConfigFileSn
 
 describe("loadConfigForInstall", () => {
   const matrixNpmRequest = {
-    rawSpec: "@kaijibot/matrix",
-    normalizedSpec: "@kaijibot/matrix",
+    rawSpec: "@allbot/matrix",
+    normalizedSpec: "@allbot/matrix",
     bundledPluginId: "matrix",
     allowInvalidConfigRecovery: true,
   } satisfies PluginInstallRequestContext;
@@ -57,7 +57,7 @@ describe("loadConfigForInstall", () => {
     readConfigFileSnapshotMock.mockReset();
     collectChannelDoctorStaleConfigMutationsMock.mockReset();
 
-    collectChannelDoctorStaleConfigMutationsMock.mockImplementation(async (cfg: KaijiBotConfig) => [
+    collectChannelDoctorStaleConfigMutationsMock.mockImplementation(async (cfg: AllBotConfig) => [
       {
         config: cfg,
         changes: [],
@@ -66,7 +66,7 @@ describe("loadConfigForInstall", () => {
   });
 
   it("returns the config directly when loadConfig succeeds", async () => {
-    const cfg = { plugins: { entries: { matrix: { enabled: true } } } } as KaijiBotConfig;
+    const cfg = { plugins: { entries: { matrix: { enabled: true } } } } as AllBotConfig;
     loadConfigMock.mockReturnValue(cfg);
 
     const result = await loadConfigForInstall(matrixNpmRequest);
@@ -75,7 +75,7 @@ describe("loadConfigForInstall", () => {
   });
 
   it("does not run stale Matrix cleanup on the happy path", async () => {
-    const cfg = { plugins: {} } as KaijiBotConfig;
+    const cfg = { plugins: {} } as AllBotConfig;
     loadConfigMock.mockReturnValue(cfg);
 
     const result = await loadConfigForInstall(matrixNpmRequest);
@@ -92,7 +92,7 @@ describe("loadConfigForInstall", () => {
 
     const snapshotCfg = {
       plugins: { installs: { matrix: { source: "path", installPath: "/gone" } } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     readConfigFileSnapshotMock.mockResolvedValue(
       makeSnapshot({
         parsed: { plugins: { installs: { matrix: {} } } },
@@ -140,7 +140,7 @@ describe("loadConfigForInstall", () => {
         rawSpec: "alpha",
         normalizedSpec: "alpha",
       }),
-    ).rejects.toThrow("Config invalid; run `kaijibot doctor --fix` before installing plugins.");
+    ).rejects.toThrow("Config invalid; run `allbot doctor --fix` before installing plugins.");
     expect(readConfigFileSnapshotMock).not.toHaveBeenCalled();
   });
 
@@ -154,12 +154,12 @@ describe("loadConfigForInstall", () => {
     readConfigFileSnapshotMock.mockResolvedValue(
       makeSnapshot({
         parsed: {},
-        config: {} as KaijiBotConfig,
+        config: {} as AllBotConfig,
       }),
     );
 
     await expect(loadConfigForInstall(matrixNpmRequest)).rejects.toThrow(
-      "Config file could not be parsed; run `kaijibot doctor` to repair it.",
+      "Config file could not be parsed; run `allbot doctor` to repair it.",
     );
   });
 
@@ -173,7 +173,7 @@ describe("loadConfigForInstall", () => {
     readConfigFileSnapshotMock.mockResolvedValue(makeSnapshot({ exists: false, parsed: {} }));
 
     await expect(loadConfigForInstall(matrixNpmRequest)).rejects.toThrow(
-      "Config file could not be parsed; run `kaijibot doctor` to repair it.",
+      "Config file could not be parsed; run `allbot doctor` to repair it.",
     );
   });
 

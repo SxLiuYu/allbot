@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "KaijiBot",
+  "name": "AllBot",
   "description": "Self-hosted proactive AI assistant for Feishu with multi-provider LLM support. Fork of OpenClaw with cognitive AI layer.",
   "theme": "mint",
   "icons": {
@@ -36,7 +36,7 @@
     "links": [
       {
         "label": "GitHub",
-        "href": "https://github.com/kaijibot/kaijibot",
+        "href": "https://github.com/allbot/allbot",
         "icon": "github"
       },
       {
@@ -341,15 +341,15 @@
     },
     {
       "source": "/clawd",
-      "destination": "/start/kaijibot"
+      "destination": "/start/allbot"
     },
     {
       "source": "/start/clawd",
-      "destination": "/start/kaijibot"
+      "destination": "/start/allbot"
     },
     {
       "source": "/start/clawd/",
-      "destination": "/start/kaijibot"
+      "destination": "/start/allbot"
     },
     {
       "source": "/start/pairing",
@@ -932,7 +932,7 @@
               {
                 "group": "Guides",
                 "pages": [
-                  "start/kaijibot",
+                  "start/allbot",
                   "start/wizard-cli-reference",
                   "start/wizard-cli-automation"
                 ]

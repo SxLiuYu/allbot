@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { resolveMemoryHostEventLogPath } from "kaijibot/plugin-sdk/memory-core-host-events";
-import type { MemoryPluginPublicArtifact } from "kaijibot/plugin-sdk/memory-host-core";
-import type { KaijiBotConfig } from "../api.js";
+import { resolveMemoryHostEventLogPath } from "allbot/plugin-sdk/memory-core-host-events";
+import type { MemoryPluginPublicArtifact } from "allbot/plugin-sdk/memory-host-core";
+import type { AllBotConfig } from "../api.js";
 
 type WorkspaceEntry = { workspaceDir: string; agentIds: string[] };
 
-function resolveWorkspaces(cfg: KaijiBotConfig): WorkspaceEntry[] {
+function resolveWorkspaces(cfg: AllBotConfig): WorkspaceEntry[] {
   const agentList = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];
   if (agentList.length === 0) {
     return [];
@@ -111,7 +111,7 @@ async function collectWorkspaceArtifacts(params: {
 }
 
 export async function listMemoryCorePublicArtifacts(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<MemoryPluginPublicArtifact[]> {
   const workspaces = resolveWorkspaces(params.cfg);
   const artifacts: MemoryPluginPublicArtifact[] = [];

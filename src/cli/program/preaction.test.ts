@@ -34,7 +34,7 @@ vi.mock("../../logging/console.js", () => ({
 }));
 
 vi.mock("../cli-name.js", () => ({
-  resolveCliName: () => "kaijibot",
+  resolveCliName: () => "allbot",
 }));
 
 vi.mock("./config-guard.js", () => ({
@@ -65,7 +65,7 @@ beforeEach(() => {
   originalProcessTitleDescriptor = Object.getOwnPropertyDescriptor(process, "title");
   observedProcessTitle = originalProcessTitle;
   originalNodeNoWarnings = process.env.NODE_NO_WARNINGS;
-  originalHideBanner = process.env.KAIJIBOT_HIDE_BANNER;
+  originalHideBanner = process.env.ALLBOT_HIDE_BANNER;
   originalForceStderr = loggingState.forceConsoleToStderr;
   // Worker-thread Vitest runs do not reliably mutate the real process title,
   // so capture writes at the property boundary instead.
@@ -79,7 +79,7 @@ beforeEach(() => {
   });
   loggingState.forceConsoleToStderr = false;
   delete process.env.NODE_NO_WARNINGS;
-  delete process.env.KAIJIBOT_HIDE_BANNER;
+  delete process.env.ALLBOT_HIDE_BANNER;
 });
 
 afterEach(() => {
@@ -101,9 +101,9 @@ afterEach(() => {
     process.env.NODE_NO_WARNINGS = originalNodeNoWarnings;
   }
   if (originalHideBanner === undefined) {
-    delete process.env.KAIJIBOT_HIDE_BANNER;
+    delete process.env.ALLBOT_HIDE_BANNER;
   } else {
-    process.env.KAIJIBOT_HIDE_BANNER = originalHideBanner;
+    process.env.ALLBOT_HIDE_BANNER = originalHideBanner;
   }
 });
 
@@ -114,7 +114,7 @@ describe("registerPreActionHooks", () => {
     | null = null;
 
   function buildProgram() {
-    const program = new Command().name("kaijibot");
+    const program = new Command().name("allbot");
     program
       .command("agent")
       .requiredOption("-m, --message <text>")
@@ -197,7 +197,7 @@ describe("registerPreActionHooks", () => {
     const processTitleSetSpy = vi.spyOn(process, "title", "set");
     await runPreAction({
       parseArgv: ["status"],
-      processArgv: ["node", "kaijibot", "status", "--debug"],
+      processArgv: ["node", "allbot", "status", "--debug"],
     });
 
     expect(emitCliBannerMock).toHaveBeenCalledWith("9.9.9-test");
@@ -207,12 +207,12 @@ describe("registerPreActionHooks", () => {
       commandPath: ["status"],
     });
     expect(ensurePluginRegistryLoadedMock).toHaveBeenCalledWith({ scope: "channels" });
-    expect(processTitleSetSpy).toHaveBeenCalledWith("kaijibot-status");
+    expect(processTitleSetSpy).toHaveBeenCalledWith("allbot-status");
 
     vi.clearAllMocks();
     await runPreAction({
       parseArgv: ["message", "send"],
-      processArgv: ["node", "kaijibot", "message", "send"],
+      processArgv: ["node", "allbot", "message", "send"],
     });
 
     expect(setVerboseMock).toHaveBeenCalledWith(false);
@@ -228,7 +228,7 @@ describe("registerPreActionHooks", () => {
   it("loads plugins for local agent runs", async () => {
     await runPreAction({
       parseArgv: ["agent"],
-      processArgv: ["node", "kaijibot", "agent", "--local", "--message", "hi"],
+      processArgv: ["node", "allbot", "agent", "--local", "--message", "hi"],
     });
 
     expect(ensureConfigReadyMock).toHaveBeenCalledWith({
@@ -241,7 +241,7 @@ describe("registerPreActionHooks", () => {
   it("keeps setup alias and channels add manifest-first", async () => {
     await runPreAction({
       parseArgv: ["onboard"],
-      processArgv: ["node", "kaijibot", "onboard"],
+      processArgv: ["node", "allbot", "onboard"],
     });
 
     expect(ensureConfigReadyMock).toHaveBeenCalledWith({
@@ -253,7 +253,7 @@ describe("registerPreActionHooks", () => {
     vi.clearAllMocks();
     await runPreAction({
       parseArgv: ["channels", "add"],
-      processArgv: ["node", "kaijibot", "channels", "add"],
+      processArgv: ["node", "allbot", "channels", "add"],
     });
 
     expect(ensureConfigReadyMock).toHaveBeenCalledWith({
@@ -266,7 +266,7 @@ describe("registerPreActionHooks", () => {
   it("skips help/version preaction and respects banner opt-out", async () => {
     await runPreAction({
       parseArgv: ["status"],
-      processArgv: ["node", "kaijibot", "--version"],
+      processArgv: ["node", "allbot", "--version"],
     });
 
     expect(emitCliBannerMock).not.toHaveBeenCalled();
@@ -274,11 +274,11 @@ describe("registerPreActionHooks", () => {
     expect(ensureConfigReadyMock).not.toHaveBeenCalled();
 
     vi.clearAllMocks();
-    process.env.KAIJIBOT_HIDE_BANNER = "1";
+    process.env.ALLBOT_HIDE_BANNER = "1";
 
     await runPreAction({
       parseArgv: ["status"],
-      processArgv: ["node", "kaijibot", "status"],
+      processArgv: ["node", "allbot", "status"],
     });
 
     expect(emitCliBannerMock).not.toHaveBeenCalled();
@@ -288,7 +288,7 @@ describe("registerPreActionHooks", () => {
   it("applies --json stdout suppression only for explicit JSON output commands", async () => {
     await runPreAction({
       parseArgv: ["status"],
-      processArgv: ["node", "kaijibot", "status", "--json"],
+      processArgv: ["node", "allbot", "status", "--json"],
     });
 
     expect(ensureConfigReadyMock).toHaveBeenCalledWith({
@@ -301,7 +301,7 @@ describe("registerPreActionHooks", () => {
     vi.clearAllMocks();
     await runPreAction({
       parseArgv: ["update", "status", "--json"],
-      processArgv: ["node", "kaijibot", "update", "status", "--json"],
+      processArgv: ["node", "allbot", "update", "status", "--json"],
     });
 
     expect(ensureConfigReadyMock).toHaveBeenCalledWith({
@@ -314,7 +314,7 @@ describe("registerPreActionHooks", () => {
     vi.clearAllMocks();
     await runPreAction({
       parseArgv: ["config", "set", "gateway.auth.mode", "{bad", "--json"],
-      processArgv: ["node", "kaijibot", "config", "set", "gateway.auth.mode", "{bad", "--json"],
+      processArgv: ["node", "allbot", "config", "set", "gateway.auth.mode", "{bad", "--json"],
     });
 
     expect(ensureConfigReadyMock).toHaveBeenCalledWith({
@@ -326,7 +326,7 @@ describe("registerPreActionHooks", () => {
   it("routes logs to stderr in --json mode so stdout stays clean", async () => {
     await runPreAction({
       parseArgv: ["agents", "list"],
-      processArgv: ["node", "kaijibot", "agents", "list", "--json"],
+      processArgv: ["node", "allbot", "agents", "list", "--json"],
     });
 
     expect(routeLogsToStderrMock).toHaveBeenCalledOnce();
@@ -336,7 +336,7 @@ describe("registerPreActionHooks", () => {
     // config set --json is parse-only (not JSON output mode), should not route
     await runPreAction({
       parseArgv: ["config", "set", "gateway.auth.mode", "local", "--json"],
-      processArgv: ["node", "kaijibot", "config", "set", "gateway.auth.mode", "local", "--json"],
+      processArgv: ["node", "allbot", "config", "set", "gateway.auth.mode", "local", "--json"],
     });
 
     expect(routeLogsToStderrMock).not.toHaveBeenCalled();
@@ -346,7 +346,7 @@ describe("registerPreActionHooks", () => {
     // non-json command should not route
     await runPreAction({
       parseArgv: ["agents", "list"],
-      processArgv: ["node", "kaijibot", "agents", "list"],
+      processArgv: ["node", "allbot", "agents", "list"],
     });
 
     expect(routeLogsToStderrMock).not.toHaveBeenCalled();
@@ -355,7 +355,7 @@ describe("registerPreActionHooks", () => {
   it("bypasses config guard for config validate", async () => {
     await runPreAction({
       parseArgv: ["config", "validate"],
-      processArgv: ["node", "kaijibot", "config", "validate"],
+      processArgv: ["node", "allbot", "config", "validate"],
     });
 
     expect(ensureConfigReadyMock).not.toHaveBeenCalled();
@@ -364,7 +364,7 @@ describe("registerPreActionHooks", () => {
   it("bypasses config guard for config validate when root option values are present", async () => {
     await runPreAction({
       parseArgv: ["config", "validate"],
-      processArgv: ["node", "kaijibot", "--profile", "work", "config", "validate"],
+      processArgv: ["node", "allbot", "--profile", "work", "config", "validate"],
     });
 
     expect(ensureConfigReadyMock).not.toHaveBeenCalled();
@@ -373,7 +373,7 @@ describe("registerPreActionHooks", () => {
   it("bypasses config guard for config schema", async () => {
     await runPreAction({
       parseArgv: ["config", "schema"],
-      processArgv: ["node", "kaijibot", "config", "schema"],
+      processArgv: ["node", "allbot", "config", "schema"],
     });
 
     expect(ensureConfigReadyMock).not.toHaveBeenCalled();
@@ -382,7 +382,7 @@ describe("registerPreActionHooks", () => {
   it("bypasses config guard for backup create", async () => {
     await runPreAction({
       parseArgv: ["backup", "create"],
-      processArgv: ["node", "kaijibot", "backup", "create", "--json"],
+      processArgv: ["node", "allbot", "backup", "create", "--json"],
     });
 
     expect(ensureConfigReadyMock).not.toHaveBeenCalled();
@@ -396,7 +396,7 @@ describe("registerPreActionHooks", () => {
 
     await runPreAction({
       parseArgv: ["agents", "list"],
-      processArgv: ["node", "kaijibot", "agents", "list", "--json"],
+      processArgv: ["node", "allbot", "agents", "list", "--json"],
     });
 
     expect(ensurePluginRegistryLoadedMock).toHaveBeenCalled();
@@ -413,7 +413,7 @@ describe("registerPreActionHooks", () => {
 
     await runPreAction({
       parseArgv: ["agents", "list"],
-      processArgv: ["node", "kaijibot", "agents", "list"],
+      processArgv: ["node", "allbot", "agents", "list"],
     });
 
     expect(ensurePluginRegistryLoadedMock).toHaveBeenCalled();

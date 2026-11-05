@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { DEFAULT_ACCOUNT_ID } from "../../routing/session-key.js";
 
 type ChannelSection = {
@@ -14,12 +14,12 @@ function isConfiguredSecretValue(value: unknown): boolean {
 }
 
 export function setAccountEnabledInConfigSection(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sectionKey: string;
   accountId: string;
   enabled: boolean;
   allowTopLevel?: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const accountKey = params.accountId || DEFAULT_ACCOUNT_ID;
   const channels = params.cfg.channels as Record<string, unknown> | undefined;
   const base = channels?.[params.sectionKey] as ChannelSection | undefined;
@@ -34,7 +34,7 @@ export function setAccountEnabledInConfigSection(params: {
           enabled: params.enabled,
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   const baseAccounts = base?.accounts ?? {};
@@ -54,15 +54,15 @@ export function setAccountEnabledInConfigSection(params: {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 export function deleteAccountFromConfigSection(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sectionKey: string;
   accountId: string;
   clearBaseFields?: string[];
-}): KaijiBotConfig {
+}): AllBotConfig {
   const accountKey = params.accountId || DEFAULT_ACCOUNT_ID;
   const channels = params.cfg.channels as Record<string, unknown> | undefined;
   const base = channels?.[params.sectionKey] as ChannelSection | undefined;
@@ -85,7 +85,7 @@ export function deleteAccountFromConfigSection(params: {
           accounts: Object.keys(accounts).length ? accounts : undefined,
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   if (baseAccounts && Object.keys(baseAccounts).length > 0) {
@@ -105,14 +105,14 @@ export function deleteAccountFromConfigSection(params: {
           accounts: Object.keys(baseAccounts).length ? baseAccounts : undefined,
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   const nextChannels = { ...params.cfg.channels } as Record<string, unknown>;
   delete nextChannels[params.sectionKey];
-  const nextCfg = { ...params.cfg } as KaijiBotConfig;
+  const nextCfg = { ...params.cfg } as AllBotConfig;
   if (Object.keys(nextChannels).length > 0) {
-    nextCfg.channels = nextChannels as KaijiBotConfig["channels"];
+    nextCfg.channels = nextChannels as AllBotConfig["channels"];
   } else {
     delete nextCfg.channels;
   }

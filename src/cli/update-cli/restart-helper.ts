@@ -35,27 +35,27 @@ function powerShellSingleQuote(value: string): string {
 }
 
 function resolveSystemdUnit(env: NodeJS.ProcessEnv): string {
-  const override = normalizeOptionalString(env.KAIJIBOT_SYSTEMD_UNIT);
+  const override = normalizeOptionalString(env.ALLBOT_SYSTEMD_UNIT);
   if (override) {
     return override.endsWith(".service") ? override : `${override}.service`;
   }
-  return `${resolveGatewaySystemdServiceName(env.KAIJIBOT_PROFILE)}.service`;
+  return `${resolveGatewaySystemdServiceName(env.ALLBOT_PROFILE)}.service`;
 }
 
 function resolveLaunchdLabel(env: NodeJS.ProcessEnv): string {
-  const override = normalizeOptionalString(env.KAIJIBOT_LAUNCHD_LABEL);
+  const override = normalizeOptionalString(env.ALLBOT_LAUNCHD_LABEL);
   if (override) {
     return override;
   }
-  return resolveGatewayLaunchAgentLabel(env.KAIJIBOT_PROFILE);
+  return resolveGatewayLaunchAgentLabel(env.ALLBOT_PROFILE);
 }
 
 function resolveWindowsTaskName(env: NodeJS.ProcessEnv): string {
-  const override = env.KAIJIBOT_WINDOWS_TASK_NAME?.trim();
+  const override = env.ALLBOT_WINDOWS_TASK_NAME?.trim();
   if (override) {
     return override;
   }
-  return resolveGatewayWindowsTaskName(env.KAIJIBOT_PROFILE);
+  return resolveGatewayWindowsTaskName(env.ALLBOT_PROFILE);
 }
 
 /**
@@ -79,33 +79,33 @@ export async function prepareRestartScript(
       const unitName = resolveSystemdUnit(env);
       const escaped = shellEscape(unitName);
       const logSetup = renderPosixRestartLogSetup({ ...process.env, ...env });
-      filename = `kaijibot-restart-${timestamp}.sh`;
+      filename = `allbot-restart-${timestamp}.sh`;
       scriptContent = `#!/bin/sh
 # Standalone restart script — survives parent process termination.
 # Wait briefly to ensure file locks are released after update.
 sleep 1
 exec 3>&2
 ${logSetup}
-printf '[%s] kaijibot restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
+printf '[%s] allbot restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
 if systemctl --user is-active --quiet '${escaped}' || systemctl --user is-enabled --quiet '${escaped}'; then
   if systemctl --user restart '${escaped}'; then
     status=0
-    printf '[%s] kaijibot restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
+    printf '[%s] allbot restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
   else
     status=$?
-    printf '[%s] kaijibot restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
+    printf '[%s] allbot restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
   fi
 elif systemctl is-active --quiet '${escaped}' || systemctl is-enabled --quiet '${escaped}'; then
   status=78
-  printf '[%s] system-scoped kaijibot gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
-  printf '[%s] system-scoped kaijibot gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&3 2>/dev/null || true
+  printf '[%s] system-scoped allbot gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&2
+  printf '[%s] system-scoped allbot gateway unit detected; update cannot restart it without sudo. Run: sudo systemctl restart %s\\n' "$(date -u +%FT%TZ)" '${escaped}' >&3 2>/dev/null || true
 else
   if systemctl --user restart '${escaped}'; then
     status=0
-    printf '[%s] kaijibot restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
+    printf '[%s] allbot restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
   else
     status=$?
-    printf '[%s] kaijibot restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
+    printf '[%s] allbot restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
   fi
 fi
 # Self-cleanup
@@ -126,7 +126,7 @@ exit "$status"
       const plistPath = path.join(home, "Library", "LaunchAgents", `${label}.plist`);
       const escapedPlistPath = shellEscape(plistPath);
       const logSetup = renderPosixRestartLogSetup({ ...process.env, ...env });
-      filename = `kaijibot-restart-${timestamp}.sh`;
+      filename = `allbot-restart-${timestamp}.sh`;
       scriptContent = `#!/bin/sh
 # Standalone restart script — survives parent process termination.
 # Wait briefly to ensure file locks are released after update.
@@ -135,7 +135,7 @@ sleep 1
 # audit trail. Log setup is best-effort: restart must still run if the log path
 # is temporarily unavailable.
 ${logSetup}
-printf '[%s] kaijibot restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${shellEscapeRestartLogValue(label)}' >&2
+printf '[%s] allbot restart attempt source=update target=%s\\n' "$(date -u +%FT%TZ)" '${shellEscapeRestartLogValue(label)}' >&2
 # Try kickstart first (works when the service is still registered).
 # If it fails (e.g. after bootout), clear any persisted disabled state,
 # then re-register via bootstrap. Bootstrap loads RunAtLoad agents, so the
@@ -153,11 +153,11 @@ if ! launchctl kickstart -k 'gui/${uid}/${escaped}'; then
   fi
 fi
 if [ "$status" -eq 0 ]; then
-  printf '[%s] kaijibot restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
+  printf '[%s] allbot restart done source=update\\n' "$(date -u +%FT%TZ)" >&2
 else
-  printf '[%s] kaijibot restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
+  printf '[%s] allbot restart failed source=update status=%s\\n' "$(date -u +%FT%TZ)" "$status" >&2
 fi
-# Self-cleanup (log is retained under the KaijiBot state logs directory).
+# Self-cleanup (log is retained under the AllBot state logs directory).
 script_dir=$(dirname "$0")
 rm -f "$0"
 rmdir "$script_dir" 2>/dev/null || true
@@ -173,15 +173,15 @@ exit "$status"
       const restartLogPath = resolveGatewayRestartLogPath({ ...process.env, ...env });
       const quotedLogPath = powerShellSingleQuote(restartLogPath);
       const quotedTaskName = powerShellSingleQuote(taskName);
-      filename = `kaijibot-restart-${timestamp}.cmd`;
+      filename = `allbot-restart-${timestamp}.cmd`;
       scriptContent = `@echo off
 REM Standalone restart script - survives parent process termination.
 REM Keep this as a cmd wrapper so Group Policy script execution policies
 REM cannot block the update restart handoff before schtasks.exe runs.
 setlocal
-set "KAIJIBOT_RESTART_SCRIPT=%~f0"
-set "KAIJIBOT_RESTART_SCRIPT_DIR=%~dp0."
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$p=$env:KAIJIBOT_RESTART_SCRIPT; $s=Get-Content -Raw -LiteralPath $p; $m='# POWERSHELL'; $i=$s.IndexOf($m); if ($i -lt 0) { exit 1 }; Invoke-Expression $s.Substring($i)"
+set "ALLBOT_RESTART_SCRIPT=%~f0"
+set "ALLBOT_RESTART_SCRIPT_DIR=%~dp0."
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p=$env:ALLBOT_RESTART_SCRIPT; $s=Get-Content -Raw -LiteralPath $p; $m='# POWERSHELL'; $i=$s.IndexOf($m); if ($i -lt 0) { exit 1 }; Invoke-Expression $s.Substring($i)"
 exit /b %ERRORLEVEL%
 # POWERSHELL
 # Wait briefly to ensure file locks are released after update.
@@ -192,7 +192,7 @@ $logPath = ${quotedLogPath}
 try {
   $logDir = Split-Path -Parent $logPath
   New-Item -ItemType Directory -Path $logDir -Force | Out-Null
-  Add-Content -LiteralPath $logPath -Value "[$(Get-Date -Format o)] kaijibot restart log initialized"
+  Add-Content -LiteralPath $logPath -Value "[$(Get-Date -Format o)] allbot restart log initialized"
 } catch {
   # Restart should still run if log setup is unavailable.
 }
@@ -205,7 +205,7 @@ function Write-RestartLog {
   }
 }
 
-function Join-KaijiBotProcessArguments {
+function Join-AllBotProcessArguments {
   param([string[]]$Arguments)
   ($Arguments | ForEach-Object {
     if ($_ -match "\\s") {
@@ -216,7 +216,7 @@ function Join-KaijiBotProcessArguments {
   }) -join " "
 }
 
-function Invoke-KaijiBotSchtasksWithTimeout {
+function Invoke-AllBotSchtasksWithTimeout {
   param(
     [string[]]$Arguments,
     [int]$TimeoutSeconds
@@ -225,7 +225,7 @@ function Invoke-KaijiBotSchtasksWithTimeout {
   try {
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
     $startInfo.FileName = "schtasks.exe"
-    $startInfo.Arguments = Join-KaijiBotProcessArguments -Arguments $Arguments
+    $startInfo.Arguments = Join-AllBotProcessArguments -Arguments $Arguments
     $startInfo.UseShellExecute = $false
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
@@ -235,7 +235,7 @@ function Invoke-KaijiBotSchtasksWithTimeout {
         $process.Kill()
       } catch {
       }
-      Write-RestartLog "kaijibot restart schtasks timeout source=update args=$($Arguments -join ' ')"
+      Write-RestartLog "allbot restart schtasks timeout source=update args=$($Arguments -join ' ')"
       return 124
     }
     $stdout = $process.StandardOutput.ReadToEnd()
@@ -248,12 +248,12 @@ function Invoke-KaijiBotSchtasksWithTimeout {
     }
     return $process.ExitCode
   } catch {
-    Write-RestartLog "kaijibot restart schtasks failed source=update args=$($Arguments -join ' ') error=$($_.Exception.Message)"
+    Write-RestartLog "allbot restart schtasks failed source=update args=$($Arguments -join ' ') error=$($_.Exception.Message)"
     return 1
   }
 }
 
-function Get-KaijiBotScheduledTaskState {
+function Get-AllBotScheduledTaskState {
   param([string]$TaskName)
   try {
     $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction Stop
@@ -276,7 +276,7 @@ function Get-KaijiBotScheduledTaskState {
   return "Unknown"
 }
 
-function Get-KaijiBotListenerPids {
+function Get-AllBotListenerPids {
   param([int]$Port)
   $listenerPids = @()
 
@@ -304,39 +304,39 @@ function Get-KaijiBotListenerPids {
   $listenerPids | Sort-Object -Unique
 }
 
-function Invoke-KaijiBotStartupLauncher {
-  $launcherPath = Join-Path $env:USERPROFILE ".kaijibot\\gateway.cmd"
+function Invoke-AllBotStartupLauncher {
+  $launcherPath = Join-Path $env:USERPROFILE ".allbot\\gateway.cmd"
   if (-not (Test-Path -LiteralPath $launcherPath)) {
-    Write-RestartLog "kaijibot restart startup launcher missing source=update path=$launcherPath"
+    Write-RestartLog "allbot restart startup launcher missing source=update path=$launcherPath"
     return 1
   }
 
   try {
     Start-Process -FilePath $launcherPath -WindowStyle Hidden | Out-Null
-    Write-RestartLog "kaijibot restart launched startup fallback source=update path=$launcherPath"
+    Write-RestartLog "allbot restart launched startup fallback source=update path=$launcherPath"
     return 0
   } catch {
-    Write-RestartLog "kaijibot restart startup fallback failed source=update error=$($_.Exception.Message)"
+    Write-RestartLog "allbot restart startup fallback failed source=update error=$($_.Exception.Message)"
     return 1
   }
 }
 
 $taskName = ${quotedTaskName}
 $port = ${port}
-Write-RestartLog "kaijibot restart attempt source=update target=$taskName"
+Write-RestartLog "allbot restart attempt source=update target=$taskName"
 
-$taskState = Get-KaijiBotScheduledTaskState -TaskName $taskName
+$taskState = Get-AllBotScheduledTaskState -TaskName $taskName
 if ($taskState -eq "Running") {
-  $endStatus = Invoke-KaijiBotSchtasksWithTimeout -Arguments @("/End", "/TN", $taskName) -TimeoutSeconds 10
+  $endStatus = Invoke-AllBotSchtasksWithTimeout -Arguments @("/End", "/TN", $taskName) -TimeoutSeconds 10
   if ($endStatus -ne 0) {
-    Write-RestartLog "kaijibot restart schtasks end did not complete cleanly source=update status=$endStatus"
+    Write-RestartLog "allbot restart schtasks end did not complete cleanly source=update status=$endStatus"
   }
 } else {
-  Write-RestartLog "kaijibot restart skipped schtasks end source=update state=$taskState"
+  Write-RestartLog "allbot restart skipped schtasks end source=update state=$taskState"
 }
 
 for ($attempt = 1; $attempt -le 10; $attempt++) {
-  $listeners = @(Get-KaijiBotListenerPids -Port $port)
+  $listeners = @(Get-AllBotListenerPids -Port $port)
   if ($listeners.Count -eq 0) {
     break
   }
@@ -345,9 +345,9 @@ for ($attempt = 1; $attempt -le 10; $attempt++) {
     foreach ($listenerPid in $listeners) {
       try {
         Stop-Process -Id $listenerPid -Force -ErrorAction Stop
-        Write-RestartLog "kaijibot restart killed stale listener source=update pid=$listenerPid"
+        Write-RestartLog "allbot restart killed stale listener source=update pid=$listenerPid"
       } catch {
-        Write-RestartLog "kaijibot restart failed to kill stale listener source=update pid=$listenerPid error=$($_.Exception.Message)"
+        Write-RestartLog "allbot restart failed to kill stale listener source=update pid=$listenerPid error=$($_.Exception.Message)"
       }
     }
     break
@@ -356,21 +356,21 @@ for ($attempt = 1; $attempt -le 10; $attempt++) {
   Start-Sleep -Seconds 1
 }
 
-$status = Invoke-KaijiBotSchtasksWithTimeout -Arguments @("/Run", "/TN", $taskName) -TimeoutSeconds 30
+$status = Invoke-AllBotSchtasksWithTimeout -Arguments @("/Run", "/TN", $taskName) -TimeoutSeconds 30
 if ($status -ne 0) {
-  $status = Invoke-KaijiBotStartupLauncher
+  $status = Invoke-AllBotStartupLauncher
 }
 if ($status -eq 0) {
-  Write-RestartLog "kaijibot restart done source=update"
+  Write-RestartLog "allbot restart done source=update"
 } else {
-  Write-RestartLog "kaijibot restart failed source=update status=$status"
+  Write-RestartLog "allbot restart failed source=update status=$status"
 }
 
 # Self-cleanup: delete script file and temp directory from within PowerShell.
 # Get-Content -Raw read the file into memory, so the file handle is closed
 # and Remove-Item can safely delete the .cmd wrapper. Retry handles AV locks.
-$scriptFile = $env:KAIJIBOT_RESTART_SCRIPT
-$scriptDir = $env:KAIJIBOT_RESTART_SCRIPT_DIR
+$scriptFile = $env:ALLBOT_RESTART_SCRIPT
+$scriptDir = $env:ALLBOT_RESTART_SCRIPT_DIR
 if ($scriptFile) {
   foreach ($attempt in 1..3) {
     try {
@@ -392,24 +392,24 @@ exit $status
     } else if (platform === "android") {
       const port =
         Number.isFinite(gatewayPort) && gatewayPort > 0 ? gatewayPort : DEFAULT_GATEWAY_PORT;
-      filename = `kaijibot-restart-${timestamp}.sh`;
+      filename = `allbot-restart-${timestamp}.sh`;
       scriptContent = `#!/bin/sh
 # Standalone restart script for Termux/Android.
 # Wait briefly to ensure file locks are released after update.
 sleep 1
-printf '[%s] kaijibot restart attempt source=update platform=android\\n' "$(date -u +%FT%TZ)" >&2
-pkill -f 'kaijibot-gateway' 2>/dev/null
-pkill -f 'kaijibot gateway' 2>/dev/null
+printf '[%s] allbot restart attempt source=update platform=android\\n' "$(date -u +%FT%TZ)" >&2
+pkill -f 'allbot-gateway' 2>/dev/null
+pkill -f 'allbot gateway' 2>/dev/null
 sleep 2
-if [ -f "$HOME/.kaijibot/start-gateway.sh" ]; then
-  . "$HOME/.kaijibot/start-gateway.sh"
+if [ -f "$HOME/.allbot/start-gateway.sh" ]; then
+  . "$HOME/.allbot/start-gateway.sh"
   status=0
-  printf '[%s] kaijibot restart done source=update via=start-gateway.sh\\n' "$(date -u +%FT%TZ)" >&2
+  printf '[%s] allbot restart done source=update via=start-gateway.sh\\n' "$(date -u +%FT%TZ)" >&2
 else
   termux-wake-lock 2>/dev/null
-  nohup kaijibot gateway --port ${port} >> "$HOME/.kaijibot/gateway.log" 2>&1 &
+  nohup allbot gateway --port ${port} >> "$HOME/.allbot/gateway.log" 2>&1 &
   status=0
-  printf '[%s] kaijibot restart done source=update via=nohup port=${port}\\n' "$(date -u +%FT%TZ)" >&2
+  printf '[%s] allbot restart done source=update via=nohup port=${port}\\n' "$(date -u +%FT%TZ)" >&2
 fi
 # Self-cleanup
 script_dir=$(dirname "$0")
@@ -421,7 +421,7 @@ exit "$status"
       return null;
     }
 
-    const scriptDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-restart-"));
+    const scriptDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-restart-"));
     const scriptPath = path.join(scriptDir, filename);
     try {
       await fs.writeFile(scriptPath, scriptContent, { mode: 0o755, flag: "wx" });

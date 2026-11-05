@@ -1,8 +1,8 @@
 import { normalizeSafeBinProfileFixtures } from "../infra/exec-safe-bin-policy.js";
 import { normalizeTrustedSafeBinDirs } from "../infra/exec-safe-bin-trust.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
-export function normalizeExecSafeBinProfilesInConfig(cfg: KaijiBotConfig): void {
+export function normalizeExecSafeBinProfilesInConfig(cfg: AllBotConfig): void {
   const normalizeExec = (exec: unknown) => {
     if (!exec || typeof exec !== "object" || Array.isArray(exec)) {
       return;

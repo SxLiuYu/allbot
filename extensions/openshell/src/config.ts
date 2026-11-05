@@ -1,6 +1,6 @@
 import path from "node:path";
-import { buildPluginConfigSchema, type KaijiBotPluginConfigSchema } from "kaijibot/plugin-sdk/core";
-import { z } from "kaijibot/plugin-sdk/zod";
+import { buildPluginConfigSchema, type AllBotPluginConfigSchema } from "allbot/plugin-sdk/core";
+import { z } from "allbot/plugin-sdk/zod";
 
 export type OpenShellPluginConfig = {
   mode?: "mirror" | "remote";
@@ -34,7 +34,7 @@ export type ResolvedOpenShellPluginConfig = {
 
 const DEFAULT_COMMAND = "openshell";
 const DEFAULT_MODE = "mirror";
-const DEFAULT_SOURCE = "kaijibot";
+const DEFAULT_SOURCE = "allbot";
 const DEFAULT_REMOTE_WORKSPACE_DIR = "/sandbox";
 const DEFAULT_REMOTE_AGENT_WORKSPACE_DIR = "/agent";
 const DEFAULT_TIMEOUT_MS = 120_000;
@@ -128,7 +128,7 @@ export function normalizeOpenShellRemotePath(
   return normalized;
 }
 
-export function createOpenShellPluginConfigSchema(): KaijiBotPluginConfigSchema {
+export function createOpenShellPluginConfigSchema(): AllBotPluginConfigSchema {
   return buildPluginConfigSchema(OpenShellPluginConfigSchema, {
     safeParse(value) {
       if (value === undefined) {

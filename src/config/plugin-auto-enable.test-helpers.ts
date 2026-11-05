@@ -22,13 +22,13 @@ export function resetPluginAutoEnableTestState(): void {
 }
 
 export function makeTempDir(): string {
-  return makeTrackedTempDir("kaijibot-plugin-auto-enable", tempDirs);
+  return makeTrackedTempDir("allbot-plugin-auto-enable", tempDirs);
 }
 
 export function makeIsolatedEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   const rootDir = makeTempDir();
   return {
-    KAIJIBOT_STATE_DIR: path.join(rootDir, "state"),
+    ALLBOT_STATE_DIR: path.join(rootDir, "state"),
     ...overrides,
   };
 }
@@ -40,7 +40,7 @@ export function writePluginManifestFixture(params: {
 }): void {
   mkdirSafeDir(params.rootDir);
   fs.writeFileSync(
-    path.join(params.rootDir, "kaijibot.plugin.json"),
+    path.join(params.rootDir, "allbot.plugin.json"),
     JSON.stringify(
       {
         id: params.id,
@@ -83,7 +83,7 @@ export function makeRegistry(
       origin: "config" as const,
       rootDir: `/fake/${plugin.id}`,
       source: `/fake/${plugin.id}/index.js`,
-      manifestPath: `/fake/${plugin.id}/kaijibot.plugin.json`,
+      manifestPath: `/fake/${plugin.id}/allbot.plugin.json`,
     })),
     diagnostics: [],
   };

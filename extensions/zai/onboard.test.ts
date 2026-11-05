@@ -1,4 +1,4 @@
-import { resolveAgentModelPrimaryValue } from "kaijibot/plugin-sdk/provider-onboard";
+import { resolveAgentModelPrimaryValue } from "allbot/plugin-sdk/provider-onboard";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ZAI_CODING_CN_BASE_URL, ZAI_GLOBAL_BASE_URL } from "./model-definitions.js";
 import { applyZaiConfig, applyZaiProviderConfig } from "./onboard.js";

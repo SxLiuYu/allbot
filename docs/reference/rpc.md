@@ -8,14 +8,14 @@ title: "RPC Adapters"
 
 # RPC adapters
 
-KaijiBot integrates external CLIs via JSON-RPC. Two patterns are used today.
+AllBot integrates external CLIs via JSON-RPC. Two patterns are used today.
 
 ## Pattern A: HTTP daemon (signal-cli)
 
 - `signal-cli` runs as a daemon with JSON-RPC over HTTP.
 - Event stream is SSE (`/api/v1/events`).
 - Health probe: `/api/v1/check`.
-- KaijiBot owns lifecycle when `channels.signal.autoStart=true`.
+- AllBot owns lifecycle when `channels.signal.autoStart=true`.
 
 See [Signal](/channels/signal) for setup and endpoints.
 
@@ -23,7 +23,7 @@ See [Signal](/channels/signal) for setup and endpoints.
 
 > **Note:** For new iMessage setups, use [BlueBubbles](/channels/bluebubbles) instead.
 
-- KaijiBot spawns `imsg rpc` as a child process (legacy iMessage integration).
+- AllBot spawns `imsg rpc` as a child process (legacy iMessage integration).
 - JSON-RPC is line-delimited over stdin/stdout (one JSON object per line).
 - No TCP port, no daemon required.
 

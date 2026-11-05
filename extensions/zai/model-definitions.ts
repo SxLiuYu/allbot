@@ -1,5 +1,5 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import manifest from "./kaijibot.plugin.json" with { type: "json" };
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import manifest from "./allbot.plugin.json" with { type: "json" };
 
 export const ZAI_CODING_GLOBAL_BASE_URL = "https://api.z.ai/api/coding/paas/v4";
 export const ZAI_CODING_CN_BASE_URL = "https://open.bigmodel.cn/api/coding/paas/v4";

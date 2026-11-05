@@ -20,7 +20,7 @@ describe("trackSkillUsage", () => {
   let writer: SkillPersistenceWriter;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-skill-usage-test-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-skill-usage-test-"));
     writer = new SkillPersistenceWriter(join(tempDir, "workspace"));
   });
 
@@ -34,7 +34,7 @@ describe("trackSkillUsage", () => {
 
     await trackSkillUsage({
       toolMetas: [
-        { toolName: "read", meta: `/home/user/.kaijibot/skills/agent/my-skill/SKILL.md` },
+        { toolName: "read", meta: `/home/user/.allbot/skills/agent/my-skill/SKILL.md` },
       ],
       configDir: tempDir,
     });

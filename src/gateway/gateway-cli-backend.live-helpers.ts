@@ -23,7 +23,7 @@ import {
   assertLiveImageProbeReply,
   buildLiveCronProbeMessage,
   createLiveCronProbeSpec,
-  runKaijiBotCliJson,
+  runAllBotCliJson,
   type CronListJob,
 } from "./live-agent-probes.js";
 import { renderCatFacePngBase64 } from "./live-image-probe.js";
@@ -79,11 +79,11 @@ export function parseImageMode(raw?: string): "list" | "repeat" | undefined {
   if (trimmed === "list" || trimmed === "repeat") {
     return trimmed;
   }
-  throw new Error("KAIJIBOT_LIVE_CLI_BACKEND_IMAGE_MODE must be 'list' or 'repeat'.");
+  throw new Error("ALLBOT_LIVE_CLI_BACKEND_IMAGE_MODE must be 'list' or 'repeat'.");
 }
 
 export function shouldRunCliImageProbe(providerId: string): boolean {
-  const raw = process.env.KAIJIBOT_LIVE_CLI_BACKEND_IMAGE_PROBE?.trim();
+  const raw = process.env.ALLBOT_LIVE_CLI_BACKEND_IMAGE_PROBE?.trim();
   if (raw) {
     return isTruthyEnvValue(raw);
   }
@@ -91,7 +91,7 @@ export function shouldRunCliImageProbe(providerId: string): boolean {
 }
 
 export function shouldRunCliMcpProbe(providerId: string): boolean {
-  const raw = process.env.KAIJIBOT_LIVE_CLI_BACKEND_MCP_PROBE?.trim();
+  const raw = process.env.ALLBOT_LIVE_CLI_BACKEND_MCP_PROBE?.trim();
   if (raw) {
     return isTruthyEnvValue(raw);
   }
@@ -114,7 +114,7 @@ export function resolveCliModelSwitchProbeTarget(
 }
 
 export function shouldRunCliModelSwitchProbe(providerId: string, modelRef: string): boolean {
-  const raw = process.env.KAIJIBOT_LIVE_CLI_BACKEND_MODEL_SWITCH_PROBE?.trim();
+  const raw = process.env.ALLBOT_LIVE_CLI_BACKEND_MODEL_SWITCH_PROBE?.trim();
   if (raw) {
     return isTruthyEnvValue(raw);
   }
@@ -267,30 +267,30 @@ function isRetryableGatewayConnectError(error: Error): boolean {
 
 export function snapshotCliBackendLiveEnv(): CliBackendLiveEnvSnapshot {
   return {
-    configPath: process.env.KAIJIBOT_CONFIG_PATH,
-    stateDir: process.env.KAIJIBOT_STATE_DIR,
-    token: process.env.KAIJIBOT_GATEWAY_TOKEN,
-    skipChannels: process.env.KAIJIBOT_SKIP_CHANNELS,
-    skipProviders: process.env.KAIJIBOT_SKIP_PROVIDERS,
-    skipGmail: process.env.KAIJIBOT_SKIP_GMAIL_WATCHER,
-    skipCron: process.env.KAIJIBOT_SKIP_CRON,
-    skipCanvas: process.env.KAIJIBOT_SKIP_CANVAS_HOST,
-    skipBrowserControl: process.env.KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER,
-    bundledPluginsDir: process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR,
-    minimalGateway: process.env.KAIJIBOT_TEST_MINIMAL_GATEWAY,
+    configPath: process.env.ALLBOT_CONFIG_PATH,
+    stateDir: process.env.ALLBOT_STATE_DIR,
+    token: process.env.ALLBOT_GATEWAY_TOKEN,
+    skipChannels: process.env.ALLBOT_SKIP_CHANNELS,
+    skipProviders: process.env.ALLBOT_SKIP_PROVIDERS,
+    skipGmail: process.env.ALLBOT_SKIP_GMAIL_WATCHER,
+    skipCron: process.env.ALLBOT_SKIP_CRON,
+    skipCanvas: process.env.ALLBOT_SKIP_CANVAS_HOST,
+    skipBrowserControl: process.env.ALLBOT_SKIP_BROWSER_CONTROL_SERVER,
+    bundledPluginsDir: process.env.ALLBOT_BUNDLED_PLUGINS_DIR,
+    minimalGateway: process.env.ALLBOT_TEST_MINIMAL_GATEWAY,
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
     anthropicApiKeyOld: process.env.ANTHROPIC_API_KEY_OLD,
   };
 }
 
 export function applyCliBackendLiveEnv(preservedEnv: ReadonlySet<string>): void {
-  process.env.KAIJIBOT_SKIP_CHANNELS = "1";
-  process.env.KAIJIBOT_SKIP_PROVIDERS = "1";
-  process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = "1";
-  process.env.KAIJIBOT_SKIP_CRON = "1";
-  process.env.KAIJIBOT_SKIP_CANVAS_HOST = "1";
-  process.env.KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
-  process.env.KAIJIBOT_TEST_MINIMAL_GATEWAY = "1";
+  process.env.ALLBOT_SKIP_CHANNELS = "1";
+  process.env.ALLBOT_SKIP_PROVIDERS = "1";
+  process.env.ALLBOT_SKIP_GMAIL_WATCHER = "1";
+  process.env.ALLBOT_SKIP_CRON = "1";
+  process.env.ALLBOT_SKIP_CANVAS_HOST = "1";
+  process.env.ALLBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
+  process.env.ALLBOT_TEST_MINIMAL_GATEWAY = "1";
   if (!preservedEnv.has("ANTHROPIC_API_KEY")) {
     delete process.env.ANTHROPIC_API_KEY;
   }
@@ -300,17 +300,17 @@ export function applyCliBackendLiveEnv(preservedEnv: ReadonlySet<string>): void 
 }
 
 export function restoreCliBackendLiveEnv(snapshot: CliBackendLiveEnvSnapshot): void {
-  restoreEnvVar("KAIJIBOT_CONFIG_PATH", snapshot.configPath);
-  restoreEnvVar("KAIJIBOT_STATE_DIR", snapshot.stateDir);
-  restoreEnvVar("KAIJIBOT_GATEWAY_TOKEN", snapshot.token);
-  restoreEnvVar("KAIJIBOT_SKIP_CHANNELS", snapshot.skipChannels);
-  restoreEnvVar("KAIJIBOT_SKIP_PROVIDERS", snapshot.skipProviders);
-  restoreEnvVar("KAIJIBOT_SKIP_GMAIL_WATCHER", snapshot.skipGmail);
-  restoreEnvVar("KAIJIBOT_SKIP_CRON", snapshot.skipCron);
-  restoreEnvVar("KAIJIBOT_SKIP_CANVAS_HOST", snapshot.skipCanvas);
-  restoreEnvVar("KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER", snapshot.skipBrowserControl);
-  restoreEnvVar("KAIJIBOT_BUNDLED_PLUGINS_DIR", snapshot.bundledPluginsDir);
-  restoreEnvVar("KAIJIBOT_TEST_MINIMAL_GATEWAY", snapshot.minimalGateway);
+  restoreEnvVar("ALLBOT_CONFIG_PATH", snapshot.configPath);
+  restoreEnvVar("ALLBOT_STATE_DIR", snapshot.stateDir);
+  restoreEnvVar("ALLBOT_GATEWAY_TOKEN", snapshot.token);
+  restoreEnvVar("ALLBOT_SKIP_CHANNELS", snapshot.skipChannels);
+  restoreEnvVar("ALLBOT_SKIP_PROVIDERS", snapshot.skipProviders);
+  restoreEnvVar("ALLBOT_SKIP_GMAIL_WATCHER", snapshot.skipGmail);
+  restoreEnvVar("ALLBOT_SKIP_CRON", snapshot.skipCron);
+  restoreEnvVar("ALLBOT_SKIP_CANVAS_HOST", snapshot.skipCanvas);
+  restoreEnvVar("ALLBOT_SKIP_BROWSER_CONTROL_SERVER", snapshot.skipBrowserControl);
+  restoreEnvVar("ALLBOT_BUNDLED_PLUGINS_DIR", snapshot.bundledPluginsDir);
+  restoreEnvVar("ALLBOT_TEST_MINIMAL_GATEWAY", snapshot.minimalGateway);
   restoreEnvVar("ANTHROPIC_API_KEY", snapshot.anthropicApiKey);
   restoreEnvVar("ANTHROPIC_API_KEY_OLD", snapshot.anthropicApiKeyOld);
 }
@@ -456,7 +456,7 @@ export async function verifyCliCronMcpProbe(params: {
     expectedSessionKey: params.sessionKey,
   });
   if (createdJob?.id) {
-    await runKaijiBotCliJson(
+    await runAllBotCliJson(
       [
         "cron",
         "rm",

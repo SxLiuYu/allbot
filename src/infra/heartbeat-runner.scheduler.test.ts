@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { startHeartbeatRunner } from "./heartbeat-runner.js";
 import { requestHeartbeatNow, resetHeartbeatWakeStateForTests } from "./heartbeat-wake.js";
 
@@ -20,14 +20,14 @@ describe.skipIf(process.env.CI)("startHeartbeatRunner", () => {
   }
 
   function heartbeatConfig(
-    list?: NonNullable<NonNullable<KaijiBotConfig["agents"]>["list"]>,
-  ): KaijiBotConfig {
+    list?: NonNullable<NonNullable<AllBotConfig["agents"]>["list"]>,
+  ): AllBotConfig {
     return {
       agents: {
         defaults: { heartbeat: { every: "30m" } },
         ...(list ? { list } : {}),
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   function createRequestsInFlightRunSpy(skipCount: number) {
@@ -42,7 +42,7 @@ describe.skipIf(process.env.CI)("startHeartbeatRunner", () => {
   }
 
   async function expectWakeDispatch(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     runSpy: RunOnce;
     wake: { reason: string; agentId?: string; sessionKey?: string; coalesceMs: number };
     expectedCall: Record<string, unknown>;
@@ -89,7 +89,7 @@ describe.skipIf(process.env.CI)("startHeartbeatRunner", () => {
           { id: "ops", heartbeat: { every: "15m" } },
         ],
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     await vi.advanceTimersByTimeAsync(10 * 60_000 + 1_000);
 
@@ -142,7 +142,7 @@ describe.skipIf(process.env.CI)("startHeartbeatRunner", () => {
 
     const cfg = {
       agents: { defaults: { heartbeat: { every: "30m" } } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     // Start runner A
     const runnerA = startHeartbeatRunner({ cfg, runOnce: runSpy1 });
@@ -240,7 +240,7 @@ describe.skipIf(process.env.CI)("startHeartbeatRunner", () => {
           { id: "main", heartbeat: { every: "30m" } },
           { id: "ops", heartbeat: { every: "15m" } },
         ]),
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       runSpy,
       wake: {
         reason: "cron:job-123",
@@ -267,7 +267,7 @@ describe.skipIf(process.env.CI)("startHeartbeatRunner", () => {
           { id: "main", heartbeat: { every: "30m" } },
           { id: "finance", heartbeat: { every: "30m" } },
         ]),
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       runSpy,
       wake: {
         reason: "exec-event",

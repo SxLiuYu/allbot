@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { MANIFEST_KEY } from "../../compat/legacy-names.js";
-import { resolveKaijiBotPackageRootSync } from "../../infra/kaijibot-root.js";
+import { resolveAllBotPackageRootSync } from "../../infra/allbot-root.js";
 import { listChannelCatalogEntries } from "../../plugins/channel-catalog-registry.js";
-import type { KaijiBotPackageManifest } from "../../plugins/manifest.js";
+import type { AllBotPackageManifest } from "../../plugins/manifest.js";
 import type { PluginPackageChannel, PluginPackageInstall } from "../../plugins/manifest.js";
 import type { PluginOrigin } from "../../plugins/types.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -61,9 +61,9 @@ type ExternalCatalogEntry = {
   name?: string;
   version?: string;
   description?: string;
-} & Partial<Record<ManifestKey, KaijiBotPackageManifest>>;
+} & Partial<Record<ManifestKey, AllBotPackageManifest>>;
 
-const ENV_CATALOG_PATHS = ["KAIJIBOT_PLUGIN_CATALOG_PATHS", "KAIJIBOT_MPM_CATALOG_PATHS"];
+const ENV_CATALOG_PATHS = ["ALLBOT_PLUGIN_CATALOG_PATHS", "ALLBOT_MPM_CATALOG_PATHS"];
 const OFFICIAL_CHANNEL_CATALOG_RELATIVE_PATH = path.join("dist", "channel-catalog.json");
 
 type ManifestKey = typeof MANIFEST_KEY;
@@ -146,8 +146,8 @@ function resolveOfficialCatalogPaths(options: CatalogOptions): string[] {
   }
 
   const packageRoots = [
-    resolveKaijiBotPackageRootSync({ cwd: process.cwd() }),
-    resolveKaijiBotPackageRootSync({ moduleUrl: import.meta.url }),
+    resolveAllBotPackageRootSync({ cwd: process.cwd() }),
+    resolveAllBotPackageRootSync({ moduleUrl: import.meta.url }),
   ].filter((entry, index, all): entry is string => Boolean(entry) && all.indexOf(entry) === index);
 
   const candidates = packageRoots.map((packageRoot) =>
@@ -170,7 +170,7 @@ function loadOfficialCatalogEntries(options: CatalogOptions): ChannelPluginCatal
 }
 
 function toChannelMeta(params: {
-  channel: NonNullable<KaijiBotPackageManifest["channel"]>;
+  channel: NonNullable<AllBotPackageManifest["channel"]>;
   id: string;
 }): ChannelMeta | null {
   const label = params.channel.label?.trim();

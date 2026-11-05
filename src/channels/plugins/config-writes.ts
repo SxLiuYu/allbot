@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeLowercaseStringOrEmpty } from "../../shared/string-coerce.js";
 import { isInternalMessageChannel } from "../../utils/message-channel.js";
 import {
@@ -18,7 +18,7 @@ export type ConfigWriteTarget = ConfigWriteTargetLike<ChannelId>;
 export type ConfigWriteAuthorizationResult = ConfigWriteAuthorizationResultLike<ChannelId>;
 
 export function resolveChannelConfigWrites(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId?: ChannelId | null;
   accountId?: string | null;
 }): boolean {
@@ -26,7 +26,7 @@ export function resolveChannelConfigWrites(params: {
 }
 
 export function authorizeConfigWrite(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   origin?: ConfigWriteScope;
   target?: ConfigWriteTarget;
   allowBypass?: boolean;

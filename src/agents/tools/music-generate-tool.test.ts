@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import * as mediaStore from "../../media/store.js";
 import * as musicGenerationRuntime from "../../music-generation/runtime.js";
 import * as musicGenerateBackground from "./music-generate-background.js";
@@ -19,8 +19,8 @@ const taskExecutorMocks = vi.hoisted(() => ({
 vi.mock("../../tasks/runtime-internal.js", () => taskRuntimeInternalMocks);
 vi.mock("../../tasks/task-executor.js", () => taskExecutorMocks);
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 describe("createMusicGenerateTool", () => {
@@ -330,7 +330,7 @@ describe("createMusicGenerateTool", () => {
     }
 
     const result = await tool.execute("call-google-generate", {
-      prompt: "KaijiBot anthem",
+      prompt: "AllBot anthem",
       instrumental: true,
       durationSeconds: 30,
       format: "wav",

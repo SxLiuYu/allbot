@@ -1,7 +1,7 @@
-import { mapAllowFromEntries } from "kaijibot/plugin-sdk/channel-config-helpers";
+import { mapAllowFromEntries } from "allbot/plugin-sdk/channel-config-helpers";
 import { normalizeChatType, type ChatType } from "../../channels/chat-type.js";
 import type { ChannelOutboundTargetMode } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import type { AgentDefaultsConfig } from "../../config/types.agent-defaults.js";
 import { normalizeAccountId } from "../../routing/session-key.js";
@@ -56,7 +56,7 @@ export function resolveOutboundTarget(params: {
   channel: GatewayMessageChannel;
   to?: string;
   allowFrom?: string[];
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   accountId?: string | null;
   mode?: ChannelOutboundTargetMode;
 }): OutboundTargetResolution {
@@ -82,7 +82,7 @@ export function resolveOutboundTarget(params: {
 }
 
 export function resolveHeartbeatDeliveryTarget(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   entry?: SessionEntry;
   heartbeat?: AgentDefaultsConfig["heartbeat"];
   turnSource?: DeliveryContext;
@@ -90,7 +90,7 @@ export function resolveHeartbeatDeliveryTarget(params: {
   const { cfg, entry } = params;
   const heartbeat = params.heartbeat ?? cfg.agents?.defaults?.heartbeat;
   const rawTarget = heartbeat?.target;
-  // KaijiBot fork: upstream defaults to "none" (no delivery unless explicitly
+  // AllBot fork: upstream defaults to "none" (no delivery unless explicitly
   // configured). We default to "last" so cognitive insights reach the user's
   // last known channel without requiring heartbeat.target in config.
   let target: HeartbeatTarget = rawTarget === undefined ? "last" : "none";
@@ -322,7 +322,7 @@ function resolveHeartbeatSenderId(params: {
 }
 
 export function resolveHeartbeatSenderContext(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   entry?: SessionEntry;
   delivery: OutboundTarget;
 }): HeartbeatSenderContext {

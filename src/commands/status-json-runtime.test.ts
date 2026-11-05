@@ -20,7 +20,7 @@ function createScan() {
     sourceConfig: { gateway: {} },
     summary: { ok: true },
     update: {
-      root: "/tmp/kaijibot",
+      root: "/tmp/allbot",
       installKind: "package",
       packageManager: "npm",
     },

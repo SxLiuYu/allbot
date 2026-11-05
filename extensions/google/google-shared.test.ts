@@ -135,7 +135,7 @@ describe.skipIf(process.env.CI)("google-shared convertTools", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("google-shared convertMessages", () => {
   function expectConsecutiveMessagesNotMerged(params: {
     modelId: string;

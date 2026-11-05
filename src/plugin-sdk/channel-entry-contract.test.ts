@@ -19,7 +19,7 @@ afterEach(() => {
 
 describe("loadBundledEntryExportSync", () => {
   it("includes importer and resolved path context when a bundled sidecar is missing", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-channel-entry-contract-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-entry-contract-"));
     tempDirs.push(tempRoot);
 
     const pluginRoot = path.join(tempRoot, "dist", "extensions", "telegram");
@@ -58,7 +58,7 @@ describe("loadBundledEntryExportSync", () => {
       const channelEntryContract = await importFreshModule<
         typeof import("./channel-entry-contract.js")
       >(import.meta.url, "./channel-entry-contract.js?scope=windows-dist-jiti");
-      const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-channel-entry-contract-"));
+      const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-entry-contract-"));
       tempDirs.push(tempRoot);
 
       const pluginRoot = path.join(tempRoot, "dist", "extensions", "telegram");
@@ -87,7 +87,7 @@ describe("loadBundledEntryExportSync", () => {
   });
 
   it("loads packaged telegram setup sidecars from dist-facing api modules", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-channel-entry-contract-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-entry-contract-"));
     tempDirs.push(tempRoot);
 
     const pluginRoot = path.join(tempRoot, "dist", "extensions", "telegram");
@@ -134,10 +134,10 @@ describe("loadBundledEntryExportSync", () => {
   });
 
   it("can disable source-tree fallback for dist bundled entry checks", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-channel-entry-contract-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-entry-contract-"));
     tempDirs.push(tempRoot);
 
-    fs.writeFileSync(path.join(tempRoot, "package.json"), '{"name":"kaijibot"}\n', "utf8");
+    fs.writeFileSync(path.join(tempRoot, "package.json"), '{"name":"allbot"}\n', "utf8");
     const pluginRoot = path.join(tempRoot, "dist", "extensions", "telegram");
     const sourceRoot = path.join(tempRoot, "extensions", "telegram", "src");
     fs.mkdirSync(pluginRoot, { recursive: true });
@@ -158,7 +158,7 @@ describe("loadBundledEntryExportSync", () => {
       }),
     ).toBe(42);
 
-    vi.stubEnv("KAIJIBOT_DISABLE_BUNDLED_ENTRY_SOURCE_FALLBACK", "1");
+    vi.stubEnv("ALLBOT_DISABLE_BUNDLED_ENTRY_SOURCE_FALLBACK", "1");
 
     expect(() =>
       loadBundledEntryExportSync<number>(pathToFileURL(importerPath).href, {

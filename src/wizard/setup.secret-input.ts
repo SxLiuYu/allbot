@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeSecretInputString, resolveSecretInputRef } from "../config/types.secrets.js";
 import { resolveSecretRefString } from "../secrets/resolve.js";
 
-type SecretDefaults = NonNullable<KaijiBotConfig["secrets"]>["defaults"];
+type SecretDefaults = NonNullable<AllBotConfig["secrets"]>["defaults"];
 
 function formatSecretResolutionError(error: unknown): string {
   if (error instanceof Error && error.message.trim().length > 0) {
@@ -12,7 +12,7 @@ function formatSecretResolutionError(error: unknown): string {
 }
 
 export async function resolveSetupSecretInputString(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   value: unknown;
   path: string;
   defaults?: SecretDefaults;

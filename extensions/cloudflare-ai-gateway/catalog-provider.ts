@@ -1,8 +1,8 @@
 import {
   coerceSecretRef,
   resolveNonEnvSecretRefApiKeyMarker,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import {
   buildCloudflareAiGatewayModelDefinition,
   resolveCloudflareAiGatewayBaseUrl,

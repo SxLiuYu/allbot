@@ -3,7 +3,7 @@ import path from "node:path";
 import { resolveSandboxConfigForAgent } from "../agents/sandbox/config.js";
 import { hasPotentialConfiguredChannels } from "../channels/config-presence.js";
 import type { listChannelPlugins } from "../channels/plugins/index.js";
-import type { ConfigFileSnapshot, KaijiBotConfig } from "../config/config.js";
+import type { ConfigFileSnapshot, AllBotConfig } from "../config/config.js";
 import { resolveConfigPath, resolveStateDir } from "../config/paths.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { hasConfiguredSecretInput } from "../config/types.secrets.js";
@@ -70,8 +70,8 @@ export type SecurityAuditReport = {
 };
 
 export type SecurityAuditOptions = {
-  config: KaijiBotConfig;
-  sourceConfig?: KaijiBotConfig;
+  config: AllBotConfig;
+  sourceConfig?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   platform?: NodeJS.Platform;
   deep?: boolean;
@@ -100,8 +100,8 @@ export type SecurityAuditOptions = {
 };
 
 type AuditExecutionContext = {
-  cfg: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig: AllBotConfig;
   env: NodeJS.ProcessEnv;
   platform: NodeJS.Platform;
   includeFilesystem: boolean;
@@ -230,7 +230,7 @@ export async function collectFilesystemFindings(params: {
         checkId: "fs.state_dir.perms_world_writable",
         severity: "critical",
         title: "State dir is world-writable",
-        detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; other users can write into your KaijiBot state.`,
+        detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; other users can write into your AllBot state.`,
         remediation: formatPermissionRemediation({
           targetPath: params.stateDir,
           perms: stateDirPerms,
@@ -244,7 +244,7 @@ export async function collectFilesystemFindings(params: {
         checkId: "fs.state_dir.perms_group_writable",
         severity: "warn",
         title: "State dir is group-writable",
-        detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; group users can write into your KaijiBot state.`,
+        detail: `${formatPermissionDetail(params.stateDir, stateDirPerms)}; group users can write into your AllBot state.`,
         remediation: formatPermissionRemediation({
           targetPath: params.stateDir,
           perms: stateDirPerms,
@@ -334,8 +334,8 @@ export async function collectFilesystemFindings(params: {
 }
 
 export function collectGatewayConfigFindings(
-  cfg: KaijiBotConfig,
-  sourceConfig: KaijiBotConfig,
+  cfg: AllBotConfig,
+  sourceConfig: AllBotConfig,
   env: NodeJS.ProcessEnv,
 ): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
@@ -354,8 +354,8 @@ export function collectGatewayConfigFindings(
     : [];
   const hasToken = typeof auth.token === "string" && auth.token.trim().length > 0;
   const hasPassword = typeof auth.password === "string" && auth.password.trim().length > 0;
-  const envTokenConfigured = hasNonEmptyString(env.KAIJIBOT_GATEWAY_TOKEN);
-  const envPasswordConfigured = hasNonEmptyString(env.KAIJIBOT_GATEWAY_PASSWORD);
+  const envTokenConfigured = hasNonEmptyString(env.ALLBOT_GATEWAY_TOKEN);
+  const envPasswordConfigured = hasNonEmptyString(env.ALLBOT_GATEWAY_PASSWORD);
   const tokenConfiguredFromConfig = hasConfiguredSecretInput(
     sourceConfig.gateway?.auth?.token,
     sourceConfig.secrets?.defaults,
@@ -768,7 +768,7 @@ async function collectPluginSecurityAuditFindings(
   return collectorResults.flat();
 }
 
-export function collectLoggingFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectLoggingFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const redact = cfg.logging?.redactSensitive;
   if (redact !== "off") {
     return [];
@@ -784,7 +784,7 @@ export function collectLoggingFindings(cfg: KaijiBotConfig): SecurityAuditFindin
   ];
 }
 
-export function collectElevatedFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectElevatedFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const enabled = cfg.tools?.elevated?.enabled;
   const allowFrom = cfg.tools?.elevated?.allowFrom ?? {};
@@ -819,7 +819,7 @@ export function collectElevatedFindings(cfg: KaijiBotConfig): SecurityAuditFindi
   return findings;
 }
 
-export function collectExecRuntimeFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectExecRuntimeFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const globalExecHost = cfg.tools?.exec?.host;
   const globalStrictInlineEval = cfg.tools?.exec?.strictInlineEval === true;
@@ -1127,7 +1127,7 @@ export function collectExecRuntimeFindings(cfg: KaijiBotConfig): SecurityAuditFi
   return findings;
 }
 
-function collectOpenExecSurfacePaths(cfg: KaijiBotConfig): string[] {
+function collectOpenExecSurfacePaths(cfg: AllBotConfig): string[] {
   const channels = asNullableRecord(cfg.channels);
   if (!channels) {
     return [];
@@ -1195,7 +1195,7 @@ function collectInterpreterAllowlistHits(params: {
 }
 
 async function maybeProbeGateway(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   timeoutMs: number;
   probe: ProbeGatewayFn;

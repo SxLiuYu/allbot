@@ -100,13 +100,13 @@ describe("gateway pre-auth hardening", () => {
   });
 
   it("closes idle unauthenticated sockets after the handshake timeout", async () => {
-    const previous = process.env.KAIJIBOT_TEST_HANDSHAKE_TIMEOUT_MS;
-    process.env.KAIJIBOT_TEST_HANDSHAKE_TIMEOUT_MS = "200";
+    const previous = process.env.ALLBOT_TEST_HANDSHAKE_TIMEOUT_MS;
+    process.env.ALLBOT_TEST_HANDSHAKE_TIMEOUT_MS = "200";
     cleanupEnv.push(() => {
       if (previous === undefined) {
-        delete process.env.KAIJIBOT_TEST_HANDSHAKE_TIMEOUT_MS;
+        delete process.env.ALLBOT_TEST_HANDSHAKE_TIMEOUT_MS;
       } else {
-        process.env.KAIJIBOT_TEST_HANDSHAKE_TIMEOUT_MS = previous;
+        process.env.ALLBOT_TEST_HANDSHAKE_TIMEOUT_MS = previous;
       }
     });
 
@@ -170,13 +170,13 @@ describe("gateway pre-auth hardening", () => {
   });
 
   it("rejects excess simultaneous unauthenticated sockets from the same client ip", async () => {
-    const previous = process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
-    process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = "1";
+    const previous = process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
+    process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = "1";
     cleanupEnv.push(() => {
       if (previous === undefined) {
-        delete process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
+        delete process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
       } else {
-        process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = previous;
+        process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = previous;
       }
     });
     const previousAuth = testState.gatewayAuth;
@@ -222,13 +222,13 @@ describe("gateway pre-auth hardening", () => {
   });
 
   it("rejects excess simultaneous unauthenticated sockets when trusted proxy headers are missing", async () => {
-    const previous = process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
-    process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = "1";
+    const previous = process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
+    process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = "1";
     cleanupEnv.push(() => {
       if (previous === undefined) {
-        delete process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
+        delete process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP;
       } else {
-        process.env.KAIJIBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = previous;
+        process.env.ALLBOT_TEST_MAX_PREAUTH_CONNECTIONS_PER_IP = previous;
       }
     });
     const previousAuth = testState.gatewayAuth;
@@ -243,7 +243,7 @@ describe("gateway pre-auth hardening", () => {
           trustedProxies: ["127.0.0.1"],
         },
       },
-      prefix: "kaijibot-preauth-proxy-",
+      prefix: "allbot-preauth-proxy-",
       run: async () => {
         const harness = await createGatewaySuiteHarness();
         try {

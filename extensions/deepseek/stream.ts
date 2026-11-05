@@ -1,5 +1,5 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
-import type { ProviderWrapStreamFnContext } from "kaijibot/plugin-sdk/plugin-entry";
+import type { ProviderWrapStreamFnContext } from "allbot/plugin-sdk/plugin-entry";
 import { isDeepSeekV4ModelRef } from "./models.js";
 
 type DeepSeekThinkingLevel = ProviderWrapStreamFnContext["thinkingLevel"];

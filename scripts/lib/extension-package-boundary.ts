@@ -15,54 +15,54 @@ export const EXTENSION_PACKAGE_BOUNDARY_EXCLUDE = [
   "./src/**/*test-support.ts",
 ] as const;
 export const EXTENSION_PACKAGE_BOUNDARY_BASE_PATHS = {
-  "kaijibot/extension-api": ["../src/extensionAPI.ts"],
-  "kaijibot/plugin-sdk": ["../dist/plugin-sdk/src/plugin-sdk/index.d.ts"],
-  "kaijibot/plugin-sdk/*": ["../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
-  "kaijibot/plugin-sdk/account-id": ["../dist/plugin-sdk/src/plugin-sdk/account-id.d.ts"],
-  "kaijibot/plugin-sdk/channel-entry-contract": [
+  "allbot/extension-api": ["../src/extensionAPI.ts"],
+  "allbot/plugin-sdk": ["../dist/plugin-sdk/src/plugin-sdk/index.d.ts"],
+  "allbot/plugin-sdk/*": ["../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
+  "allbot/plugin-sdk/account-id": ["../dist/plugin-sdk/src/plugin-sdk/account-id.d.ts"],
+  "allbot/plugin-sdk/channel-entry-contract": [
     "../packages/plugin-sdk/dist/src/plugin-sdk/channel-entry-contract.d.ts",
   ],
-  "kaijibot/plugin-sdk/browser-maintenance": [
+  "allbot/plugin-sdk/browser-maintenance": [
     "../packages/plugin-sdk/dist/extensions/browser/browser-maintenance.d.ts",
   ],
-  "kaijibot/plugin-sdk/browser-config-runtime": [
+  "allbot/plugin-sdk/browser-config-runtime": [
     "../dist/plugin-sdk/src/plugin-sdk/browser-config-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/browser-node-runtime": [
+  "allbot/plugin-sdk/browser-node-runtime": [
     "../dist/plugin-sdk/src/plugin-sdk/browser-node-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/browser-setup-tools": [
+  "allbot/plugin-sdk/browser-setup-tools": [
     "../dist/plugin-sdk/src/plugin-sdk/browser-setup-tools.d.ts",
   ],
-  "kaijibot/plugin-sdk/browser-security-runtime": [
+  "allbot/plugin-sdk/browser-security-runtime": [
     "../dist/plugin-sdk/src/plugin-sdk/browser-security-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/channel-secret-basic-runtime": [
+  "allbot/plugin-sdk/channel-secret-basic-runtime": [
     "../packages/plugin-sdk/dist/src/plugin-sdk/channel-secret-basic-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/channel-secret-runtime": [
+  "allbot/plugin-sdk/channel-secret-runtime": [
     "../dist/plugin-sdk/src/plugin-sdk/channel-secret-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/channel-secret-tts-runtime": [
+  "allbot/plugin-sdk/channel-secret-tts-runtime": [
     "../packages/plugin-sdk/dist/src/plugin-sdk/channel-secret-tts-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/channel-streaming": [
+  "allbot/plugin-sdk/channel-streaming": [
     "../dist/plugin-sdk/src/plugin-sdk/channel-streaming.d.ts",
   ],
-  "kaijibot/plugin-sdk/error-runtime": ["../dist/plugin-sdk/src/plugin-sdk/error-runtime.d.ts"],
-  "kaijibot/plugin-sdk/provider-catalog-shared": [
+  "allbot/plugin-sdk/error-runtime": ["../dist/plugin-sdk/src/plugin-sdk/error-runtime.d.ts"],
+  "allbot/plugin-sdk/provider-catalog-shared": [
     "../packages/plugin-sdk/dist/src/plugin-sdk/provider-catalog-shared.d.ts",
   ],
-  "kaijibot/plugin-sdk/provider-entry": [
+  "allbot/plugin-sdk/provider-entry": [
     "../packages/plugin-sdk/dist/src/plugin-sdk/provider-entry.d.ts",
   ],
-  "kaijibot/plugin-sdk/secret-ref-runtime": [
+  "allbot/plugin-sdk/secret-ref-runtime": [
     "../dist/plugin-sdk/src/plugin-sdk/secret-ref-runtime.d.ts",
   ],
-  "kaijibot/plugin-sdk/ssrf-runtime": ["../dist/plugin-sdk/src/plugin-sdk/ssrf-runtime.d.ts"],
-  "@kaijibot/*.js": ["../packages/plugin-sdk/dist/extensions/*.d.ts", "../extensions/*"],
-  "@kaijibot/*": ["../packages/plugin-sdk/dist/extensions/*", "../extensions/*"],
-  "@kaijibot/plugin-sdk/*": ["../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
+  "allbot/plugin-sdk/ssrf-runtime": ["../dist/plugin-sdk/src/plugin-sdk/ssrf-runtime.d.ts"],
+  "@allbot/*.js": ["../packages/plugin-sdk/dist/extensions/*.d.ts", "../extensions/*"],
+  "@allbot/*": ["../packages/plugin-sdk/dist/extensions/*", "../extensions/*"],
+  "@allbot/plugin-sdk/*": ["../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
 } as const;
 
 function prefixExtensionPackageBoundaryPaths(
@@ -80,38 +80,38 @@ function prefixExtensionPackageBoundaryPaths(
 export const EXTENSION_PACKAGE_BOUNDARY_XAI_PATHS = {
   ...prefixExtensionPackageBoundaryPaths(
     (({
-      "kaijibot/plugin-sdk/channel-secret-basic-runtime": _omitBasic,
-      "kaijibot/plugin-sdk/channel-secret-tts-runtime": _omitTts,
+      "allbot/plugin-sdk/channel-secret-basic-runtime": _omitBasic,
+      "allbot/plugin-sdk/channel-secret-tts-runtime": _omitTts,
       ...rest
     }) => rest)(EXTENSION_PACKAGE_BOUNDARY_BASE_PATHS),
     "../",
   ),
-  "kaijibot/plugin-sdk/channel-entry-contract": [
+  "allbot/plugin-sdk/channel-entry-contract": [
     "../../dist/plugin-sdk/src/plugin-sdk/channel-entry-contract.d.ts",
   ],
-  "kaijibot/plugin-sdk/browser-maintenance": [
+  "allbot/plugin-sdk/browser-maintenance": [
     "../../dist/plugin-sdk/src/plugin-sdk/browser-maintenance.d.ts",
   ],
-  "kaijibot/plugin-sdk/cli-runtime": ["../../dist/plugin-sdk/src/plugin-sdk/cli-runtime.d.ts"],
-  "kaijibot/plugin-sdk/provider-catalog-shared": [
+  "allbot/plugin-sdk/cli-runtime": ["../../dist/plugin-sdk/src/plugin-sdk/cli-runtime.d.ts"],
+  "allbot/plugin-sdk/provider-catalog-shared": [
     "../../dist/plugin-sdk/src/plugin-sdk/provider-catalog-shared.d.ts",
   ],
-  "kaijibot/plugin-sdk/provider-env-vars": [
+  "allbot/plugin-sdk/provider-env-vars": [
     "../../dist/plugin-sdk/src/plugin-sdk/provider-env-vars.d.ts",
   ],
-  "kaijibot/plugin-sdk/provider-entry": [
+  "allbot/plugin-sdk/provider-entry": [
     "../../dist/plugin-sdk/src/plugin-sdk/provider-entry.d.ts",
   ],
-  "kaijibot/plugin-sdk/provider-web-search-contract": [
+  "allbot/plugin-sdk/provider-web-search-contract": [
     "../../dist/plugin-sdk/src/plugin-sdk/provider-web-search-contract.d.ts",
   ],
-  "@kaijibot/*.js": ["../../packages/plugin-sdk/dist/extensions/*.d.ts", "../*"],
-  "@kaijibot/*": ["../*"],
-  "@kaijibot/plugin-sdk/*": ["../../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
-  "@kaijibot/anthropic-vertex/api.js": ["./.boundary-stubs/anthropic-vertex-api.d.ts"],
-  "@kaijibot/ollama/api.js": ["./.boundary-stubs/ollama-api.d.ts"],
-  "@kaijibot/ollama/runtime-api.js": ["./.boundary-stubs/ollama-runtime-api.d.ts"],
-  "@kaijibot/speech-core/runtime-api.js": ["./.boundary-stubs/speech-core-runtime-api.d.ts"],
+  "@allbot/*.js": ["../../packages/plugin-sdk/dist/extensions/*.d.ts", "../*"],
+  "@allbot/*": ["../*"],
+  "@allbot/plugin-sdk/*": ["../../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
+  "@allbot/anthropic-vertex/api.js": ["./.boundary-stubs/anthropic-vertex-api.d.ts"],
+  "@allbot/ollama/api.js": ["./.boundary-stubs/ollama-api.d.ts"],
+  "@allbot/ollama/runtime-api.js": ["./.boundary-stubs/ollama-runtime-api.d.ts"],
+  "@allbot/speech-core/runtime-api.js": ["./.boundary-stubs/speech-core-runtime-api.d.ts"],
 } as const;
 
 export type ExtensionPackageBoundaryTsConfigJson = {

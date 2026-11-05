@@ -3,7 +3,7 @@ import { resolveConfiguredModelRef } from "../agents/model-selection.js";
 import type { SkillCommandSpec } from "../agents/skills.js";
 import { getChannelPlugin } from "../channels/plugins/index.js";
 import { isCommandFlagEnabled } from "../config/commands.js";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -101,7 +101,7 @@ export function listChatCommands(params?: {
   return [...commands, ...buildSkillCommandDefinitions(params.skillCommands)];
 }
 
-export function isCommandEnabled(cfg: KaijiBotConfig, commandKey: string): boolean {
+export function isCommandEnabled(cfg: AllBotConfig, commandKey: string): boolean {
   if (commandKey === "config") {
     return isCommandFlagEnabled(cfg, "config");
   }
@@ -121,7 +121,7 @@ export function isCommandEnabled(cfg: KaijiBotConfig, commandKey: string): boole
 }
 
 export function listChatCommandsForConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params?: { skillCommands?: SkillCommandSpec[] },
 ): ChatCommandDefinition[] {
   const base = getChatCommands().filter((command) => isCommandEnabled(cfg, command.key));
@@ -175,7 +175,7 @@ export function listNativeCommandSpecs(params?: {
 }
 
 export function listNativeCommandSpecsForConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params?: { skillCommands?: SkillCommandSpec[]; provider?: string },
 ): NativeCommandSpec[] {
   return listNativeSpecsFromCommands(listChatCommandsForConfig(cfg, params), params?.provider);
@@ -296,12 +296,12 @@ export function buildCommandTextFromArgs(
   return buildCommandText(commandName, serializeCommandArgs(command, args));
 }
 
-function resolveDefaultCommandContext(cfg?: KaijiBotConfig): {
+function resolveDefaultCommandContext(cfg?: AllBotConfig): {
   provider: string;
   model: string;
 } {
   const resolved = resolveConfiguredModelRef({
-    cfg: cfg ?? ({} as KaijiBotConfig),
+    cfg: cfg ?? ({} as AllBotConfig),
     defaultProvider: DEFAULT_PROVIDER,
     defaultModel: DEFAULT_MODEL,
   });
@@ -316,7 +316,7 @@ export type ResolvedCommandArgChoice = { value: string; label: string };
 export function resolveCommandArgChoices(params: {
   command: ChatCommandDefinition;
   arg: CommandArgDefinition;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   provider?: string;
   model?: string;
 }): ResolvedCommandArgChoice[] {
@@ -346,7 +346,7 @@ export function resolveCommandArgChoices(params: {
 export function resolveCommandArgMenu(params: {
   command: ChatCommandDefinition;
   args?: CommandArgs;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): { arg: CommandArgDefinition; choices: ResolvedCommandArgChoice[]; title?: string } | null {
   const { command, args, cfg } = params;
   if (!command.args || !command.argsMenu) {
@@ -437,7 +437,7 @@ export function isCommandMessage(raw: string): boolean {
   return trimmed.startsWith("/");
 }
 
-export function getCommandDetection(_cfg?: KaijiBotConfig): CommandDetection {
+export function getCommandDetection(_cfg?: AllBotConfig): CommandDetection {
   const commands = getChatCommands();
   if (cachedDetection && cachedDetectionCommands === commands) {
     return cachedDetection;
@@ -470,7 +470,7 @@ export function getCommandDetection(_cfg?: KaijiBotConfig): CommandDetection {
   return cachedDetection;
 }
 
-export function maybeResolveTextAlias(raw: string, cfg?: KaijiBotConfig) {
+export function maybeResolveTextAlias(raw: string, cfg?: AllBotConfig) {
   const trimmed = normalizeCommandBody(raw).trim();
   if (!trimmed.startsWith("/")) {
     return null;
@@ -493,7 +493,7 @@ export function maybeResolveTextAlias(raw: string, cfg?: KaijiBotConfig) {
 
 export function resolveTextCommand(
   raw: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): {
   command: ChatCommandDefinition;
   args?: string;

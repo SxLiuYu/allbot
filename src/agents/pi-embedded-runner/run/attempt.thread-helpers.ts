@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { joinPresentTextSegments } from "../../../shared/text/join-segments.js";
 import { normalizeStructuredPromptSection } from "../../prompt-cache-stability.js";
 
-export const ATTEMPT_CACHE_TTL_CUSTOM_TYPE = "kaijibot.cache-ttl";
+export const ATTEMPT_CACHE_TTL_CUSTOM_TYPE = "allbot.cache-ttl";
 
 export function composeSystemPromptWithHookContext(params: {
   baseSystemPrompt?: string;
@@ -50,7 +50,7 @@ export function shouldUseOpenAIWebSocketTransport(params: {
 export function shouldAppendAttemptCacheTtl(params: {
   timedOutDuringCompaction: boolean;
   compactionOccurredThisAttempt: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   provider: string;
   modelId: string;
   modelApi?: string;
@@ -71,7 +71,7 @@ export function appendAttemptCacheTtlIfNeeded(params: {
   };
   timedOutDuringCompaction: boolean;
   compactionOccurredThisAttempt: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   provider: string;
   modelId: string;
   modelApi?: string;

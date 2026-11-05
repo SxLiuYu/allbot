@@ -1,7 +1,7 @@
 import {
   createCapturedPluginRegistration,
   registerSingleProviderPlugin,
-} from "kaijibot/plugin-sdk/plugin-test-runtime";
+} from "allbot/plugin-sdk/plugin-test-runtime";
 import { describe, expect, it } from "vitest";
 import deepinfraPlugin from "./index.js";
 
@@ -51,7 +51,7 @@ describe.skipIf(process.env.CI)("deepinfra augmentModelCatalog", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("deepinfra capability registration", () => {
   it("registers all DeepInfra-backed OpenClaw provider surfaces", () => {
     const captured = createCapturedPluginRegistration();
@@ -68,7 +68,7 @@ describe.skipIf(process.env.CI)("deepinfra capability registration", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("deepinfra isCacheTtlEligible", () => {
   it("returns true for anthropic/* proxied models", async () => {
     const provider = await registerSingleProviderPlugin(deepinfraPlugin);

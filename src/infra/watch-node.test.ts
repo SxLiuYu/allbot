@@ -9,7 +9,7 @@ import { bundledPluginFile } from "../../test/helpers/bundled-plugin-paths.js";
 import { withTempDir } from "../test-helpers/temp-dir.js";
 
 const VOICE_CALL_README = bundledPluginFile("voice-call", "README.md");
-const VOICE_CALL_MANIFEST = bundledPluginFile("voice-call", "kaijibot.plugin.json");
+const VOICE_CALL_MANIFEST = bundledPluginFile("voice-call", "allbot.plugin.json");
 const VOICE_CALL_PACKAGE = bundledPluginFile("voice-call", "package.json");
 const VOICE_CALL_INDEX = bundledPluginFile("voice-call", "index.ts");
 const VOICE_CALL_RUNTIME = bundledPluginFile("voice-call", "src/runtime.ts");
@@ -50,7 +50,7 @@ const createWatchHarness = () => {
 describe("watch-node script", () => {
   it("wires chokidar watch to run-node with watched source/config paths", async () => {
     const { child, spawn, watcher, createWatcher, fakeProcess } = createWatchHarness();
-    await withTempDir({ prefix: "kaijibot-watch-node-" }, async (cwd) => {
+    await withTempDir({ prefix: "allbot-watch-node-" }, async (cwd) => {
       fs.mkdirSync(path.join(cwd, "src", "infra"), { recursive: true });
       fs.mkdirSync(path.join(cwd, "extensions", "voice-call"), { recursive: true });
 
@@ -105,10 +105,10 @@ describe("watch-node script", () => {
           stdio: "inherit",
           env: expect.objectContaining({
             PATH: "/usr/bin",
-            KAIJIBOT_WATCH_MODE: "1",
-            KAIJIBOT_WATCH_SESSION: "1700000000000-4242",
-            KAIJIBOT_NO_RESPAWN: "1",
-            KAIJIBOT_WATCH_COMMAND: "gateway --force",
+            ALLBOT_WATCH_MODE: "1",
+            ALLBOT_WATCH_SESSION: "1700000000000-4242",
+            ALLBOT_NO_RESPAWN: "1",
+            ALLBOT_WATCH_COMMAND: "gateway --force",
           }),
         }),
       );
@@ -222,7 +222,7 @@ describe("watch-node script", () => {
       args: ["gateway", "--force"],
       createWatcher,
       env: {
-        LAUNCH_JOB_LABEL: "ai.kaijibot.gateway",
+        LAUNCH_JOB_LABEL: "ai.allbot.gateway",
         PATH: "/usr/bin",
       },
       lockDisabled: true,
@@ -235,8 +235,8 @@ describe("watch-node script", () => {
       ["scripts/run-node.mjs", "gateway", "--force"],
       expect.objectContaining({
         env: expect.objectContaining({
-          LAUNCH_JOB_LABEL: "ai.kaijibot.gateway",
-          KAIJIBOT_NO_RESPAWN: "1",
+          LAUNCH_JOB_LABEL: "ai.allbot.gateway",
+          ALLBOT_NO_RESPAWN: "1",
         }),
       }),
     );
@@ -348,7 +348,7 @@ describe("watch-node script", () => {
 
   it("replaces an existing watcher lock holder before starting", async () => {
     const { child, spawn, watcher, createWatcher, fakeProcess } = createWatchHarness();
-    await withTempDir({ prefix: "kaijibot-watch-node-lock-" }, async (cwd) => {
+    await withTempDir({ prefix: "allbot-watch-node-lock-" }, async (cwd) => {
       const lockPath = resolveTestWatchLockPath(cwd, ["gateway", "--force"]);
       fs.mkdirSync(path.dirname(lockPath), { recursive: true });
       fs.writeFileSync(

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { handleCompactCommand } from "./commands-compact.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 
@@ -21,7 +21,7 @@ const { compactEmbeddedPiSession } = await import("./commands-compact.runtime.js
 
 function buildCompactParams(
   commandBodyNormalized: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): HandleCommandsParams {
   return {
     cfg,
@@ -55,7 +55,7 @@ describe("handleCompactCommand", () => {
       buildCompactParams("/status", {
         commands: { text: true },
         channels: { whatsapp: { allowFrom: ["*"] } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
       true,
     );
 
@@ -67,7 +67,7 @@ describe("handleCompactCommand", () => {
     const params = buildCompactParams("/compact", {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     const result = await handleCompactCommand(
       {
@@ -96,8 +96,8 @@ describe("handleCompactCommand", () => {
         ...buildCompactParams("/compact", {
           commands: { text: true },
           channels: { whatsapp: { allowFrom: ["*"] } },
-          session: { store: "/tmp/kaijibot-session-store.json" },
-        } as KaijiBotConfig),
+          session: { store: "/tmp/allbot-session-store.json" },
+        } as AllBotConfig),
         ctx: {
           Provider: "whatsapp",
           Surface: "whatsapp",
@@ -106,7 +106,7 @@ describe("handleCompactCommand", () => {
           From: "+15550001",
           To: "+15550002",
         },
-        agentDir: "/tmp/kaijibot-agent-compact",
+        agentDir: "/tmp/allbot-agent-compact",
         sessionEntry: {
           sessionId: "session-1",
           updatedAt: Date.now(),
@@ -134,7 +134,7 @@ describe("handleCompactCommand", () => {
         groupChannel: "#general",
         groupSpace: "workspace-1",
         spawnedBy: "agent:main:parent",
-        agentDir: "/tmp/kaijibot-agent-compact",
+        agentDir: "/tmp/allbot-agent-compact",
       }),
     );
   });

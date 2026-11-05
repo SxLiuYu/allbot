@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createChannelTestPluginBase, createTestRegistry } from "../test-utils/channel-plugins.js";
 import { createExecApprovalForwarder } from "./exec-approval-forwarder.js";
@@ -21,7 +21,7 @@ const PLUGIN_TARGETS_CFG = {
       targets: [{ channel: "slack", to: "U123" }],
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 const PLUGIN_DISABLED_CFG = {
   approvals: {
@@ -29,9 +29,9 @@ const PLUGIN_DISABLED_CFG = {
       enabled: false,
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
-function createForwarder(params: { cfg: KaijiBotConfig; deliver?: ReturnType<typeof vi.fn> }) {
+function createForwarder(params: { cfg: AllBotConfig; deliver?: ReturnType<typeof vi.fn> }) {
   const deliver = params.deliver ?? vi.fn().mockResolvedValue([]);
   const forwarder = createExecApprovalForwarder({
     getConfig: () => params.cfg,
@@ -66,7 +66,7 @@ async function flushPendingDelivery(): Promise<void> {
   await Promise.resolve();
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("plugin approval forwarding", () => {
   beforeEach(() => {
     setActivePluginRegistry(emptyRegistry);
@@ -141,7 +141,7 @@ describe.skipIf(process.env.CI)("plugin approval forwarding", () => {
           exec: { enabled: true, mode: "targets", targets: [{ channel: "slack", to: "U123" }] },
           plugin: { enabled: false },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
       const { forwarder } = createForwarder({ cfg });
       const result = await forwarder.handlePluginApprovalRequested!(makePluginRequest());
       expect(result).toBe(false);
@@ -157,7 +157,7 @@ describe.skipIf(process.env.CI)("plugin approval forwarding", () => {
             targets: [{ channel: "slack", to: "U123" }],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
       const deliver = vi.fn().mockResolvedValue([]);
       const { forwarder } = createForwarder({ cfg, deliver });
       const result = await forwarder.handlePluginApprovalRequested!(makePluginRequest());
@@ -167,7 +167,7 @@ describe.skipIf(process.env.CI)("plugin approval forwarding", () => {
     });
 
     it("returns false when no approvals config at all", async () => {
-      const cfg = {} as KaijiBotConfig;
+      const cfg = {} as AllBotConfig;
       const { forwarder } = createForwarder({ cfg });
       const result = await forwarder.handlePluginApprovalRequested!(makePluginRequest());
       expect(result).toBe(false);

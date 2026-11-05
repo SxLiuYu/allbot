@@ -21,9 +21,9 @@ provider id `opencode-go` so upstream per-model routing stays correct.
 ## CLI setup
 
 ```bash
-kaijibot onboard --auth-choice opencode-go
+allbot onboard --auth-choice opencode-go
 # or non-interactive
-kaijibot onboard --opencode-go-api-key "$OPENCODE_API_KEY"
+allbot onboard --opencode-go-api-key "$OPENCODE_API_KEY"
 ```
 
 ## Config snippet
@@ -37,7 +37,7 @@ kaijibot onboard --opencode-go-api-key "$OPENCODE_API_KEY"
 
 ## Routing behavior
 
-KaijiBot handles per-model routing automatically when the model ref uses `opencode-go/...`.
+AllBot handles per-model routing automatically when the model ref uses `opencode-go/...`.
 
 ## Notes
 

@@ -1,9 +1,9 @@
 import type {
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { cloneFirstTemplateModel } from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/plugin-entry";
+import { cloneFirstTemplateModel } from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 
 const GOOGLE_GEMINI_CLI_PROVIDER_ID = "google-gemini-cli";
 const GEMINI_2_5_PRO_PREFIX = "gemini-2.5-pro";

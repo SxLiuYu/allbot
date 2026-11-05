@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/temp-path";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/temp-path";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ClawdbotConfig } from "../runtime-api.js";
 
@@ -56,7 +56,7 @@ function expectPathIsolatedToTmpRoot(pathValue: string, key: string): void {
   expect(pathValue).not.toContain(key);
   expect(pathValue).not.toContain("..");
 
-  const tmpRoot = path.resolve(resolvePreferredKaijiBotTmpDir());
+  const tmpRoot = path.resolve(resolvePreferredAllBotTmpDir());
   const resolved = path.resolve(pathValue);
   const rel = path.relative(tmpRoot, resolved);
   expect(rel === ".." || rel.startsWith(`..${path.sep}`)).toBe(false);
@@ -340,7 +340,7 @@ describe("sendMediaFeishu msg_type routing", () => {
       contentType: "application/pdf",
     });
 
-    const roots = ["/allowed/workspace", "/tmp/kaijibot"];
+    const roots = ["/allowed/workspace", "/tmp/allbot"];
     await sendMediaFeishu({
       cfg: emptyConfig,
       to: "user:ou_target",

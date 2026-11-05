@@ -1,5 +1,5 @@
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import type { KaijiBotPluginApi } from "../runtime-api.js";
+import type { AllBotPluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { FeishuTaskSchema, type FeishuTaskParams } from "./task-schema.js";
 import { createFeishuToolClient, resolveAnyEnabledFeishuToolsConfig } from "./tool-account.js";
@@ -230,7 +230,7 @@ async function updateTask(
 
 // ============ Tool Registration ============
 
-export function registerFeishuTaskTools(api: KaijiBotPluginApi) {
+export function registerFeishuTaskTools(api: AllBotPluginApi) {
   if (!api.config) {
     api.logger.debug?.("feishu_task: No config available, skipping task tools");
     return;

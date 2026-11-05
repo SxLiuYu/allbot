@@ -5,7 +5,7 @@ read_when:
 title: "Gateway Architecture"
 ---
 
-> 💡 **KaijiBot 说明：** 此页面描述 Gateway 通用架构。KaijiBot 仅支持飞书频道，认知管道是 KaijiBot 独有的新增模块。
+> 💡 **AllBot 说明：** 此页面描述 Gateway 通用架构。AllBot 仅支持飞书频道，认知管道是 AllBot 独有的新增模块。
 
 # Gateway architecture
 
@@ -20,8 +20,8 @@ title: "Gateway Architecture"
   declare `role: node` with explicit caps/commands.
 - One Gateway per host; it is the only place that opens a WhatsApp session.
 - The **canvas host** is served by the Gateway HTTP server under:
-  - `/__kaijibot__/canvas/` (agent-editable HTML/CSS/JS)
-  - `/__kaijibot__/a2ui/` (A2UI host)
+  - `/__allbot__/canvas/` (agent-editable HTML/CSS/JS)
+  - `/__allbot__/a2ui/` (A2UI host)
     It uses the same port as the Gateway (default `18789`).
 
 ## Components and flows
@@ -105,7 +105,7 @@ sequenceDiagram
   for subsequent connects.
 - Direct local loopback connects can be auto-approved to keep same-host UX
   smooth.
-- KaijiBot also has a narrow backend/container-local self-connect path for
+- AllBot also has a narrow backend/container-local self-connect path for
   trusted shared-secret helper flows.
 - Tailnet and LAN connects, including same-host tailnet binds, still require
   explicit pairing approval.
@@ -140,7 +140,7 @@ Details: [Gateway protocol](/gateway/protocol), [Pairing](/channels/pairing),
 
 ## Operations snapshot
 
-- Start: `kaijibot gateway` (foreground, logs to stdout).
+- Start: `allbot gateway` (foreground, logs to stdout).
 - Health: `health` over WS (also included in `hello-ok`).
 - Supervision: launchd/systemd for auto‑restart.
 
@@ -150,9 +150,9 @@ Details: [Gateway protocol](/gateway/protocol), [Pairing](/channels/pairing),
 - Handshake is mandatory; any non‑JSON or non‑connect first frame is a hard close.
 - Events are not replayed; clients must refresh on gaps.
 
-## Cognitive pipeline (KaijiBot-specific)
+## Cognitive pipeline (AllBot-specific)
 
-The cognitive layer runs alongside the Gateway, adding proactive AI capabilities unique to KaijiBot. It does not import from extensions and can be disabled via `cognitive.enabled: false`.
+The cognitive layer runs alongside the Gateway, adding proactive AI capabilities unique to AllBot. It does not import from extensions and can be disabled via `cognitive.enabled: false`.
 
 ```mermaid
 flowchart TD

@@ -3,8 +3,8 @@ import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import {
   registerSingleProviderPlugin,
   resolveProviderPluginChoice,
-} from "kaijibot/plugin-sdk/plugin-test-runtime";
-import { buildOpenAICompletionsParams } from "kaijibot/plugin-sdk/provider-transport-runtime";
+} from "allbot/plugin-sdk/plugin-test-runtime";
+import { buildOpenAICompletionsParams } from "allbot/plugin-sdk/provider-transport-runtime";
 import { describe, expect, it } from "vitest";
 import deepseekPlugin from "./index.js";
 import { buildDeepSeekProvider } from "./provider-catalog.js";

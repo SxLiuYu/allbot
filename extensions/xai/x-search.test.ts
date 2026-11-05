@@ -1,4 +1,4 @@
-import { withFetchPreconnect } from "kaijibot/plugin-sdk/testing";
+import { withFetchPreconnect } from "allbot/plugin-sdk/testing";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createXSearchTool } from "./x-search.js";
 
@@ -109,7 +109,7 @@ describe("xai x_search tool", () => {
 
     const result = await tool?.execute?.("x-search:1", {
       query: "dinner recipes",
-      allowed_x_handles: ["kaijibot"],
+      allowed_x_handles: ["allbot"],
       excluded_x_handles: ["spam"],
       from_date: "2026-03-01",
       to_date: "2026-03-20",
@@ -124,7 +124,7 @@ describe("xai x_search tool", () => {
     expect(body.tools).toEqual([
       {
         type: "x_search",
-        allowed_x_handles: ["kaijibot"],
+        allowed_x_handles: ["allbot"],
         excluded_x_handles: ["spam"],
         from_date: "2026-03-01",
         to_date: "2026-03-20",

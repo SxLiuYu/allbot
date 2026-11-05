@@ -1,7 +1,7 @@
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, expect, it } from "vitest";
 import { MissingAgentModelConfigError } from "../../agents/defaults.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import {
   buildInterestInferencePrompt,
@@ -112,14 +112,14 @@ function makeInput(overrides?: Partial<InsightEngineInput>): InsightEngineInput 
   };
 }
 
-function makeConfig(overrides?: Partial<KaijiBotConfig>): KaijiBotConfig {
+function makeConfig(overrides?: Partial<AllBotConfig>): AllBotConfig {
   return {
     cognitive: {
       insight: { sources: { webSearchProvider: "zai" } },
       persona: { extractionModel: "zai/glm-5.2" },
     },
     ...overrides,
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function validStrategyJSON(): string {
@@ -395,7 +395,7 @@ describe("inferSearchStrategy", () => {
           inferenceModel: "custom/inference-model",
         },
       },
-    } as Partial<KaijiBotConfig>);
+    } as Partial<AllBotConfig>);
 
     await inferSearchStrategy(makePersona(), makeInput(), config, deps);
 
@@ -417,7 +417,7 @@ describe("inferSearchStrategy", () => {
         insight: { sources: { webSearchProvider: "zai" } },
         persona: { extractionModel: "fallback/extraction-model" },
       },
-    } as Partial<KaijiBotConfig>);
+    } as Partial<AllBotConfig>);
 
     await inferSearchStrategy(makePersona(), makeInput(), config, deps);
 

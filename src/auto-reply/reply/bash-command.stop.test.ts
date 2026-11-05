@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 
 const { getSessionMock, getFinishedSessionMock, killProcessTreeMock } = vi.hoisted(() => ({
@@ -23,7 +23,7 @@ const { handleBashChatCommand } = await import("./bash-command.js");
 function buildParams(commandBody: string) {
   const cfg = {
     commands: { bash: true },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 
   const ctx = {
     CommandBody: commandBody,

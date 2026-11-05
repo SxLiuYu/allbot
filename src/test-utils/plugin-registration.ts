@@ -1,14 +1,14 @@
 import { createCapturedPluginRegistration } from "../plugins/captured-registration.js";
-import type { KaijiBotPluginApi, ProviderPlugin } from "../plugins/types.js";
+import type { AllBotPluginApi, ProviderPlugin } from "../plugins/types.js";
 
 export { createCapturedPluginRegistration };
 
 type RegistrablePlugin = {
-  register(api: KaijiBotPluginApi): void | Promise<void>;
+  register(api: AllBotPluginApi): void | Promise<void>;
 };
 
 export async function registerSingleProviderPlugin(params: {
-  register(api: KaijiBotPluginApi): void | Promise<void>;
+  register(api: AllBotPluginApi): void | Promise<void>;
 }): Promise<ProviderPlugin> {
   const captured = createCapturedPluginRegistration();
   await params.register(captured.api);

@@ -63,10 +63,10 @@ function snapshotExistingProfiles(): Map<string, LarkCliApp> {
 /**
  * Restore profiles that were lost during `profile add`.
  * Compares snapshot (pre-registration) with current config and re-adds
- * any profiles that disappeared (user-configured apps not managed by KaijiBot).
+ * any profiles that disappeared (user-configured apps not managed by AllBot).
  *
  * @param snapshot Pre-registration profile map
- * @param managedNames Profile names that KaijiBot manages (should be preserved)
+ * @param managedNames Profile names that AllBot manages (should be preserved)
  */
 function restoreLostProfiles(
   snapshot: Map<string, LarkCliApp>,
@@ -102,7 +102,7 @@ function restoreLostProfiles(
       continue; // Still present, no action needed
     }
     // Profile from snapshot is missing — restore it
-    // Skip KaijiBot-managed profiles (those are intentionally updated)
+    // Skip AllBot-managed profiles (those are intentionally updated)
     if (managedNames.has(key)) {
       continue;
     }

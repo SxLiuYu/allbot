@@ -1,5 +1,5 @@
 import { resolveBundledProviderPolicySurface } from "../plugins/provider-public-artifacts.js";
-import type { ModelProviderConfig, KaijiBotConfig } from "./types.js";
+import type { ModelProviderConfig, AllBotConfig } from "./types.js";
 
 export function normalizeProviderConfigForConfigDefaults(params: {
   provider: string;
@@ -14,9 +14,9 @@ export function normalizeProviderConfigForConfigDefaults(params: {
 
 export function applyProviderConfigDefaultsForConfig(params: {
   provider: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return (
     resolveBundledProviderPolicySurface(params.provider)?.applyConfigDefaults?.({
       provider: params.provider,

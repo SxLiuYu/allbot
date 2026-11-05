@@ -7,9 +7,9 @@ describe("buildPairingReply", () => {
   let envSnapshot: ReturnType<typeof captureEnv>;
 
   beforeEach(() => {
-    envSnapshot = captureEnv(["KAIJIBOT_CONTAINER_HINT", "KAIJIBOT_PROFILE"]);
-    delete process.env.KAIJIBOT_CONTAINER_HINT;
-    process.env.KAIJIBOT_PROFILE = "isolated";
+    envSnapshot = captureEnv(["ALLBOT_CONTAINER_HINT", "ALLBOT_PROFILE"]);
+    delete process.env.ALLBOT_CONTAINER_HINT;
+    process.env.ALLBOT_PROFILE = "isolated";
   });
 
   afterEach(() => {
@@ -51,7 +51,7 @@ describe("buildPairingReply", () => {
 
   function expectPairingApproveCommand(text: string, testCase: (typeof pairingReplyCases)[number]) {
     const commandRe = new RegExp(
-      `(?:kaijibot|kaijibot) --profile isolated pairing approve ${testCase.channel} ${testCase.code}`,
+      `(?:allbot|allbot) --profile isolated pairing approve ${testCase.channel} ${testCase.code}`,
     );
     expect(text).toMatch(commandRe);
   }

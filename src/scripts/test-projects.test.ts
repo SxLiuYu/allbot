@@ -73,11 +73,11 @@ describe("test-projects args", () => {
   });
 
   it("routes boundary targets to the boundary config", () => {
-    expect(buildVitestRunPlans(["src/infra/kaijibot-root.test.ts"])).toEqual([
+    expect(buildVitestRunPlans(["src/infra/allbot-root.test.ts"])).toEqual([
       {
         config: "vitest/vitest.boundary.config.ts",
         forwardedArgs: [],
-        includePatterns: ["src/infra/kaijibot-root.test.ts"],
+        includePatterns: ["src/infra/allbot-root.test.ts"],
         watchMode: false,
       },
     ]);
@@ -394,11 +394,11 @@ describe("test-projects args", () => {
   });
 
   it("routes infra targets to the infra config", () => {
-    expect(buildVitestRunPlans(["src/infra/kaijibot-root.test.ts"])).toEqual([
+    expect(buildVitestRunPlans(["src/infra/allbot-root.test.ts"])).toEqual([
       {
         config: "vitest/vitest.boundary.config.ts",
         forwardedArgs: [],
-        includePatterns: ["src/infra/kaijibot-root.test.ts"],
+        includePatterns: ["src/infra/allbot-root.test.ts"],
         watchMode: false,
       },
     ]);
@@ -761,8 +761,8 @@ describe("test-projects args", () => {
     expect(spec?.includePatterns).toEqual([
       "extensions/discord/src/monitor/message-handler.preflight.test.ts",
     ]);
-    expect(spec?.includeFilePath).toContain("kaijibot-vitest-include-");
-    expect(spec?.env.KAIJIBOT_VITEST_INCLUDE_FILE).toBe(spec?.includeFilePath);
+    expect(spec?.includeFilePath).toContain("allbot-vitest-include-");
+    expect(spec?.env.ALLBOT_VITEST_INCLUDE_FILE).toBe(spec?.includeFilePath);
   });
 
   it("rejects watch mode when a command spans multiple suites", () => {

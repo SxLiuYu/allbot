@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import type { ImageGenerationProvider } from "../../../src/image-generation/types.js";
 import type { MusicGenerationProvider } from "../../../src/music-generation/types.js";
 import type { VideoGenerationProvider } from "../../../src/video-generation/types.js";
@@ -27,23 +27,23 @@ const mediaRuntimeMocks = vi.hoisted(() => {
     createSubsystemLogger: vi.fn(() => ({ debug })),
     describeFailoverError: vi.fn(),
     getImageGenerationProvider: vi.fn<
-      (providerId: string, config?: KaijiBotConfig) => ImageGenerationProvider | undefined
+      (providerId: string, config?: AllBotConfig) => ImageGenerationProvider | undefined
     >(() => undefined),
     getMusicGenerationProvider: vi.fn<
-      (providerId: string, config?: KaijiBotConfig) => MusicGenerationProvider | undefined
+      (providerId: string, config?: AllBotConfig) => MusicGenerationProvider | undefined
     >(() => undefined),
     getProviderEnvVars: vi.fn<(providerId: string) => string[]>(() => []),
     getVideoGenerationProvider: vi.fn<
-      (providerId: string, config?: KaijiBotConfig) => VideoGenerationProvider | undefined
+      (providerId: string, config?: AllBotConfig) => VideoGenerationProvider | undefined
     >(() => undefined),
     isFailoverError: vi.fn<(err: unknown) => boolean>(() => false),
-    listImageGenerationProviders: vi.fn<(config?: KaijiBotConfig) => ImageGenerationProvider[]>(
+    listImageGenerationProviders: vi.fn<(config?: AllBotConfig) => ImageGenerationProvider[]>(
       () => [],
     ),
-    listMusicGenerationProviders: vi.fn<(config?: KaijiBotConfig) => MusicGenerationProvider[]>(
+    listMusicGenerationProviders: vi.fn<(config?: AllBotConfig) => MusicGenerationProvider[]>(
       () => [],
     ),
-    listVideoGenerationProviders: vi.fn<(config?: KaijiBotConfig) => VideoGenerationProvider[]>(
+    listVideoGenerationProviders: vi.fn<(config?: AllBotConfig) => VideoGenerationProvider[]>(
       () => [],
     ),
     parseImageGenerationModelRef:

@@ -658,7 +658,7 @@ describe("runCliAgent spawn path", () => {
 
   it("loads workspace bootstrap files into the Claude CLI system prompt", async () => {
     const workspaceDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "kaijibot-cli-bootstrap-context-"),
+      path.join(os.tmpdir(), "allbot-cli-bootstrap-context-"),
     );
 
     await fs.writeFile(

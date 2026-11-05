@@ -59,7 +59,7 @@ export type {
   GroupToolPolicyConfig,
   MarkdownConfig,
   MarkdownTableMode,
-  KaijiBotConfig,
+  AllBotConfig,
   ReplyToMode,
   TtsAutoMode,
   TtsConfig,

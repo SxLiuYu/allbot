@@ -4,5 +4,5 @@ export {
   getRuntimeConfig,
   readSourceConfigSnapshotForWrite,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../../config/config.js";

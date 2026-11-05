@@ -1,7 +1,7 @@
 import { normalizeChannelId } from "../channels/plugins/index.js";
 import { resolveAccountEntry } from "../routing/account-lookup.js";
 import { normalizeAccountId } from "../routing/session-key.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 type CapabilitiesConfig = string[] | Record<string, unknown>;
 
 const isStringArray = (value: unknown): value is string[] =>
@@ -41,7 +41,7 @@ function resolveAccountCapabilities(params: {
 }
 
 export function resolveChannelCapabilities(params: {
-  cfg?: Partial<KaijiBotConfig>;
+  cfg?: Partial<AllBotConfig>;
   channel?: string | null;
   accountId?: string | null;
 }): string[] | undefined {

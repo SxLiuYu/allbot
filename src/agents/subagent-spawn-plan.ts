@@ -1,5 +1,5 @@
 import { formatThinkingLevels, normalizeThinkLevel } from "../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveSubagentSpawnModelSelection } from "./model-selection.js";
 import { readStringParam } from "./tools/common.js";
 
@@ -23,7 +23,7 @@ export function splitModelRef(ref?: string) {
 }
 
 export function resolveConfiguredSubagentRunTimeoutSeconds(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runTimeoutSeconds?: number;
 }) {
   const cfgSubagentTimeout =
@@ -37,7 +37,7 @@ export function resolveConfiguredSubagentRunTimeoutSeconds(params: {
 }
 
 export function resolveSubagentModelAndThinkingPlan(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   targetAgentId: string;
   targetAgentConfig?: unknown;
   modelOverride?: string;

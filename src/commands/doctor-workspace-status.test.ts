@@ -228,7 +228,7 @@ describe("noteWorkspaceStatus", () => {
       const recoveryCalls = noteSpy.mock.calls.filter(([, title]) => title === "TaskFlow recovery");
       expect(recoveryCalls).toHaveLength(1);
       expect(String(recoveryCalls[0]?.[0])).toContain("flow-123");
-      expect(String(recoveryCalls[0]?.[0])).toContain("kaijibot tasks flow show <flow-id>");
+      expect(String(recoveryCalls[0]?.[0])).toContain("allbot tasks flow show <flow-id>");
     } finally {
       noteSpy.mockRestore();
     }

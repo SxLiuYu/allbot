@@ -1,5 +1,5 @@
 ---
-summary: "Contributor guide for adding a new shared capability to the KaijiBot plugin system"
+summary: "Contributor guide for adding a new shared capability to the AllBot plugin system"
 read_when:
   - Adding a new core capability and plugin registration surface
   - Deciding whether code belongs in core, a vendor plugin, or a feature plugin
@@ -11,12 +11,12 @@ sidebarTitle: "Adding Capabilities"
 # Adding Capabilities
 
 <Info>
-  This is a **contributor guide** for KaijiBot core developers. If you are
+  This is a **contributor guide** for AllBot core developers. If you are
   building an external plugin, see [Building Plugins](/plugins/building-plugins)
   instead.
 </Info>
 
-Use this when KaijiBot needs a new domain such as image generation, video
+Use this when AllBot needs a new domain such as image generation, video
 generation, or some future vendor-backed feature area.
 
 The rule:

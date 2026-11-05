@@ -1,6 +1,6 @@
 import "./reply.directive.directive-behavior.e2e-mocks.js";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadSessionStore } from "../config/sessions.js";
 import {
   AUTHORIZED_WHATSAPP_COMMAND,
@@ -208,7 +208,7 @@ describe("directive behavior", () => {
           CommandAuthorized: true,
         },
         {},
-        makeRestrictedElevatedDisabledConfig(home) as unknown as KaijiBotConfig,
+        makeRestrictedElevatedDisabledConfig(home) as unknown as AllBotConfig,
       );
       const deniedText = replyText(deniedRes);
       expect(deniedText).toContain("agents.list[].tools.elevated.enabled");

@@ -7,8 +7,8 @@ import { cleanupTempDirs, makeTempDir } from "../test/helpers/temp-dir.js";
 const tempRoots: string[] = [];
 
 function withFakeCli(versionOutput: string): { root: string; cliPath: string } {
-  const root = makeTempDir(tempRoots, "kaijibot-install-sh-");
-  const cliPath = path.join(root, "kaijibot");
+  const root = makeTempDir(tempRoots, "allbot-install-sh-");
+  const cliPath = path.join(root, "allbot");
   const escapedOutput = versionOutput.replace(/'/g, "'\\''");
   fs.writeFileSync(
     cliPath,
@@ -28,16 +28,16 @@ function resolveVersionFromInstaller(cliPath: string): string {
     [
       "-lc",
       `source "${installerPath}" >/dev/null 2>&1
-KAIJIBOT_BIN="$FAKE_KAIJIBOT_BIN"
-resolve_kaijibot_version`,
+ALLBOT_BIN="$FAKE_ALLBOT_BIN"
+resolve_allbot_version`,
     ],
     {
       cwd: process.cwd(),
       encoding: "utf-8",
       env: {
         ...process.env,
-        FAKE_KAIJIBOT_BIN: cliPath,
-        KAIJIBOT_INSTALL_SH_NO_RUN: "1",
+        FAKE_ALLBOT_BIN: cliPath,
+        ALLBOT_INSTALL_SH_NO_RUN: "1",
       },
     },
   );
@@ -51,13 +51,13 @@ function resolveVersionFromInstallerViaStdin(cliPath: string, cwd: string): stri
     cwd,
     encoding: "utf-8",
     input: `${installerSource}
-KAIJIBOT_BIN="$FAKE_KAIJIBOT_BIN"
-resolve_kaijibot_version
+ALLBOT_BIN="$FAKE_ALLBOT_BIN"
+resolve_allbot_version
 `,
     env: {
       ...process.env,
-      FAKE_KAIJIBOT_BIN: cliPath,
-      KAIJIBOT_INSTALL_SH_NO_RUN: "1",
+      FAKE_ALLBOT_BIN: cliPath,
+      ALLBOT_INSTALL_SH_NO_RUN: "1",
     },
   });
   return output.trim();
@@ -71,7 +71,7 @@ describe("install.sh version resolution", () => {
   it.runIf(process.platform !== "win32")(
     "extracts the semantic version from decorated CLI output",
     () => {
-      const fixture = withFakeCli("KaijiBot 2026.3.10 (abcdef0)");
+      const fixture = withFakeCli("AllBot 2026.3.10 (abcdef0)");
 
       expect(resolveVersionFromInstaller(fixture.cliPath)).toBe("2026.3.10");
     },
@@ -80,18 +80,18 @@ describe("install.sh version resolution", () => {
   it.runIf(process.platform !== "win32")(
     "falls back to raw output when no semantic version is present",
     () => {
-      const fixture = withFakeCli("KaijiBot dev's build");
+      const fixture = withFakeCli("AllBot dev's build");
 
-      expect(resolveVersionFromInstaller(fixture.cliPath)).toBe("KaijiBot dev's build");
+      expect(resolveVersionFromInstaller(fixture.cliPath)).toBe("AllBot dev's build");
     },
   );
 
   it.runIf(process.platform !== "win32")(
     "does not source version helpers from cwd when installer runs via stdin",
     () => {
-      const fixture = withFakeCli("KaijiBot 2026.3.10 (abcdef0)");
+      const fixture = withFakeCli("AllBot 2026.3.10 (abcdef0)");
 
-      const hostileCwd = makeTempDir(tempRoots, "kaijibot-install-stdin-");
+      const hostileCwd = makeTempDir(tempRoots, "allbot-install-stdin-");
       const hostileHelper = path.join(
         hostileCwd,
         "docker",
@@ -102,7 +102,7 @@ describe("install.sh version resolution", () => {
       fs.writeFileSync(
         hostileHelper,
         `#!/usr/bin/env bash
-extract_kaijibot_semver() {
+extract_allbot_semver() {
   printf '%s' 'poisoned'
 }
 `,

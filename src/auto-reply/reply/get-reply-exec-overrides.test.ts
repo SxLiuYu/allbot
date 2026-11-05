@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ModelAliasIndex } from "../../agents/model-selection.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import { parseInlineDirectives } from "./directive-handling.parse.js";
 import { persistInlineDirectives } from "./directive-handling.persist.js";
@@ -28,7 +28,7 @@ async function persistExecDirective(params: {
 }) {
   await persistInlineDirectives({
     directives: parseInlineDirectives(params.body),
-    cfg: { commands: { text: true } } as KaijiBotConfig,
+    cfg: { commands: { text: true } } as AllBotConfig,
     agentDir: "/tmp/agent",
     sessionEntry: params.sessionEntry,
     sessionStore: params.sessionStore,

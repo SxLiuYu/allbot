@@ -26,7 +26,7 @@ function makeDraft(overrides: Partial<SkillDraft> = {}): SkillDraft {
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-skill-lifecycle-test-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-skill-lifecycle-test-"));
   writer = new SkillPersistenceWriter(tempDir);
   lifecycle = new SkillLifecycleManager(writer);
 });
@@ -44,7 +44,7 @@ describe("resolveEvolutionSkillsRoot", () => {
   });
 
   it("honors a configured agent workspace", () => {
-    const customWs = join(tmpdir(), "kaijibot-custom-workspace");
+    const customWs = join(tmpdir(), "allbot-custom-workspace");
     const config = { agents: { defaults: { workspace: customWs } } } as never;
     expect(resolveEvolutionSkillBaseDir({ config, agentId: "main" })).toBe(customWs);
     expect(resolveEvolutionSkillsRoot({ config, agentId: "main" })).toBe(

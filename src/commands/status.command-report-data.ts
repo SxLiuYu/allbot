@@ -138,7 +138,7 @@ export async function buildStatusCommandReportData(params: {
     width: params.tableWidth,
     overviewRows,
     showTaskMaintenanceHint: params.summary.taskAudit.errors > 0,
-    taskMaintenanceHint: `Task maintenance: ${params.formatCliCommand("kaijibot tasks maintenance --apply")}`,
+    taskMaintenanceHint: `Task maintenance: ${params.formatCliCommand("allbot tasks maintenance --apply")}`,
     pluginCompatibilityLines: buildStatusPluginCompatibilityLines({
       notices: params.pluginCompatibility,
       formatNotice: params.formatPluginCompatibilityNotice,

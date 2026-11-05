@@ -24,14 +24,14 @@ function readManifestRecords(): PluginManifest[] {
         return false;
       }
       const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf-8")) as {
-        kaijibot?: { extensions?: unknown };
+        allbot?: { extensions?: unknown };
       };
-      return normalizeBundledPluginStringList(packageJson.kaijibot?.extensions).length > 0;
+      return normalizeBundledPluginStringList(packageJson.allbot?.extensions).length > 0;
     })
     .map(
       (pluginDir) =>
         JSON.parse(
-          fs.readFileSync(path.join(pluginDir, "kaijibot.plugin.json"), "utf-8"),
+          fs.readFileSync(path.join(pluginDir, "allbot.plugin.json"), "utf-8"),
         ) as PluginManifest,
     )
     .toSorted((left, right) => left.id.localeCompare(right.id));

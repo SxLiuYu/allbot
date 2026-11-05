@@ -1,7 +1,7 @@
 import type { ChannelStatusAdapter } from "../channels/plugins/types.adapters.js";
 import type { ChannelAccountSnapshot } from "../channels/plugins/types.core.js";
 import type { ChannelStatusIssue } from "../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 export type { ChannelAccountSnapshot } from "../channels/plugins/types.core.js";
 export type { ChannelStatusIssue } from "../channels/plugins/types.js";
@@ -34,7 +34,7 @@ type ComputedAccountStatusBase = {
 
 type ComputedAccountStatusAdapterParams<ResolvedAccount, Probe, Audit> = {
   account: ResolvedAccount;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runtime?: ChannelAccountSnapshot;
   probe?: Probe;
   audit?: Audit;

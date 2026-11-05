@@ -15,7 +15,7 @@ describe("setupCommand", () => {
 
       await setupCommand(undefined, runtime);
 
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       const raw = await fs.readFile(configPath, "utf-8");
 
       expect(raw).toContain('"mode": "local"');
@@ -30,8 +30,8 @@ describe("setupCommand", () => {
         error: vi.fn(),
         exit: vi.fn(),
       };
-      const configDir = path.join(home, ".kaijibot");
-      const configPath = path.join(configDir, "kaijibot.json");
+      const configDir = path.join(home, ".allbot");
+      const configPath = path.join(configDir, "allbot.json");
       const workspace = path.join(home, "custom-workspace");
 
       await fs.mkdir(configDir, { recursive: true });
@@ -65,8 +65,8 @@ describe("setupCommand", () => {
         error: vi.fn(),
         exit: vi.fn(),
       };
-      const configDir = path.join(home, ".kaijibot");
-      const configPath = path.join(configDir, "kaijibot.json");
+      const configDir = path.join(home, ".allbot");
+      const configPath = path.join(configDir, "allbot.json");
 
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(configPath, '"not-an-object"', "utf-8");

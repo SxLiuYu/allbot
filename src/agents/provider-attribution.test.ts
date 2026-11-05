@@ -11,20 +11,20 @@ import {
 } from "./provider-attribution.js";
 
 describe("provider attribution", () => {
-  it("resolves the canonical KaijiBot product and runtime version", () => {
+  it("resolves the canonical AllBot product and runtime version", () => {
     const identity = resolveProviderAttributionIdentity({
-      KAIJIBOT_VERSION: "2026.3.99",
+      ALLBOT_VERSION: "2026.3.99",
     });
 
     expect(identity).toEqual({
-      product: "KaijiBot",
+      product: "AllBot",
       version: "2026.3.99",
     });
   });
 
   it("returns a documented OpenRouter attribution policy", () => {
     const policy = resolveProviderAttributionPolicy("openrouter", {
-      KAIJIBOT_VERSION: "2026.3.22",
+      ALLBOT_VERSION: "2026.3.22",
     });
 
     expect(policy).toEqual({
@@ -33,12 +33,12 @@ describe("provider attribution", () => {
       verification: "vendor-documented",
       hook: "request-headers",
       docsUrl: "https://openrouter.ai/docs/app-attribution",
-      reviewNote: "Documented app attribution headers. Verified in KaijiBot runtime wrapper.",
-      product: "KaijiBot",
+      reviewNote: "Documented app attribution headers. Verified in AllBot runtime wrapper.",
+      product: "AllBot",
       version: "2026.3.22",
       headers: {
         "HTTP-Referer": "https://gitee.com/kaiji1126/kaijibot",
-        "X-OpenRouter-Title": "KaijiBot",
+        "X-OpenRouter-Title": "AllBot",
         "X-OpenRouter-Categories": "cli-agent",
       },
     });
@@ -47,41 +47,41 @@ describe("provider attribution", () => {
   it("normalizes aliases when resolving provider headers", () => {
     expect(
       resolveProviderAttributionHeaders("OpenRouter", {
-        KAIJIBOT_VERSION: "2026.3.22",
+        ALLBOT_VERSION: "2026.3.22",
       }),
     ).toEqual({
       "HTTP-Referer": "https://gitee.com/kaiji1126/kaijibot",
-      "X-OpenRouter-Title": "KaijiBot",
+      "X-OpenRouter-Title": "AllBot",
       "X-OpenRouter-Categories": "cli-agent",
     });
   });
 
   it("returns a hidden-spec OpenAI attribution policy", () => {
-    expect(resolveProviderAttributionPolicy("openai", { KAIJIBOT_VERSION: "2026.3.22" })).toEqual({
+    expect(resolveProviderAttributionPolicy("openai", { ALLBOT_VERSION: "2026.3.22" })).toEqual({
       provider: "openai",
       enabledByDefault: true,
       verification: "vendor-hidden-api-spec",
       hook: "request-headers",
       reviewNote:
         "OpenAI native traffic supports hidden originator/User-Agent attribution. Verified against the Codex wire contract.",
-      product: "KaijiBot",
+      product: "AllBot",
       version: "2026.3.22",
       headers: {
-        originator: "kaijibot",
+        originator: "allbot",
         version: "2026.3.22",
-        "User-Agent": "kaijibot/2026.3.22",
+        "User-Agent": "allbot/2026.3.22",
       },
     });
-    expect(resolveProviderAttributionHeaders("openai", { KAIJIBOT_VERSION: "2026.3.22" })).toEqual({
-      originator: "kaijibot",
+    expect(resolveProviderAttributionHeaders("openai", { ALLBOT_VERSION: "2026.3.22" })).toEqual({
+      originator: "allbot",
       version: "2026.3.22",
-      "User-Agent": "kaijibot/2026.3.22",
+      "User-Agent": "allbot/2026.3.22",
     });
   });
 
   it("returns a hidden-spec OpenAI Codex attribution policy", () => {
     expect(
-      resolveProviderAttributionPolicy("openai-codex", { KAIJIBOT_VERSION: "2026.3.22" }),
+      resolveProviderAttributionPolicy("openai-codex", { ALLBOT_VERSION: "2026.3.22" }),
     ).toEqual({
       provider: "openai-codex",
       enabledByDefault: true,
@@ -89,19 +89,19 @@ describe("provider attribution", () => {
       hook: "request-headers",
       reviewNote:
         "OpenAI Codex ChatGPT-backed traffic supports the same hidden originator/User-Agent attribution contract.",
-      product: "KaijiBot",
+      product: "AllBot",
       version: "2026.3.22",
       headers: {
-        originator: "kaijibot",
+        originator: "allbot",
         version: "2026.3.22",
-        "User-Agent": "kaijibot/2026.3.22",
+        "User-Agent": "allbot/2026.3.22",
       },
     });
   });
 
   it("lists the current attribution support matrix", () => {
     expect(
-      listProviderAttributionPolicies({ KAIJIBOT_VERSION: "2026.3.22" }).map((policy) => [
+      listProviderAttributionPolicies({ ALLBOT_VERSION: "2026.3.22" }).map((policy) => [
         policy.provider,
         policy.enabledByDefault,
         policy.verification,
@@ -129,7 +129,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { KAIJIBOT_VERSION: "2026.3.22" },
+        { ALLBOT_VERSION: "2026.3.22" },
       ),
     ).toMatchObject({
       endpointClass: "openai-public",
@@ -149,7 +149,7 @@ describe("provider attribution", () => {
           transport: "stream",
           capability: "llm",
         },
-        { KAIJIBOT_VERSION: "2026.3.22" },
+        { ALLBOT_VERSION: "2026.3.22" },
       ),
     ).toMatchObject({
       endpointClass: "custom",

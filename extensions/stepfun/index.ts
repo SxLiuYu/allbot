@@ -1,10 +1,10 @@
 import {
   definePluginEntry,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type ProviderCatalogContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/string-coerce-runtime";
 import {
   applyStepFunPlanConfig,
   applyStepFunPlanConfigCn,
@@ -131,7 +131,7 @@ function createStepFunApiKeyMethod(params: {
   choiceId: string;
   choiceLabel: string;
   choiceHint: string;
-  applyConfig: (cfg: KaijiBotConfig) => KaijiBotConfig;
+  applyConfig: (cfg: AllBotConfig) => AllBotConfig;
 }) {
   return createProviderApiKeyAuthMethod({
     providerId: params.providerId,

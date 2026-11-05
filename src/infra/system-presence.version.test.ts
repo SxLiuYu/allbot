@@ -12,8 +12,8 @@ async function withPresenceModule<T>(
 ): Promise<T> {
   return withEnvAsync(
     {
-      KAIJIBOT_VERSION: undefined,
-      KAIJIBOT_SERVICE_VERSION: undefined,
+      ALLBOT_VERSION: undefined,
+      ALLBOT_SERVICE_VERSION: undefined,
       npm_package_version: undefined,
       ...env,
     },
@@ -44,32 +44,32 @@ describe("system-presence version fallback", () => {
     });
   }
 
-  it("uses runtime VERSION when KAIJIBOT_VERSION is not set", async () => {
+  it("uses runtime VERSION when ALLBOT_VERSION is not set", async () => {
     await expectSelfVersion(
       {
-        KAIJIBOT_SERVICE_VERSION: "2.4.6-service",
+        ALLBOT_SERVICE_VERSION: "2.4.6-service",
         npm_package_version: "1.0.0-package",
       },
       runtimeVersion,
     );
   });
 
-  it("prefers KAIJIBOT_VERSION over runtime VERSION", async () => {
+  it("prefers ALLBOT_VERSION over runtime VERSION", async () => {
     await expectSelfVersion(
       {
-        KAIJIBOT_VERSION: "9.9.9-cli",
-        KAIJIBOT_SERVICE_VERSION: "2.4.6-service",
+        ALLBOT_VERSION: "9.9.9-cli",
+        ALLBOT_SERVICE_VERSION: "2.4.6-service",
         npm_package_version: "1.0.0-package",
       },
       "9.9.9-cli",
     );
   });
 
-  it("still prefers runtime VERSION over KAIJIBOT_SERVICE_VERSION when KAIJIBOT_VERSION is blank", async () => {
+  it("still prefers runtime VERSION over ALLBOT_SERVICE_VERSION when ALLBOT_VERSION is blank", async () => {
     await expectSelfVersion(
       {
-        KAIJIBOT_VERSION: " ",
-        KAIJIBOT_SERVICE_VERSION: "2.4.6-service",
+        ALLBOT_VERSION: " ",
+        ALLBOT_SERVICE_VERSION: "2.4.6-service",
         npm_package_version: "1.0.0-package",
       },
       runtimeVersion,
@@ -79,19 +79,19 @@ describe("system-presence version fallback", () => {
   it("still prefers runtime VERSION over npm_package_version when service markers are blank", async () => {
     await expectSelfVersion(
       {
-        KAIJIBOT_VERSION: " ",
-        KAIJIBOT_SERVICE_VERSION: "\t",
+        ALLBOT_VERSION: " ",
+        ALLBOT_SERVICE_VERSION: "\t",
         npm_package_version: "1.0.0-package",
       },
       runtimeVersion,
     );
   });
 
-  it("uses runtime VERSION when KAIJIBOT_VERSION and KAIJIBOT_SERVICE_VERSION are blank", async () => {
+  it("uses runtime VERSION when ALLBOT_VERSION and ALLBOT_SERVICE_VERSION are blank", async () => {
     await expectSelfVersion(
       {
-        KAIJIBOT_VERSION: " ",
-        KAIJIBOT_SERVICE_VERSION: "\t",
+        ALLBOT_VERSION: " ",
+        ALLBOT_SERVICE_VERSION: "\t",
         npm_package_version: "1.0.0-package",
       },
       runtimeVersion,

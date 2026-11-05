@@ -35,9 +35,9 @@ describe("generic current-conversation bindings", () => {
   let testStateDir = "";
 
   beforeEach(async () => {
-    previousStateDir = process.env.KAIJIBOT_STATE_DIR;
-    testStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-current-bindings-"));
-    process.env.KAIJIBOT_STATE_DIR = testStateDir;
+    previousStateDir = process.env.ALLBOT_STATE_DIR;
+    testStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-current-bindings-"));
+    process.env.ALLBOT_STATE_DIR = testStateDir;
     setMinimalCurrentConversationRegistry();
     __testing.resetCurrentConversationBindingsForTests({
       deletePersistedFile: true,
@@ -49,9 +49,9 @@ describe("generic current-conversation bindings", () => {
       deletePersistedFile: true,
     });
     if (previousStateDir == null) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = previousStateDir;
+      process.env.ALLBOT_STATE_DIR = previousStateDir;
     }
     await fs.rm(testStateDir, { recursive: true, force: true });
   });

@@ -1,7 +1,7 @@
 import type { AgentSession } from "@earendil-works/pi-coding-agent";
 import type { ReasoningLevel, VerboseLevel } from "../auto-reply/thinking.js";
 import type { ReplyPayload } from "../auto-reply/types.js";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import type { HookRunner } from "../plugins/hooks.js";
 import type { AgentInternalEvent } from "./internal-events.js";
 import type { BlockReplyChunking } from "./pi-embedded-block-chunker.js";
@@ -32,7 +32,7 @@ export type SubscribeEmbeddedPiSessionParams = {
   onAgentEvent?: (evt: { stream: string; data: Record<string, unknown> }) => void | Promise<void>;
   enforceFinalTag?: boolean;
   silentExpected?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   /** Ephemeral session UUID — regenerated on /new and /reset. */
   sessionId?: string;

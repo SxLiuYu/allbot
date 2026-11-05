@@ -17,11 +17,11 @@ import {
 describe("exec approvals wildcard agent", () => {
   it("merges wildcard allowlist entries with agent entries", () => {
     const dir = makeTempDir();
-    const prevKaijiBotHome = process.env.KAIJIBOT_HOME;
+    const prevAllBotHome = process.env.ALLBOT_HOME;
 
     try {
-      process.env.KAIJIBOT_HOME = dir;
-      const approvalsPath = path.join(dir, ".kaijibot", "exec-approvals.json");
+      process.env.ALLBOT_HOME = dir;
+      const approvalsPath = path.join(dir, ".allbot", "exec-approvals.json");
       fs.mkdirSync(path.dirname(approvalsPath), { recursive: true });
       fs.writeFileSync(
         approvalsPath,
@@ -44,10 +44,10 @@ describe("exec approvals wildcard agent", () => {
         "/usr/bin/uname",
       ]);
     } finally {
-      if (prevKaijiBotHome === undefined) {
-        delete process.env.KAIJIBOT_HOME;
+      if (prevAllBotHome === undefined) {
+        delete process.env.ALLBOT_HOME;
       } else {
-        process.env.KAIJIBOT_HOME = prevKaijiBotHome;
+        process.env.ALLBOT_HOME = prevAllBotHome;
       }
     }
   });

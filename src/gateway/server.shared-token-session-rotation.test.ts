@@ -21,9 +21,9 @@ let server: Awaited<ReturnType<typeof startGatewayServer>>;
 let port = 0;
 
 beforeAll(async () => {
-  const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+  const configPath = process.env.ALLBOT_CONFIG_PATH;
   if (!configPath) {
-    throw new Error("KAIJIBOT_CONFIG_PATH missing in gateway test environment");
+    throw new Error("ALLBOT_CONFIG_PATH missing in gateway test environment");
   }
   port = await getFreePort();
   testState.gatewayAuth = undefined;

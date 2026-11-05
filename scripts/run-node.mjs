@@ -18,7 +18,7 @@ const runNodeSourceRoots = ["src", BUNDLED_PLUGIN_ROOT_DIR];
 const runNodeConfigFiles = ["tsconfig.json", "package.json", "tsdown.config.ts"];
 export const runNodeWatchedPaths = [...runNodeSourceRoots, ...runNodeConfigFiles];
 const extensionSourceFilePattern = /\.(?:[cm]?[jt]sx?)$/;
-const extensionRestartMetadataFiles = new Set(["kaijibot.plugin.json", "package.json"]);
+const extensionRestartMetadataFiles = new Set(["allbot.plugin.json", "package.json"]);
 
 const normalizePath = (filePath) => String(filePath ?? "").replaceAll("\\", "/");
 
@@ -195,7 +195,7 @@ const hasSourceMtimeChanged = (stampMtime, deps) => {
 };
 
 export const resolveBuildRequirement = (deps) => {
-  if (deps.env.KAIJIBOT_FORCE_BUILD === "1") {
+  if (deps.env.ALLBOT_FORCE_BUILD === "1") {
     return { shouldBuild: true, reason: "force_build" };
   }
   const stamp = readBuildStamp(deps);
@@ -237,7 +237,7 @@ export const resolveBuildRequirement = (deps) => {
 };
 
 const BUILD_REASON_LABELS = {
-  force_build: "forced by KAIJIBOT_FORCE_BUILD",
+  force_build: "forced by ALLBOT_FORCE_BUILD",
   missing_build_stamp: "build stamp missing",
   missing_dist_entry: "dist entry missing",
   config_newer: "config newer than build stamp",
@@ -260,10 +260,10 @@ const isSignalKey = (signal) => Object.hasOwn(SIGNAL_EXIT_CODES, signal);
 const getSignalExitCode = (signal) => (isSignalKey(signal) ? SIGNAL_EXIT_CODES[signal] : 1);
 
 const logRunner = (message, deps) => {
-  if (deps.env.KAIJIBOT_RUNNER_LOG === "0") {
+  if (deps.env.ALLBOT_RUNNER_LOG === "0") {
     return;
   }
-  deps.stderr.write(`[kaijibot] ${message}\n`);
+  deps.stderr.write(`[allbot] ${message}\n`);
 };
 
 const waitForSpawnedProcess = async (childProcess, deps) => {
@@ -313,8 +313,8 @@ const waitForSpawnedProcess = async (childProcess, deps) => {
   }
 };
 
-const runKaijiBot = async (deps) => {
-  const nodeProcess = deps.spawn(deps.execPath, ["kaijibot.mjs", ...deps.args], {
+const runAllBot = async (deps) => {
+  const nodeProcess = deps.spawn(deps.execPath, ["allbot.mjs", ...deps.args], {
     cwd: deps.cwd,
     env: deps.env,
     stdio: "inherit",
@@ -355,7 +355,7 @@ const writeBuildStamp = (deps) => {
   }
 };
 
-const shouldSkipCleanWatchRuntimeSync = (deps) => deps.env.KAIJIBOT_WATCH_MODE === "1";
+const shouldSkipCleanWatchRuntimeSync = (deps) => deps.env.ALLBOT_WATCH_MODE === "1";
 
 export async function runNodeMain(params = {}) {
   const deps = {
@@ -385,7 +385,7 @@ export async function runNodeMain(params = {}) {
     if (!shouldSkipCleanWatchRuntimeSync(deps) && !syncRuntimeArtifacts(deps)) {
       return 1;
     }
-    return await runKaijiBot(deps);
+    return await runAllBot(deps);
   }
 
   logRunner(
@@ -414,7 +414,7 @@ export async function runNodeMain(params = {}) {
     return 1;
   }
   writeBuildStamp(deps);
-  return await runKaijiBot(deps);
+  return await runAllBot(deps);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

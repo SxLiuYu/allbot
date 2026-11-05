@@ -2,7 +2,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { ProactiveScheduler, type InsightGeneratorFn } from "../scheduler/proactive-scheduler.js";
 import type { Opportunity, SchedulerConfig, SchedulerEvent } from "../scheduler/types.js";
 import type { PersonaTree } from "../types.js";
@@ -14,10 +14,10 @@ import {
 } from "./llm-engine.js";
 import type { InsightCandidate, InsightMode } from "./types.js";
 
-// Isolated FragmentStore so tests don't read/write the real ~/.kaijibot and
+// Isolated FragmentStore so tests don't read/write the real ~/.allbot and
 // don't pollute each other across files in the same suite.
 const isolatedFragmentStore = new FragmentStore(
-  join(tmpdir(), `kaijibot-test-fragments-${Date.now()}`),
+  join(tmpdir(), `allbot-test-fragments-${Date.now()}`),
 );
 
 // ---------------------------------------------------------------------------
@@ -116,13 +116,13 @@ function makePersona(overrides?: Partial<PersonaTree>): PersonaTree {
   };
 }
 
-function makeConfig(): KaijiBotConfig {
+function makeConfig(): AllBotConfig {
   return {
     cognitive: {
       insight: { sources: { webSearchProvider: "zai" } },
       persona: { extractionModel: "zai/glm-5.2" },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function makeSchedulerConfig(overrides?: Partial<SchedulerConfig>): SchedulerConfig {

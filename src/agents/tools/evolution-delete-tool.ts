@@ -1,6 +1,6 @@
 import { Type } from "typebox";
 import type { EvolutionUserConfirmation } from "../../cognitive/evolution/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
 
@@ -9,7 +9,7 @@ export const EvolutionDeleteSchema = Type.Object({
 });
 
 export function createEvolutionDeleteTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   /**
    * User confirmation injected by the host after an explicit user action.

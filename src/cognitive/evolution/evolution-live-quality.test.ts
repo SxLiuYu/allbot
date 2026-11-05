@@ -1,7 +1,7 @@
 /**
  * Live evolution quality test — real LLM skill draft generation.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/evolution/evolution-live-quality.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/evolution/evolution-live-quality.test.ts
  */
 
 import { describe, it, expect } from "vitest";
@@ -26,7 +26,7 @@ const EXPECTED_SKILL_DRAFT = [
   "to the observed task, or bury the core procedure in vague prose.",
 ].join(" ");
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5-turbo";

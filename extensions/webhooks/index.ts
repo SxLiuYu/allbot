@@ -1,4 +1,4 @@
-import { definePluginEntry, type KaijiBotPluginApi } from "./api.js";
+import { definePluginEntry, type AllBotPluginApi } from "./api.js";
 import { resolveWebhooksPluginConfig } from "./src/config.js";
 import { createTaskFlowWebhookRequestHandler, type TaskFlowWebhookTarget } from "./src/http.js";
 
@@ -6,8 +6,8 @@ export default definePluginEntry({
   id: "webhooks",
   name: "Webhooks",
   description:
-    "Authenticated inbound webhooks that bind external automation to KaijiBot TaskFlows.",
-  async register(api: KaijiBotPluginApi) {
+    "Authenticated inbound webhooks that bind external automation to AllBot TaskFlows.",
+  async register(api: AllBotPluginApi) {
     const routes = await resolveWebhooksPluginConfig({
       pluginConfig: api.pluginConfig,
       cfg: api.config,

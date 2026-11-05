@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { SubagentRunRecord } from "../../agents/subagent-registry.js";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { formatDurationCompact } from "../../infra/format-time/format-duration.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
@@ -33,7 +33,7 @@ function createSlackThreadingPlugin(): ChannelPlugin {
 }
 
 describe("buildThreadingToolContext", () => {
-  const cfg = {} as KaijiBotConfig;
+  const cfg = {} as AllBotConfig;
 
   afterEach(() => {
     resetPluginRuntimeStateForTest();
@@ -164,7 +164,7 @@ describe("buildThreadingToolContext", () => {
 
     const result = buildThreadingToolContext({
       sessionCtx,
-      config: { channels: { slack: { replyToMode: "all" } } } as KaijiBotConfig,
+      config: { channels: { slack: { replyToMode: "all" } } } as AllBotConfig,
       hasRepliedRef: undefined,
     });
 
@@ -186,7 +186,7 @@ describe("buildThreadingToolContext", () => {
 
     const result = buildThreadingToolContext({
       sessionCtx,
-      config: { channels: { slack: { replyToMode: "all" } } } as KaijiBotConfig,
+      config: { channels: { slack: { replyToMode: "all" } } } as AllBotConfig,
       hasRepliedRef: undefined,
     });
 
@@ -390,7 +390,7 @@ describe("subagents utils", () => {
     const run = {
       ...baseRun,
       label: [
-        "KaijiBot runtime context (internal):",
+        "AllBot runtime context (internal):",
         "This context is runtime-generated, not user-authored. Keep internal details private.",
         "",
         "[Internal task completion event]",

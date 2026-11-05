@@ -28,11 +28,11 @@ function resolveGuiDomain(): string {
 }
 
 function resolveLaunchAgentLabel(env?: Record<string, string | undefined>): string {
-  const envLabel = normalizeOptionalString(env?.KAIJIBOT_LAUNCHD_LABEL);
+  const envLabel = normalizeOptionalString(env?.ALLBOT_LAUNCHD_LABEL);
   if (envLabel) {
     return envLabel;
   }
-  return resolveGatewayLaunchAgentLabel(env?.KAIJIBOT_PROFILE);
+  return resolveGatewayLaunchAgentLabel(env?.ALLBOT_PROFILE);
 }
 
 export function resolveLaunchdRestartTarget(
@@ -61,7 +61,7 @@ export function isCurrentProcessLaunchdServiceLabel(
   if (launchdLabel) {
     return launchdLabel === label;
   }
-  const configuredLabel = normalizeOptionalString(env.KAIJIBOT_LAUNCHD_LABEL);
+  const configuredLabel = normalizeOptionalString(env.ALLBOT_LAUNCHD_LABEL);
   return Boolean(configuredLabel && configuredLabel === label);
 }
 
@@ -119,7 +119,7 @@ export function scheduleDetachedLaunchdRestartHandoff(params: {
       [
         "-c",
         buildLaunchdRestartScript(params.mode),
-        "kaijibot-launchd-restart-handoff",
+        "allbot-launchd-restart-handoff",
         target.serviceTarget,
         target.domain,
         target.plistPath,

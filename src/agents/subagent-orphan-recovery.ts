@@ -6,7 +6,7 @@
  * that are still tracked as active in the subagent registry) and sends a
  * synthetic resume message to restart their work.
  *
- * @see https://github.com/kaijibot/kaijibot/issues/47711
+ * @see https://github.com/allbot/allbot/issues/47711
  */
 
 import crypto from "node:crypto";
@@ -150,7 +150,7 @@ export async function recoverOrphanedSubagentSessions(params: {
 }): Promise<{ recovered: number; failed: number; skipped: number }> {
   const result = { recovered: 0, failed: 0, skipped: 0 };
   const resumedSessionKeys = params.resumedSessionKeys ?? new Set<string>();
-  const configChangePattern = /kaijibot\.json|kaijibot gateway restart|config\.patch/i;
+  const configChangePattern = /allbot\.json|allbot gateway restart|config\.patch/i;
 
   try {
     const activeRuns = params.getActiveRuns();
@@ -227,7 +227,7 @@ export async function recoverOrphanedSubagentSessions(params: {
           task: runRecord.task,
           lastHumanMessage: extractMessageText(lastHumanMessage),
           configChangeHint: configChangeDetected
-            ? "\n\n[config changes from your previous run were already applied — do not re-modify kaijibot.json or restart the gateway]"
+            ? "\n\n[config changes from your previous run were already applied — do not re-modify allbot.json or restart the gateway]"
             : undefined,
           originalRunId: runId,
           originalRun: runRecord,

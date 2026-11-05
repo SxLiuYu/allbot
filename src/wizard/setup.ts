@@ -8,7 +8,7 @@ import type {
   OnboardOptions,
   ResetScope,
 } from "../commands/onboard-types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { readConfigFileSnapshot, resolveGatewayPort, writeConfigFile } from "../config/config.js";
 import { normalizeSecretInputString } from "../config/types.secrets.js";
 import { formatErrorMessage } from "../infra/errors.js";
@@ -22,12 +22,12 @@ import type { QuickstartGatewayDefaults, WizardFlow } from "./setup.types.js";
 
 async function resolveAuthChoiceModelSelectionPolicy(params: {
   authChoice: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   resolvePreferredProviderForAuthChoice: (params: {
     choice: string;
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
   }) => Promise<string | undefined>;
@@ -97,7 +97,7 @@ export async function showPrerequisiteChecklist(prompter: WizardPrompter): Promi
 }
 
 async function probePrimaryProviderKey(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   prompter: WizardPrompter,
 ): Promise<void> {
   const { resolvePrimaryModel } = await import("../plugins/provider-model-primary.js");
@@ -139,7 +139,7 @@ export async function runSetupWizard(
   await requireRiskAcknowledgement({ opts, prompter });
 
   const snapshot = await readConfigFileSnapshot();
-  let baseConfig: KaijiBotConfig = snapshot.valid
+  let baseConfig: AllBotConfig = snapshot.valid
     ? snapshot.exists
       ? (snapshot.sourceConfig ?? snapshot.config)
       : {}
@@ -158,7 +158,7 @@ export async function runSetupWizard(
       );
     }
     await prompter.outro(
-      t("cli.wizard.invalidConfigOutro", { doctorCmd: formatCliCommand("kaijibot doctor") }),
+      t("cli.wizard.invalidConfigOutro", { doctorCmd: formatCliCommand("allbot doctor") }),
     );
     runtime.exit(1);
     return;
@@ -177,8 +177,8 @@ export async function runSetupWizard(
           ? [`- ... +${compatibilityNotices.length - 4} more`]
           : []),
         "",
-        `Review: ${formatCliCommand("kaijibot doctor")}`,
-        `Inspect: ${formatCliCommand("kaijibot plugins inspect --all")}`,
+        `Review: ${formatCliCommand("allbot doctor")}`,
+        `Inspect: ${formatCliCommand("allbot plugins inspect --all")}`,
       ].join("\n"),
       "Plugin compatibility",
     );
@@ -215,7 +215,7 @@ export async function runSetupWizard(
         const migrationLog = (msg: string) => runtime.log(`  ${theme.muted(msg)}`);
         const report = await runFreshMigration(
           migrationSource,
-          path.resolve(os.homedir(), ".kaijibot"),
+          path.resolve(os.homedir(), ".allbot"),
           {
             dryRun: false,
             overwrite: false,
@@ -238,7 +238,7 @@ export async function runSetupWizard(
     }
   }
 
-  const quickstartHint = `Configure details later via ${formatCliCommand("kaijibot configure")}.`;
+  const quickstartHint = `Configure details later via ${formatCliCommand("allbot configure")}.`;
   const manualHint = "Configure port, network, Tailscale, and auth options.";
   const explicitFlowRaw = opts.flow?.trim();
   const normalizedExplicitFlow = explicitFlowRaw === "manual" ? "advanced" : explicitFlowRaw;
@@ -421,7 +421,7 @@ export async function runSetupWizard(
 
   const localPort = resolveGatewayPort(baseConfig);
   const localUrl = `ws://127.0.0.1:${localPort}`;
-  let localGatewayToken = process.env.KAIJIBOT_GATEWAY_TOKEN;
+  let localGatewayToken = process.env.ALLBOT_GATEWAY_TOKEN;
   try {
     const resolvedGatewayToken = await resolveSetupSecretInputString({
       config: baseConfig,
@@ -441,7 +441,7 @@ export async function runSetupWizard(
       "Gateway auth",
     );
   }
-  let localGatewayPassword = process.env.KAIJIBOT_GATEWAY_PASSWORD;
+  let localGatewayPassword = process.env.ALLBOT_GATEWAY_PASSWORD;
   try {
     const resolvedGatewayPassword = await resolveSetupSecretInputString({
       config: baseConfig,
@@ -546,7 +546,7 @@ export async function runSetupWizard(
   const workspaceDir = resolveUserPath(workspaceInput.trim() || onboardHelpers.DEFAULT_WORKSPACE);
 
   const { applyLocalSetupWorkspaceConfig } = await import("../commands/onboard-config.js");
-  let nextConfig: KaijiBotConfig = applyLocalSetupWorkspaceConfig(baseConfig, workspaceDir);
+  let nextConfig: AllBotConfig = applyLocalSetupWorkspaceConfig(baseConfig, workspaceDir);
 
   const { ensureAuthProfileStore } = await import("../agents/auth-profiles.runtime.js");
   const { promptAuthChoiceGrouped } = await import("../commands/auth-choice-prompt.js");

@@ -1,15 +1,15 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { expectGeneratedTokenPersistedToGatewayAuth } from "../../test-support.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const mocks = vi.hoisted(() => ({
-  loadConfig: vi.fn<() => KaijiBotConfig>(),
-  writeConfigFile: vi.fn<(cfg: KaijiBotConfig) => Promise<void>>(async (_cfg) => {}),
+  loadConfig: vi.fn<() => AllBotConfig>(),
+  writeConfigFile: vi.fn<(cfg: AllBotConfig) => Promise<void>>(async (_cfg) => {}),
   resolveGatewayAuth: vi.fn(
     ({
       authConfig,
     }: {
-      authConfig?: NonNullable<NonNullable<KaijiBotConfig["gateway"]>["auth"]> | undefined;
+      authConfig?: NonNullable<NonNullable<AllBotConfig["gateway"]>["auth"]> | undefined;
     }) => {
       const token =
         typeof authConfig?.token === "string"
@@ -24,7 +24,7 @@ const mocks = vi.hoisted(() => ({
       };
     },
   ),
-  ensureGatewayStartupAuth: vi.fn(async ({ cfg }: { cfg: KaijiBotConfig }) => ({
+  ensureGatewayStartupAuth: vi.fn(async ({ cfg }: { cfg: AllBotConfig }) => ({
     cfg: {
       ...cfg,
       gateway: {
@@ -62,7 +62,7 @@ let ensureBrowserControlAuth: typeof import("./control-auth.js").ensureBrowserCo
 
 describe("ensureBrowserControlAuth", () => {
   const expectExplicitModeSkipsAutoAuth = async (mode: "password") => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: { mode },
       },
@@ -104,7 +104,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("returns existing auth and skips writes", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           token: "already-set",
@@ -121,7 +121,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("auto-generates and persists a token when auth is missing", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       browser: {
         enabled: true,
       },
@@ -138,7 +138,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("skips auto-generation in test env", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       browser: {
         enabled: true,
       },
@@ -160,7 +160,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("auto-generates and persists browser auth token in none mode", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: { mode: "none" },
       },
@@ -176,14 +176,14 @@ describe("ensureBrowserControlAuth", () => {
     expect(result.auth.token).toBe(result.generatedToken);
     expect(result.auth.password).toBeUndefined();
     expect(mocks.writeConfigFile).toHaveBeenCalledTimes(1);
-    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as KaijiBotConfig | undefined;
+    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as AllBotConfig | undefined;
     expect(persistedCfg?.gateway?.auth?.mode).toBe("none");
     expect(persistedCfg?.gateway?.auth?.token).toBe(result.generatedToken);
     expect(mocks.ensureGatewayStartupAuth).not.toHaveBeenCalled();
   });
 
   it("does not persist over unresolved token SecretRef in none mode", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "none",
@@ -204,7 +204,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("still auto-generates in none mode when only password SecretRef is set", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "none",
@@ -223,14 +223,14 @@ describe("ensureBrowserControlAuth", () => {
     expect(result.auth.token).toBe(result.generatedToken);
     expect(result.auth.password).toBeUndefined();
     expect(mocks.writeConfigFile).toHaveBeenCalledTimes(1);
-    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as KaijiBotConfig | undefined;
+    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as AllBotConfig | undefined;
     expect(persistedCfg?.gateway?.auth?.mode).toBe("none");
     expect(persistedCfg?.gateway?.auth?.token).toBe(result.generatedToken);
     expect(mocks.ensureGatewayStartupAuth).not.toHaveBeenCalled();
   });
 
   it("auto-generates in trusted-proxy mode and persists browser auth password", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: { mode: "trusted-proxy", trustedProxy: { userHeader: "x-forwarded-user" } },
       },
@@ -246,14 +246,14 @@ describe("ensureBrowserControlAuth", () => {
     expect(result.auth.password).toBe(result.generatedToken);
     expect(result.auth.token).toBeUndefined();
     expect(mocks.writeConfigFile).toHaveBeenCalledTimes(1);
-    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as KaijiBotConfig | undefined;
+    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as AllBotConfig | undefined;
     expect(persistedCfg?.gateway?.auth?.mode).toBe("trusted-proxy");
     expect(persistedCfg?.gateway?.auth?.password).toBe(result.generatedToken);
     expect(mocks.ensureGatewayStartupAuth).not.toHaveBeenCalled();
   });
 
   it("still auto-generates in trusted-proxy mode when only token SecretRef is set", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "trusted-proxy",
@@ -273,14 +273,14 @@ describe("ensureBrowserControlAuth", () => {
     expect(result.auth.password).toBe(result.generatedToken);
     expect(result.auth.token).toBeUndefined();
     expect(mocks.writeConfigFile).toHaveBeenCalledTimes(1);
-    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as KaijiBotConfig | undefined;
+    const persistedCfg = mocks.writeConfigFile.mock.calls[0]?.[0] as AllBotConfig | undefined;
     expect(persistedCfg?.gateway?.auth?.mode).toBe("trusted-proxy");
     expect(persistedCfg?.gateway?.auth?.password).toBe(result.generatedToken);
     expect(mocks.ensureGatewayStartupAuth).not.toHaveBeenCalled();
   });
 
   it("does not persist over unresolved password SecretRef in trusted-proxy mode", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "trusted-proxy",
@@ -302,7 +302,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("reuses auth from latest config snapshot", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       browser: {
         enabled: true,
       },
@@ -326,7 +326,7 @@ describe("ensureBrowserControlAuth", () => {
   });
 
   it("fails when gateway.auth.token SecretRef is unresolved", async () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",

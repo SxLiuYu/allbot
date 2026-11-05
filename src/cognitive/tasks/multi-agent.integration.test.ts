@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createTaskTool, createTaskStepReportTool } from "../../agents/tools/task-tool.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { aggregateOnTaskTerminal } from "./aggregate.js";
 import { TaskRunner } from "./runner.js";
 import { createTaskSafely } from "./service.js";
@@ -48,11 +48,11 @@ function waitForEnqueued(
   );
 }
 
-function config(): KaijiBotConfig {
+function config(): AllBotConfig {
   return {
     cognitive: { enabled: true, tasks: { enabled: true } },
     agents: { list: [{ id: "main" }, { id: "researcher" }, { id: "writer" }] },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 describe("multi-agent task e2e (T9)", () => {

@@ -1,7 +1,7 @@
 /**
  * Read-only PersonaStore JSON reader.
  *
- * Loads `~/.kaijibot/cognitive/persona/<agentId>/<userId>.json` (or any
+ * Loads `~/.allbot/cognitive/persona/<agentId>/<userId>.json` (or any
  * equivalently-laid-out `stateDir`) and returns a typed `PersonaTree`.
  *
  * This module is STRICTLY read-only — it must never call writeFile, mkdir,
@@ -14,7 +14,7 @@ import type { PersonaTree } from "../types.js";
 /**
  * Load and parse a PersonaStore file.
  *
- * @param stateDir  Root state directory (e.g. `~/.kaijibot`)
+ * @param stateDir  Root state directory (e.g. `~/.allbot`)
  * @param agentId   Agent subdirectory name
  * @param userId    User id (without `.json` suffix)
  * @returns Parsed `PersonaTree`, or `null` on missing file, parse error,

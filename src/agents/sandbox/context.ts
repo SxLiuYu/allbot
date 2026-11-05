@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import { getRemoteSkillEligibility } from "../../infra/skills-remote.js";
 import {
@@ -27,7 +27,7 @@ async function ensureSandboxWorkspaceLayout(params: {
   cfg: ReturnType<typeof resolveSandboxConfigForAgent>;
   agentId: string;
   rawSessionKey: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
 }): Promise<{
   agentWorkspaceDir: string;
@@ -104,7 +104,7 @@ export async function resolveSandboxDockerUser(params: {
   }
 }
 
-function resolveSandboxSession(params: { config?: KaijiBotConfig; sessionKey?: string }) {
+function resolveSandboxSession(params: { config?: AllBotConfig; sessionKey?: string }) {
   const rawSessionKey = params.sessionKey?.trim();
   if (!rawSessionKey) {
     return null;
@@ -123,7 +123,7 @@ function resolveSandboxSession(params: { config?: KaijiBotConfig; sessionKey?: s
 }
 
 export async function resolveSandboxContext(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   workspaceDir?: string;
 }): Promise<SandboxContext | null> {
@@ -230,7 +230,7 @@ export async function resolveSandboxContext(params: {
 }
 
 export async function ensureSandboxWorkspaceForSession(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   workspaceDir?: string;
 }): Promise<SandboxWorkspaceInfo | null> {

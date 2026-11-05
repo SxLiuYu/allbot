@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY ?? "";
 const HAS_OPENAI_KEY = Boolean(process.env.OPENAI_API_KEY);
 const liveEnabled =
-  HAS_OPENAI_KEY && (process.env.KAIJIBOT_LIVE_TEST || process.env.OPENCLAW_LIVE_TEST) === "1";
+  HAS_OPENAI_KEY && (process.env.ALLBOT_LIVE_TEST || process.env.OPENCLAW_LIVE_TEST) === "1";
 const describeLive = liveEnabled ? describe : describe.skip;
 
 function installTmpDirHarness(params: { prefix: string }) {
@@ -32,7 +32,7 @@ function installTmpDirHarness(params: { prefix: string }) {
 
 // Live tests that require OpenAI API key and actually use LanceDB
 describeLive("memory plugin live tests", () => {
-  const { getDbPath } = installTmpDirHarness({ prefix: "kaijibot-memory-live-" });
+  const { getDbPath } = installTmpDirHarness({ prefix: "allbot-memory-live-" });
 
   test("memory tools work end-to-end", async () => {
     const { default: memoryPlugin } = await import("./index.js");

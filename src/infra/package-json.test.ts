@@ -15,17 +15,17 @@ async function expectPackageMeta(params: {
 
 describe("package-json helpers", () => {
   it("reads package version and trims package name", async () => {
-    await withTempDir({ prefix: "kaijibot-package-json-" }, async (root) => {
+    await withTempDir({ prefix: "allbot-package-json-" }, async (root) => {
       await fs.writeFile(
         path.join(root, "package.json"),
-        JSON.stringify({ version: " 1.2.3 ", name: "  @kaijibot/demo  " }),
+        JSON.stringify({ version: " 1.2.3 ", name: "  @allbot/demo  " }),
         "utf8",
       );
 
       await expectPackageMeta({
         root,
         expectedVersion: "1.2.3",
-        expectedName: "@kaijibot/demo",
+        expectedName: "@allbot/demo",
       });
     });
   });
@@ -62,17 +62,17 @@ describe("package-json helpers", () => {
       writePackageJson: async (root: string) => {
         await fs.writeFile(
           path.join(root, "package.json"),
-          JSON.stringify({ version: "   ", name: "@kaijibot/demo" }),
+          JSON.stringify({ version: "   ", name: "@allbot/demo" }),
           "utf8",
         );
       },
       expectedVersion: null,
-      expectedName: "@kaijibot/demo",
+      expectedName: "@allbot/demo",
     },
   ])(
     "returns normalized nulls for $name",
     async ({ writePackageJson, expectedVersion, expectedName }) => {
-      await withTempDir({ prefix: "kaijibot-package-json-" }, async (root) => {
+      await withTempDir({ prefix: "allbot-package-json-" }, async (root) => {
         await writePackageJson(root);
         await expectPackageMeta({
           root,

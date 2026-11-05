@@ -58,7 +58,7 @@ async function writeSkillWithInstallers(
     `---
 name: ${name}
 description: test skill
-metadata: ${JSON.stringify({ kaijibot: { install: installSpecs } })}
+metadata: ${JSON.stringify({ allbot: { install: installSpecs } })}
 ---
 
 # ${name}
@@ -94,7 +94,7 @@ describe("skills-install fallback edge cases", () => {
   let workspaceDir: string;
 
   beforeAll(async () => {
-    workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-fallback-test-"));
+    workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-fallback-test-"));
     await writeSkillWithInstaller(workspaceDir, "go-tool-single", "go", {
       module: "example.com/tool@latest",
     });

@@ -16,10 +16,10 @@ import {
 
 describe("writeOAuthCredentials", () => {
   const lifecycle = createAuthTestLifecycle([
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_AGENT_DIR",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
-    "KAIJIBOT_OAUTH_DIR",
+    "ALLBOT_OAUTH_DIR",
   ]);
 
   let tempStateDir: string;
@@ -29,8 +29,8 @@ describe("writeOAuthCredentials", () => {
     await lifecycle.cleanup();
   });
 
-  it("writes auth-profiles.json under KAIJIBOT_AGENT_DIR when set", async () => {
-    const env = await setupAuthTestEnv("kaijibot-oauth-");
+  it("writes auth-profiles.json under ALLBOT_AGENT_DIR when set", async () => {
+    const env = await setupAuthTestEnv("allbot-oauth-");
     lifecycle.setStateDir(env.stateDir);
 
     const creds = {
@@ -56,8 +56,8 @@ describe("writeOAuthCredentials", () => {
   });
 
   it("writes OAuth credentials to all sibling agent dirs when syncSiblingAgents=true", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-oauth-sync-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-oauth-sync-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
 
     const mainAgentDir = path.join(tempStateDir, "agents", "main", "agent");
     const kidAgentDir = path.join(tempStateDir, "agents", "kid", "agent");
@@ -66,7 +66,7 @@ describe("writeOAuthCredentials", () => {
     await fs.mkdir(kidAgentDir, { recursive: true });
     await fs.mkdir(workerAgentDir, { recursive: true });
 
-    process.env.KAIJIBOT_AGENT_DIR = kidAgentDir;
+    process.env.ALLBOT_AGENT_DIR = kidAgentDir;
     process.env.PI_CODING_AGENT_DIR = kidAgentDir;
 
     const creds = {
@@ -93,15 +93,15 @@ describe("writeOAuthCredentials", () => {
   });
 
   it("writes OAuth credentials only to target dir by default", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-oauth-nosync-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-oauth-nosync-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
 
     const mainAgentDir = path.join(tempStateDir, "agents", "main", "agent");
     const kidAgentDir = path.join(tempStateDir, "agents", "kid", "agent");
     await fs.mkdir(mainAgentDir, { recursive: true });
     await fs.mkdir(kidAgentDir, { recursive: true });
 
-    process.env.KAIJIBOT_AGENT_DIR = kidAgentDir;
+    process.env.ALLBOT_AGENT_DIR = kidAgentDir;
     process.env.PI_CODING_AGENT_DIR = kidAgentDir;
 
     const creds = {
@@ -124,11 +124,11 @@ describe("writeOAuthCredentials", () => {
     await expect(fs.readFile(authProfilePathFor(mainAgentDir), "utf8")).rejects.toThrow();
   });
 
-  it("syncs siblings from explicit agentDir outside KAIJIBOT_STATE_DIR", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-oauth-external-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+  it("syncs siblings from explicit agentDir outside ALLBOT_STATE_DIR", async () => {
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-oauth-external-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
 
-    // Create standard-layout agents tree *outside* KAIJIBOT_STATE_DIR
+    // Create standard-layout agents tree *outside* ALLBOT_STATE_DIR
     const externalRoot = path.join(tempStateDir, "external", "agents");
     const extMain = path.join(externalRoot, "main", "agent");
     const extKid = path.join(externalRoot, "kid", "agent");
@@ -168,8 +168,8 @@ describe("writeOAuthCredentials", () => {
 
 describe("upsertApiKeyProfile", () => {
   const lifecycle = createAuthTestLifecycle([
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_AGENT_DIR",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
   ]);
 
@@ -177,8 +177,8 @@ describe("upsertApiKeyProfile", () => {
     await lifecycle.cleanup();
   });
 
-  it("writes to KAIJIBOT_AGENT_DIR when set", async () => {
-    const env = await setupAuthTestEnv("kaijibot-minimax-", { agentSubdir: "custom-agent" });
+  it("writes to ALLBOT_AGENT_DIR when set", async () => {
+    const env = await setupAuthTestEnv("allbot-minimax-", { agentSubdir: "custom-agent" });
     lifecycle.setStateDir(env.stateDir);
 
     upsertApiKeyProfile({ provider: "minimax", input: "sk-minimax-test" });

@@ -1,10 +1,10 @@
 import type {
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { normalizeModelCompat } from "kaijibot/plugin-sdk/provider-model-shared";
-import { applyXaiModelCompat } from "kaijibot/plugin-sdk/provider-tools";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/plugin-entry";
+import { normalizeModelCompat } from "allbot/plugin-sdk/provider-model-shared";
+import { applyXaiModelCompat } from "allbot/plugin-sdk/provider-tools";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 import { resolveXaiCatalogEntry, XAI_BASE_URL } from "./model-definitions.js";
 
 const XAI_MODERN_MODEL_PREFIXES = ["grok-3", "grok-4", "grok-code-fast"] as const;

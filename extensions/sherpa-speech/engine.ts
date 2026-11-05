@@ -4,7 +4,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import type { MediaUnderstandingProvider } from "kaijibot/plugin-sdk/media-understanding";
+import type { MediaUnderstandingProvider } from "allbot/plugin-sdk/media-understanding";
 import { transcribeWithSherpa } from "./asr.js";
 import { ensureAsrModel, ensureRuntime } from "./model-manager.js";
 import { ASR_MODEL_MANIFESTS, resolveSherpaSpeechPaths, type AsrEngine } from "./models.js";

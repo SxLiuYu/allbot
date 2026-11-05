@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { runExec } from "../process/exec.js";
 
 type Sharp = typeof import("sharp");
@@ -26,8 +26,8 @@ function isBun(): boolean {
 
 function prefersSips(): boolean {
   return (
-    process.env.KAIJIBOT_IMAGE_BACKEND === "sips" ||
-    (process.env.KAIJIBOT_IMAGE_BACKEND !== "sharp" && isBun() && process.platform === "darwin")
+    process.env.ALLBOT_IMAGE_BACKEND === "sips" ||
+    (process.env.ALLBOT_IMAGE_BACKEND !== "sharp" && isBun() && process.platform === "darwin")
   );
 }
 
@@ -316,7 +316,7 @@ function readJpegExifOrientation(buffer: Buffer): number | null {
 }
 
 async function withTempDir<T>(fn: (dir: string) => Promise<T>): Promise<T> {
-  const dir = await fs.mkdtemp(path.join(resolvePreferredKaijiBotTmpDir(), "kaijibot-img-"));
+  const dir = await fs.mkdtemp(path.join(resolvePreferredAllBotTmpDir(), "allbot-img-"));
   try {
     return await fn(dir);
   } finally {

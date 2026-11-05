@@ -1,7 +1,7 @@
 import type {
-  KaijiBotConfig,
+  AllBotConfig,
   ResolvedMemorySearchConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import {
   resolveEmbeddingProviderFallbackModel,
   type EmbeddingProvider,
@@ -68,7 +68,7 @@ export function applyMemoryFallbackProviderState(params: {
 }
 
 export function resolveMemoryFallbackProviderRequest(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   settings: ResolvedMemorySearchConfig;
   currentProviderId: string | null;
 }): {

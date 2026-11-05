@@ -1,4 +1,4 @@
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import { parseReplyDirectives } from "../../auto-reply/reply/reply-directives.js";
 import {
   formatBtwTextForExternalDelivery,

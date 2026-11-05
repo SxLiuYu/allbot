@@ -147,7 +147,7 @@ export async function migrateSessions(
       warnings,
     );
     warnings.push(
-      "Cron jobs migrated; KaijiBot uses ProactiveScheduler instead of cron. Review jobs.json for compatibility.",
+      "Cron jobs migrated; AllBot uses ProactiveScheduler instead of cron. Review jobs.json for compatibility.",
     );
   }
 

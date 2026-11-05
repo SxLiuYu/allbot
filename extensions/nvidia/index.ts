@@ -1,4 +1,4 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
 import { buildNvidiaProvider } from "./provider-catalog.js";
 
 const PROVIDER_ID = "nvidia";

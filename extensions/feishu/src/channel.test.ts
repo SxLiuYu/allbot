@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../runtime-api.js";
+import type { AllBotConfig } from "../runtime-api.js";
 import { createFeishuCardInteractionEnvelope } from "./card-interaction.js";
 import { feishuPlugin } from "./channel.js";
 import { looksLikeFeishuId, normalizeFeishuTarget, resolveReceiveIdType } from "./targets.js";
@@ -61,7 +61,7 @@ vi.mock("../../../src/channels/plugins/bundled.js", () => ({
   bundledChannelSetupPlugins: [],
 }));
 
-function getDescribedActions(cfg: KaijiBotConfig, accountId?: string): string[] {
+function getDescribedActions(cfg: AllBotConfig, accountId?: string): string[] {
   return [...(feishuPlugin.actions?.describeMessageTool?.({ cfg, accountId })?.actions ?? [])];
 }
 
@@ -85,7 +85,7 @@ function createLegacyFeishuButtonCard(value: { command?: string; text?: string }
   };
 }
 
-async function expectLegacyFeishuCardPayloadRejected(cfg: KaijiBotConfig, card: unknown) {
+async function expectLegacyFeishuCardPayloadRejected(cfg: AllBotConfig, card: unknown) {
   await expect(
     feishuPlugin.actions?.handleAction?.({
       action: "send",
@@ -115,7 +115,7 @@ describe("feishuPlugin.status.probeAccount", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const account = feishuPlugin.config.resolveAccount(cfg, "main");
     probeFeishuMock.mockResolvedValueOnce({ ok: true, appId: "cli_main" });
@@ -157,7 +157,7 @@ describe("feishuPlugin.pairing.notifyApproval", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await feishuPlugin.pairing?.notifyApproval?.({
       cfg,
@@ -222,7 +222,7 @@ describe("feishuPlugin actions", () => {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -258,7 +258,7 @@ describe("feishuPlugin actions", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(getDescribedActions(disabledCfg)).toEqual([
       "send",
@@ -296,7 +296,7 @@ describe("feishuPlugin actions", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(getDescribedActions(cfg, "default")).toEqual([
       "send",

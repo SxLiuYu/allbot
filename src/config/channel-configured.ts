@@ -5,10 +5,10 @@ import {
   hasMeaningfulChannelConfigShallow,
   resolveChannelConfigRecord,
 } from "./channel-configured-shared.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 
 export function isChannelConfigured(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channelId: string,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {

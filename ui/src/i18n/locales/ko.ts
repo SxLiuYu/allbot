@@ -176,7 +176,7 @@ export const ko: TranslationMap = {
     skills: "Skills 및 API 키.",
     nodes: "페어링된 디바이스 및 명령.",
     chat: "빠른 개입을 위한 Gateway 채팅.",
-    config: "kaijibot.json 편집.",
+    config: "allbot.json 편집.",
     communications: "채널, 메시지, 오디오 설정.",
     appearance: "테마, UI, 설정 마법사 설정.",
     automation: "명령, hooks, cron, plugins.",
@@ -234,7 +234,7 @@ export const ko: TranslationMap = {
     pairing: {
       hint: "이 디바이스는 gateway host의 페어링 승인이 필요합니다.",
       mobileHint:
-        "모바일에서 사용 중이신가요? 데스크톱에서 kaijibot dashboard --no-open으로 전체 URL(#token=... 포함)을 복사하세요.",
+        "모바일에서 사용 중이신가요? 데스크톱에서 allbot dashboard --no-open으로 전체 URL(#token=... 포함)을 복사하세요.",
     },
     insecure: {
       hint: "이 페이지는 HTTP이므로 브라우저가 디바이스 ID를 차단합니다. HTTPS(Tailscale Serve)를 사용하거나 gateway host에서 {url}을 여세요.",

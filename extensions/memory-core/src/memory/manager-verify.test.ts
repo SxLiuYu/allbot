@@ -28,7 +28,7 @@ describe("applyVerification (post-search verification hook)", () => {
   });
 
   async function createTmpDir(): Promise<string> {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-verify-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-verify-test-"));
     tmpDirs.push(dir);
     return dir;
   }

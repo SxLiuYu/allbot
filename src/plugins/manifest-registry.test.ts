@@ -6,7 +6,7 @@ import {
   clearPluginManifestRegistryCache,
   loadPluginManifestRegistry,
 } from "./manifest-registry.js";
-import type { KaijiBotPackageManifest } from "./manifest.js";
+import type { AllBotPackageManifest } from "./manifest.js";
 import { cleanupTrackedTempDirs, makeTrackedTempDir } from "./test-helpers/fs-fixtures.js";
 
 vi.unmock("../version.js");
@@ -26,11 +26,11 @@ function mkdirSafe(dir: string) {
 }
 
 function makeTempDir() {
-  return makeTrackedTempDir("kaijibot-manifest-registry", tempDirs);
+  return makeTrackedTempDir("allbot-manifest-registry", tempDirs);
 }
 
 function writeManifest(dir: string, manifest: Record<string, unknown>) {
-  fs.writeFileSync(path.join(dir, "kaijibot.plugin.json"), JSON.stringify(manifest), "utf-8");
+  fs.writeFileSync(path.join(dir, "allbot.plugin.json"), JSON.stringify(manifest), "utf-8");
 }
 
 function writeTextFile(rootDir: string, relativePath: string, value: string) {
@@ -61,9 +61,9 @@ function createPluginCandidate(params: {
   rootDir: string;
   sourceName?: string;
   origin: "bundled" | "global" | "workspace" | "config";
-  format?: "kaijibot" | "bundle";
+  format?: "allbot" | "bundle";
   bundleFormat?: "codex" | "claude" | "cursor";
-  packageManifest?: KaijiBotPackageManifest;
+  packageManifest?: AllBotPackageManifest;
   packageDir?: string;
   bundledManifest?: PluginCandidate["bundledManifest"];
   bundledManifestPath?: string;
@@ -91,9 +91,9 @@ function loadRegistry(candidates: PluginCandidate[]) {
 
 function hermeticEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   return {
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-    KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-    KAIJIBOT_VERSION: undefined,
+    ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+    ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+    ALLBOT_VERSION: undefined,
     VITEST: "true",
     ...overrides,
   };
@@ -127,8 +127,8 @@ function prepareLinkedManifestFixture(params: { id: string; mode: "symlink" | "h
 } {
   const rootDir = makeTempDir();
   const outsideDir = makeTempDir();
-  const outsideManifest = path.join(outsideDir, "kaijibot.plugin.json");
-  const linkedManifest = path.join(rootDir, "kaijibot.plugin.json");
+  const outsideManifest = path.join(outsideDir, "allbot.plugin.json");
+  const linkedManifest = path.join(rootDir, "allbot.plugin.json");
   fs.writeFileSync(path.join(rootDir, "index.ts"), "export default function () {}", "utf-8");
   fs.writeFileSync(
     outsideManifest,
@@ -184,7 +184,7 @@ function loadRegistryForMinHostVersionCase(params: {
         origin: "global",
         packageManifest: {
           install: {
-            npmSpec: "@kaijibot/synology-chat",
+            npmSpec: "@allbot/synology-chat",
             minHostVersion: params.minHostVersion,
           },
         },
@@ -506,7 +506,7 @@ describe("loadPluginManifestRegistry", () => {
         idHint: "telegram",
         rootDir: dir,
         origin: "bundled",
-        bundledManifestPath: path.join(dir, "kaijibot.plugin.json"),
+        bundledManifestPath: path.join(dir, "allbot.plugin.json"),
         bundledManifest: {
           id: "telegram",
           configSchema: { type: "object" },
@@ -632,20 +632,20 @@ describe("loadPluginManifestRegistry", () => {
     {
       name: "skips plugins whose minHostVersion is newer than the current host",
       minHostVersion: ">=2026.3.22",
-      env: { KAIJIBOT_VERSION: "2026.3.21" } as NodeJS.ProcessEnv,
-      expectedMessage: "plugin requires KaijiBot >=2026.3.22, but this host is 2026.3.21",
+      env: { ALLBOT_VERSION: "2026.3.21" } as NodeJS.ProcessEnv,
+      expectedMessage: "plugin requires AllBot >=2026.3.22, but this host is 2026.3.21",
       expectWarn: false,
     },
     {
       name: "rejects invalid minHostVersion metadata",
       minHostVersion: "2026.3.22",
-      expectedMessage: "plugin manifest invalid | kaijibot.install.minHostVersion must use",
+      expectedMessage: "plugin manifest invalid | allbot.install.minHostVersion must use",
       expectWarn: false,
     },
     {
       name: "warns distinctly when host version cannot be determined",
       minHostVersion: ">=2026.3.22",
-      env: { KAIJIBOT_VERSION: "unknown" } as NodeJS.ProcessEnv,
+      env: { ALLBOT_VERSION: "unknown" } as NodeJS.ProcessEnv,
       expectedMessage: "host version could not be determined",
       expectWarn: true,
     },
@@ -956,13 +956,13 @@ describe("loadPluginManifestRegistry", () => {
     const first = loadPluginManifestRegistry({
       cache: true,
       env: hermeticEnv({
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledA,
+        ALLBOT_BUNDLED_PLUGINS_DIR: bundledA,
       }),
     });
     const second = loadPluginManifestRegistry({
       cache: true,
       env: hermeticEnv({
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledB,
+        ALLBOT_BUNDLED_PLUGINS_DIR: bundledB,
       }),
     });
 
@@ -1004,8 +1004,8 @@ describe("loadPluginManifestRegistry", () => {
       config,
       env: hermeticEnv({
         HOME: homeA,
-        KAIJIBOT_HOME: undefined,
-        KAIJIBOT_STATE_DIR: path.join(homeA, ".state"),
+        ALLBOT_HOME: undefined,
+        ALLBOT_STATE_DIR: path.join(homeA, ".state"),
       }),
     });
     const second = loadPluginManifestRegistry({
@@ -1013,8 +1013,8 @@ describe("loadPluginManifestRegistry", () => {
       config,
       env: hermeticEnv({
         HOME: homeB,
-        KAIJIBOT_HOME: undefined,
-        KAIJIBOT_STATE_DIR: path.join(homeB, ".state"),
+        ALLBOT_HOME: undefined,
+        ALLBOT_STATE_DIR: path.join(homeB, ".state"),
       }),
     });
 
@@ -1039,7 +1039,7 @@ describe("loadPluginManifestRegistry", () => {
         origin: "global",
         packageManifest: {
           install: {
-            npmSpec: "@kaijibot/synology-chat",
+            npmSpec: "@allbot/synology-chat",
             minHostVersion: ">=2026.3.22",
           },
         },
@@ -1050,14 +1050,14 @@ describe("loadPluginManifestRegistry", () => {
       cache: true,
       candidates,
       env: hermeticEnv({
-        KAIJIBOT_VERSION: "2026.3.21",
+        ALLBOT_VERSION: "2026.3.21",
       }),
     });
     const newerHost = loadPluginManifestRegistry({
       cache: true,
       candidates,
       env: hermeticEnv({
-        KAIJIBOT_VERSION: "2026.3.22",
+        ALLBOT_VERSION: "2026.3.22",
       }),
     });
 

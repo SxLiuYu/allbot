@@ -6,12 +6,12 @@ import {
   type MediaUnderstandingProvider,
   type VideoDescriptionRequest,
   type VideoDescriptionResult,
-} from "kaijibot/plugin-sdk/media-understanding";
+} from "allbot/plugin-sdk/media-understanding";
 import {
   assertOkOrThrowHttpError,
   postJsonRequest,
   type ProviderRequestTransportOverrides,
-} from "kaijibot/plugin-sdk/provider-http";
+} from "allbot/plugin-sdk/provider-http";
 import {
   DEFAULT_GOOGLE_API_BASE_URL,
   normalizeGoogleModelId,

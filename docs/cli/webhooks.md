@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot webhooks` (webhook helpers + Gmail Pub/Sub)"
+summary: "CLI reference for `allbot webhooks` (webhook helpers + Gmail Pub/Sub)"
 read_when:
-  - You want to wire Gmail Pub/Sub events into KaijiBot
+  - You want to wire Gmail Pub/Sub events into AllBot
   - You want webhook helper commands
 title: "webhooks"
 ---
 
-# `kaijibot webhooks`
+# `allbot webhooks`
 
 Webhook helpers and integrations (Gmail Pub/Sub, webhook helpers).
 
@@ -18,13 +18,13 @@ Related:
 ## Gmail
 
 ```bash
-kaijibot webhooks gmail setup --account you@example.com
-kaijibot webhooks gmail run
+allbot webhooks gmail setup --account you@example.com
+allbot webhooks gmail run
 ```
 
 ### `webhooks gmail setup`
 
-Configure Gmail watch, Pub/Sub, and KaijiBot webhook delivery.
+Configure Gmail watch, Pub/Sub, and AllBot webhook delivery.
 
 Required:
 
@@ -54,9 +54,9 @@ Options:
 Examples:
 
 ```bash
-kaijibot webhooks gmail setup --account you@example.com
-kaijibot webhooks gmail setup --account you@example.com --project my-gcp-project --json
-kaijibot webhooks gmail setup --account you@example.com --hook-url https://gateway.example.com/hooks/gmail
+allbot webhooks gmail setup --account you@example.com
+allbot webhooks gmail setup --account you@example.com --project my-gcp-project --json
+allbot webhooks gmail setup --account you@example.com --hook-url https://gateway.example.com/hooks/gmail
 ```
 
 ### `webhooks gmail run`
@@ -85,7 +85,7 @@ Options:
 Example:
 
 ```bash
-kaijibot webhooks gmail run --account you@example.com
+allbot webhooks gmail run --account you@example.com
 ```
 
 See [Gmail Pub/Sub documentation](/automation/cron-jobs#gmail-pubsub-integration) for the end-to-end setup flow and operational details.

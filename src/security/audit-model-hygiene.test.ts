@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectModelHygieneFindings } from "./audit-extra.sync.js";
 
 describe("security audit model hygiene findings", () => {
   it("classifies legacy and weak-tier model identifiers", () => {
     const cases: Array<{
       name: string;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       expectedPresent?: Array<{ checkId: string; severity: "warn" }>;
       expectedAbsentCheckId?: string;
     }> = [

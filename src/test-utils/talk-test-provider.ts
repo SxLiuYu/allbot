@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export const TALK_TEST_PROVIDER_ID = "acme-speech";
 export const TALK_TEST_PROVIDER_LABEL = "Acme Speech";
@@ -10,7 +10,7 @@ export const TALK_TEST_PROVIDER_API_KEY_PATH_SEGMENTS = [
   "apiKey",
 ] as const;
 
-export function buildTalkTestProviderConfig(apiKey: unknown): KaijiBotConfig {
+export function buildTalkTestProviderConfig(apiKey: unknown): AllBotConfig {
   return {
     talk: {
       providers: {
@@ -19,9 +19,9 @@ export function buildTalkTestProviderConfig(apiKey: unknown): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
-export function readTalkTestProviderApiKey(config: KaijiBotConfig): unknown {
+export function readTalkTestProviderApiKey(config: AllBotConfig): unknown {
   return config.talk?.providers?.[TALK_TEST_PROVIDER_ID]?.apiKey;
 }

@@ -1,12 +1,12 @@
 ---
-summary: "Synology Chat webhook setup and KaijiBot config"
+summary: "Synology Chat webhook setup and AllBot config"
 read_when:
-  - Setting up Synology Chat with KaijiBot
+  - Setting up Synology Chat with AllBot
   - Debugging Synology Chat webhook routing
 title: "Synology Chat"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Synology Chat
 
@@ -16,7 +16,7 @@ through a Synology Chat incoming webhook.
 
 ## Bundled plugin
 
-Synology Chat ships as a bundled plugin in current KaijiBot releases, so normal
+Synology Chat ships as a bundled plugin in current AllBot releases, so normal
 packaged builds do not need a separate install.
 
 If you are on an older build or a custom install that excludes Synology Chat,
@@ -25,7 +25,7 @@ install it manually:
 Install from a local checkout:
 
 ```bash
-kaijibot plugins install ./path/to/local/synology-chat-plugin
+allbot plugins install ./path/to/local/synology-chat-plugin
 ```
 
 Details: [Plugins](/tools/plugin)
@@ -33,29 +33,29 @@ Details: [Plugins](/tools/plugin)
 ## Quick setup
 
 1. Ensure the Synology Chat plugin is available.
-   - Current packaged KaijiBot releases already bundle it.
+   - Current packaged AllBot releases already bundle it.
    - Older/custom installs can add it manually from a source checkout with the command above.
-   - `kaijibot onboard` now shows Synology Chat in the same channel setup list as `kaijibot channels add`.
-   - Non-interactive setup: `kaijibot channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
+   - `allbot onboard` now shows Synology Chat in the same channel setup list as `allbot channels add`.
+   - Non-interactive setup: `allbot channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
 2. In Synology Chat integrations:
    - Create an incoming webhook and copy its URL.
    - Create an outgoing webhook with your secret token.
-3. Point the outgoing webhook URL to your KaijiBot gateway:
+3. Point the outgoing webhook URL to your AllBot gateway:
    - `https://gateway-host/webhook/synology` by default.
    - Or your custom `channels.synology-chat.webhookPath`.
-4. Finish setup in KaijiBot.
-   - Guided: `kaijibot onboard`
-   - Direct: `kaijibot channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
+4. Finish setup in AllBot.
+   - Guided: `allbot onboard`
+   - Direct: `allbot channels add --channel synology-chat --token <token> --url <incoming-webhook-url>`
 5. Restart gateway and send a DM to the Synology Chat bot.
 
 Webhook auth details:
 
-- KaijiBot accepts the outgoing webhook token from `body.token`, then
+- AllBot accepts the outgoing webhook token from `body.token`, then
   `?token=...`, then headers.
 - Accepted header forms:
   - `x-synology-token`
   - `x-webhook-token`
-  - `x-kaijibot-token`
+  - `x-allbot-token`
   - `Authorization: Bearer <token>`
 - Empty or missing tokens fail closed.
 
@@ -87,7 +87,7 @@ For the default account, you can use env vars:
 - `SYNOLOGY_NAS_HOST`
 - `SYNOLOGY_ALLOWED_USER_IDS` (comma-separated)
 - `SYNOLOGY_RATE_LIMIT`
-- `KAIJIBOT_BOT_NAME`
+- `ALLBOT_BOT_NAME`
 
 Config values override env vars.
 
@@ -100,8 +100,8 @@ Config values override env vars.
 - `dmPolicy: "disabled"` blocks DMs.
 - Reply recipient binding stays on stable numeric `user_id` by default. `channels.synology-chat.dangerouslyAllowNameMatching: true` is break-glass compatibility mode that re-enables mutable username/nickname lookup for reply delivery.
 - Pairing approvals work with:
-  - `kaijibot pairing list synology-chat`
-  - `kaijibot pairing approve synology-chat <CODE>`
+  - `allbot pairing list synology-chat`
+  - `allbot pairing approve synology-chat <CODE>`
 
 ## Outbound delivery
 
@@ -110,8 +110,8 @@ Use numeric Synology Chat user IDs as targets.
 Examples:
 
 ```bash
-kaijibot message send --channel synology-chat --target 123456 --text "Hello from KaijiBot"
-kaijibot message send --channel synology-chat --target synology-chat:123456 --text "Hello again"
+allbot message send --channel synology-chat --target 123456 --text "Hello from AllBot"
+allbot message send --channel synology-chat --target synology-chat:123456 --text "Hello again"
 ```
 
 Media sends are supported by URL-based file delivery.
@@ -122,7 +122,7 @@ Multiple Synology Chat accounts are supported under `channels.synology-chat.acco
 Each account can override token, incoming URL, webhook path, DM policy, and limits.
 Direct-message sessions are isolated per account and user, so the same numeric `user_id`
 on two different Synology accounts does not share transcript state.
-Give each enabled account a distinct `webhookPath`. KaijiBot now rejects duplicate exact paths
+Give each enabled account a distinct `webhookPath`. AllBot now rejects duplicate exact paths
 and refuses to start named accounts that only inherit a shared webhook path in multi-account setups.
 If you intentionally need legacy inheritance for a named account, set
 `dangerouslyAllowInheritedWebhookPath: true` on that account or at `channels.synology-chat`,
@@ -169,7 +169,7 @@ but duplicate exact paths are still rejected fail-closed. Prefer explicit per-ac
 - `Invalid token`:
   - the outgoing webhook secret does not match `channels.synology-chat.token`
   - the request is hitting the wrong account/webhook path
-  - a reverse proxy stripped the token header before the request reached KaijiBot
+  - a reverse proxy stripped the token header before the request reached AllBot
 - `Rate limit exceeded`:
   - too many invalid token attempts from the same source can temporarily lock that source out
   - authenticated senders also have a separate per-user message rate limit

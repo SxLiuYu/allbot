@@ -1,1 +1,1 @@
-export { resolveGatewayPort } from "kaijibot/plugin-sdk/browser-config-support";
+export { resolveGatewayPort } from "allbot/plugin-sdk/browser-config-support";

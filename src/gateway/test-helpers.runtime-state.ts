@@ -4,7 +4,7 @@ import path from "node:path";
 import { Mock, vi } from "vitest";
 import type { MsgContext } from "../auto-reply/templating.js";
 import type { GetReplyOptions, ReplyPayload } from "../auto-reply/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentBinding } from "../config/types.agents.js";
 import type { HooksConfig } from "../config/types.hooks.js";
 import type { TailscaleWhoisIdentity } from "../infra/tailscale.js";
@@ -13,7 +13,7 @@ import { resolveGlobalSingleton } from "../shared/global-singleton.js";
 export type GetReplyFromConfigFn = (
   ctx: MsgContext,
   opts?: GetReplyOptions,
-  configOverride?: KaijiBotConfig,
+  configOverride?: AllBotConfig,
 ) => Promise<ReplyPayload | ReplyPayload[] | undefined>;
 export type CronIsolatedRunFn = (
   ...args: unknown[]
@@ -24,7 +24,7 @@ export type RunBtwSideQuestionFn = (...args: unknown[]) => Promise<unknown>;
 export type DispatchInboundMessageFn = (...args: unknown[]) => Promise<unknown>;
 export type CompactEmbeddedPiSessionFn = (...args: unknown[]) => Promise<unknown>;
 
-const GATEWAY_TEST_CONFIG_ROOT_KEY = Symbol.for("kaijibot.gatewayTestHelpers.configRoot");
+const GATEWAY_TEST_CONFIG_ROOT_KEY = Symbol.for("allbot.gatewayTestHelpers.configRoot");
 
 export type GatewayTestHoistedState = {
   testTailnetIPv4: { value: string | undefined };
@@ -78,7 +78,7 @@ export type GatewayTestHoistedState = {
 };
 
 const gatewayTestHoisted = vi.hoisted(() => {
-  const key = Symbol.for("kaijibot.gatewayTestHelpers.hoisted");
+  const key = Symbol.for("allbot.gatewayTestHelpers.hoisted");
   const store = globalThis as Record<PropertyKey, unknown>;
   if (Object.prototype.hasOwnProperty.call(store, key)) {
     return store[key] as GatewayTestHoistedState;
@@ -162,10 +162,10 @@ export const sessionStoreSaveDelayMs = gatewayTestHoisted.sessionStoreSaveDelayM
 export const embeddedRunMock = gatewayTestHoisted.embeddedRunMock;
 
 export const testConfigRoot = resolveGlobalSingleton(GATEWAY_TEST_CONFIG_ROOT_KEY, () => ({
-  value: path.join(os.tmpdir(), `kaijibot-gateway-test-${process.pid}-${crypto.randomUUID()}`),
+  value: path.join(os.tmpdir(), `allbot-gateway-test-${process.pid}-${crypto.randomUUID()}`),
 }));
 
 export function setTestConfigRoot(root: string): void {
   testConfigRoot.value = root;
-  process.env.KAIJIBOT_CONFIG_PATH = path.join(root, "kaijibot.json");
+  process.env.ALLBOT_CONFIG_PATH = path.join(root, "allbot.json");
 }

@@ -14,7 +14,7 @@ import {
   resolveConfiguredModelRef,
 } from "../agents/model-selection.js";
 import { formatTokenK } from "../commands/models/shared.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
 import { applyPrimaryModel } from "../plugins/provider-model-primary.js";
 import { resolveOwningPluginIdsForProvider } from "../plugins/providers.js";
@@ -34,7 +34,7 @@ const PROVIDER_FILTER_THRESHOLD = 30;
 const HIDDEN_ROUTER_MODELS = new Set(["openrouter/auto"]);
 
 export type PromptDefaultModelParams = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   allowKeep?: boolean;
   includeManual?: boolean;
@@ -48,7 +48,7 @@ export type PromptDefaultModelParams = {
   message?: string;
 };
 
-export type PromptDefaultModelResult = { model?: string; config?: KaijiBotConfig };
+export type PromptDefaultModelResult = { model?: string; config?: AllBotConfig };
 export type PromptModelAllowlistResult = { models?: string[] };
 
 async function loadModelPickerRuntime() {
@@ -62,7 +62,7 @@ const loadResolvedModelPickerRuntime = createLazyRuntimeSurface(
 
 function hasAuthForProvider(
   provider: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   store: ReturnType<typeof ensureAuthProfileStore>,
 ) {
   if (listProfilesForProvider(store, provider).length > 0) {
@@ -78,7 +78,7 @@ function hasAuthForProvider(
 }
 
 function createProviderAuthChecker(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
 }): (provider: string) => boolean {
   const authStore = ensureAuthProfileStore(params.agentDir, {
@@ -96,11 +96,11 @@ function createProviderAuthChecker(params: {
   };
 }
 
-function resolveConfiguredModelRaw(cfg: KaijiBotConfig): string {
+function resolveConfiguredModelRaw(cfg: AllBotConfig): string {
   return resolveAgentModelPrimaryValue(cfg.agents?.defaults?.model) ?? "";
 }
 
-function resolveConfiguredModelKeys(cfg: KaijiBotConfig): string[] {
+function resolveConfiguredModelKeys(cfg: AllBotConfig): string[] {
   const models = cfg.agents?.defaults?.models ?? {};
   return Object.keys(models)
     .map((key) => String(key ?? "").trim())
@@ -180,7 +180,7 @@ function addModelSelectOption(params: {
 
 function createPreferredProviderMatcher(params: {
   preferredProvider: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): (entryProvider: string) => boolean {
@@ -263,7 +263,7 @@ async function maybeFilterModelsByProvider(params: {
   }>;
   preferredProvider?: string;
   prompter: WizardPrompter;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): Promise<typeof params.models> {
@@ -303,7 +303,7 @@ async function maybeFilterModelsByProvider(params: {
 }
 
 async function resolveProviderPluginSetupOptions(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): Promise<WizardSelectOption[]> {
@@ -332,7 +332,7 @@ async function resolveProviderPluginSetupOptions(params: {
 
 async function maybeHandleProviderPluginSelection(params: {
   selection: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   agentDir?: string;
   workspaceDir?: string;
@@ -585,7 +585,7 @@ export async function promptDefaultModel(
 }
 
 export async function promptModelAllowlist(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   message?: string;
   agentDir?: string;
@@ -708,7 +708,7 @@ export async function promptModelAllowlist(params: {
   return { models: [] };
 }
 
-export function applyModelAllowlist(cfg: KaijiBotConfig, models: string[]): KaijiBotConfig {
+export function applyModelAllowlist(cfg: AllBotConfig, models: string[]): AllBotConfig {
   const defaults = cfg.agents?.defaults;
   const normalized = normalizeModelKeys(models);
   if (normalized.length === 0) {
@@ -744,9 +744,9 @@ export function applyModelAllowlist(cfg: KaijiBotConfig, models: string[]): Kaij
 }
 
 export function applyModelFallbacksFromSelection(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   selection: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   const normalized = normalizeModelKeys(selection);
   if (normalized.length <= 1) {
     return cfg;

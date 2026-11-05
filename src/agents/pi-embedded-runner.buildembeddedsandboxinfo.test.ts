@@ -7,16 +7,16 @@ function createSandboxContext(overrides?: Partial<SandboxContext>): SandboxConte
     enabled: true,
     backendId: "docker",
     sessionKey: "session:test",
-    workspaceDir: "/tmp/kaijibot-sandbox",
-    agentWorkspaceDir: "/tmp/kaijibot-workspace",
+    workspaceDir: "/tmp/allbot-sandbox",
+    agentWorkspaceDir: "/tmp/allbot-workspace",
     workspaceAccess: "none",
-    runtimeId: "kaijibot-sbx-test",
-    runtimeLabel: "kaijibot-sbx-test",
-    containerName: "kaijibot-sbx-test",
+    runtimeId: "allbot-sbx-test",
+    runtimeLabel: "allbot-sbx-test",
+    containerName: "allbot-sbx-test",
     containerWorkdir: "/workspace",
     docker: {
-      image: "kaijibot-sandbox:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-",
+      image: "allbot-sandbox:bookworm-slim",
+      containerPrefix: "allbot-sbx-",
       workdir: "/workspace",
       readOnlyRoot: true,
       tmpfs: ["/tmp"],
@@ -33,7 +33,7 @@ function createSandboxContext(overrides?: Partial<SandboxContext>): SandboxConte
     browser: {
       bridgeUrl: "http://localhost:9222",
       noVncUrl: "http://localhost:6080",
-      containerName: "kaijibot-sbx-browser-test",
+      containerName: "allbot-sbx-browser-test",
     },
   } satisfies SandboxContext;
   return { ...base, ...overrides };
@@ -49,7 +49,7 @@ describe("buildEmbeddedSandboxInfo", () => {
 
     expect(buildEmbeddedSandboxInfo(sandbox)).toEqual({
       enabled: true,
-      workspaceDir: "/tmp/kaijibot-sandbox",
+      workspaceDir: "/tmp/allbot-sandbox",
       containerWorkspaceDir: "/workspace",
       workspaceAccess: "none",
       agentWorkspaceMount: undefined,
@@ -73,7 +73,7 @@ describe("buildEmbeddedSandboxInfo", () => {
       }),
     ).toEqual({
       enabled: true,
-      workspaceDir: "/tmp/kaijibot-sandbox",
+      workspaceDir: "/tmp/allbot-sandbox",
       containerWorkspaceDir: "/workspace",
       workspaceAccess: "none",
       agentWorkspaceMount: undefined,

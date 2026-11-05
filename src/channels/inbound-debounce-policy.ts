@@ -5,12 +5,12 @@ import {
   resolveInboundDebounceMs,
   type InboundDebounceCreateParams,
 } from "../auto-reply/inbound-debounce.js";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 
 export function shouldDebounceTextInbound(params: {
   text: string | null | undefined;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   hasMedia?: boolean;
   commandOptions?: CommandNormalizeOptions;
   allowDebounce?: boolean;
@@ -30,7 +30,7 @@ export function shouldDebounceTextInbound(params: {
 
 export function createChannelInboundDebouncer<T>(
   params: Omit<InboundDebounceCreateParams<T>, "debounceMs"> & {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     channel: string;
     debounceMsOverride?: number;
   },

@@ -48,10 +48,10 @@ function emitAndClose(
   });
 }
 
-vi.mock("kaijibot/plugin-sdk/memory-core-host-engine-foundation", async () => {
+vi.mock("allbot/plugin-sdk/memory-core-host-engine-foundation", async () => {
   const actual = await vi.importActual<
-    typeof import("kaijibot/plugin-sdk/memory-core-host-engine-foundation")
-  >("kaijibot/plugin-sdk/memory-core-host-engine-foundation");
+    typeof import("allbot/plugin-sdk/memory-core-host-engine-foundation")
+  >("allbot/plugin-sdk/memory-core-host-engine-foundation");
   return {
     ...actual,
     createSubsystemLogger: () => {
@@ -75,8 +75,8 @@ vi.mock("node:child_process", async () => {
 });
 
 import { spawn as mockedSpawn } from "node:child_process";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import { resolveMemoryBackendConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import { resolveMemoryBackendConfig } from "allbot/plugin-sdk/memory-core-host-engine-storage";
 import { QmdMemoryManager } from "./qmd-manager.js";
 
 const spawnMock = mockedSpawn as unknown as Mock;
@@ -85,7 +85,7 @@ describe("QmdMemoryManager slugified path resolution", () => {
   let tmpRoot: string;
   let workspaceDir: string;
   let stateDir: string;
-  let cfg: KaijiBotConfig;
+  let cfg: AllBotConfig;
   const agentId = "main";
   const openManagers = new Set<QmdMemoryManager>();
 
@@ -96,7 +96,7 @@ describe("QmdMemoryManager slugified path resolution", () => {
     return manager;
   }
 
-  async function createManager(params?: { cfg?: KaijiBotConfig }) {
+  async function createManager(params?: { cfg?: AllBotConfig }) {
     const cfgToUse = params?.cfg ?? cfg;
     const resolved = resolveMemoryBackendConfig({ cfg: cfgToUse, agentId });
     const manager = trackManager(
@@ -154,7 +154,7 @@ describe("QmdMemoryManager slugified path resolution", () => {
     logDebugMock.mockClear();
     logInfoMock.mockClear();
 
-    tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-qmd-slugified-"));
+    tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-qmd-slugified-"));
     workspaceDir = path.join(tmpRoot, "workspace");
     stateDir = path.join(tmpRoot, "state");
     await fs.mkdir(workspaceDir, { recursive: true });
@@ -172,7 +172,7 @@ describe("QmdMemoryManager slugified path resolution", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   });
 
   afterEach(async () => {
@@ -252,7 +252,7 @@ describe("QmdMemoryManager slugified path resolution", () => {
           paths: [{ path: extraRoot, pattern: "**/*.md", name: "vault" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const actualRelative = "Topics/Sub Category/Topic Name.md";
     const actualFile = path.join(extraRoot, actualRelative);

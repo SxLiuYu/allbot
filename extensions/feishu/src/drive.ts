@@ -1,6 +1,6 @@
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import type { KaijiBotPluginApi } from "../runtime-api.js";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import type { AllBotPluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { encodeQuery, extractReplyText, isRecord, readString } from "./comment-shared.js";
 import { parseFeishuCommentTarget, type CommentFileType } from "./comment-target.js";
@@ -857,7 +857,7 @@ async function getViewRecords(
 
 // ============ Tool Registration ============
 
-export function registerFeishuDriveTools(api: KaijiBotPluginApi) {
+export function registerFeishuDriveTools(api: AllBotPluginApi) {
   if (!api.config) {
     api.logger.debug?.("feishu_drive: No config available, skipping drive tools");
     return;

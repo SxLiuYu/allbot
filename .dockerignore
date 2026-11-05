@@ -1,7 +1,7 @@
 .git
 .worktrees
 
-# Sensitive files – scripts/docker/setup.sh writes .env with KAIJIBOT_GATEWAY_TOKEN
+# Sensitive files – scripts/docker/setup.sh writes .env with ALLBOT_GATEWAY_TOKEN
 # into the project root; keep it out of the build context.
 .env
 .env.*
@@ -58,14 +58,14 @@ vendor/
 # Needed for building the Canvas A2UI bundle during Docker image builds.
 # Keep the rest of apps/ and vendor/ excluded to avoid a large build context.
 !apps/shared/
-!apps/shared/KaijiBotKit/
-!apps/shared/KaijiBotKit/Sources/
-!apps/shared/KaijiBotKit/Sources/KaijiBotKit/
-!apps/shared/KaijiBotKit/Sources/KaijiBotKit/Resources/
-!apps/shared/KaijiBotKit/Sources/KaijiBotKit/Resources/tool-display.json
-!apps/shared/KaijiBotKit/Tools/
-!apps/shared/KaijiBotKit/Tools/CanvasA2UI/
-!apps/shared/KaijiBotKit/Tools/CanvasA2UI/**
+!apps/shared/AllBotKit/
+!apps/shared/AllBotKit/Sources/
+!apps/shared/AllBotKit/Sources/AllBotKit/
+!apps/shared/AllBotKit/Sources/AllBotKit/Resources/
+!apps/shared/AllBotKit/Sources/AllBotKit/Resources/tool-display.json
+!apps/shared/AllBotKit/Tools/
+!apps/shared/AllBotKit/Tools/CanvasA2UI/
+!apps/shared/AllBotKit/Tools/CanvasA2UI/**
 !vendor/a2ui/
 !vendor/a2ui/renderers/
 !vendor/a2ui/renderers/lit/

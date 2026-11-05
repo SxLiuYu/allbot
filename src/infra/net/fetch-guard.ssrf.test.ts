@@ -103,7 +103,7 @@ describe("fetchWithSsrFGuard hardening", () => {
   const CROSS_ORIGIN_REDIRECT_PRESERVED_HEADERS = [
     ["accept", "application/json"],
     ["content-type", "application/json"],
-    ["user-agent", "KaijiBot-Test/1.0"],
+    ["user-agent", "AllBot-Test/1.0"],
   ] as const;
 
   const createPublicLookup = (): LookupFn =>
@@ -373,7 +373,7 @@ describe("fetchWithSsrFGuard hardening", () => {
         globalFetchCalls += 1;
         throw new Error("ambient global fetch should not be used when a dispatcher is attached");
       },
-      { __kaijibotAcceptsDispatcher: true as const },
+      { __allbotAcceptsDispatcher: true as const },
     );
 
     class MockAgent {
@@ -562,7 +562,7 @@ describe("fetchWithSsrFGuard hardening", () => {
           "X-Trace": "1",
           Accept: "application/json",
           "Content-Type": "application/json",
-          "User-Agent": "KaijiBot-Test/1.0",
+          "User-Agent": "AllBot-Test/1.0",
         },
       },
     });
@@ -856,12 +856,12 @@ describe("fetchWithSsrFGuard hardening", () => {
       Authorization: "Bearer secret",
       Cookie: "session=abc",
       Accept: "application/json",
-      "User-Agent": "KaijiBot-Test/1.0",
+      "User-Agent": "AllBot-Test/1.0",
     });
 
     expect(headers).toEqual({
       accept: "application/json",
-      "user-agent": "KaijiBot-Test/1.0",
+      "user-agent": "AllBot-Test/1.0",
     });
   });
 

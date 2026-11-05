@@ -15,7 +15,7 @@ const DEFAULT_FAST_LOCAL_CHECK_MIN_CPUS = 12;
 const SLEEP_BUFFER = new Int32Array(new SharedArrayBuffer(4));
 
 export function isLocalCheckEnabled(env) {
-  const raw = env.KAIJIBOT_LOCAL_CHECK?.trim().toLowerCase();
+  const raw = env.ALLBOT_LOCAL_CHECK?.trim().toLowerCase();
   return raw !== "0" && raw !== "false";
 }
 
@@ -42,8 +42,8 @@ export function applyLocalTsgoPolicy(args, env, hostResources) {
       nextEnv.GOMEMLIMIT = DEFAULT_LOCAL_GO_MEMORY_LIMIT;
     }
   }
-  if (nextEnv.KAIJIBOT_TSGO_PPROF_DIR && !hasFlag(nextArgs, "--pprofDir")) {
-    insertBeforeSeparator(nextArgs, "--pprofDir", nextEnv.KAIJIBOT_TSGO_PPROF_DIR);
+  if (nextEnv.ALLBOT_TSGO_PPROF_DIR && !hasFlag(nextArgs, "--pprofDir")) {
+    insertBeforeSeparator(nextArgs, "--pprofDir", nextEnv.ALLBOT_TSGO_PPROF_DIR);
   }
 
   return { env: nextEnv, args: nextArgs };
@@ -97,20 +97,20 @@ export function acquireLocalHeavyCheckLockSync(params) {
   }
 
   const commonDir = resolveGitCommonDir(params.cwd);
-  const locksDir = path.join(commonDir, "kaijibot-local-checks");
+  const locksDir = path.join(commonDir, "allbot-local-checks");
   const lockDir = path.join(locksDir, `${params.lockName ?? "heavy-check"}.lock`);
   const ownerPath = path.join(lockDir, "owner.json");
   const timeoutMs = readPositiveInt(
-    env.KAIJIBOT_HEAVY_CHECK_LOCK_TIMEOUT_MS,
+    env.ALLBOT_HEAVY_CHECK_LOCK_TIMEOUT_MS,
     DEFAULT_LOCK_TIMEOUT_MS,
   );
-  const pollMs = readPositiveInt(env.KAIJIBOT_HEAVY_CHECK_LOCK_POLL_MS, DEFAULT_LOCK_POLL_MS);
+  const pollMs = readPositiveInt(env.ALLBOT_HEAVY_CHECK_LOCK_POLL_MS, DEFAULT_LOCK_POLL_MS);
   const progressMs = readPositiveInt(
-    env.KAIJIBOT_HEAVY_CHECK_LOCK_PROGRESS_MS,
+    env.ALLBOT_HEAVY_CHECK_LOCK_PROGRESS_MS,
     DEFAULT_LOCK_PROGRESS_MS,
   );
   const staleLockMs = readPositiveInt(
-    env.KAIJIBOT_HEAVY_CHECK_STALE_LOCK_MS,
+    env.ALLBOT_HEAVY_CHECK_STALE_LOCK_MS,
     DEFAULT_STALE_LOCK_MS,
   );
   const startedAt = Date.now();
@@ -206,7 +206,7 @@ function insertBeforeSeparator(args, ...items) {
 }
 
 function readLocalCheckMode(env) {
-  const raw = env.KAIJIBOT_LOCAL_CHECK_MODE?.trim().toLowerCase();
+  const raw = env.ALLBOT_LOCAL_CHECK_MODE?.trim().toLowerCase();
   if (raw === "throttled" || raw === "low-memory") {
     return "throttled";
   }

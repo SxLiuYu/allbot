@@ -26,11 +26,11 @@ const {
   })),
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("allbot/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: resolveApiKeyForProviderMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
+vi.mock("allbot/plugin-sdk/provider-http", () => ({
   assertOkOrThrowHttpError: assertOkOrThrowHttpErrorMock,
   createProviderOperationDeadline: createProviderOperationDeadlineMock,
   postJsonRequest: postJsonRequestMock,
@@ -41,8 +41,8 @@ vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
 }));
 
 afterAll(() => {
-  vi.doUnmock("kaijibot/plugin-sdk/provider-auth-runtime");
-  vi.doUnmock("kaijibot/plugin-sdk/provider-http");
+  vi.doUnmock("allbot/plugin-sdk/provider-auth-runtime");
+  vi.doUnmock("allbot/plugin-sdk/provider-http");
   vi.resetModules();
 });
 

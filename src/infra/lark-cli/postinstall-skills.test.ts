@@ -14,7 +14,7 @@ import {
 function makeParams(overrides: Record<string, unknown> = {}) {
   return {
     env: { PATH: "/usr/bin" },
-    packageRoot: "/opt/kaijibot",
+    packageRoot: "/opt/allbot",
     platform: "linux",
     skillsDir: "/home/user/.agents/skills",
     log: { log: vi.fn(), error: vi.fn(), warn: vi.fn() },
@@ -70,7 +70,7 @@ function happyPathMocks(p: Record<string, unknown>) {
 
 describe("installLarkCliSkills (postinstall)", () => {
   it("skips when env var is set", () => {
-    const p = makeParams({ env: { PATH: "/usr/bin", KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL: "1" } });
+    const p = makeParams({ env: { PATH: "/usr/bin", ALLBOT_DISABLE_LARK_SKILLS_INSTALL: "1" } });
     installLarkCliSkills(p);
     expect(p.spawnSync).not.toHaveBeenCalled();
   });

@@ -139,7 +139,7 @@ schema 五处同步去掉 Reserved 标注)。Q=dismissive 且 U≥1 时可提前
   旧数据文件必须无损加载。
 - **测试改写政策**:允许按新语义迁移编码旧不变量的用例(gate.test.ts:917-1003 等),
   逐条注明理由,新套件中必须有对应覆盖;禁止删除覆盖来凑绿。
-- **live 测试**:本地跑,key 在 ~/.kaijibot/.env;不可用则记录跳过,不阻塞前 5 条判据。
+- **live 测试**:本地跑,key 在 ~/.allbot/.env;不可用则记录跳过,不阻塞前 5 条判据。
 - **配置五处同步**:types.cognitive.ts / defaults.ts / schema.base.generated.ts /
   schema.labels.ts / schema.help.ts(+zod-schema.cognitive.ts)。
 - **每轮一个机制点**:先跑判据收集基线 → 改 → 重跑留证据;禁止一轮改多个机制。

@@ -8,7 +8,7 @@ import {
 import { isNonSecretApiKeyMarker } from "../agents/model-auth-markers.js";
 import { resolveUsableCustomProviderApiKey } from "../agents/model-auth.js";
 import { normalizeProviderId } from "../agents/model-selection.js";
-import { loadConfig, type KaijiBotConfig } from "../config/config.js";
+import { loadConfig, type AllBotConfig } from "../config/config.js";
 import { resolveProviderUsageAuthWithPlugin } from "../plugins/provider-runtime.js";
 import { normalizeSecretInput } from "../utils/normalize-secret-input.js";
 import type { UsageProviderId } from "./provider-usage.types.js";
@@ -22,7 +22,7 @@ export type ProviderAuth = {
 type AuthStore = ReturnType<typeof ensureAuthProfileStore>;
 
 type UsageAuthState = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   agentDir?: string;
   store?: AuthStore;
@@ -206,7 +206,7 @@ export async function resolveProviderAuths(params: {
   providers: UsageProviderId[];
   auth?: ProviderAuth[];
   agentDir?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
 }): Promise<ProviderAuth[]> {
   if (params.auth) {

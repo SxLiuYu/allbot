@@ -1,5 +1,5 @@
 /**
- * Hook system for KaijiBot agent events
+ * Hook system for AllBot agent events
  *
  * Provides an extensible event-driven hook system for agent events
  * like command processing, session lifecycle, etc.
@@ -7,7 +7,7 @@
 
 import type { WorkspaceBootstrapFile } from "../agents/workspace.js";
 import type { CliDeps } from "../cli/deps.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import type { SessionsPatchParams } from "../gateway/protocol/index.js";
 import { formatErrorMessage } from "../infra/errors.js";
@@ -25,7 +25,7 @@ export type InternalHookEventType =
 export type AgentBootstrapHookContext = {
   workspaceDir: string;
   bootstrapFiles: WorkspaceBootstrapFile[];
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;
@@ -38,7 +38,7 @@ export type AgentBootstrapHookEvent = InternalHookEvent & {
 };
 
 export type GatewayStartupHookContext = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   deps?: CliDeps;
   workspaceDir?: string;
 };
@@ -169,7 +169,7 @@ export type MessagePreprocessedHookEvent = InternalHookEvent & {
 export type SessionPatchHookContext = {
   sessionEntry: SessionEntry;
   patch: SessionsPatchParams;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 };
 
 export type SessionPatchHookEvent = InternalHookEvent & {
@@ -205,7 +205,7 @@ export type InternalHookHandler = (event: InternalHookEvent) => Promise<void> | 
  * are invisible to triggerInternalHook in another chunk, causing hooks
  * to silently fire with zero handlers.
  */
-const INTERNAL_HOOK_HANDLERS_KEY = Symbol.for("kaijibot.internalHookHandlers");
+const INTERNAL_HOOK_HANDLERS_KEY = Symbol.for("allbot.internalHookHandlers");
 const handlers = resolveGlobalSingleton<Map<string, InternalHookHandler[]>>(
   INTERNAL_HOOK_HANDLERS_KEY,
   () => new Map<string, InternalHookHandler[]>(),

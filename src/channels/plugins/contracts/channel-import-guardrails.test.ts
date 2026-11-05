@@ -284,10 +284,10 @@ function expectNoCrossPluginSdkFacadeImports(file: string, imports: string[]): v
     return;
   }
   for (const specifier of imports) {
-    if (!specifier.startsWith("kaijibot/plugin-sdk/")) {
+    if (!specifier.startsWith("allbot/plugin-sdk/")) {
       continue;
     }
-    const targetSubpath = specifier.slice("kaijibot/plugin-sdk/".length);
+    const targetSubpath = specifier.slice("allbot/plugin-sdk/".length);
     const targetExtensionId =
       BUNDLED_EXTENSION_IDS.find(
         (extensionId) =>
@@ -358,11 +358,11 @@ describe("channel import guardrails", () => {
   it("keeps bundled extension source files off root and compat plugin-sdk imports", () => {
     for (const file of collectExtensionSourceFiles()) {
       const text = readSource(file);
-      expect(text, `${file} should not import kaijibot/plugin-sdk root`).not.toMatch(
-        /["']kaijibot\/plugin-sdk["']/,
+      expect(text, `${file} should not import allbot/plugin-sdk root`).not.toMatch(
+        /["']allbot\/plugin-sdk["']/,
       );
-      expect(text, `${file} should not import kaijibot/plugin-sdk/compat`).not.toMatch(
-        /["']kaijibot\/plugin-sdk\/compat["']/,
+      expect(text, `${file} should not import allbot/plugin-sdk/compat`).not.toMatch(
+        /["']allbot\/plugin-sdk\/compat["']/,
       );
     }
   });
@@ -438,7 +438,7 @@ describe("channel import guardrails", () => {
         expect(
           text,
           `${normalized} should import ${extensionId} helpers via the local api barrel`,
-        ).not.toMatch(new RegExp(`["']kaijibot/plugin-sdk/${extensionId}(?:["'/])`, "u"));
+        ).not.toMatch(new RegExp(`["']allbot/plugin-sdk/${extensionId}(?:["'/])`, "u"));
       }
     }
   });

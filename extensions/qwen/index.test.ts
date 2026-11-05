@@ -1,4 +1,4 @@
-import { registerSingleProviderPlugin } from "kaijibot/plugin-sdk/plugin-test-runtime";
+import { registerSingleProviderPlugin } from "allbot/plugin-sdk/plugin-test-runtime";
 import { describe, expect, it } from "vitest";
 import { QWEN_36_PLUS_MODEL_ID, QWEN_BASE_URL } from "./api.js";
 import qwenPlugin from "./index.js";

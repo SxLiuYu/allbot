@@ -9,7 +9,7 @@ title: "Gemini Search"
 
 # Gemini Search
 
-KaijiBot supports Gemini models with built-in
+AllBot supports Gemini models with built-in
 [Google Search grounding](https://ai.google.dev/gemini-api/docs/grounding),
 which returns AI-synthesized answers backed by live Google Search results with
 citations.
@@ -25,7 +25,7 @@ citations.
     Set `GEMINI_API_KEY` in the Gateway environment, or configure via:
 
     ```bash
-    kaijibot configure --section web
+    allbot configure --section web
     ```
 
   </Step>
@@ -58,7 +58,7 @@ citations.
 ```
 
 **Environment alternative:** set `GEMINI_API_KEY` in the Gateway environment.
-For a gateway install, put it in `~/.kaijibot/.env`.
+For a gateway install, put it in `~/.allbot/.env`.
 
 ## How it works
 

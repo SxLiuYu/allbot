@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type {
   PluginWebFetchProviderEntry,
   PluginWebSearchProviderEntry,
@@ -103,8 +103,8 @@ vi.mock("./runtime-web-tools-manifest.runtime.js", async () => {
   };
 });
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function providerPluginId(provider: ProviderUnderTest): string {
@@ -133,7 +133,7 @@ function ensureRecord(target: Record<string, unknown>, key: string): Record<stri
 }
 
 function setConfiguredProviderKey(
-  configTarget: KaijiBotConfig,
+  configTarget: AllBotConfig,
   pluginId: string,
   value: unknown,
 ): void {
@@ -145,7 +145,7 @@ function setConfiguredProviderKey(
   webSearch.apiKey = value;
 }
 
-function setConfiguredFetchProviderKey(configTarget: KaijiBotConfig, value: unknown): void {
+function setConfiguredFetchProviderKey(configTarget: AllBotConfig, value: unknown): void {
   const plugins = ensureRecord(configTarget as Record<string, unknown>, "plugins");
   const entries = ensureRecord(plugins, "entries");
   const pluginEntry = ensureRecord(entries, "firecrawl");
@@ -238,7 +238,7 @@ function buildTestWebFetchProviders(): PluginWebFetchProviderEntry[] {
   ];
 }
 
-async function runRuntimeWebTools(params: { config: KaijiBotConfig; env?: NodeJS.ProcessEnv }) {
+async function runRuntimeWebTools(params: { config: AllBotConfig; env?: NodeJS.ProcessEnv }) {
   const sourceConfig = structuredClone(params.config);
   const resolvedConfig = structuredClone(params.config);
   const context = createResolverContext({
@@ -256,7 +256,7 @@ async function runRuntimeWebTools(params: { config: KaijiBotConfig; env?: NodeJS
 function createProviderSecretRefConfig(
   provider: ProviderUnderTest,
   envRefId: string,
-): KaijiBotConfig {
+): AllBotConfig {
   return asConfig({
     tools: {
       web: {
@@ -281,7 +281,7 @@ function createProviderSecretRefConfig(
   });
 }
 
-function readProviderKey(config: KaijiBotConfig, provider: ProviderUnderTest): unknown {
+function readProviderKey(config: AllBotConfig, provider: ProviderUnderTest): unknown {
   const pluginConfig = config.plugins?.entries?.[providerPluginId(provider)]?.config as
     | { webSearch?: { apiKey?: unknown } }
     | undefined;

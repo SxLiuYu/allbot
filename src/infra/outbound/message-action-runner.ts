@@ -13,7 +13,7 @@ import type {
   ChannelMessageActionName,
   ChannelThreadingToolContext,
 } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { hasInteractiveReplyBlocks, hasReplyPayloadContent } from "../../interactive/payload.js";
 import type { OutboundMediaAccess } from "../../media/load-options.js";
 import { getAgentScopedMediaLocalRoots } from "../../media/local-roots.js";
@@ -75,7 +75,7 @@ export type MessageActionRunnerGateway = {
 };
 
 export type RunMessageActionParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   action: ChannelMessageActionName;
   params: Record<string, unknown>;
   defaultAccountId?: string;
@@ -182,7 +182,7 @@ function applyCrossContextMessageDecoration({
 }
 
 async function maybeApplyCrossContextMarker(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   action: ChannelMessageActionName;
   target: string;
@@ -214,7 +214,7 @@ async function maybeApplyCrossContextMarker(params: {
 }
 
 async function resolveChannel(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params: Record<string, unknown>,
   toolContext?: { currentChannelProvider?: string },
 ) {
@@ -230,7 +230,7 @@ async function resolveChannel(
 }
 
 async function resolveActionTarget(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   action: ChannelMessageActionName;
   args: Record<string, unknown>;
@@ -271,7 +271,7 @@ function sanitizeGroupTargetId(target: string): string {
 }
 
 async function resolveResolvedTargetOrThrow(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   input: string;
   accountId?: string;
@@ -296,7 +296,7 @@ async function resolveResolvedTargetOrThrow(params: {
 }
 
 type ResolvedActionContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   params: Record<string, unknown>;
   channel: ChannelId;
   mediaAccess: OutboundMediaAccess;

@@ -7,9 +7,9 @@ describe("SUPERVISOR_HINT_ENV_VARS", () => {
       expect.arrayContaining([
         "LAUNCH_JOB_LABEL",
         "INVOCATION_ID",
-        "KAIJIBOT_WINDOWS_TASK_NAME",
-        "KAIJIBOT_SERVICE_MARKER",
-        "KAIJIBOT_SERVICE_KIND",
+        "ALLBOT_WINDOWS_TASK_NAME",
+        "ALLBOT_SERVICE_MARKER",
+        "ALLBOT_SERVICE_KIND",
       ]),
     );
   });
@@ -17,7 +17,7 @@ describe("SUPERVISOR_HINT_ENV_VARS", () => {
 
 describe("detectRespawnSupervisor", () => {
   it("detects launchd and systemd only from non-blank platform-specific hints", () => {
-    expect(detectRespawnSupervisor({ LAUNCH_JOB_LABEL: " ai.kaijibot.gateway " }, "darwin")).toBe(
+    expect(detectRespawnSupervisor({ LAUNCH_JOB_LABEL: " ai.allbot.gateway " }, "darwin")).toBe(
       "launchd",
     );
     expect(detectRespawnSupervisor({ LAUNCH_JOB_LABEL: "   " }, "darwin")).toBeNull();
@@ -28,13 +28,13 @@ describe("detectRespawnSupervisor", () => {
 
   it("detects scheduled-task supervision on Windows from either hint family", () => {
     expect(
-      detectRespawnSupervisor({ KAIJIBOT_WINDOWS_TASK_NAME: "KaijiBot Gateway" }, "win32"),
+      detectRespawnSupervisor({ ALLBOT_WINDOWS_TASK_NAME: "AllBot Gateway" }, "win32"),
     ).toBe("schtasks");
     expect(
       detectRespawnSupervisor(
         {
-          KAIJIBOT_SERVICE_MARKER: "kaijibot",
-          KAIJIBOT_SERVICE_KIND: "gateway",
+          ALLBOT_SERVICE_MARKER: "allbot",
+          ALLBOT_SERVICE_KIND: "gateway",
         },
         "win32",
       ),
@@ -42,8 +42,8 @@ describe("detectRespawnSupervisor", () => {
     expect(
       detectRespawnSupervisor(
         {
-          KAIJIBOT_SERVICE_MARKER: "kaijibot",
-          KAIJIBOT_SERVICE_KIND: "worker",
+          ALLBOT_SERVICE_MARKER: "allbot",
+          ALLBOT_SERVICE_KIND: "worker",
         },
         "win32",
       ),
@@ -54,14 +54,14 @@ describe("detectRespawnSupervisor", () => {
     expect(
       detectRespawnSupervisor(
         {
-          KAIJIBOT_SERVICE_MARKER: "kaijibot",
-          KAIJIBOT_SERVICE_KIND: "gateway",
+          ALLBOT_SERVICE_MARKER: "allbot",
+          ALLBOT_SERVICE_KIND: "gateway",
         },
         "linux",
       ),
     ).toBeNull();
     expect(
-      detectRespawnSupervisor({ LAUNCH_JOB_LABEL: "ai.kaijibot.gateway" }, "freebsd"),
+      detectRespawnSupervisor({ LAUNCH_JOB_LABEL: "ai.allbot.gateway" }, "freebsd"),
     ).toBeNull();
   });
 });

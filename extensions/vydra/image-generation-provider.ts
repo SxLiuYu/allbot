@@ -1,6 +1,6 @@
-import type { ImageGenerationProvider } from "kaijibot/plugin-sdk/image-generation";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { assertOkOrThrowHttpError, postJsonRequest } from "kaijibot/plugin-sdk/provider-http";
+import type { ImageGenerationProvider } from "allbot/plugin-sdk/image-generation";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { assertOkOrThrowHttpError, postJsonRequest } from "allbot/plugin-sdk/provider-http";
 import {
   DEFAULT_VYDRA_IMAGE_MODEL,
   downloadVydraAsset,

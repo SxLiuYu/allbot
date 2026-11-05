@@ -1,4 +1,4 @@
-import { definePluginEntry } from "@kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "@allbot/plugin-sdk/plugin-entry";
 import { isRecord } from "./src/tool-config-shared.js";
 
 export default definePluginEntry({

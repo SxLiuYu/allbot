@@ -143,8 +143,8 @@ describe("runDaemonRestart health checks", () => {
   });
 
   beforeEach(() => {
-    envSnapshot = captureEnv(["KAIJIBOT_CONTAINER_HINT", "KAIJIBOT_PROFILE"]);
-    delete process.env.KAIJIBOT_CONTAINER_HINT;
+    envSnapshot = captureEnv(["ALLBOT_CONTAINER_HINT", "ALLBOT_PROFILE"]);
+    delete process.env.ALLBOT_CONTAINER_HINT;
     service.readCommand.mockReset();
     service.restart.mockReset();
     runServiceStart.mockReset();
@@ -166,7 +166,7 @@ describe("runDaemonRestart health checks", () => {
     tryResolveGatewayService.mockReset();
 
     service.readCommand.mockResolvedValue({
-      programArguments: ["kaijibot", "gateway", "--port", "18789"],
+      programArguments: ["allbot", "gateway", "--port", "18789"],
       environment: {},
     });
     service.restart.mockResolvedValue({ outcome: "completed" });
@@ -287,8 +287,8 @@ describe("runDaemonRestart health checks", () => {
     await expect(runDaemonRestart({ json: true })).rejects.toMatchObject({
       message: "Gateway restart timed out after 60s waiting for health checks.",
       hints: [
-        formatCliCommand("kaijibot gateway status --deep"),
-        formatCliCommand("kaijibot doctor"),
+        formatCliCommand("allbot gateway status --deep"),
+        formatCliCommand("allbot doctor"),
       ],
     });
     expect(terminateStaleGatewayPids).not.toHaveBeenCalled();
@@ -311,8 +311,8 @@ describe("runDaemonRestart health checks", () => {
       message:
         "Gateway restart failed after 13s: service stayed stopped and health checks never came up.",
       hints: [
-        formatCliCommand("kaijibot gateway status --deep"),
-        formatCliCommand("kaijibot doctor"),
+        formatCliCommand("allbot gateway status --deep"),
+        formatCliCommand("allbot doctor"),
       ],
     });
     expect(terminateStaleGatewayPids).not.toHaveBeenCalled();

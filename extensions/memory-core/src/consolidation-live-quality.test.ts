@@ -4,14 +4,14 @@
  * Validates that the consolidation prompt produces valid, high-quality structured
  * output from real session transcripts via the ZAI API.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test extensions/memory-core/src/consolidation-live-quality.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test extensions/memory-core/src/consolidation-live-quality.test.ts
  */
 
 import { describe, it, expect } from "vitest";
 import { extractFromBatch } from "./consolidation-extract.js";
 import type { TranscriptBatch } from "./consolidation-types.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5-turbo";

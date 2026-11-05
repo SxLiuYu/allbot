@@ -44,29 +44,29 @@ function makePermissionRequest(
 }
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-acp-client-test-");
+const createTempDir = () => tempDirs.make("allbot-acp-client-test-");
 
 afterEach(async () => {
   await tempDirs.cleanup();
 });
 
 describe("resolveAcpClientSpawnEnv", () => {
-  it("sets KAIJIBOT_SHELL marker and preserves existing env values", () => {
+  it("sets ALLBOT_SHELL marker and preserves existing env values", () => {
     const env = resolveAcpClientSpawnEnv({
       PATH: "/usr/bin",
-      USER: "kaijibot",
+      USER: "allbot",
     });
 
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
     expect(env.PATH).toBe("/usr/bin");
-    expect(env.USER).toBe("kaijibot");
+    expect(env.USER).toBe("allbot");
   });
 
-  it("overrides pre-existing KAIJIBOT_SHELL to acp-client", () => {
+  it("overrides pre-existing ALLBOT_SHELL to acp-client", () => {
     const env = resolveAcpClientSpawnEnv({
-      KAIJIBOT_SHELL: "wrong",
+      ALLBOT_SHELL: "wrong",
     });
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
   });
 
   it("strips skill-injected env keys when stripKeys is provided", () => {
@@ -85,7 +85,7 @@ describe("resolveAcpClientSpawnEnv", () => {
     );
 
     expect(env.PATH).toBe("/usr/bin");
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
     expect(env.ANTHROPIC_API_KEY).toBe("anthropic-test-value");
     expect(env.OPENAI_API_KEY).toBeUndefined();
     expect(env.ELEVENLABS_API_KEY).toBeUndefined();
@@ -103,28 +103,28 @@ describe("resolveAcpClientSpawnEnv", () => {
     expect(baseEnv.OPENAI_API_KEY).toBe("openai-original");
   });
 
-  it("preserves KAIJIBOT_SHELL even when stripKeys contains it", () => {
+  it("preserves ALLBOT_SHELL even when stripKeys contains it", () => {
     const openAiApiKeyEnv = envVar("OPENAI", "API", "KEY");
     const env = resolveAcpClientSpawnEnv(
       {
-        KAIJIBOT_SHELL: "skill-overridden",
+        ALLBOT_SHELL: "skill-overridden",
         [openAiApiKeyEnv]: "openai-leaked", // pragma: allowlist secret
       },
-      { stripKeys: new Set(["KAIJIBOT_SHELL", openAiApiKeyEnv]) },
+      { stripKeys: new Set(["ALLBOT_SHELL", openAiApiKeyEnv]) },
     );
 
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
     expect(env.OPENAI_API_KEY).toBeUndefined();
   });
 
-  it("strips provider auth env vars for the default KaijiBot bridge", () => {
+  it("strips provider auth env vars for the default AllBot bridge", () => {
     const stripKeys = new Set(["OPENAI_API_KEY", "GITHUB_TOKEN", "HF_TOKEN"]);
     const env = resolveAcpClientSpawnEnv(
       {
         OPENAI_API_KEY: "openai-secret", // pragma: allowlist secret
         GITHUB_TOKEN: "gh-secret", // pragma: allowlist secret
         HF_TOKEN: "hf-secret", // pragma: allowlist secret
-        KAIJIBOT_API_KEY: "keep-me",
+        ALLBOT_API_KEY: "keep-me",
         PATH: "/usr/bin",
       },
       { stripKeys },
@@ -133,9 +133,9 @@ describe("resolveAcpClientSpawnEnv", () => {
     expect(env.OPENAI_API_KEY).toBeUndefined();
     expect(env.GITHUB_TOKEN).toBeUndefined();
     expect(env.HF_TOKEN).toBeUndefined();
-    expect(env.KAIJIBOT_API_KEY).toBe("keep-me");
+    expect(env.ALLBOT_API_KEY).toBe("keep-me");
     expect(env.PATH).toBe("/usr/bin");
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
   });
 
   it("strips provider auth env vars case-insensitively", () => {
@@ -143,15 +143,15 @@ describe("resolveAcpClientSpawnEnv", () => {
       {
         OpenAI_Api_Key: "openai-secret", // pragma: allowlist secret
         Github_Token: "gh-secret", // pragma: allowlist secret
-        KAIJIBOT_API_KEY: "keep-me",
+        ALLBOT_API_KEY: "keep-me",
       },
       { stripKeys: new Set(["OPENAI_API_KEY", "GITHUB_TOKEN"]) },
     );
 
     expect(env.OpenAI_Api_Key).toBeUndefined();
     expect(env.Github_Token).toBeUndefined();
-    expect(env.KAIJIBOT_API_KEY).toBe("keep-me");
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_API_KEY).toBe("keep-me");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
   });
 
   it("preserves provider auth env vars for explicit custom ACP servers", () => {
@@ -159,14 +159,14 @@ describe("resolveAcpClientSpawnEnv", () => {
       OPENAI_API_KEY: "openai-secret", // pragma: allowlist secret
       GITHUB_TOKEN: "gh-secret", // pragma: allowlist secret
       HF_TOKEN: "hf-secret", // pragma: allowlist secret
-      KAIJIBOT_API_KEY: "keep-me",
+      ALLBOT_API_KEY: "keep-me",
     });
 
     expect(env.OPENAI_API_KEY).toBe("openai-secret");
     expect(env.GITHUB_TOKEN).toBe("gh-secret");
     expect(env.HF_TOKEN).toBe("hf-secret");
-    expect(env.KAIJIBOT_API_KEY).toBe("keep-me");
-    expect(env.KAIJIBOT_SHELL).toBe("acp-client");
+    expect(env.ALLBOT_API_KEY).toBe("keep-me");
+    expect(env.ALLBOT_SHELL).toBe("acp-client");
   });
 });
 
@@ -175,9 +175,9 @@ describe("shouldStripProviderAuthEnvVarsForAcpServer", () => {
     expect(shouldStripProviderAuthEnvVarsForAcpServer()).toBe(true);
     expect(
       shouldStripProviderAuthEnvVarsForAcpServer({
-        serverCommand: "kaijibot",
+        serverCommand: "allbot",
         serverArgs: ["acp"],
-        defaultServerCommand: "kaijibot",
+        defaultServerCommand: "allbot",
         defaultServerArgs: ["acp"],
       }),
     ).toBe(true);
@@ -188,7 +188,7 @@ describe("shouldStripProviderAuthEnvVarsForAcpServer", () => {
       shouldStripProviderAuthEnvVarsForAcpServer({
         serverCommand: "custom-acp-server",
         serverArgs: ["serve"],
-        defaultServerCommand: "kaijibot",
+        defaultServerCommand: "allbot",
         defaultServerArgs: ["acp"],
       }),
     ).toBe(false);
@@ -228,14 +228,14 @@ describe("buildAcpClientStripKeys", () => {
     expect(stripKeys.has("OPENAI_API_KEY")).toBe(true);
     expect(stripKeys.has("GITHUB_TOKEN")).toBe(true);
     expect(stripKeys.has("HF_TOKEN")).toBe(true);
-    expect(stripKeys.has("KAIJIBOT_API_KEY")).toBe(false);
+    expect(stripKeys.has("ALLBOT_API_KEY")).toBe(false);
   });
 });
 
 describe("resolveAcpClientSpawnInvocation", () => {
   it("keeps non-windows invocation unchanged", () => {
     const resolved = resolveAcpClientSpawnInvocation(
-      { serverCommand: "kaijibot", serverArgs: ["acp", "--verbose"] },
+      { serverCommand: "allbot", serverArgs: ["acp", "--verbose"] },
       {
         platform: "darwin",
         env: {},
@@ -243,7 +243,7 @@ describe("resolveAcpClientSpawnInvocation", () => {
       },
     );
     expect(resolved).toEqual({
-      command: "kaijibot",
+      command: "allbot",
       args: ["acp", "--verbose"],
       shell: undefined,
       windowsHide: undefined,
@@ -252,11 +252,11 @@ describe("resolveAcpClientSpawnInvocation", () => {
 
   it("unwraps .cmd shim entrypoint on windows", async () => {
     const dir = await createTempDir();
-    const scriptPath = path.join(dir, "kaijibot", "dist", "entry.js");
-    const shimPath = path.join(dir, "kaijibot.cmd");
+    const scriptPath = path.join(dir, "allbot", "dist", "entry.js");
+    const shimPath = path.join(dir, "allbot.cmd");
     await mkdir(path.dirname(scriptPath), { recursive: true });
     await writeFile(scriptPath, "console.log('ok')\n", "utf8");
-    await writeFile(shimPath, `@ECHO off\r\n"%~dp0\\kaijibot\\dist\\entry.js" %*\r\n`, "utf8");
+    await writeFile(shimPath, `@ECHO off\r\n"%~dp0\\allbot\\dist\\entry.js" %*\r\n`, "utf8");
 
     const resolved = resolveAcpClientSpawnInvocation(
       { serverCommand: shimPath, serverArgs: ["acp", "--verbose"] },
@@ -274,7 +274,7 @@ describe("resolveAcpClientSpawnInvocation", () => {
 
   it("fails closed for unresolved wrappers on windows", async () => {
     const dir = await createTempDir();
-    const shimPath = path.join(dir, "kaijibot.cmd");
+    const shimPath = path.join(dir, "allbot.cmd");
     await writeFile(shimPath, "@ECHO off\r\necho wrapper\r\n", "utf8");
 
     expect(() =>
@@ -516,7 +516,7 @@ describe("resolvePermissionRequest", () => {
           rawInput: { path: "docs/security.md" },
         },
       },
-      cwd: "/tmp/kaijibot-acp-cwd",
+      cwd: "/tmp/allbot-acp-cwd",
     });
   });
 
@@ -527,10 +527,10 @@ describe("resolvePermissionRequest", () => {
           toolCallId: "tool-read-inside-cwd-file-url",
           title: "read: ignored-by-raw-input",
           status: "pending",
-          rawInput: { path: "file:///tmp/kaijibot-acp-cwd/docs/security.md" },
+          rawInput: { path: "file:///tmp/allbot-acp-cwd/docs/security.md" },
         },
       },
-      cwd: "/tmp/kaijibot-acp-cwd",
+      cwd: "/tmp/allbot-acp-cwd",
     });
   });
 
@@ -545,7 +545,7 @@ describe("resolvePermissionRequest", () => {
           rawInput: { path: "../.ssh/id_rsa" },
         },
       }),
-      { prompt, log: () => {}, cwd: "/tmp/kaijibot-acp-cwd/workspace" },
+      { prompt, log: () => {}, cwd: "/tmp/allbot-acp-cwd/workspace" },
     );
     expect(prompt).toHaveBeenCalledTimes(1);
     expect(prompt).toHaveBeenCalledWith("read", "read: ignored-by-raw-input");

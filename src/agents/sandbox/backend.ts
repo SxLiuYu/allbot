@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeOptionalLowercaseString } from "../../shared/string-coerce.js";
 import type { SandboxBackendHandle, SandboxBackendId } from "./backend-handle.types.js";
 import type { SandboxRegistryEntry } from "./registry.js";
@@ -22,12 +22,12 @@ export type SandboxBackendRuntimeInfo = {
 export type SandboxBackendManager = {
   describeRuntime(params: {
     entry: SandboxRegistryEntry;
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     agentId?: string;
   }): Promise<SandboxBackendRuntimeInfo>;
   removeRuntime(params: {
     entry: SandboxRegistryEntry;
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     agentId?: string;
   }): Promise<void>;
 };

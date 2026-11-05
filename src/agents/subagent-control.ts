@@ -6,7 +6,7 @@ import {
   sortSubagentRuns,
   type SubagentTargetResolution,
 } from "../auto-reply/reply/subagents-utils.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { loadSessionStore, resolveStorePath, updateSessionStore } from "../config/sessions.js";
 import { callGateway } from "../gateway/call.js";
@@ -81,7 +81,7 @@ export {
 };
 
 export function resolveSubagentController(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentSessionKey?: string;
 }): ResolvedSubagentController {
   const { mainKey, alias } = resolveMainSessionAlias(params.cfg);
@@ -138,7 +138,7 @@ function ensureControllerOwnsRun(params: {
 }
 
 async function killSubagentRun(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   entry: SubagentRunRecord;
   cache: Map<string, Record<string, SessionEntry>>;
 }): Promise<{ killed: boolean; sessionId?: string }> {
@@ -186,7 +186,7 @@ async function killSubagentRun(params: {
 }
 
 async function cascadeKillChildren(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   parentChildSessionKey: string;
   cache: Map<string, Record<string, SessionEntry>>;
   seenChildSessionKeys?: Set<string>;
@@ -250,7 +250,7 @@ async function cascadeKillChildren(params: {
 }
 
 export async function killAllControlledSubagentRuns(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   controller: ResolvedSubagentController;
   runs: SubagentRunRecord[];
 }) {
@@ -298,7 +298,7 @@ export async function killAllControlledSubagentRuns(params: {
 }
 
 export async function killControlledSubagentRun(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   controller: ResolvedSubagentController;
   entry: SubagentRunRecord;
 }) {
@@ -373,7 +373,7 @@ export async function killControlledSubagentRun(params: {
   };
 }
 
-export async function killSubagentRunAdmin(params: { cfg: KaijiBotConfig; sessionKey: string }) {
+export async function killSubagentRunAdmin(params: { cfg: AllBotConfig; sessionKey: string }) {
   const targetSessionKey = params.sessionKey.trim();
   if (!targetSessionKey) {
     return { found: false as const, killed: false };
@@ -408,7 +408,7 @@ export async function killSubagentRunAdmin(params: { cfg: KaijiBotConfig; sessio
 }
 
 export async function steerControlledSubagentRun(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   controller: ResolvedSubagentController;
   entry: SubagentRunRecord;
   message: string;
@@ -595,7 +595,7 @@ export async function steerControlledSubagentRun(params: {
 }
 
 export async function sendControlledSubagentMessage(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   controller: ResolvedSubagentController;
   entry: SubagentRunRecord;
   message: string;

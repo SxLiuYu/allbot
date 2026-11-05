@@ -5,7 +5,7 @@ read_when:
 title: "Nextcloud Talk"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Nextcloud Talk
 
@@ -13,7 +13,7 @@ Status: bundled plugin (webhook bot). Direct messages, rooms, reactions, and mar
 
 ## Bundled plugin
 
-Nextcloud Talk ships as a bundled plugin in current KaijiBot releases, so
+Nextcloud Talk ships as a bundled plugin in current AllBot releases, so
 normal packaged builds do not need a separate install.
 
 If you are on an older build or a custom install that excludes Nextcloud Talk,
@@ -22,13 +22,13 @@ install it manually:
 Install via CLI (npm registry):
 
 ```bash
-kaijibot plugins install @kaijibot/nextcloud-talk
+allbot plugins install @allbot/nextcloud-talk
 ```
 
 Local checkout (when running from a git repo):
 
 ```bash
-kaijibot plugins install ./path/to/local/nextcloud-talk-plugin
+allbot plugins install ./path/to/local/nextcloud-talk-plugin
 ```
 
 Details: [Plugins](/tools/plugin)
@@ -36,16 +36,16 @@ Details: [Plugins](/tools/plugin)
 ## Quick setup (beginner)
 
 1. Ensure the Nextcloud Talk plugin is available.
-   - Current packaged KaijiBot releases already bundle it.
+   - Current packaged AllBot releases already bundle it.
    - Older/custom installs can add it manually with the commands above.
 2. On your Nextcloud server, create a bot:
 
    ```bash
-   ./occ talk:bot:install "KaijiBot" "<shared-secret>" "<webhook-url>" --feature reaction
+   ./occ talk:bot:install "AllBot" "<shared-secret>" "<webhook-url>" --feature reaction
    ```
 
 3. Enable the bot in the target room settings.
-4. Configure KaijiBot:
+4. Configure AllBot:
    - Config: `channels.nextcloud-talk.baseUrl` + `channels.nextcloud-talk.botSecret`
    - Or env: `NEXTCLOUD_TALK_BOT_SECRET` (default account only)
 5. Restart the gateway (or finish setup).
@@ -76,8 +76,8 @@ Minimal config:
 
 - Default: `channels.nextcloud-talk.dmPolicy = "pairing"`. Unknown senders get a pairing code.
 - Approve via:
-  - `kaijibot pairing list nextcloud-talk`
-  - `kaijibot pairing approve nextcloud-talk <CODE>`
+  - `allbot pairing list nextcloud-talk`
+  - `allbot pairing approve nextcloud-talk <CODE>`
 - Public DMs: `channels.nextcloud-talk.dmPolicy="open"` plus `channels.nextcloud-talk.allowFrom=["*"]`.
 - `allowFrom` matches Nextcloud user IDs only; display names are ignored.
 

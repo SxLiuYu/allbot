@@ -5,8 +5,8 @@ import type { AuthRateLimiter } from "./auth-rate-limit.js";
 import type { ResolvedGatewayAuth } from "./auth.js";
 import { sendInvalidRequest, sendJson, sendMethodNotAllowed } from "./http-common.js";
 import {
-  KAIJIBOT_DEFAULT_MODEL_ID,
-  KAIJIBOT_MODEL_ID,
+  ALLBOT_DEFAULT_MODEL_ID,
+  ALLBOT_MODEL_ID,
   authorizeGatewayHttpRequestOrReply,
   type AuthorizedGatewayHttpRequest,
   resolveAgentIdFromModel,
@@ -34,7 +34,7 @@ function toOpenAiModel(id: string): OpenAiModelObject {
     id,
     object: "model",
     created: 0,
-    owned_by: "kaijibot",
+    owned_by: "allbot",
     permission: [],
   };
 }
@@ -57,10 +57,10 @@ async function authorizeRequest(
 function loadAgentModelIds(): string[] {
   const cfg = loadConfig();
   const defaultAgentId = resolveDefaultAgentId(cfg);
-  const ids = new Set<string>([KAIJIBOT_MODEL_ID, KAIJIBOT_DEFAULT_MODEL_ID]);
-  ids.add(`kaijibot/${defaultAgentId}`);
+  const ids = new Set<string>([ALLBOT_MODEL_ID, ALLBOT_DEFAULT_MODEL_ID]);
+  ids.add(`allbot/${defaultAgentId}`);
   for (const agentId of listAgentIds(cfg)) {
-    ids.add(`kaijibot/${agentId}`);
+    ids.add(`allbot/${agentId}`);
   }
   return Array.from(ids);
 }
@@ -125,7 +125,7 @@ export async function handleOpenAiModelsHttpRequest(
     return true;
   }
 
-  if (decodedId !== KAIJIBOT_MODEL_ID && !resolveAgentIdFromModel(decodedId)) {
+  if (decodedId !== ALLBOT_MODEL_ID && !resolveAgentIdFromModel(decodedId)) {
     sendInvalidRequest(res, "Invalid model id.");
     return true;
   }

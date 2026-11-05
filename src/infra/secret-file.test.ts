@@ -10,7 +10,7 @@ import {
 } from "./secret-file.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-secret-file-test-");
+const createTempDir = () => tempDirs.make("allbot-secret-file-test-");
 
 afterEach(async () => {
   await tempDirs.cleanup();

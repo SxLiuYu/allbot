@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { createCodingTools, createReadTool } from "@earendil-works/pi-coding-agent";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ModelCompatConfig } from "../config/types.models.js";
 import type { ToolLoopDetectionConfig } from "../config/types.tools.js";
 import { resolveMergedSafeBinProfileFixtures } from "../infra/exec-safe-bin-runtime-policy.js";
@@ -26,7 +26,7 @@ import {
 import { listChannelAgentTools } from "./channel-tools.js";
 import { shouldSuppressManagedWebSearchTool } from "./codex-native-web-search.js";
 import { resolveImageSanitizationLimits } from "./image-sanitization.js";
-import { createKaijiBotTools } from "./kaijibot-tools.js";
+import { createAllBotTools } from "./allbot-tools.js";
 import type { ModelAuthMode } from "./model-auth.js";
 import { wrapToolWithAbortSignal } from "./pi-tools.abort.js";
 import { wrapToolWithBeforeToolCallHook } from "./pi-tools.before-tool-call.js";
@@ -41,7 +41,7 @@ import {
   assertRequiredParams,
   createHostWorkspaceEditTool,
   createHostWorkspaceWriteTool,
-  createKaijiBotReadTool,
+  createAllBotReadTool,
   createSandboxedEditTool,
   createSandboxedReadTool,
   createSandboxedWriteTool,
@@ -77,7 +77,7 @@ const MEMORY_FLUSH_ALLOWED_TOOL_NAMES = new Set(["read", "write"]);
 function applyModelProviderToolPolicy(
   tools: AnyAgentTool[],
   params?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     modelProvider?: string;
     modelApi?: string;
     modelId?: string;
@@ -151,7 +151,7 @@ function isApplyPatchAllowedForModel(params: {
 
 /**
  * Ensure the project's `node_modules/.bin` is in the PATH for exec commands.
- * This makes `kaijibot` CLI and other pnpm-installed binaries discoverable
+ * This makes `allbot` CLI and other pnpm-installed binaries discoverable
  * when the gateway runs from a git-clone installation (not Docker or npm global).
  */
 const _projectBinDir = path.join(process.cwd(), "node_modules", ".bin");
@@ -165,7 +165,7 @@ function ensureProjectBinInPath(configured: string[] | undefined): string[] | un
   return result.length > 0 ? result : undefined;
 }
 
-function resolveExecConfig(params: { cfg?: KaijiBotConfig; agentId?: string }) {
+function resolveExecConfig(params: { cfg?: AllBotConfig; agentId?: string }) {
   const cfg = params.cfg;
   const globalExec = cfg?.tools?.exec;
   const agentExec =
@@ -196,7 +196,7 @@ function resolveExecConfig(params: { cfg?: KaijiBotConfig; agentId?: string }) {
 }
 
 export function resolveToolLoopDetectionConfig(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentId?: string;
 }): ToolLoopDetectionConfig | undefined {
   const global = params.cfg?.tools?.loopDetection;
@@ -230,7 +230,7 @@ export const __testing = {
   applyModelProviderToolPolicy,
 } as const;
 
-export function createKaijiBotCodingTools(options?: {
+export function createAllBotCodingTools(options?: {
   agentId?: string;
   exec?: ExecToolDefaults & ProcessToolDefaults;
   messageProvider?: string;
@@ -256,7 +256,7 @@ export function createKaijiBotCodingTools(options?: {
    * Defaults to workspaceDir when not set.
    */
   spawnWorkspaceDir?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   abortSignal?: AbortSignal;
   /**
    * Provider of the currently selected model (used for provider-specific tool quirks).
@@ -426,7 +426,7 @@ export function createKaijiBotCodingTools(options?: {
         ];
       }
       const freshReadTool = createReadTool(workspaceRoot) as unknown as AnyAgentTool;
-      const wrapped = createKaijiBotReadTool(freshReadTool, {
+      const wrapped = createAllBotReadTool(freshReadTool, {
         modelContextWindowTokens: options?.modelContextWindowTokens,
         imageSanitization,
       });
@@ -537,7 +537,7 @@ export function createKaijiBotCodingTools(options?: {
     processTool as unknown as AnyAgentTool,
     // Channel docking: include channel-defined agent tools (login, etc.).
     ...listChannelAgentTools({ cfg: options?.config }),
-    ...createKaijiBotTools({
+    ...createAllBotTools({
       sandboxBrowserBridgeUrl: sandbox?.browser?.bridgeUrl,
       allowHostBrowserControl: sandbox ? sandbox.browserAllowHostControl : true,
       agentSessionKey: options?.sessionKey,

@@ -62,7 +62,7 @@ function buildEntry(name: string): SkillEntry {
       description: `${name} test skill`,
       filePath,
       baseDir: skillDir,
-      source: "kaijibot-workspace",
+      source: "allbot-workspace",
     }),
     frontmatter: {},
   };
@@ -157,7 +157,7 @@ let workspaceDir = "";
 let stateDir = "";
 
 beforeAll(async () => {
-  workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-skills-install-"));
+  workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-skills-install-"));
   stateDir = setTempStateDir(workspaceDir);
 });
 

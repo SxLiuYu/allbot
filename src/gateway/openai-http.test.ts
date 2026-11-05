@@ -58,9 +58,9 @@ async function startTokenServer(port: number, opts?: { openAiChatCompletionsEnab
 }
 
 async function writeGatewayConfig(config: Record<string, unknown>) {
-  const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+  const configPath = process.env.ALLBOT_CONFIG_PATH;
   if (!configPath) {
-    throw new Error("KAIJIBOT_CONFIG_PATH is required for gateway config tests");
+    throw new Error("ALLBOT_CONFIG_PATH is required for gateway config tests");
   }
   await fs.mkdir(path.dirname(configPath), { recursive: true });
   await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
@@ -71,7 +71,7 @@ async function postChatCompletions(port: number, body: unknown, headers?: Record
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-kaijibot-scopes": "operator.write",
+      "x-allbot-scopes": "operator.write",
       ...headers,
     },
     body: JSON.stringify(body),
@@ -86,7 +86,7 @@ async function expectChatCompletionsDisabled(
   const server = await start(port);
   try {
     const res = await postChatCompletions(port, {
-      model: "kaijibot",
+      model: "allbot",
       messages: [{ role: "user", content: "hi" }],
     });
     expect(res.status).toBe(404);
@@ -163,7 +163,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
     const expectInvalidRequestNoDispatch = async (messages: unknown[]) => {
       agentCommand.mockClear();
       const res = await postChatCompletions(port, {
-        model: "kaijibot",
+        model: "allbot",
         messages,
       });
       expect(res.status).toBe(400);
@@ -176,7 +176,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
     const postSyncUserMessage = async (message: string) => {
       const res = await postChatCompletions(port, {
         stream: false,
-        model: "kaijibot",
+        model: "allbot",
         messages: [{ role: "user", content: message }],
       });
       expect(res.status).toBe(200);
@@ -211,8 +211,8 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
 
       {
         await expectAgentSessionKeyMatch({
-          body: { model: "kaijibot", messages: [{ role: "user", content: "hi" }] },
-          headers: { "x-kaijibot-agent-id": "beta" },
+          body: { model: "allbot", messages: [{ role: "user", content: "hi" }] },
+          headers: { "x-allbot-agent-id": "beta" },
           matcher: /^agent:beta:/,
         });
       }
@@ -220,7 +220,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         await expectAgentSessionKeyMatch({
           body: {
-            model: "kaijibot/beta",
+            model: "allbot/beta",
             messages: [{ role: "user", content: "hi" }],
           },
           matcher: /^agent:beta:/,
@@ -230,7 +230,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         await expectAgentSessionKeyMatch({
           body: {
-            model: "kaijibot/default",
+            model: "allbot/default",
             messages: [{ role: "user", content: "hi" }],
           },
           matcher: /^agent:main:/,
@@ -241,10 +241,10 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         mockAgentOnce([{ text: "hello" }]);
         const res = await postChatCompletions(
           port,
-          { model: "kaijibot", messages: [{ role: "user", content: "hi" }] },
+          { model: "allbot", messages: [{ role: "user", content: "hi" }] },
           {
-            "x-kaijibot-agent-id": "beta",
-            "x-kaijibot-session-key": "agent:beta:openai:custom",
+            "x-allbot-agent-id": "beta",
+            "x-allbot-session-key": "agent:beta:openai:custom",
           },
         );
         expect(res.status).toBe(200);
@@ -260,7 +260,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         mockAgentOnce([{ text: "hello" }]);
         const res = await postChatCompletions(port, {
           user: "alice",
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         });
         expect(res.status).toBe(200);
@@ -277,10 +277,10 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const res = await postChatCompletions(
           port,
           {
-            model: "kaijibot",
+            model: "allbot",
             messages: [{ role: "user", content: "hi" }],
           },
-          { "x-kaijibot-message-channel": "custom-client-channel" },
+          { "x-allbot-message-channel": "custom-client-channel" },
         );
         expect(res.status).toBe(200);
         expect(getFirstAgentCall()?.messageChannel).toBe("custom-client-channel");
@@ -292,11 +292,11 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const res = await postChatCompletions(
           port,
           {
-            model: "kaijibot",
+            model: "allbot",
             messages: [{ role: "user", content: "hi" }],
           },
           {
-            "x-kaijibot-model": "openai/gpt-5.4",
+            "x-allbot-model": "openai/gpt-5.4",
           },
         );
         expect(res.status).toBe(200);
@@ -320,11 +320,11 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const res = await postChatCompletions(
           port,
           {
-            model: "kaijibot",
+            model: "allbot",
             messages: [{ role: "user", content: "hi" }],
           },
           {
-            "x-kaijibot-model": "gpt-5.4",
+            "x-allbot-model": "gpt-5.4",
           },
         );
         expect(res.status).toBe(200);
@@ -344,7 +344,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const json = (await res.json()) as { error?: { type?: string; message?: string } };
         expect(json.error?.type).toBe("invalid_request_error");
         expect(json.error?.message).toBe(
-          "Invalid `model`. Use `kaijibot` or `kaijibot/<agentId>`.",
+          "Invalid `model`. Use `allbot` or `allbot/<agentId>`.",
         );
         expect(agentCommand).toHaveBeenCalledTimes(0);
       }
@@ -354,22 +354,22 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const res = await postChatCompletions(
           port,
           {
-            model: "kaijibot",
+            model: "allbot",
             messages: [{ role: "user", content: "hi" }],
           },
-          { "x-kaijibot-model": "openai/" },
+          { "x-allbot-model": "openai/" },
         );
         expect(res.status).toBe(400);
         const json = (await res.json()) as { error?: { type?: string; message?: string } };
         expect(json.error?.type).toBe("invalid_request_error");
-        expect(json.error?.message).toBe("Invalid `x-kaijibot-model`.");
+        expect(json.error?.message).toBe("Invalid `x-allbot-model`.");
         expect(agentCommand).toHaveBeenCalledTimes(0);
       }
 
       {
         mockAgentOnce([{ text: "hello" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -391,7 +391,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const imageData = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAA";
         mockAgentOnce([{ text: "looks good" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -419,7 +419,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const imageData = "QUJDRA==";
         mockAgentOnce([{ text: "supports data-uri params" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -459,7 +459,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "I can see the image" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -485,7 +485,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "follow up answer" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -508,7 +508,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "latest image only" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -540,7 +540,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const largeMessage = "x".repeat(1_200_000);
         mockAgentOnce([{ text: "accepted" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: largeMessage }],
         });
         expect(res.status).toBe(200);
@@ -577,7 +577,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "I am Claude" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             { role: "system", content: "You are a helpful assistant." },
             { role: "user", content: "Hello, who are you?" },
@@ -598,7 +598,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "hello" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             { role: "system", content: "You are a helpful assistant." },
             { role: "user", content: "Hello" },
@@ -616,7 +616,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "hello" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             { role: "developer", content: "You are a helpful assistant." },
             { role: "user", content: "Hello" },
@@ -632,7 +632,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "ok" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             { role: "system", content: "You are a helpful assistant." },
             { role: "user", content: "What's the weather?" },
@@ -653,7 +653,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       {
         mockAgentOnce([{ text: "tool follow-up ok" }]);
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [
             {
               role: "user",
@@ -696,12 +696,12 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         const json = await postSyncUserMessage("hi");
         const choice0 = (json.choices as Array<Record<string, unknown>>)[0] ?? {};
         const msg = (choice0.message as Record<string, unknown> | undefined) ?? {};
-        expect(msg.content).toBe("No response from KaijiBot.");
+        expect(msg.content).toBe("No response from AllBot.");
       }
 
       {
         const res = await postChatCompletions(port, {
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "system", content: "yo" }],
         });
         expect(res.status).toBe(400);
@@ -728,7 +728,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
           authorization: "Bearer wrong",
         };
         const body = {
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         };
 
@@ -772,7 +772,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
 
         const res = await postChatCompletions(port, {
           stream: true,
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         });
         expect(res.status).toBe(200);
@@ -806,7 +806,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
 
         const repeatedRes = await postChatCompletions(port, {
           stream: true,
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         });
         expect(repeatedRes.status).toBe(200);
@@ -831,7 +831,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
 
         const fallbackRes = await postChatCompletions(port, {
           stream: true,
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         });
         expect(fallbackRes.status).toBe(200);
@@ -846,7 +846,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
 
         const errorRes = await postChatCompletions(port, {
           stream: true,
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         });
         expect(errorRes.status).toBe(200);
@@ -881,10 +881,10 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
         headers: {
           authorization: "Bearer secret",
           "content-type": "application/json",
-          "x-kaijibot-scopes": "operator.approvals",
+          "x-allbot-scopes": "operator.approvals",
         },
         body: JSON.stringify({
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         }),
       });
@@ -932,7 +932,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
     clientReq.end(
       JSON.stringify({
         stream: true,
-        model: "kaijibot",
+        model: "allbot",
         messages: [{ role: "user", content: "hi" }],
       }),
     );
@@ -985,7 +985,7 @@ describe.skipIf(process.env.CI)("OpenAI-compatible HTTP API (e2e)", () => {
       clientReq.on("error", () => {});
       clientReq.end(
         JSON.stringify({
-          model: "kaijibot",
+          model: "allbot",
           messages: [{ role: "user", content: "hi" }],
         }),
       );

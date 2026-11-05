@@ -25,9 +25,9 @@ const { withFileLockMock } = vi.hoisted(() => ({
     async <T>(_filePath: string, _options: unknown, fn: () => Promise<T>) => await fn(),
   ),
 }));
-const MEMORY_EMBEDDING_PROVIDERS_KEY = Symbol.for("kaijibot.memoryEmbeddingProviders");
-const MCPORTER_STATE_KEY = Symbol.for("kaijibot.mcporterState");
-const QMD_EMBED_QUEUE_KEY = Symbol.for("kaijibot.qmdEmbedQueueTail");
+const MEMORY_EMBEDDING_PROVIDERS_KEY = Symbol.for("allbot.memoryEmbeddingProviders");
+const MCPORTER_STATE_KEY = Symbol.for("allbot.mcporterState");
+const QMD_EMBED_QUEUE_KEY = Symbol.for("allbot.qmdEmbedQueueTail");
 
 interface MockChild extends EventEmitter {
   stdout: EventEmitter;
@@ -83,10 +83,10 @@ function isMcporterCommand(cmd: unknown): boolean {
   return /(^|[\\/])mcporter(?:\.cmd)?$/i.test(cmd);
 }
 
-vi.mock("kaijibot/plugin-sdk/memory-core-host-engine-foundation", async () => {
+vi.mock("allbot/plugin-sdk/memory-core-host-engine-foundation", async () => {
   const actual = await vi.importActual<
-    typeof import("kaijibot/plugin-sdk/memory-core-host-engine-foundation")
-  >("kaijibot/plugin-sdk/memory-core-host-engine-foundation");
+    typeof import("allbot/plugin-sdk/memory-core-host-engine-foundation")
+  >("allbot/plugin-sdk/memory-core-host-engine-foundation");
   return {
     ...actual,
     createSubsystemLogger: () => {
@@ -114,9 +114,9 @@ vi.mock("chokidar", () => ({
   watch: watchMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/file-lock", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/file-lock")>(
-    "kaijibot/plugin-sdk/file-lock",
+vi.mock("allbot/plugin-sdk/file-lock", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/file-lock")>(
+    "allbot/plugin-sdk/file-lock",
   );
   return {
     ...actual,
@@ -125,11 +125,11 @@ vi.mock("kaijibot/plugin-sdk/file-lock", async () => {
 });
 
 import { spawn as mockedSpawn } from "node:child_process";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import {
   requireNodeSqlite,
   resolveMemoryBackendConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 import { QmdMemoryManager } from "./qmd-manager.js";
 
 const spawnMock = mockedSpawn as unknown as Mock;
@@ -144,7 +144,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
   let tmpRoot: string;
   let workspaceDir: string;
   let stateDir: string;
-  let cfg: KaijiBotConfig;
+  let cfg: AllBotConfig;
   const agentId = "main";
   const openManagers = new Set<QmdMemoryManager>();
   let embedStartupJitterSpy: { mockRestore: () => void } | null = null;
@@ -172,7 +172,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
     return manager;
   }
 
-  async function createManager(params?: { mode?: "full" | "status"; cfg?: KaijiBotConfig }) {
+  async function createManager(params?: { mode?: "full" | "status"; cfg?: AllBotConfig }) {
     const cfgToUse = params?.cfg ?? cfg;
     const resolved = resolveMemoryBackendConfig({ cfg: cfgToUse, agentId });
     const manager = trackManager(
@@ -237,7 +237,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     seedMemoryEmbeddingProviders();
     embedStartupJitterSpy = vi
       .spyOn(
@@ -322,7 +322,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -366,7 +366,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let releaseUpdate: (() => void) | null = null;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -421,7 +421,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "full" });
     expect(watchMock).toHaveBeenCalledTimes(1);
@@ -451,7 +451,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let releaseUpdate: (() => void) | null = null;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -480,7 +480,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "status" });
     expect(spawnMock).not.toHaveBeenCalled();
@@ -503,7 +503,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const updateSpawned = createDeferred<void>();
     let releaseUpdate: (() => void) | null = null;
@@ -547,7 +547,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "collection" && args[1] === "list") {
@@ -581,7 +581,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           sessions: { enabled: true },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const sessionCollectionName = `sessions-${devAgentId}`;
     const wrongSessionsPath = path.join(stateDir, "agents", agentId, "qmd", "sessions");
@@ -642,7 +642,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           sessions: { enabled: true },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const sessionCollectionName = `sessions-${agentId}`;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -680,7 +680,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "collection" && args[1] === "list") {
@@ -729,7 +729,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const legacyCollections = new Map<
       string,
@@ -813,7 +813,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const listedCollections = new Map<
       string,
@@ -891,7 +891,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const listedCollections = new Map<
       string,
@@ -971,7 +971,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "collection" && args[1] === "list") {
@@ -1007,7 +1007,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const addFlagCalls: string[] = [];
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -1049,7 +1049,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const removeCalls: string[] = [];
     const addCalls: string[] = [];
@@ -1105,7 +1105,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const differentPath = path.join(tmpRoot, "other-memory");
     await fs.mkdir(differentPath, { recursive: true });
@@ -1156,7 +1156,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "update") {
         return createMockChild({ autoClose: false });
@@ -1190,7 +1190,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let updateCalls = 0;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -1247,7 +1247,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let updateCalls = 0;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -1304,7 +1304,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let updateCalls = 0;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -1361,7 +1361,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "update") {
@@ -1396,7 +1396,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "update") {
@@ -1437,7 +1437,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
         const child = createMockChild({ autoClose: false });
@@ -1488,7 +1488,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const expectedDocId = "abc123";
     let missingCollectionSeen = false;
@@ -1622,7 +1622,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
         const child = createMockChild({ autoClose: false });
@@ -1669,7 +1669,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
         const child = createMockChild({ autoClose: false });
@@ -1703,7 +1703,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
         const child = createMockChild({ autoClose: false });
@@ -1738,7 +1738,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "query") {
         const child = createMockChild({ autoClose: false });
@@ -1772,7 +1772,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
         const child = createMockChild({ autoClose: false });
@@ -1825,7 +1825,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const firstUpdateSpawned = createDeferred<void>();
     let updateCalls = 0;
@@ -1877,7 +1877,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const firstUpdateSpawned = createDeferred<void>();
     const secondUpdateSpawned = createDeferred<void>();
@@ -1943,7 +1943,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           ],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
@@ -1983,7 +1983,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
@@ -2024,7 +2024,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: sharedMirrorDir, pattern: "**/*.md", name: "notion-mirror" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
@@ -2066,7 +2066,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           ],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "query") {
@@ -2112,7 +2112,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           ],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
@@ -2161,7 +2161,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2205,7 +2205,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2255,7 +2255,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let callCount = 0;
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
@@ -2317,7 +2317,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2358,7 +2358,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2432,7 +2432,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2505,7 +2505,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2546,7 +2546,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selectors: string[] = [];
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
@@ -2600,7 +2600,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selectors: string[] = [];
     const collections: string[] = [];
@@ -2646,7 +2646,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selectors: string[] = [];
     let firstQueryCall = true;
@@ -2701,7 +2701,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selectors: string[] = [];
     let firstQueryCall = true;
@@ -2788,7 +2788,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
             mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       spawnMock.mockImplementation((_cmd: string, args: string[]) => {
         const child = createMockChild({ autoClose: false });
@@ -2839,7 +2839,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
             mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       let firstCallCommand: string | null = null;
       spawnMock.mockImplementation((cmd: string, args: string[]) => {
@@ -2892,7 +2892,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: false },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -2935,7 +2935,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: true },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let daemonAttempts = 0;
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
@@ -2979,7 +2979,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           mcporter: { enabled: true, serverName: "qmd", startDaemon: true },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((cmd: string, args: string[]) => {
       const child = createMockChild({ autoClose: false });
@@ -3019,7 +3019,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager();
 
@@ -3043,7 +3043,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search" && args.includes("workspace-main")) {
@@ -3128,7 +3128,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "embed") {
         return createMockChild({ autoClose: false });
@@ -3169,7 +3169,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "full" });
 
@@ -3207,7 +3207,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "full" });
 
@@ -3239,7 +3239,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "full" });
 
@@ -3271,7 +3271,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "full" });
 
@@ -3312,7 +3312,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "full" });
 
@@ -3393,7 +3393,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager({ mode: "status" });
     await manager.sync({ reason: "manual", force: true });
@@ -3422,7 +3422,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     let updateCalls = 0;
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -3495,7 +3495,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const { manager } = await createManager();
 
     const isAllowed = (key?: string) =>
@@ -3524,7 +3524,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const { manager } = await createManager();
 
     logWarnMock.mockClear();
@@ -3646,7 +3646,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { manager } = await createManager();
 
@@ -3819,7 +3819,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           ],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const duplicateDocid = "dup-123";
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
@@ -3886,7 +3886,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
@@ -3941,7 +3941,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           paths: [{ path: workspaceDir, pattern: "**/*.md", name: "workspace" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search") {
@@ -4032,7 +4032,7 @@ describe.skipIf(process.env.CI)("QmdMemoryManager", () => {
           ],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     spawnMock.mockImplementation((_cmd: string, args: string[]) => {
       if (args[0] === "search" && args.includes("workspace-main")) {

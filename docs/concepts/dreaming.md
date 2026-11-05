@@ -10,7 +10,7 @@ read_when:
 # Dreaming (experimental)
 
 Dreaming is the background memory consolidation system in `memory-core`.
-It helps KaijiBot move strong short-term signals into durable memory while
+It helps AllBot move strong short-term signals into durable memory while
 keeping the process explainable and reviewable.
 
 Dreaming is **opt-in** and disabled by default.
@@ -176,10 +176,10 @@ Enable dreaming with a custom sweep cadence:
 Use CLI promotion for preview or manual apply:
 
 ```bash
-kaijibot memory promote
-kaijibot memory promote --apply
-kaijibot memory promote --limit 5
-kaijibot memory status --deep
+allbot memory promote
+allbot memory promote --apply
+allbot memory promote --limit 5
+allbot memory status --deep
 ```
 
 Manual `memory promote` uses deep-phase thresholds by default unless overridden
@@ -188,16 +188,16 @@ with CLI flags.
 Explain why a specific candidate would or would not promote:
 
 ```bash
-kaijibot memory promote-explain "router vlan"
-kaijibot memory promote-explain "router vlan" --json
+allbot memory promote-explain "router vlan"
+allbot memory promote-explain "router vlan" --json
 ```
 
 Preview REM reflections, candidate truths, and deep promotion output without
 writing anything:
 
 ```bash
-kaijibot memory rem-harness
-kaijibot memory rem-harness --json
+allbot memory rem-harness
+allbot memory rem-harness --json
 ```
 
 ## Key defaults

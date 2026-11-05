@@ -1,4 +1,4 @@
-import { withEnv, withEnvAsync } from "kaijibot/plugin-sdk/test-env";
+import { withEnv, withEnvAsync } from "allbot/plugin-sdk/test-env";
 import { describe, expect, it } from "vitest";
 import { createPerplexityWebSearchProvider } from "./perplexity-web-search-provider.js";
 import { testing } from "./perplexity-web-search-provider.runtime.js";

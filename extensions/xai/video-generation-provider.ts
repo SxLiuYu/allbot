@@ -1,17 +1,17 @@
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   fetchWithTimeout,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import type {
   GeneratedVideoAsset,
   VideoGenerationProvider,
   VideoGenerationRequest,
-} from "kaijibot/plugin-sdk/video-generation";
+} from "allbot/plugin-sdk/video-generation";
 
 const DEFAULT_XAI_VIDEO_BASE_URL = "https://api.x.ai/v1";
 const DEFAULT_XAI_VIDEO_MODEL = "grok-imagine-video";

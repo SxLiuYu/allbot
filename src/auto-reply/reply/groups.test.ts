@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resetPluginRuntimeStateForTest } from "../../plugins/runtime.js";
 
 describe("group runtime loading", () => {
@@ -28,7 +28,7 @@ describe("group runtime loading", () => {
     ).toContain('You are in the Whatsapp group chat "Ops".');
     expect(
       groups.buildGroupIntro({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         sessionCtx: { Provider: "whatsapp" },
         defaultActivation: "mention",
         silentToken: "NO_REPLY",
@@ -36,7 +36,7 @@ describe("group runtime loading", () => {
     ).toContain("Activation: trigger-only");
     expect(
       groups.buildGroupIntro({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         sessionCtx: { Provider: "whatsapp" },
         defaultActivation: "mention",
         silentToken: "NO_REPLY",
@@ -67,7 +67,7 @@ describe("group runtime loading", () => {
               },
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         ctx: {
           Provider: "slack",
           From: "slack:channel:C123",

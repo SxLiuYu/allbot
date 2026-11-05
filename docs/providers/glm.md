@@ -1,33 +1,33 @@
 ---
-summary: "GLM model family overview + how to use it in KaijiBot"
+summary: "GLM model family overview + how to use it in AllBot"
 read_when:
-  - You want GLM models in KaijiBot
+  - You want GLM models in AllBot
   - You need the model naming convention and setup
 title: "GLM Models"
 ---
 
 # GLM models
 
-GLM is a **model family** (not a company) available through the Z.AI platform. In KaijiBot, GLM
+GLM is a **model family** (not a company) available through the Z.AI platform. In AllBot, GLM
 models are accessed via the `zai` provider and model IDs like `zai/glm-5`.
 
 ## CLI setup
 
 ```bash
 # Generic API-key setup with endpoint auto-detection
-kaijibot onboard --auth-choice zai-api-key
+allbot onboard --auth-choice zai-api-key
 
 # Coding Plan Global, recommended for Coding Plan users
-kaijibot onboard --auth-choice zai-coding-global
+allbot onboard --auth-choice zai-coding-global
 
 # Coding Plan CN (China region), recommended for Coding Plan users
-kaijibot onboard --auth-choice zai-coding-cn
+allbot onboard --auth-choice zai-coding-cn
 
 # General API
-kaijibot onboard --auth-choice zai-global
+allbot onboard --auth-choice zai-global
 
 # General API CN (China region)
-kaijibot onboard --auth-choice zai-cn
+allbot onboard --auth-choice zai-cn
 ```
 
 ## Config snippet
@@ -39,13 +39,13 @@ kaijibot onboard --auth-choice zai-cn
 }
 ```
 
-`zai-api-key` lets KaijiBot detect the matching Z.AI endpoint from the key and
+`zai-api-key` lets AllBot detect the matching Z.AI endpoint from the key and
 apply the correct base URL automatically. Use the explicit regional choices when
 you want to force a specific Coding Plan or general API surface.
 
 ## Current bundled GLM models
 
-KaijiBot currently seeds the bundled `zai` provider with these GLM refs:
+AllBot currently seeds the bundled `zai` provider with these GLM refs:
 
 - `glm-5.1`
 - `glm-5`

@@ -21,6 +21,6 @@ export type McpServerConfig = {
 };
 
 export type McpConfig = {
-  /** Named MCP server definitions managed by KaijiBot. */
+  /** Named MCP server definitions managed by AllBot. */
   servers?: Record<string, McpServerConfig>;
 };

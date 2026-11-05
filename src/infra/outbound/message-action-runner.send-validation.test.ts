@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createTestRegistry } from "../../test-utils/channel-plugins.js";
 import {
@@ -52,7 +52,7 @@ describe("runMessageAction send validation", () => {
             botToken: "telegram-test",
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       actionParams: {
         channel: "telegram",
         target: "123456",

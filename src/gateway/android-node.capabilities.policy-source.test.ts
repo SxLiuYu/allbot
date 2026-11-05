@@ -25,7 +25,7 @@ describe("shouldFetchRemotePolicyConfig", () => {
   });
 
   it("returns true for env and cli overrides", () => {
-    expect(shouldFetchRemotePolicyConfig(details({ urlSource: "env KAIJIBOT_GATEWAY_URL" }))).toBe(
+    expect(shouldFetchRemotePolicyConfig(details({ urlSource: "env ALLBOT_GATEWAY_URL" }))).toBe(
       true,
     );
     expect(shouldFetchRemotePolicyConfig(details({ urlSource: "cli --url" }))).toBe(true);

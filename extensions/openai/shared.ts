@@ -1,10 +1,10 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
-import { findCatalogTemplate } from "kaijibot/plugin-sdk/provider-catalog-shared";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
+import { findCatalogTemplate } from "allbot/plugin-sdk/provider-catalog-shared";
 import {
   cloneFirstTemplateModel,
   matchesExactOrPrefix,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 
 type SyntheticOpenAIModelCatalogEntry = {
   provider: string;
@@ -22,7 +22,7 @@ export function toOpenAIDataUrl(buffer: Buffer, mimeType: string): string {
   return `data:${mimeType};base64,${buffer.toString("base64")}`;
 }
 
-export function resolveConfiguredOpenAIBaseUrl(cfg: KaijiBotConfig | undefined): string {
+export function resolveConfiguredOpenAIBaseUrl(cfg: AllBotConfig | undefined): string {
   return normalizeOptionalString(cfg?.models?.providers?.openai?.baseUrl) ?? OPENAI_API_BASE_URL;
 }
 

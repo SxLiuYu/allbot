@@ -12,9 +12,9 @@ export {
   resolveMemoryFtsState,
   resolveMemoryVectorState,
   type Tone,
-} from "kaijibot/plugin-sdk/memory-core-host-status";
-export { checkQmdBinaryAvailability } from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
-export { hasConfiguredMemorySecretInput } from "kaijibot/plugin-sdk/memory-core-host-secret";
+} from "allbot/plugin-sdk/memory-core-host-status";
+export { checkQmdBinaryAvailability } from "allbot/plugin-sdk/memory-core-host-engine-qmd";
+export { hasConfiguredMemorySecretInput } from "allbot/plugin-sdk/memory-core-host-secret";
 export {
   auditShortTermPromotionArtifacts,
   removeGroundedShortTermCandidates,

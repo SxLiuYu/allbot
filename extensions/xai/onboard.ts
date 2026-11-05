@@ -1,7 +1,7 @@
 import {
   createDefaultModelsPresetAppliers,
-  type KaijiBotConfig,
-} from "@kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "@allbot/plugin-sdk/provider-onboard";
 import { XAI_BASE_URL, XAI_DEFAULT_MODEL_ID } from "./model-definitions.js";
 import { buildXaiCatalogModels } from "./model-definitions.js";
 
@@ -11,7 +11,7 @@ const xaiPresetAppliers = createDefaultModelsPresetAppliers<
   ["openai-completions" | "openai-responses"]
 >({
   primaryModelRef: XAI_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig, api) => ({
+  resolveParams: (_cfg: AllBotConfig, api) => ({
     providerId: "xai",
     api,
     baseUrl: XAI_BASE_URL,
@@ -21,14 +21,14 @@ const xaiPresetAppliers = createDefaultModelsPresetAppliers<
   }),
 });
 
-export function applyXaiProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyXaiProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return xaiPresetAppliers.applyProviderConfig(cfg, "openai-responses");
 }
 
-export function applyXaiResponsesApiConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyXaiResponsesApiConfig(cfg: AllBotConfig): AllBotConfig {
   return xaiPresetAppliers.applyProviderConfig(cfg, "openai-responses");
 }
 
-export function applyXaiConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyXaiConfig(cfg: AllBotConfig): AllBotConfig {
   return xaiPresetAppliers.applyConfig(cfg, "openai-responses");
 }

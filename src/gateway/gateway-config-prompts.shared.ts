@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { getTailnetHostname } from "../infra/tailscale.js";
 import { isIpv6Address, parseCanonicalIpAddress } from "../shared/net/ip.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
@@ -65,10 +65,10 @@ export function appendAllowedOrigin(existing: string[] | undefined, origin: stri
 }
 
 export async function maybeAddTailnetOriginToControlUiAllowedOrigins(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   tailscaleMode: string;
   tailscaleBin?: string | null;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   if (params.tailscaleMode !== "serve" && params.tailscaleMode !== "funnel") {
     return params.config;
   }

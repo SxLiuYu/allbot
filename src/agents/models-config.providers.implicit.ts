@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
@@ -39,7 +39,7 @@ const PLUGIN_DISCOVERY_ORDERS = ["simple", "profile", "paired", "late"] as const
 
 type ImplicitProviderParams = {
   agentDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   explicitProviders?: Record<string, ProviderConfig> | null;
@@ -54,11 +54,11 @@ type ImplicitProviderContext = ImplicitProviderParams & {
 
 function resolveLiveProviderCatalogTimeoutMs(env: NodeJS.ProcessEnv): number | null {
   const live =
-    env.KAIJIBOT_LIVE_TEST === "1" || env.KAIJIBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
+    env.ALLBOT_LIVE_TEST === "1" || env.ALLBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
   if (!live) {
     return null;
   }
-  const raw = env.KAIJIBOT_LIVE_PROVIDER_DISCOVERY_TIMEOUT_MS?.trim();
+  const raw = env.ALLBOT_LIVE_PROVIDER_DISCOVERY_TIMEOUT_MS?.trim();
   if (!raw) {
     return 15_000;
   }
@@ -67,12 +67,12 @@ function resolveLiveProviderCatalogTimeoutMs(env: NodeJS.ProcessEnv): number | n
 }
 
 function resolveProviderDiscoveryFilter(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] | undefined {
   const { config, workspaceDir, env } = params;
-  const testRaw = env.KAIJIBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS?.trim();
+  const testRaw = env.ALLBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS?.trim();
   if (testRaw) {
     const ids = testRaw
       .split(",")
@@ -81,13 +81,13 @@ function resolveProviderDiscoveryFilter(params: {
     return ids.length > 0 ? [...new Set(ids)] : undefined;
   }
   const live =
-    env.KAIJIBOT_LIVE_TEST === "1" || env.KAIJIBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
+    env.ALLBOT_LIVE_TEST === "1" || env.ALLBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
   if (!live) {
     return undefined;
   }
   const rawValues = [
-    env.KAIJIBOT_LIVE_PROVIDERS?.trim(),
-    env.KAIJIBOT_LIVE_GATEWAY_PROVIDERS?.trim(),
+    env.ALLBOT_LIVE_PROVIDERS?.trim(),
+    env.ALLBOT_LIVE_GATEWAY_PROVIDERS?.trim(),
   ].filter((value): value is string => Boolean(value && value !== "all"));
   if (rawValues.length === 0) {
     return undefined;
@@ -122,7 +122,7 @@ function resolveProviderDiscoveryFilter(params: {
 }
 
 export function resolveProviderDiscoveryFilterForTest(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] | undefined {
@@ -282,7 +282,7 @@ async function resolvePluginImplicitProviders(
   return Object.keys(discovered).length > 0 ? discovered : undefined;
 }
 
-function buildPluginCatalogConfig(ctx: ImplicitProviderContext): KaijiBotConfig {
+function buildPluginCatalogConfig(ctx: ImplicitProviderContext): AllBotConfig {
   if (!ctx.explicitProviders || Object.keys(ctx.explicitProviders).length === 0) {
     return ctx.config ?? {};
   }
@@ -338,7 +338,7 @@ async function runProviderCatalogWithTimeout(
 
 export async function resolveImplicitProviders(
   params: ImplicitProviderParams,
-): Promise<NonNullable<KaijiBotConfig["models"]>["providers"]> {
+): Promise<NonNullable<AllBotConfig["models"]>["providers"]> {
   const providers: Record<string, ProviderConfig> = {};
   const env = params.env ?? process.env;
   let authStore: ReturnType<typeof ensureAuthProfileStore> | undefined;

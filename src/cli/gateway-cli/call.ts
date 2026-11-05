@@ -1,11 +1,11 @@
 import type { Command } from "commander";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { callGateway } from "../../gateway/call.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../../utils/message-channel.js";
 import { withProgress } from "../progress.js";
 
 export type GatewayRpcOpts = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   url?: string;
   token?: string;
   password?: string;

@@ -1,11 +1,11 @@
-import type { ImageGenerationProvider } from "kaijibot/plugin-sdk/image-generation";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import type { ImageGenerationProvider } from "allbot/plugin-sdk/image-generation";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
+} from "allbot/plugin-sdk/provider-http";
 
 const DEFAULT_MINIMAX_IMAGE_BASE_URL = "https://api.minimax.io";
 const DEFAULT_MODEL = "image-01";

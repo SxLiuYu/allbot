@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resetLogger, setLoggerOverride } from "../logging/logger.js";
 import { createWarnLogCapture } from "../logging/test-helpers/warn-log-capture.js";
 import { AUTH_STORE_VERSION } from "./auth-profiles/constants.js";
@@ -21,7 +21,7 @@ vi.mock("../plugins/provider-runtime.js", () => ({
 
 const makeCfg = makeModelFallbackCfg;
 
-function makeFallbacksOnlyCfg(): KaijiBotConfig {
+function makeFallbacksOnlyCfg(): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -30,10 +30,10 @@ function makeFallbacksOnlyCfg(): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
-function makeProviderFallbackCfg(provider: string): KaijiBotConfig {
+function makeProviderFallbackCfg(provider: string): AllBotConfig {
   return makeCfg({
     agents: {
       defaults: {
@@ -50,7 +50,7 @@ async function withTempAuthStore<T>(
   store: AuthProfileStore,
   run: (tempDir: string) => Promise<T>,
 ): Promise<T> {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-auth-"));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-auth-"));
   saveAuthProfileStore(store, tempDir);
   try {
     return await run(tempDir);
@@ -60,7 +60,7 @@ async function withTempAuthStore<T>(
 }
 
 async function runWithStoredAuth(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   store: AuthProfileStore;
   provider: string;
   run: (provider: string, model: string) => Promise<string>;
@@ -187,10 +187,10 @@ const OPENAI_RATE_LIMIT_MESSAGE =
 const ANTHROPIC_OVERLOADED_PAYLOAD =
   '{"type":"error","error":{"type":"overloaded_error","message":"Overloaded"},"request_id":"req_test"}';
 // Issue-backed Anthropic/OpenAI-compatible insufficient_quota payload under HTTP 400:
-// https://github.com/kaijibot/kaijibot/issues/23440
+// https://github.com/allbot/allbot/issues/23440
 const INSUFFICIENT_QUOTA_PAYLOAD =
   '{"type":"error","error":{"type":"insufficient_quota","message":"Your account has insufficient quota balance to run this request."}}';
-// Internal KaijiBot compatibility marker, not a provider API contract.
+// Internal AllBot compatibility marker, not a provider API contract.
 const MODEL_COOLDOWN_MESSAGE = "model_cooldown: All credentials for model gpt-5 are cooling down";
 // SDK/transport compatibility marker, not a provider API contract.
 const CONNECTION_ERROR_MESSAGE = "Connection error.";
@@ -569,7 +569,7 @@ describe("runWithModelFallback", () => {
   });
 
   it("sanitizes model identifiers in model_not_found warnings", async () => {
-    const warnLogs = createWarnLogCapture("kaijibot-model-fallback-test");
+    const warnLogs = createWarnLogCapture("allbot-model-fallback-test");
     try {
       const cfg = makeCfg();
       const run = vi
@@ -1282,7 +1282,7 @@ describe("runWithModelFallback", () => {
       provider: string,
       reason: "rate_limit" | "overloaded" | "auth" | "billing",
     ): Promise<{ store: AuthProfileStore; dir: string }> {
-      const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+      const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
       const now = Date.now();
       const store: AuthProfileStore = {
         version: AUTH_STORE_VERSION,
@@ -1447,7 +1447,7 @@ describe("runWithModelFallback", () => {
 
     it("tries cross-provider fallbacks when same provider has rate limit", async () => {
       // Anthropic in rate limit cooldown, Groq available
-      const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+      const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
       const store: AuthProfileStore = {
         version: AUTH_STORE_VERSION,
         profiles: {

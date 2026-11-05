@@ -101,9 +101,9 @@ function createLsofResult(overrides: Partial<MockLsofResult> = {}): MockLsofResu
   };
 }
 
-function createKaijiBotBusyResult(pid: number, overrides: Partial<MockLsofResult> = {}) {
+function createAllBotBusyResult(pid: number, overrides: Partial<MockLsofResult> = {}) {
   return createLsofResult({
-    stdout: lsofOutput([{ pid, cmd: "kaijibot-gateway" }]),
+    stdout: lsofOutput([{ pid, cmd: "allbot-gateway" }]),
     ...overrides,
   });
 }
@@ -122,7 +122,7 @@ function installInitialBusyPoll(
   mockSpawnSync.mockImplementation(() => {
     call += 1;
     if (call === 1) {
-      return createKaijiBotBusyResult(stalePid);
+      return createAllBotBusyResult(stalePid);
     }
     return resolvePoll(call);
   });
@@ -187,14 +187,14 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       );
     });
 
-    it("parses kaijibot-gateway pids and excludes the current process", () => {
+    it("parses allbot-gateway pids and excludes the current process", () => {
       const stalePid = process.pid + 1;
       mockSpawnSync.mockReturnValue({
         error: null,
         status: 0,
         stdout: lsofOutput([
-          { pid: stalePid, cmd: "kaijibot-gateway" },
-          { pid: process.pid, cmd: "kaijibot-gateway" },
+          { pid: stalePid, cmd: "allbot-gateway" },
+          { pid: process.pid, cmd: "allbot-gateway" },
         ]),
         stderr: "",
       });
@@ -203,7 +203,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       expect(pids).not.toContain(process.pid);
     });
 
-    it("excludes pids whose command does not include 'kaijibot'", () => {
+    it("excludes pids whose command does not include 'allbot'", () => {
       const otherPid = process.pid + 2;
       mockSpawnSync.mockReturnValue({
         error: null,
@@ -229,7 +229,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       // (once for the IPv4 socket, once for IPv6). Without dedup, terminateStaleProcessesSync
       // sends SIGTERM twice and returns killed=[pid, pid], corrupting the count.
       const stalePid = process.pid + 600;
-      const stdout = `p${stalePid}\nckaijibot-gateway\np${stalePid}\nckaijibot-gateway\n`;
+      const stdout = `p${stalePid}\ncallbot-gateway\np${stalePid}\ncallbot-gateway\n`;
       mockSpawnSync.mockReturnValue({ error: null, status: 0, stdout, stderr: "" });
       const result = findGatewayPidsOnPortSync(18789);
       expect(result).toEqual([stalePid]); // deduped — not [pid, pid]
@@ -258,7 +258,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       try {
         mockReadWindowsListeningPids.mockReturnValue([stalePid]);
         // Simulate a verified gateway process (must pass real isGatewayArgv)
-        mockReadWindowsProcessArgs.mockReturnValue(["kaijibot", "gateway"]);
+        mockReadWindowsProcessArgs.mockReturnValue(["allbot", "gateway"]);
         expect(findGatewayPidsOnPortSync(18789)).toEqual([stalePid]);
         expect(mockReadWindowsListeningPids).toHaveBeenCalledWith(18789, undefined);
         expect(mockReadWindowsProcessArgs).toHaveBeenCalledWith(stalePid, undefined);
@@ -279,15 +279,15 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       expect(findGatewayPidsOnPortSync(18789)).toEqual([]);
     });
 
-    it("parses multiple kaijibot pids from a single lsof output block", () => {
+    it("parses multiple allbot pids from a single lsof output block", () => {
       const pid1 = process.pid + 10;
       const pid2 = process.pid + 11;
       mockSpawnSync.mockReturnValue({
         error: null,
         status: 0,
         stdout: lsofOutput([
-          { pid: pid1, cmd: "kaijibot-gateway" },
-          { pid: pid2, cmd: "kaijibot-gateway" },
+          { pid: pid1, cmd: "allbot-gateway" },
+          { pid: pid2, cmd: "allbot-gateway" },
         ]),
         stderr: "",
       });
@@ -296,9 +296,9 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       expect(result).toContain(pid2);
     });
 
-    it("returns [] when status 0 but only non-kaijibot pids present", () => {
+    it("returns [] when status 0 but only non-allbot pids present", () => {
       // Port may be bound by an unrelated process. findGatewayPidsOnPortSync
-      // only tracks kaijibot processes — non-kaijibot listeners are ignored.
+      // only tracks allbot processes — non-allbot listeners are ignored.
       const otherPid = process.pid + 50;
       mockSpawnSync.mockReturnValue({
         error: null,
@@ -360,7 +360,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       const getCallCount = installInitialBusyPoll(stalePid, (call) => {
         if (call === 2) {
           // First waitForPortFreeSync poll — status 0, port busy (should parse inline, not spawn again)
-          return createKaijiBotBusyResult(stalePid);
+          return createAllBotBusyResult(stalePid);
         }
         // Port free on third call
         return createLsofResult();
@@ -375,15 +375,15 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       expect(getCallCount()).toBe(3);
     });
 
-    it("lsof status 1 with non-empty kaijibot stdout is treated as busy, not free (Linux container edge case)", () => {
+    it("lsof status 1 with non-empty allbot stdout is treated as busy, not free (Linux container edge case)", () => {
       // On Linux containers with restricted /proc (AppArmor, seccomp, user namespaces),
       // lsof can exit 1 AND still emit output for processes it could read.
-      // status 1 + non-empty kaijibot stdout must not be treated as port-free.
+      // status 1 + non-empty allbot stdout must not be treated as port-free.
       const stalePid = process.pid + 601;
       const getCallCount = installInitialBusyPoll(stalePid, (call) => {
         if (call === 2) {
-          // status 1 + kaijibot pid in stdout — container-restricted lsof reports partial results
-          return createKaijiBotBusyResult(stalePid, {
+          // status 1 + allbot pid in stdout — container-restricted lsof reports partial results
+          return createAllBotBusyResult(stalePid, {
             status: 1,
             stderr: "lsof: WARNING: can't stat() fuse",
           });
@@ -414,7 +414,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
         return {
           error: null,
           status: 0,
-          stdout: lsofOutput([{ pid: stalePid, cmd: "kaijibot-gateway" }]),
+          stdout: lsofOutput([{ pid: stalePid, cmd: "allbot-gateway" }]),
           stderr: "",
         };
       });
@@ -465,7 +465,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
           return {
             error: null,
             status: 0,
-            stdout: lsofOutput([{ pid: stalePid, cmd: "kaijibot-gateway" }]),
+            stdout: lsofOutput([{ pid: stalePid, cmd: "allbot-gateway" }]),
             stderr: "",
           };
         }
@@ -495,7 +495,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
           return {
             error: null,
             status: 0,
-            stdout: lsofOutput([{ pid: stalePid, cmd: "kaijibot-gateway" }]),
+            stdout: lsofOutput([{ pid: stalePid, cmd: "allbot-gateway" }]),
             stderr: "",
           };
         }
@@ -504,7 +504,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
           return {
             error: null,
             status: 0,
-            stdout: lsofOutput([{ pid: stalePid, cmd: "kaijibot-gateway" }]),
+            stdout: lsofOutput([{ pid: stalePid, cmd: "allbot-gateway" }]),
             stderr: "",
           };
         }
@@ -579,7 +579,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       installInitialBusyPoll(stalePid, () => {
         // Advance clock by PORT_FREE_TIMEOUT_MS + 1ms on first poll to trip the deadline.
         fakeNow += 2001;
-        return createKaijiBotBusyResult(stalePid);
+        return createAllBotBusyResult(stalePid);
       });
 
       vi.spyOn(process, "kill").mockReturnValue(true);
@@ -667,10 +667,10 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       Object.defineProperty(process, "platform", { value: "win32", configurable: true });
       try {
         mockReadWindowsListeningPids.mockReturnValue([stalePid]);
-        mockReadWindowsProcessArgs.mockReturnValue(["kaijibot", "gateway"]);
+        mockReadWindowsProcessArgs.mockReturnValue(["allbot", "gateway"]);
         mockReadWindowsProcessArgsResult.mockReturnValue({
           ok: true,
-          args: ["kaijibot", "gateway"],
+          args: ["allbot", "gateway"],
         });
         mockSpawnSync.mockReturnValue({
           error: null,
@@ -777,10 +777,10 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       Object.defineProperty(process, "platform", { value: "win32", configurable: true });
       try {
         mockReadWindowsListeningPids.mockReturnValue([stalePid]);
-        mockReadWindowsProcessArgs.mockReturnValue(["kaijibot", "gateway"]);
+        mockReadWindowsProcessArgs.mockReturnValue(["allbot", "gateway"]);
         mockReadWindowsProcessArgsResult.mockReturnValue({
           ok: true,
-          args: ["kaijibot", "gateway"],
+          args: ["allbot", "gateway"],
         });
         mockReadWindowsListeningPidsResult.mockReturnValue({ ok: true, pids: [stalePid] });
         mockSpawnSync.mockReturnValue({
@@ -815,10 +815,10 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       Object.defineProperty(process, "platform", { value: "win32", configurable: true });
       try {
         mockReadWindowsListeningPidsResult.mockReturnValue({ ok: true, pids: [stalePid] });
-        mockReadWindowsProcessArgs.mockReturnValue(["kaijibot", "gateway"]);
+        mockReadWindowsProcessArgs.mockReturnValue(["allbot", "gateway"]);
         mockReadWindowsProcessArgsResult.mockReturnValue({
           ok: true,
-          args: ["kaijibot", "gateway"],
+          args: ["allbot", "gateway"],
         });
         mockSpawnSync
           .mockReturnValueOnce({
@@ -865,13 +865,13 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
   // parsePidsFromLsofOutput — branch-coverage for mid-loop && short-circuits
   // -------------------------------------------------------------------------
   describe("parsePidsFromLsofOutput — branch coverage (lines 67-69)", () => {
-    it("skips a mid-loop entry when the command does not include 'kaijibot'", () => {
-      // Exercises the false branch of currentCmd.toLowerCase().includes("kaijibot")
-      // inside the mid-loop flush: a non-kaijibot cmd between two entries must not
-      // be pushed, but the following kaijibot entry still must be.
+    it("skips a mid-loop entry when the command does not include 'allbot'", () => {
+      // Exercises the false branch of currentCmd.toLowerCase().includes("allbot")
+      // inside the mid-loop flush: a non-allbot cmd between two entries must not
+      // be pushed, but the following allbot entry still must be.
       const stalePid = process.pid + 700;
-      // Mixed output: non-kaijibot entry first, then kaijibot entry
-      const stdout = `p${process.pid + 699}\ncnginx\np${stalePid}\nckaijibot-gateway\n`;
+      // Mixed output: non-allbot entry first, then allbot entry
+      const stdout = `p${process.pid + 699}\ncnginx\np${stalePid}\ncallbot-gateway\n`;
       mockSpawnSync.mockReturnValue({ error: null, status: 0, stdout, stderr: "" });
       const result = findGatewayPidsOnPortSync(18789);
       expect(result).toContain(stalePid);
@@ -883,7 +883,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       // (no 'c' line between them) — the first PID must be skipped, the second handled.
       const stalePid = process.pid + 701;
       // Two consecutive p-lines: first has no c-line before the next p-line
-      const stdout = `p${process.pid + 702}\np${stalePid}\nckaijibot-gateway\n`;
+      const stdout = `p${process.pid + 702}\np${stalePid}\ncallbot-gateway\n`;
       mockSpawnSync.mockReturnValue({ error: null, status: 0, stdout, stderr: "" });
       const result = findGatewayPidsOnPortSync(18789);
       expect(result).toContain(stalePid);
@@ -894,8 +894,8 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       // false branch: a malformed 'p' line (e.g. 'p0' or 'pNaN') must not corrupt
       // currentPid and must not end up in the returned pids array.
       const stalePid = process.pid + 703;
-      // p0 is invalid (not > 0); the following valid kaijibot entry must still be found.
-      const stdout = `p0\nckaijibot-gateway\np${stalePid}\nckaijibot-gateway\n`;
+      // p0 is invalid (not > 0); the following valid allbot entry must still be found.
+      const stdout = `p0\ncallbot-gateway\np${stalePid}\ncallbot-gateway\n`;
       mockSpawnSync.mockReturnValue({ error: null, status: 0, stdout, stderr: "" });
       const result = findGatewayPidsOnPortSync(18789);
       expect(result).toContain(stalePid);
@@ -908,7 +908,7 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
       // must not throw or corrupt the pid list. Unknown lines are just skipped.
       const stalePid = process.pid + 704;
       // Intersperse an 'f' line (file descriptor marker) — not a 'p' or 'c' line
-      const stdout = `p${stalePid}\nf8\nckaijibot-gateway\n`;
+      const stdout = `p${stalePid}\nf8\ncallbot-gateway\n`;
       mockSpawnSync.mockReturnValue({ error: null, status: 0, stdout, stderr: "" });
       const result = findGatewayPidsOnPortSync(18789);
       // The 'f' line must not corrupt parsing; stalePid must still be found
@@ -918,23 +918,23 @@ describe.skipIf(isWindows)("restart-stale-pids", () => {
   });
 
   // -------------------------------------------------------------------------
-  // pollPortOnce branch — status 1 + non-empty stdout with zero kaijibot pids
+  // pollPortOnce branch — status 1 + non-empty stdout with zero allbot pids
   // -------------------------------------------------------------------------
-  describe("pollPortOnce — status 1 + non-empty non-kaijibot stdout (line 145)", () => {
-    it("treats status 1 + non-kaijibot stdout as port-free (not an kaijibot process)", () => {
-      // status 1 + non-empty stdout where no kaijibot pids are present:
+  describe("pollPortOnce — status 1 + non-empty non-allbot stdout (line 145)", () => {
+    it("treats status 1 + non-allbot stdout as port-free (not an allbot process)", () => {
+      // status 1 + non-empty stdout where no allbot pids are present:
       // the port may be held by an unrelated process. From our perspective
-      // (we only kill kaijibot pids) it is effectively free.
+      // (we only kill allbot pids) it is effectively free.
       const stalePid = process.pid + 800;
       const getCallCount = installInitialBusyPoll(stalePid, () => {
-        // status 1 + non-kaijibot output — should be treated as free:true for our purposes
+        // status 1 + non-allbot output — should be treated as free:true for our purposes
         return createLsofResult({
           status: 1,
           stdout: lsofOutput([{ pid: process.pid + 801, cmd: "caddy" }]),
         });
       });
       vi.spyOn(process, "kill").mockReturnValue(true);
-      // Should complete cleanly — no kaijibot pids in status-1 output → free
+      // Should complete cleanly — no allbot pids in status-1 output → free
       expect(() => cleanStaleGatewayProcessesSync()).not.toThrow();
       // Completed in exactly 2 calls (initial find + 1 free poll)
       expect(getCallCount()).toBe(2);

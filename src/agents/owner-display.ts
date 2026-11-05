@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 
 export type OwnerDisplaySetting = {
@@ -8,7 +8,7 @@ export type OwnerDisplaySetting = {
 };
 
 export type OwnerDisplaySecretResolution = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   generatedSecret?: string;
 };
 
@@ -16,7 +16,7 @@ export type OwnerDisplaySecretResolution = {
  * Resolve owner display settings for prompt rendering.
  * Keep auth secrets decoupled from owner hash secrets.
  */
-export function resolveOwnerDisplaySetting(config?: KaijiBotConfig): OwnerDisplaySetting {
+export function resolveOwnerDisplaySetting(config?: AllBotConfig): OwnerDisplaySetting {
   const ownerDisplay = config?.commands?.ownerDisplay;
   if (ownerDisplay !== "hash") {
     return { ownerDisplay, ownerDisplaySecret: undefined };
@@ -32,7 +32,7 @@ export function resolveOwnerDisplaySetting(config?: KaijiBotConfig): OwnerDispla
  * Returns updated config and generated secret when autofill was needed.
  */
 export function ensureOwnerDisplaySecret(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   generateSecret: () => string = () => crypto.randomBytes(32).toString("hex"),
 ): OwnerDisplaySecretResolution {
   const settings = resolveOwnerDisplaySetting(config);

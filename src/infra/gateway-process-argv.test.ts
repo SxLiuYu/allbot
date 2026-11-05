@@ -44,30 +44,30 @@ describe("isGatewayArgv", () => {
   });
 
   it("matches known entrypoints across slash and case variants", () => {
-    expect(isGatewayArgv(["NODE", "C:\\KaijiBot\\DIST\\ENTRY.JS", "gateway"])).toBe(true);
-    expect(isGatewayArgv(["bun", "/srv/kaijibot/scripts/run-node.mjs", "gateway"])).toBe(true);
-    expect(isGatewayArgv(["node", "/srv/kaijibot/kaijibot.mjs", "gateway"])).toBe(true);
-    expect(isGatewayArgv(["tsx", "/srv/kaijibot/src/entry.ts", "gateway"])).toBe(true);
-    expect(isGatewayArgv(["tsx", "/srv/kaijibot/src/index.ts", "gateway"])).toBe(true);
+    expect(isGatewayArgv(["NODE", "C:\\AllBot\\DIST\\ENTRY.JS", "gateway"])).toBe(true);
+    expect(isGatewayArgv(["bun", "/srv/allbot/scripts/run-node.mjs", "gateway"])).toBe(true);
+    expect(isGatewayArgv(["node", "/srv/allbot/allbot.mjs", "gateway"])).toBe(true);
+    expect(isGatewayArgv(["tsx", "/srv/allbot/src/entry.ts", "gateway"])).toBe(true);
+    expect(isGatewayArgv(["tsx", "/srv/allbot/src/index.ts", "gateway"])).toBe(true);
   });
 
-  it("matches the kaijibot executable but gates the gateway binary behind the opt-in flag", () => {
-    expect(isGatewayArgv(["C:\\bin\\kaijibot.cmd", "gateway"])).toBe(true);
-    expect(isGatewayArgv(["/usr/local/bin/kaijibot-gateway", "gateway"])).toBe(false);
+  it("matches the allbot executable but gates the gateway binary behind the opt-in flag", () => {
+    expect(isGatewayArgv(["C:\\bin\\allbot.cmd", "gateway"])).toBe(true);
+    expect(isGatewayArgv(["/usr/local/bin/allbot-gateway", "gateway"])).toBe(false);
     expect(
-      isGatewayArgv(["/usr/local/bin/kaijibot-gateway", "gateway"], {
+      isGatewayArgv(["/usr/local/bin/allbot-gateway", "gateway"], {
         allowGatewayBinary: true,
       }),
     ).toBe(true);
     expect(
-      isGatewayArgv(["C:\\bin\\kaijibot-gateway.EXE", "gateway"], {
+      isGatewayArgv(["C:\\bin\\allbot-gateway.EXE", "gateway"], {
         allowGatewayBinary: true,
       }),
     ).toBe(true);
   });
 
   it("rejects unknown gateway argv even when the token is present", () => {
-    expect(isGatewayArgv(["node", "/srv/kaijibot/custom.js", "gateway"])).toBe(false);
+    expect(isGatewayArgv(["node", "/srv/allbot/custom.js", "gateway"])).toBe(false);
     expect(isGatewayArgv(["python", "gateway", "script.py"])).toBe(false);
   });
 });

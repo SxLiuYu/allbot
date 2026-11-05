@@ -70,7 +70,7 @@ function isObject(v: unknown): v is Record<string, unknown> {
 /**
  * Scan the cognitive stores and return aggregate counts.
  *
- * @param stateDir  Root state directory (e.g. `~/.kaijibot`)
+ * @param stateDir  Root state directory (e.g. `~/.allbot`)
  * @returns Always returns a `CognitiveStats` object; missing paths yield 0.
  *          Never throws.
  */

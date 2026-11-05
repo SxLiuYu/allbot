@@ -1,5 +1,5 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveProviderSetupFlowContributions } from "../flows/provider-flow.js";
 import {
   CORE_AUTH_CHOICE_OPTIONS,
@@ -24,7 +24,7 @@ function compareGroupLabels(a: AuthChoiceGroup, b: AuthChoiceGroup): number {
 }
 
 function resolveProviderChoiceOptions(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): AuthChoiceOption[] {
@@ -54,7 +54,7 @@ function resolveProviderChoiceOptions(params?: {
 export function formatAuthChoiceChoicesForCli(params?: {
   includeSkip?: boolean;
   includeLegacyAliases?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): string {
@@ -73,7 +73,7 @@ export function buildAuthChoiceOptions(params: {
   store: AuthProfileStore;
   includeSkip: boolean;
   assistantVisibleOnly?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): AuthChoiceOption[] {
@@ -106,7 +106,7 @@ export function buildAuthChoiceOptions(params: {
 export function buildAuthChoiceGroups(params: {
   store: AuthProfileStore;
   includeSkip: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): {

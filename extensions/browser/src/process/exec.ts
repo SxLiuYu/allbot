@@ -1,1 +1,1 @@
-export { runExec } from "kaijibot/plugin-sdk/browser-node-runtime";
+export { runExec } from "allbot/plugin-sdk/browser-node-runtime";

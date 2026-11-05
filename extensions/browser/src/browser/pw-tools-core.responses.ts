@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { formatCliCommand } from "../cli/command-format.js";
 import { ensurePageState, getPageForTargetId } from "./pw-session.js";
 import { normalizeTimeoutMs } from "./pw-tools-core.shared.js";
@@ -68,7 +68,7 @@ export async function responseBodyViaPlaywright(opts: {
       cleanup();
       reject(
         new Error(
-          `Response not found for url pattern "${pattern}". Run '${formatCliCommand("kaijibot browser requests")}' to inspect recent network activity.`,
+          `Response not found for url pattern "${pattern}". Run '${formatCliCommand("allbot browser requests")}' to inspect recent network activity.`,
         ),
       );
     }, timeout);

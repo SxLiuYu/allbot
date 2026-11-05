@@ -94,11 +94,11 @@ describe("refreshChatAvatar", () => {
     });
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
-    const host = makeHost({ basePath: "/kaijibot/", sessionKey: "agent:ops:main" });
+    const host = makeHost({ basePath: "/allbot/", sessionKey: "agent:ops:main" });
     await refreshChatAvatar(host);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/kaijibot/avatar/ops?meta=1",
+      "/allbot/avatar/ops?meta=1",
       expect.objectContaining({ method: "GET" }),
     );
     expect(host.chatAvatarUrl).toBeNull();

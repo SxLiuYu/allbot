@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { configureChannelAccessWithAllowlist } from "./setup-group-access-configure.js";
 import type { ChannelAccessPolicy } from "./setup-group-access.js";
 
@@ -13,13 +13,13 @@ function createPrompter(params: { confirm: boolean; policy?: ChannelAccessPolicy
 }
 
 async function runConfigureChannelAccess<TResolved>(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: ReturnType<typeof createPrompter>;
   label?: string;
   placeholder?: string;
-  setPolicy: (cfg: KaijiBotConfig, policy: ChannelAccessPolicy) => KaijiBotConfig;
-  resolveAllowlist: (params: { cfg: KaijiBotConfig; entries: string[] }) => Promise<TResolved>;
-  applyAllowlist: (params: { cfg: KaijiBotConfig; resolved: TResolved }) => KaijiBotConfig;
+  setPolicy: (cfg: AllBotConfig, policy: ChannelAccessPolicy) => AllBotConfig;
+  resolveAllowlist: (params: { cfg: AllBotConfig; entries: string[] }) => Promise<TResolved>;
+  applyAllowlist: (params: { cfg: AllBotConfig; resolved: TResolved }) => AllBotConfig;
 }) {
   return await configureChannelAccessWithAllowlist({
     cfg: params.cfg,
@@ -37,11 +37,11 @@ async function runConfigureChannelAccess<TResolved>(params: {
 
 describe("configureChannelAccessWithAllowlist", () => {
   it("returns input config when user skips access configuration", async () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const prompter = createPrompter({ confirm: false });
-    const setPolicy = vi.fn((next: KaijiBotConfig) => next);
+    const setPolicy = vi.fn((next: AllBotConfig) => next);
     const resolveAllowlist = vi.fn(async () => [] as string[]);
-    const applyAllowlist = vi.fn((params: { cfg: KaijiBotConfig }) => params.cfg);
+    const applyAllowlist = vi.fn((params: { cfg: AllBotConfig }) => params.cfg);
 
     const next = await runConfigureChannelAccess({
       cfg,
@@ -58,19 +58,19 @@ describe("configureChannelAccessWithAllowlist", () => {
   });
 
   it("applies non-allowlist policy directly", async () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const prompter = createPrompter({
       confirm: true,
       policy: "open",
     });
     const setPolicy = vi.fn(
-      (next: KaijiBotConfig, policy: ChannelAccessPolicy): KaijiBotConfig => ({
+      (next: AllBotConfig, policy: ChannelAccessPolicy): AllBotConfig => ({
         ...next,
         channels: { discord: { groupPolicy: policy } },
       }),
     );
     const resolveAllowlist = vi.fn(async () => ["ignored"]);
-    const applyAllowlist = vi.fn((params: { cfg: KaijiBotConfig }) => params.cfg);
+    const applyAllowlist = vi.fn((params: { cfg: AllBotConfig }) => params.cfg);
 
     const next = await runConfigureChannelAccess({
       cfg,
@@ -89,19 +89,19 @@ describe("configureChannelAccessWithAllowlist", () => {
   });
 
   it("supports allowlist policies without prompting for entries", async () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const prompter = createPrompter({
       confirm: true,
       policy: "allowlist",
     });
     const setPolicy = vi.fn(
-      (next: KaijiBotConfig, policy: ChannelAccessPolicy): KaijiBotConfig => ({
+      (next: AllBotConfig, policy: ChannelAccessPolicy): AllBotConfig => ({
         ...next,
         channels: { twitch: { groupPolicy: policy } },
       }),
     );
     const resolveAllowlist = vi.fn(async () => ["ignored"]);
-    const applyAllowlist = vi.fn((params: { cfg: KaijiBotConfig }) => params.cfg);
+    const applyAllowlist = vi.fn((params: { cfg: AllBotConfig }) => params.cfg);
 
     const next = await configureChannelAccessWithAllowlist({
       cfg,
@@ -123,27 +123,27 @@ describe("configureChannelAccessWithAllowlist", () => {
   });
 
   it("resolves allowlist entries and applies them after forcing allowlist policy", async () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const prompter = createPrompter({
       confirm: true,
       policy: "allowlist",
       text: "#general, #support",
     });
     const calls: string[] = [];
-    const setPolicy = vi.fn((next: KaijiBotConfig, policy: ChannelAccessPolicy): KaijiBotConfig => {
+    const setPolicy = vi.fn((next: AllBotConfig, policy: ChannelAccessPolicy): AllBotConfig => {
       calls.push("setPolicy");
       return {
         ...next,
         channels: { slack: { groupPolicy: policy } },
       };
     });
-    const resolveAllowlist = vi.fn(async (params: { cfg: KaijiBotConfig; entries: string[] }) => {
+    const resolveAllowlist = vi.fn(async (params: { cfg: AllBotConfig; entries: string[] }) => {
       calls.push("resolve");
       expect(params.cfg).toBe(cfg);
       expect(params.entries).toEqual(["#general", "#support"]);
       return ["C1", "C2"];
     });
-    const applyAllowlist = vi.fn((params: { cfg: KaijiBotConfig; resolved: string[] }) => {
+    const applyAllowlist = vi.fn((params: { cfg: AllBotConfig; resolved: string[] }) => {
       calls.push("apply");
       expect(params.cfg.channels?.slack?.groupPolicy).toBe("allowlist");
       return {

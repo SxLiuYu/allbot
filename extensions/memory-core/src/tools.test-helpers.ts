@@ -1,17 +1,17 @@
 import { expect } from "vitest";
-import type { KaijiBotConfig } from "../api.js";
+import type { AllBotConfig } from "../api.js";
 import { createMemoryGetTool, createMemorySearchTool } from "./tools.js";
 
-export function asKaijiBotConfig(config: Partial<KaijiBotConfig>): KaijiBotConfig {
+export function asAllBotConfig(config: Partial<AllBotConfig>): AllBotConfig {
   return config;
 }
 
-export function createDefaultMemoryToolConfig(): KaijiBotConfig {
-  return asKaijiBotConfig({ agents: { list: [{ id: "main", default: true }] } });
+export function createDefaultMemoryToolConfig(): AllBotConfig {
+  return asAllBotConfig({ agents: { list: [{ id: "main", default: true }] } });
 }
 
 export function createMemorySearchToolOrThrow(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentSessionKey?: string;
 }) {
   const tool = createMemorySearchTool({
@@ -25,7 +25,7 @@ export function createMemorySearchToolOrThrow(params?: {
 }
 
 export function createMemoryGetToolOrThrow(
-  config: KaijiBotConfig = createDefaultMemoryToolConfig(),
+  config: AllBotConfig = createDefaultMemoryToolConfig(),
 ) {
   const tool = createMemoryGetTool({ config });
   if (!tool) {
@@ -36,7 +36,7 @@ export function createMemoryGetToolOrThrow(
 
 export function createAutoCitationsMemorySearchTool(agentSessionKey: string) {
   return createMemorySearchToolOrThrow({
-    config: asKaijiBotConfig({
+    config: asAllBotConfig({
       memory: { citations: "auto" },
       agents: { list: [{ id: "main", default: true }] },
     }),

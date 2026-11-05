@@ -1,7 +1,7 @@
-import type { KilocodeModelCatalogEntry } from "kaijibot/plugin-sdk/provider-model-shared";
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import type { KilocodeModelCatalogEntry } from "allbot/plugin-sdk/provider-model-shared";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 
 const log = createSubsystemLogger("kilocode-models");
 

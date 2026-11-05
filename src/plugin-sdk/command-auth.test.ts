@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   buildCommandsMessage,
   buildCommandsMessagePaginated,
@@ -9,7 +9,7 @@ import {
 
 const baseCfg = {
   commands: { useAccessGroups: true },
-} as unknown as KaijiBotConfig;
+} as unknown as AllBotConfig;
 
 async function resolveAuthorization(params: {
   senderId: string;
@@ -34,7 +34,7 @@ async function resolveAuthorization(params: {
 
 describe("plugin-sdk/command-auth", () => {
   it("keeps deprecated command status builders available for compatibility", () => {
-    const cfg = { commands: { config: false, debug: false } } as unknown as KaijiBotConfig;
+    const cfg = { commands: { config: false, debug: false } } as unknown as AllBotConfig;
 
     expect(buildHelpMessage(cfg)).toContain("/commands for full list");
     expect(buildCommandsMessage(cfg)).toContain("More: /tools for available capabilities");

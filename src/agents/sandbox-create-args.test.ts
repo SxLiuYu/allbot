@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KAIJIBOT_CLI_ENV_VALUE } from "../infra/kaijibot-exec-env.js";
+import { ALLBOT_CLI_ENV_VALUE } from "../infra/allbot-exec-env.js";
 import { buildSandboxCreateArgs } from "./sandbox/docker.js";
 import type { SandboxDockerConfig } from "./sandbox/types.js";
 
@@ -9,8 +9,8 @@ describe("buildSandboxCreateArgs", () => {
     binds?: string[],
   ): SandboxDockerConfig {
     return {
-      image: "kaijibot-sandbox:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-",
+      image: "allbot-sandbox:bookworm-slim",
+      containerPrefix: "allbot-sbx-",
       workdir: "/workspace",
       readOnlyRoot: false,
       tmpfs: [],
@@ -40,8 +40,8 @@ describe("buildSandboxCreateArgs", () => {
 
   it("includes hardening and resource flags", () => {
     const cfg: SandboxDockerConfig = {
-      image: "kaijibot-sandbox:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-",
+      image: "allbot-sandbox:bookworm-slim",
+      containerPrefix: "allbot-sbx-",
       workdir: "/workspace",
       readOnlyRoot: true,
       tmpfs: ["/tmp"],
@@ -59,32 +59,32 @@ describe("buildSandboxCreateArgs", () => {
         core: "0",
       },
       seccompProfile: "/tmp/seccomp.json",
-      apparmorProfile: "kaijibot-sandbox",
+      apparmorProfile: "allbot-sandbox",
       dns: ["1.1.1.1"],
       extraHosts: ["internal.service:10.0.0.5"],
     };
 
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-test",
+      name: "allbot-sbx-test",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,
-      labels: { "kaijibot.sandboxBrowser": "1" },
+      labels: { "allbot.sandboxBrowser": "1" },
     });
 
     expect(args).toEqual(
       expect.arrayContaining([
         "create",
         "--name",
-        "kaijibot-sbx-test",
+        "allbot-sbx-test",
         "--label",
-        "kaijibot.sandbox=1",
+        "allbot.sandbox=1",
         "--label",
-        "kaijibot.sessionKey=main",
+        "allbot.sessionKey=main",
         "--label",
-        "kaijibot.createdAtMs=1700000000000",
+        "allbot.createdAtMs=1700000000000",
         "--label",
-        "kaijibot.sandboxBrowser=1",
+        "allbot.sandboxBrowser=1",
         "--read-only",
         "--tmpfs",
         "/tmp",
@@ -99,7 +99,7 @@ describe("buildSandboxCreateArgs", () => {
         "--security-opt",
         "seccomp=/tmp/seccomp.json",
         "--security-opt",
-        "apparmor=kaijibot-sandbox",
+        "apparmor=allbot-sandbox",
         "--dns",
         "1.1.1.1",
         "--add-host",
@@ -119,7 +119,7 @@ describe("buildSandboxCreateArgs", () => {
         "--env",
         "LANG=C.UTF-8",
         "--env",
-        `KAIJIBOT_CLI=${KAIJIBOT_CLI_ENV_VALUE}`,
+        `ALLBOT_CLI=${ALLBOT_CLI_ENV_VALUE}`,
       ]),
     );
 
@@ -137,7 +137,7 @@ describe("buildSandboxCreateArgs", () => {
     );
   });
 
-  it("preserves the KaijiBot exec marker when strict env sanitization is enabled", () => {
+  it("preserves the AllBot exec marker when strict env sanitization is enabled", () => {
     const cfg = createSandboxConfig({
       env: {
         NODE_ENV: "test",
@@ -145,7 +145,7 @@ describe("buildSandboxCreateArgs", () => {
     });
 
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-marker",
+      name: "allbot-sbx-marker",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,
@@ -159,15 +159,15 @@ describe("buildSandboxCreateArgs", () => {
         "--env",
         "NODE_ENV=test",
         "--env",
-        `KAIJIBOT_CLI=${KAIJIBOT_CLI_ENV_VALUE}`,
+        `ALLBOT_CLI=${ALLBOT_CLI_ENV_VALUE}`,
       ]),
     );
   });
 
   it("emits -v flags for safe custom binds", () => {
     const cfg: SandboxDockerConfig = {
-      image: "kaijibot-sandbox:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-",
+      image: "allbot-sandbox:bookworm-slim",
+      containerPrefix: "allbot-sbx-",
       workdir: "/workspace",
       readOnlyRoot: false,
       tmpfs: [],
@@ -177,7 +177,7 @@ describe("buildSandboxCreateArgs", () => {
     };
 
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-binds",
+      name: "allbot-sbx-binds",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,
@@ -200,37 +200,37 @@ describe("buildSandboxCreateArgs", () => {
   it.each([
     {
       name: "dangerous Docker socket bind mounts",
-      containerName: "kaijibot-sbx-dangerous",
+      containerName: "allbot-sbx-dangerous",
       cfg: createSandboxConfig({}, ["/var/run/docker.sock:/var/run/docker.sock"]),
       expected: /blocked path/,
     },
     {
       name: "dangerous parent bind mounts",
-      containerName: "kaijibot-sbx-dangerous-parent",
+      containerName: "allbot-sbx-dangerous-parent",
       cfg: createSandboxConfig({}, ["/run:/run"]),
       expected: /blocked path/,
     },
     {
       name: "network host mode",
-      containerName: "kaijibot-sbx-host",
+      containerName: "allbot-sbx-host",
       cfg: createSandboxConfig({ network: "host" }),
       expected: /network mode "host" is blocked/,
     },
     {
       name: "network container namespace join",
-      containerName: "kaijibot-sbx-container-network",
+      containerName: "allbot-sbx-container-network",
       cfg: createSandboxConfig({ network: "container:peer" }),
       expected: /network mode "container:peer" is blocked by default/,
     },
     {
       name: "seccomp unconfined",
-      containerName: "kaijibot-sbx-seccomp",
+      containerName: "allbot-sbx-seccomp",
       cfg: createSandboxConfig({ seccompProfile: "unconfined" }),
       expected: /seccomp profile "unconfined" is blocked/,
     },
     {
       name: "apparmor unconfined",
-      containerName: "kaijibot-sbx-apparmor",
+      containerName: "allbot-sbx-apparmor",
       cfg: createSandboxConfig({ apparmorProfile: "unconfined" }),
       expected: /apparmor profile "unconfined" is blocked/,
     },
@@ -240,8 +240,8 @@ describe("buildSandboxCreateArgs", () => {
 
   it("omits -v flags when binds is empty or undefined", () => {
     const cfg: SandboxDockerConfig = {
-      image: "kaijibot-sandbox:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-",
+      image: "allbot-sandbox:bookworm-slim",
+      containerPrefix: "allbot-sbx-",
       workdir: "/workspace",
       readOnlyRoot: false,
       tmpfs: [],
@@ -251,7 +251,7 @@ describe("buildSandboxCreateArgs", () => {
     };
 
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-no-binds",
+      name: "allbot-sbx-no-binds",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,
@@ -274,7 +274,7 @@ describe("buildSandboxCreateArgs", () => {
     const cfg = createSandboxConfig({}, ["/opt/external:/data:rw"]);
     expect(() =>
       buildSandboxCreateArgs({
-        name: "kaijibot-sbx-outside-roots",
+        name: "allbot-sbx-outside-roots",
         cfg,
         scopeKey: "main",
         createdAtMs: 1700000000000,
@@ -286,7 +286,7 @@ describe("buildSandboxCreateArgs", () => {
   it("allows bind sources outside runtime allowlist with explicit override", () => {
     const cfg = createSandboxConfig({}, ["/opt/external:/data:rw"]);
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-outside-roots-override",
+      name: "allbot-sbx-outside-roots-override",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,
@@ -298,13 +298,13 @@ describe("buildSandboxCreateArgs", () => {
 
   it("blocks reserved /workspace target bind mounts by default", () => {
     const cfg = createSandboxConfig({}, ["/tmp/override:/workspace:rw"]);
-    expectBuildToThrow("kaijibot-sbx-reserved-target", cfg, /reserved container path/);
+    expectBuildToThrow("allbot-sbx-reserved-target", cfg, /reserved container path/);
   });
 
   it("allows reserved /workspace target bind mounts with explicit dangerous override", () => {
     const cfg = createSandboxConfig({}, ["/tmp/override:/workspace:rw"]);
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-reserved-target-override",
+      name: "allbot-sbx-reserved-target-override",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,
@@ -319,7 +319,7 @@ describe("buildSandboxCreateArgs", () => {
       dangerouslyAllowContainerNamespaceJoin: true,
     });
     const args = buildSandboxCreateArgs({
-      name: "kaijibot-sbx-container-network-override",
+      name: "allbot-sbx-container-network-override",
       cfg,
       scopeKey: "main",
       createdAtMs: 1700000000000,

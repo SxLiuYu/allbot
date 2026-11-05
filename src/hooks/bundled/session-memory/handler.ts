@@ -13,7 +13,7 @@ import {
   resolveAgentWorkspaceDir,
 } from "../../../agents/agent-scope.js";
 import { resolveCorrectionUserId } from "../../../cognitive/correction/userid.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { resolveStateDir } from "../../../config/paths.js";
 import { appendFileWithinRoot } from "../../../infra/fs-safe.js";
 import { writeTextAtomic } from "../../../infra/json-files.js";
@@ -56,7 +56,7 @@ const log = createSubsystemLogger("hooks/session-memory");
  * `cognitive.enabled` (default true) and `cognitive.correction.enabled`
  * (default true) to both be on.
  */
-export function isCorrectionExtractionEnabled(cfg?: KaijiBotConfig): boolean {
+export function isCorrectionExtractionEnabled(cfg?: AllBotConfig): boolean {
   return cfg?.cognitive?.enabled !== false && cfg?.cognitive?.correction?.enabled !== false;
 }
 
@@ -77,7 +77,7 @@ const MEMORY_TYPE_TO_SECTION: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 function resolveDisplaySessionKey(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   workspaceDir?: string;
   sessionKey: string;
 }): string {
@@ -134,7 +134,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
     log.debug("Hook triggered for reset/new command", { action: event.action });
 
     const context = event.context || {};
-    const cfg = context.cfg as KaijiBotConfig | undefined;
+    const cfg = context.cfg as AllBotConfig | undefined;
     const contextWorkspaceDir =
       typeof context.workspaceDir === "string" && context.workspaceDir.trim().length > 0
         ? context.workspaceDir
@@ -239,7 +239,7 @@ const saveSessionToMemory: HookHandler = async (event) => {
     }
 
     const isTestEnv =
-      process.env.KAIJIBOT_TEST_FAST === "1" ||
+      process.env.ALLBOT_TEST_FAST === "1" ||
       process.env.VITEST === "true" ||
       process.env.VITEST === "1" ||
       process.env.NODE_ENV === "test";

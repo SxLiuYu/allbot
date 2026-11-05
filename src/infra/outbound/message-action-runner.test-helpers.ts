@@ -5,7 +5,7 @@ import type {
   ChannelOutboundAdapter,
   ChannelPlugin,
 } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createChannelTestPluginBase } from "../../test-utils/channel-plugins.js";
 import { runMessageAction } from "./message-action-runner.js";
 
@@ -16,7 +16,7 @@ export const slackConfig = {
       appToken: "xapp-test",
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 export const whatsappConfig = {
   channels: {
@@ -24,12 +24,12 @@ export const whatsappConfig = {
       allowFrom: ["*"],
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 export const directOutbound: ChannelOutboundAdapter = { deliveryMode: "direct" };
 
 export const runDryAction = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   action: ChannelMessageActionName;
   actionParams: Record<string, unknown>;
   toolContext?: Record<string, unknown>;
@@ -47,7 +47,7 @@ export const runDryAction = (params: {
   });
 
 export const runDrySend = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   actionParams: Record<string, unknown>;
   toolContext?: Record<string, unknown>;
   abortSignal?: AbortSignal;
@@ -83,7 +83,7 @@ export function normalizeSlackTarget(raw: string): string {
 
 export function createConfiguredTestPlugin(params: {
   id: "slack" | "telegram" | "whatsapp";
-  isConfigured: (cfg: KaijiBotConfig) => boolean;
+  isConfigured: (cfg: AllBotConfig) => boolean;
   normalizeTarget: (raw: string) => string | undefined;
   resolveTarget: (input: string) => ResolvedTestTarget | null;
 }): ChannelPlugin {

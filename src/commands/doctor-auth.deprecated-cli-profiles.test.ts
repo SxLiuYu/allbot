@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ProviderPlugin } from "../plugins/types.js";
 import { captureEnv } from "../test-utils/env.js";
 import { maybeRepairLegacyOAuthProfileIds } from "./doctor-auth.js";
@@ -41,9 +41,9 @@ function makePrompter(confirmValue: boolean): DoctorPrompter {
 }
 
 beforeEach(() => {
-  envSnapshot = captureEnv(["KAIJIBOT_AGENT_DIR", "PI_CODING_AGENT_DIR"]);
-  tempAgentDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-auth-"));
-  process.env.KAIJIBOT_AGENT_DIR = tempAgentDir;
+  envSnapshot = captureEnv(["ALLBOT_AGENT_DIR", "PI_CODING_AGENT_DIR"]);
+  tempAgentDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-auth-"));
+  process.env.ALLBOT_AGENT_DIR = tempAgentDir;
   process.env.PI_CODING_AGENT_DIR = tempAgentDir;
   resolvePluginProvidersMock.mockReset();
   resolvePluginProvidersMock.mockReturnValue([]);
@@ -109,7 +109,7 @@ describe("maybeRepairLegacyOAuthProfileIds", () => {
             anthropic: ["anthropic:default"],
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       makePrompter(true),
     );
 

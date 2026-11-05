@@ -43,7 +43,7 @@ function createInboundContext(): MsgContext {
 
 describe("session store key normalization", () => {
   const suiteRootTracker = createSuiteTempRootTracker({
-    prefix: "kaijibot-session-key-normalize-",
+    prefix: "allbot-session-key-normalize-",
   });
   let tempDir = "";
   let storePath = "";

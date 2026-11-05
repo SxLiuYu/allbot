@@ -2,7 +2,7 @@
 
 /**
  * No longer bound to a specific vendor. Kept as an empty string for SDK
- * backwards compatibility (`kaijibot/plugin-sdk/agent-runtime` re-exports it).
+ * backwards compatibility (`allbot/plugin-sdk/agent-runtime` re-exports it).
  *
  * In practice this value is rarely reached at runtime:
  * - Alias resolution falls back to `inferUniqueProviderFromConfiguredModels`
@@ -15,13 +15,13 @@
  *   partial ref like `"/"` or `"zai/"`.
  *
  * Operators set their provider/model via `agents.defaults.model.primary` in
- * `kaijibot.json` or through `kaijibot onboard`.
+ * `allbot.json` or through `allbot onboard`.
  */
 export const DEFAULT_PROVIDER = "";
 
 /**
  * No longer bound to a specific vendor model. Kept as an empty string for SDK
- * backwards compatibility (`kaijibot/plugin-sdk/agent-runtime` re-exports it).
+ * backwards compatibility (`allbot/plugin-sdk/agent-runtime` re-exports it).
  *
  * See {@link DEFAULT_PROVIDER} for the resolution strategy when this value
  * is empty.
@@ -39,8 +39,8 @@ export class MissingAgentModelConfigError extends Error {
   constructor(public readonly context?: string) {
     const ctx = context ? ` (context: ${context})` : "";
     super(
-      `No agent model is configured. Set \`agents.defaults.model.primary\` in kaijibot.json ` +
-        `or run \`kaijibot onboard\` to choose a provider/model.${ctx}`,
+      `No agent model is configured. Set \`agents.defaults.model.primary\` in allbot.json ` +
+        `or run \`allbot onboard\` to choose a provider/model.${ctx}`,
     );
     this.name = "MissingAgentModelConfigError";
   }

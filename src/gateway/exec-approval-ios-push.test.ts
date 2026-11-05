@@ -56,7 +56,7 @@ describe("createExecApprovalIosPushDelivery", () => {
       nodeId: "ios-device-1",
       transport: "direct",
       token: "apns-token",
-      topic: "ai.kaijibot.ios.test",
+      topic: "ai.allbot.ios.test",
       environment: "sandbox",
       updatedAtMs: 1,
     });
@@ -69,7 +69,7 @@ describe("createExecApprovalIosPushDelivery", () => {
       ok: true,
       status: 200,
       environment: "sandbox",
-      topic: "ai.kaijibot.ios.test",
+      topic: "ai.allbot.ios.test",
       tokenSuffix: "token",
       transport: "direct",
     });
@@ -77,7 +77,7 @@ describe("createExecApprovalIosPushDelivery", () => {
       ok: true,
       status: 200,
       environment: "sandbox",
-      topic: "ai.kaijibot.ios.test",
+      topic: "ai.allbot.ios.test",
       tokenSuffix: "token",
       transport: "direct",
     });
@@ -191,7 +191,7 @@ describe("createExecApprovalIosPushDelivery", () => {
       status: 410,
       reason: "Unregistered",
       environment: "sandbox",
-      topic: "ai.kaijibot.ios.test",
+      topic: "ai.allbot.ios.test",
       tokenSuffix: "token",
       transport: "direct",
     });
@@ -271,7 +271,7 @@ describe("createExecApprovalIosPushDelivery", () => {
       ok: true,
       status: 200,
       environment: "sandbox",
-      topic: "ai.kaijibot.ios.test",
+      topic: "ai.allbot.ios.test",
       tokenSuffix: "token",
       transport: "direct",
     });
@@ -338,7 +338,7 @@ describe("createExecApprovalIosPushDelivery", () => {
       nodeId: "ios-device-1",
       transport: "direct",
       token: "apns-token",
-      topic: "ai.kaijibot.ios.test",
+      topic: "ai.allbot.ios.test",
       environment: "sandbox",
       updatedAtMs: 1,
     });

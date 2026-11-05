@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core";
-import type { ConsolidationConfig } from "kaijibot/plugin-sdk/memory-core-host-status";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core";
+import type { ConsolidationConfig } from "allbot/plugin-sdk/memory-core-host-status";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type { ConsolidationRouteDeps } from "./consolidation-route.js";
 import {
@@ -375,7 +375,7 @@ describe("runConsolidationAllAgents", () => {
   }
 
   it("returns empty array when no workspaces", async () => {
-    const cfg = {} as unknown as KaijiBotConfig;
+    const cfg = {} as unknown as AllBotConfig;
     const deps: ConsolidationDeps = {
       listSessionFiles: vi.fn().mockResolvedValue([]),
       readSessionFile: vi.fn().mockResolvedValue(""),
@@ -394,7 +394,7 @@ describe("runConsolidationAllAgents", () => {
 
   it("runs consolidation for a single workspace", async () => {
     await withTempWorkspace(async (workspaceDir) => {
-      const cfg = {} as unknown as KaijiBotConfig;
+      const cfg = {} as unknown as AllBotConfig;
       const deps: ConsolidationDeps = {
         listSessionFiles: vi.fn().mockResolvedValue([`${workspaceDir}/session1.jsonl`]),
         readSessionFile: vi.fn().mockResolvedValue("Some transcript content here"),
@@ -420,7 +420,7 @@ describe("runConsolidationAllAgents", () => {
   it("runs consolidation for multiple workspaces with bounded concurrency", async () => {
     await withTempWorkspace(async (ws1) => {
       await withTempWorkspace(async (ws2) => {
-        const cfg = {} as unknown as KaijiBotConfig;
+        const cfg = {} as unknown as AllBotConfig;
         const deps: ConsolidationDeps = {
           listSessionFiles: vi.fn().mockResolvedValue([]),
           readSessionFile: vi.fn().mockResolvedValue(""),

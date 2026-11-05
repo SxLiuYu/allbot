@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import { type KaijiBotConfig, loadConfig } from "../../config/config.js";
+import { type AllBotConfig, loadConfig } from "../../config/config.js";
 import { callGateway } from "../../gateway/call.js";
 import { capArrayByJsonBytes } from "../../gateway/session-utils.fs.js";
 import { jsonUtf8Bytes } from "../../infra/json-utf8-bytes.js";
@@ -175,7 +175,7 @@ function enforceSessionsHistoryHardCap(params: {
 export function createSessionsHistoryTool(opts?: {
   agentSessionKey?: string;
   sandboxed?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   callGateway?: GatewayCaller;
 }): AnyAgentTool {
   return {

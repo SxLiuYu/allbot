@@ -1,7 +1,7 @@
 import { resolveDefaultAgentId } from "../agents/agent-scope.js";
 import type { ChatType } from "../channels/chat-type.js";
 import { normalizeChatType } from "../channels/chat-type.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { shouldLogVerbose } from "../globals.js";
 import { logDebug } from "../logger.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
@@ -26,7 +26,7 @@ export type RoutePeer = {
 };
 
 export type ResolveAgentRouteInput = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId?: string | null;
   peer?: RoutePeer | null;
@@ -114,20 +114,20 @@ export function buildAgentSessionKey(params: {
   });
 }
 
-function listAgents(cfg: KaijiBotConfig) {
+function listAgents(cfg: AllBotConfig) {
   const agents = cfg.agents?.list;
   return Array.isArray(agents) ? agents : [];
 }
 
 type AgentLookupCache = {
-  agentsRef: KaijiBotConfig["agents"] | undefined;
+  agentsRef: AllBotConfig["agents"] | undefined;
   byNormalizedId: Map<string, string>;
   fallbackDefaultAgentId: string;
 };
 
-const agentLookupCacheByCfg = new WeakMap<KaijiBotConfig, AgentLookupCache>();
+const agentLookupCacheByCfg = new WeakMap<AllBotConfig, AgentLookupCache>();
 
-function resolveAgentLookupCache(cfg: KaijiBotConfig): AgentLookupCache {
+function resolveAgentLookupCache(cfg: AllBotConfig): AgentLookupCache {
   const agentsRef = cfg.agents;
   const existing = agentLookupCacheByCfg.get(cfg);
   if (existing && existing.agentsRef === agentsRef) {
@@ -151,7 +151,7 @@ function resolveAgentLookupCache(cfg: KaijiBotConfig): AgentLookupCache {
   return next;
 }
 
-export function pickFirstExistingAgentId(cfg: KaijiBotConfig, agentId: string): string {
+export function pickFirstExistingAgentId(cfg: AllBotConfig, agentId: string): string {
   const lookup = resolveAgentLookupCache(cfg);
   const trimmed = (agentId ?? "").trim();
   if (!trimmed) {
@@ -196,20 +196,20 @@ type BindingScope = {
 };
 
 type EvaluatedBindingsCache = {
-  bindingsRef: KaijiBotConfig["bindings"];
+  bindingsRef: AllBotConfig["bindings"];
   byChannel: Map<string, EvaluatedBindingsByChannel>;
   byChannelAccount: Map<string, EvaluatedBinding[]>;
   byChannelAccountIndex: Map<string, EvaluatedBindingsIndex>;
 };
 
-const evaluatedBindingsCacheByCfg = new WeakMap<KaijiBotConfig, EvaluatedBindingsCache>();
+const evaluatedBindingsCacheByCfg = new WeakMap<AllBotConfig, EvaluatedBindingsCache>();
 const MAX_EVALUATED_BINDINGS_CACHE_KEYS = 2000;
 const resolvedRouteCacheByCfg = new WeakMap<
-  KaijiBotConfig,
+  AllBotConfig,
   {
-    bindingsRef: KaijiBotConfig["bindings"];
-    agentsRef: KaijiBotConfig["agents"];
-    sessionRef: KaijiBotConfig["session"];
+    bindingsRef: AllBotConfig["bindings"];
+    agentsRef: AllBotConfig["agents"];
+    sessionRef: AllBotConfig["session"];
     byKey: Map<string, ResolvedAgentRoute>;
   }
 >();
@@ -238,7 +238,7 @@ function resolveAccountPatternKey(accountPattern: string): string {
 }
 
 function buildEvaluatedBindingsByChannel(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): Map<string, EvaluatedBindingsByChannel> {
   const byChannel = new Map<string, EvaluatedBindingsByChannel>();
   let order = 0;
@@ -422,7 +422,7 @@ function buildEvaluatedBindingsIndex(bindings: EvaluatedBinding[]): EvaluatedBin
 }
 
 function getEvaluatedBindingsForChannelAccount(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel: string,
   accountId: string,
 ): EvaluatedBinding[] {
@@ -465,7 +465,7 @@ function getEvaluatedBindingsForChannelAccount(
 }
 
 function getEvaluatedBindingIndexForChannelAccount(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel: string,
   accountId: string,
 ): EvaluatedBindingsIndex {
@@ -519,7 +519,7 @@ function normalizeBindingMatch(
   };
 }
 
-function resolveRouteCacheForConfig(cfg: KaijiBotConfig): Map<string, ResolvedAgentRoute> {
+function resolveRouteCacheForConfig(cfg: AllBotConfig): Map<string, ResolvedAgentRoute> {
   const existing = resolvedRouteCacheByCfg.get(cfg);
   if (
     existing &&

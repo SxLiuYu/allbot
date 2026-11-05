@@ -26,7 +26,7 @@ export type GatewayBonjourAdvertiseOpts = {
 };
 
 function isDisabledByEnv() {
-  if (isTruthyEnvValue(process.env.KAIJIBOT_DISABLE_BONJOUR)) {
+  if (isTruthyEnvValue(process.env.ALLBOT_DISABLE_BONJOUR)) {
     return true;
   }
   if (process.env.NODE_ENV === "test") {
@@ -37,8 +37,8 @@ function isDisabledByEnv() {
   }
   // mDNS/Bonjour is unreliable on Windows — repeated probe/restart cycles
   // add ~5s+ to gateway startup on NTFS.  Disable by default; users who
-  // need it can set KAIJIBOT_ENABLE_BONJOUR=1.
-  if (process.platform === "win32" && !isTruthyEnvValue(process.env.KAIJIBOT_ENABLE_BONJOUR)) {
+  // need it can set ALLBOT_ENABLE_BONJOUR=1.
+  if (process.platform === "win32" && !isTruthyEnvValue(process.env.ALLBOT_ENABLE_BONJOUR)) {
     return true;
   }
   return false;
@@ -46,12 +46,12 @@ function isDisabledByEnv() {
 
 function safeServiceName(name: string) {
   const trimmed = name.trim();
-  return trimmed.length > 0 ? trimmed : "KaijiBot";
+  return trimmed.length > 0 ? trimmed : "AllBot";
 }
 
 function prettifyInstanceName(name: string) {
   const normalized = name.trim().replace(/\s+/g, " ");
-  return normalized.replace(/\s+\(KaijiBot\)\s*$/i, "").trim() || normalized;
+  return normalized.replace(/\s+\(AllBot\)\s*$/i, "").trim() || normalized;
 }
 
 type BonjourService = import("@homebridge/ciao").CiaoService;
@@ -154,16 +154,16 @@ export async function startGatewayBonjourAdvertiser(
     // mDNS service instance names are single DNS labels; dots in hostnames (like
     // `Mac.localdomain`) can confuse some resolvers/browsers and break discovery.
     // Keep only the first label and normalize away a trailing `.local`.
-    const hostnameRaw = process.env.KAIJIBOT_MDNS_HOSTNAME?.trim() || "kaijibot";
+    const hostnameRaw = process.env.ALLBOT_MDNS_HOSTNAME?.trim() || "allbot";
     const hostname =
       hostnameRaw
         .replace(/\.local$/i, "")
         .split(".")[0]
-        .trim() || "kaijibot";
+        .trim() || "allbot";
     const instanceName =
       typeof opts.instanceName === "string" && opts.instanceName.trim()
         ? opts.instanceName.trim()
-        : `${hostname} (KaijiBot)`;
+        : `${hostname} (AllBot)`;
     const displayName = prettifyInstanceName(instanceName);
 
     const txtBase: Record<string, string> = {
@@ -206,7 +206,7 @@ export async function startGatewayBonjourAdvertiser(
 
       const gateway = responder.createService({
         name: safeServiceName(instanceName),
-        type: "kaijibot-gw",
+        type: "allbot-gw",
         protocol: Protocol.TCP,
         port: opts.gatewayPort,
         domain: "local",

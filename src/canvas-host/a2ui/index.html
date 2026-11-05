@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KaijiBot Canvas</title>
+    <title>AllBot Canvas</title>
     <script>
       (() => {
         const normalizeLower = (value) => {
@@ -85,7 +85,7 @@
         backface-visibility: hidden;
         opacity: 0.45;
         pointer-events: none;
-        animation: kaijibot-grid-drift 140s ease-in-out infinite alternate;
+        animation: allbot-grid-drift 140s ease-in-out infinite alternate;
       }
       :root[data-platform="android"] body::before {
         opacity: 0.8;
@@ -105,7 +105,7 @@
         backface-visibility: hidden;
         transform: translate3d(0, 0, 0);
         pointer-events: none;
-        animation: kaijibot-glow-drift 110s ease-in-out infinite alternate;
+        animation: allbot-glow-drift 110s ease-in-out infinite alternate;
       }
       :root[data-platform="android"] body::after {
         opacity: 0.85;
@@ -120,7 +120,7 @@
           opacity: 0.7;
         }
       }
-      @keyframes kaijibot-grid-drift {
+      @keyframes allbot-grid-drift {
         0% {
           transform: translate3d(-12px, 8px, 0) rotate(-7deg);
           opacity: 0.4;
@@ -134,7 +134,7 @@
           opacity: 0.42;
         }
       }
-      @keyframes kaijibot-glow-drift {
+      @keyframes allbot-glow-drift {
         0% {
           transform: translate3d(-18px, 12px, 0) scale(1.02);
           opacity: 0.4;
@@ -157,14 +157,14 @@
         touch-action: none;
         z-index: 1;
       }
-      :root[data-platform="android"] #kaijibot-canvas {
+      :root[data-platform="android"] #allbot-canvas {
         background:
           radial-gradient(1100px 800px at 20% 15%, rgba(42, 113, 255, 0.78), rgba(0, 0, 0, 0) 58%),
           radial-gradient(900px 650px at 82% 28%, rgba(255, 0, 138, 0.66), rgba(0, 0, 0, 0) 62%),
           radial-gradient(1000px 900px at 60% 88%, rgba(0, 209, 255, 0.58), rgba(0, 0, 0, 0) 62%),
           #141c33;
       }
-      #kaijibot-status {
+      #allbot-status {
         position: fixed;
         inset: 0;
         display: none;
@@ -176,7 +176,7 @@
         pointer-events: none;
         z-index: 3;
       }
-      #kaijibot-status .card {
+      #allbot-status .card {
         width: min(560px, 88vw);
         text-align: left;
         padding: 14px 16px 12px;
@@ -189,7 +189,7 @@
         -webkit-backdrop-filter: blur(18px) saturate(140%);
         backdrop-filter: blur(18px) saturate(140%);
       }
-      #kaijibot-status .title {
+      #allbot-status .title {
         font:
           600 12px/1.2 -apple-system,
           BlinkMacSystemFont,
@@ -200,7 +200,7 @@
         text-transform: uppercase;
         color: rgba(255, 255, 255, 0.7);
       }
-      #kaijibot-status .subtitle {
+      #allbot-status .subtitle {
         margin-top: 8px;
         font:
           500 13px/1.45 -apple-system,
@@ -212,39 +212,39 @@
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
-      kaijibot-a2ui-host {
+      allbot-a2ui-host {
         display: block;
         height: 100%;
         position: fixed;
         inset: 0;
         z-index: 4;
-        --kaijibot-a2ui-inset-top: 28px;
-        --kaijibot-a2ui-inset-right: 0px;
-        --kaijibot-a2ui-inset-bottom: 0px;
-        --kaijibot-a2ui-inset-left: 0px;
-        --kaijibot-a2ui-scroll-pad-bottom: 0px;
-        --kaijibot-a2ui-status-top: calc(50% - 18px);
-        --kaijibot-a2ui-empty-top: 18px;
+        --allbot-a2ui-inset-top: 28px;
+        --allbot-a2ui-inset-right: 0px;
+        --allbot-a2ui-inset-bottom: 0px;
+        --allbot-a2ui-inset-left: 0px;
+        --allbot-a2ui-scroll-pad-bottom: 0px;
+        --allbot-a2ui-status-top: calc(50% - 18px);
+        --allbot-a2ui-empty-top: 18px;
       }
     </style>
   </head>
   <body>
-    <canvas id="kaijibot-canvas"></canvas>
-    <div id="kaijibot-status" role="status" aria-live="polite">
+    <canvas id="allbot-canvas"></canvas>
+    <div id="allbot-status" role="status" aria-live="polite">
       <section class="card">
-        <div class="title" id="kaijibot-status-title">Ready</div>
-        <div class="subtitle" id="kaijibot-status-subtitle">Waiting for agent</div>
+        <div class="title" id="allbot-status-title">Ready</div>
+        <div class="subtitle" id="allbot-status-subtitle">Waiting for agent</div>
       </section>
     </div>
-    <kaijibot-a2ui-host></kaijibot-a2ui-host>
+    <allbot-a2ui-host></allbot-a2ui-host>
     <script src="a2ui.bundle.js"></script>
     <script>
       (() => {
-        const canvas = document.getElementById("kaijibot-canvas");
+        const canvas = document.getElementById("allbot-canvas");
         const ctx = canvas.getContext("2d");
-        const statusEl = document.getElementById("kaijibot-status");
-        const titleEl = document.getElementById("kaijibot-status-title");
-        const subtitleEl = document.getElementById("kaijibot-status-subtitle");
+        const statusEl = document.getElementById("allbot-status");
+        const titleEl = document.getElementById("allbot-status-title");
+        const subtitleEl = document.getElementById("allbot-status-subtitle");
         const debugStatusEnabledByQuery = (() => {
           try {
             const params = new URLSearchParams(window.location.search);
@@ -282,7 +282,7 @@
           statusEl.style.display = "none";
         }
 
-        window.__kaijibot = {
+        window.__allbot = {
           canvas,
           ctx,
           setDebugStatusEnabled,

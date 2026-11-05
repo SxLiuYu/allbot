@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createContextShowTool } from "./context-show-tool.js";
 
 let workspaceDir: string;
@@ -17,8 +17,8 @@ function extractText(result: { content: Array<{ type: string; text?: string }> }
 beforeEach(() => {
   workspaceDir = mkdtempSync(join(tmpdir(), "ctx-show-ws-"));
   configDir = mkdtempSync(join(tmpdir(), "ctx-show-cfg-"));
-  origStateDir = process.env.KAIJIBOT_STATE_DIR;
-  process.env.KAIJIBOT_STATE_DIR = configDir;
+  origStateDir = process.env.ALLBOT_STATE_DIR;
+  process.env.ALLBOT_STATE_DIR = configDir;
 
   writeFileSync(
     join(workspaceDir, "AGENTS.md"),
@@ -32,9 +32,9 @@ beforeEach(() => {
 
 afterEach(() => {
   if (origStateDir !== undefined) {
-    process.env.KAIJIBOT_STATE_DIR = origStateDir;
+    process.env.ALLBOT_STATE_DIR = origStateDir;
   } else {
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_STATE_DIR;
   }
   rmSync(workspaceDir, { recursive: true, force: true });
   rmSync(configDir, { recursive: true, force: true });
@@ -43,7 +43,7 @@ afterEach(() => {
 describe("context_show tool", () => {
   it("returns null when cognitive is disabled", () => {
     const tool = createContextShowTool({
-      config: { cognitive: { enabled: false } } as KaijiBotConfig,
+      config: { cognitive: { enabled: false } } as AllBotConfig,
       workspaceDir,
       agentId: "main",
     });

@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { normalizeChatType } from "../../channels/chat-type.js";
 import { normalizeAnyChannelId } from "../../channels/registry.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { applyMergePatch } from "../../config/merge-patch.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import {
@@ -15,17 +15,17 @@ import type { CommandContext } from "./commands-types.js";
 import { stripMentions, stripStructuralPrefixes } from "./mentions.js";
 import type { SessionInitResult } from "./session.js";
 
-const COMPLETE_REPLY_CONFIG_SYMBOL = Symbol.for("kaijibot.reply.complete-config");
-const FULL_REPLY_RUNTIME_SYMBOL = Symbol.for("kaijibot.reply.full-runtime");
+const COMPLETE_REPLY_CONFIG_SYMBOL = Symbol.for("allbot.reply.complete-config");
+const FULL_REPLY_RUNTIME_SYMBOL = Symbol.for("allbot.reply.full-runtime");
 
-type ReplyConfigWithMarker = KaijiBotConfig & {
+type ReplyConfigWithMarker = AllBotConfig & {
   [COMPLETE_REPLY_CONFIG_SYMBOL]?: true;
   [FULL_REPLY_RUNTIME_SYMBOL]?: true;
 };
 
 function isSlowReplyTestAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
   return (
-    env.KAIJIBOT_ALLOW_SLOW_REPLY_TESTS === "1" || env.KAIJIBOT_STRICT_FAST_REPLY_CONFIG === "0"
+    env.ALLBOT_ALLOW_SLOW_REPLY_TESTS === "1" || env.ALLBOT_STRICT_FAST_REPLY_CONFIG === "0"
   );
 }
 
@@ -57,7 +57,7 @@ function markReplyConfigRuntimeMode(
   });
 }
 
-export function markCompleteReplyConfig<T extends KaijiBotConfig>(
+export function markCompleteReplyConfig<T extends AllBotConfig>(
   config: T,
   options?: { runtimeMode?: "fast" | "full" },
 ): T {
@@ -70,15 +70,15 @@ export function markCompleteReplyConfig<T extends KaijiBotConfig>(
   return config;
 }
 
-export function withFastReplyConfig<T extends KaijiBotConfig>(config: T): T {
+export function withFastReplyConfig<T extends AllBotConfig>(config: T): T {
   return markCompleteReplyConfig(config, { runtimeMode: "fast" });
 }
 
-export function withFullRuntimeReplyConfig<T extends KaijiBotConfig>(config: T): T {
+export function withFullRuntimeReplyConfig<T extends AllBotConfig>(config: T): T {
   return markCompleteReplyConfig(config, { runtimeMode: "full" });
 }
 
-export function isCompleteReplyConfig(config: unknown): config is KaijiBotConfig {
+export function isCompleteReplyConfig(config: unknown): config is AllBotConfig {
   return Boolean(
     config &&
     typeof config === "object" &&
@@ -95,28 +95,28 @@ export function usesFullReplyRuntime(config: unknown): boolean {
 }
 
 export function resolveGetReplyConfig(params: {
-  loadConfig: () => KaijiBotConfig;
+  loadConfig: () => AllBotConfig;
   isFastTestEnv: boolean;
-  configOverride?: KaijiBotConfig;
-}): KaijiBotConfig {
+  configOverride?: AllBotConfig;
+}): AllBotConfig {
   const { configOverride } = params;
   if (configOverride == null) {
     return params.loadConfig();
   }
   if (params.isFastTestEnv && !isCompleteReplyConfig(configOverride) && !isSlowReplyTestAllowed()) {
     throw new Error(
-      "Fast reply tests must pass with withFastReplyConfig()/markCompleteReplyConfig(); set KAIJIBOT_ALLOW_SLOW_REPLY_TESTS=1 to opt out.",
+      "Fast reply tests must pass with withFastReplyConfig()/markCompleteReplyConfig(); set ALLBOT_ALLOW_SLOW_REPLY_TESTS=1 to opt out.",
     );
   }
   if (params.isFastTestEnv && isCompleteReplyConfig(configOverride)) {
     return configOverride;
   }
-  return applyMergePatch(params.loadConfig(), configOverride) as KaijiBotConfig;
+  return applyMergePatch(params.loadConfig(), configOverride) as AllBotConfig;
 }
 
 export function shouldUseReplyFastTestBootstrap(params: {
   isFastTestEnv: boolean;
-  configOverride?: KaijiBotConfig;
+  configOverride?: AllBotConfig;
 }): boolean {
   return (
     params.isFastTestEnv &&
@@ -126,7 +126,7 @@ export function shouldUseReplyFastTestBootstrap(params: {
 }
 
 export function shouldUseReplyFastTestRuntime(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   isFastTestEnv: boolean;
 }): boolean {
   return (
@@ -154,7 +154,7 @@ export function shouldUseReplyFastDirectiveExecution(params: {
 
 export function buildFastReplyCommandContext(params: {
   ctx: MsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId?: string;
   sessionKey?: string;
   isGroup: boolean;
@@ -187,7 +187,7 @@ export function buildFastReplyCommandContext(params: {
 }
 
 export function shouldHandleFastReplyTextCommands(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   commandSource?: string;
 }): boolean {
   return params.commandSource === "native" || params.cfg.commands?.text !== false;
@@ -195,7 +195,7 @@ export function shouldHandleFastReplyTextCommands(params: {
 
 export function initFastReplySessionState(params: {
   ctx: MsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   commandAuthorized: boolean;
   workspaceDir: string;
@@ -217,7 +217,7 @@ export function initFastReplySessionState(params: {
     ? strippedForReset.slice(resetMatch?.[0].length ?? 0).trimStart()
     : (ctx.BodyForAgent ?? ctx.Body ?? "");
   const now = Date.now();
-  const sessionFile = path.join(workspaceDir, ".kaijibot", "sessions", `${sessionId}.jsonl`);
+  const sessionFile = path.join(workspaceDir, ".allbot", "sessions", `${sessionId}.jsonl`);
   const sessionEntry: SessionEntry = {
     sessionId,
     sessionFile,

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolvePluginInstallDir } from "./install.js";
 import {
   cleanupTrackedTempDirsAsync,
@@ -15,7 +15,7 @@ import {
   uninstallPlugin,
 } from "./uninstall.js";
 
-type PluginConfig = NonNullable<KaijiBotConfig["plugins"]>;
+type PluginConfig = NonNullable<AllBotConfig["plugins"]>;
 type PluginInstallRecord = NonNullable<PluginConfig["installs"]>[string];
 
 async function createInstalledNpmPluginFixture(params: {
@@ -25,7 +25,7 @@ async function createInstalledNpmPluginFixture(params: {
   pluginId: string;
   extensionsDir: string;
   pluginDir: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
 }> {
   const pluginId = params.pluginId ?? "my-plugin";
   const extensionsDir = path.join(params.baseDir, "extensions");
@@ -132,8 +132,8 @@ function createPluginConfig(params: {
   enabled?: boolean;
   slots?: PluginConfig["slots"];
   loadPaths?: string[];
-  channels?: KaijiBotConfig["channels"];
-}): KaijiBotConfig {
+  channels?: AllBotConfig["channels"];
+}): AllBotConfig {
   const plugins: PluginConfig = {};
   if (params.entries) {
     plugins.entries = params.entries;
@@ -163,14 +163,14 @@ function createPluginConfig(params: {
 }
 
 function expectRemainingChannels(
-  channels: KaijiBotConfig["channels"],
+  channels: AllBotConfig["channels"],
   expected: Record<string, unknown> | undefined,
 ) {
   expect(channels as Record<string, unknown> | undefined).toEqual(expected);
 }
 
 function expectChannelCleanupResult(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   pluginId: string;
   expectedChannels: Record<string, unknown> | undefined;
   expectedChanged: boolean;
@@ -189,14 +189,14 @@ function expectChannelCleanupResult(params: {
   expect(actions.channelConfig).toBe(params.expectedChanged);
 }
 
-function createSinglePluginWithEmptySlotsConfig(): KaijiBotConfig {
+function createSinglePluginWithEmptySlotsConfig(): AllBotConfig {
   return createPluginConfig({
     entries: createSinglePluginEntries(),
     slots: {},
   });
 }
 
-function createSingleNpmInstallConfig(installPath: string): KaijiBotConfig {
+function createSingleNpmInstallConfig(installPath: string): AllBotConfig {
   return createPluginConfig({
     entries: createSinglePluginEntries(),
     installs: {
@@ -535,7 +535,7 @@ describe("removePluginFromConfig", () => {
           defaults: { groupPolicy: "opt-in" },
           modelByChannel: { timbot: "gpt-3.5" } as Record<string, string>,
           timbot: { sdkAppId: "123" },
-        } as unknown as KaijiBotConfig["channels"],
+        } as unknown as AllBotConfig["channels"],
       }),
       pluginId: "timbot",
       expectedChannels: {
@@ -555,7 +555,7 @@ describe("removePluginFromConfig", () => {
         },
         channels: {
           defaults: { groupPolicy: "opt-in" },
-        } as unknown as KaijiBotConfig["channels"],
+        } as unknown as AllBotConfig["channels"],
       }),
       pluginId: "bad-plugin",
       options: {
@@ -775,14 +775,14 @@ describe("resolveUninstallDirectoryTarget", () => {
   });
 
   it("falls back to default path when configured installPath is untrusted", () => {
-    const extensionsDir = path.join(os.tmpdir(), "kaijibot-uninstall-safe");
+    const extensionsDir = path.join(os.tmpdir(), "allbot-uninstall-safe");
     const target = resolveUninstallDirectoryTarget({
       pluginId: "my-plugin",
       hasInstall: true,
       installRecord: {
         source: "npm",
         spec: "my-plugin@1.0.0",
-        installPath: "/tmp/not-kaijibot-plugin-install/my-plugin",
+        installPath: "/tmp/not-allbot-plugin-install/my-plugin",
       },
       extensionsDir,
     });

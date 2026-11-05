@@ -4,8 +4,8 @@ import { formatBackupCreateSummary, type BackupCreateResult } from "./backup-cre
 function makeResult(overrides: Partial<BackupCreateResult> = {}): BackupCreateResult {
   return {
     createdAt: "2026-01-01T00:00:00.000Z",
-    archiveRoot: "kaijibot-backup-2026-01-01",
-    archivePath: "/tmp/kaijibot-backup.tar.gz",
+    archiveRoot: "allbot-backup-2026-01-01",
+    archivePath: "/tmp/allbot-backup.tar.gz",
     dryRun: false,
     includeWorkspace: true,
     onlyConfig: false,
@@ -17,7 +17,7 @@ function makeResult(overrides: Partial<BackupCreateResult> = {}): BackupCreateRe
 }
 
 describe("formatBackupCreateSummary", () => {
-  const backupArchiveLine = "Backup archive: /tmp/kaijibot-backup.tar.gz";
+  const backupArchiveLine = "Backup archive: /tmp/allbot-backup.tar.gz";
 
   it.each([
     {
@@ -29,26 +29,26 @@ describe("formatBackupCreateSummary", () => {
             kind: "state",
             sourcePath: "/state",
             archivePath: "archive/state",
-            displayPath: "~/.kaijibot",
+            displayPath: "~/.allbot",
           },
         ],
         skipped: [
           {
             kind: "workspace",
             sourcePath: "/workspace",
-            displayPath: "~/Projects/kaijibot",
+            displayPath: "~/Projects/allbot",
             reason: "covered",
-            coveredBy: "~/.kaijibot",
+            coveredBy: "~/.allbot",
           },
         ],
       }),
       expected: [
         backupArchiveLine,
         "Included 1 path:",
-        "- state: ~/.kaijibot",
+        "- state: ~/.allbot",
         "Skipped 1 path:",
-        "- workspace: ~/Projects/kaijibot (covered by ~/.kaijibot)",
-        "Created /tmp/kaijibot-backup.tar.gz",
+        "- workspace: ~/Projects/allbot (covered by ~/.allbot)",
+        "Created /tmp/allbot-backup.tar.gz",
         "Archive verification: passed",
       ],
     },
@@ -61,21 +61,21 @@ describe("formatBackupCreateSummary", () => {
             kind: "config",
             sourcePath: "/config",
             archivePath: "archive/config",
-            displayPath: "~/.kaijibot/config.json",
+            displayPath: "~/.allbot/config.json",
           },
           {
             kind: "credentials",
             sourcePath: "/oauth",
             archivePath: "archive/oauth",
-            displayPath: "~/.kaijibot/oauth",
+            displayPath: "~/.allbot/oauth",
           },
         ],
       }),
       expected: [
         backupArchiveLine,
         "Included 2 paths:",
-        "- config: ~/.kaijibot/config.json",
-        "- credentials: ~/.kaijibot/oauth",
+        "- config: ~/.allbot/config.json",
+        "- credentials: ~/.allbot/oauth",
         "Dry run only; archive was not written.",
       ],
     },

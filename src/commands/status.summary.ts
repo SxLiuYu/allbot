@@ -4,7 +4,7 @@ import { resolveMainSessionKey } from "../config/sessions/main-session.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { readSessionStoreReadOnly } from "../config/sessions/store-read.js";
 import { resolveFreshSessionTotalTokens, type SessionEntry } from "../config/sessions/types.js";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { listGatewayAgentsBasic } from "../gateway/agent-list.js";
 import { resolveHeartbeatSummaryForAgent } from "../infra/heartbeat-summary.js";
 import { peekSystemEvents } from "../infra/system-events.js";
@@ -105,8 +105,8 @@ export function redactSensitiveStatusSummary(summary: StatusSummary): StatusSumm
 export async function getStatusSummary(
   options: {
     includeSensitive?: boolean;
-    config?: KaijiBotConfig;
-    sourceConfig?: KaijiBotConfig;
+    config?: AllBotConfig;
+    sourceConfig?: AllBotConfig;
   } = {},
 ): Promise<StatusSummary> {
   const { includeSensitive = true } = options;

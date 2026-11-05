@@ -1,5 +1,5 @@
-import type { RuntimeEnv } from "kaijibot/plugin-sdk/runtime-env";
-import type { WizardPrompter } from "kaijibot/plugin-sdk/setup";
+import type { RuntimeEnv } from "allbot/plugin-sdk/runtime-env";
+import type { WizardPrompter } from "allbot/plugin-sdk/setup";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { jsonResponse, requestBodyText, requestUrl } from "../../../src/test-helpers/http.js";
 import {

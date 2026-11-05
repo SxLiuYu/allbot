@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
-  planKaijiBotModelsJson,
-  planKaijiBotModelsJsonWithDeps,
+  planAllBotModelsJson,
+  planAllBotModelsJsonWithDeps,
   type ResolveImplicitProvidersForModelsJson,
 } from "./models-config.plan.js";
 import type { ProviderConfig } from "./models-config.providers.secrets.js";
@@ -46,7 +46,7 @@ describe("models-config", () => {
   });
 
   it("does not override explicit github-copilot provider config", async () => {
-    const plan = await planKaijiBotModelsJson({
+    const plan = await planAllBotModelsJson({
       cfg: {
         models: {
           providers: {
@@ -58,7 +58,7 @@ describe("models-config", () => {
           },
         },
       },
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       env: {} as NodeJS.ProcessEnv,
       existingRaw: "",
       existingParsed: null,
@@ -84,7 +84,7 @@ describe("models-config", () => {
       },
     );
 
-    const plan = await planKaijiBotModelsJsonWithDeps(
+    const plan = await planAllBotModelsJsonWithDeps(
       {
         cfg: {
           models: {
@@ -97,7 +97,7 @@ describe("models-config", () => {
             },
           },
         },
-        agentDir: "/tmp/kaijibot-agent",
+        agentDir: "/tmp/allbot-agent",
         env: { VLLM_API_KEY: "test-vllm-key" } as NodeJS.ProcessEnv,
         existingRaw: "",
         existingParsed: null,
@@ -180,10 +180,10 @@ function createCopilotImplicitResolver(
 }
 
 async function planCopilotWithImplicitProvider(params: { provider: ProviderConfig }) {
-  return await planKaijiBotModelsJsonWithDeps(
+  return await planAllBotModelsJsonWithDeps(
     {
       cfg: { models: { providers: {} } },
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       env: {} as NodeJS.ProcessEnv,
       existingRaw: "",
       existingParsed: null,

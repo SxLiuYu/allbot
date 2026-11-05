@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => ({
     }>
   >(async () => ({ messageId: "poll-1" })),
   getChannelPlugin: vi.fn(),
-  loadKaijiBotPlugins: vi.fn(),
+  loadAllBotPlugins: vi.fn(),
   applyPluginAutoEnable: vi.fn(),
 }));
 
@@ -41,7 +41,7 @@ vi.mock("../../channels/plugins/index.js", () => ({
   normalizeChannelId: (value: string) => (value === "webchat" ? null : value),
 }));
 
-const TEST_AGENT_WORKSPACE = "/tmp/kaijibot-test-workspace";
+const TEST_AGENT_WORKSPACE = "/tmp/allbot-test-workspace";
 let sendHandlers: typeof import("./send.js").sendHandlers;
 
 function resolveAgentIdFromSessionKeyForTests(params: { sessionKey?: string }): string {
@@ -72,7 +72,7 @@ vi.mock("../../config/plugin-auto-enable.js", () => ({
 }));
 
 vi.mock("../../plugins/loader.js", () => ({
-  loadKaijiBotPlugins: mocks.loadKaijiBotPlugins,
+  loadAllBotPlugins: mocks.loadAllBotPlugins,
 }));
 
 vi.mock("../../infra/outbound/targets.js", () => ({

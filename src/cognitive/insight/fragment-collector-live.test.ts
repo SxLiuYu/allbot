@@ -1,15 +1,15 @@
 /**
  * Live fragment collector test — real LLM, measures extraction rate.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/insight/fragment-collector-live.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/insight/fragment-collector-live.test.ts
  */
 
 import { describe, it, expect } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import { collectFragments, createDefaultFragmentCollectorDeps } from "./fragment-collector.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 
 function makePersona(): PersonaTree {
@@ -109,14 +109,14 @@ function makePersona(): PersonaTree {
   };
 }
 
-function makeConfig(): KaijiBotConfig {
+function makeConfig(): AllBotConfig {
   return {
     cognitive: {
       persona: {
         extractionModel: "zai/glm-5-turbo",
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 // ─── Test turns ───

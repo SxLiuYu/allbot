@@ -1,7 +1,7 @@
 {
-  "name": "@kaijibot/memory-lancedb",
+  "name": "@allbot/memory-lancedb",
   "version": "2026.4.12",
-  "description": "KaijiBot LanceDB-backed long-term memory plugin with auto-recall/capture",
+  "description": "AllBot LanceDB-backed long-term memory plugin with auto-recall/capture",
   "type": "module",
   "dependencies": {
     "@lancedb/lancedb": "^0.27.2",
@@ -9,14 +9,14 @@
     "typebox": "^1.1"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ],
     "install": {
-      "npmSpec": "@kaijibot/memory-lancedb",
+      "npmSpec": "@allbot/memory-lancedb",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },
@@ -24,7 +24,7 @@
       "pluginApi": ">=2026.4.12"
     },
     "build": {
-      "kaijibotVersion": "2026.4.12"
+      "allbotVersion": "2026.4.12"
     },
     "release": {
       "publishToClawHub": true,

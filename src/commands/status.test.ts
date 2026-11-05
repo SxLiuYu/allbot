@@ -8,8 +8,8 @@ import { captureEnv } from "../test-utils/env.js";
 let envSnapshot: ReturnType<typeof captureEnv>;
 
 beforeAll(() => {
-  envSnapshot = captureEnv(["KAIJIBOT_PROFILE"]);
-  process.env.KAIJIBOT_PROFILE = "isolated";
+  envSnapshot = captureEnv(["ALLBOT_PROFILE"]);
+  process.env.ALLBOT_PROFILE = "isolated";
 });
 
 afterAll(() => {
@@ -261,7 +261,7 @@ const mocks = vi.hoisted(() => ({
     readRuntime: async () => ({ status: "running", pid: 1234 }),
     readCommand: async () => ({
       programArguments: ["node", "dist/entry.js", "gateway"],
-      sourcePath: "/tmp/Library/LaunchAgents/ai.kaijibot.gateway.plist",
+      sourcePath: "/tmp/Library/LaunchAgents/ai.allbot.gateway.plist",
     }),
   }),
   resolveNodeService: vi.fn().mockReturnValue({
@@ -277,7 +277,7 @@ const mocks = vi.hoisted(() => ({
     readRuntime: async () => ({ status: "running", pid: 4321 }),
     readCommand: async () => ({
       programArguments: ["node", "dist/entry.js", "node-host"],
-      sourcePath: "/tmp/Library/LaunchAgents/ai.kaijibot.node.plist",
+      sourcePath: "/tmp/Library/LaunchAgents/ai.allbot.node.plist",
     }),
   }),
 }));
@@ -301,7 +301,7 @@ vi.mock("../plugins/memory-runtime.js", async (importOriginal) => ({
         files: 2,
         chunks: 3,
         dirty: false,
-        workspaceDir: "/tmp/kaijibot",
+        workspaceDir: "/tmp/allbot",
         dbPath: "/tmp/memory.sqlite",
         provider: "openai",
         model: "text-embedding-3-small",
@@ -416,7 +416,7 @@ vi.mock("../gateway/call.js", async (importOriginal) => ({
       if (token && typeof token === "object" && "source" in token) {
         throw new GatewaySecretRefUnavailableError("gateway.auth.token");
       }
-      const envToken = process.env.KAIJIBOT_GATEWAY_TOKEN?.trim();
+      const envToken = process.env.ALLBOT_GATEWAY_TOKEN?.trim();
       return envToken ? { token: envToken } : {};
     },
   ),
@@ -426,15 +426,15 @@ vi.mock("../gateway/agent-list.js", async (importOriginal) => ({
   listGatewayAgentsBasic: mocks.listGatewayAgentsBasic,
 }));
 // The real loader require()s bundled extension sources, which cannot resolve the
-// kaijibot/plugin-sdk alias under vitest; channel plugin data is faked above instead.
+// allbot/plugin-sdk alias under vitest; channel plugin data is faked above instead.
 vi.mock("../cli/plugin-registry-loader.js", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../cli/plugin-registry-loader.js")>()),
   ensureCliPluginRegistryLoaded: vi.fn(async () => {}),
 }));
-vi.mock("../infra/kaijibot-root.js", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../infra/kaijibot-root.js")>()),
-  resolveKaijiBotPackageRoot: vi.fn().mockResolvedValue("/tmp/kaijibot"),
-  resolveKaijiBotPackageRootSync: vi.fn(() => "/tmp/kaijibot"),
+vi.mock("../infra/allbot-root.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../infra/allbot-root.js")>()),
+  resolveAllBotPackageRoot: vi.fn().mockResolvedValue("/tmp/allbot"),
+  resolveAllBotPackageRootSync: vi.fn(() => "/tmp/allbot"),
 }));
 vi.mock("../infra/os-summary.js", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../infra/os-summary.js")>()),
@@ -448,11 +448,11 @@ vi.mock("../infra/os-summary.js", async (importOriginal) => ({
 vi.mock("../infra/update-check.js", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../infra/update-check.js")>()),
   checkUpdateStatus: vi.fn().mockResolvedValue({
-    root: "/tmp/kaijibot",
+    root: "/tmp/allbot",
     installKind: "git",
     packageManager: "pnpm",
     git: {
-      root: "/tmp/kaijibot",
+      root: "/tmp/allbot",
       branch: "main",
       upstream: "origin/main",
       dirty: false,
@@ -463,8 +463,8 @@ vi.mock("../infra/update-check.js", async (importOriginal) => ({
     deps: {
       manager: "pnpm",
       status: "ok",
-      lockfilePath: "/tmp/kaijibot/pnpm-lock.yaml",
-      markerPath: "/tmp/kaijibot/node_modules/.modules.yaml",
+      lockfilePath: "/tmp/allbot/pnpm-lock.yaml",
+      markerPath: "/tmp/allbot/node_modules/.modules.yaml",
     },
     registry: { latestVersion: "0.0.0" },
   }),
@@ -562,7 +562,7 @@ vi.mock("./status.daemon.js", () => ({
       label: service.label,
       installed: Boolean(command) || runtime?.status === "running",
       loaded,
-      managedByKaijiBot: Boolean(command),
+      managedByAllBot: Boolean(command),
       externallyManaged: !command && runtime?.status === "running",
       loadedText: loaded ? service.loadedText : service.notLoadedText,
       runtimeShort: runtime?.pid ? `pid ${runtime.pid}` : null,
@@ -577,7 +577,7 @@ vi.mock("./status.daemon.js", () => ({
       label: service.label,
       installed: Boolean(command) || runtime?.status === "running",
       loaded,
-      managedByKaijiBot: Boolean(command),
+      managedByAllBot: Boolean(command),
       externallyManaged: !command && runtime?.status === "running",
       loadedText: loaded ? service.loadedText : service.notLoadedText,
       runtimeShort: runtime?.pid ? `pid ${runtime.pid}` : null,
@@ -668,7 +668,7 @@ describe("statusCommand", () => {
       readRuntime: async () => ({ status: "running", pid: 1234 }),
       readCommand: async () => ({
         programArguments: ["node", "dist/entry.js", "gateway"],
-        sourcePath: "/tmp/Library/LaunchAgents/ai.kaijibot.gateway.plist",
+        sourcePath: "/tmp/Library/LaunchAgents/ai.allbot.gateway.plist",
       }),
     });
     mocks.resolveNodeService.mockReset();
@@ -685,7 +685,7 @@ describe("statusCommand", () => {
       readRuntime: async () => ({ status: "running", pid: 4321 }),
       readCommand: async () => ({
         programArguments: ["node", "dist/entry.js", "node-host"],
-        sourcePath: "/tmp/Library/LaunchAgents/ai.kaijibot.node.plist",
+        sourcePath: "/tmp/Library/LaunchAgents/ai.allbot.node.plist",
       }),
     });
     runtimeLogMock.mockClear();
@@ -775,7 +775,7 @@ describe("statusCommand", () => {
     ]);
     const logs = await runStatusAndGetLogs();
     for (const token of [
-      "KaijiBot status",
+      "AllBot status",
       "Overview",
       "Security audit",
       "Summary:",
@@ -805,8 +805,8 @@ describe("statusCommand", () => {
     expect(
       logs.some(
         (line) =>
-          line.includes("kaijibot status --all") ||
-          line.includes("kaijibot --profile isolated status --all"),
+          line.includes("allbot status --all") ||
+          line.includes("allbot --profile isolated status --all"),
       ),
     ).toBe(true);
   });
@@ -926,7 +926,7 @@ describe("statusCommand", () => {
     const joined = await runStatusAndGetJoinedLogs();
     expect(joined).toContain("node → gateway.example.com:19000 · no local gateway");
     expect(joined).not.toContain("Gateway: local · ws://127.0.0.1:18789");
-    expect(joined).toContain("kaijibot --profile isolated node status");
+    expect(joined).toContain("allbot --profile isolated node status");
     expect(joined).not.toContain("Fix reachability first");
   });
 
@@ -935,7 +935,7 @@ describe("statusCommand", () => {
       session: {},
       channels: { whatsapp: { allowFrom: ["*"] } },
     });
-    await withEnvVar("KAIJIBOT_GATEWAY_TOKEN", "abcd1234", async () => {
+    await withEnvVar("ALLBOT_GATEWAY_TOKEN", "abcd1234", async () => {
       mockProbeGatewayResult({
         ok: true,
         connectLatencyMs: 123,

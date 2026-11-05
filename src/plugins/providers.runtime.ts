@@ -2,7 +2,7 @@ import { withActivatedPluginIds } from "./activation-context.js";
 import { resolveBundledPluginCompatibleActivationInputs } from "./activation-context.js";
 import {
   isPluginRegistryLoadInFlight,
-  loadKaijiBotPlugins,
+  loadAllBotPlugins,
   resolveRuntimePluginRegistry,
   type PluginLoadOptions,
 } from "./loader.js";
@@ -201,7 +201,7 @@ export function resolvePluginProviders(params: {
     if (!loadState) {
       return [];
     }
-    const registry = loadKaijiBotPlugins(loadState.loadOptions);
+    const registry = loadAllBotPlugins(loadState.loadOptions);
     return registry.providers.map((entry) => ({
       ...entry.provider,
       pluginId: entry.pluginId,

@@ -1,12 +1,12 @@
 import {
   applyAgentDefaultModelPrimary,
   withAgentModelAliases,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 
 export const OPENCODE_ZEN_DEFAULT_MODEL_REF = "opencode/claude-opus-4-6";
 
-export function applyOpencodeZenProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpencodeZenProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return {
     ...cfg,
     agents: {
@@ -21,7 +21,7 @@ export function applyOpencodeZenProviderConfig(cfg: KaijiBotConfig): KaijiBotCon
   };
 }
 
-export function applyOpencodeZenConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpencodeZenConfig(cfg: AllBotConfig): AllBotConfig {
   return applyAgentDefaultModelPrimary(
     applyOpencodeZenProviderConfig(cfg),
     OPENCODE_ZEN_DEFAULT_MODEL_REF,

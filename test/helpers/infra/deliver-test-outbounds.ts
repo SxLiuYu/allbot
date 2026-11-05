@@ -1,7 +1,7 @@
 import { chunkMarkdownTextWithMode, chunkText } from "../../../src/auto-reply/chunk.js";
 import { resolveChannelMediaMaxBytes } from "../../../src/channels/plugins/media-limits.js";
 import type { ChannelOutboundAdapter } from "../../../src/channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import {
   resolveOutboundSendDep,
   type OutboundSendDeps,
@@ -16,7 +16,7 @@ type SignalSendFn = (
 
 const MB = 1024 * 1024;
 
-function resolveSignalMaxBytes(cfg: KaijiBotConfig, accountId?: string): number | undefined {
+function resolveSignalMaxBytes(cfg: AllBotConfig, accountId?: string): number | undefined {
   const signalCfg = cfg.channels?.signal as
     | {
         mediaMaxMb?: number;
@@ -36,7 +36,7 @@ function resolveSignalSender(deps: OutboundSendDeps | undefined): SignalSendFn {
   return sender;
 }
 
-function resolveSignalTextChunkLimit(cfg: KaijiBotConfig, accountId?: string | null): number {
+function resolveSignalTextChunkLimit(cfg: AllBotConfig, accountId?: string | null): number {
   const signalCfg = cfg.channels?.signal as
     | {
         textChunkLimit?: number;
@@ -235,7 +235,7 @@ function withIMessageChannel(
 }
 
 function resolveIMessageMaxBytes(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId?: string | null,
 ): number | undefined {
   return resolveChannelMediaMaxBytes({

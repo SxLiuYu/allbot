@@ -22,14 +22,14 @@ const DEFAULTS = {
 };
 
 const WATCH_GATEWAY_SKIP_ENV = {
-  KAIJIBOT_DISABLE_BONJOUR: "1",
-  KAIJIBOT_SKIP_ACPX_RUNTIME: "1",
-  KAIJIBOT_SKIP_ACPX_RUNTIME_PROBE: "1",
-  KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER: "1",
-  KAIJIBOT_SKIP_CANVAS_HOST: "1",
-  KAIJIBOT_SKIP_CHANNELS: "1",
-  KAIJIBOT_SKIP_CRON: "1",
-  KAIJIBOT_SKIP_GMAIL_WATCHER: "1",
+  ALLBOT_DISABLE_BONJOUR: "1",
+  ALLBOT_SKIP_ACPX_RUNTIME: "1",
+  ALLBOT_SKIP_ACPX_RUNTIME_PROBE: "1",
+  ALLBOT_SKIP_BROWSER_CONTROL_SERVER: "1",
+  ALLBOT_SKIP_CANVAS_HOST: "1",
+  ALLBOT_SKIP_CHANNELS: "1",
+  ALLBOT_SKIP_CRON: "1",
+  ALLBOT_SKIP_GMAIL_WATCHER: "1",
 };
 
 function parseArgs(argv) {
@@ -253,15 +253,15 @@ async function allocateLoopbackPort() {
 
 function buildTimedWatchCommand(pidFilePath, timeFilePath, isolatedHomeDir, port) {
   const shellSource = [
-    'echo "$$" > "$KAIJIBOT_WATCH_PID_FILE"',
-    'mkdir -p "$KAIJIBOT_HOME/.kaijibot"',
-    `printf '%s\n' '{"gateway":{"controlUi":{"enabled":false}}}' > "$KAIJIBOT_HOME/.kaijibot/kaijibot.json"`,
+    'echo "$$" > "$ALLBOT_WATCH_PID_FILE"',
+    'mkdir -p "$ALLBOT_HOME/.allbot"',
+    `printf '%s\n' '{"gateway":{"controlUi":{"enabled":false}}}' > "$ALLBOT_HOME/.allbot/allbot.json"`,
     `exec node scripts/watch-node.mjs gateway --force --allow-unconfigured --port ${String(port)} --token watch-regression-token`,
   ].join("\n");
   const env = {
-    KAIJIBOT_WATCH_PID_FILE: pidFilePath,
+    ALLBOT_WATCH_PID_FILE: pidFilePath,
     HOME: isolatedHomeDir,
-    KAIJIBOT_HOME: isolatedHomeDir,
+    ALLBOT_HOME: isolatedHomeDir,
     ...WATCH_GATEWAY_SKIP_ENV,
   };
 
@@ -312,7 +312,7 @@ function parseTimingFile(timeFilePath) {
 async function runTimedWatch(options, outputDir) {
   const pidFilePath = path.join(outputDir, "watch.pid");
   const timeFilePath = path.join(outputDir, "watch.time.log");
-  const isolatedHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-gateway-watch-"));
+  const isolatedHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-gateway-watch-"));
   fs.writeFileSync(path.join(outputDir, "watch.home.txt"), `${isolatedHomeDir}\n`, "utf8");
   const stdoutPath = path.join(outputDir, "watch.stdout.log");
   const stderrPath = path.join(outputDir, "watch.stderr.log");

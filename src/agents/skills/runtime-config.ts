@@ -1,5 +1,5 @@
-import { getRuntimeConfigSnapshot, type KaijiBotConfig } from "../../config/config.js";
+import { getRuntimeConfigSnapshot, type AllBotConfig } from "../../config/config.js";
 
-export function resolveSkillRuntimeConfig(config?: KaijiBotConfig): KaijiBotConfig | undefined {
+export function resolveSkillRuntimeConfig(config?: AllBotConfig): AllBotConfig | undefined {
   return getRuntimeConfigSnapshot() ?? config;
 }

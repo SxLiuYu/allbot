@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { stopKaijiBotChromeMock } = vi.hoisted(() => ({
-  stopKaijiBotChromeMock: vi.fn(async () => {}),
+const { stopAllBotChromeMock } = vi.hoisted(() => ({
+  stopAllBotChromeMock: vi.fn(async () => {}),
 }));
 
 const { createBrowserRouteContextMock, listKnownProfileNamesMock } = vi.hoisted(() => ({
@@ -10,7 +10,7 @@ const { createBrowserRouteContextMock, listKnownProfileNamesMock } = vi.hoisted(
 }));
 
 vi.mock("./chrome.js", () => ({
-  stopKaijiBotChrome: stopKaijiBotChromeMock,
+  stopAllBotChrome: stopAllBotChromeMock,
 }));
 
 vi.mock("./server-context.js", () => ({
@@ -24,7 +24,7 @@ const { ensureExtensionRelayForProfiles, stopKnownBrowserProfiles } =
 beforeEach(() => {
   createBrowserRouteContextMock.mockClear();
   listKnownProfileNamesMock.mockClear();
-  stopKaijiBotChromeMock.mockClear();
+  stopAllBotChromeMock.mockClear();
 });
 
 describe("ensureExtensionRelayForProfiles", () => {
@@ -40,9 +40,9 @@ describe("ensureExtensionRelayForProfiles", () => {
 
 describe("stopKnownBrowserProfiles", () => {
   it("stops all known profiles and ignores per-profile failures", async () => {
-    listKnownProfileNamesMock.mockReturnValue(["kaijibot", "user"]);
+    listKnownProfileNamesMock.mockReturnValue(["allbot", "user"]);
     const stopMap: Record<string, ReturnType<typeof vi.fn>> = {
-      kaijibot: vi.fn(async () => {}),
+      allbot: vi.fn(async () => {}),
       user: vi.fn(async () => {
         throw new Error("profile stop failed");
       }),
@@ -60,7 +60,7 @@ describe("stopKnownBrowserProfiles", () => {
       onWarn,
     });
 
-    expect(stopMap.kaijibot).toHaveBeenCalledTimes(1);
+    expect(stopMap.allbot).toHaveBeenCalledTimes(1);
     expect(stopMap.user).toHaveBeenCalledTimes(1);
     expect(onWarn).not.toHaveBeenCalled();
   });
@@ -75,7 +75,7 @@ describe("stopKnownBrowserProfiles", () => {
     const localRuntime = {
       profile: {
         name: "deleted-local",
-        driver: "kaijibot",
+        driver: "allbot",
       },
       running: {
         pid: 42,
@@ -94,7 +94,7 @@ describe("stopKnownBrowserProfiles", () => {
       onWarn: vi.fn(),
     });
 
-    expect(stopKaijiBotChromeMock).toHaveBeenCalledWith(launchedBrowser);
+    expect(stopAllBotChromeMock).toHaveBeenCalledWith(launchedBrowser);
     expect(localRuntime.running).toBeNull();
   });
 
@@ -112,6 +112,6 @@ describe("stopKnownBrowserProfiles", () => {
       onWarn,
     });
 
-    expect(onWarn).toHaveBeenCalledWith("kaijibot browser stop failed: Error: oops");
+    expect(onWarn).toHaveBeenCalledWith("allbot browser stop failed: Error: oops");
   });
 });

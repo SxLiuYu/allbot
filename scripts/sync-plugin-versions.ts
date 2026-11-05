@@ -6,7 +6,7 @@ type PackageJson = {
   version?: string;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
-  kaijibot?: {
+  allbot?: {
     install?: {
       minHostVersion?: string;
     };
@@ -14,33 +14,33 @@ type PackageJson = {
       pluginApi?: string;
     };
     build?: {
-      kaijibotVersion?: string;
+      allbotVersion?: string;
     };
   };
 };
 
-const KAIJIBOT_VERSION_RANGE_RE = /^>=\d{4}\.\d{1,2}\.\d{1,2}(?:[-.][^"\s]+)?$/u;
+const ALLBOT_VERSION_RANGE_RE = /^>=\d{4}\.\d{1,2}\.\d{1,2}(?:[-.][^"\s]+)?$/u;
 
-function syncKaijiBotDependencyRange(
+function syncAllBotDependencyRange(
   deps: Record<string, string> | undefined,
   targetVersion: string,
 ): boolean {
-  const current = deps?.kaijibot;
-  if (!current || current === "workspace:*" || !KAIJIBOT_VERSION_RANGE_RE.test(current)) {
+  const current = deps?.allbot;
+  if (!current || current === "workspace:*" || !ALLBOT_VERSION_RANGE_RE.test(current)) {
     return false;
   }
   const next = `>=${targetVersion}`;
   if (current === next) {
     return false;
   }
-  deps.kaijibot = next;
+  deps.allbot = next;
   return true;
 }
 
 function syncMinHostVersion(pkg: PackageJson, targetVersion: string): boolean {
-  const installConfig = pkg.kaijibot?.install;
+  const installConfig = pkg.allbot?.install;
   const current = installConfig?.minHostVersion;
-  if (!current || !KAIJIBOT_VERSION_RANGE_RE.test(current)) {
+  if (!current || !ALLBOT_VERSION_RANGE_RE.test(current)) {
     return false;
   }
   const next = `>=${targetVersion}`;
@@ -52,9 +52,9 @@ function syncMinHostVersion(pkg: PackageJson, targetVersion: string): boolean {
 }
 
 function syncPluginApiVersion(pkg: PackageJson, targetVersion: string): boolean {
-  const compat = pkg.kaijibot?.compat;
+  const compat = pkg.allbot?.compat;
   const current = compat?.pluginApi;
-  if (!current || !KAIJIBOT_VERSION_RANGE_RE.test(current)) {
+  if (!current || !ALLBOT_VERSION_RANGE_RE.test(current)) {
     return false;
   }
   const next = `>=${targetVersion}`;
@@ -65,16 +65,16 @@ function syncPluginApiVersion(pkg: PackageJson, targetVersion: string): boolean 
   return true;
 }
 
-function syncBuildKaijiBotVersion(pkg: PackageJson, targetVersion: string): boolean {
-  const build = pkg.kaijibot?.build;
-  const current = build?.kaijibotVersion;
+function syncBuildAllBotVersion(pkg: PackageJson, targetVersion: string): boolean {
+  const build = pkg.allbot?.build;
+  const current = build?.allbotVersion;
   if (!current) {
     return false;
   }
   if (current === targetVersion) {
     return false;
   }
-  build.kaijibotVersion = targetVersion;
+  build.allbotVersion = targetVersion;
   return true;
 }
 
@@ -86,7 +86,7 @@ function ensureChangelogEntry(changelogPath: string, version: string): boolean {
   if (content.includes(`## ${version}`)) {
     return false;
   }
-  const entry = `## ${version}\n\n### Changes\n- Version alignment with core KaijiBot release numbers.\n\n`;
+  const entry = `## ${version}\n\n### Changes\n- Version alignment with core AllBot release numbers.\n\n`;
   if (content.startsWith("# Changelog\n\n")) {
     const next = content.replace("# Changelog\n\n", `# Changelog\n\n${entry}`);
     writeFileSync(changelogPath, next);
@@ -134,18 +134,18 @@ export function syncPluginVersions(rootDir = resolve(".")) {
     }
 
     const versionChanged = pkg.version !== targetVersion;
-    const devDependencyChanged = syncKaijiBotDependencyRange(pkg.devDependencies, targetVersion);
-    const peerDependencyChanged = syncKaijiBotDependencyRange(pkg.peerDependencies, targetVersion);
+    const devDependencyChanged = syncAllBotDependencyRange(pkg.devDependencies, targetVersion);
+    const peerDependencyChanged = syncAllBotDependencyRange(pkg.peerDependencies, targetVersion);
     const minHostVersionChanged = syncMinHostVersion(pkg, targetVersion);
     const pluginApiChanged = syncPluginApiVersion(pkg, targetVersion);
-    const buildKaijiBotVersionChanged = syncBuildKaijiBotVersion(pkg, targetVersion);
+    const buildAllBotVersionChanged = syncBuildAllBotVersion(pkg, targetVersion);
     const packageChanged =
       versionChanged ||
       devDependencyChanged ||
       peerDependencyChanged ||
       minHostVersionChanged ||
       pluginApiChanged ||
-      buildKaijiBotVersionChanged;
+      buildAllBotVersionChanged;
     if (!packageChanged) {
       skipped.push(pkg.name);
       continue;

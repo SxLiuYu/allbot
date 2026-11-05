@@ -14,7 +14,7 @@ describe("runEmbeddedAttempt bootstrap warning prompt assembly", () => {
         bootstrapFiles: [
           {
             name: "AGENTS.md",
-            path: "/tmp/kaijibot-warning-workspace/AGENTS.md",
+            path: "/tmp/allbot-warning-workspace/AGENTS.md",
             content: "A".repeat(200),
             missing: false,
           },

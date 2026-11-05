@@ -1,4 +1,4 @@
-# 🧠 KaijiBot Docker 部署指南
+# 🧠 AllBot Docker 部署指南
 
 面向中国开发者的一键 Docker 部署方案。
 
@@ -31,7 +31,7 @@ brew install --cask docker
 
 ```bash
 git clone <你的仓库地址>
-cd KaijiBot
+cd AllBot
 bash scripts/docker/setup.sh
 ```
 
@@ -88,7 +88,7 @@ docker compose logs --tail 100
 | 变量                     | 说明             | 默认值         |
 | ------------------------ | ---------------- | -------------- |
 | `ZAI_API_KEY`            | 智谱 GLM API Key | 无（必须设置） |
-| `KAIJIBOT_GATEWAY_TOKEN` | 网关认证令牌     | 自动生成       |
+| `ALLBOT_GATEWAY_TOKEN` | 网关认证令牌     | 自动生成       |
 
 ### 可选
 
@@ -96,16 +96,16 @@ docker compose logs --tail 100
 | ----------------------- | ------------------------------ | --------------- |
 | `EXA_API_KEY`           | Exa 语义搜索（增强洞察实时性） | 无              |
 | `TAVILY_API_KEY`        | Tavily 搜索（增强洞察实时性）  | 无              |
-| `KAIJIBOT_GATEWAY_PORT` | 网关端口                       | `18789`         |
-| `KAIJIBOT_BRIDGE_PORT`  | 桥接端口                       | `18790`         |
-| `KAIJIBOT_TZ`           | 时区                           | `Asia/Shanghai` |
+| `ALLBOT_GATEWAY_PORT` | 网关端口                       | `18789`         |
+| `ALLBOT_BRIDGE_PORT`  | 桥接端口                       | `18790`         |
+| `ALLBOT_TZ`           | 时区                           | `Asia/Shanghai` |
 
 ### 数据卷
 
 | 宿主路径                 | 容器路径                         | 说明                 |
 | ------------------------ | -------------------------------- | -------------------- |
-| `~/.kaijibot/`           | `/home/node/.kaijibot`           | 配置、凭证、认知画像 |
-| `~/.kaijibot/workspace/` | `/home/node/.kaijibot/workspace` | 工作空间             |
+| `~/.allbot/`           | `/home/node/.allbot`           | 配置、凭证、认知画像 |
+| `~/.allbot/workspace/` | `/home/node/.allbot/workspace` | 工作空间             |
 
 ## 故障排查
 
@@ -132,8 +132,8 @@ ZAI_API_KEY=你的实际Key
 在 `.env` 中修改端口：
 
 ```bash
-KAIJIBOT_GATEWAY_PORT=28789
-KAIJIBOT_BRIDGE_PORT=28790
+ALLBOT_GATEWAY_PORT=28789
+ALLBOT_BRIDGE_PORT=28790
 ```
 
 ### 权限问题
@@ -171,11 +171,11 @@ cp .env.example .env
 
 # 2. 构建镜像
 docker build \
-  --build-arg KAIJIBOT_EXTENSIONS="feishu zai openai ollama lmstudio exa tavily browser memory-core memory-lancedb memory-wiki speech-core talk-voice media-understanding-core image-generation-core diffs llm-task device-pair webhooks shared" \
-  -t kaijibot:local .
+  --build-arg ALLBOT_EXTENSIONS="feishu zai openai ollama lmstudio exa tavily browser memory-core memory-lancedb memory-wiki speech-core talk-voice media-understanding-core image-generation-core diffs llm-task device-pair webhooks shared" \
+  -t allbot:local .
 
 # 3. 启动
-KAIJIBOT_STATE_DIR=~/.kaijibot \
-KAIJIBOT_WORKSPACE_DIR=~/.kaijibot/workspace \
+ALLBOT_STATE_DIR=~/.allbot \
+ALLBOT_WORKSPACE_DIR=~/.allbot/workspace \
 docker compose up -d
 ```

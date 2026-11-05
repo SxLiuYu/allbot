@@ -1,25 +1,25 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { loadConfig, type KaijiBotConfig } from "../config/config.js";
+import { loadConfig, type AllBotConfig } from "../config/config.js";
 import { VERSION } from "../version.js";
-import { KaijiBotChannelBridge } from "./channel-bridge.js";
+import { AllBotChannelBridge } from "./channel-bridge.js";
 import { ClaudePermissionRequestSchema, type ClaudeChannelMode } from "./channel-shared.js";
 import { getChannelMcpCapabilities, registerChannelMcpTools } from "./channel-tools.js";
 
-export { KaijiBotChannelBridge } from "./channel-bridge.js";
+export { AllBotChannelBridge } from "./channel-bridge.js";
 
-export type KaijiBotMcpServeOptions = {
+export type AllBotMcpServeOptions = {
   gatewayUrl?: string;
   gatewayToken?: string;
   gatewayPassword?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   claudeChannelMode?: ClaudeChannelMode;
   verbose?: boolean;
 };
 
-export async function createKaijiBotChannelMcpServer(opts: KaijiBotMcpServeOptions = {}): Promise<{
+export async function createAllBotChannelMcpServer(opts: AllBotMcpServeOptions = {}): Promise<{
   server: McpServer;
-  bridge: KaijiBotChannelBridge;
+  bridge: AllBotChannelBridge;
   start: () => Promise<void>;
   close: () => Promise<void>;
 }> {
@@ -27,10 +27,10 @@ export async function createKaijiBotChannelMcpServer(opts: KaijiBotMcpServeOptio
   const claudeChannelMode = opts.claudeChannelMode ?? "auto";
   const capabilities = getChannelMcpCapabilities(claudeChannelMode);
   const server = new McpServer(
-    { name: "kaijibot", version: VERSION },
+    { name: "allbot", version: VERSION },
     capabilities ? { capabilities } : undefined,
   );
-  const bridge = new KaijiBotChannelBridge(cfg, {
+  const bridge = new AllBotChannelBridge(cfg, {
     gatewayUrl: opts.gatewayUrl,
     gatewayToken: opts.gatewayToken,
     gatewayPassword: opts.gatewayPassword,
@@ -62,8 +62,8 @@ export async function createKaijiBotChannelMcpServer(opts: KaijiBotMcpServeOptio
   };
 }
 
-export async function serveKaijiBotChannelMcp(opts: KaijiBotMcpServeOptions = {}): Promise<void> {
-  const { server, start, close } = await createKaijiBotChannelMcpServer(opts);
+export async function serveAllBotChannelMcp(opts: AllBotMcpServeOptions = {}): Promise<void> {
+  const { server, start, close } = await createAllBotChannelMcpServer(opts);
   const transport = new StdioServerTransport();
 
   let shuttingDown = false;

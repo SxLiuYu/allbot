@@ -8,12 +8,12 @@ import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { runFfmpeg } from "kaijibot/plugin-sdk/media-runtime";
+import { runFfmpeg } from "allbot/plugin-sdk/media-runtime";
 import type {
   AudioTranscriptionRequest,
   AudioTranscriptionResult,
-} from "kaijibot/plugin-sdk/media-understanding";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/temp-path";
+} from "allbot/plugin-sdk/media-understanding";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/temp-path";
 import { ASR_MODEL_MANIFESTS, resolveSherpaSpeechPaths, type AsrEngine } from "./models.js";
 import { resolveSherpaBinaries } from "./runtime.js";
 
@@ -202,7 +202,7 @@ export async function transcribeWithSherpa(
   const modelDir = paths.modelDir(manifest.id);
   await findFirstExisting(modelDir, manifest.modelFileCandidates);
 
-  const tmpRoot = resolvePreferredKaijiBotTmpDir();
+  const tmpRoot = resolvePreferredAllBotTmpDir();
   await fs.mkdir(tmpRoot, { recursive: true, mode: 0o700 });
   const tempDir = path.join(tmpRoot, `sherpa-asr-${randomUUID()}`);
   await fs.mkdir(tempDir, { recursive: true, mode: 0o700 });

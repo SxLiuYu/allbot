@@ -1,4 +1,4 @@
-import { discoverKaijiBotPlugins } from "./discovery.js";
+import { discoverAllBotPlugins } from "./discovery.js";
 import {
   loadPluginManifest,
   type PluginPackageChannel,
@@ -23,7 +23,7 @@ export function listChannelCatalogEntries(
     env?: NodeJS.ProcessEnv;
   } = {},
 ): PluginChannelCatalogEntry[] {
-  return discoverKaijiBotPlugins({
+  return discoverAllBotPlugins({
     workspaceDir: params.workspaceDir,
     env: params.env,
   }).candidates.flatMap((candidate) => {

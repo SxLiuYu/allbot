@@ -1,5 +1,5 @@
 
-> kaijibot@2026.8.21-1 test /home/kaiji/projects/KaijiBot
+> allbot@2026.8.21-1 test /home/kaiji/projects/KaijiBot
 > node scripts/test-projects.mjs src/cognitive/scheduler/human-cadence.sim.test.ts
 
 

@@ -173,7 +173,7 @@ describe("exec SecretRef id parity", () => {
 
   function planAcceptsExecRefForSample(params: {
     type: string;
-    configFile: "kaijibot.json" | "auth-profiles.json";
+    configFile: "allbot.json" | "auth-profiles.json";
     pathSegments: string[];
     id: string;
   }): boolean {

@@ -150,7 +150,7 @@ function makeCandidate(overrides: Partial<InsightCandidate> = {}): InsightCandid
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-insight-pipeline-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-insight-pipeline-"));
   store = new InsightStore(tempDir);
 });
 

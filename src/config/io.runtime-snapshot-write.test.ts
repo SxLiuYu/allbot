@@ -5,9 +5,9 @@ import {
   setRuntimeConfigSnapshotRefreshHandler,
   setRuntimeConfigSnapshot,
 } from "./io.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
-function createSourceConfig(): KaijiBotConfig {
+function createSourceConfig(): AllBotConfig {
   return {
     models: {
       providers: {
@@ -21,7 +21,7 @@ function createSourceConfig(): KaijiBotConfig {
   };
 }
 
-function createRuntimeConfig(): KaijiBotConfig {
+function createRuntimeConfig(): AllBotConfig {
   return {
     models: {
       providers: {
@@ -50,7 +50,7 @@ describe("runtime config snapshot writes", () => {
   });
 
   it("skips source projection for non-runtime-derived configs", () => {
-    const sourceConfig: KaijiBotConfig = {
+    const sourceConfig: AllBotConfig = {
       ...createSourceConfig(),
       gateway: {
         auth: {
@@ -58,7 +58,7 @@ describe("runtime config snapshot writes", () => {
         },
       },
     };
-    const runtimeConfig: KaijiBotConfig = {
+    const runtimeConfig: AllBotConfig = {
       ...createRuntimeConfig(),
       gateway: {
         auth: {
@@ -66,7 +66,7 @@ describe("runtime config snapshot writes", () => {
         },
       },
     };
-    const independentConfig: KaijiBotConfig = {
+    const independentConfig: AllBotConfig = {
       models: {
         providers: {
           openai: {

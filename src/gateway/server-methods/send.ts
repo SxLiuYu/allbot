@@ -1,4 +1,4 @@
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { normalizeChannelId } from "../../channels/plugins/index.js";
 import { createOutboundSendDeps } from "../../cli/deps.js";

@@ -351,7 +351,7 @@ function extractGroupText(group: MessageGroup): string {
   return parts.join("\n\n");
 }
 
-export const SKIP_DELETE_CONFIRM_KEY = "kaijibot:skipDeleteConfirm";
+export const SKIP_DELETE_CONFIRM_KEY = "allbot:skipDeleteConfirm";
 
 type DeleteConfirmSide = "left" | "right";
 type DeleteConfirmPopover = {

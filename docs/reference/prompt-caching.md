@@ -9,7 +9,7 @@ read_when:
 
 # Prompt caching
 
-Prompt caching means the model provider can reuse unchanged prompt prefixes (usually system/developer instructions and other stable context) across turns instead of re-processing them every time. KaijiBot normalizes provider usage into `cacheRead` and `cacheWrite` where the upstream API exposes those counters directly.
+Prompt caching means the model provider can reuse unchanged prompt prefixes (usually system/developer instructions and other stable context) across turns instead of re-processing them every time. AllBot normalizes provider usage into `cacheRead` and `cacheWrite` where the upstream API exposes those counters directly.
 
 Status surfaces can also recover cache counters from the most recent transcript
 usage log when the live session snapshot is missing them, so `/status` can keep
@@ -99,15 +99,15 @@ Per-agent heartbeat is supported at `agents.list[].heartbeat`.
 ### Anthropic (direct API)
 
 - `cacheRetention` is supported.
-- With Anthropic API-key auth profiles, KaijiBot seeds `cacheRetention: "short"` for Anthropic model refs when unset.
-- Anthropic native Messages responses expose both `cache_read_input_tokens` and `cache_creation_input_tokens`, so KaijiBot can show both `cacheRead` and `cacheWrite`.
+- With Anthropic API-key auth profiles, AllBot seeds `cacheRetention: "short"` for Anthropic model refs when unset.
+- Anthropic native Messages responses expose both `cache_read_input_tokens` and `cache_creation_input_tokens`, so AllBot can show both `cacheRead` and `cacheWrite`.
 - For native Anthropic requests, `cacheRetention: "short"` maps to the default 5-minute ephemeral cache, and `cacheRetention: "long"` upgrades to the 1-hour TTL only on direct `api.anthropic.com` hosts.
 
 ### OpenAI (direct API)
 
-- Prompt caching is automatic on supported recent models. KaijiBot does not need to inject block-level cache markers.
-- KaijiBot uses `prompt_cache_key` to keep cache routing stable across turns and uses `prompt_cache_retention: "24h"` only when `cacheRetention: "long"` is selected on direct OpenAI hosts.
-- OpenAI responses expose cached prompt tokens via `usage.prompt_tokens_details.cached_tokens` (or `input_tokens_details.cached_tokens` on Responses API events). KaijiBot maps that to `cacheRead`.
+- Prompt caching is automatic on supported recent models. AllBot does not need to inject block-level cache markers.
+- AllBot uses `prompt_cache_key` to keep cache routing stable across turns and uses `prompt_cache_retention: "24h"` only when `cacheRetention: "long"` is selected on direct OpenAI hosts.
+- OpenAI responses expose cached prompt tokens via `usage.prompt_tokens_details.cached_tokens` (or `input_tokens_details.cached_tokens` on Responses API events). AllBot maps that to `cacheRead`.
 - OpenAI does not expose a separate cache-write token counter, so `cacheWrite` stays `0` on OpenAI paths even when the provider is warming a cache.
 - OpenAI returns useful tracing and rate-limit headers such as `x-request-id`, `openai-processing-ms`, and `x-ratelimit-*`, but cache-hit accounting should come from the usage payload, not from headers.
 - In practice, OpenAI often behaves like an initial-prefix cache rather than Anthropic-style moving full-history reuse. Stable long-prefix text turns can land near a `4864` cached-token plateau in current live probes, while tool-heavy or MCP-style transcripts often plateau near `4608` cached tokens even on exact repeats.
@@ -126,13 +126,13 @@ Per-agent heartbeat is supported at `agents.list[].heartbeat`.
 
 ### OpenRouter Anthropic models
 
-For `openrouter/anthropic/*` model refs, KaijiBot injects Anthropic
+For `openrouter/anthropic/*` model refs, AllBot injects Anthropic
 `cache_control` on system/developer prompt blocks to improve prompt-cache
 reuse only when the request is still targeting a verified OpenRouter route
 (`openrouter` on its default endpoint, or any provider/base URL that resolves
 to `openrouter.ai`).
 
-If you repoint the model at an arbitrary OpenAI-compatible proxy URL, KaijiBot
+If you repoint the model at an arbitrary OpenAI-compatible proxy URL, AllBot
 stops injecting those OpenRouter-specific Anthropic cache markers.
 
 ### Other providers
@@ -142,8 +142,8 @@ If the provider does not support this cache mode, `cacheRetention` has no effect
 ### Google Gemini direct API
 
 - Direct Gemini transport (`api: "google-generative-ai"`) reports cache hits
-  through upstream `cachedContentTokenCount`; KaijiBot maps that to `cacheRead`.
-- When `cacheRetention` is set on a direct Gemini model, KaijiBot automatically
+  through upstream `cachedContentTokenCount`; AllBot maps that to `cacheRead`.
+- When `cacheRetention` is set on a direct Gemini model, AllBot automatically
   creates, reuses, and refreshes `cachedContents` resources for system prompts
   on Google AI Studio runs. This means you no longer need to pre-create a
   cached-content handle manually.
@@ -151,21 +151,21 @@ If the provider does not support this cache mode, `cacheRetention` has no effect
   `params.cachedContent` (or legacy `params.cached_content`) on the configured
   model.
 - This is separate from Anthropic/OpenAI prompt-prefix caching. For Gemini,
-  KaijiBot manages a provider-native `cachedContents` resource rather than
+  AllBot manages a provider-native `cachedContents` resource rather than
   injecting cache markers into the request.
 
 ### Gemini CLI JSON usage
 
 - Gemini CLI JSON output can also surface cache hits through `stats.cached`;
-  KaijiBot maps that to `cacheRead`.
-- If the CLI omits a direct `stats.input` value, KaijiBot derives input tokens
+  AllBot maps that to `cacheRead`.
+- If the CLI omits a direct `stats.input` value, AllBot derives input tokens
   from `stats.input_tokens - stats.cached`.
-- This is usage normalization only. It does not mean KaijiBot is creating
+- This is usage normalization only. It does not mean AllBot is creating
   Anthropic/OpenAI-style prompt-cache markers for Gemini CLI.
 
 ## System-prompt cache boundary
 
-KaijiBot splits the system prompt into a **stable prefix** and a **volatile
+AllBot splits the system prompt into a **stable prefix** and a **volatile
 suffix** separated by an internal cache-prefix boundary. Content above the
 boundary (tool definitions, skills metadata, workspace files, and other
 relatively static context) is ordered so it stays byte-identical across turns.
@@ -192,9 +192,9 @@ check whether the change lands above or below the cache boundary. Moving
 volatile content below the boundary (or stabilizing it) often resolves the
 issue.
 
-## KaijiBot cache-stability guards
+## AllBot cache-stability guards
 
-KaijiBot also keeps several cache-sensitive payload shapes deterministic before
+AllBot also keeps several cache-sensitive payload shapes deterministic before
 the request reaches the provider:
 
 - Bundle MCP tool catalogs are sorted deterministically before tool
@@ -238,7 +238,7 @@ agents:
 
 ## Cache diagnostics
 
-KaijiBot exposes dedicated cache-trace diagnostics for embedded agent runs.
+AllBot exposes dedicated cache-trace diagnostics for embedded agent runs.
 
 For normal user-facing diagnostics, `/status` and other usage summaries can use
 the latest transcript usage entry as a fallback source for `cacheRead` /
@@ -246,7 +246,7 @@ the latest transcript usage entry as a fallback source for `cacheRead` /
 
 ## Live regression tests
 
-KaijiBot keeps one combined live cache regression gate for repeated prefixes, tool turns, image turns, MCP-style tool transcripts, and an Anthropic no-cache control.
+AllBot keeps one combined live cache regression gate for repeated prefixes, tool turns, image turns, MCP-style tool transcripts, and an Anthropic no-cache control.
 
 - `src/agents/live-cache-regression.live.test.ts`
 - `src/agents/live-cache-regression-baseline.ts`
@@ -254,7 +254,7 @@ KaijiBot keeps one combined live cache regression gate for repeated prefixes, to
 Run the narrow live gate with:
 
 ```sh
-KAIJIBOT_LIVE_TEST=1 KAIJIBOT_LIVE_CACHE_TEST=1 pnpm test:live:cache
+ALLBOT_LIVE_TEST=1 ALLBOT_LIVE_CACHE_TEST=1 pnpm test:live:cache
 ```
 
 The baseline file stores the most recent observed live numbers plus the provider-specific regression floors used by the test.
@@ -299,7 +299,7 @@ Why the assertions differ:
 diagnostics:
   cacheTrace:
     enabled: true
-    filePath: "~/.kaijibot/logs/cache-trace.jsonl" # optional
+    filePath: "~/.allbot/logs/cache-trace.jsonl" # optional
     includeMessages: false # default true
     includePrompt: false # default true
     includeSystem: false # default true
@@ -307,18 +307,18 @@ diagnostics:
 
 Defaults:
 
-- `filePath`: `$KAIJIBOT_STATE_DIR/logs/cache-trace.jsonl`
+- `filePath`: `$ALLBOT_STATE_DIR/logs/cache-trace.jsonl`
 - `includeMessages`: `true`
 - `includePrompt`: `true`
 - `includeSystem`: `true`
 
 ### Env toggles (one-off debugging)
 
-- `KAIJIBOT_CACHE_TRACE=1` enables cache tracing.
-- `KAIJIBOT_CACHE_TRACE_FILE=/path/to/cache-trace.jsonl` overrides output path.
-- `KAIJIBOT_CACHE_TRACE_MESSAGES=0|1` toggles full message payload capture.
-- `KAIJIBOT_CACHE_TRACE_PROMPT=0|1` toggles prompt text capture.
-- `KAIJIBOT_CACHE_TRACE_SYSTEM=0|1` toggles system prompt capture.
+- `ALLBOT_CACHE_TRACE=1` enables cache tracing.
+- `ALLBOT_CACHE_TRACE_FILE=/path/to/cache-trace.jsonl` overrides output path.
+- `ALLBOT_CACHE_TRACE_MESSAGES=0|1` toggles full message payload capture.
+- `ALLBOT_CACHE_TRACE_PROMPT=0|1` toggles prompt text capture.
+- `ALLBOT_CACHE_TRACE_SYSTEM=0|1` toggles system prompt capture.
 
 ### What to inspect
 
@@ -326,7 +326,7 @@ Defaults:
 - Per-turn cache token impact is visible in normal usage surfaces via `cacheRead` and `cacheWrite` (for example `/usage full` and session usage summaries).
 - For Anthropic, expect both `cacheRead` and `cacheWrite` when caching is active.
 - For OpenAI, expect `cacheRead` on cache hits and `cacheWrite` to remain `0`; OpenAI does not publish a separate cache-write token field.
-- If you need request tracing, log request IDs and rate-limit headers separately from cache metrics. KaijiBot's current cache-trace output is focused on prompt/session shape and normalized token usage rather than raw provider response headers.
+- If you need request tracing, log request IDs and rate-limit headers separately from cache metrics. AllBot's current cache-trace output is focused on prompt/session shape and normalized token usage rather than raw provider response headers.
 
 ## Quick troubleshooting
 

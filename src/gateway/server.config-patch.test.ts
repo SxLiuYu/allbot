@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { resolveKaijiBotAgentDir } from "../agents/agent-paths.js";
+import { resolveAllBotAgentDir } from "../agents/agent-paths.js";
 import { AUTH_PROFILE_FILENAME } from "../agents/auth-profiles/constants.js";
 import { __testing as controlPlaneRateLimitTesting } from "./control-plane-rate-limit.js";
 import {
@@ -29,7 +29,7 @@ function requireWs(): Awaited<ReturnType<typeof startServerWithClient>>["ws"] {
 }
 
 beforeAll(async () => {
-  sharedTempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-sessions-config-"));
+  sharedTempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-sessions-config-"));
   startedServer = await startServerWithClient(undefined, { controlUiEnabled: true });
   await connectOk(requireWs());
 });
@@ -74,11 +74,11 @@ beforeEach(() => {
   controlPlaneRateLimitTesting.resetControlPlaneRateLimitState();
 });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway config methods", () => {
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)("rejects config.set when SecretRef resolution fails", async () => {
-    const missingEnvVar = `KAIJIBOT_MISSING_SECRETREF_${Date.now()}`;
+    const missingEnvVar = `ALLBOT_MISSING_SECRETREF_${Date.now()}`;
     delete process.env[missingEnvVar];
     const current = await rpcReq<{
       hash?: string;
@@ -137,10 +137,10 @@ describe.skipIf(process.env.CI)("gateway config methods", () => {
   });
 
   it("does not reject config.set for unresolved auth-profile refs outside submitted config", async () => {
-    const missingEnvVar = `KAIJIBOT_MISSING_AUTH_PROFILE_REF_${Date.now()}`;
+    const missingEnvVar = `ALLBOT_MISSING_AUTH_PROFILE_REF_${Date.now()}`;
     delete process.env[missingEnvVar];
 
-    const authStorePath = path.join(resolveKaijiBotAgentDir(), AUTH_PROFILE_FILENAME);
+    const authStorePath = path.join(resolveAllBotAgentDir(), AUTH_PROFILE_FILENAME);
     await fs.mkdir(path.dirname(authStorePath), { recursive: true });
     await fs.writeFile(
       authStorePath,
@@ -299,11 +299,11 @@ describe.skipIf(process.env.CI)("gateway config methods", () => {
     expect(res.error?.message ?? "").toContain("raw must be an object");
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)(
     "rejects config.patch when merged SecretRefs cannot resolve",
     async () => {
-      const missingEnvVar = `KAIJIBOT_MISSING_SECRETREF_PATCH_${Date.now()}`;
+      const missingEnvVar = `ALLBOT_MISSING_SECRETREF_PATCH_${Date.now()}`;
       delete process.env[missingEnvVar];
       const beforeHash = await getConfigHash();
       const res = await rpcReq<{ ok?: boolean; error?: { message?: string } }>(
@@ -338,11 +338,11 @@ describe.skipIf(process.env.CI)("gateway config methods", () => {
   );
 });
 
-// Skip on CI: requires upstream-only channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway config.apply", () => {
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)("rejects config.apply when SecretRef resolution fails", async () => {
-    const missingEnvVar = `KAIJIBOT_MISSING_SECRETREF_APPLY_${Date.now()}`;
+    const missingEnvVar = `ALLBOT_MISSING_SECRETREF_APPLY_${Date.now()}`;
     delete process.env[missingEnvVar];
     const current = await rpcReq<{
       hash?: string;
@@ -379,10 +379,10 @@ describe.skipIf(process.env.CI)("gateway config.apply", () => {
   });
 
   it("does not reject config.apply for unresolved auth-profile refs outside submitted config", async () => {
-    const missingEnvVar = `KAIJIBOT_MISSING_AUTH_PROFILE_REF_APPLY_${Date.now()}`;
+    const missingEnvVar = `ALLBOT_MISSING_AUTH_PROFILE_REF_APPLY_${Date.now()}`;
     delete process.env[missingEnvVar];
 
-    const authStorePath = path.join(resolveKaijiBotAgentDir(), AUTH_PROFILE_FILENAME);
+    const authStorePath = path.join(resolveAllBotAgentDir(), AUTH_PROFILE_FILENAME);
     await fs.mkdir(path.dirname(authStorePath), { recursive: true });
     await fs.writeFile(
       authStorePath,

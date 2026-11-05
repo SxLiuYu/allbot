@@ -1,7 +1,7 @@
 import type {
   ModelDefinitionConfig,
   ModelProviderConfig,
-} from "kaijibot/plugin-sdk/provider-model-types";
+} from "allbot/plugin-sdk/provider-model-types";
 import { describe, expect, it } from "vitest";
 import { normalizeConfig } from "./provider-policy-api.js";
 

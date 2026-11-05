@@ -1,5 +1,5 @@
 {
-  "name": "@kaijibot/plugin-sdk",
+  "name": "@allbot/plugin-sdk",
   "version": "0.0.0-private",
   "private": true,
   "type": "module",

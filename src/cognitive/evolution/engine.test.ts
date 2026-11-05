@@ -35,7 +35,7 @@ const complexCandidate = makeCandidate({
 });
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-engine-test-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-engine-test-"));
   store = new EvolutionStore(tempDir);
   engine = new EvolutionEngine(store);
 });
@@ -177,7 +177,7 @@ describe("EvolutionEngine.patchSkill", () => {
   let patchTempDir: string;
 
   beforeEach(() => {
-    patchTempDir = mkdtempSync(join(tmpdir(), "kaijibot-engine-patch-test-"));
+    patchTempDir = mkdtempSync(join(tmpdir(), "allbot-engine-patch-test-"));
     patchStore = new EvolutionStore(patchTempDir);
     patchEngine = new EvolutionEngine(patchStore);
     skillWriter = new SkillPersistenceWriter(patchTempDir);
@@ -207,7 +207,7 @@ describe("EvolutionEngine.patchSkill", () => {
     });
 
     const updatedMarkdown =
-      '---\nname: existing-skill\ndescription: "New desc"\nmetadata:\n  kaijibot:\n    generated: true\n    version: 1\n---\n\n## New Body\n\nUpdated content.';
+      '---\nname: existing-skill\ndescription: "New desc"\nmetadata:\n  allbot:\n    generated: true\n    version: 1\n---\n\n## New Body\n\nUpdated content.';
 
     const mockGenerateText = async (_prompt: string) => updatedMarkdown;
 
@@ -237,7 +237,7 @@ describe("EvolutionEngine.patchSkill", () => {
       { name: "path-test", instructions: "no-op" },
       {
         generateText: async () =>
-          '---\nname: path-test\ndescription: "Test"\nmetadata:\n  kaijibot:\n    generated: true\n    version: 1\n---\n\nBody',
+          '---\nname: path-test\ndescription: "Test"\nmetadata:\n  allbot:\n    generated: true\n    version: 1\n---\n\nBody',
         writer: skillWriter,
       },
     );

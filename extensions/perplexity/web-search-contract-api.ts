@@ -1,4 +1,4 @@
-import { type WebSearchProviderPlugin } from "kaijibot/plugin-sdk/provider-web-search-config-contract";
+import { type WebSearchProviderPlugin } from "allbot/plugin-sdk/provider-web-search-config-contract";
 import {
   createPerplexityWebSearchProviderBase,
   resolvePerplexityWebSearchRuntimeMetadata,

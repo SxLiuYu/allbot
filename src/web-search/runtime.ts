@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { logVerbose } from "../globals.js";
 import type {
   PluginWebSearchProviderEntry,
@@ -21,14 +21,14 @@ import {
   resolveWebProviderDefinition,
 } from "../web/provider-runtime-shared.js";
 
-type WebSearchConfig = NonNullable<KaijiBotConfig["tools"]>["web"] extends infer Web
+type WebSearchConfig = NonNullable<AllBotConfig["tools"]>["web"] extends infer Web
   ? Web extends { search?: infer Search }
     ? Search
     : undefined
   : undefined;
 
 export type ResolveWebSearchDefinitionParams = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sandboxed?: boolean;
   runtimeWebSearch?: RuntimeWebSearchMetadata;
   providerId?: string;
@@ -39,7 +39,7 @@ export type RunWebSearchParams = ResolveWebSearchDefinitionParams & {
   args: Record<string, unknown>;
 };
 
-function resolveSearchConfig(cfg?: KaijiBotConfig): WebSearchConfig {
+function resolveSearchConfig(cfg?: AllBotConfig): WebSearchConfig {
   return resolveWebProviderConfig<"search", NonNullable<WebSearchConfig>>(cfg, "search");
 }
 
@@ -66,7 +66,7 @@ function hasEntryCredential(
     | "getCredentialValue"
     | "requiresCredential"
   >,
-  config: KaijiBotConfig | undefined,
+  config: AllBotConfig | undefined,
   search: WebSearchConfig | undefined,
 ): boolean {
   return hasWebProviderEntryCredential({
@@ -92,13 +92,13 @@ export function isWebSearchProviderConfigured(params: {
     | "getCredentialValue"
     | "requiresCredential"
   >;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }): boolean {
   return hasEntryCredential(params.provider, params.config, resolveSearchConfig(params.config));
 }
 
 export function listWebSearchProviders(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }): PluginWebSearchProviderEntry[] {
   return resolveRuntimeWebSearchProviders({
     config: params?.config,
@@ -107,7 +107,7 @@ export function listWebSearchProviders(params?: {
 }
 
 export function listConfiguredWebSearchProviders(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }): PluginWebSearchProviderEntry[] {
   return resolvePluginWebSearchProviders({
     config: params?.config,
@@ -117,7 +117,7 @@ export function listConfiguredWebSearchProviders(params?: {
 
 export function resolveWebSearchProviderId(params: {
   search?: WebSearchConfig;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   providers?: PluginWebSearchProviderEntry[];
 }): string {
   const providers = sortWebSearchProvidersForAutoDetect(

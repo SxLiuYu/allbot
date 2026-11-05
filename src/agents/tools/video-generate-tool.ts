@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
@@ -107,7 +107,7 @@ const VideoGenerateToolSchema = Type.Object({
   filename: Type.Optional(
     Type.String({
       description:
-        "Optional output filename hint. KaijiBot preserves the basename and saves under its managed media directory.",
+        "Optional output filename hint. AllBot preserves the basename and saves under its managed media directory.",
     }),
   ),
   size: Type.Optional(
@@ -129,7 +129,7 @@ const VideoGenerateToolSchema = Type.Object({
   durationSeconds: Type.Optional(
     Type.Number({
       description:
-        "Optional target duration in seconds. KaijiBot may round this to the nearest provider-supported duration.",
+        "Optional target duration in seconds. AllBot may round this to the nearest provider-supported duration.",
       minimum: 1,
     }),
   ),
@@ -146,7 +146,7 @@ const VideoGenerateToolSchema = Type.Object({
 });
 
 export function resolveVideoGenerationModelConfigForTool(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
 }): ToolModelConfig | null {
   return resolveCapabilityModelConfigForTool({
@@ -210,7 +210,7 @@ function normalizeReferenceInputs(params: {
 }
 
 function resolveSelectedVideoGenerationProvider(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   videoGenerationModelConfig: ToolModelConfig;
   modelOverride?: string;
 }): VideoGenerationProvider | undefined {
@@ -438,7 +438,7 @@ type ExecutedVideoGeneration = {
 };
 
 async function executeVideoGenerationJob(params: {
-  effectiveCfg: KaijiBotConfig;
+  effectiveCfg: AllBotConfig;
   prompt: string;
   agentDir?: string;
   model?: string;
@@ -615,7 +615,7 @@ async function executeVideoGenerationJob(params: {
 }
 
 export function createVideoGenerateTool(options?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   agentSessionKey?: string;
   requesterOrigin?: DeliveryContext;
@@ -624,7 +624,7 @@ export function createVideoGenerateTool(options?: {
   fsPolicy?: ToolFsPolicy;
   scheduleBackgroundWork?: VideoGenerateBackgroundScheduler;
 }): AnyAgentTool | null {
-  const cfg: KaijiBotConfig = options?.config ?? loadConfig();
+  const cfg: AllBotConfig = options?.config ?? loadConfig();
   const videoGenerationModelConfig = resolveVideoGenerationModelConfigForTool({
     cfg,
     agentDir: options?.agentDir,
@@ -648,7 +648,7 @@ export function createVideoGenerateTool(options?: {
     name: "video_generate",
     displaySummary: "Generate videos",
     description:
-      "Generate videos using configured providers. Generated videos are saved under KaijiBot-managed media storage and delivered automatically as attachments. Duration requests may be rounded to the nearest provider-supported value.",
+      "Generate videos using configured providers. Generated videos are saved under AllBot-managed media storage and delivered automatically as attachments. Duration requests may be rounded to the nearest provider-supported value.",
     parameters: VideoGenerateToolSchema,
     execute: async (_toolCallId, rawArgs) => {
       const args = rawArgs as Record<string, unknown>;

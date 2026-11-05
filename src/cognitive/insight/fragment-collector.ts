@@ -4,7 +4,7 @@ import { DEFAULT_MODEL } from "../../agents/defaults.js";
 import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { prepareSimpleCompletionModel } from "../../agents/simple-completion-runtime.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { PersonaTree } from "../types.js";
 import type { Fragment, FragmentKind } from "./fragment-types.js";
@@ -26,7 +26,7 @@ const VALID_FRAGMENT_KINDS: ReadonlySet<string> = new Set<FragmentKind>([
 export type FragmentCollectorDeps = {
   complete: typeof complete;
   prepareModel: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     modelRef?: string,
   ) => Promise<{ model: Model<Api>; auth: ResolvedProviderAuth } | { error: string }>;
 };
@@ -84,7 +84,7 @@ export async function collectFragments(
   userText: string,
   assistantText: string,
   persona: PersonaTree,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: FragmentCollectorDeps,
 ): Promise<Fragment[]> {
   try {

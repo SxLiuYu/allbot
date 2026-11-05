@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { DEFAULT_ACCOUNT_ID } from "../../routing/session-key.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import type { WizardPrompter } from "../../wizard/prompts.js";
@@ -28,21 +28,21 @@ export type ChannelSetupWizardStatus = {
   configuredScore?: number;
   unconfiguredScore?: number;
   resolveConfigured: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
   }) => boolean | Promise<boolean>;
   resolveStatusLines?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     configured: boolean;
   }) => string[] | Promise<string[]>;
   resolveSelectionHint?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     configured: boolean;
   }) => string | undefined | Promise<string | undefined>;
   resolveQuickstartScore?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     configured: boolean;
   }) => number | undefined | Promise<number | undefined>;
@@ -61,7 +61,7 @@ export type ChannelSetupWizardNote = {
   title: string;
   lines: string[];
   shouldShow?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
   }) => boolean | Promise<boolean>;
@@ -70,11 +70,11 @@ export type ChannelSetupWizardNote = {
 export type ChannelSetupWizardEnvShortcut = {
   prompt: string;
   preferredEnvVar?: string;
-  isAvailable: (params: { cfg: KaijiBotConfig; accountId: string }) => boolean;
+  isAvailable: (params: { cfg: AllBotConfig; accountId: string }) => boolean;
   apply: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
-  }) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  }) => AllBotConfig | Promise<AllBotConfig>;
 };
 
 export type ChannelSetupWizardCredential = {
@@ -87,29 +87,29 @@ export type ChannelSetupWizardCredential = {
   envPrompt: string;
   keepPrompt: string;
   inputPrompt: string;
-  allowEnv?: (params: { cfg: KaijiBotConfig; accountId: string }) => boolean;
+  allowEnv?: (params: { cfg: AllBotConfig; accountId: string }) => boolean;
   inspect: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
   }) => ChannelSetupWizardCredentialState;
   shouldPrompt?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
     currentValue?: string;
     state: ChannelSetupWizardCredentialState;
   }) => boolean | Promise<boolean>;
   applyUseEnv?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
-  }) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  }) => AllBotConfig | Promise<AllBotConfig>;
   applySet?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
     value: unknown;
     resolvedValue: string;
-  }) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  }) => AllBotConfig | Promise<AllBotConfig>;
 };
 
 export type ChannelSetupWizardTextInput = {
@@ -123,17 +123,17 @@ export type ChannelSetupWizardTextInput = {
   confirmCurrentValue?: boolean;
   keepPrompt?: string | ((value: string) => string);
   currentValue?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
   }) => string | undefined | Promise<string | undefined>;
   initialValue?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
   }) => string | undefined | Promise<string | undefined>;
   shouldPrompt?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
     currentValue?: string;
@@ -141,21 +141,21 @@ export type ChannelSetupWizardTextInput = {
   applyCurrentValue?: boolean;
   validate?: (params: {
     value: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
   }) => string | undefined;
   normalizeValue?: (params: {
     value: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
   }) => string;
   applySet?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     value: string;
-  }) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  }) => AllBotConfig | Promise<AllBotConfig>;
 };
 
 export type ChannelSetupWizardAllowFromEntry = {
@@ -174,16 +174,16 @@ export type ChannelSetupWizardAllowFrom = {
   parseInputs?: (raw: string) => string[];
   parseId: (raw: string) => string | null;
   resolveEntries: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
     entries: string[];
   }) => Promise<ChannelSetupWizardAllowFromEntry[]>;
   apply: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     allowFrom: string[];
-  }) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  }) => AllBotConfig | Promise<AllBotConfig>;
 };
 
 export type ChannelSetupWizardGroupAccess = {
@@ -192,30 +192,30 @@ export type ChannelSetupWizardGroupAccess = {
   helpTitle?: string;
   helpLines?: string[];
   skipAllowlistEntries?: boolean;
-  currentPolicy: (params: { cfg: KaijiBotConfig; accountId: string }) => ChannelAccessPolicy;
-  currentEntries: (params: { cfg: KaijiBotConfig; accountId: string }) => string[];
-  updatePrompt: (params: { cfg: KaijiBotConfig; accountId: string }) => boolean;
+  currentPolicy: (params: { cfg: AllBotConfig; accountId: string }) => ChannelAccessPolicy;
+  currentEntries: (params: { cfg: AllBotConfig; accountId: string }) => string[];
+  updatePrompt: (params: { cfg: AllBotConfig; accountId: string }) => boolean;
   setPolicy: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     policy: ChannelAccessPolicy;
-  }) => KaijiBotConfig;
+  }) => AllBotConfig;
   resolveAllowlist?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     credentialValues: ChannelSetupWizardCredentialValues;
     entries: string[];
     prompter: Pick<WizardPrompter, "note">;
   }) => Promise<unknown>;
   applyAllowlist?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     resolved: unknown;
-  }) => KaijiBotConfig;
+  }) => AllBotConfig;
 };
 
 export type ChannelSetupWizardPrepare = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   credentialValues: ChannelSetupWizardCredentialValues;
   runtime: ChannelSetupConfigureContext["runtime"];
@@ -223,17 +223,17 @@ export type ChannelSetupWizardPrepare = (params: {
   options?: ChannelSetupConfigureContext["options"];
 }) =>
   | {
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       credentialValues?: ChannelSetupWizardCredentialValues;
     }
   | void
   | Promise<{
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       credentialValues?: ChannelSetupWizardCredentialValues;
     } | void>;
 
 export type ChannelSetupWizardFinalize = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   credentialValues: ChannelSetupWizardCredentialValues;
   runtime: ChannelSetupConfigureContext["runtime"];
@@ -242,12 +242,12 @@ export type ChannelSetupWizardFinalize = (params: {
   forceAllowFrom: boolean;
 }) =>
   | {
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       credentialValues?: ChannelSetupWizardCredentialValues;
     }
   | void
   | Promise<{
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       credentialValues?: ChannelSetupWizardCredentialValues;
     } | void>;
 
@@ -257,7 +257,7 @@ export type ChannelSetupWizard = {
   introNote?: ChannelSetupWizardNote;
   envShortcut?: ChannelSetupWizardEnvShortcut;
   resolveAccountIdForConfigure?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     prompter: WizardPrompter;
     options?: ChannelSetupConfigureContext["options"];
     accountOverride?: string;
@@ -266,7 +266,7 @@ export type ChannelSetupWizard = {
     defaultAccountId: string;
   }) => string | Promise<string>;
   resolveShouldPromptAccountIds?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     options?: ChannelSetupConfigureContext["options"];
     shouldPromptAccountIds: boolean;
   }) => boolean;
@@ -279,7 +279,7 @@ export type ChannelSetupWizard = {
   dmPolicy?: ChannelSetupDmPolicy;
   allowFrom?: ChannelSetupWizardAllowFrom;
   groupAccess?: ChannelSetupWizardGroupAccess;
-  disable?: (cfg: KaijiBotConfig) => KaijiBotConfig;
+  disable?: (cfg: AllBotConfig) => AllBotConfig;
   onAccountRecorded?: ChannelSetupWizardAdapter["onAccountRecorded"];
 };
 
@@ -322,7 +322,7 @@ async function buildStatus(
 
 function applySetupInput(params: {
   plugin: ChannelSetupWizardPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   input: ChannelSetupInput;
 }) {
@@ -364,7 +364,7 @@ function applySetupInput(params: {
 
 function collectCredentialValues(params: {
   wizard: ChannelSetupWizard;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
 }): ChannelSetupWizardCredentialValues {
   const values: ChannelSetupWizardCredentialValues = {};
@@ -385,7 +385,7 @@ function collectCredentialValues(params: {
 async function applyWizardTextInputValue(params: {
   plugin: ChannelSetupWizardPlugin;
   input: ChannelSetupWizardTextInput;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   value: string;
 }) {

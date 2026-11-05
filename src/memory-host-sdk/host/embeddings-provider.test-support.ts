@@ -26,7 +26,7 @@ type JsonResponseFetchMock = ReturnType<typeof vi.fn<FetchMock>> & {
     url: string | URL,
     options?: { dns?: boolean; tcp?: boolean; http?: boolean; https?: boolean },
   ) => void;
-  __kaijibotAcceptsDispatcher: true;
+  __allbotAcceptsDispatcher: true;
 };
 
 export type JsonFetchMock = ReturnType<typeof createJsonResponseFetchMock>;

@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig, readConfigFileSnapshot, replaceConfigFile } from "../config/config.js";
 import {
   buildWorkspaceHookStatus,
@@ -45,7 +45,7 @@ function mergeHookEntries(pluginEntries: HookEntry[], workspaceEntries: HookEntr
   return resolveHookEntries([...pluginEntries, ...workspaceEntries]);
 }
 
-function buildHooksReport(config: KaijiBotConfig): HookStatusReport {
+function buildHooksReport(config: AllBotConfig): HookStatusReport {
   const workspaceDir = resolveAgentWorkspaceDir(config, resolveDefaultAgentId(config));
   const workspaceEntries = loadWorkspaceHookEntries(workspaceDir, { config });
   const pluginReport = buildPluginDiagnosticsReport({ config, workspaceDir });
@@ -75,11 +75,11 @@ function resolveHookForToggle(
 }
 
 function buildConfigWithHookEnabled(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   hookName: string;
   enabled: boolean;
   ensureHooksEnabled?: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const entries = { ...params.config.hooks?.internal?.entries };
   entries[params.hookName] = { ...entries[params.hookName], enabled: params.enabled };
 
@@ -194,7 +194,7 @@ export function formatHooksList(report: HookStatusReport, opts: HooksListOptions
 
   if (hooks.length === 0) {
     const message = opts.eligible
-      ? t("cli.hooks.list.noEligible", { cmd: formatCliCommand("kaijibot hooks list") })
+      ? t("cli.hooks.list.noEligible", { cmd: formatCliCommand("allbot hooks list") })
       : t("cli.hooks.list.empty");
     return message;
   }
@@ -252,7 +252,7 @@ export function formatHookInfo(
     }
     return t("cli.hooks.info.notFound", {
       name: hookName,
-      cmd: formatCliCommand("kaijibot hooks list"),
+      cmd: formatCliCommand("allbot hooks list"),
     });
   }
 
@@ -423,7 +423,7 @@ export function formatHooksCheck(report: HookStatusReport, opts: HooksCheckOptio
 
 export async function enableHook(hookName: string): Promise<void> {
   const snapshot = await readConfigFileSnapshot();
-  const config = (snapshot.sourceConfig ?? snapshot.config) as KaijiBotConfig;
+  const config = (snapshot.sourceConfig ?? snapshot.config) as AllBotConfig;
   const hook = resolveHookForToggle(buildHooksReport(config), hookName, { requireEligible: true });
   const nextConfig = buildConfigWithHookEnabled({
     config,
@@ -443,7 +443,7 @@ export async function enableHook(hookName: string): Promise<void> {
 
 export async function disableHook(hookName: string): Promise<void> {
   const snapshot = await readConfigFileSnapshot();
-  const config = (snapshot.sourceConfig ?? snapshot.config) as KaijiBotConfig;
+  const config = (snapshot.sourceConfig ?? snapshot.config) as AllBotConfig;
   const hook = resolveHookForToggle(buildHooksReport(config), hookName);
   const nextConfig = buildConfigWithHookEnabled({ config, hookName, enabled: false });
 
@@ -524,7 +524,7 @@ export function registerHooksCli(program: Command): void {
 
   hooks
     .command("install")
-    .description("Deprecated: install a hook pack via `kaijibot plugins install`")
+    .description("Deprecated: install a hook pack via `allbot plugins install`")
     .argument("<path-or-spec>", "Path to a hook pack or npm package spec")
     .option("-l, --link", "Link a local path instead of copying", false)
     .option("--pin", "Record npm installs as exact resolved <name>@<version>", false)
@@ -535,7 +535,7 @@ export function registerHooksCli(program: Command): void {
 
   hooks
     .command("update")
-    .description("Deprecated: update hook packs via `kaijibot plugins update`")
+    .description("Deprecated: update hook packs via `allbot plugins update`")
     .argument("[id]", "Hook pack id (omit with --all)")
     .option("--all", "Update all tracked hooks", false)
     .option("--dry-run", "Show what would change without writing", false)

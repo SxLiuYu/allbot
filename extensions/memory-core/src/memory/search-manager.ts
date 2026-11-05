@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
   resolveAgentWorkspaceDir,
   resolveGlobalSingleton,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import { checkQmdBinaryAvailability } from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import { checkQmdBinaryAvailability } from "allbot/plugin-sdk/memory-core-host-engine-qmd";
 import {
   resolveMemoryBackendConfig,
   type MemoryEmbeddingProbeResult,
@@ -14,9 +14,9 @@ import {
   type MemorySearchRuntimeDebug,
   type MemorySyncProgressUpdate,
   type ResolvedQmdConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
-const MEMORY_SEARCH_MANAGER_CACHE_KEY = Symbol.for("kaijibot.memorySearchManagerCache");
+const MEMORY_SEARCH_MANAGER_CACHE_KEY = Symbol.for("allbot.memorySearchManagerCache");
 type MemorySearchManagerCacheStore = {
   qmdManagerCache: Map<string, MemorySearchManager>;
 };
@@ -46,7 +46,7 @@ export type MemorySearchManagerResult = {
 };
 
 export async function getMemorySearchManager(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   purpose?: "default" | "status";
 }): Promise<MemorySearchManagerResult> {
@@ -127,7 +127,7 @@ export async function getMemorySearchManager(params: {
 }
 
 async function getBuiltinMemorySearchManager(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   purpose?: "default" | "status";
 }): Promise<MemorySearchManagerResult> {

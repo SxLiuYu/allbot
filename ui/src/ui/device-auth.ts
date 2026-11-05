@@ -7,7 +7,7 @@ import {
 import type { DeviceAuthStore } from "../../../src/shared/device-auth.js";
 import { getSafeLocalStorage } from "../local-storage.ts";
 
-const STORAGE_KEY = "kaijibot.device.auth.v1";
+const STORAGE_KEY = "allbot.device.auth.v1";
 
 function readStore(): DeviceAuthStore | null {
   try {

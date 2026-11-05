@@ -1,4 +1,4 @@
-import type { ChannelMessageActionName } from "kaijibot/plugin-sdk/channel-contract";
+import type { ChannelMessageActionName } from "allbot/plugin-sdk/channel-contract";
 
 type MessageActionTargetAliasSpec = {
   aliases: string[];

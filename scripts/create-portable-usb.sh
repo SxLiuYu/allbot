@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════
-# KaijiBot 便携版 U盘 制作脚本
+# AllBot 便携版 U盘 制作脚本
 # 
 # 用法：
 #   1. 插上 USB 3.0 U盘
@@ -46,13 +46,13 @@ print(versions[0] if versions else 'v22.11.0')
     ok "下载完成: $(ls -lh "$NODE_ZIP" | awk '{print $5}')"
 fi
 
-# ── 步骤 3: 在 Windows 侧安装 KaijiBot（获取 Windows 原生模块）──
-step 3 "安装 KaijiBot（Windows 原生模块）"
-KAIJI_TAR="$USB_ROOT/archives/kaijibot-offline.tar"
+# ── 步骤 3: 在 Windows 侧安装 AllBot（获取 Windows 原生模块）──
+step 3 "安装 AllBot（Windows 原生模块）"
+KAIJI_TAR="$USB_ROOT/archives/allbot-offline.tar"
 if [ -f "$KAIJI_TAR" ] && [ $(stat -c%s "$KAIJI_TAR" 2>/dev/null || echo 0) -gt 600000000 ]; then
     ok "已存在，跳过"
 else
-    BUILD_DIR="C:\\temp\\kaijibot-usb-build"
+    BUILD_DIR="C:\\temp\\allbot-usb-build"
     info "在 C 盘创建临时构建目录（SSD 速度快）..."
     
     # 解压 Node.js 到 C:\temp
@@ -72,13 +72,13 @@ else
     info "npm install（获取 Windows 原生模块，约 5-10 分钟）..."
     powershell.exe -Command "
         Set-Location '$BUILD_DIR'
-        & '$NPM_CMD' install 'kaijibot@latest' '--omit=dev' 2>&1
+        & '$NPM_CMD' install 'allbot@latest' '--omit=dev' 2>&1
     " 2>/dev/null
     
     # 验证安装
-    KAIJI_ENTRY="$BUILD_DIR\\node_modules\\kaijibot\\dist\\index.js"
+    KAIJI_ENTRY="$BUILD_DIR\\node_modules\\allbot\\dist\\index.js"
     powershell.exe -Command "
-        if (-not (Test-Path '$KAIJI_ENTRY')) { Write-Error 'KaijiBot install failed'; exit 1 }
+        if (-not (Test-Path '$KAIJI_ENTRY')) { Write-Error 'AllBot install failed'; exit 1 }
         & '$NODE_EXE' '$KAIJI_ENTRY' --version
     " 2>/dev/null | tr -d '\r' | while read -r line; do ok "$line"; done
     
@@ -98,8 +98,8 @@ fi
 step 4 "写入启动器"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# KaijiBot.bat
-cat > "$USB_ROOT/KaijiBot.bat" << 'BATEOF'
+# AllBot.bat
+cat > "$USB_ROOT/AllBot.bat" << 'BATEOF'
 @echo off
 chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
@@ -107,12 +107,12 @@ setlocal enabledelayedexpansion
 set "USB_ROOT=%~dp0"
 set "USB_ROOT=%USB_ROOT:~0,-1%"
 set "CONFIG_DIR=%USB_ROOT%\config"
-set "KAIJI_DIR=%USB_ROOT%\kaijibot"
+set "KAIJI_DIR=%USB_ROOT%\allbot"
 set "NODE_DIR=%USB_ROOT%\node"
 set "NODE_EXE=%NODE_DIR%\node.exe"
 
-set "KAIJIBOT_STATE_DIR=%CONFIG_DIR%"
-set "KAIJIBOT_HOME=%CONFIG_DIR%"
+set "ALLBOT_STATE_DIR=%CONFIG_DIR%"
+set "ALLBOT_HOME=%CONFIG_DIR%"
 
 if not exist "%CONFIG_DIR%" mkdir "%CONFIG_DIR%"
 
@@ -125,19 +125,19 @@ if not exist "%NODE_EXE%" (
     echo  OK
 )
 
-set "KAIJI_ENTRY=%KAIJI_DIR%\node_modules\kaijibot\dist\index.js"
+set "KAIJI_ENTRY=%KAIJI_DIR%\node_modules\allbot\dist\index.js"
 if not exist "%KAIJI_ENTRY%" (
     echo.
-    echo  [2/3] 解包 KaijiBot + 依赖（约 1-2 分钟）...
+    echo  [2/3] 解包 AllBot + 依赖（约 1-2 分钟）...
     mkdir "%KAIJI_DIR%" 2>nul
     cd /d "%KAIJI_DIR%"
-    tar xf "%USB_ROOT%\archives\kaijibot-offline.tar"
+    tar xf "%USB_ROOT%\archives\allbot-offline.tar"
     if not exist "%KAIJI_ENTRY%" ( echo  失败 & pause & exit /b 1 )
     echo  OK
     cd /d "%USB_ROOT%"
 )
 
-if not exist "%CONFIG_DIR%\kaijibot.json" (
+if not exist "%CONFIG_DIR%\allbot.json" (
     echo.
     echo  [3/3] 首次配置...
     echo.
@@ -149,24 +149,24 @@ if not exist "%CONFIG_DIR%\kaijibot.json" (
 )
 
 echo.
-echo  KaijiBot 启动中...
+echo  AllBot 启动中...
 echo  网关: http://localhost:18789
 echo.
 
 "%NODE_EXE%" "%KAIJI_ENTRY%" gateway --port 18789 --verbose
 pause
 BATEOF
-ok "KaijiBot.bat"
+ok "AllBot.bat"
 
 # README.txt
 cat > "$USB_ROOT/README.txt" << 'READMEEOF'
-KaijiBot 便携版 — Windows 完全离线安装
+AllBot 便携版 — Windows 完全离线安装
 
-使用方法：双击 KaijiBot.bat
+使用方法：双击 AllBot.bat
 
 首次使用（约 2 分钟，离线安装）：
   1. 解包 Node.js（10 秒）
-  2. 解包 KaijiBot + 依赖（1-2 分钟）
+  2. 解包 AllBot + 依赖（1-2 分钟）
   3. 配置向导（需联网注册 API Key）
 
 之后：双击即用，3 秒启动。
@@ -180,9 +180,9 @@ ok "README.txt"
 step 5 "验证"
 echo ""
 echo "  U盘 内容:"
-ls -lh "$USB_ROOT/KaijiBot.bat" "$USB_ROOT/README.txt" 2>/dev/null | awk '{print "   " $5 "  " $9}'
+ls -lh "$USB_ROOT/AllBot.bat" "$USB_ROOT/README.txt" 2>/dev/null | awk '{print "   " $5 "  " $9}'
 ls -lh "$USB_ROOT/archives/" 2>/dev/null | awk '{print "   " $5 "  " $9}'
 echo ""
 echo "  总大小: $(du -sh "$USB_ROOT/" 2>/dev/null | awk '{print $1}' || echo '未知')"
 echo ""
-ok "完成！双击 KaijiBot.bat 即可使用。"
+ok "完成！双击 AllBot.bat 即可使用。"

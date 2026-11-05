@@ -1,5 +1,5 @@
 import { normalizeProviderId } from "../agents/model-selection.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -63,7 +63,7 @@ export function mergeConfigPatch<T>(base: T, patch: unknown): T {
   return next as T;
 }
 
-export function applyProviderAuthConfigPatch(cfg: KaijiBotConfig, patch: unknown): KaijiBotConfig {
+export function applyProviderAuthConfigPatch(cfg: AllBotConfig, patch: unknown): AllBotConfig {
   const merged = mergeConfigPatch(cfg, patch);
   if (!isPlainRecord(patch)) {
     return merged;
@@ -83,14 +83,14 @@ export function applyProviderAuthConfigPatch(cfg: KaijiBotConfig, patch: unknown
         ...merged.agents?.defaults,
         // Provider auth migrations can intentionally replace the exact allowlist.
         models: patchModels as NonNullable<
-          NonNullable<KaijiBotConfig["agents"]>["defaults"]
+          NonNullable<AllBotConfig["agents"]>["defaults"]
         >["models"],
       },
     },
   };
 }
 
-export function applyDefaultModel(cfg: KaijiBotConfig, model: string): KaijiBotConfig {
+export function applyDefaultModel(cfg: AllBotConfig, model: string): AllBotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[model] = models[model] ?? {};
 

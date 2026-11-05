@@ -1,6 +1,6 @@
 import { resolveAgentConfig } from "../../agents/agent-scope.js";
 import { getChannelPlugin, normalizeChannelId } from "../../channels/plugins/index.js";
-import type { AgentElevatedAllowFromConfig, KaijiBotConfig } from "../../config/config.js";
+import type { AgentElevatedAllowFromConfig, AllBotConfig } from "../../config/config.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import { normalizeStringEntries } from "../../shared/string-normalization.js";
 import type { MsgContext } from "../templating.js";
@@ -29,7 +29,7 @@ function resolveElevatedAllowList(
 }
 
 function resolveAllowFromFormatter(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   provider: string;
   accountId?: string;
 }): AllowFromFormatter {
@@ -167,7 +167,7 @@ function isApprovedElevatedSender(params: {
 }
 
 export function resolveElevatedPermissions(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   ctx: MsgContext;
   provider: string;

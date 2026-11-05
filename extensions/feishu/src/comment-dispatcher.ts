@@ -1,4 +1,4 @@
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";
 import {

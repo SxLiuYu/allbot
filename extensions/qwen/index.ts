@@ -1,4 +1,4 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
 import { applyQwenNativeStreamingUsageCompat } from "./api.js";
 import { buildQwenMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import {

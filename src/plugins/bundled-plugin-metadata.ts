@@ -14,13 +14,13 @@ import {
 import {
   getPackageManifestMetadata,
   loadPluginManifest,
-  type KaijiBotPackageManifest,
+  type AllBotPackageManifest,
   type PackageManifest,
   type PluginManifest,
 } from "./manifest.js";
 import { resolveLoaderPackageRoot } from "./sdk-alias.js";
 
-const KAIJIBOT_PACKAGE_ROOT =
+const ALLBOT_PACKAGE_ROOT =
   resolveLoaderPackageRoot({
     modulePath: fileURLToPath(import.meta.url),
     moduleUrl: import.meta.url,
@@ -45,7 +45,7 @@ export type BundledPluginMetadata = {
   packageName?: string;
   packageVersion?: string;
   packageDescription?: string;
-  packageManifest?: KaijiBotPackageManifest;
+  packageManifest?: AllBotPackageManifest;
   manifest: PluginManifest;
 };
 
@@ -168,7 +168,7 @@ export function listBundledPluginMetadata(params?: {
   includeChannelConfigs?: boolean;
   includeSyntheticChannelConfigs?: boolean;
 }): readonly BundledPluginMetadata[] {
-  const rootDir = path.resolve(params?.rootDir ?? KAIJIBOT_PACKAGE_ROOT);
+  const rootDir = path.resolve(params?.rootDir ?? ALLBOT_PACKAGE_ROOT);
   const includeChannelConfigs = params?.includeChannelConfigs ?? !RUNNING_FROM_BUILT_ARTIFACT;
   const includeSyntheticChannelConfigs =
     params?.includeSyntheticChannelConfigs ?? includeChannelConfigs;

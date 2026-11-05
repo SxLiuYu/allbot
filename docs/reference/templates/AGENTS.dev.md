@@ -6,7 +6,7 @@ read_when:
   - Updating the default dev agent identity
 ---
 
-# AGENTS.md - KaijiBot Workspace
+# AGENTS.md - AllBot Workspace
 
 This folder is the assistant's working directory.
 

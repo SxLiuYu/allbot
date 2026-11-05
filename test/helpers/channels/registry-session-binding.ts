@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { expect } from "vitest";
 import { createChannelConversationBindingManager } from "../../../src/channels/plugins/conversation-bindings.js";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import {
   getSessionBindingService,
   type SessionBindingCapabilities,
@@ -27,7 +27,7 @@ type SessionBindingContractEntry = {
 const contractApiPromises = new Map<string, Promise<Record<string, unknown>>>();
 
 const matrixSessionBindingStateDir = fs.mkdtempSync(
-  path.join(os.tmpdir(), "kaijibot-feishu-session-binding-contract-"),
+  path.join(os.tmpdir(), "allbot-feishu-session-binding-contract-"),
 );
 const matrixSessionBindingAuth = {
   accountId: "ops",
@@ -124,7 +124,7 @@ async function createContractMatrixThreadBindingManager() {
 
 const baseSessionBindingCfg = {
   session: { mainKey: "main", scope: "per-sender" },
-} satisfies KaijiBotConfig;
+} satisfies AllBotConfig;
 
 const sessionBindingContractEntries: Record<
   SessionBindingContractChannelId,
@@ -203,7 +203,7 @@ const sessionBindingContractEntries: Record<
       const { createThreadBindingManager } = await getContractApi<{
         createThreadBindingManager: (params: {
           accountId: string;
-          cfg?: KaijiBotConfig;
+          cfg?: AllBotConfig;
           persist: boolean;
           enableSweeper: boolean;
         }) => unknown;
@@ -223,7 +223,7 @@ const sessionBindingContractEntries: Record<
       const { createThreadBindingManager } = await getContractApi<{
         createThreadBindingManager: (params: {
           accountId: string;
-          cfg?: KaijiBotConfig;
+          cfg?: AllBotConfig;
           persist: boolean;
           enableSweeper: boolean;
         }) => unknown;
@@ -277,7 +277,7 @@ const sessionBindingContractEntries: Record<
       const { createFeishuThreadBindingManager } = await getContractApi<{
         createFeishuThreadBindingManager: (params: {
           accountId?: string;
-          cfg: KaijiBotConfig;
+          cfg: AllBotConfig;
         }) => unknown;
       }>("feishu");
       createFeishuThreadBindingManager({
@@ -293,7 +293,7 @@ const sessionBindingContractEntries: Record<
       const { createFeishuThreadBindingManager } = await getContractApi<{
         createFeishuThreadBindingManager: (params: {
           accountId?: string;
-          cfg: KaijiBotConfig;
+          cfg: AllBotConfig;
         }) => unknown;
       }>("feishu");
       createFeishuThreadBindingManager({

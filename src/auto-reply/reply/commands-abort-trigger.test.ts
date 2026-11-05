@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { handleAbortTrigger } from "./commands-session-abort.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 
@@ -53,7 +53,7 @@ function buildAbortParams(): HandleCommandsParams {
     cfg: {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig,
+    } as AllBotConfig,
     ctx: {
       Provider: "whatsapp",
       Surface: "whatsapp",

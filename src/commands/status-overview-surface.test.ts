@@ -33,7 +33,7 @@ const baseScanFields = {
 const baseGatewayService = {
   label: "LaunchAgent",
   installed: true,
-  managedByKaijiBot: true,
+  managedByAllBot: true,
   loadedText: "loaded",
   runtimeShort: "running",
 };

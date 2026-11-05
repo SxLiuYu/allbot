@@ -1,1 +1,1 @@
-export { renderQrPngBase64 } from "kaijibot/plugin-sdk/media-runtime";
+export { renderQrPngBase64 } from "allbot/plugin-sdk/media-runtime";

@@ -31,7 +31,7 @@ const fixture = process.env.CI
   ? ({ cases: [] } as Fixture)
   : (JSON.parse(fs.readFileSync(fixturePath, "utf8")) as Fixture);
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("system-run approval mismatch contract fixtures", () => {
   test.each(fixture.cases)("$name", (entry) => {
     const result = toSystemRunApprovalMismatchError({

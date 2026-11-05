@@ -1,5 +1,5 @@
 import { upsertAuthProfile } from "../agents/auth-profiles/profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SecretInput } from "../config/types.secrets.js";
 import { createLazyRuntimeSurface } from "../shared/lazy-runtime.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -30,7 +30,7 @@ type ProviderApiKeyAuthMethodOptions = {
   metadata?: Record<string, string>;
   noteMessage?: string;
   noteTitle?: string;
-  applyConfig?: (cfg: KaijiBotConfig) => KaijiBotConfig;
+  applyConfig?: (cfg: AllBotConfig) => AllBotConfig;
 };
 
 const loadProviderApiKeyAuthRuntime = createLazyRuntimeSurface(
@@ -63,7 +63,7 @@ async function applyApiKeyConfig(params: {
   providerId: string;
   profileIds: string[];
   defaultModel?: string;
-  applyConfig?: (cfg: KaijiBotConfig) => KaijiBotConfig;
+  applyConfig?: (cfg: AllBotConfig) => AllBotConfig;
 }) {
   const { applyAuthProfileConfig, applyPrimaryModel } = await loadProviderApiKeyAuthRuntime();
   let next = params.ctx.config;

@@ -3,7 +3,7 @@ import {
   resolveHeartbeatPrompt as resolveHeartbeatPromptText,
 } from "../auto-reply/heartbeat.js";
 import { parseDurationMs } from "../cli/parse-duration.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentDefaultsConfig } from "../config/types.agent-defaults.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -12,7 +12,7 @@ import { listAgentEntries, resolveAgentConfig, resolveDefaultAgentId } from "./a
 type HeartbeatConfig = AgentDefaultsConfig["heartbeat"];
 
 function resolveHeartbeatConfigForSystemPrompt(
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
   agentId?: string,
 ): HeartbeatConfig | undefined {
   const defaults = config?.agents?.defaults?.heartbeat;
@@ -26,7 +26,7 @@ function resolveHeartbeatConfigForSystemPrompt(
   return { ...defaults, ...overrides };
 }
 
-function isHeartbeatEnabledByAgentPolicy(config: KaijiBotConfig, agentId: string): boolean {
+function isHeartbeatEnabledByAgentPolicy(config: AllBotConfig, agentId: string): boolean {
   const resolvedAgentId = normalizeAgentId(agentId);
   const agents = listAgentEntries(config);
   const hasExplicitHeartbeatAgents = agents.some((entry) => Boolean(entry?.heartbeat));
@@ -52,7 +52,7 @@ function isHeartbeatCadenceEnabled(heartbeat?: HeartbeatConfig): boolean {
 }
 
 export function shouldIncludeHeartbeatGuidanceForSystemPrompt(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   defaultAgentId?: string;
 }): boolean {
@@ -72,7 +72,7 @@ export function shouldIncludeHeartbeatGuidanceForSystemPrompt(params: {
 }
 
 export function resolveHeartbeatPromptForSystemPrompt(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   defaultAgentId?: string;
 }): string | undefined {

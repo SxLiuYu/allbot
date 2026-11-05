@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildMicrosoftSpeechProvider,
@@ -8,7 +8,7 @@ import {
 } from "./speech-provider.js";
 import * as ttsModule from "./tts.js";
 
-const TEST_CFG = {} as KaijiBotConfig;
+const TEST_CFG = {} as AllBotConfig;
 
 describe("listMicrosoftVoices", () => {
   const originalFetch = globalThis.fetch;

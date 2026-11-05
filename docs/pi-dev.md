@@ -8,7 +8,7 @@ read_when:
 
 # Pi Development Workflow
 
-This guide summarizes a sane workflow for working on the pi integration in KaijiBot.
+This guide summarizes a sane workflow for working on the pi integration in AllBot.
 
 ## Type Checking and Linting
 
@@ -33,7 +33,7 @@ pnpm test \
 To include the live provider exercise:
 
 ```bash
-KAIJIBOT_LIVE_TEST=1 pnpm test src/agents/pi-embedded-runner-extraparams.live.test.ts
+ALLBOT_LIVE_TEST=1 pnpm test src/agents/pi-embedded-runner-extraparams.live.test.ts
 ```
 
 This covers the main Pi unit suites:
@@ -52,7 +52,7 @@ Recommended flow:
 - Run the gateway in dev mode:
   - `pnpm gateway:dev`
 - Trigger the agent directly:
-  - `pnpm kaijibot agent --message "Hello" --thinking low`
+  - `pnpm allbot agent --message "Hello" --thinking low`
 - Use the TUI for interactive debugging:
   - `pnpm tui`
 
@@ -60,11 +60,11 @@ For tool call behavior, prompt for a `read` or `exec` action so you can see tool
 
 ## Clean Slate Reset
 
-State lives under the KaijiBot state directory. Default is `~/.kaijibot`. If `KAIJIBOT_STATE_DIR` is set, use that directory instead.
+State lives under the AllBot state directory. Default is `~/.allbot`. If `ALLBOT_STATE_DIR` is set, use that directory instead.
 
 To reset everything:
 
-- `kaijibot.json` for config
+- `allbot.json` for config
 - `agents/<agentId>/agent/auth-profiles.json` for model auth profiles (API keys + OAuth)
 - `credentials/` for provider/channel state that still lives outside the auth profile store
 - `agents/<agentId>/sessions/` for agent session history

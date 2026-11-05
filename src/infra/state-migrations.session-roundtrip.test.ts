@@ -10,7 +10,7 @@
  * "agent:ops:work". Without canonicalization, writes and reads diverge.
  */
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { canonicalizeMainSessionAlias } from "../config/sessions/main-session.js";
 import { resolveMainSessionKey } from "../config/sessions/main-session.js";
 import { resolveSessionKey } from "../config/sessions/session-key.js";
@@ -18,12 +18,12 @@ import { resolveCronAgentSessionKey } from "../cron/isolated-agent/session-key.j
 import { resolveSessionStoreKey } from "../gateway/session-utils.js";
 import { normalizeMainKey } from "../routing/session-key.js";
 
-function makeNonDefaultAgentCfg(overrides?: Partial<KaijiBotConfig>): KaijiBotConfig {
+function makeNonDefaultAgentCfg(overrides?: Partial<AllBotConfig>): AllBotConfig {
   return {
     session: { mainKey: "work", scope: "per-sender" },
     agents: { list: [{ id: "ops", default: true }] },
     ...overrides,
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("session key write/read round-trip (#29683)", () => {
@@ -116,7 +116,7 @@ describe("session key write/read round-trip (#29683)", () => {
 
   describe("no-op when default agent is main", () => {
     it("write and gateway canonical keys match when agent is main", () => {
-      const cfg = { session: { scope: "per-sender" } } as KaijiBotConfig;
+      const cfg = { session: { scope: "per-sender" } } as AllBotConfig;
       const mainKey = normalizeMainKey(cfg.session?.mainKey);
 
       const rawWriteKey = resolveSessionKey("per-sender", { From: "+1234567890" }, mainKey);

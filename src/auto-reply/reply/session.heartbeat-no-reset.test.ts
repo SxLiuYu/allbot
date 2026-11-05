@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { saveSessionStore } from "../../config/sessions/store.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import type { MsgContext } from "../templating.js";
@@ -12,7 +12,7 @@ describe("initSessionState - heartbeat should not trigger session reset", () => 
   let storePath: string;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp("/tmp/kaijibot-test-");
+    tempDir = await fs.mkdtemp("/tmp/allbot-test-");
     storePath = path.join(tempDir, "sessions.json");
   });
 
@@ -20,7 +20,7 @@ describe("initSessionState - heartbeat should not trigger session reset", () => 
     await fs.rm(tempDir, { recursive: true, force: true });
   });
 
-  const createBaseConfig = (): KaijiBotConfig => ({
+  const createBaseConfig = (): AllBotConfig => ({
     agents: {
       defaults: {
         workspace: tempDir,

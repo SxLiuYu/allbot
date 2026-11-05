@@ -6,7 +6,7 @@ export type ExtensionPackageJson = {
   version?: string;
   dependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
-  kaijibot?: {
+  allbot?: {
     install?: unknown;
     releaseChecks?: unknown;
   };
@@ -18,10 +18,10 @@ export function collectBundledExtensionManifestErrors(extensions: BundledExtensi
   const errors: string[] = [];
 
   for (const extension of extensions) {
-    const install = extension.packageJson.kaijibot?.install;
+    const install = extension.packageJson.allbot?.install;
     if (install !== undefined && !isRecord(install)) {
       errors.push(
-        `bundled extension '${extension.id}' manifest invalid | kaijibot.install must be an object`,
+        `bundled extension '${extension.id}' manifest invalid | allbot.install must be an object`,
       );
       continue;
     }
@@ -31,7 +31,7 @@ export function collectBundledExtensionManifestErrors(extensions: BundledExtensi
       (!install.npmSpec || typeof install.npmSpec !== "string" || !install.npmSpec.trim())
     ) {
       errors.push(
-        `bundled extension '${extension.id}' manifest invalid | kaijibot.install.npmSpec must be a non-empty string`,
+        `bundled extension '${extension.id}' manifest invalid | allbot.install.npmSpec must be a non-empty string`,
       );
     }
     const minHostVersionError = validateMinHostVersion(install?.minHostVersion);

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { handlePluginsCommand } from "./commands-plugins.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 
@@ -63,7 +63,7 @@ vi.mock("../../plugins/status.js", () => ({
 }));
 
 vi.mock("../../plugins/toggle-config.js", () => ({
-  setPluginEnabledInConfig: vi.fn((config: KaijiBotConfig, id: string, enabled: boolean) => ({
+  setPluginEnabledInConfig: vi.fn((config: AllBotConfig, id: string, enabled: boolean) => ({
     ...config,
     plugins: {
       ...config.plugins,
@@ -83,7 +83,7 @@ vi.mock("../../utils.js", async () => {
   };
 });
 
-function buildCfg(): KaijiBotConfig {
+function buildCfg(): AllBotConfig {
   return {
     plugins: { enabled: true },
     commands: { text: true, plugins: true },
@@ -92,7 +92,7 @@ function buildCfg(): KaijiBotConfig {
 
 function buildPluginsParams(
   commandBodyNormalized: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): HandleCommandsParams {
   return {
     cfg,
@@ -130,7 +130,7 @@ describe("handlePluginsCommand", () => {
     vi.clearAllMocks();
     readConfigFileSnapshotMock.mockResolvedValue({
       valid: true,
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       resolved: buildCfg(),
     });
     validateConfigObjectWithPluginsMock.mockReturnValue({
@@ -145,7 +145,7 @@ describe("handlePluginsCommand", () => {
           id: "superpowers",
           name: "superpowers",
           status: "disabled",
-          format: "kaijibot",
+          format: "allbot",
           bundleFormat: "claude",
         },
       ],
@@ -157,7 +157,7 @@ describe("handlePluginsCommand", () => {
           id: "superpowers",
           name: "superpowers",
           status: "disabled",
-          format: "kaijibot",
+          format: "allbot",
           bundleFormat: "claude",
         },
       ],

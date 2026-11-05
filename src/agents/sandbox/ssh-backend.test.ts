@@ -6,7 +6,7 @@ import {
   createSandboxPruneConfig,
   createSandboxSshConfig,
 } from "../../../test/helpers/sandbox-fixtures.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SandboxConfig } from "./types.js";
 
 const sshMocks = vi.hoisted(() => ({
@@ -31,7 +31,7 @@ vi.mock("./ssh.js", async () => {
 
 const { createSshSandboxBackend, sshSandboxBackendManager } = await import("./ssh-backend.js");
 
-function createConfig(): KaijiBotConfig {
+function createConfig(): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -43,7 +43,7 @@ function createConfig(): KaijiBotConfig {
           ssh: {
             target: "peter@example.com:2222",
             command: "ssh",
-            workspaceRoot: "/remote/kaijibot",
+            workspaceRoot: "/remote/allbot",
             strictHostKeyChecking: true,
             updateHostKeys: true,
           },
@@ -56,8 +56,8 @@ function createConfig(): KaijiBotConfig {
 function createSession() {
   return {
     command: "ssh",
-    configPath: path.join(os.tmpdir(), "kaijibot-test-ssh-config"),
-    host: "kaijibot-sandbox",
+    configPath: path.join(os.tmpdir(), "allbot-test-ssh-config"),
+    host: "allbot-sandbox",
   };
 }
 
@@ -67,7 +67,7 @@ function createBackendSandboxConfig(params?: { binds?: string[]; target?: string
     backend: "ssh",
     scope: "session",
     workspaceAccess: "rw" as const,
-    workspaceRoot: "~/.kaijibot/sandboxes",
+    workspaceRoot: "~/.allbot/sandboxes",
     docker: {
       image: "img",
       containerPrefix: "prefix-",
@@ -81,7 +81,7 @@ function createBackendSandboxConfig(params?: { binds?: string[]; target?: string
     },
     ssh: {
       ...createSandboxSshConfig(
-        "/remote/kaijibot",
+        "/remote/allbot",
         params?.target ? { target: params.target } : {},
       ),
     },
@@ -153,9 +153,9 @@ describe("ssh sandbox backend", () => {
   it("describes runtimes via the configured ssh target", async () => {
     const result = await sshSandboxBackendManager.describeRuntime({
       entry: {
-        containerName: "kaijibot-ssh-worker-abcd1234",
+        containerName: "allbot-ssh-worker-abcd1234",
         backendId: "ssh",
-        runtimeLabel: "kaijibot-ssh-worker-abcd1234",
+        runtimeLabel: "allbot-ssh-worker-abcd1234",
         sessionKey: "agent:worker",
         createdAtMs: 1,
         lastUsedAtMs: 1,
@@ -173,12 +173,12 @@ describe("ssh sandbox backend", () => {
     expect(sshMocks.createSshSandboxSessionFromSettings).toHaveBeenCalledWith(
       expect.objectContaining({
         target: "peter@example.com:2222",
-        workspaceRoot: "/remote/kaijibot",
+        workspaceRoot: "/remote/allbot",
       }),
     );
     expect(sshMocks.runSshSandboxCommand).toHaveBeenCalledWith(
       expect.objectContaining({
-        remoteCommand: expect.stringContaining("/remote/kaijibot/kaijibot-ssh-agent-worker"),
+        remoteCommand: expect.stringContaining("/remote/allbot/allbot-ssh-agent-worker"),
       }),
     );
   });
@@ -186,9 +186,9 @@ describe("ssh sandbox backend", () => {
   it("removes runtimes by deleting the remote scope root", async () => {
     await sshSandboxBackendManager.removeRuntime({
       entry: {
-        containerName: "kaijibot-ssh-worker-abcd1234",
+        containerName: "allbot-ssh-worker-abcd1234",
         backendId: "ssh",
-        runtimeLabel: "kaijibot-ssh-worker-abcd1234",
+        runtimeLabel: "allbot-ssh-worker-abcd1234",
         sessionKey: "agent:worker",
         createdAtMs: 1,
         lastUsedAtMs: 1,
@@ -234,10 +234,10 @@ describe("ssh sandbox backend", () => {
         backend: "ssh",
         scope: "session",
         workspaceAccess: "rw",
-        workspaceRoot: "~/.kaijibot/sandboxes",
+        workspaceRoot: "~/.allbot/sandboxes",
         docker: {
-          image: "kaijibot-sandbox:bookworm-slim",
-          containerPrefix: "kaijibot-sbx-",
+          image: "allbot-sandbox:bookworm-slim",
+          containerPrefix: "allbot-sbx-",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp"],
@@ -248,14 +248,14 @@ describe("ssh sandbox backend", () => {
         ssh: {
           target: "peter@example.com:2222",
           command: "ssh",
-          workspaceRoot: "/remote/kaijibot",
+          workspaceRoot: "/remote/allbot",
           strictHostKeyChecking: true,
           updateHostKeys: true,
         },
         browser: {
           enabled: false,
-          image: "kaijibot-browser",
-          containerPrefix: "kaijibot-browser-",
+          image: "allbot-browser",
+          containerPrefix: "allbot-browser-",
           network: "bridge",
           cdpPort: 9222,
           vncPort: 5900,
@@ -280,7 +280,7 @@ describe("ssh sandbox backend", () => {
     expect(execSpec.argv).toEqual(
       expect.arrayContaining(["ssh", "-F", createSession().configPath, "-T", createSession().host]),
     );
-    expect(execSpec.argv.at(-1)).toContain("/remote/kaijibot/kaijibot-ssh-agent-worker");
+    expect(execSpec.argv.at(-1)).toContain("/remote/allbot/allbot-ssh-agent-worker");
     expect(sshMocks.uploadDirectoryToSshTarget).toHaveBeenCalledTimes(2);
     expect(sshMocks.uploadDirectoryToSshTarget).toHaveBeenNthCalledWith(
       1,

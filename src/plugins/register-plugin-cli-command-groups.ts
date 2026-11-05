@@ -6,7 +6,7 @@ import {
   removeCommandGroupNames,
   type CommandGroupEntry,
 } from "../cli/program/register-command-groups.js";
-import type { KaijiBotPluginCliCommandDescriptor, PluginLogger } from "./types.js";
+import type { AllBotPluginCliCommandDescriptor, PluginLogger } from "./types.js";
 
 export type PluginCliCommandGroupEntry = CommandGroupEntry & {
   pluginId: string;
@@ -19,7 +19,7 @@ function canRegisterPluginCliLazily(entry: PluginCliCommandGroupEntry): boolean 
     return false;
   }
   const descriptorNames = new Set(
-    (entry.placeholders as readonly KaijiBotPluginCliCommandDescriptor[]).map(
+    (entry.placeholders as readonly AllBotPluginCliCommandDescriptor[]).map(
       (descriptor) => descriptor.name,
     ),
   );

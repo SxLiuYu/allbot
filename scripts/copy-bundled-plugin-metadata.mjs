@@ -60,7 +60,7 @@ function collectTopLevelPublicSurfaceEntries(pluginDir) {
 
 function isManifestlessBundledRuntimeSupportPackage(params) {
   const packageName = typeof params.packageJson?.name === "string" ? params.packageJson.name : "";
-  if (packageName !== `@kaijibot/${params.dirName}`) {
+  if (packageName !== `@allbot/${params.dirName}`) {
     return false;
   }
   return params.topLevelPublicSurfaceEntries.length > 0;
@@ -227,7 +227,7 @@ export function copyBundledPluginMetadata(params = {}) {
     }
 
     const pluginDir = path.join(extensionsRoot, dirent.name);
-    const manifestPath = path.join(pluginDir, "kaijibot.plugin.json");
+    const manifestPath = path.join(pluginDir, "allbot.plugin.json");
     const distPluginDir = path.join(distExtensionsRoot, dirent.name);
     const packageJsonPath = path.join(pluginDir, "package.json");
     const packageJson = fs.existsSync(packageJsonPath)
@@ -249,7 +249,7 @@ export function copyBundledPluginMetadata(params = {}) {
 
     sourcePluginDirs.add(dirent.name);
 
-    const distManifestPath = path.join(distPluginDir, "kaijibot.plugin.json");
+    const distManifestPath = path.join(distPluginDir, "allbot.plugin.json");
     const distPackageJsonPath = path.join(distPluginDir, "package.json");
     if (!fs.existsSync(manifestPath) && !isManifestlessSupportPackage) {
       removePathIfExists(distPluginDir);
@@ -280,12 +280,12 @@ export function copyBundledPluginMetadata(params = {}) {
       removeFileIfExists(distPackageJsonPath);
       continue;
     }
-    if (packageJson.kaijibot && "extensions" in packageJson.kaijibot) {
-      packageJson.kaijibot = {
-        ...packageJson.kaijibot,
-        extensions: rewritePackageExtensions(packageJson.kaijibot.extensions),
-        ...(typeof packageJson.kaijibot.setupEntry === "string"
-          ? { setupEntry: rewritePackageEntry(packageJson.kaijibot.setupEntry) }
+    if (packageJson.allbot && "extensions" in packageJson.allbot) {
+      packageJson.allbot = {
+        ...packageJson.allbot,
+        extensions: rewritePackageExtensions(packageJson.allbot.extensions),
+        ...(typeof packageJson.allbot.setupEntry === "string"
+          ? { setupEntry: rewritePackageEntry(packageJson.allbot.setupEntry) }
           : {}),
       };
     }

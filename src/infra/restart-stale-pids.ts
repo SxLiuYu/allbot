@@ -20,7 +20,7 @@ const STALE_SIGKILL_WAIT_MS = 400;
 /**
  * After SIGKILL, the kernel may not release the TCP port immediately.
  * Poll until the port is confirmed free (or until the budget expires) before
- * returning control to the caller (typically `triggerKaijiBotRestart` →
+ * returning control to the caller (typically `triggerAllBotRestart` →
  * `systemctl restart`). Without this wait the new process races the dying
  * process for the port and systemd enters an EADDRINUSE restart loop.
  *
@@ -62,7 +62,7 @@ function sleepSync(ms: number): void {
 }
 
 /**
- * Parse kaijibot gateway PIDs from lsof -Fpc stdout.
+ * Parse allbot gateway PIDs from lsof -Fpc stdout.
  * Pure function — no I/O. Excludes the current process.
  */
 function parsePidsFromLsofOutput(stdout: string): number[] {
@@ -74,7 +74,7 @@ function parsePidsFromLsofOutput(stdout: string): number[] {
       if (
         currentPid != null &&
         currentCmd &&
-        normalizeLowercaseStringOrEmpty(currentCmd).includes("kaijibot")
+        normalizeLowercaseStringOrEmpty(currentCmd).includes("allbot")
       ) {
         pids.push(currentPid);
       }
@@ -88,7 +88,7 @@ function parsePidsFromLsofOutput(stdout: string): number[] {
   if (
     currentPid != null &&
     currentCmd &&
-    normalizeLowercaseStringOrEmpty(currentCmd).includes("kaijibot")
+    normalizeLowercaseStringOrEmpty(currentCmd).includes("allbot")
   ) {
     pids.push(currentPid);
   }
@@ -98,7 +98,7 @@ function parsePidsFromLsofOutput(stdout: string): number[] {
 }
 
 /**
- * Windows: find listening PIDs on the port, then verify each is an kaijibot
+ * Windows: find listening PIDs on the port, then verify each is an allbot
  * gateway process via command-line inspection. Excludes the current process.
  */
 function filterVerifiedWindowsGatewayPids(rawPids: number[]): number[] {
@@ -146,7 +146,7 @@ function findVerifiedWindowsGatewayPidsOnPortResultSync(port: number): WindowsLi
 
 /**
  * Find PIDs of gateway processes listening on the given port using synchronous lsof.
- * Returns only PIDs that belong to kaijibot gateway processes (not the current process).
+ * Returns only PIDs that belong to allbot gateway processes (not the current process).
  */
 export function findGatewayPidsOnPortSync(
   port: number,
@@ -154,7 +154,7 @@ export function findGatewayPidsOnPortSync(
 ): number[] {
   if (process.platform === "win32") {
     // Use the shared Windows port inspection (PowerShell / netstat) with
-    // command-line verification to find only kaijibot gateway processes.
+    // command-line verification to find only allbot gateway processes.
     return findVerifiedWindowsGatewayPidsOnPortSync(port);
   }
   const lsof = resolveLsofCommandSync();

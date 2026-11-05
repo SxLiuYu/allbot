@@ -1,9 +1,9 @@
-import { resolveMarkdownTableMode } from "kaijibot/plugin-sdk/config-runtime";
+import { resolveMarkdownTableMode } from "allbot/plugin-sdk/config-runtime";
 import {
   convertMarkdownTables,
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import type { ClawdbotConfig } from "../runtime-api.js";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";

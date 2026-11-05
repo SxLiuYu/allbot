@@ -35,8 +35,8 @@ type ExecFileError = Error & {
 };
 
 const TEST_SERVICE_HOME = "/home/test";
-const TEST_MANAGED_HOME = "/tmp/kaijibot-test-home";
-const GATEWAY_SERVICE = "kaijibot-gateway.service";
+const TEST_MANAGED_HOME = "/tmp/allbot-test-home";
+const GATEWAY_SERVICE = "allbot-gateway.service";
 
 const createExecFileError = (
   message: string,
@@ -105,10 +105,10 @@ function mockReadGatewayServiceFile(
 }
 
 async function expectExecStartWithoutEnvironment(envFileLine: string) {
-  mockReadGatewayServiceFile(["[Service]", "ExecStart=/usr/bin/kaijibot gateway run", envFileLine]);
+  mockReadGatewayServiceFile(["[Service]", "ExecStart=/usr/bin/allbot gateway run", envFileLine]);
 
   const command = await readSystemdServiceExecStart({ HOME: TEST_SERVICE_HOME });
-  expect(command?.programArguments).toEqual(["/usr/bin/kaijibot", "gateway", "run"]);
+  expect(command?.programArguments).toEqual(["/usr/bin/allbot", "gateway", "run"]);
   expect(command?.environment).toBeUndefined();
 }
 
@@ -226,7 +226,7 @@ describe("isSystemdServiceEnabled", () => {
     err.code = "ENOENT";
     vi.spyOn(fs, "access").mockRejectedValueOnce(err);
 
-    const result = await isSystemdServiceEnabled({ env: { HOME: "/tmp/kaijibot-test-home" } });
+    const result = await isSystemdServiceEnabled({ env: { HOME: "/tmp/allbot-test-home" } });
 
     expect(result).toBe(false);
     expect(execFileMock).not.toHaveBeenCalled();
@@ -330,7 +330,7 @@ describe("isSystemdServiceEnabled", () => {
     vi.spyOn(fs, "access").mockResolvedValue(undefined);
     execFileMock
       .mockImplementationOnce((_cmd, args, _opts, cb) => {
-        expect(args).toEqual(["--user", "is-enabled", "kaijibot-gateway.service"]);
+        expect(args).toEqual(["--user", "is-enabled", "allbot-gateway.service"]);
         const err = new Error("Failed to connect to bus") as Error & { code?: number };
         err.code = 1;
         cb(err, "", "Failed to connect to bus");
@@ -338,13 +338,13 @@ describe("isSystemdServiceEnabled", () => {
       .mockImplementationOnce((_cmd, args, _opts, cb) => {
         expect(args[0]).toBe("--machine");
         expect(String(args[1])).toMatch(/^[^@]+@$/);
-        expect(args.slice(2)).toEqual(["--user", "is-enabled", "kaijibot-gateway.service"]);
+        expect(args.slice(2)).toEqual(["--user", "is-enabled", "allbot-gateway.service"]);
         const err = new Error("permission denied") as Error & { code?: number };
         err.code = 1;
         cb(err, "", "permission denied");
       });
     await expect(
-      isSystemdServiceEnabled({ env: { HOME: "/tmp/kaijibot-test-home" } }),
+      isSystemdServiceEnabled({ env: { HOME: "/tmp/allbot-test-home" } }),
     ).rejects.toThrow("systemctl is-enabled unavailable: permission denied");
   });
 
@@ -354,12 +354,12 @@ describe("isSystemdServiceEnabled", () => {
       // On Ubuntu 24.04, `systemctl --user is-enabled <unit>` exits with
       // code 4 and prints "not-found" to stdout when the unit doesn't exist.
       const err = new Error(
-        "Command failed: systemctl --user is-enabled kaijibot-gateway.service",
+        "Command failed: systemctl --user is-enabled allbot-gateway.service",
       ) as Error & { code?: number };
       err.code = 4;
       cb(err, "not-found\n", "");
     });
-    const result = await isSystemdServiceEnabled({ env: { HOME: "/tmp/kaijibot-test-home" } });
+    const result = await isSystemdServiceEnabled({ env: { HOME: "/tmp/allbot-test-home" } });
     expect(result).toBe(false);
   });
 });
@@ -368,7 +368,7 @@ describe("isNonFatalSystemdInstallProbeError", () => {
   it("matches wrapper-only WSL install probe failures", () => {
     expect(
       isNonFatalSystemdInstallProbeError(
-        new Error("Command failed: systemctl --user is-enabled kaijibot-gateway.service"),
+        new Error("Command failed: systemctl --user is-enabled allbot-gateway.service"),
       ),
     ).toBe(true);
   });
@@ -426,37 +426,37 @@ describe("systemd runtime parsing", () => {
 describe("resolveSystemdUserUnitPath", () => {
   it.each([
     {
-      name: "uses default service name when KAIJIBOT_PROFILE is unset",
+      name: "uses default service name when ALLBOT_PROFILE is unset",
       env: { HOME: "/home/test" },
-      expected: "/home/test/.config/systemd/user/kaijibot-gateway.service",
+      expected: "/home/test/.config/systemd/user/allbot-gateway.service",
     },
     {
-      name: "uses profile-specific service name when KAIJIBOT_PROFILE is set to a custom value",
-      env: { HOME: "/home/test", KAIJIBOT_PROFILE: "jbphoenix" },
-      expected: "/home/test/.config/systemd/user/kaijibot-gateway-jbphoenix.service",
+      name: "uses profile-specific service name when ALLBOT_PROFILE is set to a custom value",
+      env: { HOME: "/home/test", ALLBOT_PROFILE: "jbphoenix" },
+      expected: "/home/test/.config/systemd/user/allbot-gateway-jbphoenix.service",
     },
     {
-      name: "prefers KAIJIBOT_SYSTEMD_UNIT over KAIJIBOT_PROFILE",
+      name: "prefers ALLBOT_SYSTEMD_UNIT over ALLBOT_PROFILE",
       env: {
         HOME: "/home/test",
-        KAIJIBOT_PROFILE: "jbphoenix",
-        KAIJIBOT_SYSTEMD_UNIT: "custom-unit",
+        ALLBOT_PROFILE: "jbphoenix",
+        ALLBOT_SYSTEMD_UNIT: "custom-unit",
       },
       expected: "/home/test/.config/systemd/user/custom-unit.service",
     },
     {
-      name: "handles KAIJIBOT_SYSTEMD_UNIT with .service suffix",
+      name: "handles ALLBOT_SYSTEMD_UNIT with .service suffix",
       env: {
         HOME: "/home/test",
-        KAIJIBOT_SYSTEMD_UNIT: "custom-unit.service",
+        ALLBOT_SYSTEMD_UNIT: "custom-unit.service",
       },
       expected: "/home/test/.config/systemd/user/custom-unit.service",
     },
     {
-      name: "trims whitespace from KAIJIBOT_SYSTEMD_UNIT",
+      name: "trims whitespace from ALLBOT_SYSTEMD_UNIT",
       env: {
         HOME: "/home/test",
-        KAIJIBOT_SYSTEMD_UNIT: "  custom-unit  ",
+        ALLBOT_SYSTEMD_UNIT: "  custom-unit  ",
       },
       expected: "/home/test/.config/systemd/user/custom-unit.service",
     },
@@ -467,8 +467,8 @@ describe("resolveSystemdUserUnitPath", () => {
 
 describe("splitArgsPreservingQuotes", () => {
   it("splits on whitespace outside quotes", () => {
-    expect(splitArgsPreservingQuotes('/usr/bin/kaijibot gateway start --name "My Bot"')).toEqual([
-      "/usr/bin/kaijibot",
+    expect(splitArgsPreservingQuotes('/usr/bin/allbot gateway start --name "My Bot"')).toEqual([
+      "/usr/bin/allbot",
       "gateway",
       "start",
       "--name",
@@ -478,32 +478,32 @@ describe("splitArgsPreservingQuotes", () => {
 
   it("supports systemd-style backslash escaping", () => {
     expect(
-      splitArgsPreservingQuotes('kaijibot --name "My \\"Bot\\"" --foo bar', {
+      splitArgsPreservingQuotes('allbot --name "My \\"Bot\\"" --foo bar', {
         escapeMode: "backslash",
       }),
-    ).toEqual(["kaijibot", "--name", 'My "Bot"', "--foo", "bar"]);
+    ).toEqual(["allbot", "--name", 'My "Bot"', "--foo", "bar"]);
   });
 
   it("supports schtasks-style escaped quotes while preserving other backslashes", () => {
     expect(
-      splitArgsPreservingQuotes('kaijibot --path "C:\\\\Program Files\\\\KaijiBot"', {
+      splitArgsPreservingQuotes('allbot --path "C:\\\\Program Files\\\\AllBot"', {
         escapeMode: "backslash-quote-only",
       }),
-    ).toEqual(["kaijibot", "--path", "C:\\\\Program Files\\\\KaijiBot"]);
+    ).toEqual(["allbot", "--path", "C:\\\\Program Files\\\\AllBot"]);
 
     expect(
-      splitArgsPreservingQuotes('kaijibot --label "My \\"Quoted\\" Name"', {
+      splitArgsPreservingQuotes('allbot --label "My \\"Quoted\\" Name"', {
         escapeMode: "backslash-quote-only",
       }),
-    ).toEqual(["kaijibot", "--label", 'My "Quoted" Name']);
+    ).toEqual(["allbot", "--label", 'My "Quoted" Name']);
   });
 });
 
 describe("parseSystemdExecStart", () => {
   it("preserves quoted arguments", () => {
-    const execStart = '/usr/bin/kaijibot gateway start --name "My Bot"';
+    const execStart = '/usr/bin/allbot gateway start --name "My Bot"';
     expect(parseSystemdExecStart(execStart)).toEqual([
-      "/usr/bin/kaijibot",
+      "/usr/bin/allbot",
       "gateway",
       "start",
       "--name",
@@ -517,14 +517,14 @@ describe("readSystemdServiceExecStart", () => {
     vi.restoreAllMocks();
   });
 
-  it("loads KAIJIBOT_GATEWAY_TOKEN from EnvironmentFile", async () => {
+  it("loads ALLBOT_GATEWAY_TOKEN from EnvironmentFile", async () => {
     const readFileSpy = mockReadGatewayServiceFile(
-      ["[Service]", "ExecStart=/usr/bin/kaijibot gateway run", "EnvironmentFile=%h/.kaijibot/.env"],
-      { [`${TEST_SERVICE_HOME}/.kaijibot/.env`]: "KAIJIBOT_GATEWAY_TOKEN=env-file-token\n" },
+      ["[Service]", "ExecStart=/usr/bin/allbot gateway run", "EnvironmentFile=%h/.allbot/.env"],
+      { [`${TEST_SERVICE_HOME}/.allbot/.env`]: "ALLBOT_GATEWAY_TOKEN=env-file-token\n" },
     );
 
     const command = await readSystemdServiceExecStart({ HOME: TEST_SERVICE_HOME });
-    expect(command?.environment?.KAIJIBOT_GATEWAY_TOKEN).toBe("env-file-token");
+    expect(command?.environment?.ALLBOT_GATEWAY_TOKEN).toBe("env-file-token");
     expect(readFileSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -532,97 +532,97 @@ describe("readSystemdServiceExecStart", () => {
     mockReadGatewayServiceFile(
       [
         "[Service]",
-        "ExecStart=/usr/bin/kaijibot gateway run",
-        "EnvironmentFile=%h/.kaijibot/.env",
-        'Environment="KAIJIBOT_GATEWAY_TOKEN=inline-token"',
+        "ExecStart=/usr/bin/allbot gateway run",
+        "EnvironmentFile=%h/.allbot/.env",
+        'Environment="ALLBOT_GATEWAY_TOKEN=inline-token"',
       ],
-      { [`${TEST_SERVICE_HOME}/.kaijibot/.env`]: "KAIJIBOT_GATEWAY_TOKEN=env-file-token\n" },
+      { [`${TEST_SERVICE_HOME}/.allbot/.env`]: "ALLBOT_GATEWAY_TOKEN=env-file-token\n" },
     );
 
     const command = await readSystemdServiceExecStart({ HOME: TEST_SERVICE_HOME });
-    expect(command?.environment?.KAIJIBOT_GATEWAY_TOKEN).toBe("env-file-token");
-    expect(command?.environmentValueSources?.KAIJIBOT_GATEWAY_TOKEN).toBe("file");
+    expect(command?.environment?.ALLBOT_GATEWAY_TOKEN).toBe("env-file-token");
+    expect(command?.environmentValueSources?.ALLBOT_GATEWAY_TOKEN).toBe("file");
   });
 
   it("ignores missing optional EnvironmentFile entries", async () => {
-    await expectExecStartWithoutEnvironment("EnvironmentFile=-%h/.kaijibot/missing.env");
+    await expectExecStartWithoutEnvironment("EnvironmentFile=-%h/.allbot/missing.env");
   });
 
   it("keeps parsing when non-optional EnvironmentFile entries are missing", async () => {
-    await expectExecStartWithoutEnvironment("EnvironmentFile=%h/.kaijibot/missing.env");
+    await expectExecStartWithoutEnvironment("EnvironmentFile=%h/.allbot/missing.env");
   });
 
   it("supports multiple EnvironmentFile entries and quoted paths", async () => {
     vi.spyOn(fs, "readFile").mockImplementation(async (pathname) => {
       const pathValue = pathLikeToString(pathname);
-      if (pathValue.endsWith("/kaijibot-gateway.service")) {
+      if (pathValue.endsWith("/allbot-gateway.service")) {
         return [
           "[Service]",
-          "ExecStart=/usr/bin/kaijibot gateway run",
-          'EnvironmentFile=%h/.kaijibot/first.env "%h/.kaijibot/second env.env"',
+          "ExecStart=/usr/bin/allbot gateway run",
+          'EnvironmentFile=%h/.allbot/first.env "%h/.allbot/second env.env"',
         ].join("\n");
       }
-      if (pathValue === "/home/test/.kaijibot/first.env") {
-        return "KAIJIBOT_GATEWAY_TOKEN=first-token\n"; // pragma: allowlist secret
+      if (pathValue === "/home/test/.allbot/first.env") {
+        return "ALLBOT_GATEWAY_TOKEN=first-token\n"; // pragma: allowlist secret
       }
-      if (pathValue === "/home/test/.kaijibot/second env.env") {
-        return 'KAIJIBOT_GATEWAY_PASSWORD="second password"\n'; // pragma: allowlist secret
+      if (pathValue === "/home/test/.allbot/second env.env") {
+        return 'ALLBOT_GATEWAY_PASSWORD="second password"\n'; // pragma: allowlist secret
       }
       throw new Error(`unexpected readFile path: ${pathValue}`);
     });
 
     const command = await readSystemdServiceExecStart({ HOME: "/home/test" });
     expect(command?.environment).toEqual({
-      KAIJIBOT_GATEWAY_TOKEN: "first-token",
-      KAIJIBOT_GATEWAY_PASSWORD: "second password", // pragma: allowlist secret
+      ALLBOT_GATEWAY_TOKEN: "first-token",
+      ALLBOT_GATEWAY_PASSWORD: "second password", // pragma: allowlist secret
     });
   });
 
   it("resolves relative EnvironmentFile paths from the unit directory", async () => {
     vi.spyOn(fs, "readFile").mockImplementation(async (pathname) => {
       const pathValue = pathLikeToString(pathname);
-      if (pathValue.endsWith("/kaijibot-gateway.service")) {
+      if (pathValue.endsWith("/allbot-gateway.service")) {
         return [
           "[Service]",
-          "ExecStart=/usr/bin/kaijibot gateway run",
+          "ExecStart=/usr/bin/allbot gateway run",
           "EnvironmentFile=./gateway.env ./override.env",
         ].join("\n");
       }
       if (pathValue.endsWith("/.config/systemd/user/gateway.env")) {
         return [
-          "KAIJIBOT_GATEWAY_TOKEN=relative-token", // pragma: allowlist secret
-          "KAIJIBOT_GATEWAY_PASSWORD=relative-password", // pragma: allowlist secret
+          "ALLBOT_GATEWAY_TOKEN=relative-token", // pragma: allowlist secret
+          "ALLBOT_GATEWAY_PASSWORD=relative-password", // pragma: allowlist secret
         ].join("\n");
       }
       if (pathValue.endsWith("/.config/systemd/user/override.env")) {
-        return "KAIJIBOT_GATEWAY_TOKEN=override-token\n"; // pragma: allowlist secret
+        return "ALLBOT_GATEWAY_TOKEN=override-token\n"; // pragma: allowlist secret
       }
       throw new Error(`unexpected readFile path: ${pathValue}`);
     });
 
     const command = await readSystemdServiceExecStart({ HOME: "/home/test" });
     expect(command?.environment).toEqual({
-      KAIJIBOT_GATEWAY_TOKEN: "override-token",
-      KAIJIBOT_GATEWAY_PASSWORD: "relative-password", // pragma: allowlist secret
+      ALLBOT_GATEWAY_TOKEN: "override-token",
+      ALLBOT_GATEWAY_PASSWORD: "relative-password", // pragma: allowlist secret
     });
   });
 
   it("parses EnvironmentFile content with comments and quoted values", async () => {
     vi.spyOn(fs, "readFile").mockImplementation(async (pathname) => {
       const pathValue = pathLikeToString(pathname);
-      if (pathValue.endsWith("/kaijibot-gateway.service")) {
+      if (pathValue.endsWith("/allbot-gateway.service")) {
         return [
           "[Service]",
-          "ExecStart=/usr/bin/kaijibot gateway run",
-          "EnvironmentFile=%h/.kaijibot/gateway.env",
+          "ExecStart=/usr/bin/allbot gateway run",
+          "EnvironmentFile=%h/.allbot/gateway.env",
         ].join("\n");
       }
-      if (pathValue === "/home/test/.kaijibot/gateway.env") {
+      if (pathValue === "/home/test/.allbot/gateway.env") {
         return [
           "# comment",
           "; another comment",
-          'KAIJIBOT_GATEWAY_TOKEN="quoted token"', // pragma: allowlist secret
-          "KAIJIBOT_GATEWAY_PASSWORD=quoted-password", // pragma: allowlist secret
+          'ALLBOT_GATEWAY_TOKEN="quoted token"', // pragma: allowlist secret
+          "ALLBOT_GATEWAY_PASSWORD=quoted-password", // pragma: allowlist secret
         ].join("\n");
       }
       throw new Error(`unexpected readFile path: ${pathValue}`);
@@ -630,12 +630,12 @@ describe("readSystemdServiceExecStart", () => {
 
     const command = await readSystemdServiceExecStart({ HOME: "/home/test" });
     expect(command?.environment).toEqual({
-      KAIJIBOT_GATEWAY_TOKEN: "quoted token",
-      KAIJIBOT_GATEWAY_PASSWORD: "quoted-password", // pragma: allowlist secret
+      ALLBOT_GATEWAY_TOKEN: "quoted token",
+      ALLBOT_GATEWAY_PASSWORD: "quoted-password", // pragma: allowlist secret
     });
     expect(command?.environmentValueSources).toEqual({
-      KAIJIBOT_GATEWAY_TOKEN: "file",
-      KAIJIBOT_GATEWAY_PASSWORD: "file", // pragma: allowlist secret
+      ALLBOT_GATEWAY_TOKEN: "file",
+      ALLBOT_GATEWAY_PASSWORD: "file", // pragma: allowlist secret
     });
   });
 });
@@ -689,10 +689,10 @@ describe("systemd service control", () => {
     execFileMock
       .mockImplementationOnce((_cmd, _args, _opts, cb) => cb(null, "", ""))
       .mockImplementationOnce((_cmd, args, _opts, cb) => {
-        assertUserSystemctlArgs(args, "restart", "kaijibot-gateway-work.service");
+        assertUserSystemctlArgs(args, "restart", "allbot-gateway-work.service");
         cb(null, "", "");
       });
-    await assertRestartSuccess({ KAIJIBOT_PROFILE: "work" });
+    await assertRestartSuccess({ ALLBOT_PROFILE: "work" });
   });
 
   it("surfaces stop failures with systemctl detail", async () => {

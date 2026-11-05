@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateConfigObject } from "./config.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("signal groups schema", () => {
   it("accepts top-level Signal groups overrides", () => {
     const res = validateConfigObject({

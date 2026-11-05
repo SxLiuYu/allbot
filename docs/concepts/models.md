@@ -15,7 +15,7 @@ Quick provider overview + examples: [/concepts/model-providers](/concepts/model-
 
 ## How model selection works
 
-KaijiBot selects models in this order:
+AllBot selects models in this order:
 
 1. **Primary** model (`agents.defaults.model.primary` or `agents.defaults.model`).
 2. **Fallbacks** in `agents.defaults.model.fallbacks` (in order).
@@ -24,7 +24,7 @@ KaijiBot selects models in this order:
 
 Related:
 
-- `agents.defaults.models` is the allowlist/catalog of models KaijiBot can use (plus aliases).
+- `agents.defaults.models` is the allowlist/catalog of models AllBot can use (plus aliases).
 - `agents.defaults.imageModel` is used **only when** the primary model can’t accept images.
 - `agents.defaults.pdfModel` is used by the `pdf` tool. If omitted, the tool
   falls back to `agents.defaults.imageModel`, then the resolved session/default
@@ -45,7 +45,7 @@ Related:
 If you don’t want to hand-edit config, run onboarding:
 
 ```bash
-kaijibot onboard
+allbot onboard
 ```
 
 It can set up model + auth for common providers, including **OpenAI Code (Codex)
@@ -71,7 +71,7 @@ Provider configuration examples (including OpenCode) live in
 
 If `agents.defaults.models` is set, it becomes the **allowlist** for `/model` and for
 session overrides. When a user selects a model that isn’t in that allowlist,
-KaijiBot returns:
+AllBot returns:
 
 ```
 Model "provider/model" is not allowed. Use /model to list available models.
@@ -117,16 +117,16 @@ Notes:
 - `/model <#>` selects from that picker.
 - `/model` persists the new session selection immediately.
 - If the agent is idle, the next run uses the new model right away.
-- If a run is already active, KaijiBot marks a live switch as pending and only restarts into the new model at a clean retry point.
+- If a run is already active, AllBot marks a live switch as pending and only restarts into the new model at a clean retry point.
 - If tool activity or reply output has already started, the pending switch can stay queued until a later retry opportunity or the next user turn.
 - `/model status` is the detailed view (auth candidates and, when configured, provider endpoint `baseUrl` + `api` mode).
 - Model refs are parsed by splitting on the **first** `/`. Use `provider/model` when typing `/model <ref>`.
 - If the model ID itself contains `/` (OpenRouter-style), you must include the provider prefix (example: `/model openrouter/moonshotai/kimi-k2`).
-- If you omit the provider, KaijiBot resolves the input in this order:
+- If you omit the provider, AllBot resolves the input in this order:
   1. alias match
   2. unique configured-provider match for that exact unprefixed model id
   3. deprecated fallback to the configured default provider
-     If that provider no longer exposes the configured default model, KaijiBot
+     If that provider no longer exposes the configured default model, AllBot
      instead falls back to the first configured provider/model to avoid
      surfacing a stale removed-provider default.
 
@@ -135,27 +135,27 @@ Full command behavior/config: [Slash commands](/tools/slash-commands).
 ## CLI commands
 
 ```bash
-kaijibot models list
-kaijibot models status
-kaijibot models set <provider/model>
-kaijibot models set-image <provider/model>
+allbot models list
+allbot models status
+allbot models set <provider/model>
+allbot models set-image <provider/model>
 
-kaijibot models aliases list
-kaijibot models aliases add <alias> <provider/model>
-kaijibot models aliases remove <alias>
+allbot models aliases list
+allbot models aliases add <alias> <provider/model>
+allbot models aliases remove <alias>
 
-kaijibot models fallbacks list
-kaijibot models fallbacks add <provider/model>
-kaijibot models fallbacks remove <provider/model>
-kaijibot models fallbacks clear
+allbot models fallbacks list
+allbot models fallbacks add <provider/model>
+allbot models fallbacks remove <provider/model>
+allbot models fallbacks clear
 
-kaijibot models image-fallbacks list
-kaijibot models image-fallbacks add <provider/model>
-kaijibot models image-fallbacks remove <provider/model>
-kaijibot models image-fallbacks clear
+allbot models image-fallbacks list
+allbot models image-fallbacks add <provider/model>
+allbot models image-fallbacks remove <provider/model>
+allbot models image-fallbacks clear
 ```
 
-`kaijibot models` (no subcommand) is a shortcut for `models status`.
+`allbot models` (no subcommand) is a shortcut for `models status`.
 
 ### `models list`
 
@@ -193,12 +193,12 @@ Example (Claude CLI):
 
 ```bash
 claude auth login
-kaijibot models status
+allbot models status
 ```
 
 ## Scanning (OpenRouter free models)
 
-`kaijibot models scan` inspects OpenRouter’s **free model catalog** and can
+`allbot models scan` inspects OpenRouter’s **free model catalog** and can
 optionally probe models for tool and image support.
 
 Key flags:
@@ -234,7 +234,7 @@ mode, pass `--yes` to accept defaults.
 ## Models registry (`models.json`)
 
 Custom providers in `models.providers` are written into `models.json` under the
-agent directory (default `~/.kaijibot/agents/<agentId>/agent/models.json`). This file
+agent directory (default `~/.allbot/agents/<agentId>/agent/models.json`). This file
 is merged by default unless `models.mode` is set to `replace`.
 
 Merge mode precedence for matching provider IDs:
@@ -246,8 +246,8 @@ Merge mode precedence for matching provider IDs:
 - Empty or missing agent `apiKey`/`baseUrl` fall back to config `models.providers`.
 - Other provider fields are refreshed from config and normalized catalog data.
 
-Marker persistence is source-authoritative: KaijiBot writes markers from the active source config snapshot (pre-resolution), not from resolved runtime secret values.
-This applies whenever KaijiBot regenerates `models.json`, including command-driven paths like `kaijibot agent`.
+Marker persistence is source-authoritative: AllBot writes markers from the active source config snapshot (pre-resolution), not from resolved runtime secret values.
+This applies whenever AllBot regenerates `models.json`, including command-driven paths like `allbot agent`.
 
 ## Related
 

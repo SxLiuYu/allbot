@@ -4,7 +4,7 @@ import path from "node:path";
 import { Type } from "typebox";
 import { writeBase64ToFile } from "../../cli/nodes-camera.js";
 import { canvasSnapshotTempPath, parseCanvasSnapshotPayload } from "../../cli/nodes-canvas.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { logVerbose, shouldLogVerbose } from "../../globals.js";
 import { isInboundPathAllowed } from "../../media/inbound-path-policy.js";
 import { getDefaultMediaLocalRoots } from "../../media/local-roots.js";
@@ -78,7 +78,7 @@ const CanvasToolSchema = Type.Object({
   jsonlPath: Type.Optional(Type.String()),
 });
 
-export function createCanvasTool(options?: { config?: KaijiBotConfig }): AnyAgentTool {
+export function createCanvasTool(options?: { config?: AllBotConfig }): AnyAgentTool {
   const imageSanitization = resolveImageSanitizationLimits(options?.config);
   return {
     label: "Canvas",

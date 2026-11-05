@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { getActivePluginRegistry, setActivePluginRegistry } from "../plugins/runtime.js";
 import { createOutboundTestPlugin, createTestRegistry } from "../test-utils/channel-plugins.js";
 import { onHeartbeatEvent } from "./heartbeat-events.js";
@@ -72,7 +72,7 @@ describe("heartbeat degeneration guard (insight relay)", () => {
           },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = await seedMainSessionStore(storePath, cfg, {
         lastChannel: "telegram",
@@ -140,7 +140,7 @@ describe("heartbeat degeneration guard (insight relay)", () => {
           },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = await seedMainSessionStore(storePath, cfg, {
         lastChannel: "telegram",

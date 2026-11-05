@@ -1,28 +1,28 @@
 ---
-summary: "Move (migrate) an KaijiBot install from one machine to another"
+summary: "Move (migrate) an AllBot install from one machine to another"
 read_when:
-  - You are moving KaijiBot to a new laptop/server
+  - You are moving AllBot to a new laptop/server
   - You want to preserve sessions, auth, and channel logins (WhatsApp, etc.)
 title: "Migration Guide"
 ---
 
-# Migrating KaijiBot to a New Machine
+# Migrating AllBot to a New Machine
 
-This guide moves an KaijiBot gateway to a new machine without redoing onboarding.
+This guide moves an AllBot gateway to a new machine without redoing onboarding.
 
 ## What Gets Migrated
 
-When you copy the **state directory** (`~/.kaijibot/` by default) and your **workspace**, you preserve:
+When you copy the **state directory** (`~/.allbot/` by default) and your **workspace**, you preserve:
 
-- **Config** -- `kaijibot.json` and all gateway settings
+- **Config** -- `allbot.json` and all gateway settings
 - **Auth** -- per-agent `auth-profiles.json` (API keys + OAuth), plus any channel/provider state under `credentials/`
 - **Sessions** -- conversation history and agent state
 - **Channel state** -- WhatsApp login, Telegram session, etc.
 - **Workspace files** -- `MEMORY.md`, `USER.md`, skills, and prompts
 
 <Tip>
-Run `kaijibot status` on the old machine to confirm your state directory path.
-Custom profiles use `~/.kaijibot-<profile>/` or a path set via `KAIJIBOT_STATE_DIR`.
+Run `allbot status` on the old machine to confirm your state directory path.
+Custom profiles use `~/.allbot-<profile>/` or a path set via `ALLBOT_STATE_DIR`.
 </Tip>
 
 ## Migration Steps
@@ -32,18 +32,18 @@ Custom profiles use `~/.kaijibot-<profile>/` or a path set via `KAIJIBOT_STATE_D
     On the **old** machine, stop the gateway so files are not changing mid-copy, then archive:
 
     ```bash
-    kaijibot gateway stop
+    allbot gateway stop
     cd ~
-    tar -czf kaijibot-state.tgz .kaijibot
+    tar -czf allbot-state.tgz .allbot
     ```
 
-    If you use multiple profiles (e.g. `~/.kaijibot-work`), archive each separately.
+    If you use multiple profiles (e.g. `~/.allbot-work`), archive each separately.
 
   </Step>
 
-  <Step title="Install KaijiBot on the new machine">
+  <Step title="Install AllBot on the new machine">
     [Install](/install) the CLI (and Node if needed) on the new machine.
-    It is fine if onboarding creates a fresh `~/.kaijibot/` -- you will overwrite it next.
+    It is fine if onboarding creates a fresh `~/.allbot/` -- you will overwrite it next.
   </Step>
 
   <Step title="Copy state directory and workspace">
@@ -51,7 +51,7 @@ Custom profiles use `~/.kaijibot-<profile>/` or a path set via `KAIJIBOT_STATE_D
 
     ```bash
     cd ~
-    tar -xzf kaijibot-state.tgz
+    tar -xzf allbot-state.tgz
     ```
 
     Ensure hidden directories were included and file ownership matches the user that will run the gateway.
@@ -62,9 +62,9 @@ Custom profiles use `~/.kaijibot-<profile>/` or a path set via `KAIJIBOT_STATE_D
     On the new machine, run [Doctor](/gateway/doctor) to apply config migrations and repair services:
 
     ```bash
-    kaijibot doctor
-    kaijibot gateway restart
-    kaijibot status
+    allbot doctor
+    allbot gateway restart
+    allbot status
     ```
 
   </Step>
@@ -74,12 +74,12 @@ Custom profiles use `~/.kaijibot-<profile>/` or a path set via `KAIJIBOT_STATE_D
 
 <AccordionGroup>
   <Accordion title="Profile or state-dir mismatch">
-    If the old gateway used `--profile` or `KAIJIBOT_STATE_DIR` and the new one does not,
+    If the old gateway used `--profile` or `ALLBOT_STATE_DIR` and the new one does not,
     channels will appear logged out and sessions will be empty.
-    Launch the gateway with the **same** profile or state-dir you migrated, then rerun `kaijibot doctor`.
+    Launch the gateway with the **same** profile or state-dir you migrated, then rerun `allbot doctor`.
   </Accordion>
 
-  <Accordion title="Copying only kaijibot.json">
+  <Accordion title="Copying only allbot.json">
     The config file alone is not enough. Model auth profiles live under
     `agents/<agentId>/agent/auth-profiles.json`, and channel/provider state still
     lives under `credentials/`. Always migrate the **entire** state directory.
@@ -106,7 +106,7 @@ Custom profiles use `~/.kaijibot-<profile>/` or a path set via `KAIJIBOT_STATE_D
 
 On the new machine, confirm:
 
-- [ ] `kaijibot status` shows the gateway running
+- [ ] `allbot status` shows the gateway running
 - [ ] Channels are still connected (no re-pairing needed)
 - [ ] The dashboard opens and shows existing sessions
 - [ ] Workspace files (memory, configs) are present

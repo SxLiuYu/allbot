@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { isValidEnvSecretRefId, type SecretRef } from "../config/types.secrets.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { encodeJsonPointerToken } from "../secrets/json-pointer.js";
@@ -52,7 +52,7 @@ function resolveDefaultFilePointerId(provider: string): string {
 }
 
 export function resolveRefFallbackInput(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   provider: string;
   preferredEnvVar?: string;
   env?: NodeJS.ProcessEnv;
@@ -84,7 +84,7 @@ export function resolveRefFallbackInput(params: {
 
 async function promptEnvSecretRefForSetup(params: {
   provider: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   defaultEnvVar: string;
   copy?: SecretRefSetupPromptCopy;
@@ -133,7 +133,7 @@ async function promptEnvSecretRefForSetup(params: {
   };
   await params.prompter.note(
     params.copy?.envValidatedMessage?.(envVar) ??
-      `Validated environment variable ${envVar}. KaijiBot will store a reference, not the key value.`,
+      `Validated environment variable ${envVar}. AllBot will store a reference, not the key value.`,
     "Reference validated",
   );
   return { ref, resolvedValue };
@@ -141,7 +141,7 @@ async function promptEnvSecretRefForSetup(params: {
 
 async function promptProviderSecretRefForSetup(params: {
   provider: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   defaultFilePointer: string;
   copy?: SecretRefSetupPromptCopy;
@@ -236,7 +236,7 @@ async function promptProviderSecretRefForSetup(params: {
     });
     await params.prompter.note(
       params.copy?.providerValidatedMessage?.(selectedProvider, id, providerEntry.source) ??
-        `Validated ${providerEntry.source} reference ${selectedProvider}:${id}. KaijiBot will store a reference, not the key value.`,
+        `Validated ${providerEntry.source} reference ${selectedProvider}:${id}. AllBot will store a reference, not the key value.`,
       "Reference validated",
     );
     return { ref, resolvedValue };
@@ -255,7 +255,7 @@ async function promptProviderSecretRefForSetup(params: {
 
 export async function promptSecretRefForSetup(params: {
   provider: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   preferredEnvVar?: string;
   copy?: SecretRefSetupPromptCopy;

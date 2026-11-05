@@ -144,10 +144,10 @@ describe("registerOnboardCommand", () => {
   });
 
   it("forwards --gateway-token-ref-env", async () => {
-    await runCli(["onboard", "--gateway-token-ref-env", "KAIJIBOT_GATEWAY_TOKEN"]);
+    await runCli(["onboard", "--gateway-token-ref-env", "ALLBOT_GATEWAY_TOKEN"]);
     expect(setupWizardCommandMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        gatewayTokenRefEnv: "KAIJIBOT_GATEWAY_TOKEN",
+        gatewayTokenRefEnv: "ALLBOT_GATEWAY_TOKEN",
       }),
       runtime,
     );

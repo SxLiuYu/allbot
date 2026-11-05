@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { extensionForMime } from "kaijibot/plugin-sdk/media-mime";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import { extensionForMime } from "allbot/plugin-sdk/media-mime";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   createProviderOperationDeadline,
@@ -12,13 +12,13 @@ import {
   resolveProviderOperationTimeoutMs,
   resolveProviderHttpRequestConfig,
   type ProviderOperationTimeoutMs,
-} from "kaijibot/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import type {
   GeneratedVideoAsset,
   VideoGenerationProvider,
   VideoGenerationRequest,
-} from "kaijibot/plugin-sdk/video-generation";
+} from "allbot/plugin-sdk/video-generation";
 import { TOGETHER_BASE_URL } from "./models.js";
 
 const DEFAULT_TOGETHER_VIDEO_MODEL = "Wan-AI/Wan2.2-T2V-A14B";

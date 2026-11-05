@@ -14,13 +14,13 @@ import type {
   ChannelStatusIssue as ContractChannelStatusIssue,
   ChannelThreadingContext as ContractChannelThreadingContext,
   ChannelThreadingToolContext as ContractChannelThreadingToolContext,
-} from "kaijibot/plugin-sdk/channel-contract";
+} from "allbot/plugin-sdk/channel-contract";
 import type {
   ChannelMessageActionContext as CoreChannelMessageActionContext,
-  KaijiBotPluginApi as CoreKaijiBotPluginApi,
+  AllBotPluginApi as CoreAllBotPluginApi,
   PluginRuntime as CorePluginRuntime,
-} from "kaijibot/plugin-sdk/core";
-import * as providerEntrySdk from "kaijibot/plugin-sdk/provider-entry";
+} from "allbot/plugin-sdk/core";
+import * as providerEntrySdk from "allbot/plugin-sdk/provider-entry";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { ChannelMessageActionContext } from "../../channels/plugins/types.js";
 import type {
@@ -38,12 +38,12 @@ import type {
 } from "../../channels/plugins/types.js";
 import type {
   ChannelMessageActionContext as SharedChannelMessageActionContext,
-  KaijiBotPluginApi as SharedKaijiBotPluginApi,
+  AllBotPluginApi as SharedAllBotPluginApi,
   PluginRuntime as SharedPluginRuntime,
 } from "../../plugin-sdk/channel-plugin-common.js";
 import { pluginSdkSubpaths } from "../../plugin-sdk/entrypoints.js";
 import type { PluginRuntime } from "../runtime/types.js";
-import type { KaijiBotPluginApi } from "../types.js";
+import type { AllBotPluginApi } from "../types.js";
 
 const SRC_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const REPO_ROOT = resolve(SRC_ROOT, "..");
@@ -420,7 +420,7 @@ describe("plugin-sdk subpath exports", () => {
         resolve(REPO_ROOT, "extensions"),
         resolve(REPO_ROOT, "test"),
       ],
-      pattern: /kaijibot\/plugin-sdk\/channel-runtime(?=["'])/u,
+      pattern: /allbot\/plugin-sdk\/channel-runtime(?=["'])/u,
       exclude: ["src/plugins/sdk-alias.test.ts"],
     });
     expect(matches).toEqual([]);
@@ -852,36 +852,36 @@ describe("plugin-sdk subpath exports", () => {
     expectTypeOf<ContractChannelStatusIssue>().toMatchTypeOf<ChannelStatusIssue>();
     expectTypeOf<ContractChannelThreadingContext>().toMatchTypeOf<ChannelThreadingContext>();
     expectTypeOf<ContractChannelThreadingToolContext>().toMatchTypeOf<ChannelThreadingToolContext>();
-    expectTypeOf<CoreKaijiBotPluginApi>().toMatchTypeOf<KaijiBotPluginApi>();
+    expectTypeOf<CoreAllBotPluginApi>().toMatchTypeOf<AllBotPluginApi>();
     expectTypeOf<CorePluginRuntime>().toMatchTypeOf<PluginRuntime>();
     expectTypeOf<CoreChannelMessageActionContext>().toMatchTypeOf<ChannelMessageActionContext>();
-    expectTypeOf<CoreKaijiBotPluginApi>().toMatchTypeOf<SharedKaijiBotPluginApi>();
+    expectTypeOf<CoreAllBotPluginApi>().toMatchTypeOf<SharedAllBotPluginApi>();
     expectTypeOf<CorePluginRuntime>().toMatchTypeOf<SharedPluginRuntime>();
     expectTypeOf<CoreChannelMessageActionContext>().toMatchTypeOf<SharedChannelMessageActionContext>();
   });
 
   it("keeps runtime entry subpaths importable", async () => {
-    const coreSdk = await importResolvedPluginSdkSubpath("kaijibot/plugin-sdk/core");
+    const coreSdk = await importResolvedPluginSdkSubpath("allbot/plugin-sdk/core");
     const channelActionsSdk = await importResolvedPluginSdkSubpath(
-      "kaijibot/plugin-sdk/channel-actions",
+      "allbot/plugin-sdk/channel-actions",
     );
     const globalSingletonSdk = await importResolvedPluginSdkSubpath(
-      "kaijibot/plugin-sdk/global-singleton",
+      "allbot/plugin-sdk/global-singleton",
     );
-    const textRuntimeSdk = await importResolvedPluginSdkSubpath("kaijibot/plugin-sdk/text-runtime");
-    const pluginEntrySdk = await importResolvedPluginSdkSubpath("kaijibot/plugin-sdk/plugin-entry");
+    const textRuntimeSdk = await importResolvedPluginSdkSubpath("allbot/plugin-sdk/text-runtime");
+    const pluginEntrySdk = await importResolvedPluginSdkSubpath("allbot/plugin-sdk/plugin-entry");
     const channelLifecycleSdk = await importResolvedPluginSdkSubpath(
-      "kaijibot/plugin-sdk/channel-lifecycle",
+      "allbot/plugin-sdk/channel-lifecycle",
     );
     const channelPairingSdk = await importResolvedPluginSdkSubpath(
-      "kaijibot/plugin-sdk/channel-pairing",
+      "allbot/plugin-sdk/channel-pairing",
     );
     const channelReplyPipelineSdk = await importResolvedPluginSdkSubpath(
-      "kaijibot/plugin-sdk/channel-reply-pipeline",
+      "allbot/plugin-sdk/channel-reply-pipeline",
     );
     const representativeModules = [];
     for (const id of representativeRuntimeSmokeSubpaths) {
-      representativeModules.push(await importResolvedPluginSdkSubpath(`kaijibot/plugin-sdk/${id}`));
+      representativeModules.push(await importResolvedPluginSdkSubpath(`allbot/plugin-sdk/${id}`));
     }
 
     expect(coreSdk.definePluginEntry).toBe(pluginEntrySdk.definePluginEntry);

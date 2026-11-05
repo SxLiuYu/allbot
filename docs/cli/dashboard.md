@@ -1,18 +1,18 @@
 ---
-summary: "CLI reference for `kaijibot dashboard` (open the Control UI)"
+summary: "CLI reference for `allbot dashboard` (open the Control UI)"
 read_when:
   - You want to open the Control UI with your current token
   - You want to print the URL without launching a browser
 title: "dashboard"
 ---
 
-# `kaijibot dashboard`
+# `allbot dashboard`
 
 Open the Control UI using your current auth.
 
 ```bash
-kaijibot dashboard
-kaijibot dashboard --no-open
+allbot dashboard
+allbot dashboard --no-open
 ```
 
 Notes:

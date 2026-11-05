@@ -42,15 +42,15 @@ type FeishuLifecycleReplyDispatcher = {
 };
 
 export function setFeishuLifecycleStateDir(prefix: string) {
-  process.env.KAIJIBOT_STATE_DIR = `/tmp/${prefix}-${randomUUID()}`;
+  process.env.ALLBOT_STATE_DIR = `/tmp/${prefix}-${randomUUID()}`;
 }
 
 export function restoreFeishuLifecycleStateDir(originalStateDir: string | undefined) {
   if (originalStateDir === undefined) {
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_STATE_DIR;
     return;
   }
-  process.env.KAIJIBOT_STATE_DIR = originalStateDir;
+  process.env.ALLBOT_STATE_DIR = originalStateDir;
 }
 
 export const FEISHU_PREFETCHED_BOT_OPEN_ID_SOURCE = {

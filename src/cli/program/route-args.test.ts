@@ -14,7 +14,7 @@ import {
 describe("route-args", () => {
   it("parses health and status route args", () => {
     expect(
-      parseHealthRouteArgs(["node", "kaijibot", "health", "--json", "--timeout", "5000"]),
+      parseHealthRouteArgs(["node", "allbot", "health", "--json", "--timeout", "5000"]),
     ).toEqual({
       json: true,
       verbose: false,
@@ -23,7 +23,7 @@ describe("route-args", () => {
     expect(
       parseStatusRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "status",
         "--json",
         "--deep",
@@ -40,14 +40,14 @@ describe("route-args", () => {
       verbose: false,
       timeoutMs: 5000,
     });
-    expect(parseStatusRouteArgs(["node", "kaijibot", "status", "--timeout"])).toBeNull();
+    expect(parseStatusRouteArgs(["node", "allbot", "status", "--timeout"])).toBeNull();
   });
 
   it("parses gateway status route args and rejects probe-only ssh flags", () => {
     expect(
       parseGatewayStatusRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "gateway",
         "status",
         "--url",
@@ -75,10 +75,10 @@ describe("route-args", () => {
       json: true,
     });
     expect(
-      parseGatewayStatusRouteArgs(["node", "kaijibot", "gateway", "status", "--ssh", "host"]),
+      parseGatewayStatusRouteArgs(["node", "allbot", "gateway", "status", "--ssh", "host"]),
     ).toBeNull();
     expect(
-      parseGatewayStatusRouteArgs(["node", "kaijibot", "gateway", "status", "--ssh-auto"]),
+      parseGatewayStatusRouteArgs(["node", "allbot", "gateway", "status", "--ssh-auto"]),
     ).toBeNull();
   });
 
@@ -86,7 +86,7 @@ describe("route-args", () => {
     expect(
       parseSessionsRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "sessions",
         "--json",
         "--all-agents",
@@ -104,9 +104,9 @@ describe("route-args", () => {
       store: "sqlite",
       active: "true",
     });
-    expect(parseSessionsRouteArgs(["node", "kaijibot", "sessions", "--agent"])).toBeNull();
+    expect(parseSessionsRouteArgs(["node", "allbot", "sessions", "--agent"])).toBeNull();
     expect(
-      parseAgentsListRouteArgs(["node", "kaijibot", "agents", "list", "--json", "--bindings"]),
+      parseAgentsListRouteArgs(["node", "allbot", "agents", "list", "--json", "--bindings"]),
     ).toEqual({
       json: true,
       bindings: true,
@@ -117,7 +117,7 @@ describe("route-args", () => {
     expect(
       parseConfigGetRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "--log-level",
         "debug",
         "config",
@@ -132,7 +132,7 @@ describe("route-args", () => {
     expect(
       parseConfigUnsetRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "config",
         "unset",
         "--profile",
@@ -142,14 +142,14 @@ describe("route-args", () => {
     ).toEqual({
       path: "update.channel",
     });
-    expect(parseConfigGetRouteArgs(["node", "kaijibot", "config", "get", "--json"])).toBeNull();
+    expect(parseConfigGetRouteArgs(["node", "allbot", "config", "get", "--json"])).toBeNull();
   });
 
   it("parses models list and models status route args", () => {
     expect(
       parseModelsListRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "models",
         "list",
         "--provider",
@@ -169,7 +169,7 @@ describe("route-args", () => {
     expect(
       parseModelsStatusRouteArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "models",
         "status",
         "--probe-provider",
@@ -204,7 +204,7 @@ describe("route-args", () => {
       probe: true,
     });
     expect(
-      parseModelsStatusRouteArgs(["node", "kaijibot", "models", "status", "--probe-profile"]),
+      parseModelsStatusRouteArgs(["node", "allbot", "models", "status", "--probe-profile"]),
     ).toBeNull();
   });
 });

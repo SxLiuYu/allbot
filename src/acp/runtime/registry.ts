@@ -13,7 +13,7 @@ type AcpRuntimeRegistryGlobalState = {
   backendsById: Map<string, AcpRuntimeBackend>;
 };
 
-const ACP_RUNTIME_REGISTRY_STATE_KEY = Symbol.for("kaijibot.acpRuntimeRegistryState");
+const ACP_RUNTIME_REGISTRY_STATE_KEY = Symbol.for("allbot.acpRuntimeRegistryState");
 
 function resolveAcpRuntimeRegistryGlobalState(): AcpRuntimeRegistryGlobalState {
   return resolveGlobalSingleton<AcpRuntimeRegistryGlobalState>(

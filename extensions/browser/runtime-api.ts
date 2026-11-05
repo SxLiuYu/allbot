@@ -6,7 +6,7 @@ export { handleBrowserGatewayRequest } from "./src/gateway/browser-request.js";
 export { browserHandlers } from "./src/gateway/browser-request.js";
 export {
   definePluginEntry,
-  type KaijiBotPluginApi,
-  type KaijiBotPluginToolContext,
-  type KaijiBotPluginToolFactory,
-} from "kaijibot/plugin-sdk/plugin-entry";
+  type AllBotPluginApi,
+  type AllBotPluginToolContext,
+  type AllBotPluginToolFactory,
+} from "allbot/plugin-sdk/plugin-entry";

@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   resolveChannelPluginIds,
   resolveConfiguredChannelPluginIds,
 } from "../channel-plugin-ids.js";
-import { loadKaijiBotPlugins } from "../loader.js";
+import { loadAllBotPlugins } from "../loader.js";
 import { getActivePluginRegistry } from "../runtime.js";
 import { buildPluginRuntimeLoadOptions, resolvePluginRuntimeLoadContext } from "./load-context.js";
 
@@ -54,8 +54,8 @@ function activeRegistrySatisfiesScope(
 
 export function ensurePluginRegistryLoaded(options?: {
   scope?: PluginRegistryScope;
-  config?: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config?: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   onlyPluginIds?: string[];
 }): void {
@@ -96,7 +96,7 @@ export function ensurePluginRegistryLoaded(options?: {
     }
     return;
   }
-  loadKaijiBotPlugins(
+  loadAllBotPlugins(
     buildPluginRuntimeLoadOptions(context, {
       throwOnLoadError: true,
       ...(expectedChannelPluginIds.length > 0 ? { onlyPluginIds: expectedChannelPluginIds } : {}),

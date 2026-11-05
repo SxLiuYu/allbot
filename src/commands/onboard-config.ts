@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { DmScope } from "../config/types.base.js";
 import type { ToolProfileId } from "../config/types.tools.js";
 
@@ -6,9 +6,9 @@ export const ONBOARDING_DEFAULT_DM_SCOPE: DmScope = "per-channel-peer";
 export const ONBOARDING_DEFAULT_TOOLS_PROFILE: ToolProfileId = "full";
 
 export function applyLocalSetupWorkspaceConfig(
-  baseConfig: KaijiBotConfig,
+  baseConfig: AllBotConfig,
   workspaceDir: string,
-): KaijiBotConfig {
+): AllBotConfig {
   return {
     ...baseConfig,
     agents: {

@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/tavily",
+  "name": "@allbot/tavily",
   "version": "2026.4.12",
   "private": true,
-  "description": "KaijiBot Tavily plugin",
+  "description": "AllBot Tavily plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

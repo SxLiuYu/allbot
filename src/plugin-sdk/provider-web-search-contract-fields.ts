@@ -7,7 +7,7 @@ import {
   setProviderWebSearchPluginConfigValue,
   setTopLevelCredentialValue,
 } from "../agents/tools/web-search-provider-config.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { WebSearchProviderPlugin } from "../plugins/types.js";
 
 export type WebSearchProviderContractCredential =
@@ -72,9 +72,9 @@ function createConfiguredCredentialFields(
   const field = configuredCredential.field ?? "apiKey";
 
   return {
-    getConfiguredCredentialValue: (config?: KaijiBotConfig) =>
+    getConfiguredCredentialValue: (config?: AllBotConfig) =>
       resolveProviderWebSearchPluginConfig(config, configuredCredential.pluginId)?.[field],
-    setConfiguredCredentialValue: (configTarget: KaijiBotConfig, value: unknown) => {
+    setConfiguredCredentialValue: (configTarget: AllBotConfig, value: unknown) => {
       setProviderWebSearchPluginConfigValue(
         configTarget,
         configuredCredential.pluginId,

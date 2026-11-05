@@ -1,8 +1,8 @@
 import {
   applyAgentDefaultModelPrimary,
   withAgentModelAliases,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 
 export const OPENCODE_GO_DEFAULT_MODEL_REF = "opencode-go/kimi-k2.5";
 
@@ -12,7 +12,7 @@ const OPENCODE_GO_ALIAS_DEFAULTS: Record<string, string> = {
   "opencode-go/minimax-m2.5": "MiniMax",
 };
 
-export function applyOpencodeGoProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpencodeGoProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return {
     ...cfg,
     agents: {
@@ -31,7 +31,7 @@ export function applyOpencodeGoProviderConfig(cfg: KaijiBotConfig): KaijiBotConf
   };
 }
 
-export function applyOpencodeGoConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpencodeGoConfig(cfg: AllBotConfig): AllBotConfig {
   return applyAgentDefaultModelPrimary(
     applyOpencodeGoProviderConfig(cfg),
     OPENCODE_GO_DEFAULT_MODEL_REF,

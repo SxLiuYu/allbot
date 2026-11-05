@@ -30,7 +30,7 @@ const originalPath = process.env.PATH;
 const originalPathExt = process.env.PATHEXT;
 
 beforeEach(async () => {
-  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-qmd-win-spawn-"));
+  tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-qmd-win-spawn-"));
   platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("win32");
 });
 

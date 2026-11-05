@@ -1,5 +1,5 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import type { MemorySyncProgressUpdate } from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import type { MemorySyncProgressUpdate } from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 type TargetedSyncProgress = {
   completed: number;

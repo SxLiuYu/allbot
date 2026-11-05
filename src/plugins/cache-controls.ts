@@ -4,17 +4,17 @@ export const DEFAULT_PLUGIN_DISCOVERY_CACHE_MS = 1000;
 export const DEFAULT_PLUGIN_MANIFEST_CACHE_MS = 1000;
 
 export function shouldUsePluginSnapshotCache(env: NodeJS.ProcessEnv): boolean {
-  if (normalizeOptionalString(env.KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE)) {
+  if (normalizeOptionalString(env.ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE)) {
     return false;
   }
-  if (normalizeOptionalString(env.KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE)) {
+  if (normalizeOptionalString(env.ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE)) {
     return false;
   }
-  const discoveryCacheMs = normalizeOptionalString(env.KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS);
+  const discoveryCacheMs = normalizeOptionalString(env.ALLBOT_PLUGIN_DISCOVERY_CACHE_MS);
   if (discoveryCacheMs === "0") {
     return false;
   }
-  const manifestCacheMs = normalizeOptionalString(env.KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS);
+  const manifestCacheMs = normalizeOptionalString(env.ALLBOT_PLUGIN_MANIFEST_CACHE_MS);
   if (manifestCacheMs === "0") {
     return false;
   }
@@ -38,11 +38,11 @@ export function resolvePluginCacheMs(rawValue: string | undefined, defaultMs: nu
 
 export function resolvePluginSnapshotCacheTtlMs(env: NodeJS.ProcessEnv): number {
   const discoveryCacheMs = resolvePluginCacheMs(
-    env.KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS,
+    env.ALLBOT_PLUGIN_DISCOVERY_CACHE_MS,
     DEFAULT_PLUGIN_DISCOVERY_CACHE_MS,
   );
   const manifestCacheMs = resolvePluginCacheMs(
-    env.KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS,
+    env.ALLBOT_PLUGIN_MANIFEST_CACHE_MS,
     DEFAULT_PLUGIN_MANIFEST_CACHE_MS,
   );
   return Math.min(discoveryCacheMs, manifestCacheMs);
@@ -50,14 +50,14 @@ export function resolvePluginSnapshotCacheTtlMs(env: NodeJS.ProcessEnv): number 
 
 export function buildPluginSnapshotCacheEnvKey(env: NodeJS.ProcessEnv): string {
   return JSON.stringify({
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: env.KAIJIBOT_BUNDLED_PLUGINS_DIR ?? "",
-    KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: env.KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE ?? "",
-    KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE: env.KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE ?? "",
-    KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS: env.KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS ?? "",
-    KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS: env.KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS ?? "",
-    KAIJIBOT_HOME: env.KAIJIBOT_HOME ?? "",
-    KAIJIBOT_STATE_DIR: env.KAIJIBOT_STATE_DIR ?? "",
-    KAIJIBOT_CONFIG_PATH: env.KAIJIBOT_CONFIG_PATH ?? "",
+    ALLBOT_BUNDLED_PLUGINS_DIR: env.ALLBOT_BUNDLED_PLUGINS_DIR ?? "",
+    ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: env.ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE ?? "",
+    ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE: env.ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE ?? "",
+    ALLBOT_PLUGIN_DISCOVERY_CACHE_MS: env.ALLBOT_PLUGIN_DISCOVERY_CACHE_MS ?? "",
+    ALLBOT_PLUGIN_MANIFEST_CACHE_MS: env.ALLBOT_PLUGIN_MANIFEST_CACHE_MS ?? "",
+    ALLBOT_HOME: env.ALLBOT_HOME ?? "",
+    ALLBOT_STATE_DIR: env.ALLBOT_STATE_DIR ?? "",
+    ALLBOT_CONFIG_PATH: env.ALLBOT_CONFIG_PATH ?? "",
     HOME: env.HOME ?? "",
     USERPROFILE: env.USERPROFILE ?? "",
     VITEST: env.VITEST ?? "",

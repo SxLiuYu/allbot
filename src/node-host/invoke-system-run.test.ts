@@ -32,26 +32,26 @@ describe("formatSystemRunAllowlistMissMessage", () => {
 });
 
 describe("handleSystemRunInvoke mac app exec host routing", () => {
-  let testKaijiBotHome = "";
-  let previousKaijiBotHome: string | undefined;
+  let testAllBotHome = "";
+  let previousAllBotHome: string | undefined;
 
   beforeEach(() => {
-    previousKaijiBotHome = process.env.KAIJIBOT_HOME;
-    testKaijiBotHome = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-node-host-home-"));
-    process.env.KAIJIBOT_HOME = testKaijiBotHome;
+    previousAllBotHome = process.env.ALLBOT_HOME;
+    testAllBotHome = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-node-host-home-"));
+    process.env.ALLBOT_HOME = testAllBotHome;
     clearRuntimeConfigSnapshot();
   });
 
   afterEach(() => {
     clearRuntimeConfigSnapshot();
-    if (previousKaijiBotHome === undefined) {
-      delete process.env.KAIJIBOT_HOME;
+    if (previousAllBotHome === undefined) {
+      delete process.env.ALLBOT_HOME;
     } else {
-      process.env.KAIJIBOT_HOME = previousKaijiBotHome;
+      process.env.ALLBOT_HOME = previousAllBotHome;
     }
-    if (testKaijiBotHome) {
-      fs.rmSync(testKaijiBotHome, { recursive: true, force: true });
-      testKaijiBotHome = "";
+    if (testAllBotHome) {
+      fs.rmSync(testAllBotHome, { recursive: true, force: true });
+      testAllBotHome = "";
     }
   });
 
@@ -238,17 +238,17 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
     approvals: Parameters<typeof saveExecApprovals>[0];
     run: (ctx: { tempHome: string }) => Promise<T>;
   }): Promise<T> {
-    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-exec-approvals-"));
-    const previousKaijiBotHome = process.env.KAIJIBOT_HOME;
-    process.env.KAIJIBOT_HOME = tempHome;
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-exec-approvals-"));
+    const previousAllBotHome = process.env.ALLBOT_HOME;
+    process.env.ALLBOT_HOME = tempHome;
     saveExecApprovals(params.approvals);
     try {
       return await params.run({ tempHome });
     } finally {
-      if (previousKaijiBotHome === undefined) {
-        delete process.env.KAIJIBOT_HOME;
+      if (previousAllBotHome === undefined) {
+        delete process.env.ALLBOT_HOME;
       } else {
-        process.env.KAIJIBOT_HOME = previousKaijiBotHome;
+        process.env.ALLBOT_HOME = previousAllBotHome;
       }
       fs.rmSync(tempHome, { recursive: true, force: true });
     }
@@ -282,7 +282,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
     runtime: "bun" | "deno" | "jiti" | "tsx";
     run: () => Promise<T>;
   }): Promise<T> {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `kaijibot-${params.runtime}-path-`));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), `allbot-${params.runtime}-path-`));
     const binDir = path.join(tmp, "bin");
     fs.mkdirSync(binDir, { recursive: true });
     const runtimePath =
@@ -522,7 +522,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
 
   for (const testCase of approvedEnvShellWrapperCases) {
     it.runIf(process.platform !== "win32")(testCase.name, async () => {
-      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approved-wrapper-"));
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approved-wrapper-"));
       const marker = path.join(tmp, "marker");
       const attackerScript = path.join(tmp, "sh");
       fs.writeFileSync(attackerScript, "#!/bin/sh\necho exploited > marker\n");
@@ -617,7 +617,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
     "pins PATH-token executable to canonical path for approval-based runs",
     async () => {
       await withPathTokenCommand({
-        tmpPrefix: "kaijibot-approval-path-pin-",
+        tmpPrefix: "allbot-approval-path-pin-",
         run: async ({ expected }) => {
           const { runCommand, sendInvokeResult } = await runSystemInvoke({
             preferMacAppExecHost: false,
@@ -641,7 +641,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
     "accepts prepared plans after PATH-token hardening rewrites argv",
     async () => {
       await withPathTokenCommand({
-        tmpPrefix: "kaijibot-prepare-run-path-pin-",
+        tmpPrefix: "allbot-prepare-run-path-pin-",
         run: async ({ expected }) => {
           const prepared = buildSystemRunApprovalPlan({
             command: ["poccmd", "hello"],
@@ -678,7 +678,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
       }));
       const sendInvokeResult = vi.fn(async () => {});
       await withPathTokenCommand({
-        tmpPrefix: "kaijibot-allowlist-path-pin-",
+        tmpPrefix: "allbot-allowlist-path-pin-",
         run: async ({ link, expected }) => {
           await withTempApprovalsHome({
             approvals: {
@@ -719,7 +719,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   it.runIf(process.platform !== "win32")(
     "denies approval-based execution when cwd is a symlink",
     async () => {
-      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-cwd-link-"));
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-cwd-link-"));
       const safeDir = path.join(tmp, "safe");
       const linkDir = path.join(tmp, "cwd-link");
       const script = path.join(safeDir, "run.sh");
@@ -747,7 +747,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   it.runIf(process.platform !== "win32")(
     "denies approval-based execution when cwd contains a symlink parent component",
     async () => {
-      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-cwd-parent-link-"));
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-cwd-parent-link-"));
       const safeRoot = path.join(tmp, "safe-root");
       const safeSub = path.join(safeRoot, "sub");
       const linkRoot = path.join(tmp, "approved-link");
@@ -771,7 +771,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   );
 
   it("uses canonical executable path for approval-based relative command execution", async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-cwd-real-"));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-cwd-real-"));
     const script = path.join(tmp, "run.sh");
     fs.writeFileSync(script, "#!/bin/sh\necho SAFE\n");
     fs.chmodSync(script, 0o755);
@@ -805,8 +805,8 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   });
 
   it("denies approval-based execution when cwd identity drifts before execution", async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-cwd-drift-"));
-    const fallback = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-cwd-drift-alt-"));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-cwd-drift-"));
+    const fallback = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-cwd-drift-alt-"));
     const script = path.join(tmp, "run.sh");
     fs.writeFileSync(script, "#!/bin/sh\necho SAFE\n");
     fs.chmodSync(script, 0o755);
@@ -845,7 +845,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   });
 
   it("denies approval-based execution when a script operand changes after approval", async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-script-drift-"));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-script-drift-"));
     const fixture = createMutableScriptOperandFixture(tmp);
     fs.writeFileSync(fixture.scriptPath, fixture.initialBody);
     if (process.platform !== "win32") {
@@ -884,7 +884,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   });
 
   it("keeps approved shell script execution working when the script is unchanged", async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-approval-script-stable-"));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-approval-script-stable-"));
     const fixture = createMutableScriptOperandFixture(tmp);
     fs.writeFileSync(fixture.scriptPath, fixture.initialBody);
     if (process.platform !== "win32") {
@@ -924,7 +924,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
         runtime,
         run: async () => {
           const tmp = fs.mkdtempSync(
-            path.join(os.tmpdir(), `kaijibot-approval-${runtime}-script-drift-`),
+            path.join(os.tmpdir(), `allbot-approval-${runtime}-script-drift-`),
           );
           const fixture = createRuntimeScriptOperandFixture({ tmp, runtime });
           fs.writeFileSync(fixture.scriptPath, fixture.initialBody);
@@ -967,7 +967,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
         runtime,
         run: async () => {
           const tmp = fs.mkdtempSync(
-            path.join(os.tmpdir(), `kaijibot-approval-${runtime}-script-stable-`),
+            path.join(os.tmpdir(), `allbot-approval-${runtime}-script-stable-`),
           );
           const fixture = createRuntimeScriptOperandFixture({ tmp, runtime });
           fs.writeFileSync(fixture.scriptPath, fixture.initialBody);
@@ -1007,7 +1007,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
       runtime: "tsx",
       run: async () => {
         const tmp = fs.mkdtempSync(
-          path.join(os.tmpdir(), "kaijibot-approval-tsx-missing-binding-"),
+          path.join(os.tmpdir(), "allbot-approval-tsx-missing-binding-"),
         );
         const fixture = createRuntimeScriptOperandFixture({ tmp, runtime: "tsx" });
         fs.writeFileSync(fixture.scriptPath, fixture.initialBody);
@@ -1047,7 +1047,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   });
 
   it("denies ./sh wrapper spoof in allowlist on-miss mode before execution", async () => {
-    const marker = path.join(os.tmpdir(), `kaijibot-wrapper-spoof-${process.pid}-${Date.now()}`);
+    const marker = path.join(os.tmpdir(), `allbot-wrapper-spoof-${process.pid}-${Date.now()}`);
     const runCommand = vi.fn(async () => {
       fs.writeFileSync(marker, "executed");
       return createLocalRunResult();
@@ -1113,7 +1113,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   });
 
   it("denies semicolon-chained shell payloads in allowlist mode without explicit approval", async () => {
-    const payloads = ["kaijibot status; id", "kaijibot status; cat /etc/passwd"];
+    const payloads = ["allbot status; id", "allbot status; cat /etc/passwd"];
     for (const payload of payloads) {
       const command =
         process.platform === "win32"
@@ -1371,7 +1371,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
         await withTempApprovalsHome({
           approvals: createAllowlistOnMissApprovals(),
           run: async () => {
-            const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-inline-eval-bin-"));
+            const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-inline-eval-bin-"));
             try {
               const executablePath = createTempExecutable({
                 dir: tempDir,
@@ -1413,7 +1413,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
       await withTempApprovalsHome({
         approvals: createAllowlistOnMissApprovals(),
         run: async () => {
-          const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-inline-eval-awk-"));
+          const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-inline-eval-awk-"));
           try {
             const executablePath = createTempExecutable({
               dir: tempDir,
@@ -1470,7 +1470,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
       await withTempApprovalsHome({
         approvals: createAllowlistOnMissApprovals(),
         run: async () => {
-          const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-inline-eval-make-"));
+          const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-inline-eval-make-"));
           try {
             const executablePath = createTempExecutable({
               dir: tempDir,
@@ -1516,7 +1516,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
   it.runIf(process.platform !== "win32")(
     "auto-runs allowlisted inner scripts through transport shell wrappers",
     async () => {
-      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-shell-wrapper-inner-"));
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-shell-wrapper-inner-"));
       try {
         const scriptsDir = path.join(tempDir, "scripts");
         fs.mkdirSync(scriptsDir, { recursive: true });
@@ -1557,7 +1557,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
 
   it("keeps cmd.exe transport wrappers approval-gated on Windows", async () => {
     const platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("win32");
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-cmd-wrapper-allow-"));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-cmd-wrapper-allow-"));
     try {
       const scriptPath = path.join(tempDir, "check_mail.cmd");
       fs.writeFileSync(scriptPath, "@echo off\r\necho ok\r\n");
@@ -1611,7 +1611,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
     },
   ])("$name", async ({ command }) => {
     const platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("win32");
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-env-cmd-wrapper-allow-"));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-env-cmd-wrapper-allow-"));
     try {
       const scriptPath = path.join(tempDir, "check_mail.cmd");
       fs.writeFileSync(scriptPath, "@echo off\r\necho ok\r\n");
@@ -1663,7 +1663,7 @@ describe("handleSystemRunInvoke mac app exec host routing", () => {
       return;
     }
 
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-shell-wrapper-allow-"));
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-shell-wrapper-allow-"));
     try {
       const prepared = buildSystemRunApprovalPlan({
         command: ["/bin/sh", "-lc", "cd ."],

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import { startGmailWatcher } from "./gmail-watcher.js";
 
@@ -9,11 +9,11 @@ export type GMailWatcherLog = {
 };
 
 export async function startGmailWatcherWithLogs(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   log: GMailWatcherLog;
   onSkipped?: () => void;
 }) {
-  if (isTruthyEnvValue(process.env.KAIJIBOT_SKIP_GMAIL_WATCHER)) {
+  if (isTruthyEnvValue(process.env.ALLBOT_SKIP_GMAIL_WATCHER)) {
     params.onSkipped?.();
     return;
   }

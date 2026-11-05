@@ -66,7 +66,7 @@ Use code_execution to calculate the 7-day moving average for these numbers: ...
 ```
 
 ```text
-Use x_search to find posts mentioning KaijiBot this week, then use code_execution to count them by day.
+Use x_search to find posts mentioning AllBot this week, then use code_execution to count them by day.
 ```
 
 ```text

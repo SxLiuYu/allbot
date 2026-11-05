@@ -10,7 +10,7 @@ import {
   getSkillsSnapshotVersion,
   shouldRefreshSnapshotForVersion,
 } from "../../agents/skills/refresh.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   resolveSessionFilePath,
   resolveSessionFilePathOptions,
@@ -52,7 +52,7 @@ async function persistSessionEntryUpdate(params: {
 }
 
 function emitCompactionSessionLifecycleHooks(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   storePath?: string;
   previousEntry: SessionEntry;
@@ -105,7 +105,7 @@ export async function ensureSkillSnapshot(params: {
   sessionId?: string;
   isFirstTurnInSession: boolean;
   workspaceDir: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   /** If provided, only load skills with these names (for per-channel skill filtering) */
   skillFilter?: string[];
 }): Promise<{
@@ -113,7 +113,7 @@ export async function ensureSkillSnapshot(params: {
   skillsSnapshot?: SessionEntry["skillsSnapshot"];
   systemSent: boolean;
 }> {
-  if (process.env.KAIJIBOT_TEST_FAST === "1") {
+  if (process.env.ALLBOT_TEST_FAST === "1") {
     // In fast unit-test runs we skip filesystem scanning, watchers, and session-store writes.
     // Dedicated skills tests cover snapshot generation behavior.
     return {
@@ -216,7 +216,7 @@ export async function incrementCompactionCount(params: {
   sessionStore?: Record<string, SessionEntry>;
   sessionKey?: string;
   storePath?: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   now?: number;
   amount?: number;
   /** Token count after compaction - if provided, updates session token counts */

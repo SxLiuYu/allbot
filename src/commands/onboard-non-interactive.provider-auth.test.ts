@@ -33,9 +33,9 @@ const readConfigFileSnapshotMock = vi.hoisted(() =>
       import("node:path"),
       import("node:crypto"),
     ]);
-    const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+    const configPath = process.env.ALLBOT_CONFIG_PATH;
     if (!configPath) {
-      throw new Error("KAIJIBOT_CONFIG_PATH must be set for provider auth onboarding tests");
+      throw new Error("ALLBOT_CONFIG_PATH must be set for provider auth onboarding tests");
     }
     let raw: string | null = null;
     try {
@@ -65,9 +65,9 @@ const replaceConfigFileMock = vi.hoisted(() =>
       import("node:fs/promises"),
       import("node:path"),
     ]);
-    const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+    const configPath = process.env.ALLBOT_CONFIG_PATH;
     if (!configPath) {
-      throw new Error("KAIJIBOT_CONFIG_PATH must be set for provider auth onboarding tests");
+      throw new Error("ALLBOT_CONFIG_PATH must be set for provider auth onboarding tests");
     }
     await fs.mkdir(path.dirname(configPath), { recursive: true });
     await fs.writeFile(configPath, `${JSON.stringify(params.nextConfig, null, 2)}\n`, "utf-8");
@@ -952,25 +952,25 @@ async function withOnboardEnv(
   run: (ctx: OnboardEnv) => Promise<void>,
 ): Promise<void> {
   const tempHome = await makeTempWorkspace(prefix);
-  const configPath = path.join(tempHome, "kaijibot.json");
+  const configPath = path.join(tempHome, "allbot.json");
   const runtime = createThrowingRuntime();
 
   try {
     await withEnvAsync(
       {
         HOME: tempHome,
-        KAIJIBOT_STATE_DIR: tempHome,
-        KAIJIBOT_CONFIG_PATH: configPath,
-        KAIJIBOT_SKIP_CHANNELS: "1",
-        KAIJIBOT_SKIP_GMAIL_WATCHER: "1",
-        KAIJIBOT_SKIP_CRON: "1",
-        KAIJIBOT_SKIP_CANVAS_HOST: "1",
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
-        KAIJIBOT_GATEWAY_PASSWORD: undefined,
+        ALLBOT_STATE_DIR: tempHome,
+        ALLBOT_CONFIG_PATH: configPath,
+        ALLBOT_SKIP_CHANNELS: "1",
+        ALLBOT_SKIP_GMAIL_WATCHER: "1",
+        ALLBOT_SKIP_CRON: "1",
+        ALLBOT_SKIP_CANVAS_HOST: "1",
+        ALLBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_PASSWORD: undefined,
         CUSTOM_API_KEY: undefined,
-        KAIJIBOT_DISABLE_CONFIG_CACHE: "1",
-        KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-        KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
+        ALLBOT_DISABLE_CONFIG_CACHE: "1",
+        ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+        ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
       },
       async () => {
         await run({ configPath, runtime });
@@ -1086,7 +1086,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores MiniMax API key in the global auth profile", async () => {
-    await withOnboardEnv("kaijibot-onboard-minimax-", async (env) => {
+    await withOnboardEnv("allbot-onboard-minimax-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "minimax-global-api",
         minimaxApiKey: "sk-minimax-test", // pragma: allowlist secret
@@ -1103,7 +1103,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("supports MiniMax CN API endpoint auth choice", async () => {
-    await withOnboardEnv("kaijibot-onboard-minimax-cn-", async (env) => {
+    await withOnboardEnv("allbot-onboard-minimax-cn-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "minimax-cn-api",
         minimaxApiKey: "sk-minimax-test", // pragma: allowlist secret
@@ -1125,7 +1125,7 @@ describe("onboard (non-interactive): provider auth", () => {
         [`${ZAI_GLOBAL_BASE_URL}/chat/completions::glm-5.1`]: 200,
       },
       async (fetchMock) =>
-        await withOnboardEnv("kaijibot-onboard-zai-", async (env) => {
+        await withOnboardEnv("allbot-onboard-zai-", async (env) => {
           const cfg = await runOnboardingAndReadConfig(env, {
             authChoice: "zai-api-key",
             zaiApiKey: "zai-test-key", // pragma: allowlist secret
@@ -1155,7 +1155,7 @@ describe("onboard (non-interactive): provider auth", () => {
         [`${ZAI_CODING_CN_BASE_URL}/chat/completions::glm-4.7`]: 200,
       },
       async (fetchMock) =>
-        await withOnboardEnv("kaijibot-onboard-zai-cn-", async (env) => {
+        await withOnboardEnv("allbot-onboard-zai-cn-", async (env) => {
           const cfg = await runOnboardingAndReadConfig(env, {
             authChoice: "zai-coding-cn",
             zaiApiKey: "zai-test-key", // pragma: allowlist secret
@@ -1188,7 +1188,7 @@ describe("onboard (non-interactive): provider auth", () => {
         [`${ZAI_CODING_GLOBAL_BASE_URL}/chat/completions::glm-5.1`]: 200,
       },
       async (fetchMock) =>
-        await withOnboardEnv("kaijibot-onboard-zai-coding-global-", async (env) => {
+        await withOnboardEnv("allbot-onboard-zai-coding-global-", async (env) => {
           const cfg = await runOnboardingAndReadConfig(env, {
             authChoice: "zai-coding-global",
             zaiApiKey: "zai-test-key", // pragma: allowlist secret
@@ -1212,7 +1212,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores xAI API key in the default auth profile", async () => {
-    await withOnboardEnv("kaijibot-onboard-xai-", async (env) => {
+    await withOnboardEnv("allbot-onboard-xai-", async (env) => {
       const rawKey = "xai-test-\r\nkey";
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "xai-api-key",
@@ -1226,7 +1226,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("infers Mistral auth choice from --mistral-api-key", async () => {
-    await withOnboardEnv("kaijibot-onboard-mistral-infer-", async (env) => {
+    await withOnboardEnv("allbot-onboard-mistral-infer-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         mistralApiKey: "mistral-test-key", // pragma: allowlist secret
       });
@@ -1242,7 +1242,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores Volcano Engine API key and sets default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-volcengine-", async (env) => {
+    await withOnboardEnv("allbot-onboard-volcengine-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "volcengine-api-key",
         volcengineApiKey: "volcengine-test-key", // pragma: allowlist secret
@@ -1253,7 +1253,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("infers BytePlus auth choice from --byteplus-api-key and sets default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-byteplus-infer-", async (env) => {
+    await withOnboardEnv("allbot-onboard-byteplus-infer-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         byteplusApiKey: "byteplus-test-key", // pragma: allowlist secret
       });
@@ -1263,7 +1263,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores Vercel AI Gateway API key and sets default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-ai-gateway-", async (env) => {
+    await withOnboardEnv("allbot-onboard-ai-gateway-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "ai-gateway-api-key",
         aiGatewayApiKey: "gateway-test-key", // pragma: allowlist secret
@@ -1283,7 +1283,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores legacy Anthropic setup-token onboarding again when explicitly selected", async () => {
-    await withOnboardEnv("kaijibot-onboard-token-", async ({ configPath, runtime }) => {
+    await withOnboardEnv("allbot-onboard-token-", async ({ configPath, runtime }) => {
       const cleanToken = `sk-ant-oat01-${"a".repeat(80)}`;
       const token = `${cleanToken.slice(0, 30)}\r${cleanToken.slice(30)}`;
 
@@ -1306,7 +1306,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores OpenAI API key and sets OpenAI default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-openai-", async (env) => {
+    await withOnboardEnv("allbot-onboard-openai-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "openai-api-key",
         openaiApiKey: "sk-openai-test", // pragma: allowlist secret
@@ -1319,7 +1319,7 @@ describe("onboard (non-interactive): provider auth", () => {
   it.each([
     {
       name: "anthropic",
-      prefix: "kaijibot-onboard-ref-flag-anthropic-",
+      prefix: "allbot-onboard-ref-flag-anthropic-",
       authChoice: "apiKey",
       optionKey: "anthropicApiKey",
       flagName: "--anthropic-api-key",
@@ -1327,7 +1327,7 @@ describe("onboard (non-interactive): provider auth", () => {
     },
     {
       name: "openai",
-      prefix: "kaijibot-onboard-ref-flag-openai-",
+      prefix: "allbot-onboard-ref-flag-openai-",
       authChoice: "openai-api-key",
       optionKey: "openaiApiKey",
       flagName: "--openai-api-key",
@@ -1335,7 +1335,7 @@ describe("onboard (non-interactive): provider auth", () => {
     },
     {
       name: "openrouter",
-      prefix: "kaijibot-onboard-ref-flag-openrouter-",
+      prefix: "allbot-onboard-ref-flag-openrouter-",
       authChoice: "openrouter-api-key",
       optionKey: "openrouterApiKey",
       flagName: "--openrouter-api-key",
@@ -1343,7 +1343,7 @@ describe("onboard (non-interactive): provider auth", () => {
     },
     {
       name: "xai",
-      prefix: "kaijibot-onboard-ref-flag-xai-",
+      prefix: "allbot-onboard-ref-flag-xai-",
       authChoice: "xai-api-key",
       optionKey: "xaiApiKey",
       flagName: "--xai-api-key",
@@ -1351,7 +1351,7 @@ describe("onboard (non-interactive): provider auth", () => {
     },
     {
       name: "volcengine",
-      prefix: "kaijibot-onboard-ref-flag-volcengine-",
+      prefix: "allbot-onboard-ref-flag-volcengine-",
       authChoice: "volcengine-api-key",
       optionKey: "volcengineApiKey",
       flagName: "--volcengine-api-key",
@@ -1359,7 +1359,7 @@ describe("onboard (non-interactive): provider auth", () => {
     },
     {
       name: "byteplus",
-      prefix: "kaijibot-onboard-ref-flag-byteplus-",
+      prefix: "allbot-onboard-ref-flag-byteplus-",
       authChoice: "byteplus-api-key",
       optionKey: "byteplusApiKey",
       flagName: "--byteplus-api-key",
@@ -1402,7 +1402,7 @@ describe("onboard (non-interactive): provider auth", () => {
   );
 
   it("stores the detected env alias as keyRef for both OpenCode runtime providers", async () => {
-    await withOnboardEnv("kaijibot-onboard-ref-opencode-alias-", async ({ runtime }) => {
+    await withOnboardEnv("allbot-onboard-ref-opencode-alias-", async ({ runtime }) => {
       await withEnvAsync(
         {
           OPENCODE_API_KEY: undefined,
@@ -1434,7 +1434,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("stores LiteLLM API key in the default auth profile", async () => {
-    await withOnboardEnv("kaijibot-onboard-litellm-", async (env) => {
+    await withOnboardEnv("allbot-onboard-litellm-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         authChoice: "litellm-api-key",
         litellmApiKey: "litellm-test-key", // pragma: allowlist secret
@@ -1453,14 +1453,14 @@ describe("onboard (non-interactive): provider auth", () => {
   it.each([
     {
       name: "stores Cloudflare AI Gateway API key and metadata",
-      prefix: "kaijibot-onboard-cf-gateway-",
+      prefix: "allbot-onboard-cf-gateway-",
       options: {
         authChoice: "cloudflare-ai-gateway-api-key",
       },
     },
     {
       name: "infers Cloudflare auth choice from API key flags",
-      prefix: "kaijibot-onboard-cf-gateway-infer-",
+      prefix: "allbot-onboard-cf-gateway-infer-",
       options: {},
     },
   ])("$name", async ({ prefix, options }) => {
@@ -1490,7 +1490,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("infers Together auth choice from --together-api-key and sets default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-together-infer-", async (env) => {
+    await withOnboardEnv("allbot-onboard-together-infer-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         togetherApiKey: "together-test-key", // pragma: allowlist secret
       });
@@ -1507,7 +1507,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("infers QIANFAN auth choice from --qianfan-api-key and sets default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-qianfan-infer-", async (env) => {
+    await withOnboardEnv("allbot-onboard-qianfan-infer-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         qianfanApiKey: "qianfan-test-key", // pragma: allowlist secret
       });
@@ -1524,7 +1524,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("infers Qwen auth choice from --modelstudio-api-key and sets default model", async () => {
-    await withOnboardEnv("kaijibot-onboard-modelstudio-infer-", async (env) => {
+    await withOnboardEnv("allbot-onboard-modelstudio-infer-", async (env) => {
       const cfg = await runOnboardingAndReadConfig(env, {
         modelstudioApiKey: "modelstudio-test-key", // pragma: allowlist secret
       });
@@ -1544,7 +1544,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("configures a custom provider from non-interactive flags", async () => {
-    await withOnboardEnv("kaijibot-onboard-custom-provider-", async ({ configPath, runtime }) => {
+    await withOnboardEnv("allbot-onboard-custom-provider-", async ({ configPath, runtime }) => {
       await runNonInteractiveSetupWithDefaults(runtime, {
         authChoice: "custom-api-key",
         customBaseUrl: "https://llm.example.com/v1",
@@ -1567,7 +1567,7 @@ describe("onboard (non-interactive): provider auth", () => {
 
   it("infers custom provider auth choice from custom flags", async () => {
     await withOnboardEnv(
-      "kaijibot-onboard-custom-provider-infer-",
+      "allbot-onboard-custom-provider-infer-",
       async ({ configPath, runtime }) => {
         await runNonInteractiveSetupWithDefaults(runtime, {
           customBaseUrl: "https://models.custom.local/v1",
@@ -1591,7 +1591,7 @@ describe("onboard (non-interactive): provider auth", () => {
 
   it("uses CUSTOM_API_KEY env fallback for non-interactive custom provider auth", async () => {
     await withOnboardEnv(
-      "kaijibot-onboard-custom-provider-env-fallback-",
+      "allbot-onboard-custom-provider-env-fallback-",
       async ({ configPath, runtime }) => {
         process.env.CUSTOM_API_KEY = "custom-env-key"; // pragma: allowlist secret
         await runCustomLocalNonInteractive(runtime);
@@ -1602,7 +1602,7 @@ describe("onboard (non-interactive): provider auth", () => {
 
   it("stores CUSTOM_API_KEY env ref for non-interactive custom provider auth in ref mode", async () => {
     await withOnboardEnv(
-      "kaijibot-onboard-custom-provider-env-ref-",
+      "allbot-onboard-custom-provider-env-ref-",
       async ({ configPath, runtime }) => {
         process.env.CUSTOM_API_KEY = "custom-env-key"; // pragma: allowlist secret
         await runCustomLocalNonInteractive(runtime, {
@@ -1618,7 +1618,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("fails fast for custom provider ref mode when --custom-api-key is set but CUSTOM_API_KEY env is missing", async () => {
-    await withOnboardEnv("kaijibot-onboard-custom-provider-ref-flag-", async ({ runtime }) => {
+    await withOnboardEnv("allbot-onboard-custom-provider-ref-flag-", async ({ runtime }) => {
       const providedSecret = "custom-inline-key-should-not-leak"; // pragma: allowlist secret
       await withEnvAsync({ CUSTOM_API_KEY: undefined }, async () => {
         let thrown: Error | undefined;
@@ -1645,7 +1645,7 @@ describe("onboard (non-interactive): provider auth", () => {
 
   it("fails custom provider auth when compatibility is invalid", async () => {
     await withOnboardEnv(
-      "kaijibot-onboard-custom-provider-invalid-compat-",
+      "allbot-onboard-custom-provider-invalid-compat-",
       async ({ runtime }) => {
         await expect(
           runNonInteractiveSetupWithDefaults(runtime, {
@@ -1661,7 +1661,7 @@ describe("onboard (non-interactive): provider auth", () => {
   });
 
   it("fails custom provider auth when explicit provider id is invalid", async () => {
-    await withOnboardEnv("kaijibot-onboard-custom-provider-invalid-id-", async ({ runtime }) => {
+    await withOnboardEnv("allbot-onboard-custom-provider-invalid-id-", async ({ runtime }) => {
       await expect(
         runNonInteractiveSetupWithDefaults(runtime, {
           authChoice: "custom-api-key",
@@ -1678,7 +1678,7 @@ describe("onboard (non-interactive): provider auth", () => {
 
   it("fails inferred custom auth when required flags are incomplete", async () => {
     await withOnboardEnv(
-      "kaijibot-onboard-custom-provider-missing-required-",
+      "allbot-onboard-custom-provider-missing-required-",
       async ({ runtime }) => {
         await expect(
           runNonInteractiveSetupWithDefaults(runtime, {

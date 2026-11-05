@@ -4,7 +4,7 @@ import {
   writeConfigFile,
   type ConfigWriteOptions,
 } from "./io.js";
-import type { ConfigFileSnapshot, KaijiBotConfig } from "./types.js";
+import type { ConfigFileSnapshot, AllBotConfig } from "./types.js";
 
 export type ConfigMutationBase = "runtime" | "source";
 
@@ -22,7 +22,7 @@ export type ConfigReplaceResult = {
   path: string;
   previousHash: string | null;
   snapshot: ConfigFileSnapshot;
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
 };
 
 function assertBaseHashMatches(snapshot: ConfigFileSnapshot, expectedHash?: string): string | null {
@@ -36,7 +36,7 @@ function assertBaseHashMatches(snapshot: ConfigFileSnapshot, expectedHash?: stri
 }
 
 export async function replaceConfigFile(params: {
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   baseHash?: string;
   writeOptions?: ConfigWriteOptions;
 }): Promise<ConfigReplaceResult> {
@@ -59,14 +59,14 @@ export async function mutateConfigFile<T = void>(params: {
   baseHash?: string;
   writeOptions?: ConfigWriteOptions;
   mutate: (
-    draft: KaijiBotConfig,
+    draft: AllBotConfig,
     context: { snapshot: ConfigFileSnapshot; previousHash: string | null },
   ) => Promise<T | void> | T | void;
 }): Promise<ConfigReplaceResult & { result: T | undefined }> {
   const { snapshot, writeOptions } = await readConfigFileSnapshotForWrite();
   const previousHash = assertBaseHashMatches(snapshot, params.baseHash);
   const baseConfig = params.base === "runtime" ? snapshot.runtimeConfig : snapshot.sourceConfig;
-  const draft = structuredClone(baseConfig) as KaijiBotConfig;
+  const draft = structuredClone(baseConfig) as AllBotConfig;
   const result = (await params.mutate(draft, { snapshot, previousHash })) as T | undefined;
   await writeConfigFile(draft, {
     ...writeOptions,

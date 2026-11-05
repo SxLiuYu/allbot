@@ -175,7 +175,7 @@ describe("formatGitInstallLabel", () => {
 
 describe("checkDepsStatus", () => {
   it("reports unknown, missing, stale, and ok states from lockfile markers", async () => {
-    await withTempDir({ prefix: "kaijibot-update-check-" }, async (base) => {
+    await withTempDir({ prefix: "allbot-update-check-" }, async (base) => {
       await expect(checkDepsStatus({ root: base, manager: "unknown" })).resolves.toEqual({
         manager: "unknown",
         status: "unknown",
@@ -228,7 +228,7 @@ describe("checkUpdateStatus", () => {
   });
 
   it("detects package installs for non-git roots", async () => {
-    await withTempDir({ prefix: "kaijibot-update-check-" }, async (root) => {
+    await withTempDir({ prefix: "allbot-update-check-" }, async (root) => {
       await fs.writeFile(
         path.join(root, "package.json"),
         JSON.stringify({ packageManager: "npm@10.0.0" }),

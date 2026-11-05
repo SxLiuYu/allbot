@@ -3,7 +3,7 @@ import { SILENT_REPLY_TOKEN } from "../auto-reply/tokens.js";
 import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import * as configSessions from "../config/sessions.js";
 import type { SessionEntry } from "../config/sessions/types.js";
@@ -125,7 +125,7 @@ const chatHistoryMock = vi.fn(async (_sessionKey?: string) => ({
   messages: [] as Array<unknown>,
 }));
 let sessionStore: SessionStoreFixture = {};
-let configOverride: KaijiBotConfig = {
+let configOverride: AllBotConfig = {
   session: {
     mainKey: "main",
     scope: "per-sender",
@@ -147,7 +147,7 @@ async function getSingleAgentCallParams() {
   return call?.params ?? {};
 }
 
-function setConfigOverride(next: KaijiBotConfig): void {
+function setConfigOverride(next: AllBotConfig): void {
   configOverride = next;
   setRuntimeConfigSnapshot(configOverride);
 }
@@ -195,23 +195,23 @@ describe("subagent announce formatting", () => {
     // Set FAST_TEST_MODE before importing the module to ensure the module-level
     // constant picks it up. This fixes flaky Windows CI failures where the test
     // timeout budget is too tight without fast mode enabled.
-    // See: https://github.com/kaijibot/kaijibot/issues/31298
-    previousFastTestEnv = process.env.KAIJIBOT_TEST_FAST;
-    process.env.KAIJIBOT_TEST_FAST = "1";
+    // See: https://github.com/allbot/allbot/issues/31298
+    previousFastTestEnv = process.env.ALLBOT_TEST_FAST;
+    process.env.ALLBOT_TEST_FAST = "1";
     ({ runSubagentAnnounceFlow } = await import("./subagent-announce.js"));
   });
 
   afterAll(() => {
     clearRuntimeConfigSnapshot();
     if (previousFastTestEnv === undefined) {
-      delete process.env.KAIJIBOT_TEST_FAST;
+      delete process.env.ALLBOT_TEST_FAST;
       return;
     }
-    process.env.KAIJIBOT_TEST_FAST = previousFastTestEnv;
+    process.env.ALLBOT_TEST_FAST = previousFastTestEnv;
   });
 
   beforeEach(() => {
-    // KAIJIBOT_TEST_FAST is set in beforeAll before module import
+    // ALLBOT_TEST_FAST is set in beforeAll before module import
     // to ensure the module-level constant picks it up.
     agentSpy
       .mockClear()
@@ -362,7 +362,7 @@ describe("subagent announce formatting", () => {
     };
     const msg = call?.params?.message as string;
     expect(call?.params?.sessionKey).toBe("agent:main:main");
-    expect(msg).toContain("KaijiBot runtime context (internal):");
+    expect(msg).toContain("AllBot runtime context (internal):");
     expect(msg).toContain("[Internal task completion event]");
     expect(msg).toContain("session_id: child-session-123");
     expect(msg).toContain("subagent task");

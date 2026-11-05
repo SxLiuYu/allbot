@@ -2,14 +2,14 @@ import {
   DEFAULT_CHAT_HISTORY_TEXT_MAX_CHARS,
   sanitizeChatHistoryMessages,
 } from "./server-methods/chat.js";
-import { attachKaijiBotTranscriptMeta, readSessionMessages } from "./session-utils.js";
+import { attachAllBotTranscriptMeta, readSessionMessages } from "./session-utils.js";
 
 type SessionHistoryTranscriptMeta = {
   seq?: number;
 };
 
 export type SessionHistoryMessage = Record<string, unknown> & {
-  __kaijibot?: SessionHistoryTranscriptMeta;
+  __allbot?: SessionHistoryTranscriptMeta;
 };
 
 export type PaginatedSessionHistory = {
@@ -60,7 +60,7 @@ function buildPaginatedSessionHistory(params: {
 }
 
 export function resolveMessageSeq(message: SessionHistoryMessage | undefined): number | undefined {
-  const seq = message?.__kaijibot?.seq;
+  const seq = message?.__allbot?.seq;
   return typeof seq === "number" && Number.isFinite(seq) && seq > 0 ? seq : undefined;
 }
 
@@ -174,7 +174,7 @@ export class SessionHistorySseState {
       return null;
     }
     this.rawTranscriptSeq += 1;
-    const nextMessage = attachKaijiBotTranscriptMeta(update.message, {
+    const nextMessage = attachAllBotTranscriptMeta(update.message, {
       ...(typeof update.messageId === "string" ? { id: update.messageId } : {}),
       seq: this.rawTranscriptSeq,
     });

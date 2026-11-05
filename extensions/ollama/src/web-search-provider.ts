@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
 import {
   isNonSecretApiKeyMarker,
   normalizeOptionalSecretInput,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { resolveEnvApiKey } from "kaijibot/plugin-sdk/provider-auth-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { resolveEnvApiKey } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   enablePluginInConfig,
   readNumberParam,
@@ -14,9 +14,9 @@ import {
   truncateText,
   wrapWebContent,
   type WebSearchProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-web-search";
-import { fetchWithSsrFGuard } from "kaijibot/plugin-sdk/ssrf-runtime";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-web-search";
+import { fetchWithSsrFGuard } from "allbot/plugin-sdk/ssrf-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { Type } from "typebox";
 import { OLLAMA_DEFAULT_BASE_URL } from "./defaults.js";
 import {
@@ -55,7 +55,7 @@ type OllamaWebSearchResponse = {
   results?: OllamaWebSearchResult[];
 };
 
-function resolveOllamaWebSearchApiKey(config?: KaijiBotConfig): string | undefined {
+function resolveOllamaWebSearchApiKey(config?: AllBotConfig): string | undefined {
   const providerApiKey = normalizeOptionalSecretInput(config?.models?.providers?.ollama?.apiKey);
   if (providerApiKey && !isNonSecretApiKeyMarker(providerApiKey)) {
     return providerApiKey;
@@ -63,7 +63,7 @@ function resolveOllamaWebSearchApiKey(config?: KaijiBotConfig): string | undefin
   return resolveEnvApiKey("ollama")?.apiKey;
 }
 
-function resolveOllamaWebSearchBaseUrl(config?: KaijiBotConfig): string {
+function resolveOllamaWebSearchBaseUrl(config?: AllBotConfig): string {
   const configuredBaseUrl = config?.models?.providers?.ollama?.baseUrl;
   if (normalizeOptionalString(configuredBaseUrl)) {
     return resolveOllamaApiBase(configuredBaseUrl);
@@ -86,7 +86,7 @@ function normalizeOllamaWebSearchResult(
 }
 
 export async function runOllamaWebSearch(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   query: string;
   count?: number;
 }): Promise<Record<string, unknown>> {
@@ -164,11 +164,11 @@ export async function runOllamaWebSearch(params: {
 }
 
 async function warnOllamaWebSearchPrereqs(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: {
     note: (message: string, title?: string) => Promise<void>;
   };
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const baseUrl = resolveOllamaWebSearchBaseUrl(params.config);
   const { reachable } = await fetchOllamaModels(baseUrl);
   if (!reachable) {

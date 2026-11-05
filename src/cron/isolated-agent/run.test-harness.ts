@@ -388,17 +388,17 @@ export function resetRunCronIsolatedAgentTurnHarness(): void {
 }
 
 export function clearFastTestEnv(): string | undefined {
-  const previousFastTestEnv = process.env.KAIJIBOT_TEST_FAST;
-  delete process.env.KAIJIBOT_TEST_FAST;
+  const previousFastTestEnv = process.env.ALLBOT_TEST_FAST;
+  delete process.env.ALLBOT_TEST_FAST;
   return previousFastTestEnv;
 }
 
 export function restoreFastTestEnv(previousFastTestEnv: string | undefined): void {
   if (previousFastTestEnv == null) {
-    delete process.env.KAIJIBOT_TEST_FAST;
+    delete process.env.ALLBOT_TEST_FAST;
     return;
   }
-  process.env.KAIJIBOT_TEST_FAST = previousFastTestEnv;
+  process.env.ALLBOT_TEST_FAST = previousFastTestEnv;
 }
 
 export async function loadRunCronIsolatedAgentTurn() {

@@ -9,21 +9,21 @@ describe("shared/assistant-identity-values", () => {
   });
 
   it("trims values and preserves strings within the limit", () => {
-    expect(coerceIdentityValue("  KaijiBot  ", 20)).toBe("KaijiBot");
-    expect(coerceIdentityValue("  KaijiBot  ", 8)).toBe("KaijiBot");
+    expect(coerceIdentityValue("  AllBot  ", 20)).toBe("AllBot");
+    expect(coerceIdentityValue("  AllBot  ", 8)).toBe("AllBot");
   });
 
   it("truncates overlong trimmed values at the exact limit", () => {
-    expect(coerceIdentityValue("  KaijiBot Assistant  ", 8)).toBe("KaijiBot");
+    expect(coerceIdentityValue("  AllBot Assistant  ", 8)).toBe("AllBot");
   });
 
-  // Skip on CI: assertion below expects "OpenCla" but actual returns "KaijiBo"
-  // (slice(0, -1) of "KaijiBot"); test logic/assertions cannot be modified per task rules.
+  // Skip on CI: assertion below expects "OpenCla" but actual returns "AllBotBo"
+  // (slice(0, -1) of "AllBot"); test logic/assertions cannot be modified per task rules.
   it.skipIf(process.env.CI)(
     "returns an empty string when truncating to a zero-length limit",
     () => {
-      expect(coerceIdentityValue("  KaijiBot  ", 0)).toBe("");
-      expect(coerceIdentityValue("  KaijiBot  ", -1)).toBe("OpenCla");
+      expect(coerceIdentityValue("  AllBot  ", 0)).toBe("");
+      expect(coerceIdentityValue("  AllBot  ", -1)).toBe("OpenCla");
     },
   );
 });

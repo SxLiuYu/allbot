@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import { applyCognitiveDefaults } from "./defaults.js";
 import { CognitiveSchema } from "./zod-schema.cognitive.js";
 
-const base = { agents: { defaults: {} } } as unknown as KaijiBotConfig;
+const base = { agents: { defaults: {} } } as unknown as AllBotConfig;
 
 describe("cognitive defaults", () => {
   it("fills proactive defaults even when the cognitive section is absent", () => {
@@ -20,7 +20,7 @@ describe("cognitive defaults", () => {
     const cfg = applyCognitiveDefaults({
       ...base,
       cognitive: { proactive: { enabled: true, activeHours: { start: "08:00" } } },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     expect(cfg.cognitive?.proactive?.enabled).toBe(true);
     expect(cfg.cognitive?.proactive?.activeHours?.start).toBe("08:00");
     expect(cfg.cognitive?.proactive?.activeHours?.end).toBe("22:00");
@@ -30,7 +30,7 @@ describe("cognitive defaults", () => {
     const cfg = applyCognitiveDefaults({
       ...base,
       cognitive: { enabled: true },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     expect(cfg.cognitive?.tasks?.enabled).toBe(false);
     expect(cfg.cognitive?.tasks?.maxSteps).toBe(12);
     expect(cfg.cognitive?.tasks?.progressMessages).toBe(false);
@@ -46,7 +46,7 @@ describe("cognitive defaults", () => {
         proactive: { enabled: true },
         tasks: { enabled: true, maxSteps: 3, progressMessages: true },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     expect(cfg.cognitive?.proactive?.enabled).toBe(true);
     expect(cfg.cognitive?.tasks?.enabled).toBe(true);
     expect(cfg.cognitive?.tasks?.maxSteps).toBe(3);
@@ -55,7 +55,7 @@ describe("cognitive defaults", () => {
     const optedOut = applyCognitiveDefaults({
       ...base,
       cognitive: { tasks: { enabled: false } },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
     expect(optedOut.cognitive?.tasks?.enabled).toBe(false);
   });
 
@@ -63,7 +63,7 @@ describe("cognitive defaults", () => {
     const cfg = applyCognitiveDefaults({
       ...base,
       cognitive: { insight: {}, evolution: {} },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     expect(cfg.cognitive?.insight?.maxLlmCallsPerDelivery).toBe(3);
     expect(cfg.cognitive?.insight?.maxCandidatesPerEvent).toBe(2);
     expect(cfg.cognitive?.insight?.verificationLevel).toBe("basic");

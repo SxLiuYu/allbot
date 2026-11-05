@@ -23,7 +23,7 @@ vi.mock("../config/config.js", () => ({
 }));
 
 vi.mock("./onboard-helpers.js", () => ({
-  DEFAULT_WORKSPACE: "~/.kaijibot/workspace",
+  DEFAULT_WORKSPACE: "~/.allbot/workspace",
   handleReset: mocks.handleReset,
 }));
 
@@ -68,7 +68,7 @@ describe("setupWizardCommand", () => {
 
       expect(runtime.log).toHaveBeenCalledWith(
         [
-          "Windows detected - KaijiBot runs great on WSL2!",
+          "Windows detected - AllBot runs great on WSL2!",
           "Native Windows might be trickier.",
           "Quick setup: wsl --install (one command, one reboot)",
           "Guide: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/platforms/windows.md",
@@ -104,7 +104,7 @@ describe("setupWizardCommand", () => {
       config: {
         agents: {
           defaults: {
-            workspace: "/tmp/kaijibot-custom-workspace",
+            workspace: "/tmp/allbot-custom-workspace",
           },
         },
       },
@@ -119,7 +119,7 @@ describe("setupWizardCommand", () => {
 
     expect(mocks.handleReset).toHaveBeenCalledWith(
       "config+creds+sessions",
-      path.resolve("/tmp/kaijibot-custom-workspace"),
+      path.resolve("/tmp/allbot-custom-workspace"),
       runtime,
     );
   });

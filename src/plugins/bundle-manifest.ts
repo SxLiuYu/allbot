@@ -21,7 +21,7 @@ export type BundlePluginManifest = {
   version?: string;
   skills: string[];
   settingsFiles?: string[];
-  // Only include hook roots that KaijiBot can execute via HOOK.md + handler files.
+  // Only include hook roots that AllBot can execute via HOOK.md + handler files.
   hooks: string[];
   bundleFormat: PluginBundleFormat;
   capabilities: string[];

@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 
 export const QIANFAN_BASE_URL = "https://qianfan.baidubce.com/v2";
 export const QIANFAN_DEFAULT_MODEL_ID = "deepseek-v3.2";

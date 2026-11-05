@@ -1,4 +1,4 @@
-import * as providerAuth from "kaijibot/plugin-sdk/provider-auth-runtime";
+import * as providerAuth from "allbot/plugin-sdk/provider-auth-runtime";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildVydraVideoGenerationProvider } from "./video-generation-provider.js";
 

@@ -768,7 +768,7 @@ function shouldDropSystemHistoryMessage(message: unknown): boolean {
     return false;
   }
   // Keep compaction markers — they're rendered as dividers by the UI.
-  const meta = (message as { __kaijibot?: { kind?: unknown } }).__kaijibot;
+  const meta = (message as { __allbot?: { kind?: unknown } }).__allbot;
   if (meta && meta.kind === "compaction") {
     return false;
   }
@@ -858,7 +858,7 @@ function buildOversizedHistoryPlaceholder(message?: unknown): Record<string, unk
     role,
     timestamp,
     content: [{ type: "text", text: CHAT_HISTORY_OVERSIZED_PLACEHOLDER }],
-    __kaijibot: { truncated: true, reason: "oversized" },
+    __allbot: { truncated: true, reason: "oversized" },
   };
 }
 
@@ -1723,7 +1723,7 @@ export const chatHandlers: GatewayRequestHandlers = {
       });
       // Inject timestamp so agents know the current date/time.
       // Only BodyForAgent gets the timestamp — Body stays raw for UI display.
-      // See: https://github.com/kaijibot/kaijibot/issues/3658
+      // See: https://github.com/allbot/allbot/issues/3658
       const stampedMessage = injectTimestamp(messageForAgent, timestampOptsFromConfig(cfg));
 
       const ctx: MsgContext = {

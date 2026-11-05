@@ -6,19 +6,19 @@ rm -rf dist
 pnpm build
 
 echo "[deploy] Stopping gateway..."
-pkill -f 'kaijibot-gateway' 2>/dev/null || true
+pkill -f 'allbot-gateway' 2>/dev/null || true
 sleep 2
 
 echo "[deploy] Starting gateway in tmux session 'gw'..."
 tmux has-session -t gw 2>/dev/null || tmux new-session -d -s gw
 tmux send-keys -t gw '' C-c 2>/dev/null || true
 sleep 0.5
-tmux send-keys -t gw 'node kaijibot.mjs gateway --port 18789 --verbose' Enter
+tmux send-keys -t gw 'node allbot.mjs gateway --port 18789 --verbose' Enter
 
 echo "[deploy] Waiting for gateway to start..."
 for i in $(seq 1 60); do
-  if pgrep -f 'kaijibot-gateway' >/dev/null 2>&1; then
-    echo "[deploy] Gateway running (PID $(pgrep -f 'kaijibot-gateway' | head -1))"
+  if pgrep -f 'allbot-gateway' >/dev/null 2>&1; then
+    echo "[deploy] Gateway running (PID $(pgrep -f 'allbot-gateway' | head -1))"
     exit 0
   fi
   sleep 1

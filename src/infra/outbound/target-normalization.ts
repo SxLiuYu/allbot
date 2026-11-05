@@ -1,6 +1,6 @@
 import { getChannelPlugin, normalizeChannelId } from "../../channels/plugins/index.js";
 import type { ChannelDirectoryEntryKind, ChannelId } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { getActivePluginChannelRegistryVersion } from "../../plugins/runtime.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 
@@ -102,7 +102,7 @@ export function looksLikeTargetId(params: {
 }
 
 export async function maybeResolvePluginMessagingTarget(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   input: string;
   accountId?: string | null;

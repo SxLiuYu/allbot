@@ -1,5 +1,5 @@
 import { buildModelAliasIndex, resolveModelRefFromString } from "../../agents/model-selection.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
 import { resolveAgentModelFallbackValues, toAgentModelListLike } from "../../config/model-input.js";
 import type { AgentModelEntryConfig } from "../../config/types.agent-defaults.js";
@@ -18,14 +18,14 @@ import {
 
 type DefaultsFallbackKey = "model" | "imageModel";
 
-function getFallbacks(cfg: KaijiBotConfig, key: DefaultsFallbackKey): string[] {
+function getFallbacks(cfg: AllBotConfig, key: DefaultsFallbackKey): string[] {
   return resolveAgentModelFallbackValues(cfg.agents?.defaults?.[key]);
 }
 
 function patchDefaultsFallbacks(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params: { key: DefaultsFallbackKey; fallbacks: string[]; models?: Record<string, unknown> },
-): KaijiBotConfig {
+): AllBotConfig {
   const existing = toAgentModelListLike(cfg.agents?.defaults?.[params.key]);
   return {
     ...cfg,

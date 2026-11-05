@@ -60,7 +60,7 @@ function createProps(overrides: Partial<ChatProps> = {}): ChatProps {
       ],
     },
     focusMode: false,
-    assistantName: "KaijiBot",
+    assistantName: "AllBot",
     assistantAvatar: null,
     onRefresh: () => undefined,
     onToggleFocusMode: () => undefined,

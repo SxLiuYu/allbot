@@ -27,7 +27,7 @@ export default definePluginEntry({
     const config = resolveWikiConfig(api.pluginConfig);
 
     const getGenerateText = async (): Promise<GenerateTextFn> => {
-      const { createStandaloneGenerateText } = await import("kaijibot/plugin-sdk/generate-text");
+      const { createStandaloneGenerateText } = await import("allbot/plugin-sdk/generate-text");
       const fn = await createStandaloneGenerateText(api.config);
       return fn;
     };

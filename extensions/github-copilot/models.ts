@@ -1,9 +1,9 @@
 import type {
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/core";
-import { normalizeModelCompat } from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/core";
+import { normalizeModelCompat } from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 
 export const PROVIDER_ID = "github-copilot";
 const CODEX_GPT_54_MODEL_ID = "gpt-5.4";
@@ -58,7 +58,7 @@ export function resolveCopilotForwardCompatModel(
   // Catch-all: create a synthetic model definition for any unknown model ID.
   // The Copilot API is OpenAI-compatible and will return its own error if the
   // model isn't available on the user's plan. This lets new models be used
-  // by simply adding them to agents.defaults.models in kaijibot.json — no
+  // by simply adding them to agents.defaults.models in allbot.json — no
   // code change required.
   const reasoning = /^o[13](\b|$)/.test(lowerModelId);
   return normalizeModelCompat({

@@ -100,11 +100,11 @@ describe("formatSummaryAsMarkdown", () => {
     const summary = makeSummary();
     const md = formatSummaryAsMarkdown(summary, "2026-04-24", undefined, {
       sessionId: "abc-123",
-      sessionsDir: "~/.kaijibot/agents/default/sessions",
+      sessionsDir: "~/.allbot/agents/default/sessions",
     });
 
     expect(md).toContain("- **Session ID**: abc-123");
-    expect(md).toContain("- **会话目录**: ~/.kaijibot/agents/default/sessions");
+    expect(md).toContain("- **会话目录**: ~/.allbot/agents/default/sessions");
   });
 
   it("omits sessionKey and session pointer when not provided", () => {

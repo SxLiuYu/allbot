@@ -2,7 +2,7 @@
  * Live test: verify the quality gate works with real LLM calls.
  * Ensures generated skills pass the 4-dimension quality evaluation.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/evolution/skill-quality-gate-live.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/evolution/skill-quality-gate-live.test.ts
  */
 
 import { describe, it, expect } from "vitest";
@@ -11,7 +11,7 @@ import { evaluateSkillQuality, refineSkillDraft } from "./skill-quality-gate.js"
 import { createStandaloneGenerateText } from "./standalone-generate.js";
 import type { SkillDraft } from "./types.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 
 const goodDraft: SkillDraft = {

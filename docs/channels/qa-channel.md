@@ -1,6 +1,6 @@
 ---
 title: "QA Channel"
-summary: "Synthetic Slack-class channel plugin for deterministic KaijiBot QA scenarios"
+summary: "Synthetic Slack-class channel plugin for deterministic AllBot QA scenarios"
 read_when:
   - You are wiring the synthetic QA transport into a local or CI test run
   - You need the bundled qa-channel config surface
@@ -9,7 +9,7 @@ read_when:
 
 # QA Channel
 
-`qa-channel` is a bundled synthetic message transport for automated KaijiBot QA.
+`qa-channel` is a bundled synthetic message transport for automated AllBot QA.
 
 It is not a production channel. It exists to exercise the same channel plugin
 boundary used by real transports while keeping state deterministic and fully
@@ -38,8 +38,8 @@ inspectable.
   "channels": {
     "qa-channel": {
       "baseUrl": "http://127.0.0.1:43123",
-      "botUserId": "kaijibot",
-      "botDisplayName": "KaijiBot QA",
+      "botUserId": "allbot",
+      "botDisplayName": "AllBot QA",
       "allowFrom": ["*"],
       "pollTimeoutMs": 1000
     }
@@ -85,7 +85,7 @@ the model lane, launch individual runs, and watch results live.
 Full repo-backed QA suite:
 
 ```bash
-pnpm kaijibot qa suite
+pnpm allbot qa suite
 ```
 
 That launches the private QA debugger at a local URL, separate from the
@@ -105,4 +105,4 @@ Follow-up work will add:
 
 - provider/model matrix execution
 - richer scenario discovery
-- KaijiBot-native orchestration later
+- AllBot-native orchestration later

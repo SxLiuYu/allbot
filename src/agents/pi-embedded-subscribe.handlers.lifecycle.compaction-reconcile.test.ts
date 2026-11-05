@@ -95,7 +95,7 @@ function createLifecycleContext(params: {
 
 describe("createEmbeddedPiSessionEventHandler compaction reconciliation", () => {
   it("reconciles sessions.json on routed auto_compaction_end success", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-lifecycle-compaction-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-lifecycle-compaction-"));
     const storePath = path.join(tmp, "sessions.json");
     const sessionKey = "main";
     await seedSessionStore({

@@ -8,7 +8,7 @@ import { safeParsePersona } from "./persona-schema.js";
 const COGNITIVE_DIR = "cognitive";
 const PERSONA_DIR = "persona";
 
-const MIGRATION_SKIP_USER_IDS = new Set(["main", "kaijibot-tui", "slug-generator"]);
+const MIGRATION_SKIP_USER_IDS = new Set(["main", "allbot-tui", "slug-generator"]);
 
 function backfillStalePhases(persona: PersonaTree): void {
   const now = Date.now();

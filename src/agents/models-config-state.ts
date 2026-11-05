@@ -1,4 +1,4 @@
-const MODELS_JSON_STATE_KEY = Symbol.for("kaijibot.modelsJsonState");
+const MODELS_JSON_STATE_KEY = Symbol.for("allbot.modelsJsonState");
 
 type ModelsJsonState = {
   writeLocks: Map<string, Promise<void>>;

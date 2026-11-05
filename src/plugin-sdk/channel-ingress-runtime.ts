@@ -6,7 +6,7 @@
  * group config, then returns sender/route/command/activation projections plus
  * the ordered ingress graph.
  *
- * NOTE: KaijiBot does not yet have the channels/message-access subsystem
+ * NOTE: AllBot does not yet have the channels/message-access subsystem
  * ported from upstream. The types are declared here for compilation
  * compatibility; function calls will throw at runtime until the subsystem
  * is ported.
@@ -157,7 +157,7 @@ export type CreateChannelIngressResolverParams = {
 
 function throwNotPorted(name: string): never {
   throw new Error(
-    `Channel ingress subsystem not yet ported to KaijiBot: ${name}. ` +
+    `Channel ingress subsystem not yet ported to AllBot: ${name}. ` +
       `The channels/message-access module from upstream has not been ported.`,
   );
 }

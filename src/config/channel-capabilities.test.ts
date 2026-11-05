@@ -3,7 +3,7 @@ import type { ChannelPlugin } from "../channels/plugins/types.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../test-utils/channel-plugins.js";
 import { resolveChannelCapabilities } from "./channel-capabilities.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 
 describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
           },
         },
       },
-    } satisfies Partial<KaijiBotConfig>;
+    } satisfies Partial<AllBotConfig>;
 
     expect(
       resolveChannelCapabilities({
@@ -53,7 +53,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
           },
         },
       },
-    } satisfies Partial<KaijiBotConfig>;
+    } satisfies Partial<AllBotConfig>;
 
     expect(
       resolveChannelCapabilities({
@@ -73,7 +73,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
           },
         },
       },
-    } satisfies Partial<KaijiBotConfig>;
+    } satisfies Partial<AllBotConfig>;
 
     expect(
       resolveChannelCapabilities({
@@ -96,7 +96,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
     );
     const cfg = {
       channels: { feishu: { capabilities: [" polls ", ""] } },
-    } satisfies Partial<KaijiBotConfig>;
+    } satisfies Partial<AllBotConfig>;
 
     expect(
       resolveChannelCapabilities({
@@ -114,7 +114,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
           capabilities: { inlineButtons: "dm" },
         },
       },
-    } as unknown as Partial<KaijiBotConfig>;
+    } as unknown as Partial<AllBotConfig>;
 
     // Should return undefined (not crash), allowing channel-specific handlers to process it.
     expect(
@@ -132,7 +132,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
           capabilities: { interactiveReplies: true },
         },
       },
-    } as unknown as Partial<KaijiBotConfig>;
+    } as unknown as Partial<AllBotConfig>;
 
     expect(
       resolveChannelCapabilities({
@@ -149,7 +149,7 @@ describe.skipIf(process.env.CI)("resolveChannelCapabilities", () => {
           capabilities: { interactiveReplies: true },
         },
       },
-    } as unknown as Partial<KaijiBotConfig>;
+    } as unknown as Partial<AllBotConfig>;
 
     expect(
       resolveChannelCapabilities({

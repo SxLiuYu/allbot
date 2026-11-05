@@ -25,7 +25,7 @@ import type {
 } from "../commands/channel-setup/types.js";
 import type { ChannelChoice } from "../commands/onboard-types.js";
 import { isChannelConfigured } from "../config/channel-configured.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { enablePluginInConfig } from "../plugins/enable.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../routing/session-key.js";
@@ -62,7 +62,7 @@ export function createChannelOnboardingPostWriteHookCollector() {
 
 export async function runCollectedChannelOnboardingPostWriteHooks(params: {
   hooks: ChannelOnboardingPostWriteHook[];
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runtime: RuntimeEnv;
 }): Promise<void> {
   for (const hook of params.hooks) {
@@ -80,11 +80,11 @@ export async function runCollectedChannelOnboardingPostWriteHooks(params: {
 // Channel-specific prompts moved into setup flow adapters.
 
 export async function setupChannels(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
   options?: SetupChannelsOptions,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   let next = cfg;
   const forceAllowFromChannels = new Set(options?.forceAllowFromChannels ?? []);
   const accountOverrides: Partial<Record<ChannelChoice, string>> = {
@@ -314,8 +314,8 @@ export async function setupChannels(
       if (adapter) {
         await prompter.note(
           `${channel} plugin not available (continuing with setup). If the channel still doesn't work after setup, run \`${formatCliCommand(
-            "kaijibot plugins list",
-          )}\` and \`${formatCliCommand("kaijibot plugins enable " + channel)}\`, then restart the gateway.`,
+            "allbot plugins list",
+          )}\` and \`${formatCliCommand("allbot plugins enable " + channel)}\`, then restart the gateway.`,
           "Channel setup",
         );
         await refreshStatus(channel);
@@ -567,7 +567,7 @@ export async function setupChannels(
         {
           value: "__skip__",
           label: "Skip for now",
-          hint: `You can add channels later via \`${formatCliCommand("kaijibot channels add")}\``,
+          hint: `You can add channels later via \`${formatCliCommand("allbot channels add")}\``,
         },
       ],
       initialValue: quickstartDefault,

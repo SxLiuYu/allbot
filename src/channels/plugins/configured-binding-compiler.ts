@@ -1,5 +1,5 @@
 import { listConfiguredBindings } from "../../config/bindings.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   getActivePluginChannelRegistryVersion,
   requireActivePluginChannelRegistry,
@@ -32,7 +32,7 @@ type CachedCompiledConfiguredBindingRegistry = {
 };
 
 const compiledRegistryCache = new WeakMap<
-  KaijiBotConfig,
+  AllBotConfig,
   CachedCompiledConfiguredBindingRegistry
 >();
 
@@ -86,7 +86,7 @@ function compileConfiguredBindingTarget(params: {
 }
 
 function compileConfiguredBindingRule(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ConfiguredBindingChannel;
   binding: CompiledConfiguredBinding["binding"];
   target: ChannelConfiguredBindingConversationRef;
@@ -134,7 +134,7 @@ function pushCompiledRule(
 }
 
 function compileConfiguredBindingRegistry(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): CompiledConfiguredBindingRegistry {
   const rulesByChannel = new Map<ConfiguredBindingChannel, CompiledConfiguredBinding[]>();
 
@@ -178,7 +178,7 @@ function compileConfiguredBindingRegistry(params: {
 }
 
 export function resolveCompiledBindingRegistry(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): CompiledConfiguredBindingRegistry {
   const activeRegistry = requireActivePluginChannelRegistry();
   const registryVersion = getActivePluginChannelRegistryVersion();
@@ -199,7 +199,7 @@ export function resolveCompiledBindingRegistry(
 }
 
 export function primeCompiledBindingRegistry(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): CompiledConfiguredBindingRegistry {
   const activeRegistry = requireActivePluginChannelRegistry();
   const registry = compileConfiguredBindingRegistry({ cfg });

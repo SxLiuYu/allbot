@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createPathResolutionEnv, withEnvAsync } from "../test-utils/env.js";
 import { collectPluginsTrustFindings } from "./audit-extra.async.js";
 
@@ -17,12 +17,12 @@ describe("security audit install metadata findings", () => {
     return dir;
   };
 
-  const runInstallMetadataAudit = async (cfg: KaijiBotConfig, stateDir: string) => {
+  const runInstallMetadataAudit = async (cfg: AllBotConfig, stateDir: string) => {
     return await collectPluginsTrustFindings({ cfg, stateDir });
   };
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-security-install-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-security-install-"));
     sharedInstallMetadataStateDir = path.join(fixtureRoot, "shared-install-metadata-state");
     await fs.mkdir(sharedInstallMetadataStateDir, { recursive: true });
   });
@@ -49,7 +49,7 @@ describe("security audit install metadata findings", () => {
                 installs: {
                   "voice-call": {
                     source: "npm",
-                    spec: "@kaijibot/voice-call",
+                    spec: "@allbot/voice-call",
                   },
                 },
               },
@@ -58,7 +58,7 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@kaijibot/test-hooks",
+                      spec: "@allbot/test-hooks",
                     },
                   },
                 },
@@ -82,7 +82,7 @@ describe("security audit install metadata findings", () => {
                 installs: {
                   "voice-call": {
                     source: "npm",
-                    spec: "@kaijibot/voice-call@1.2.3",
+                    spec: "@allbot/voice-call@1.2.3",
                     integrity: "sha512-plugin",
                   },
                 },
@@ -92,7 +92,7 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@kaijibot/test-hooks@1.2.3",
+                      spec: "@allbot/test-hooks@1.2.3",
                       integrity: "sha512-hook",
                     },
                   },
@@ -119,12 +119,12 @@ describe("security audit install metadata findings", () => {
           await fs.mkdir(hookDir, { recursive: true });
           await fs.writeFile(
             path.join(pluginDir, "package.json"),
-            JSON.stringify({ name: "@kaijibot/voice-call", version: "9.9.9" }),
+            JSON.stringify({ name: "@allbot/voice-call", version: "9.9.9" }),
             "utf-8",
           );
           await fs.writeFile(
             path.join(hookDir, "package.json"),
-            JSON.stringify({ name: "@kaijibot/test-hooks", version: "8.8.8" }),
+            JSON.stringify({ name: "@allbot/test-hooks", version: "8.8.8" }),
             "utf-8",
           );
 
@@ -134,7 +134,7 @@ describe("security audit install metadata findings", () => {
                 installs: {
                   "voice-call": {
                     source: "npm",
-                    spec: "@kaijibot/voice-call@1.2.3",
+                    spec: "@allbot/voice-call@1.2.3",
                     integrity: "sha512-plugin",
                     resolvedVersion: "1.2.3",
                   },
@@ -145,7 +145,7 @@ describe("security audit install metadata findings", () => {
                   installs: {
                     "test-hooks": {
                       source: "npm",
-                      spec: "@kaijibot/test-hooks@1.2.3",
+                      spec: "@allbot/test-hooks@1.2.3",
                       integrity: "sha512-hook",
                       resolvedVersion: "1.2.3",
                     },
@@ -188,14 +188,14 @@ describe("security audit extension tool reachability findings", () => {
     "USERPROFILE",
     "HOMEDRIVE",
     "HOMEPATH",
-    "KAIJIBOT_HOME",
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_BUNDLED_PLUGINS_DIR",
+    "ALLBOT_HOME",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_BUNDLED_PLUGINS_DIR",
   ] as const;
   const previousPathResolutionEnv: Partial<Record<(typeof pathResolutionEnvKeys)[number], string>> =
     {};
 
-  const runSharedExtensionsAudit = async (config: KaijiBotConfig) => {
+  const runSharedExtensionsAudit = async (config: AllBotConfig) => {
     return await collectPluginsTrustFindings({
       cfg: config,
       stateDir: sharedExtensionsStateDir,
@@ -205,9 +205,9 @@ describe("security audit extension tool reachability findings", () => {
   beforeAll(async () => {
     const osModule = await import("node:os");
     const vitestModule = await import("vitest");
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-security-extensions-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-security-extensions-"));
     isolatedHome = path.join(fixtureRoot, "home");
-    const isolatedEnv = createPathResolutionEnv(isolatedHome, { KAIJIBOT_HOME: isolatedHome });
+    const isolatedEnv = createPathResolutionEnv(isolatedHome, { ALLBOT_HOME: isolatedHome });
     for (const key of pathResolutionEnvKeys) {
       previousPathResolutionEnv[key] = process.env[key];
       const value = isolatedEnv[key];
@@ -247,7 +247,7 @@ describe("security audit extension tool reachability findings", () => {
     const cases = [
       {
         name: "flags extensions without plugins.allow",
-        cfg: {} satisfies KaijiBotConfig,
+        cfg: {} satisfies AllBotConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -262,7 +262,7 @@ describe("security audit extension tool reachability findings", () => {
         name: "flags enabled extensions when tool policy can expose plugin tools",
         cfg: {
           plugins: { allow: ["some-plugin"] },
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -278,7 +278,7 @@ describe("security audit extension tool reachability findings", () => {
         cfg: {
           plugins: { allow: ["some-plugin"] },
           tools: { profile: "coding" },
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -293,7 +293,7 @@ describe("security audit extension tool reachability findings", () => {
           channels: {
             discord: { enabled: true, token: "t" },
           },
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(
@@ -317,7 +317,7 @@ describe("security audit extension tool reachability findings", () => {
               } as unknown as string,
             },
           },
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         assert: (findings: Awaited<ReturnType<typeof runSharedExtensionsAudit>>) => {
           expect(
             findings.some(

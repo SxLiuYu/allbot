@@ -66,7 +66,7 @@ const STYLE_CROSS_EDGE = 'stroke="#666" stroke-width="1" stroke-dasharray="3,2"'
 // Wiki-to-wiki: thin faint (secondary relationship).
 const STYLE_WIKI_EDGE = 'stroke="#ccc" stroke-width="0.5"';
 
-const EMPTY_MESSAGE = "No persona data yet. Chat with KaijiBot to build your cognitive map.";
+const EMPTY_MESSAGE = "No persona data yet. Chat with AllBot to build your cognitive map.";
 
 /** Escape a string for safe inclusion in XML/SVG text content and attributes. */
 function escapeXml(s: string): string {

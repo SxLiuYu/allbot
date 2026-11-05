@@ -66,11 +66,11 @@ describe("listSandboxBrowsers", () => {
             scope: "session",
             workspaceAccess: "none",
             docker: {
-              image: "kaijibot-sandbox:bookworm-slim",
+              image: "allbot-sandbox:bookworm-slim",
             },
             browser: {
               enabled: true,
-              image: "kaijibot-sandbox-browser:bookworm-slim",
+              image: "allbot-sandbox-browser:bookworm-slim",
             },
           },
         },
@@ -91,7 +91,7 @@ describe("listSandboxBrowsers", () => {
     });
     backendMocks.describeRuntime.mockResolvedValue({
       running: true,
-      actualConfigLabel: "kaijibot-sandbox-browser:bookworm-slim",
+      actualConfigLabel: "allbot-sandbox-browser:bookworm-slim",
       configLabelMatch: true,
     });
 
@@ -111,7 +111,7 @@ describe("listSandboxBrowsers", () => {
     );
     expect(results).toHaveLength(1);
     expect(results[0]).toMatchObject({
-      image: "kaijibot-sandbox-browser:bookworm-slim",
+      image: "allbot-sandbox-browser:bookworm-slim",
       running: true,
       imageMatch: true,
     });

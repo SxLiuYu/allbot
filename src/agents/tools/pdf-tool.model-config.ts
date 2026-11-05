@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   bundledProviderSupportsNativePdfDocument,
   resolveBundledAutoMediaKeyProviders,
@@ -13,7 +13,7 @@ import { hasAuthForProvider, resolveDefaultModelRef } from "./model-config.helpe
 import { coercePdfModelConfig } from "./pdf-tool.helpers.js";
 
 function resolveBundledImageCandidateRefs(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir: string;
   filter?: (providerId: string) => boolean;
 }): string[] {
@@ -36,7 +36,7 @@ function resolveBundledImageCandidateRefs(params: {
 }
 
 export function resolvePdfModelConfigForTool(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir: string;
 }): ImageModelConfig | null {
   const explicitPdf = coercePdfModelConfig(params.cfg);

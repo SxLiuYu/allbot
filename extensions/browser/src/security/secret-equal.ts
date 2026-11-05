@@ -1,1 +1,1 @@
-export { safeEqualSecret } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { safeEqualSecret } from "allbot/plugin-sdk/browser-security-runtime";

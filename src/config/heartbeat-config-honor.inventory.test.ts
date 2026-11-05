@@ -24,7 +24,7 @@ const EXPECTED_HEARTBEAT_KEYS = [
   "includeReasoning",
 ] as const;
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("heartbeat config-honor inventory", () => {
   it("keeps the planned heartbeat audit slice aligned with schema leaf keys", () => {
     const schemaKeys = listSchemaLeafKeysForPrefixes([...HEARTBEAT_CONFIG_PREFIXES]);

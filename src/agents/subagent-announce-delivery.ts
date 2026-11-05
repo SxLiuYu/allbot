@@ -59,7 +59,7 @@ let subagentAnnounceDeliveryDeps: SubagentAnnounceDeliveryDeps =
   defaultSubagentAnnounceDeliveryDeps;
 
 function resolveDirectAnnounceTransientRetryDelaysMs() {
-  return process.env.KAIJIBOT_TEST_FAST === "1"
+  return process.env.ALLBOT_TEST_FAST === "1"
     ? ([8, 16, 32] as const)
     : ([5_000, 10_000, 20_000] as const);
 }

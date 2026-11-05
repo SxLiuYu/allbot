@@ -5,7 +5,7 @@ read_when: "You want multiple isolated agents (workspaces + auth) in one gateway
 status: active
 ---
 
-> 💡 **KaijiBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。KaijiBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
+> 💡 **AllBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。AllBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
 
 # Multi-Agent Routing
 
@@ -17,12 +17,12 @@ An **agent** is a fully scoped brain with its own:
 
 - **Workspace** (files, AGENTS.md/SOUL.md/USER.md, local notes, persona rules).
 - **State directory** (`agentDir`) for auth profiles, model registry, and per-agent config.
-- **Session store** (chat history + routing state) under `~/.kaijibot/agents/<agentId>/sessions`.
+- **Session store** (chat history + routing state) under `~/.allbot/agents/<agentId>/sessions`.
 
 Auth profiles are **per-agent**. Each agent reads from its own:
 
 ```text
-~/.kaijibot/agents/<agentId>/agent/auth-profiles.json
+~/.allbot/agents/<agentId>/agent/auth-profiles.json
 ```
 
 `sessions_history` is the safer cross-session recall path here too: it returns
@@ -39,7 +39,7 @@ across agents (it causes auth/session collisions). If you want to share creds,
 copy `auth-profiles.json` into the other agent's `agentDir`.
 
 Skills are loaded from each agent workspace plus shared roots such as
-`~/.kaijibot/skills`, then filtered by the effective agent skill allowlist when
+`~/.allbot/skills`, then filtered by the effective agent skill allowlist when
 configured. Use `agents.defaults.skills` for a shared baseline and
 `agents.list[].skills` for per-agent replacement. See
 [Skills: per-agent vs shared](/tools/skills#per-agent-vs-shared-skills) and
@@ -54,27 +54,27 @@ reach other host locations unless sandboxing is enabled. See
 
 ## Paths (quick map)
 
-- Config: `~/.kaijibot/kaijibot.json` (or `KAIJIBOT_CONFIG_PATH`)
-- State dir: `~/.kaijibot` (or `KAIJIBOT_STATE_DIR`)
-- Workspace: `~/.kaijibot/workspace` (or `~/.kaijibot/workspace-<agentId>`)
-- Agent dir: `~/.kaijibot/agents/<agentId>/agent` (or `agents.list[].agentDir`)
-- Sessions: `~/.kaijibot/agents/<agentId>/sessions`
+- Config: `~/.allbot/allbot.json` (or `ALLBOT_CONFIG_PATH`)
+- State dir: `~/.allbot` (or `ALLBOT_STATE_DIR`)
+- Workspace: `~/.allbot/workspace` (or `~/.allbot/workspace-<agentId>`)
+- Agent dir: `~/.allbot/agents/<agentId>/agent` (or `agents.list[].agentDir`)
+- Sessions: `~/.allbot/agents/<agentId>/sessions`
 
 ### Single-agent mode (default)
 
-If you do nothing, KaijiBot runs a single agent:
+If you do nothing, AllBot runs a single agent:
 
 - `agentId` defaults to **`main`**.
 - Sessions are keyed as `agent:main:<mainKey>`.
-- Workspace defaults to `~/.kaijibot/workspace` (or `~/.kaijibot/workspace-<profile>` when `KAIJIBOT_PROFILE` is set).
-- State defaults to `~/.kaijibot/agents/main/agent`.
+- Workspace defaults to `~/.allbot/workspace` (or `~/.allbot/workspace-<profile>` when `ALLBOT_PROFILE` is set).
+- State defaults to `~/.allbot/agents/main/agent`.
 
 ## Agent helper
 
 Use the agent wizard to add a new isolated agent:
 
 ```bash
-kaijibot agents add work
+allbot agents add work
 ```
 
 Then add `bindings` (or let the wizard do it) to route inbound messages.
@@ -82,7 +82,7 @@ Then add `bindings` (or let the wizard do it) to route inbound messages.
 Verify with:
 
 ```bash
-kaijibot agents list --bindings
+allbot agents list --bindings
 ```
 
 ## Quick start
@@ -93,11 +93,11 @@ kaijibot agents list --bindings
 Use the wizard or create workspaces manually:
 
 ```bash
-kaijibot agents add coding
-kaijibot agents add social
+allbot agents add coding
+allbot agents add social
 ```
 
-Each agent gets its own workspace with `SOUL.md`, `AGENTS.md`, and optional `USER.md`, plus a dedicated `agentDir` and session store under `~/.kaijibot/agents/<agentId>`.
+Each agent gets its own workspace with `SOUL.md`, `AGENTS.md`, and optional `USER.md`, plus a dedicated `agentDir` and session store under `~/.allbot/agents/<agentId>`.
 
   </Step>
 
@@ -110,7 +110,7 @@ Create one account per agent on your preferred channels:
 - WhatsApp: link each phone number per account.
 
 ```bash
-kaijibot channels login --channel whatsapp --account work
+allbot channels login --channel whatsapp --account work
 ```
 
 See channel guides: [Discord](/channels/discord), [Telegram](/channels/telegram), [WhatsApp](/channels/whatsapp).
@@ -126,9 +126,9 @@ Add agents under `agents.list`, channel accounts under `channels.<channel>.accou
   <Step title="Restart and verify">
 
 ```bash
-kaijibot gateway restart
-kaijibot agents list --bindings
-kaijibot channels status --probe
+allbot gateway restart
+allbot agents list --bindings
+allbot channels status --probe
 ```
 
   </Step>
@@ -198,8 +198,8 @@ Example:
 {
   agents: {
     list: [
-      { id: "alex", workspace: "~/.kaijibot/workspace-alex" },
-      { id: "mia", workspace: "~/.kaijibot/workspace-mia" },
+      { id: "alex", workspace: "~/.allbot/workspace-alex" },
+      { id: "mia", workspace: "~/.allbot/workspace-mia" },
     ],
   },
   bindings: [
@@ -246,7 +246,7 @@ Important account-scope detail:
 
 - A binding that omits `accountId` matches the default account only.
 - Use `accountId: "*"` for a channel-wide fallback across all accounts.
-- If you later add the same binding for the same agent with an explicit account id, KaijiBot upgrades the existing channel-only binding to account-scoped instead of duplicating it.
+- If you later add the same binding for the same agent with an explicit account id, AllBot upgrades the existing channel-only binding to account-scoped instead of duplicating it.
 
 ## Multiple accounts / phone numbers
 
@@ -255,7 +255,7 @@ each login. Each `accountId` can be routed to a different agent, so one server c
 multiple phone numbers without mixing sessions.
 
 If you want a channel-wide default account when `accountId` is omitted, set
-`channels.<channel>.defaultAccount` (optional). When unset, KaijiBot falls back
+`channels.<channel>.defaultAccount` (optional). When unset, AllBot falls back
 to `default` if present, otherwise the first configured account id (sorted).
 
 Common channels supporting this pattern include:
@@ -281,8 +281,8 @@ Each Discord bot account maps to a unique `accountId`. Bind each account to an a
 {
   agents: {
     list: [
-      { id: "main", workspace: "~/.kaijibot/workspace-main" },
-      { id: "coding", workspace: "~/.kaijibot/workspace-coding" },
+      { id: "main", workspace: "~/.allbot/workspace-main" },
+      { id: "coding", workspace: "~/.allbot/workspace-coding" },
     ],
   },
   bindings: [
@@ -330,8 +330,8 @@ Notes:
 {
   agents: {
     list: [
-      { id: "main", workspace: "~/.kaijibot/workspace-main" },
-      { id: "alerts", workspace: "~/.kaijibot/workspace-alerts" },
+      { id: "main", workspace: "~/.allbot/workspace-main" },
+      { id: "alerts", workspace: "~/.allbot/workspace-alerts" },
     ],
   },
   bindings: [
@@ -366,11 +366,11 @@ Notes:
 Link each account before starting the gateway:
 
 ```bash
-kaijibot channels login --channel whatsapp --account personal
-kaijibot channels login --channel whatsapp --account biz
+allbot channels login --channel whatsapp --account personal
+allbot channels login --channel whatsapp --account biz
 ```
 
-`~/.kaijibot/kaijibot.json` (JSON5):
+`~/.allbot/allbot.json` (JSON5):
 
 ```js
 {
@@ -380,14 +380,14 @@ kaijibot channels login --channel whatsapp --account biz
         id: "home",
         default: true,
         name: "Home",
-        workspace: "~/.kaijibot/workspace-home",
-        agentDir: "~/.kaijibot/agents/home/agent",
+        workspace: "~/.allbot/workspace-home",
+        agentDir: "~/.allbot/agents/home/agent",
       },
       {
         id: "work",
         name: "Work",
-        workspace: "~/.kaijibot/workspace-work",
-        agentDir: "~/.kaijibot/agents/work/agent",
+        workspace: "~/.allbot/workspace-work",
+        agentDir: "~/.allbot/agents/work/agent",
       },
     ],
   },
@@ -420,12 +420,12 @@ kaijibot channels login --channel whatsapp --account biz
     whatsapp: {
       accounts: {
         personal: {
-          // Optional override. Default: ~/.kaijibot/credentials/whatsapp/personal
-          // authDir: "~/.kaijibot/credentials/whatsapp/personal",
+          // Optional override. Default: ~/.allbot/credentials/whatsapp/personal
+          // authDir: "~/.allbot/credentials/whatsapp/personal",
         },
         biz: {
-          // Optional override. Default: ~/.kaijibot/credentials/whatsapp/biz
-          // authDir: "~/.kaijibot/credentials/whatsapp/biz",
+          // Optional override. Default: ~/.allbot/credentials/whatsapp/biz
+          // authDir: "~/.allbot/credentials/whatsapp/biz",
         },
       },
     },
@@ -444,13 +444,13 @@ Split by channel: route WhatsApp to a fast everyday agent and Telegram to an Opu
       {
         id: "chat",
         name: "Everyday",
-        workspace: "~/.kaijibot/workspace-chat",
+        workspace: "~/.allbot/workspace-chat",
         model: "anthropic/claude-sonnet-4-6",
       },
       {
         id: "opus",
         name: "Deep Work",
-        workspace: "~/.kaijibot/workspace-opus",
+        workspace: "~/.allbot/workspace-opus",
         model: "anthropic/claude-opus-4-6",
       },
     ],
@@ -478,13 +478,13 @@ Keep WhatsApp on the fast agent, but route one DM to Opus:
       {
         id: "chat",
         name: "Everyday",
-        workspace: "~/.kaijibot/workspace-chat",
+        workspace: "~/.allbot/workspace-chat",
         model: "anthropic/claude-sonnet-4-6",
       },
       {
         id: "opus",
         name: "Deep Work",
-        workspace: "~/.kaijibot/workspace-opus",
+        workspace: "~/.allbot/workspace-opus",
         model: "anthropic/claude-opus-4-6",
       },
     ],
@@ -513,7 +513,7 @@ and a tighter tool policy:
       {
         id: "family",
         name: "Family",
-        workspace: "~/.kaijibot/workspace-family",
+        workspace: "~/.allbot/workspace-family",
         identity: { name: "Family Bot" },
         groupChat: {
           mentionPatterns: ["@family", "@familybot", "@Family Bot"],
@@ -566,7 +566,7 @@ Each agent can have its own sandbox and tool restrictions:
     list: [
       {
         id: "personal",
-        workspace: "~/.kaijibot/workspace-personal",
+        workspace: "~/.allbot/workspace-personal",
         sandbox: {
           mode: "off",  // No sandbox for personal agent
         },
@@ -574,7 +574,7 @@ Each agent can have its own sandbox and tool restrictions:
       },
       {
         id: "family",
-        workspace: "~/.kaijibot/workspace-family",
+        workspace: "~/.allbot/workspace-family",
         sandbox: {
           mode: "all",     // Always sandboxed
           scope: "agent",  // One container per agent

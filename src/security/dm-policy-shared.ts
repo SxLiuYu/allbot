@@ -1,4 +1,4 @@
-import { evaluateMatchedGroupAccessForPolicy } from "kaijibot/plugin-sdk/group-access";
+import { evaluateMatchedGroupAccessForPolicy } from "allbot/plugin-sdk/group-access";
 import { mergeDmAllowFromSources, resolveGroupAllowFromSources } from "../channels/allow-from.js";
 import { resolveControlCommandGate } from "../channels/command-gating.js";
 import type { ChannelId } from "../channels/plugins/types.js";

@@ -33,7 +33,7 @@ vi.mock("../plugins/provider-runtime.js", () => ({
 let discoverAuthStorage: typeof import("./pi-model-discovery.js").discoverAuthStorage;
 
 async function withAgentDir(run: (agentDir: string) => Promise<void>): Promise<void> {
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-pi-synthetic-auth-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-pi-synthetic-auth-"));
   try {
     await run(agentDir);
   } finally {

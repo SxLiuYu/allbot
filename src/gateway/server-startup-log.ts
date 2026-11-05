@@ -41,7 +41,7 @@ export function logGatewayStartup(params: {
     });
   } else {
     params.log.warn(
-      "agent model: not configured — set `agents.defaults.model.primary` in kaijibot.json or run `kaijibot onboard`",
+      "agent model: not configured — set `agents.defaults.model.primary` in allbot.json or run `allbot onboard`",
     );
   }
   const startupDurationMs =
@@ -60,7 +60,7 @@ export function logGatewayStartup(params: {
   if (enabledDangerousFlags.length > 0) {
     const warning =
       `security warning: dangerous config flags enabled: ${enabledDangerousFlags.join(", ")}. ` +
-      "Run `kaijibot security audit`.";
+      "Run `allbot security audit`.";
     params.log.warn(warning);
   }
 }

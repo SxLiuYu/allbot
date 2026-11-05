@@ -210,8 +210,8 @@ async function launchChromium(): Promise<import("playwright-core").Browser | nul
   }
 
   const candidates: string[] = [
-    "/home/kaiji/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome",
-    "/home/kaiji/.cache/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell",
+    "/home/allbot/.cache/ms-playwright/chromium-1208/chrome-linux64/chrome",
+    "/home/allbot/.cache/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell",
   ];
 
   try {

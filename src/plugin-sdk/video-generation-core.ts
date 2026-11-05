@@ -17,7 +17,7 @@ export type {
   VideoGenerationSourceAsset,
   VideoGenerationTransformCapabilities,
 } from "../video-generation/types.js";
-export type { KaijiBotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
 
 export { describeFailoverError, isFailoverError } from "../agents/failover-error.js";
 export {

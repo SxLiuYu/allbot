@@ -69,17 +69,17 @@ describe("listManifestInstalledChannelIds", () => {
     const installedIds = listManifestInstalledChannelIds({
       cfg: {} as never,
       workspaceDir: "/tmp/workspace",
-      env: { KAIJIBOT_HOME: "/tmp/home" } as NodeJS.ProcessEnv,
+      env: { ALLBOT_HOME: "/tmp/home" } as NodeJS.ProcessEnv,
     });
 
     expect(applyPluginAutoEnable).toHaveBeenCalledWith({
       config: {},
-      env: { KAIJIBOT_HOME: "/tmp/home" },
+      env: { ALLBOT_HOME: "/tmp/home" },
     });
     expect(loadPluginManifestRegistry).toHaveBeenCalledWith({
       config: autoEnabledConfig,
       workspaceDir: "/tmp/workspace",
-      env: { KAIJIBOT_HOME: "/tmp/home" },
+      env: { ALLBOT_HOME: "/tmp/home" },
     });
     expect(installedIds).toEqual(new Set(["slack"]));
   });
@@ -111,7 +111,7 @@ describe("listManifestInstalledChannelIds", () => {
         } as never,
       ],
       workspaceDir: "/tmp/workspace",
-      env: { KAIJIBOT_HOME: "/tmp/home" } as NodeJS.ProcessEnv,
+      env: { ALLBOT_HOME: "/tmp/home" } as NodeJS.ProcessEnv,
     });
 
     expect(resolved.entries.map((entry) => entry.id)).toEqual(["telegram"]);

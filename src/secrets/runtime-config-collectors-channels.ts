@@ -1,10 +1,10 @@
 import { getBootstrapChannelSecrets } from "../channels/plugins/bootstrap-registry.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadBundledChannelSecretContractApi } from "./channel-contract-api.js";
 import { type ResolverContext, type SecretDefaults } from "./runtime-shared.js";
 
 export function collectChannelConfigAssignments(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   defaults: SecretDefaults | undefined;
   context: ResolverContext;
 }): void {

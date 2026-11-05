@@ -1,21 +1,21 @@
 ---
-summary: "Install KaijiBot: one-click installer, npm, Docker, or build from source"
+summary: "Install AllBot: one-click installer, npm, Docker, or build from source"
 read_when:
-  - You want to install KaijiBot
-  - You want to run KaijiBot via Docker
+  - You want to install AllBot
+  - You want to run AllBot via Docker
   - You want to set up a development environment
 title: "Installation Guide"
 ---
 
 # Installation
 
-KaijiBot supports multiple installation methods. Pick the one that suits your environment.
-（KaijiBot 支持多种安装方式，按需选择。）
+AllBot supports multiple installation methods. Pick the one that suits your environment.
+（AllBot 支持多种安装方式，按需选择。）
 
 | Method                                     | Command                    | Best for                             |
 | ------------------------------------------ | -------------------------- | ------------------------------------ |
 | **One-click install** (recommended / 推荐) | `curl -fsSL ... \| bash`   | Most users, fastest path             |
-| **npm install**                            | `npm install -g kaijibot`  | Users with Node.js already installed |
+| **npm install**                            | `npm install -g allbot`  | Users with Node.js already installed |
 | **Docker**                                 | `docker compose up -d`     | Containerized / headless deployments |
 | **Build from source**                      | `git clone` + `pnpm build` | Contributors and custom builds       |
 
@@ -28,7 +28,7 @@ KaijiBot supports multiple installation methods. Pick the one that suits your en
 | Git         | 2.x               | latest      |
 
 <Note>
-KaijiBot targets Chinese users and uses the Gitee mirror as the default
+AllBot targets Chinese users and uses the Gitee mirror as the default
 upstream. A GitHub remote is also available for international contributors.
 (默认使用 Gitee 镜像，GitHub 仓库同样可用。)
 </Note>
@@ -44,7 +44,7 @@ curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.sh | ba
 ```
 
 The script auto-detects your system, installs Node.js if needed, configures the
-environment, and launches the `kaijibot onboard` wizard. Uses the Gitee mirror
+environment, and launches the `allbot onboard` wizard. Uses the Gitee mirror
 for fast downloads in China.（自动检测系统、安装 Node.js、配置环境，并启动
 onboard 向导。）
 
@@ -61,14 +61,14 @@ iwr -useb https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.ps1 | ie
 If you already have Node.js 22+ installed:
 
 ```bash
-npm install -g kaijibot
-kaijibot onboard   # interactive setup wizard
+npm install -g allbot
+allbot onboard   # interactive setup wizard
 ```
 
 Then start the gateway:
 
 ```bash
-kaijibot gateway --port 18789
+allbot gateway --port 18789
 ```
 
 ---
@@ -79,7 +79,7 @@ kaijibot gateway --port 18789
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 ```
 
 ### 2. Install dependencies
@@ -106,7 +106,7 @@ pnpm build
 Run the interactive setup wizard (交互式配置向导):
 
 ```bash
-pnpm kaijibot onboard
+pnpm allbot onboard
 ```
 
 Or set required values manually:
@@ -116,16 +116,16 @@ Or set required values manually:
 export ZAI_API_KEY="your-key"
 
 # Feishu channel
-pnpm kaijibot config set channels.feishu.appId "your-app-id"
-pnpm kaijibot config set channels.feishu.appSecret "your-app-secret"
+pnpm allbot config set channels.feishu.appId "your-app-id"
+pnpm allbot config set channels.feishu.appSecret "your-app-secret"
 ```
 
-Config is stored at `~/.kaijibot/kaijibot.json`.
+Config is stored at `~/.allbot/allbot.json`.
 
 ### 5. Start the gateway
 
 ```bash
-pnpm kaijibot gateway --port 18789
+pnpm allbot gateway --port 18789
 ```
 
 Add `--verbose` for debug output. The gateway listens on port 18789 by default
@@ -143,7 +143,7 @@ Send a message to your bot in Feishu. If it responds, installation is complete.
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 docker compose up -d
 ```
 
@@ -160,12 +160,12 @@ Set these in `docker-compose.yml` or a `.env` file:
 
 ```bash
 ZAI_API_KEY=your-key
-KAIJIBOT_GATEWAY_TOKEN=your-token
-KAIJIBOT_GATEWAY_PORT=18789
-KAIJIBOT_GATEWAY_BIND=0.0.0.0
+ALLBOT_GATEWAY_TOKEN=your-token
+ALLBOT_GATEWAY_PORT=18789
+ALLBOT_GATEWAY_BIND=0.0.0.0
 ```
 
-Config and credentials are mounted at `/home/node/.kaijibot` inside the
+Config and credentials are mounted at `/home/node/.allbot` inside the
 container.
 
 ---
@@ -182,7 +182,7 @@ Same source-build steps as above. Useful commands for contributors:
 | `pnpm test`         | Run tests (Vitest)                 |
 | `pnpm test <path>`  | Scoped test run                    |
 | `pnpm format:fix`   | Auto-format (oxfmt)                |
-| `pnpm kaijibot ...` | Run CLI in dev                     |
+| `pnpm allbot ...` | Run CLI in dev                     |
 
 Pre-commit hooks: `prek install`. Skip with `FAST_COMMIT=1`.
 
@@ -208,7 +208,7 @@ conflicts should be rare.
 
 <AccordionGroup>
   <Accordion title="Node.js version too old">
-    KaijiBot requires Node.js >= 22. Check your version:
+    AllBot requires Node.js >= 22. Check your version:
 
     ```bash
     node -v
@@ -255,7 +255,7 @@ conflicts should be rare.
     Check logs:
 
     ```bash
-    docker compose logs kaijibot-gateway
+    docker compose logs allbot-gateway
     ```
 
     Common cause: missing `ZAI_API_KEY` or Feishu credentials.

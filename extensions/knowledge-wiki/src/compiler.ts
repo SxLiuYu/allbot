@@ -23,7 +23,7 @@ Rules:
 - Extract only what is explicitly stated or directly implied in the document
 - Confidence: 0.9+ for explicit statements, 0.7-0.9 for strong implications, 0.5-0.7 for weak implications
 - Keep claim text concise (one sentence)
-- Entity naming: use the canonical, most common English form. For "Rust" use "Rust", not "rust-language" or "Rust Programming Language". For Chinese names, use the most common form (e.g. "凯机" not "kaiji-user"). Person names: use real name if known, otherwise username.
+- Entity naming: use the canonical, most common English form. For "Rust" use "Rust", not "rust-language" or "Rust Programming Language". For Chinese names, use the most common form (e.g. "凯机" not "allbot-user"). Person names: use real name if known, otherwise username.
 - Within this document, use consistent entity names — do not use "Rust" in one place and "rust-lang" in another
 - Do NOT classify abstract ideas as entities — use the concepts array for those
 - Relationships: extract all meaningful connections between entities and concepts mentioned in the document

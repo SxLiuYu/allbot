@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig, writeConfigFile } from "../config/config.js";
 import { resolveGatewayAuth } from "../gateway/auth.js";
 import { ensureGatewayStartupAuth } from "../gateway/startup-auth.js";
@@ -14,7 +14,7 @@ export type BrowserControlAuth = {
 };
 
 export function resolveBrowserControlAuth(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): BrowserControlAuth {
   const auth = resolveGatewayAuth({
@@ -43,7 +43,7 @@ export function shouldAutoGenerateBrowserAuth(env: NodeJS.ProcessEnv): boolean {
 }
 
 function hasExplicitNonStringGatewayCredentialForMode(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   mode: "none" | "trusted-proxy";
 }): boolean {
   const { cfg, mode } = params;
@@ -62,14 +62,14 @@ function generateBrowserControlToken(): string {
 }
 
 async function generateAndPersistBrowserControlToken(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<{
   auth: BrowserControlAuth;
   generatedToken?: string;
 }> {
   const token = generateBrowserControlToken();
-  const nextCfg: KaijiBotConfig = {
+  const nextCfg: AllBotConfig = {
     ...params.cfg,
     gateway: {
       ...params.cfg.gateway,
@@ -93,14 +93,14 @@ async function generateAndPersistBrowserControlToken(params: {
 }
 
 async function generateAndPersistBrowserControlPassword(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
 }): Promise<{
   auth: BrowserControlAuth;
   generatedToken?: string;
 }> {
   const password = generateBrowserControlToken();
-  const nextCfg: KaijiBotConfig = {
+  const nextCfg: AllBotConfig = {
     ...params.cfg,
     gateway: {
       ...params.cfg.gateway,
@@ -124,7 +124,7 @@ async function generateAndPersistBrowserControlPassword(params: {
 }
 
 export async function ensureBrowserControlAuth(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env?: NodeJS.ProcessEnv;
 }): Promise<{
   auth: BrowserControlAuth;

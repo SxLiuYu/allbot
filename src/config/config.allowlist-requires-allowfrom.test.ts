@@ -14,7 +14,7 @@ function expectChannelAllowlistIssue(
   }
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)(
   'dmPolicy="allowlist" requires non-empty effective allowFrom',
   () => {
@@ -52,7 +52,7 @@ describe.skipIf(process.env.CI)(
   },
 );
 
-// Skip on CI: requires upstream-only channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels not bundled in AllBot
 describe.skipIf(process.env.CI)('account dmPolicy="allowlist" uses inherited allowFrom', () => {
   it.each([
     {

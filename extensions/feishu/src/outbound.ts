@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { createAttachedChannelResultAdapter } from "kaijibot/plugin-sdk/channel-send-result";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { createAttachedChannelResultAdapter } from "allbot/plugin-sdk/channel-send-result";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { resolveFeishuAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";
 import { parseFeishuCommentTarget } from "./comment-target.js";

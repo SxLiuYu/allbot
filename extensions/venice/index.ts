@@ -1,6 +1,6 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { applyXaiModelCompat } from "kaijibot/plugin-sdk/provider-tools";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { applyXaiModelCompat } from "allbot/plugin-sdk/provider-tools";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { applyVeniceConfig, VENICE_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildVeniceProvider } from "./provider-catalog.js";
 

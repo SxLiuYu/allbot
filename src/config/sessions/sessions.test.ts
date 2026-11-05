@@ -5,7 +5,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest
 import { upsertAcpSessionMeta } from "../../acp/runtime/session-meta.js";
 import * as jsonFiles from "../../infra/json-files.js";
 import { createSuiteTempRootTracker, withTempDirSync } from "../../test-helpers/temp-dir.js";
-import type { KaijiBotConfig } from "../config.js";
+import type { AllBotConfig } from "../config.js";
 import type { SessionConfig } from "../types.base.js";
 import {
   resolveSessionFilePath,
@@ -44,18 +44,18 @@ describe("session path safety", () => {
   });
 
   it("resolves transcript path inside an explicit sessions dir", () => {
-    const sessionsDir = "/tmp/kaijibot/agents/main/sessions";
+    const sessionsDir = "/tmp/allbot/agents/main/sessions";
     const resolved = resolveSessionTranscriptPathInDir("sess-1", sessionsDir, "topic/a+b");
 
     expect(resolved).toBe(path.resolve(sessionsDir, "sess-1-topic-topic%2Fa%2Bb.jsonl"));
   });
 
   it("falls back to derived path when sessionFile is outside known agent sessions dirs", () => {
-    const sessionsDir = "/tmp/kaijibot/agents/main/sessions";
+    const sessionsDir = "/tmp/allbot/agents/main/sessions";
 
     const resolved = resolveSessionFilePath(
       "sess-1",
-      { sessionFile: "/tmp/kaijibot/agents/work/not-sessions/abc-123.jsonl" },
+      { sessionFile: "/tmp/allbot/agents/work/not-sessions/abc-123.jsonl" },
       { sessionsDir },
     );
     expect(resolved).toBe(path.resolve(sessionsDir, "sess-1.jsonl"));
@@ -72,7 +72,7 @@ describe("session path safety", () => {
     if (process.platform === "win32") {
       return;
     }
-    withTempDirSync({ prefix: "kaijibot-symlink-session-" }, (tmpDir) => {
+    withTempDirSync({ prefix: "allbot-symlink-session-" }, (tmpDir) => {
       const realRoot = path.join(tmpDir, "real-state");
       const aliasRoot = path.join(tmpDir, "alias-state");
       const sessionsDir = path.join(realRoot, "agents", "main", "sessions");
@@ -91,7 +91,7 @@ describe("session path safety", () => {
     if (process.platform === "win32") {
       return;
     }
-    withTempDirSync({ prefix: "kaijibot-symlink-escape-" }, (tmpDir) => {
+    withTempDirSync({ prefix: "allbot-symlink-escape-" }, (tmpDir) => {
       const sessionsDir = path.join(tmpDir, "agents", "main", "sessions");
       const outsideDir = path.join(tmpDir, "outside");
       fs.mkdirSync(sessionsDir, { recursive: true });
@@ -161,7 +161,7 @@ describe("resolveSessionResetPolicy", () => {
 });
 
 describe("session store lock (Promise chain mutex)", () => {
-  const lockFixtureRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-lock-test-" });
+  const lockFixtureRootTracker = createSuiteTempRootTracker({ prefix: "allbot-lock-test-" });
   let lockTmpDirs: string[] = [];
 
   async function makeTmpStore(
@@ -343,7 +343,7 @@ describe("session store lock (Promise chain mutex)", () => {
       session: {
         store: storePath,
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const result = await upsertAcpSessionMeta({
       cfg,

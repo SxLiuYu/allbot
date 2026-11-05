@@ -20,7 +20,7 @@ function makeDraft(overrides: Partial<SkillDraft> = {}): SkillDraft {
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-skill-writer-test-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-skill-writer-test-"));
   writer = new SkillPersistenceWriter(tempDir);
 });
 

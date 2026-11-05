@@ -31,7 +31,7 @@ vi.mock("../../cognitive/evolution/standalone-generate.js", () => ({
 
 const mockWriteSkill = vi
   .fn()
-  .mockResolvedValue("/home/test/.kaijibot/skills/agent/test-skill/SKILL.md");
+  .mockResolvedValue("/home/test/.allbot/skills/agent/test-skill/SKILL.md");
 const mockListSkillNames = vi.fn().mockResolvedValue([]);
 const mockReadSkillMeta = vi.fn().mockResolvedValue(null);
 
@@ -45,21 +45,21 @@ vi.mock("../../cognitive/evolution/skill-writer.js", () => ({
 
 vi.mock("../../cognitive/evolution/skill-lifecycle.js", () => ({
   SkillLifecycleManager: class {},
-  resolveEvolutionSkillBaseDir: vi.fn().mockReturnValue("/home/test/.kaijibot/workspace"),
+  resolveEvolutionSkillBaseDir: vi.fn().mockReturnValue("/home/test/.allbot/workspace"),
 }));
 
 vi.mock("../../utils.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../utils.js")>();
   return {
     ...actual,
-    resolveConfigDir: vi.fn().mockReturnValue("/home/test/.kaijibot"),
+    resolveConfigDir: vi.fn().mockReturnValue("/home/test/.allbot"),
   };
 });
 
 describe("createEvolutionSuggestTool", () => {
   afterEach(() => {
     vi.clearAllMocks();
-    mockWriteSkill.mockResolvedValue("/home/test/.kaijibot/skills/agent/test-skill/SKILL.md");
+    mockWriteSkill.mockResolvedValue("/home/test/.allbot/skills/agent/test-skill/SKILL.md");
     mockListSkillNames.mockResolvedValue([]);
     mockReadSkillMeta.mockResolvedValue(null);
     mockList.mockResolvedValue([]);
@@ -393,7 +393,7 @@ describe("createEvolutionSuggestTool", () => {
         triggerPhrases: ["test"],
         bodyMarkdown: "# Test",
       });
-      mockWriteSkill.mockResolvedValueOnce("/home/test/.kaijibot/skills/agent/path-test/SKILL.md");
+      mockWriteSkill.mockResolvedValueOnce("/home/test/.allbot/skills/agent/path-test/SKILL.md");
 
       const tool = createEvolutionSuggestTool({
         sessionKey: "agent:main:user-path",
@@ -414,7 +414,7 @@ describe("createEvolutionSuggestTool", () => {
       expect(mockSave).toHaveBeenCalledTimes(1);
       const savedRecord = mockSave.mock.calls[0][1];
       expect(savedRecord.savedSkillPath).toBe(
-        "/home/test/.kaijibot/skills/agent/path-test/SKILL.md",
+        "/home/test/.allbot/skills/agent/path-test/SKILL.md",
       );
       expect(savedRecord.draft.name).toBe("path-test");
     });

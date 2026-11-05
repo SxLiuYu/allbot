@@ -34,8 +34,8 @@ describe("tailscale helpers", () => {
   let envSnapshot: ReturnType<typeof captureEnv>;
 
   beforeEach(() => {
-    envSnapshot = captureEnv(["KAIJIBOT_TEST_TAILSCALE_BINARY", "NODE_ENV", "VITEST"]);
-    process.env.KAIJIBOT_TEST_TAILSCALE_BINARY = "tailscale";
+    envSnapshot = captureEnv(["ALLBOT_TEST_TAILSCALE_BINARY", "NODE_ENV", "VITEST"]);
+    process.env.ALLBOT_TEST_TAILSCALE_BINARY = "tailscale";
     process.env.VITEST ??= "true";
   });
 
@@ -72,7 +72,7 @@ describe("tailscale helpers", () => {
   });
 
   it("allows the test binary override in explicit test environments", () => {
-    process.env.KAIJIBOT_TEST_TAILSCALE_BINARY = "/tmp/test-tailscale";
+    process.env.ALLBOT_TEST_TAILSCALE_BINARY = "/tmp/test-tailscale";
     process.env.NODE_ENV = "test";
     delete process.env.VITEST;
 
@@ -80,7 +80,7 @@ describe("tailscale helpers", () => {
   });
 
   it("ignores the test binary override outside test environments", () => {
-    process.env.KAIJIBOT_TEST_TAILSCALE_BINARY = "/tmp/attacker-tailscale";
+    process.env.ALLBOT_TEST_TAILSCALE_BINARY = "/tmp/attacker-tailscale";
     process.env.NODE_ENV = "production";
     delete process.env.VITEST;
 

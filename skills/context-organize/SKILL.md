@@ -1,12 +1,12 @@
 ---
 name: context-organize
-description: "整理和优化 KaijiBot 的上下文 token 预算。展示三层注入（L1 硬编码 / L2 用户文件 / L3 认知数据），让 agent 判断冗余并修改 L2 文件。当用户说'整理上下文'、'上下文太乱了'、'优化上下文'、'精简 prompt'、'AGENTS.md 太长了'、'SOUL.md 需要精简'、'token 太多了'、'workspace 文件太大了'、'上下文窗口不够用了'、'organize context'、'optimize context' 时使用。即使用户没有明确说'上下文'，只要提到某个 workspace 文件需要精简、缩短或优化，就应使用此 skill。"
-metadata: { "kaijibot": { "emoji": "🔧", "requires": { "bins": [] }, "install": [] } }
+description: "整理和优化 AllBot 的上下文 token 预算。展示三层注入（L1 硬编码 / L2 用户文件 / L3 认知数据），让 agent 判断冗余并修改 L2 文件。当用户说'整理上下文'、'上下文太乱了'、'优化上下文'、'精简 prompt'、'AGENTS.md 太长了'、'SOUL.md 需要精简'、'token 太多了'、'workspace 文件太大了'、'上下文窗口不够用了'、'organize context'、'optimize context' 时使用。即使用户没有明确说'上下文'，只要提到某个 workspace 文件需要精简、缩短或优化，就应使用此 skill。"
+metadata: { "allbot": { "emoji": "🔧", "requires": { "bins": [] }, "install": [] } }
 ---
 
 # Context Organize
 
-KaijiBot 每个 agent turn 注入三层上下文。随着使用积累，L2 文件膨胀，token 预算被无效内容占据，模型注意力被稀释。这个 skill 让 agent 看到全部注入内容，判断冗余，修改 L2 文件。
+AllBot 每个 agent turn 注入三层上下文。随着使用积累，L2 文件膨胀，token 预算被无效内容占据，模型注意力被稀释。这个 skill 让 agent 看到全部注入内容，判断冗余，修改 L2 文件。
 
 **职责边界**：只改 L2 workspace 文件。L1 是硬编码（不改），L3 由 cognitive 系统自管理（consolidation cron 自动清理，不碰）。
 

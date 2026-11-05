@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { generatePkceVerifierChallenge, toFormUrlEncoded } from "kaijibot/plugin-sdk/provider-auth";
-import { ensureGlobalUndiciEnvProxyDispatcher } from "kaijibot/plugin-sdk/runtime-env";
+import { generatePkceVerifierChallenge, toFormUrlEncoded } from "allbot/plugin-sdk/provider-auth";
+import { ensureGlobalUndiciEnvProxyDispatcher } from "allbot/plugin-sdk/runtime-env";
 
 export type MiniMaxRegion = "cn" | "global";
 

@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
-import { hasConfiguredSecretInput } from "kaijibot/plugin-sdk/setup";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
+import { hasConfiguredSecretInput } from "allbot/plugin-sdk/setup";
 import { asRecord, hasNonEmptyString } from "./comment-shared.js";
 
-function isFeishuDocToolEnabled(cfg: KaijiBotConfig): boolean {
+function isFeishuDocToolEnabled(cfg: AllBotConfig): boolean {
   const channels = asRecord(cfg.channels);
   const feishu = asRecord(channels?.feishu);
   if (!feishu || feishu.enabled === false) {
@@ -42,7 +42,7 @@ function isFeishuDocToolEnabled(cfg: KaijiBotConfig): boolean {
   return false;
 }
 
-export function collectFeishuSecurityAuditFindings(params: { cfg: KaijiBotConfig }) {
+export function collectFeishuSecurityAuditFindings(params: { cfg: AllBotConfig }) {
   if (!isFeishuDocToolEnabled(params.cfg)) {
     return [];
   }

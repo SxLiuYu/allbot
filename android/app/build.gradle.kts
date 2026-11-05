@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.kaiji.launcher"
+    namespace = "com.allbot.launcher"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.kaiji.launcher"
+        applicationId = "com.allbot.launcher"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

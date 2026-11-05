@@ -79,7 +79,7 @@ describe("ensureSkillSnapshot", () => {
   });
 
   it("uses config-aware session agent resolution for legacy session keys", async () => {
-    vi.stubEnv("KAIJIBOT_TEST_FAST", "0");
+    vi.stubEnv("ALLBOT_TEST_FAST", "0");
 
     await ensureSkillSnapshot({
       sessionKey: "main",
@@ -108,7 +108,7 @@ describe("ensureSkillSnapshot", () => {
   });
 
   it("skips disk write for transient session entries via ensureSkillSnapshot", async () => {
-    vi.stubEnv("KAIJIBOT_TEST_FAST", "0");
+    vi.stubEnv("ALLBOT_TEST_FAST", "0");
 
     const sessionKey = "agent:main:telegram:direct:transient-test";
     const transientEntry: SessionEntry = {

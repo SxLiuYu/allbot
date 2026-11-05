@@ -11,7 +11,7 @@ export default createScopedVitestConfig(["ui/src/**/*.test.ts"], {
   dir: "ui",
   environment: "jsdom",
   exclude: ["ui/src/**/*.browser.test.ts"],
-  includeKaijiBotRuntimeSetup: false,
+  includeAllBotRuntimeSetup: false,
   isolate: true,
   name: "ui",
   passWithNoTests: true,

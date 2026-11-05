@@ -47,7 +47,7 @@ Supported keys:
 - `seed`, `normalize`, `lang`, `output_format`, `latency_tier`
 - `once`
 
-## Config (`~/.kaijibot/kaijibot.json`)
+## Config (`~/.allbot/allbot.json`)
 
 ```json5
 {

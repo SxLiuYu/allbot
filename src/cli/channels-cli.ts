@@ -70,13 +70,13 @@ export function registerChannelsCli(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.help.heading.examples"))}\n${formatHelpExamples([
-          ["kaijibot channels list", "List configured channels and auth profiles."],
-          ["kaijibot channels status --probe", "Run channel status checks and probes."],
+          ["allbot channels list", "List configured channels and auth profiles."],
+          ["allbot channels status --probe", "Run channel status checks and probes."],
           [
-            "kaijibot channels add --channel feishu --app-id <app-id>",
+            "allbot channels add --channel feishu --app-id <app-id>",
             "Add or update a channel account non-interactively.",
           ],
-          ["kaijibot channels login --channel feishu", "Link a Feishu account."],
+          ["allbot channels login --channel feishu", "Link a Feishu account."],
         ])}\n\n${theme.muted(t("cli.help.heading.docs"))} ${formatDocsLink(
           "/cli/channels",
           "gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/channels.md",

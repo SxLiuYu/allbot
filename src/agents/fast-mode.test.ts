@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveFastModeState } from "./fast-mode.js";
 
 describe("resolveFastModeState", () => {
   it("prefers session overrides", () => {
     const state = resolveFastModeState({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       provider: "openai",
       model: "gpt-4o",
       sessionEntry: { fastMode: true },
@@ -20,7 +20,7 @@ describe("resolveFastModeState", () => {
       agents: {
         list: [{ id: "alpha", fastModeDefault: true }],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const state = resolveFastModeState({
       cfg,
@@ -42,7 +42,7 @@ describe("resolveFastModeState", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const state = resolveFastModeState({
       cfg,
@@ -56,7 +56,7 @@ describe("resolveFastModeState", () => {
 
   it("defaults to off when unset", () => {
     const state = resolveFastModeState({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       provider: "openai",
       model: "gpt-4o",
     });

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import type { FollowupRun, QueueSettings } from "./queue.js";
 
@@ -23,7 +23,7 @@ let sessionRunAccounting: typeof import("./session-run-accounting.js");
 let setRuntimeConfigSnapshot: typeof import("../../config/config.js").setRuntimeConfigSnapshot;
 let createMockFollowupRun: typeof import("./test-helpers.js").createMockFollowupRun;
 let createMockTypingController: typeof import("./test-helpers.js").createMockTypingController;
-const FOLLOWUP_DEBUG = process.env.KAIJIBOT_DEBUG_FOLLOWUP_RUNNER_TEST === "1";
+const FOLLOWUP_DEBUG = process.env.ALLBOT_DEBUG_FOLLOWUP_RUNNER_TEST === "1";
 const FOLLOWUP_TEST_QUEUES = new Map<
   string,
   {
@@ -395,7 +395,7 @@ function createAsyncReplySpy() {
 
 describe("createFollowupRunner runtime config", () => {
   it("uses the active runtime snapshot for queued embedded followup runs", async () => {
-    const sourceConfig: KaijiBotConfig = {
+    const sourceConfig: AllBotConfig = {
       models: {
         providers: {
           openai: {
@@ -410,7 +410,7 @@ describe("createFollowupRunner runtime config", () => {
         },
       },
     };
-    const runtimeConfig: KaijiBotConfig = {
+    const runtimeConfig: AllBotConfig = {
       models: {
         providers: {
           openai: {
@@ -452,7 +452,7 @@ describe("createFollowupRunner runtime config", () => {
   });
 
   it("resolves queued embedded followups before preflight helpers read config", async () => {
-    const sourceConfig: KaijiBotConfig = {
+    const sourceConfig: AllBotConfig = {
       skills: {
         entries: {
           whisper: {
@@ -465,7 +465,7 @@ describe("createFollowupRunner runtime config", () => {
         },
       },
     };
-    const runtimeConfig: KaijiBotConfig = {
+    const runtimeConfig: AllBotConfig = {
       skills: {
         entries: {
           whisper: {
@@ -518,7 +518,7 @@ describe("createFollowupRunner runtime config", () => {
 describe("createFollowupRunner compaction", () => {
   it("adds verbose auto-compaction notice and tracks count", async () => {
     const storePath = path.join(
-      await fs.mkdtemp(path.join(tmpdir(), "kaijibot-compaction-")),
+      await fs.mkdtemp(path.join(tmpdir(), "allbot-compaction-")),
       "sessions.json",
     );
     const sessionEntry: SessionEntry = {
@@ -563,7 +563,7 @@ describe("createFollowupRunner compaction", () => {
 
   it("tracks auto-compaction from embedded result metadata even when no compaction event is emitted", async () => {
     const storePath = path.join(
-      await fs.mkdtemp(path.join(tmpdir(), "kaijibot-compaction-meta-")),
+      await fs.mkdtemp(path.join(tmpdir(), "allbot-compaction-meta-")),
       "sessions.json",
     );
     const sessionEntry: SessionEntry = {
@@ -619,7 +619,7 @@ describe("createFollowupRunner compaction", () => {
 
   it("refreshes queued followup runs to the rotated transcript", async () => {
     const storePath = path.join(
-      await fs.mkdtemp(path.join(tmpdir(), "kaijibot-compaction-queue-")),
+      await fs.mkdtemp(path.join(tmpdir(), "allbot-compaction-queue-")),
       "sessions.json",
     );
     const sessionEntry: SessionEntry = {
@@ -682,7 +682,7 @@ describe("createFollowupRunner compaction", () => {
 
   it("does not count failed compaction end events in followup runs", async () => {
     const storePath = path.join(
-      await fs.mkdtemp(path.join(tmpdir(), "kaijibot-compaction-failed-")),
+      await fs.mkdtemp(path.join(tmpdir(), "allbot-compaction-failed-")),
       "sessions.json",
     );
     const sessionEntry: SessionEntry = {
@@ -737,7 +737,7 @@ describe("createFollowupRunner compaction", () => {
   });
 
   it("injects the post-compaction refresh prompt before followup runs after preflight compaction", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(tmpdir(), "kaijibot-preflight-followup-"));
+    const workspaceDir = await fs.mkdtemp(path.join(tmpdir(), "allbot-preflight-followup-"));
     const storePath = path.join(workspaceDir, "sessions.json");
     const transcriptPath = path.join(workspaceDir, "session.jsonl");
     await fs.writeFile(
@@ -990,7 +990,7 @@ describe("createFollowupRunner messaging tool dedupe", () => {
   }
 
   it("persists usage even when replies are suppressed", async () => {
-    const storePath = "/tmp/kaijibot-followup-usage.json";
+    const storePath = "/tmp/allbot-followup-usage.json";
     const sessionKey = "main";
     const sessionEntry: SessionEntry = { sessionId: "session", updatedAt: Date.now() };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1050,7 +1050,7 @@ describe("createFollowupRunner messaging tool dedupe", () => {
   });
 
   it("passes queued config into usage persistence during drained followups", async () => {
-    const storePath = "/tmp/kaijibot-followup-usage-cfg.json";
+    const storePath = "/tmp/allbot-followup-usage-cfg.json";
     const sessionKey = "main";
     const sessionEntry: SessionEntry = { sessionId: "session", updatedAt: Date.now() };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1104,7 +1104,7 @@ describe("createFollowupRunner messaging tool dedupe", () => {
   });
 
   it("uses providerUsed for snapshot freshness when agent metadata overrides the run provider", async () => {
-    const storePath = "/tmp/kaijibot-followup-usage-provider.json";
+    const storePath = "/tmp/allbot-followup-usage-provider.json";
     const sessionKey = "main";
     const sessionEntry: SessionEntry = { sessionId: "session", updatedAt: Date.now() };
     const sessionStore: Record<string, SessionEntry> = { [sessionKey]: sessionEntry };
@@ -1145,7 +1145,7 @@ describe("createFollowupRunner messaging tool dedupe", () => {
                   },
                 },
               },
-            } as unknown as KaijiBotConfig,
+            } as unknown as AllBotConfig,
           },
         }),
       ),

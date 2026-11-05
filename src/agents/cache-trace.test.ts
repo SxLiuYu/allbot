@@ -1,13 +1,13 @@
 import crypto from "node:crypto";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveUserPath } from "../utils.js";
 import { createCacheTrace } from "./cache-trace.js";
 
 describe("createCacheTrace", () => {
   it("returns null when diagnostics cache tracing is disabled", () => {
     const trace = createCacheTrace({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       env: {},
     });
 
@@ -21,7 +21,7 @@ describe("createCacheTrace", () => {
         diagnostics: {
           cacheTrace: {
             enabled: true,
-            filePath: "~/.kaijibot/logs/cache-trace.jsonl",
+            filePath: "~/.allbot/logs/cache-trace.jsonl",
           },
         },
       },
@@ -33,7 +33,7 @@ describe("createCacheTrace", () => {
     });
 
     expect(trace).not.toBeNull();
-    expect(trace?.filePath).toBe(resolveUserPath("~/.kaijibot/logs/cache-trace.jsonl"));
+    expect(trace?.filePath).toBe(resolveUserPath("~/.allbot/logs/cache-trace.jsonl"));
 
     trace?.recordStage("session:loaded", {
       messages: [],
@@ -123,7 +123,7 @@ describe("createCacheTrace", () => {
         },
       },
       env: {
-        KAIJIBOT_CACHE_TRACE: "0",
+        ALLBOT_CACHE_TRACE: "0",
       },
       writer: {
         filePath: "memory",

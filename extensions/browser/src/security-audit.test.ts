@@ -8,8 +8,8 @@ function collectFindings(
     config,
     sourceConfig: config,
     env: {} as NodeJS.ProcessEnv,
-    stateDir: "/tmp/kaijibot-state",
-    configPath: "/tmp/kaijibot.json",
+    stateDir: "/tmp/allbot-state",
+    configPath: "/tmp/allbot.json",
   });
 }
 
@@ -124,7 +124,7 @@ describe("browser security audit collector", () => {
       browser: {
         proxy: { enabled: true },
         profiles: {
-          kaijibot: { cdpPort: 18800, color: "#FF4500" },
+          allbot: { cdpPort: 18800, color: "#FF4500" },
         },
       },
     });

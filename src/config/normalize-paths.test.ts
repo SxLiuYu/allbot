@@ -9,23 +9,23 @@ describe("normalizeConfigPaths", () => {
       const cfg = normalizeConfigPaths({
         tools: { exec: { pathPrepend: ["~/bin"] } },
         plugins: { load: { paths: ["~/plugins/a"] } },
-        logging: { file: "~/.kaijibot/logs/kaijibot.log" },
+        logging: { file: "~/.allbot/logs/allbot.log" },
         hooks: {
-          path: "~/.kaijibot/hooks.json5",
+          path: "~/.allbot/hooks.json5",
           transformsDir: "~/hooks-xform",
         },
         channels: {
           telegram: {
             accounts: {
               personal: {
-                tokenFile: "~/.kaijibot/telegram.token",
+                tokenFile: "~/.allbot/telegram.token",
               },
             },
           },
           whatsapp: {
             accounts: {
               personal: {
-                authDir: "~/.kaijibot/credentials/wa-personal",
+                authDir: "~/.allbot/credentials/wa-personal",
               },
             },
           },
@@ -39,7 +39,7 @@ describe("normalizeConfigPaths", () => {
             {
               id: "main",
               workspace: "~/ws-agent",
-              agentDir: "~/.kaijibot/agents/main",
+              agentDir: "~/.allbot/agents/main",
               identity: {
                 name: "~not-a-path",
               },
@@ -50,22 +50,22 @@ describe("normalizeConfigPaths", () => {
       });
 
       expect(cfg.plugins?.load?.paths?.[0]).toBe(path.join(home, "plugins", "a"));
-      expect(cfg.logging?.file).toBe(path.join(home, ".kaijibot", "logs", "kaijibot.log"));
-      expect(cfg.hooks?.path).toBe(path.join(home, ".kaijibot", "hooks.json5"));
+      expect(cfg.logging?.file).toBe(path.join(home, ".allbot", "logs", "allbot.log"));
+      expect(cfg.hooks?.path).toBe(path.join(home, ".allbot", "hooks.json5"));
       expect(cfg.hooks?.transformsDir).toBe(path.join(home, "hooks-xform"));
       expect(cfg.tools?.exec?.pathPrepend?.[0]).toBe(path.join(home, "bin"));
       expect(cfg.channels?.telegram?.accounts?.personal?.tokenFile).toBe(
-        path.join(home, ".kaijibot", "telegram.token"),
+        path.join(home, ".allbot", "telegram.token"),
       );
       expect(cfg.channels?.whatsapp?.accounts?.personal?.authDir).toBe(
-        path.join(home, ".kaijibot", "credentials", "wa-personal"),
+        path.join(home, ".allbot", "credentials", "wa-personal"),
       );
       expect(cfg.channels?.imessage?.accounts?.personal?.dbPath).toBe(
         path.join(home, "Library", "Messages", "chat.db"),
       );
       expect(cfg.agents?.defaults?.workspace).toBe(path.join(home, "ws-default"));
       expect(cfg.agents?.list?.[0]?.workspace).toBe(path.join(home, "ws-agent"));
-      expect(cfg.agents?.list?.[0]?.agentDir).toBe(path.join(home, ".kaijibot", "agents", "main"));
+      expect(cfg.agents?.list?.[0]?.agentDir).toBe(path.join(home, ".allbot", "agents", "main"));
       expect(cfg.agents?.list?.[0]?.sandbox?.workspaceRoot).toBe(path.join(home, "sandbox-root"));
 
       // Non-path key => do not treat "~" as home expansion.

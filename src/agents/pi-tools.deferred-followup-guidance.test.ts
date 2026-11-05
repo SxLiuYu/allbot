@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import "./test-helpers/fast-kaijibot-tools.js";
-import { createKaijiBotCodingTools } from "./pi-tools.js";
+import "./test-helpers/fast-allbot-tools.js";
+import { createAllBotCodingTools } from "./pi-tools.js";
 
 function findToolDescription(toolName: string, senderIsOwner: boolean) {
-  const tools = createKaijiBotCodingTools({ senderIsOwner });
+  const tools = createAllBotCodingTools({ senderIsOwner });
   const tool = tools.find((entry) => entry.name === toolName);
   return {
     toolNames: tools.map((entry) => entry.name),
@@ -11,7 +11,7 @@ function findToolDescription(toolName: string, senderIsOwner: boolean) {
   };
 }
 
-describe("createKaijiBotCodingTools deferred follow-up guidance", () => {
+describe("createAllBotCodingTools deferred follow-up guidance", () => {
   it("keeps cron-specific guidance when cron survives filtering", () => {
     const exec = findToolDescription("exec", true);
     const process = findToolDescription("process", true);

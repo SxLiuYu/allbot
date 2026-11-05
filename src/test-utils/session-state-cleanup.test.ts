@@ -69,8 +69,8 @@ describe("cleanupSessionStateForTest", () => {
   });
 
   it("waits for in-flight session store locks before clearing test state", async () => {
-    const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-session-cleanup-"));
-    const storePath = path.join(fixtureRoot, "kaijibot-sessions.json");
+    const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-session-cleanup-"));
+    const storePath = path.join(fixtureRoot, "allbot-sessions.json");
     const started = createDeferred<void>();
     const release = createDeferred<void>();
     const drainRequested = createDeferred<void>();

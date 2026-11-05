@@ -1,4 +1,4 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
 import { applyVercelAiGatewayConfig, VERCEL_AI_GATEWAY_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildVercelAiGatewayProvider } from "./provider-catalog.js";
 

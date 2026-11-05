@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import type { SecretInput } from "../../config/types.secrets.js";
 import type { EmbeddingInput } from "./embedding-inputs.js";
 
@@ -34,7 +34,7 @@ export type GeminiTaskType =
   | "FACT_VERIFICATION";
 
 export type EmbeddingProviderOptions = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   provider: EmbeddingProviderRequest;
   remote?: {

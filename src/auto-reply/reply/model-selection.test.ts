@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MODEL_CONTEXT_TOKEN_CACHE } from "../../agents/context-cache.js";
 import { loadModelCatalog } from "../../agents/model-catalog.runtime.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import { createModelSelectionState, resolveContextTokens } from "./model-selection.js";
 
@@ -57,7 +57,7 @@ describe("createModelSelectionState catalog loading", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const state = await createModelSelectionState({
       cfg,
@@ -94,7 +94,7 @@ describe("createModelSelectionState catalog loading", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const state = await createModelSelectionState({
       cfg,
@@ -120,7 +120,7 @@ describe("createModelSelectionState catalog loading", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await createModelSelectionState({
       cfg,
@@ -142,7 +142,7 @@ describe("resolveContextTokens", () => {
     MODEL_CONTEXT_TOKEN_CACHE.set("anthropic/claude-opus-4-6", 1_000_000);
 
     const result = resolveContextTokens({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       agentCfg: undefined,
       provider: "anthropic",
       model: "claude-opus-4-6",
@@ -163,7 +163,7 @@ describe("createModelSelectionState parent inheritance", () => {
   const defaultModel = "gpt-4o-mini";
 
   async function resolveState(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     sessionEntry: ReturnType<typeof makeEntry>;
     sessionStore: Record<string, ReturnType<typeof makeEntry>>;
     sessionKey: string;
@@ -185,7 +185,7 @@ describe("createModelSelectionState parent inheritance", () => {
   }
 
   async function resolveHeartbeatStoredOverrideState(hasResolvedHeartbeatModelOverride: boolean) {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const sessionKey = "agent:main:discord:channel:c1";
     const sessionEntry = makeEntry({
       providerOverride: "openai",
@@ -209,7 +209,7 @@ describe("createModelSelectionState parent inheritance", () => {
   }
 
   async function resolveStateWithParent(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     parentKey: string;
     sessionKey: string;
     parentEntry: ReturnType<typeof makeEntry>;
@@ -231,7 +231,7 @@ describe("createModelSelectionState parent inheritance", () => {
   }
 
   it("inherits parent override from explicit parentSessionKey", async () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const parentKey = "agent:main:discord:channel:c1";
     const sessionKey = "agent:main:discord:channel:c1:thread:123";
     const parentEntry = makeEntry({
@@ -251,7 +251,7 @@ describe("createModelSelectionState parent inheritance", () => {
   });
 
   it("derives parent key from topic session suffix", async () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const parentKey = "agent:main:telegram:group:123";
     const sessionKey = "agent:main:telegram:group:123:topic:99";
     const parentEntry = makeEntry({
@@ -270,7 +270,7 @@ describe("createModelSelectionState parent inheritance", () => {
   });
 
   it("prefers child override over parent", async () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const parentKey = "agent:main:telegram:group:123";
     const sessionKey = "agent:main:telegram:group:123:topic:99";
     const parentEntry = makeEntry({
@@ -302,7 +302,7 @@ describe("createModelSelectionState parent inheritance", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const parentKey = "agent:main:slack:channel:c1";
     const sessionKey = "agent:main:slack:channel:c1:thread:123";
     const parentEntry = makeEntry({
@@ -340,7 +340,7 @@ describe("createModelSelectionState respects session model override", () => {
   const defaultModel = "deepseek-v3-4bit-mlx";
 
   async function resolveState(sessionEntry: ReturnType<typeof makeEntry>) {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const sessionKey = "agent:main:main";
     const sessionStore = { [sessionKey]: sessionEntry };
 
@@ -428,7 +428,7 @@ describe("createModelSelectionState respects session model override", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const sessionKey = "agent:main:telegram:group:123:topic:99";
     const sessionEntry = makeEntry({
       providerOverride: "xai",
@@ -464,7 +464,7 @@ describe("createModelSelectionState respects session model override", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const sessionKey = "agent:main:telegram:direct:1";
     const sessionEntry = makeEntry({
       providerOverride: "openai",
@@ -501,7 +501,7 @@ describe("createModelSelectionState respects session model override", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const sessionKey = "agent:main:telegram:direct:2";
     const sessionEntry = makeEntry({
       modelOverride: "ollama-beelink2/qwen2.5-coder:7b",
@@ -536,7 +536,7 @@ describe("createModelSelectionState resolveDefaultReasoningLevel", () => {
       { provider: "openrouter", id: "x-ai/grok-4.1-fast", name: "Grok", reasoning: true },
     ]);
     const state = await createModelSelectionState({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       agentCfg: undefined,
       defaultProvider: "openrouter",
       defaultModel: "x-ai/grok-4.1-fast",
@@ -549,7 +549,7 @@ describe("createModelSelectionState resolveDefaultReasoningLevel", () => {
 
   it("returns off when catalog model has no reasoning", async () => {
     const state = await createModelSelectionState({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       agentCfg: undefined,
       defaultProvider: "openai",
       defaultModel: "gpt-4o-mini",

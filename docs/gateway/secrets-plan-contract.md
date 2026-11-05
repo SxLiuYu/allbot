@@ -1,7 +1,7 @@
 ---
 summary: "Contract for `secrets apply` plans: target validation, path matching, and `auth-profiles.json` target scope"
 read_when:
-  - Generating or reviewing `kaijibot secrets apply` plans
+  - Generating or reviewing `allbot secrets apply` plans
   - Debugging `Invalid plan target path` errors
   - Understanding target type and path validation behavior
 title: "Secrets Apply Plan Contract"
@@ -9,13 +9,13 @@ title: "Secrets Apply Plan Contract"
 
 # Secrets apply plan contract
 
-This page defines the strict contract enforced by `kaijibot secrets apply`.
+This page defines the strict contract enforced by `allbot secrets apply`.
 
 If a target does not match these rules, apply fails before mutating configuration.
 
 ## Plan file shape
 
-`kaijibot secrets apply --from <plan.json>` expects a `targets` array of plan targets:
+`allbot secrets apply --from <plan.json>` expects a `targets` array of plan targets:
 
 ```json5
 {
@@ -90,23 +90,23 @@ No writes are committed for an invalid plan.
 ## Runtime and audit scope notes
 
 - Ref-only `auth-profiles.json` entries (`keyRef`/`tokenRef`) are included in runtime resolution and audit coverage.
-- `secrets apply` writes supported `kaijibot.json` targets, supported `auth-profiles.json` targets, and optional scrub targets.
+- `secrets apply` writes supported `allbot.json` targets, supported `auth-profiles.json` targets, and optional scrub targets.
 
 ## Operator checks
 
 ```bash
 # Validate plan without writes
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --dry-run
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --dry-run
 
 # Then apply for real
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json
+allbot secrets apply --from /tmp/allbot-secrets-plan.json
 
 # For exec-containing plans, opt in explicitly in both modes
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --dry-run --allow-exec
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --allow-exec
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --dry-run --allow-exec
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --allow-exec
 ```
 
-If apply fails with an invalid target path message, regenerate the plan with `kaijibot secrets configure` or fix the target path to a supported shape above.
+If apply fails with an invalid target path message, regenerate the plan with `allbot secrets configure` or fix the target path to a supported shape above.
 
 ## Related docs
 

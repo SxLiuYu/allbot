@@ -3,7 +3,7 @@ import { getFreePort, installGatewayTestHooks } from "./test-helpers.js";
 
 installGatewayTestHooks({ scope: "suite" });
 
-const READ_SCOPE_HEADER = { "x-kaijibot-scopes": "operator.read" };
+const READ_SCOPE_HEADER = { "x-allbot-scopes": "operator.read" };
 
 let startGatewayServer: typeof import("./server.js").startGatewayServer;
 let enabledServer: Awaited<ReturnType<typeof startServer>>;
@@ -54,10 +54,10 @@ describe("OpenAI-compatible models HTTP API (e2e)", () => {
     expect(json.object).toBe("list");
     expect(Array.isArray(json.data)).toBe(true);
     expect((json.data?.length ?? 0) > 0).toBe(true);
-    expect(json.data?.map((entry) => entry.id)).toContain("kaijibot");
-    expect(json.data?.map((entry) => entry.id)).toContain("kaijibot/default");
+    expect(json.data?.map((entry) => entry.id)).toContain("allbot");
+    expect(json.data?.map((entry) => entry.id)).toContain("allbot/default");
     expect(
-      json.data?.every((entry) => typeof entry.id === "string" && entry.id?.startsWith("kaijibot")),
+      json.data?.every((entry) => typeof entry.id === "string" && entry.id?.startsWith("allbot")),
     ).toBe(true);
   });
 
@@ -75,7 +75,7 @@ describe("OpenAI-compatible models HTTP API (e2e)", () => {
   });
 
   it("rejects operator scopes that lack read access", async () => {
-    const res = await getModels("/v1/models", { "x-kaijibot-scopes": "operator.approvals" });
+    const res = await getModels("/v1/models", { "x-allbot-scopes": "operator.approvals" });
     expect(res.status).toBe(403);
     await expect(res.json()).resolves.toMatchObject({
       ok: false,
@@ -87,7 +87,7 @@ describe("OpenAI-compatible models HTTP API (e2e)", () => {
   });
 
   it("rejects requests with no declared operator scopes", async () => {
-    const res = await getModels("/v1/models", { "x-kaijibot-scopes": "" });
+    const res = await getModels("/v1/models", { "x-allbot-scopes": "" });
     expect(res.status).toBe(403);
     await expect(res.json()).resolves.toMatchObject({
       ok: false,
@@ -105,7 +105,7 @@ describe("OpenAI-compatible models HTTP API (e2e)", () => {
     const firstId = list.data?.[0]?.id;
     expect(typeof firstId).toBe("string");
     const res = await getModels(`/v1/models/${encodeURIComponent(firstId!)}`, {
-      "x-kaijibot-scopes": "operator.approvals",
+      "x-allbot-scopes": "operator.approvals",
     });
     expect(res.status).toBe(403);
     await expect(res.json()).resolves.toMatchObject({
@@ -137,13 +137,13 @@ describe("OpenAI-compatible models HTTP API (e2e)", () => {
       const res = await fetch(`http://127.0.0.1:${port}/v1/models`, {
         headers: {
           authorization: "Bearer secret",
-          "x-kaijibot-scopes": "operator.approvals",
+          "x-allbot-scopes": "operator.approvals",
         },
       });
       expect(res.status).toBe(200);
       const json = (await res.json()) as { object?: string; data?: Array<{ id?: string }> };
       expect(json.object).toBe("list");
-      expect(json.data?.map((entry) => entry.id)).toContain("kaijibot/default");
+      expect(json.data?.map((entry) => entry.id)).toContain("allbot/default");
     } finally {
       await server.close({ reason: "models token auth compat test done" });
     }

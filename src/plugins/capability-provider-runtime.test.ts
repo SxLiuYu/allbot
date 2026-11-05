@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "./registry.js";
 
 type MockManifestRegistry = {
@@ -50,8 +50,8 @@ function expectNoResolvedCapabilityProviders(providers: Array<{ id: string }>) {
 }
 
 function expectBundledCompatLoadPath(params: {
-  cfg: KaijiBotConfig;
-  allowlistCompat: KaijiBotConfig;
+  cfg: AllBotConfig;
+  allowlistCompat: AllBotConfig;
   enablementCompat: {
     plugins: {
       allow?: string[];
@@ -78,12 +78,12 @@ function expectBundledCompatLoadPath(params: {
 }
 
 function createCompatChainConfig() {
-  const cfg = { plugins: { allow: ["custom-plugin"] } } as KaijiBotConfig;
+  const cfg = { plugins: { allow: ["custom-plugin"] } } as AllBotConfig;
   const allowlistCompat = {
     plugins: {
       allow: ["custom-plugin", "openai"],
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
   const enablementCompat = {
     plugins: {
       allow: ["custom-plugin", "openai"],
@@ -122,8 +122,8 @@ function expectCompatChainApplied(params: {
     | "videoGenerationProviders"
     | "musicGenerationProviders";
   contractKey: string;
-  cfg: KaijiBotConfig;
-  allowlistCompat: KaijiBotConfig;
+  cfg: AllBotConfig;
+  allowlistCompat: AllBotConfig;
   enablementCompat: {
     plugins: {
       allow?: string[];
@@ -208,7 +208,7 @@ describe("resolvePluginCapabilityProviders", () => {
 
     const providers = resolvePluginCapabilityProviders({
       key: "speechProviders",
-      cfg: { messages: { tts: { provider: "edge" } } } as KaijiBotConfig,
+      cfg: { messages: { tts: { provider: "edge" } } } as AllBotConfig,
     });
 
     expectResolvedCapabilityProviderIds(providers, ["microsoft"]);
@@ -244,7 +244,7 @@ describe("resolvePluginCapabilityProviders", () => {
 
     const providers = resolvePluginCapabilityProviders({
       key: "mediaUnderstandingProviders",
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
     });
 
     expectNoResolvedCapabilityProviders(providers);
@@ -260,7 +260,7 @@ describe("resolvePluginCapabilityProviders", () => {
         allow: ["google"],
         entries: { google: { enabled: true } },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const loaded = createEmptyPluginRegistry();
     loaded.mediaUnderstandingProviders.push({
       pluginId: "google",

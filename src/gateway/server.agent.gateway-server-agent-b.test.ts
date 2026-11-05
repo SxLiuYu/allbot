@@ -180,11 +180,11 @@ async function sendAgentWsRequestAndWaitFinal(
 }
 
 async function useTempSessionStorePath() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-gw-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-gw-"));
   testState.sessionStorePath = path.join(dir, "sessions.json");
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway server agent", () => {
   beforeEach(() => {
     setRegistry(defaultRegistry);
@@ -328,7 +328,7 @@ describe.skipIf(process.env.CI)("gateway server agent", () => {
     expectAgentRoutingCall({ channel: "webchat", deliver: false });
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   test.skipIf(process.env.CI)(
     "agent downgrades to session-only when multiple channels are configured but no external target resolves",
     async () => {

@@ -4,7 +4,7 @@ import path from "node:path";
 import {
   hasOutboundReplyContent,
   resolveSendableOutboundReplyParts,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 import {
   resolveAgentConfig,
   resolveAgentWorkspaceDir,
@@ -41,7 +41,7 @@ import { resolveStorePath } from "../config/sessions/paths.js";
 import { loadSessionStore } from "../config/sessions/store-load.js";
 import { saveSessionStore, updateSessionStore } from "../config/sessions/store.js";
 import type { AgentDefaultsConfig } from "../config/types.agent-defaults.js";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import { resolveCronSession } from "../cron/isolated-agent/session.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { getQueueSize } from "../process/command-queue.js";
@@ -162,7 +162,7 @@ type HeartbeatAgentState = {
 
 export type HeartbeatRunner = {
   stop: () => void;
-  updateConfig: (cfg: KaijiBotConfig) => void;
+  updateConfig: (cfg: AllBotConfig) => void;
 };
 
 function resolveHeartbeatSchedulerSeed(explicitSeed?: string) {
@@ -181,13 +181,13 @@ function resolveHeartbeatSchedulerSeed(explicitSeed?: string) {
   }
 }
 
-function hasExplicitHeartbeatAgents(cfg: KaijiBotConfig) {
+function hasExplicitHeartbeatAgents(cfg: AllBotConfig) {
   const list = cfg.agents?.list ?? [];
   return list.some((entry) => Boolean(entry?.heartbeat));
 }
 
 function resolveHeartbeatConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId?: string,
 ): HeartbeatConfig | undefined {
   const defaults = cfg.agents?.defaults?.heartbeat;
@@ -201,7 +201,7 @@ function resolveHeartbeatConfig(
   return { ...defaults, ...overrides };
 }
 
-function resolveHeartbeatAgents(cfg: KaijiBotConfig): HeartbeatAgent[] {
+function resolveHeartbeatAgents(cfg: AllBotConfig): HeartbeatAgent[] {
   const list = cfg.agents?.list ?? [];
   if (hasExplicitHeartbeatAgents(cfg)) {
     return list
@@ -216,11 +216,11 @@ function resolveHeartbeatAgents(cfg: KaijiBotConfig): HeartbeatAgent[] {
   return [{ agentId: fallbackId, heartbeat: resolveHeartbeatConfig(cfg, fallbackId) }];
 }
 
-export function resolveHeartbeatPrompt(cfg: KaijiBotConfig, heartbeat?: HeartbeatConfig) {
+export function resolveHeartbeatPrompt(cfg: AllBotConfig, heartbeat?: HeartbeatConfig) {
   return resolveHeartbeatPromptText(heartbeat?.prompt ?? cfg.agents?.defaults?.heartbeat?.prompt);
 }
 
-function resolveHeartbeatAckMaxChars(cfg: KaijiBotConfig, heartbeat?: HeartbeatConfig) {
+function resolveHeartbeatAckMaxChars(cfg: AllBotConfig, heartbeat?: HeartbeatConfig) {
   return Math.max(
     0,
     heartbeat?.ackMaxChars ??
@@ -230,7 +230,7 @@ function resolveHeartbeatAckMaxChars(cfg: KaijiBotConfig, heartbeat?: HeartbeatC
 }
 
 function resolveHeartbeatSession(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId?: string,
   heartbeat?: HeartbeatConfig,
   forcedSessionKey?: string,
@@ -526,7 +526,7 @@ function resolveHeartbeatReasonFlags(reason?: string): HeartbeatReasonFlags {
 }
 
 async function resolveHeartbeatPreflight(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   heartbeat?: HeartbeatConfig;
   forcedSessionKey?: string;
@@ -640,7 +640,7 @@ function appendHeartbeatWorkspacePathHint(prompt: string, workspaceDir: string):
 }
 
 function resolveHeartbeatRunPrompt(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   heartbeat?: HeartbeatConfig;
   preflight: HeartbeatPreflight;
   canRelayToUser: boolean;
@@ -726,7 +726,7 @@ After completing all due tasks, reply HEARTBEAT_OK.`;
 }
 
 export async function runHeartbeatOnce(opts: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentId?: string;
   sessionKey?: string;
   heartbeat?: HeartbeatConfig;
@@ -1437,7 +1437,7 @@ export async function runHeartbeatOnce(opts: {
 }
 
 export function startHeartbeatRunner(opts: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   runOnce?: typeof runHeartbeatOnce;
@@ -1518,7 +1518,7 @@ export function startHeartbeatRunner(opts: {
     state.timer.unref?.();
   };
 
-  const updateConfig = (cfg: KaijiBotConfig) => {
+  const updateConfig = (cfg: AllBotConfig) => {
     if (state.stopped) {
       return;
     }

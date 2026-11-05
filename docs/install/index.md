@@ -1,5 +1,5 @@
 ---
-summary: "Install KaijiBot -- one-click installer, npm, Docker, and source build"
+summary: "Install AllBot -- one-click installer, npm, Docker, and source build"
 read_when:
   - You need an install method other than the Getting Started quickstart
   - You want to deploy to a cloud platform
@@ -9,8 +9,8 @@ title: "Install"
 
 # Install
 
-KaijiBot supports multiple installation methods: one-click installer (recommended for most users), npm, Docker, or build from source.
-（KaijiBot 支持多种安装方式：一键安装（推荐）、npm、Docker 或从源码构建。）
+AllBot supports multiple installation methods: one-click installer (recommended for most users), npm, Docker, or build from source.
+（AllBot 支持多种安装方式：一键安装（推荐）、npm、Docker 或从源码构建。）
 
 ## System requirements
 
@@ -33,15 +33,15 @@ iwr -useb https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.ps1 | ie
 ```
 
 The script auto-detects your system, installs Node.js if needed, and launches
-the `kaijibot onboard` wizard.（自动检测系统、安装 Node.js，并启动 onboard 向导。）
+the `allbot onboard` wizard.（自动检测系统、安装 Node.js，并启动 onboard 向导。）
 
 ## npm install
 
 If you already have Node.js 22+:
 
 ```bash
-npm install -g kaijibot
-kaijibot onboard
+npm install -g allbot
+allbot onboard
 ```
 
 ## Source build
@@ -50,7 +50,7 @@ Clone the repo, install dependencies, and build:
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 pnpm install
 pnpm build
 ```
@@ -62,16 +62,16 @@ pnpm build
 Then run onboarding and start the Gateway:
 
 ```bash
-pnpm kaijibot onboard      # interactive setup wizard
-pnpm kaijibot gateway --port 18789
+pnpm allbot onboard      # interactive setup wizard
+pnpm allbot gateway --port 18789
 ```
 
-Or link the CLI globally and use `kaijibot` directly:
+Or link the CLI globally and use `allbot` directly:
 
 ```bash
 pnpm link --global
-kaijibot onboard
-kaijibot gateway --port 18789
+allbot onboard
+allbot gateway --port 18789
 ```
 
 See [Setup](/start/setup) for full development workflows.
@@ -82,31 +82,31 @@ For containerized or headless deployments:
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 docker compose up -d
 ```
 
 The default `docker-compose.yml` runs the gateway service on port 18789. Configure via environment variables:
 
 - `ZAI_API_KEY` -- LLM provider API key
-- `KAIJIBOT_GATEWAY_TOKEN` -- gateway authentication token
-- `KAIJIBOT_GATEWAY_PORT` -- override the default port (18789)
-- `KAIJIBOT_GATEWAY_BIND` -- override the bind address
+- `ALLBOT_GATEWAY_TOKEN` -- gateway authentication token
+- `ALLBOT_GATEWAY_PORT` -- override the default port (18789)
+- `ALLBOT_GATEWAY_BIND` -- override the bind address
 
-Config directory is mounted at `/home/node/.kaijibot`. See [Docker](/install/docker) for details.
+Config directory is mounted at `/home/node/.allbot`. See [Docker](/install/docker) for details.
 
 ## Cloud deployment
 
-Deploy KaijiBot on a cloud server or VPS. The source build steps apply to any Linux VM:
+Deploy AllBot on a cloud server or VPS. The source build steps apply to any Linux VM:
 
 ```bash
 # On your server
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 pnpm install --frozen-lockfile
 pnpm build
-kaijibot onboard
-kaijibot gateway --port 18789
+allbot onboard
+allbot gateway --port 18789
 ```
 
 <CardGroup cols={3}>
@@ -117,44 +117,44 @@ kaijibot gateway --port 18789
 
 For managed startup after install:
 
-- macOS: LaunchAgent via `kaijibot gateway install`
+- macOS: LaunchAgent via `allbot gateway install`
 - Linux/WSL2: systemd user service via the same command
 - Native Windows: Scheduled Task
 
 ## Verify the install
 
 ```bash
-kaijibot --version      # confirm the CLI is available
-kaijibot doctor         # check for config issues
-kaijibot gateway status # verify the Gateway is running
+allbot --version      # confirm the CLI is available
+allbot doctor         # check for config issues
+allbot gateway status # verify the Gateway is running
 ```
 
 ## Update, migrate, or uninstall
 
 <CardGroup cols={3}>
   <Card title="Updating" href="/install/updating" icon="refresh-cw">
-    Keep KaijiBot up to date.
+    Keep AllBot up to date.
   </Card>
   <Card title="Migrating" href="/install/migrating" icon="arrow-right">
     Move to a new machine.
   </Card>
   <Card title="Uninstall" href="/install/uninstall" icon="trash-2">
-    Remove KaijiBot completely.
+    Remove AllBot completely.
   </Card>
 </CardGroup>
 
 For source builds, update by pulling the latest changes:
 
 ```bash
-cd kaijibot
+cd allbot
 git pull
 pnpm install
 pnpm build
 ```
 
-## Troubleshooting: `kaijibot` not found
+## Troubleshooting: `allbot` not found
 
-If you used `pnpm link --global` but `kaijibot` is not found in your terminal:
+If you used `pnpm link --global` but `allbot` is not found in your terminal:
 
 ```bash
 node -v           # Node installed?

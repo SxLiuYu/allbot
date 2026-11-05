@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { sanitizeForLog } from "../../../terminal/ansi.js";
 import {
   collectBundledPluginLoadPathWarnings,
@@ -35,7 +35,7 @@ import {
 } from "./stale-plugin-config.js";
 
 export async function collectDoctorPreviewWarnings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   doctorFixCommand: string;
 }): Promise<string[]> {
   const warnings: string[] = [];

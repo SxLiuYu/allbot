@@ -5,7 +5,7 @@ import {
 } from "../agents/defaults.js";
 import { resolveConfiguredModelRef } from "../agents/model-selection.js";
 import type { SessionEntry } from "../config/sessions.js";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import { resolveSessionModelRef } from "../gateway/session-utils.js";
 import { formatTimeAgo } from "../infra/format-time/format-relative.ts";
 import { parseAgentSessionKey } from "../routing/session-key.js";
@@ -74,7 +74,7 @@ export function toSessionDisplayRows(store: Record<string, SessionEntry>): Sessi
     .toSorted((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
 }
 
-export function resolveSessionDisplayDefaults(cfg: KaijiBotConfig): SessionDisplayDefaults {
+export function resolveSessionDisplayDefaults(cfg: AllBotConfig): SessionDisplayDefaults {
   // Session listing/cleanup must work on unconfigured installs; degrade to the
   // empty default instead of throwing MissingAgentModelConfigError.
   try {
@@ -93,7 +93,7 @@ export function resolveSessionDisplayDefaults(cfg: KaijiBotConfig): SessionDispl
 }
 
 export function resolveSessionDisplayModel(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   row: Pick<
     SessionDisplayRow,
     "key" | "model" | "modelProvider" | "modelOverride" | "providerOverride"

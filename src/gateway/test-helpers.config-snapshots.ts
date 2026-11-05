@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { ConfigFileSnapshot, KaijiBotConfig } from "../config/types.js";
+import type { ConfigFileSnapshot, AllBotConfig } from "../config/types.js";
 
 function hashConfigRaw(raw: string | null): string {
   return crypto
@@ -14,7 +14,7 @@ export function buildTestConfigSnapshot(params: {
   raw: string | null;
   parsed: unknown;
   valid: boolean;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   issues: ConfigFileSnapshot["issues"];
   warnings?: ConfigFileSnapshot["warnings"];
   legacyIssues: ConfigFileSnapshot["legacyIssues"];

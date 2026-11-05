@@ -183,7 +183,7 @@ function createLogWriters() {
     onBrokenPipe: (err, stream) => {
       const code = err.code ?? "EPIPE";
       const target = stream === process.stdout ? "stdout" : "stderr";
-      const message = `kaijibot logs: output ${target} closed (${code}). Stopping tail.`;
+      const message = `allbot logs: output ${target} closed (${code}). Stopping tail.`;
       try {
         clearActiveProgressLine();
         process.stderr.write(`${message}\n`);
@@ -211,7 +211,7 @@ async function emitGatewayError(
 ) {
   const runtime = await loadLogsCliRuntime();
   const message = "Gateway not reachable. Is it running and accessible?";
-  const hint = `Hint: run \`${formatCliCommand("kaijibot doctor")}\`.`;
+  const hint = `Hint: run \`${formatCliCommand("allbot doctor")}\`.`;
   const errorText = formatErrorMessage(err);
 
   const details = runtime.buildGatewayConnectionDetails({ url: opts.url });

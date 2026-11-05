@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   buildProviderRegistry,
   createMediaAttachmentCache,
@@ -22,7 +22,7 @@ const KIND_BY_CAPABILITY: Record<MediaUnderstandingCapability, MediaUnderstandin
 export type RunMediaUnderstandingFileParams = {
   capability: MediaUnderstandingCapability;
   filePath: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   mime?: string;
   activeModel?: ActiveMediaModel;
@@ -94,7 +94,7 @@ export async function runMediaUnderstandingFile(
 
 export async function describeImageFile(params: {
   filePath: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   mime?: string;
   activeModel?: ActiveMediaModel;
@@ -104,7 +104,7 @@ export async function describeImageFile(params: {
 
 export async function describeImageFileWithModel(params: {
   filePath: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   mime?: string;
   provider: string;
@@ -136,7 +136,7 @@ export async function describeImageFileWithModel(params: {
 
 export async function describeVideoFile(params: {
   filePath: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   mime?: string;
   activeModel?: ActiveMediaModel;
@@ -146,7 +146,7 @@ export async function describeVideoFile(params: {
 
 export async function transcribeAudioFile(params: {
   filePath: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   mime?: string;
   activeModel?: ActiveMediaModel;

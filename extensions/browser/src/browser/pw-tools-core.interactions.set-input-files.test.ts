@@ -34,7 +34,7 @@ vi.mock("./pw-session.js", () => {
 
 vi.mock("./paths.js", () => {
   return {
-    DEFAULT_UPLOAD_DIR: "/tmp/kaijibot/uploads",
+    DEFAULT_UPLOAD_DIR: "/tmp/allbot/uploads",
     resolveStrictExistingPathsWithinRoot,
   };
 });
@@ -60,7 +60,7 @@ describe("setInputFilesViaPlaywright", () => {
     locator = null;
     resolveStrictExistingPathsWithinRoot.mockResolvedValue({
       ok: true,
-      paths: ["/private/tmp/kaijibot/uploads/ok.txt"],
+      paths: ["/private/tmp/allbot/uploads/ok.txt"],
     });
   });
 
@@ -71,16 +71,16 @@ describe("setInputFilesViaPlaywright", () => {
       cdpUrl: "http://127.0.0.1:18792",
       targetId: "T1",
       inputRef: "e7",
-      paths: ["/tmp/kaijibot/uploads/ok.txt"],
+      paths: ["/tmp/allbot/uploads/ok.txt"],
     });
 
     expect(resolveStrictExistingPathsWithinRoot).toHaveBeenCalledWith({
-      rootDir: "/tmp/kaijibot/uploads",
-      requestedPaths: ["/tmp/kaijibot/uploads/ok.txt"],
-      scopeLabel: "uploads directory (/tmp/kaijibot/uploads)",
+      rootDir: "/tmp/allbot/uploads",
+      requestedPaths: ["/tmp/allbot/uploads/ok.txt"],
+      scopeLabel: "uploads directory (/tmp/allbot/uploads)",
     });
     expect(refLocator).toHaveBeenCalledWith(page, "e7");
-    expect(setInputFiles).toHaveBeenCalledWith(["/private/tmp/kaijibot/uploads/ok.txt"]);
+    expect(setInputFiles).toHaveBeenCalledWith(["/private/tmp/allbot/uploads/ok.txt"]);
   });
 
   it("throws and skips setInputFiles when use-time validation fails", async () => {
@@ -96,7 +96,7 @@ describe("setInputFilesViaPlaywright", () => {
         cdpUrl: "http://127.0.0.1:18792",
         targetId: "T1",
         element: "input[type=file]",
-        paths: ["/tmp/kaijibot/uploads/missing.txt"],
+        paths: ["/tmp/allbot/uploads/missing.txt"],
       }),
     ).rejects.toThrow("Invalid path: must stay within uploads directory");
 

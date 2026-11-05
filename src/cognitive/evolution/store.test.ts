@@ -36,7 +36,7 @@ function makeRecord(overrides: Partial<EvolutionRecord> = {}): EvolutionRecord {
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-evolution-test-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-evolution-test-"));
   store = new EvolutionStore(tempDir);
 });
 

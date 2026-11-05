@@ -65,7 +65,7 @@ export async function buildStatusAllReportLines(params: {
   const tableWidth = getTerminalTableWidth();
 
   const lines: string[] = [];
-  lines.push(heading("KaijiBot status --all"));
+  lines.push(heading("AllBot status --all"));
   appendStatusReportSections({
     lines,
     heading,

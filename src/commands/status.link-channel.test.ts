@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const pluginRegistry = vi.hoisted(() => ({ list: [] as unknown[] }));
 
@@ -29,7 +29,7 @@ describe("resolveLinkChannelContext", () => {
       },
     ];
 
-    const result = await resolveLinkChannelContext({} as KaijiBotConfig);
+    const result = await resolveLinkChannelContext({} as AllBotConfig);
     expect(result?.linked).toBe(true);
     expect(result?.authAgeMs).toBe(1234);
     expect(result?.account).toBe(account);
@@ -49,7 +49,7 @@ describe("resolveLinkChannelContext", () => {
       },
     ];
 
-    const result = await resolveLinkChannelContext({} as KaijiBotConfig);
+    const result = await resolveLinkChannelContext({} as AllBotConfig);
     expect(result).toBeNull();
   });
 });

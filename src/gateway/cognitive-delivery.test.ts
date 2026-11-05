@@ -10,16 +10,16 @@ describe("findSessionKeyForUserId", () => {
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), "cognitive-delivery-test-"));
-    originalHome = process.env.KAIJIBOT_HOME;
-    process.env.KAIJIBOT_HOME = tempDir;
+    originalHome = process.env.ALLBOT_HOME;
+    process.env.ALLBOT_HOME = tempDir;
   });
 
   afterEach(() => {
     rmSync(tempDir, { recursive: true, force: true });
     if (originalHome !== undefined) {
-      process.env.KAIJIBOT_HOME = originalHome;
+      process.env.ALLBOT_HOME = originalHome;
     } else {
-      delete process.env.KAIJIBOT_HOME;
+      delete process.env.ALLBOT_HOME;
     }
   });
 
@@ -37,10 +37,10 @@ describe("findSessionKeyForUserId", () => {
 
   it("returns direct key when agent:main:{userId} entry exists", () => {
     const storePath = writeSessionStore({
-      "agent:main:kaijibot-tui": { lastChannel: "tui" },
+      "agent:main:allbot-tui": { lastChannel: "tui" },
     });
-    const result = findSessionKeyForUserId(makeCfg(storePath), "kaijibot-tui");
-    expect(result).toBe("agent:main:kaijibot-tui");
+    const result = findSessionKeyForUserId(makeCfg(storePath), "allbot-tui");
+    expect(result).toBe("agent:main:allbot-tui");
   });
 
   it("returns channel-routed key for Feishu session", () => {
@@ -150,16 +150,16 @@ describe("resolveCognitiveDeliveryTarget", () => {
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), "cognitive-delivery-test-"));
-    originalHome = process.env.KAIJIBOT_HOME;
-    process.env.KAIJIBOT_HOME = tempDir;
+    originalHome = process.env.ALLBOT_HOME;
+    process.env.ALLBOT_HOME = tempDir;
   });
 
   afterEach(() => {
     rmSync(tempDir, { recursive: true, force: true });
     if (originalHome !== undefined) {
-      process.env.KAIJIBOT_HOME = originalHome;
+      process.env.ALLBOT_HOME = originalHome;
     } else {
-      delete process.env.KAIJIBOT_HOME;
+      delete process.env.ALLBOT_HOME;
     }
   });
 

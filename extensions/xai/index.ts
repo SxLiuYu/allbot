@@ -1,6 +1,6 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import { jsonResult, readProviderEnvValue } from "kaijibot/plugin-sdk/provider-web-search";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import { jsonResult, readProviderEnvValue } from "allbot/plugin-sdk/provider-web-search";
 import { Type } from "typebox";
 import {
   applyXaiModelCompat,

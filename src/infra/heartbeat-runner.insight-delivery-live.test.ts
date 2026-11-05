@@ -16,15 +16,15 @@
  *   Proves events are detected, prompt is built, getReplyFromConfig is called,
  *   events are consumed.
  *
- * Phase 2 (requires KAIJIBOT_LIVE_TEST=1 + ZAI_API_KEY): real LLM delivery.
+ * Phase 2 (requires ALLBOT_LIVE_TEST=1 + ZAI_API_KEY): real LLM delivery.
  *   Calls the real GLM model with the insight prompt + system event, verifies
  *   the model generates a natural, conversational message that shares the insight.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/infra/heartbeat-runner.insight-delivery-live.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/infra/heartbeat-runner.insight-delivery-live.test.ts
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveMainSessionKey } from "../config/sessions.js";
 import { buildInsightEventPrompt } from "./heartbeat-events-filter.js";
 import { runHeartbeatOnce } from "./heartbeat-runner.js";
@@ -40,7 +40,7 @@ installHeartbeatRunnerTestRuntime();
 
 // ─── Live test config ───────────────────────────────────────────────────────
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5-turbo";
@@ -94,7 +94,7 @@ const TEST_INSIGHTS: Array<{ text: string; keywords: string[]; label: string }> 
 
 // ─── Shared config builder ──────────────────────────────────────────────────
 
-function buildConfig(tmpDir: string, storePath: string): KaijiBotConfig {
+function buildConfig(tmpDir: string, storePath: string): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -105,7 +105,7 @@ function buildConfig(tmpDir: string, storePath: string): KaijiBotConfig {
     },
     channels: { telegram: { token: "test" } },
     session: { store: storePath },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 const DELIVERY_INSTRUCTION = "（这是一条已生成的主动洞察，请用你自己的语言自然地分享给用户。）";
@@ -172,7 +172,7 @@ describe("Phase 1: infrastructure — insight event → runHeartbeatOnce → dra
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PHASE 2: Live LLM delivery — requires KAIJIBOT_LIVE_TEST=1 + ZAI_API_KEY
+// PHASE 2: Live LLM delivery — requires ALLBOT_LIVE_TEST=1 + ZAI_API_KEY
 //
 // Calls the real GLM model with the insight prompt + system event.
 // Verifies the model generates a natural, conversational delivery message

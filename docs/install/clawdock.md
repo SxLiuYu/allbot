@@ -1,14 +1,14 @@
 ---
-summary: "ClawDock shell helpers for Docker-based KaijiBot installs"
+summary: "ClawDock shell helpers for Docker-based AllBot installs"
 read_when:
-  - You run KaijiBot with Docker often and want shorter day-to-day commands
+  - You run AllBot with Docker often and want shorter day-to-day commands
   - You want a helper layer for dashboard, logs, token setup, and pairing flows
 title: "ClawDock"
 ---
 
 # ClawDock
 
-ClawDock is a small shell-helper layer for Docker-based KaijiBot installs.
+ClawDock is a small shell-helper layer for Docker-based AllBot installs.
 
 It gives you short commands like `clawdock-start`, `clawdock-dashboard`, and `clawdock-fix-token` instead of longer `docker compose ...` invocations.
 
@@ -19,7 +19,7 @@ If you have not set up Docker yet, start with [Docker](/install/docker).
 Use the canonical helper path:
 
 ```bash
-mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/kaijibot/kaijibot/main/scripts/clawdock/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
+mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/allbot/allbot/main/scripts/clawdock/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
 echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
@@ -42,7 +42,7 @@ If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helper
 | Command                   | Description                                   |
 | ------------------------- | --------------------------------------------- |
 | `clawdock-shell`          | Open a shell inside the gateway container     |
-| `clawdock-cli <command>`  | Run KaijiBot CLI commands in Docker           |
+| `clawdock-cli <command>`  | Run AllBot CLI commands in Docker           |
 | `clawdock-exec <command>` | Execute an arbitrary command in the container |
 
 ### Web UI and pairing
@@ -68,8 +68,8 @@ If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helper
 | ---------------------- | --------------------------------------- |
 | `clawdock-health`      | Run a gateway health check              |
 | `clawdock-token`       | Print the gateway token                 |
-| `clawdock-cd`          | Jump to the KaijiBot project directory  |
-| `clawdock-config`      | Open `~/.kaijibot`                      |
+| `clawdock-cd`          | Jump to the AllBot project directory  |
+| `clawdock-config`      | Open `~/.allbot`                      |
 | `clawdock-show-config` | Print config files with redacted values |
 | `clawdock-workspace`   | Open the workspace directory            |
 
@@ -93,11 +93,11 @@ clawdock-approve <request-id>
 ClawDock works with the same Docker config split described in [Docker](/install/docker):
 
 - `<project>/.env` for Docker-specific values like image name, ports, and the gateway token
-- `~/.kaijibot/.env` for env-backed provider keys and bot tokens
-- `~/.kaijibot/agents/<agentId>/agent/auth-profiles.json` for stored provider OAuth/API-key auth
-- `~/.kaijibot/kaijibot.json` for behavior config
+- `~/.allbot/.env` for env-backed provider keys and bot tokens
+- `~/.allbot/agents/<agentId>/agent/auth-profiles.json` for stored provider OAuth/API-key auth
+- `~/.allbot/allbot.json` for behavior config
 
-Use `clawdock-show-config` when you want to inspect the `.env` files and `kaijibot.json` quickly. It redacts `.env` values in its printed output.
+Use `clawdock-show-config` when you want to inspect the `.env` files and `allbot.json` quickly. It redacts `.env` values in its printed output.
 
 ## Related pages
 

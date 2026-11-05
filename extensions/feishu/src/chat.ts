@@ -1,6 +1,6 @@
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import type { KaijiBotPluginApi } from "../runtime-api.js";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import type { AllBotPluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { FeishuChatSchema, type FeishuChatParams } from "./chat-schema.js";
 import { createFeishuClient } from "./client.js";
@@ -121,7 +121,7 @@ export async function getFeishuMemberInfo(
   };
 }
 
-export function registerFeishuChatTools(api: KaijiBotPluginApi) {
+export function registerFeishuChatTools(api: AllBotPluginApi) {
   if (!api.config) {
     api.logger.debug?.("feishu_chat: No config available, skipping chat tools");
     return;

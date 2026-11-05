@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { parseToolsBySenderTypedKey } from "../../../config/types.tools.js";
 import { sanitizeForLog } from "../../../terminal/ansi.js";
 import { formatConfigPath, resolveConfigPathTarget } from "../../doctor-config-analysis.js";
@@ -53,7 +53,7 @@ function collectLegacyToolsBySenderKeyHits(
   }
 }
 
-export function scanLegacyToolsBySenderKeys(cfg: KaijiBotConfig): LegacyToolsBySenderKeyHit[] {
+export function scanLegacyToolsBySenderKeys(cfg: AllBotConfig): LegacyToolsBySenderKeyHit[] {
   const hits: LegacyToolsBySenderKeyHit[] = [];
   collectLegacyToolsBySenderKeyHits(cfg, [], hits);
   return hits;
@@ -77,8 +77,8 @@ export function collectLegacyToolsBySenderWarnings(params: {
   ];
 }
 
-export function maybeRepairLegacyToolsBySenderKeys(cfg: KaijiBotConfig): {
-  config: KaijiBotConfig;
+export function maybeRepairLegacyToolsBySenderKeys(cfg: AllBotConfig): {
+  config: AllBotConfig;
   changes: string[];
 } {
   const next = structuredClone(cfg);

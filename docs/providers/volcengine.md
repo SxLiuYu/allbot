@@ -2,7 +2,7 @@
 title: "Volcengine (Doubao)"
 summary: "Volcano Engine setup (Doubao models, general + coding endpoints)"
 read_when:
-  - You want to use Volcano Engine or Doubao models with KaijiBot
+  - You want to use Volcano Engine or Doubao models with AllBot
   - You need the Volcengine API key setup
 ---
 
@@ -21,7 +21,7 @@ workloads.
 1. Set the API key:
 
 ```bash
-kaijibot onboard --auth-choice volcengine-api-key
+allbot onboard --auth-choice volcengine-api-key
 ```
 
 2. Set a default model:
@@ -39,7 +39,7 @@ kaijibot onboard --auth-choice volcengine-api-key
 ## Non-interactive example
 
 ```bash
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice volcengine-api-key \
   --volcengine-api-key "$VOLCANO_ENGINE_API_KEY"
@@ -78,17 +78,17 @@ Coding provider (`volcengine-plan`):
 | `volcengine-plan/kimi-k2.5`                       | Kimi K2.5 Coding         | text  | 256,000 |
 | `volcengine-plan/doubao-seed-code-preview-251028` | Doubao Seed Code Preview | text  | 256,000 |
 
-`kaijibot onboard --auth-choice volcengine-api-key` currently sets
+`allbot onboard --auth-choice volcengine-api-key` currently sets
 `volcengine-plan/ark-code-latest` as the default model while also registering
 the general `volcengine` catalog.
 
 During onboarding/configure model selection, the Volcengine auth choice prefers
 both `volcengine/*` and `volcengine-plan/*` rows. If those models are not
-loaded yet, KaijiBot falls back to the unfiltered catalog instead of showing an
+loaded yet, AllBot falls back to the unfiltered catalog instead of showing an
 empty provider-scoped picker.
 
 ## Environment note
 
 If the Gateway runs as a daemon (launchd/systemd), make sure
 `VOLCANO_ENGINE_API_KEY` is available to that process (for example, in
-`~/.kaijibot/.env` or via `env.shellEnv`).
+`~/.allbot/.env` or via `env.shellEnv`).

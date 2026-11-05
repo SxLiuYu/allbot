@@ -1,14 +1,14 @@
 ---
 title: "Alibaba Model Studio"
-summary: "Alibaba Model Studio Wan video generation in KaijiBot"
+summary: "Alibaba Model Studio Wan video generation in AllBot"
 read_when:
-  - You want to use Alibaba Wan video generation in KaijiBot
+  - You want to use Alibaba Wan video generation in AllBot
   - You need Model Studio or DashScope API key setup for video generation
 ---
 
 # Alibaba Model Studio
 
-KaijiBot ships a bundled `alibaba` video-generation provider for Wan models on
+AllBot ships a bundled `alibaba` video-generation provider for Wan models on
 Alibaba Model Studio / DashScope.
 
 - Provider: `alibaba`
@@ -21,7 +21,7 @@ Alibaba Model Studio / DashScope.
 1. Set an API key:
 
 ```bash
-kaijibot onboard --auth-choice qwen-standard-api-key
+allbot onboard --auth-choice qwen-standard-api-key
 ```
 
 2. Set a default video model:

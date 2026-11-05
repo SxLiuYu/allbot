@@ -1,4 +1,4 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 import { contributeGroqResolvedModelCompat } from "./api.js";
 import { groqMediaUnderstandingProvider } from "./media-understanding-provider.js";
 

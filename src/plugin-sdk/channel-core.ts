@@ -1,8 +1,8 @@
 export type {
   ChannelConfigUiHint,
   ChannelPlugin,
-  KaijiBotConfig,
-  KaijiBotPluginApi,
+  AllBotConfig,
+  AllBotPluginApi,
   PluginCommandContext,
   PluginRuntime,
   ChannelOutboundSessionRouteParams,

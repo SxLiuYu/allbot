@@ -3,4 +3,4 @@
 
 export { definePluginEntry } from "./plugin-entry.js";
 export { resolveStateDir } from "./state-paths.js";
-export type { KaijiBotPluginApi } from "../plugins/types.js";
+export type { AllBotPluginApi } from "../plugins/types.js";

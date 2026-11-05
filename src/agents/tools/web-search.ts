@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { wrapUntrustedSourceText } from "../../infra/system-events.js";
 import { resolveManifestContractOwnerPluginId } from "../../plugins/manifest-registry.js";
 import type { RuntimeWebSearchMetadata } from "../../secrets/runtime-web-tools.types.js";
@@ -12,7 +12,7 @@ import { textResult } from "./common.js";
 import { SEARCH_CACHE } from "./web-search-provider-common.js";
 
 export function createWebSearchTool(options?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sandboxed?: boolean;
   runtimeWebSearch?: RuntimeWebSearchMetadata;
 }): AnyAgentTool | null {

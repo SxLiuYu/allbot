@@ -1,5 +1,5 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import manifest from "./kaijibot.plugin.json" with { type: "json" };
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
+import manifest from "./allbot.plugin.json" with { type: "json" };
 
 export function buildTogetherProvider(): ModelProviderConfig {
   const catalog = manifest.modelCatalog.providers.together;

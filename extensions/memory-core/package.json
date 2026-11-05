@@ -1,22 +1,22 @@
 {
-  "name": "@kaijibot/memory-core",
+  "name": "@allbot/memory-core",
   "version": "2026.4.12",
   "private": true,
-  "description": "KaijiBot core memory search plugin",
+  "description": "AllBot core memory search plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*",
-    "kaijibot": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*",
+    "allbot": "workspace:*"
   },
   "peerDependencies": {
-    "kaijibot": ">=2026.4.12"
+    "allbot": ">=2026.4.12"
   },
   "peerDependenciesMeta": {
-    "kaijibot": {
+    "allbot": {
       "optional": true
     }
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,7 +1,7 @@
-import type { ProviderPrepareRuntimeAuthContext } from "kaijibot/plugin-sdk/core";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import { ensureAuthProfileStore } from "kaijibot/plugin-sdk/provider-auth";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import type { ProviderPrepareRuntimeAuthContext } from "allbot/plugin-sdk/core";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import { ensureAuthProfileStore } from "allbot/plugin-sdk/provider-auth";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { getAccessTokenResultAsync } from "./cli.js";
 import {
   type CachedTokenEntry,

@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/moonshot-provider",
+  "name": "@allbot/moonshot-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Moonshot provider plugin",
+  "description": "AllBot Moonshot provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

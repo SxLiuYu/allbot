@@ -22,15 +22,15 @@ export function clearActiveMcpLoopbackRuntime(token: string): void {
 export function createMcpLoopbackServerConfig(port: number) {
   return {
     mcpServers: {
-      kaijibot: {
+      allbot: {
         type: "http",
         url: `http://127.0.0.1:${port}/mcp`,
         headers: {
-          Authorization: "Bearer ${KAIJIBOT_MCP_TOKEN}",
-          "x-session-key": "${KAIJIBOT_MCP_SESSION_KEY}",
-          "x-kaijibot-agent-id": "${KAIJIBOT_MCP_AGENT_ID}",
-          "x-kaijibot-account-id": "${KAIJIBOT_MCP_ACCOUNT_ID}",
-          "x-kaijibot-message-channel": "${KAIJIBOT_MCP_MESSAGE_CHANNEL}",
+          Authorization: "Bearer ${ALLBOT_MCP_TOKEN}",
+          "x-session-key": "${ALLBOT_MCP_SESSION_KEY}",
+          "x-allbot-agent-id": "${ALLBOT_MCP_AGENT_ID}",
+          "x-allbot-account-id": "${ALLBOT_MCP_ACCOUNT_ID}",
+          "x-allbot-message-channel": "${ALLBOT_MCP_MESSAGE_CHANNEL}",
         },
       },
     },

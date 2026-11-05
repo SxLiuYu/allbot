@@ -26,13 +26,13 @@ const configState = vi.hoisted(() => ({
   snapshot: { exists: false } as Record<string, unknown>,
 }));
 const controlUiState = vi.hoisted(() => ({
-  root: "/tmp/kaijibot-control-ui" as string | null,
+  root: "/tmp/allbot-control-ui" as string | null,
 }));
 
 const { runtimeErrors, defaultRuntime, resetRuntimeCapture } = createCliRuntimeCapture();
 
 vi.mock("../../config/config.js", () => ({
-  getConfigPath: () => "/tmp/kaijibot-test-missing-config.json",
+  getConfigPath: () => "/tmp/allbot-test-missing-config.json",
   loadConfig: () => configState.cfg,
   readConfigFileSnapshot: async () => configState.snapshot,
   resolveStateDir: () => "/tmp",
@@ -49,13 +49,13 @@ vi.mock("../../gateway/auth.js", () => ({
     const token =
       (typeof params.authOverride?.token === "string" ? params.authOverride.token : undefined) ??
       (typeof params.authConfig?.token === "string" ? params.authConfig.token : undefined) ??
-      params.env?.KAIJIBOT_GATEWAY_TOKEN;
+      params.env?.ALLBOT_GATEWAY_TOKEN;
     const password =
       (typeof params.authOverride?.password === "string"
         ? params.authOverride.password
         : undefined) ??
       (typeof params.authConfig?.password === "string" ? params.authConfig.password : undefined) ??
-      params.env?.KAIJIBOT_GATEWAY_PASSWORD;
+      params.env?.ALLBOT_GATEWAY_PASSWORD;
     return {
       mode,
       token,
@@ -142,7 +142,7 @@ describe("gateway run option collisions", () => {
     resetRuntimeCapture();
     configState.cfg = {};
     configState.snapshot = { exists: false };
-    controlUiState.root = "/tmp/kaijibot-control-ui";
+    controlUiState.root = "/tmp/allbot-control-ui";
     gatewayLogMessages.length = 0;
     startGatewayServer.mockClear();
     setGatewayWsLogStyle.mockClear();
@@ -201,12 +201,12 @@ describe("gateway run option collisions", () => {
     ["--cli-backend-logs", "generic flag"],
     ["--claude-cli-logs", "deprecated alias"],
   ])("enables CLI backend log filtering via %s (%s)", async (flag) => {
-    delete process.env.KAIJIBOT_CLI_BACKEND_LOG_OUTPUT;
+    delete process.env.ALLBOT_CLI_BACKEND_LOG_OUTPUT;
 
     await runGatewayCli(["gateway", "run", flag, "--allow-unconfigured"]);
 
     expect(setConsoleSubsystemFilter).toHaveBeenCalledWith(["agent/cli-backend"]);
-    expect(process.env.KAIJIBOT_CLI_BACKEND_LOG_OUTPUT).toBe("1");
+    expect(process.env.ALLBOT_CLI_BACKEND_LOG_OUTPUT).toBe("1");
   });
 
   it("starts gateway when token mode has no configured token (startup bootstrap path)", async () => {
@@ -250,7 +250,7 @@ describe("gateway run option collisions", () => {
     await expect(runGatewayCli(["gateway", "run"])).rejects.toThrow("__exit__:1");
 
     expect(runtimeErrors).toContain(
-      "Gateway start blocked: existing config is missing gateway.mode. Treat this as suspicious or clobbered config. Re-run `kaijibot onboard --mode local` or `kaijibot setup`, set gateway.mode=local manually, or pass --allow-unconfigured.",
+      "Gateway start blocked: existing config is missing gateway.mode. Treat this as suspicious or clobbered config. Re-run `allbot onboard --mode local` or `allbot setup`, set gateway.mode=local manually, or pass --allow-unconfigured.",
     );
     expect(runtimeErrors).toContain(
       `Config write audit: ${path.join("/tmp", "logs", "config-audit.jsonl")}`,
@@ -279,7 +279,7 @@ describe("gateway run option collisions", () => {
       gateway: {
         auth: {
           mode: "password",
-          password: { source: "env", provider: "default", id: "KAIJIBOT_GATEWAY_PASSWORD" },
+          password: { source: "env", provider: "default", id: "ALLBOT_GATEWAY_PASSWORD" },
         },
       },
       secrets: {
@@ -302,7 +302,7 @@ describe("gateway run option collisions", () => {
 
   it("reads gateway password from --password-file", async () => {
     await withTempSecretFiles(
-      "kaijibot-gateway-run-",
+      "allbot-gateway-run-",
       { password: "pw_from_file\n" },
       async ({ passwordFile }) => {
         await runGatewayCli([
@@ -327,7 +327,7 @@ describe("gateway run option collisions", () => {
       }),
     );
     expect(runtimeErrors).not.toContain(
-      "Warning: --password can be exposed via process listings. Prefer --password-file or KAIJIBOT_GATEWAY_PASSWORD.",
+      "Warning: --password can be exposed via process listings. Prefer --password-file or ALLBOT_GATEWAY_PASSWORD.",
     );
   });
 
@@ -343,13 +343,13 @@ describe("gateway run option collisions", () => {
     ]);
 
     expect(runtimeErrors).toContain(
-      "Warning: --password can be exposed via process listings. Prefer --password-file or KAIJIBOT_GATEWAY_PASSWORD.",
+      "Warning: --password can be exposed via process listings. Prefer --password-file or ALLBOT_GATEWAY_PASSWORD.",
     );
   });
 
   it("rejects using both --password and --password-file", async () => {
     await withTempSecretFiles(
-      "kaijibot-gateway-run-",
+      "allbot-gateway-run-",
       { password: "pw_from_file\n" },
       async ({ passwordFile }) => {
         await expect(

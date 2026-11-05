@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/opencode-provider",
+  "name": "@allbot/opencode-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot OpenCode Zen provider plugin",
+  "description": "AllBot OpenCode Zen provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

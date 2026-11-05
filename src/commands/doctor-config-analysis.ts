@@ -1,8 +1,8 @@
 import path from "node:path";
 import type { ZodIssue } from "zod";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { CONFIG_PATH } from "../config/config.js";
-import { KaijiBotSchema } from "../config/zod-schema.js";
+import { AllBotSchema } from "../config/zod-schema.js";
 import { note } from "../terminal/note.js";
 import { isRecord } from "../utils.js";
 
@@ -59,11 +59,11 @@ export function resolveConfigPathTarget(root: unknown, path: Array<string | numb
   return current;
 }
 
-export function stripUnknownConfigKeys(config: KaijiBotConfig): {
-  config: KaijiBotConfig;
+export function stripUnknownConfigKeys(config: AllBotConfig): {
+  config: AllBotConfig;
   removed: string[];
 } {
-  const parsed = KaijiBotSchema.safeParse(config);
+  const parsed = AllBotSchema.safeParse(config);
   if (parsed.success) {
     return { config, removed: [] };
   }
@@ -92,7 +92,7 @@ export function stripUnknownConfigKeys(config: KaijiBotConfig): {
   return { config: next, removed };
 }
 
-export function noteOpencodeProviderOverrides(cfg: KaijiBotConfig): void {
+export function noteOpencodeProviderOverrides(cfg: AllBotConfig): void {
   const providers = cfg.models?.providers;
   if (!providers) {
     return;

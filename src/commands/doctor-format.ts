@@ -59,14 +59,14 @@ export function buildGatewayRuntimeHints(
     return hints;
   }
   if (runtime.cachedLabel && platform === "darwin") {
-    const label = resolveGatewayLaunchAgentLabel(env.KAIJIBOT_PROFILE);
+    const label = resolveGatewayLaunchAgentLabel(env.ALLBOT_PROFILE);
     hints.push(
       `LaunchAgent label cached but plist missing. Clear with: launchctl bootout gui/$UID/${label}`,
     );
-    hints.push(`Then reinstall: ${formatCliCommand("kaijibot gateway install", env)}`);
+    hints.push(`Then reinstall: ${formatCliCommand("allbot gateway install", env)}`);
   }
   if (runtime.missingUnit) {
-    hints.push(`Service not installed. Run: ${formatCliCommand("kaijibot gateway install", env)}`);
+    hints.push(`Service not installed. Run: ${formatCliCommand("allbot gateway install", env)}`);
     if (fileLog) {
       hints.push(`File logs: ${fileLog}`);
     }
@@ -81,8 +81,8 @@ export function buildGatewayRuntimeHints(
       ...buildPlatformRuntimeLogHints({
         platform,
         env,
-        systemdServiceName: resolveGatewaySystemdServiceName(env.KAIJIBOT_PROFILE),
-        windowsTaskName: resolveGatewayWindowsTaskName(env.KAIJIBOT_PROFILE),
+        systemdServiceName: resolveGatewaySystemdServiceName(env.ALLBOT_PROFILE),
+        windowsTaskName: resolveGatewayWindowsTaskName(env.ALLBOT_PROFILE),
       }),
     );
   }

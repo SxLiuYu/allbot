@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot reset` (reset local state/config)"
+summary: "CLI reference for `allbot reset` (reset local state/config)"
 read_when:
   - You want to wipe local state while keeping the CLI installed
   - You want a dry-run of what would be removed
 title: "reset"
 ---
 
-# `kaijibot reset`
+# `allbot reset`
 
 Reset local config/state (keeps the CLI installed).
 
@@ -20,16 +20,16 @@ Options:
 Examples:
 
 ```bash
-kaijibot backup create
-kaijibot reset
-kaijibot reset --dry-run
-kaijibot reset --scope config --yes --non-interactive
-kaijibot reset --scope config+creds+sessions --yes --non-interactive
-kaijibot reset --scope full --yes --non-interactive
+allbot backup create
+allbot reset
+allbot reset --dry-run
+allbot reset --scope config --yes --non-interactive
+allbot reset --scope config+creds+sessions --yes --non-interactive
+allbot reset --scope full --yes --non-interactive
 ```
 
 Notes:
 
-- Run `kaijibot backup create` first if you want a restorable snapshot before removing local state.
-- If you omit `--scope`, `kaijibot reset` uses an interactive prompt to choose what to remove.
+- Run `allbot backup create` first if you want a restorable snapshot before removing local state.
+- If you omit `--scope`, `allbot reset` uses an interactive prompt to choose what to remove.
 - `--non-interactive` is only valid when both `--scope` and `--yes` are set.

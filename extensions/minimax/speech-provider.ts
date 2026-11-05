@@ -1,11 +1,11 @@
-import { normalizeResolvedSecretInputString } from "kaijibot/plugin-sdk/secret-input";
+import { normalizeResolvedSecretInputString } from "allbot/plugin-sdk/secret-input";
 import type {
   SpeechDirectiveTokenParseContext,
   SpeechProviderConfig,
   SpeechProviderOverrides,
   SpeechProviderPlugin,
-} from "kaijibot/plugin-sdk/speech-core";
-import { asFiniteNumber, asObject, trimToUndefined } from "kaijibot/plugin-sdk/speech-core";
+} from "allbot/plugin-sdk/speech-core";
+import { asFiniteNumber, asObject, trimToUndefined } from "allbot/plugin-sdk/speech-core";
 import {
   DEFAULT_MINIMAX_TTS_BASE_URL,
   MINIMAX_TTS_MODELS,

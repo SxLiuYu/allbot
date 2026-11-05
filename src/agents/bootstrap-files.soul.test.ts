@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { resolveSoulPreset } from "./bootstrap-files.js";
 
 describe("resolveSoulPreset", () => {
@@ -8,7 +8,7 @@ describe("resolveSoulPreset", () => {
       agents: {
         list: [{ id: "main", soul: { preset: "intj" } }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBe("intj");
@@ -20,7 +20,7 @@ describe("resolveSoulPreset", () => {
         defaults: { soul: { preset: "entp" } },
         list: [{ id: "main" }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBe("entp");
@@ -29,7 +29,7 @@ describe("resolveSoulPreset", () => {
   it("falls back to global soul.preset when no per-agent and no defaults", () => {
     const config = {
       soul: { preset: "infj" },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBe("infj");
@@ -42,7 +42,7 @@ describe("resolveSoulPreset", () => {
         defaults: { soul: { preset: "entp" } },
         list: [{ id: "main", soul: { preset: "intj" } }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBe("intj");
@@ -54,14 +54,14 @@ describe("resolveSoulPreset", () => {
       agents: {
         defaults: { soul: { preset: "entp" } },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBe("entp");
   });
 
   it("returns undefined when no soul preset anywhere", () => {
-    const config = {} as KaijiBotConfig;
+    const config = {} as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBeUndefined();
@@ -77,7 +77,7 @@ describe("resolveSoulPreset", () => {
       agents: {
         list: [{ id: "main", soul: { preset: "intj" } }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     // sessionKey format: feishu:ou_xxx:main  or similar
     const result = resolveSoulPreset(config, undefined, "feishu:ou_test:main");
@@ -90,7 +90,7 @@ describe("resolveSoulPreset", () => {
       agents: {
         list: [{ id: "other" }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = resolveSoulPreset(config, "main");
     expect(result).toBe("infj");

@@ -16,18 +16,18 @@ Start at [/help/troubleshooting](/help/troubleshooting) if you want the fast tri
 Run these first, in this order:
 
 ```bash
-kaijibot status
-kaijibot gateway status
-kaijibot logs --follow
-kaijibot doctor
-kaijibot channels status --probe
+allbot status
+allbot gateway status
+allbot logs --follow
+allbot doctor
+allbot channels status --probe
 ```
 
 Expected healthy signals:
 
-- `kaijibot gateway status` shows `Runtime: running` and `RPC probe: ok`.
-- `kaijibot doctor` reports no blocking config/service issues.
-- `kaijibot channels status --probe` shows live per-account transport status and,
+- `allbot gateway status` shows `Runtime: running` and `RPC probe: ok`.
+- `allbot doctor` reports no blocking config/service issues.
+- `allbot channels status --probe` shows live per-account transport status and,
   where supported, probe/audit results such as `works` or `audit ok`.
 
 ## Anthropic 429 extra usage required for long context
@@ -36,9 +36,9 @@ Use this when logs/errors include:
 `HTTP 429: rate_limit_error: Extra usage is required for long context requests`.
 
 ```bash
-kaijibot logs --follow
-kaijibot models status
-kaijibot config get agents.defaults.models
+allbot logs --follow
+allbot models status
+allbot config get agents.defaults.models
 ```
 
 Look for:
@@ -65,20 +65,20 @@ Use this when:
 
 - `curl ... /v1/models` works
 - tiny direct `/v1/chat/completions` calls work
-- KaijiBot model runs fail only on normal agent turns
+- AllBot model runs fail only on normal agent turns
 
 ```bash
 curl http://127.0.0.1:1234/v1/models
 curl http://127.0.0.1:1234/v1/chat/completions \
   -H 'content-type: application/json' \
   -d '{"model":"<id>","messages":[{"role":"user","content":"hi"}],"stream":false}'
-kaijibot infer model run --model <provider/model> --prompt "hi" --json
-kaijibot logs --follow
+allbot infer model run --model <provider/model> --prompt "hi" --json
+allbot logs --follow
 ```
 
 Look for:
 
-- direct tiny calls succeed, but KaijiBot runs fail only on larger prompts
+- direct tiny calls succeed, but AllBot runs fail only on larger prompts
 - backend errors about `messages[].content` expecting a string
 - backend crashes that appear only with larger prompt-token counts or full agent
   runtime prompts
@@ -88,8 +88,8 @@ Common signatures:
 - `messages[...].content: invalid type: sequence, expected a string` → backend
   rejects structured Chat Completions content parts. Fix: set
   `models.providers.<provider>.models[].compat.requiresStringContent: true`.
-- direct tiny requests succeed, but KaijiBot agent runs fail with backend/model
-  crashes (for example Gemma on some `inferrs` builds) → KaijiBot transport is
+- direct tiny requests succeed, but AllBot agent runs fail with backend/model
+  crashes (for example Gemma on some `inferrs` builds) → AllBot transport is
   likely already correct; the backend is failing on the larger agent-runtime
   prompt shape.
 - failures shrink after disabling tools but do not disappear → tool schemas were
@@ -100,11 +100,11 @@ Fix options:
 
 1. Set `compat.requiresStringContent: true` for string-only Chat Completions backends.
 2. Set `compat.supportsTools: false` for models/backends that cannot handle
-   KaijiBot's tool schema surface reliably.
+   AllBot's tool schema surface reliably.
 3. Lower prompt pressure where possible: smaller workspace bootstrap, shorter
    session history, lighter local model, or a backend with stronger long-context
    support.
-4. If tiny direct requests keep passing while KaijiBot agent turns still crash
+4. If tiny direct requests keep passing while AllBot agent turns still crash
    inside the backend, treat it as an upstream server/model limitation and file
    a repro there with the accepted payload shape.
 
@@ -119,11 +119,11 @@ Related:
 If channels are up but nothing answers, check routing and policy before reconnecting anything.
 
 ```bash
-kaijibot status
-kaijibot channels status --probe
-kaijibot pairing list --channel <channel> [--account <id>]
-kaijibot config get channels
-kaijibot logs --follow
+allbot status
+allbot channels status --probe
+allbot pairing list --channel <channel> [--account <id>]
+allbot config get channels
+allbot logs --follow
 ```
 
 Look for:
@@ -149,11 +149,11 @@ Related:
 When dashboard/control UI will not connect, validate URL, auth mode, and secure context assumptions.
 
 ```bash
-kaijibot gateway status
-kaijibot status
-kaijibot logs --follow
-kaijibot doctor
-kaijibot gateway status --json
+allbot gateway status
+allbot status
+allbot logs --follow
+allbot doctor
+allbot gateway status --json
 ```
 
 Look for:
@@ -195,17 +195,17 @@ Use `error.details.code` from the failed `connect` response to pick the next act
 
 | Detail code                  | Meaning                                                  | Recommended action                                                                                                                                                                                                                                                                       |
 | ---------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AUTH_TOKEN_MISSING`         | Client did not send a required shared token.             | Paste/set token in the client and retry. For dashboard paths: `kaijibot config get gateway.auth.token` then paste into Control UI settings.                                                                                                                                              |
+| `AUTH_TOKEN_MISSING`         | Client did not send a required shared token.             | Paste/set token in the client and retry. For dashboard paths: `allbot config get gateway.auth.token` then paste into Control UI settings.                                                                                                                                              |
 | `AUTH_TOKEN_MISMATCH`        | Shared token did not match gateway auth token.           | If `canRetryWithDeviceToken=true`, allow one trusted retry. Cached-token retries reuse stored approved scopes; explicit `deviceToken` / `scopes` callers keep requested scopes. If still failing, run the [token drift recovery checklist](/cli/devices#token-drift-recovery-checklist). |
 | `AUTH_DEVICE_TOKEN_MISMATCH` | Cached per-device token is stale or revoked.             | Rotate/re-approve device token using [devices CLI](/cli/devices), then reconnect.                                                                                                                                                                                                        |
-| `PAIRING_REQUIRED`           | Device identity is known but not approved for this role. | Approve pending request: `kaijibot devices list` then `kaijibot devices approve <requestId>`.                                                                                                                                                                                            |
+| `PAIRING_REQUIRED`           | Device identity is known but not approved for this role. | Approve pending request: `allbot devices list` then `allbot devices approve <requestId>`.                                                                                                                                                                                            |
 
 Device auth v2 migration check:
 
 ```bash
-kaijibot --version
-kaijibot doctor
-kaijibot gateway status
+allbot --version
+allbot doctor
+allbot gateway status
 ```
 
 If logs show nonce/signature errors, update the connecting client and verify it:
@@ -214,11 +214,11 @@ If logs show nonce/signature errors, update the connecting client and verify it:
 2. signs the challenge-bound payload
 3. sends `connect.params.device.nonce` with the same challenge nonce
 
-If `kaijibot devices rotate` / `revoke` / `remove` is denied unexpectedly:
+If `allbot devices rotate` / `revoke` / `remove` is denied unexpectedly:
 
 - paired-device token sessions can manage only **their own** device unless the
   caller also has `operator.admin`
-- `kaijibot devices rotate --scope ...` can only request operator scopes that
+- `allbot devices rotate --scope ...` can only request operator scopes that
   the caller session already holds
 
 Related:
@@ -234,11 +234,11 @@ Related:
 Use this when service is installed but process does not stay up.
 
 ```bash
-kaijibot gateway status
-kaijibot status
-kaijibot logs --follow
-kaijibot doctor
-kaijibot gateway status --deep   # also scan system-level services
+allbot gateway status
+allbot status
+allbot logs --follow
+allbot doctor
+allbot gateway status --deep   # also scan system-level services
 ```
 
 Look for:
@@ -251,7 +251,7 @@ Look for:
 
 Common signatures:
 
-- `Gateway start blocked: set gateway.mode=local` or `existing config is missing gateway.mode` → local gateway mode is not enabled, or the config file was clobbered and lost `gateway.mode`. Fix: set `gateway.mode="local"` in your config, or re-run `kaijibot onboard --mode local` / `kaijibot setup` to restamp the expected local-mode config. If you are running KaijiBot via Podman, the default config path is `~/.kaijibot/kaijibot.json`.
+- `Gateway start blocked: set gateway.mode=local` or `existing config is missing gateway.mode` → local gateway mode is not enabled, or the config file was clobbered and lost `gateway.mode`. Fix: set `gateway.mode="local"` in your config, or re-run `allbot onboard --mode local` / `allbot setup` to restamp the expected local-mode config. If you are running AllBot via Podman, the default config path is `~/.allbot/allbot.json`.
 - `refusing to bind gateway ... without auth` → non-loopback bind without a valid gateway auth path (token/password, or trusted-proxy where configured).
 - `another gateway instance is already listening` / `EADDRINUSE` → port conflict.
 - `Other gateway-like services detected (best effort)` → stale or parallel launchd/systemd/schtasks units exist. Most setups should keep one gateway per machine; if you do need more than one, isolate ports + config/state/workspace. See [/gateway#multiple-gateways-same-host](/gateway#multiple-gateways-same-host).
@@ -264,12 +264,12 @@ Related:
 
 ## Gateway probe warnings
 
-Use this when `kaijibot gateway probe` reaches something, but still prints a warning block.
+Use this when `allbot gateway probe` reaches something, but still prints a warning block.
 
 ```bash
-kaijibot gateway probe
-kaijibot gateway probe --json
-kaijibot gateway probe --ssh user@gateway-host
+allbot gateway probe
+allbot gateway probe --json
+allbot gateway probe --ssh user@gateway-host
 ```
 
 Look for:
@@ -295,11 +295,11 @@ Related:
 If channel state is connected but message flow is dead, focus on policy, permissions, and channel specific delivery rules.
 
 ```bash
-kaijibot channels status --probe
-kaijibot pairing list --channel <channel> [--account <id>]
-kaijibot status --deep
-kaijibot logs --follow
-kaijibot config get channels
+allbot channels status --probe
+allbot pairing list --channel <channel> [--account <id>]
+allbot status --deep
+allbot logs --follow
+allbot config get channels
 ```
 
 Look for:
@@ -326,11 +326,11 @@ Related:
 If cron or heartbeat did not run or did not deliver, verify scheduler state first, then delivery target.
 
 ```bash
-kaijibot cron status
-kaijibot cron list
-kaijibot cron runs --id <jobId> --limit 20
-kaijibot system heartbeat last
-kaijibot logs --follow
+allbot cron status
+allbot cron list
+allbot cron runs --id <jobId> --limit 20
+allbot system heartbeat last
+allbot logs --follow
 ```
 
 Look for:
@@ -344,7 +344,7 @@ Common signatures:
 - `cron: scheduler disabled; jobs will not run automatically` → cron disabled.
 - `cron: timer tick failed` → scheduler tick failed; check file/log/runtime errors.
 - `heartbeat skipped` with `reason=quiet-hours` → outside active hours window.
-- `heartbeat skipped` with `reason=empty-heartbeat-file` → `HEARTBEAT.md` exists but only contains blank lines / markdown headers, so KaijiBot skips the model call.
+- `heartbeat skipped` with `reason=empty-heartbeat-file` → `HEARTBEAT.md` exists but only contains blank lines / markdown headers, so AllBot skips the model call.
 - `heartbeat skipped` with `reason=no-tasks-due` → `HEARTBEAT.md` contains a `tasks:` block, but none of the tasks are due on this tick.
 - `heartbeat: unknown accountId` → invalid account id for heartbeat delivery target.
 - `heartbeat skipped` with `reason=dm-blocked` → heartbeat target resolved to a DM-style destination while `agents.defaults.heartbeat.directPolicy` (or per-agent override) is set to `block`.
@@ -360,11 +360,11 @@ Related:
 If a node is paired but tools fail, isolate foreground, permission, and approval state.
 
 ```bash
-kaijibot nodes status
-kaijibot nodes describe --node <idOrNameOrIp>
-kaijibot approvals get --node <idOrNameOrIp>
-kaijibot logs --follow
-kaijibot status
+allbot nodes status
+allbot nodes describe --node <idOrNameOrIp>
+allbot approvals get --node <idOrNameOrIp>
+allbot logs --follow
+allbot status
 ```
 
 Look for:
@@ -391,11 +391,11 @@ Related:
 Use this when browser tool actions fail even though the gateway itself is healthy.
 
 ```bash
-kaijibot browser status
-kaijibot browser start --browser-profile kaijibot
-kaijibot browser profiles
-kaijibot logs --follow
-kaijibot doctor
+allbot browser status
+allbot browser start --browser-profile allbot
+allbot browser profiles
+allbot logs --follow
+allbot doctor
 ```
 
 Look for:
@@ -423,7 +423,7 @@ Common signatures:
 - `existing-session file uploads currently support one file at a time.` → send one upload per call on Chrome MCP profiles.
 - `existing-session dialog handling does not support timeoutMs.` → dialog hooks on Chrome MCP profiles do not support timeout overrides.
 - `response body is not supported for existing-session profiles yet.` → `responsebody` still requires a managed browser or raw CDP profile.
-- stale viewport / dark-mode / locale / offline overrides on attach-only or remote CDP profiles → run `kaijibot browser stop --browser-profile <name>` to close the active control session and release Playwright/CDP emulation state without restarting the whole gateway.
+- stale viewport / dark-mode / locale / offline overrides on attach-only or remote CDP profiles → run `allbot browser stop --browser-profile <name>` to close the active control session and release Playwright/CDP emulation state without restarting the whole gateway.
 
 Related:
 
@@ -437,10 +437,10 @@ Most post-upgrade breakage is config drift or stricter defaults now being enforc
 ### 1) Auth and URL override behavior changed
 
 ```bash
-kaijibot gateway status
-kaijibot config get gateway.mode
-kaijibot config get gateway.remote.url
-kaijibot config get gateway.auth.mode
+allbot gateway status
+allbot config get gateway.mode
+allbot config get gateway.remote.url
+allbot config get gateway.auth.mode
 ```
 
 What to check:
@@ -456,11 +456,11 @@ Common signatures:
 ### 2) Bind and auth guardrails are stricter
 
 ```bash
-kaijibot config get gateway.bind
-kaijibot config get gateway.auth.mode
-kaijibot config get gateway.auth.token
-kaijibot gateway status
-kaijibot logs --follow
+allbot config get gateway.bind
+allbot config get gateway.auth.mode
+allbot config get gateway.auth.token
+allbot gateway status
+allbot logs --follow
 ```
 
 What to check:
@@ -476,10 +476,10 @@ Common signatures:
 ### 3) Pairing and device identity state changed
 
 ```bash
-kaijibot devices list
-kaijibot pairing list --channel <channel> [--account <id>]
-kaijibot logs --follow
-kaijibot doctor
+allbot devices list
+allbot pairing list --channel <channel> [--account <id>]
+allbot logs --follow
+allbot doctor
 ```
 
 What to check:
@@ -495,8 +495,8 @@ Common signatures:
 If the service config and runtime still disagree after checks, reinstall service metadata from the same profile/state directory:
 
 ```bash
-kaijibot gateway install --force
-kaijibot gateway restart
+allbot gateway install --force
+allbot gateway restart
 ```
 
 Related:

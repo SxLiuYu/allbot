@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 import {
   CHUTES_BASE_URL,
   CHUTES_MODEL_CATALOG,

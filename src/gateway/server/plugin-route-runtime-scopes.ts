@@ -13,7 +13,7 @@ export function resolvePluginRouteRuntimeOperatorScopes(
   if (requestAuth.authMethod !== "trusted-proxy") {
     return [WRITE_SCOPE];
   }
-  if (getHeader(req, "x-kaijibot-scopes") === undefined) {
+  if (getHeader(req, "x-allbot-scopes") === undefined) {
     return [WRITE_SCOPE];
   }
   return resolveTrustedHttpOperatorScopes(req, requestAuth);

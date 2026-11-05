@@ -7,7 +7,7 @@ describe("createOptionalChannelSetupSurface", () => {
     const setup = createOptionalChannelSetupSurface({
       channel: "example",
       label: "Example",
-      npmSpec: "@kaijibot/example",
+      npmSpec: "@allbot/example",
       docsPath: "/channels/example",
     });
 
@@ -18,7 +18,7 @@ describe("createOptionalChannelSetupSurface", () => {
         accountId: "default",
         input: {},
       }),
-    ).toContain("@kaijibot/example");
+    ).toContain("@allbot/example");
     expect(setup.setupWizard.channel).toBe("example");
     expect(setup.setupWizard.status.unconfiguredHint).toContain("/channels/example");
     await expect(
@@ -30,6 +30,6 @@ describe("createOptionalChannelSetupSurface", () => {
           exit: async () => {},
         },
       }),
-    ).rejects.toThrow("@kaijibot/example");
+    ).rejects.toThrow("@allbot/example");
   });
 });

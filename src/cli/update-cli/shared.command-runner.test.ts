@@ -33,14 +33,14 @@ describe("createGlobalCommandRunner", () => {
 
     const result = await runCommand(["npm", "root", "-g"], {
       timeoutMs: 1200,
-      cwd: "/tmp/kaijibot",
-      env: { KAIJIBOT_TEST: "1" },
+      cwd: "/tmp/allbot",
+      env: { ALLBOT_TEST: "1" },
     });
 
     expect(runCommandWithTimeout).toHaveBeenCalledWith(["npm", "root", "-g"], {
       timeoutMs: 1200,
-      cwd: "/tmp/kaijibot",
-      env: { KAIJIBOT_TEST: "1" },
+      cwd: "/tmp/allbot",
+      env: { ALLBOT_TEST: "1" },
     });
     expect(result).toEqual({
       stdout: "out",

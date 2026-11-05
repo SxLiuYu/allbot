@@ -1,5 +1,5 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import { applyPluginAutoEnable } from "../../config/plugin-auto-enable.js";
 import { createSubsystemLogger } from "../../logging.js";
@@ -9,9 +9,9 @@ import type { PluginLogger } from "../types.js";
 const log = createSubsystemLogger("plugins");
 
 export type PluginRuntimeLoadContext = {
-  rawConfig: KaijiBotConfig;
-  config: KaijiBotConfig;
-  activationSourceConfig: KaijiBotConfig;
+  rawConfig: AllBotConfig;
+  config: AllBotConfig;
+  activationSourceConfig: AllBotConfig;
   autoEnabledReasons: Readonly<Record<string, string[]>>;
   workspaceDir: string | undefined;
   env: NodeJS.ProcessEnv;
@@ -24,8 +24,8 @@ export type PluginRuntimeResolvedLoadValues = Pick<
 >;
 
 export type PluginRuntimeLoadContextOptions = {
-  config?: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config?: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   logger?: PluginLogger;

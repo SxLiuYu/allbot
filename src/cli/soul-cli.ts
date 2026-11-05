@@ -76,10 +76,10 @@ async function runSoulList(agentId?: string): Promise<void> {
   }
   defaultRuntime.log("");
   defaultRuntime.log(
-    `Use ${theme.command(`kaijibot soul set <type> --agent ${effectiveAgentId}`)} to select a soul preset.`,
+    `Use ${theme.command(`allbot soul set <type> --agent ${effectiveAgentId}`)} to select a soul preset.`,
   );
   defaultRuntime.log(
-    `Use ${theme.command(`kaijibot soul unset --agent ${effectiveAgentId}`)} to revert to the default SOUL.md.`,
+    `Use ${theme.command(`allbot soul unset --agent ${effectiveAgentId}`)} to revert to the default SOUL.md.`,
   );
 }
 
@@ -181,7 +181,7 @@ export function registerSoulCli(program: Command) {
 
   soul
     .command("set")
-    .description("Set the active soul preset (e.g., kaijibot soul set intj)")
+    .description("Set the active soul preset (e.g., allbot soul set intj)")
     .argument("<type>", "MBTI type (e.g., intj, entp, infj)")
     .option("--agent <id>", "Target a specific agent")
     .action(async (type: string, opts: { agent?: string }) => {

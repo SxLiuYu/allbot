@@ -1,5 +1,5 @@
 import { normalizeProviderId } from "../agents/model-selection.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ModelProviderConfig } from "../config/types.js";
 import type { ProviderDiscoveryOrder, ProviderPlugin } from "./types.js";
 
@@ -16,7 +16,7 @@ function resolveProviderCatalogHook(provider: ProviderPlugin) {
 }
 
 export async function resolvePluginDiscoveryProviders(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   onlyPluginIds?: string[];
@@ -90,7 +90,7 @@ export function normalizePluginDiscoveryResult(params: {
 
 export function runProviderCatalog(params: {
   provider: ProviderPlugin;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;

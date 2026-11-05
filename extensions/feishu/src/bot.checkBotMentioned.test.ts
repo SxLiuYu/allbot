@@ -78,9 +78,9 @@ describe("parseFeishuMessageEvent – mentionedBot", () => {
 
   it("returns mentionedBot=true when bot mention name differs from configured botName", () => {
     const event = makeEvent("group", [
-      { key: "@_user_1", name: "KaijiBot Bot (Alias)", id: { open_id: BOT_OPEN_ID } },
+      { key: "@_user_1", name: "AllBot Bot (Alias)", id: { open_id: BOT_OPEN_ID } },
     ]);
-    const ctx = parseFeishuMessageEvent(event, BOT_OPEN_ID, "KaijiBot Bot");
+    const ctx = parseFeishuMessageEvent(event, BOT_OPEN_ID, "AllBot Bot");
     expect(ctx.mentionedBot).toBe(true);
   });
 

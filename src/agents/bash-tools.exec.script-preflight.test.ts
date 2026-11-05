@@ -17,7 +17,7 @@ afterEach(() => {
 
 describeNonWin("exec script preflight", () => {
   it("blocks shell env var injection tokens in python scripts before execution", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
 
       await fs.writeFile(
@@ -43,7 +43,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("blocks obvious shell-as-js output before node execution", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const jsPath = path.join(tmp, "bad.js");
 
       await fs.writeFile(
@@ -66,7 +66,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("blocks shell env var injection when script path is quoted", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const jsPath = path.join(tmp, "bad.js");
       await fs.writeFile(jsPath, "const value = $DM_JSON;", "utf-8");
 
@@ -81,7 +81,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates in-workdir scripts whose names start with '..'", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const jsPath = path.join(tmp, "..bad.js");
       await fs.writeFile(jsPath, "const value = $DM_JSON;", "utf-8");
 
@@ -96,7 +96,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates in-workdir symlinked script entrypoints", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const targetPath = path.join(tmp, "bad-target.js");
       const linkPath = path.join(tmp, "link.js");
       await fs.writeFile(targetPath, "const value = $DM_JSON;", "utf-8");
@@ -113,7 +113,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates scripts under literal tilde directories in workdir", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const literalTildeDir = path.join(tmp, "~");
       await fs.mkdir(literalTildeDir, { recursive: true });
       await fs.writeFile(path.join(literalTildeDir, "bad.js"), "const value = $DM_JSON;", "utf-8");
@@ -129,7 +129,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates python scripts when interpreter is prefixed with env", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -144,7 +144,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates python scripts when interpreter is prefixed with path-qualified env", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -159,7 +159,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates node scripts when interpreter is prefixed with env", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const jsPath = path.join(tmp, "bad.js");
       await fs.writeFile(jsPath, "const value = $DM_JSON;", "utf-8");
 
@@ -174,7 +174,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates the first positional python script operand when extra args follow", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.py"), "payload = $DM_JSON", "utf-8");
       await fs.writeFile(path.join(tmp, "ghost.py"), "print('ok')", "utf-8");
 
@@ -189,7 +189,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates python script operand even when trailing option values look like scripts", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "script.py"), "payload = $DM_JSON", "utf-8");
       await fs.writeFile(path.join(tmp, "out.py"), "print('ok')", "utf-8");
 
@@ -204,7 +204,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates the first positional node script operand when extra args follow", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "app.js"), "const value = $DM_JSON;", "utf-8");
       await fs.writeFile(path.join(tmp, "config.js"), "console.log('ok')", "utf-8");
 
@@ -219,7 +219,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("still resolves node script when --require consumes a preceding .js option value", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bootstrap.js"), "console.log('bootstrap')", "utf-8");
       await fs.writeFile(path.join(tmp, "app.js"), "const value = $DM_JSON;", "utf-8");
 
@@ -234,7 +234,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates node --require preload modules before a benign entry script", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad-preload.js"), "const value = $DM_JSON;", "utf-8");
       await fs.writeFile(path.join(tmp, "app.js"), "console.log('ok')", "utf-8");
 
@@ -249,7 +249,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates node --require preload modules when no entry script is provided", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.js"), "const value = $DM_JSON;", "utf-8");
 
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
@@ -263,7 +263,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates node --import preload modules when no entry script is provided", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.js"), "const value = $DM_JSON;", "utf-8");
 
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
@@ -277,7 +277,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates node --require preload modules even when -e is present", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.js"), "const value = $DM_JSON;", "utf-8");
 
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
@@ -291,7 +291,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("validates node --import preload modules even when -e is present", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.js"), "const value = $DM_JSON;", "utf-8");
 
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
@@ -305,7 +305,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("skips preflight file reads for script paths outside the workdir", async () => {
-    await withTempDir("kaijibot-exec-preflight-parent-", async (parent) => {
+    await withTempDir("allbot-exec-preflight-parent-", async (parent) => {
       const outsidePath = path.join(parent, "outside.js");
       const workdir = path.join(parent, "workdir");
       await fs.mkdir(workdir, { recursive: true });
@@ -323,7 +323,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not trust a swapped script pathname between validation and read", async () => {
-    await withTempDir("kaijibot-exec-preflight-race-", async (parent) => {
+    await withTempDir("allbot-exec-preflight-race-", async (parent) => {
       const workdir = path.join(parent, "workdir");
       const scriptPath = path.join(workdir, "script.js");
       const outsidePath = path.join(parent, "outside.js");
@@ -356,7 +356,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("handles pre-open symlink swaps without surfacing preflight errors", async () => {
-    await withTempDir("kaijibot-exec-preflight-open-race-", async (parent) => {
+    await withTempDir("allbot-exec-preflight-open-race-", async (parent) => {
       const workdir = path.join(parent, "workdir");
       const scriptPath = path.join(workdir, "script.js");
       const outsidePath = path.join(parent, "outside.js");
@@ -389,7 +389,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("opens preflight script reads with O_NONBLOCK to avoid FIFO stalls", async () => {
-    await withTempDir("kaijibot-exec-preflight-nonblock-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-nonblock-", async (tmp) => {
       const scriptPath = path.join(tmp, "script.js");
       await fs.writeFile(scriptPath, 'console.log("ok")', "utf-8");
       const scriptRealPath = await fs.realpath(scriptPath);
@@ -416,7 +416,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for piped interpreter commands that bypass direct script parsing", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -432,7 +432,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for top-level interpreter invocations inside shell control-flow", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -448,7 +448,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for multiline top-level control-flow interpreter invocations", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -464,7 +464,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations with quoted script paths", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -480,7 +480,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for top-level control-flow with quoted interpreter script paths", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -496,7 +496,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -512,7 +512,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for shell-wrapped payloads that only echo interpreter words", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-shell-wrap-echo-text", {
@@ -526,7 +526,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations inside control-flow payloads", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -542,7 +542,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for env-prefixed shell-wrapped interpreter invocations", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -558,7 +558,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations via absolute shell paths", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -574,7 +574,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations when long options take separate values", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
       await fs.writeFile(path.join(tmp, "shell.rc"), "# rc", "utf-8");
@@ -591,7 +591,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations with leading long options", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -607,7 +607,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations with combined shell flags", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -623,7 +623,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations when -O consumes a separate value", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -639,7 +639,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations when -o consumes a separate value", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -655,7 +655,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for shell-wrapped interpreter invocations when -c is not the trailing short flag", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -671,7 +671,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("fails closed for process-substitution interpreter invocations", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const pyPath = path.join(tmp, "bad.py");
       await fs.writeFile(pyPath, "payload = $DM_JSON", "utf-8");
 
@@ -687,7 +687,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("allows direct inline interpreter commands with no script file hint", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-inline", {
@@ -701,7 +701,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed when interpreter and script hints only appear in echoed text", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-echo-text", {
@@ -715,7 +715,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed when shell keyword-like text appears only as echo arguments", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-echo-keyword-like-text", {
@@ -729,7 +729,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for pipelines that only contain interpreter words as plain text", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-echo-pipe-text", {
@@ -743,7 +743,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for non-executing pipelines that only print interpreter words", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-printf-pipe-text", {
@@ -757,7 +757,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed when script-like text is in a separate command segment", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-separate-script-hint-segment", {
@@ -771,7 +771,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed when script hints appear outside the interpreter segment with &&", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "sample.py"), "print('ok')", "utf-8");
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
@@ -786,7 +786,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for piped interpreter version commands with script-like upstream text", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-piped-interpreter-version", {
@@ -800,7 +800,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for piped node -c syntax-check commands with script-like upstream text", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "ok.js"), "console.log('ok')", "utf-8");
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
@@ -814,7 +814,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for piped node -e commands when inline code contains script-like text", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-piped-node-e-inline-script-hint", {
@@ -828,7 +828,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed when shell operator characters are escaped", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-echo-escaped-operator", {
@@ -842,7 +842,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed when escaped semicolons appear with interpreter hints", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-echo-escaped-semicolon", {
@@ -856,7 +856,7 @@ describeNonWin("exec script preflight", () => {
   });
 
   it("does not fail closed for node -e when .py appears inside quoted inline code", async () => {
-    await withTempDir("kaijibot-exec-preflight-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-", async (tmp) => {
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
 
       const result = await tool.execute("call-inline-script-hint", {
@@ -872,7 +872,7 @@ describeNonWin("exec script preflight", () => {
 
 describeWin("exec script preflight on windows path syntax", () => {
   it("preserves windows-style python relative path separators during script extraction", async () => {
-    await withTempDir("kaijibot-exec-preflight-win-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-win-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.py"), "payload = $DM_JSON", "utf-8");
 
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
@@ -886,7 +886,7 @@ describeWin("exec script preflight on windows path syntax", () => {
   });
 
   it("preserves windows-style node relative path separators during script extraction", async () => {
-    await withTempDir("kaijibot-exec-preflight-win-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-win-", async (tmp) => {
       await fs.writeFile(path.join(tmp, "bad.js"), "const value = $DM_JSON;", "utf-8");
 
       const tool = createExecTool({ host: "gateway", security: "full", ask: "off" });
@@ -900,7 +900,7 @@ describeWin("exec script preflight on windows path syntax", () => {
   });
 
   it("preserves windows-style python absolute drive paths during script extraction", async () => {
-    await withTempDir("kaijibot-exec-preflight-win-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-win-", async (tmp) => {
       const absPath = path.join(tmp, "bad.py");
       await fs.writeFile(absPath, "payload = $DM_JSON", "utf-8");
       const winAbsPath = absPath.replaceAll("/", "\\");
@@ -916,7 +916,7 @@ describeWin("exec script preflight on windows path syntax", () => {
   });
 
   it("preserves windows-style nested relative path separators during script extraction", async () => {
-    await withTempDir("kaijibot-exec-preflight-win-", async (tmp) => {
+    await withTempDir("allbot-exec-preflight-win-", async (tmp) => {
       await fs.mkdir(path.join(tmp, "subdir"), { recursive: true });
       await fs.writeFile(path.join(tmp, "subdir", "bad.py"), "payload = $DM_JSON", "utf-8");
 
@@ -938,7 +938,7 @@ describe("exec interpreter heuristics ReDoS guard", () => {
     // command-substitution failure local so the test measures parser behavior,
     // not external network timing.
     const htmlBlock = '<section style="padding: 30px 20px; font-family: Arial;">'.repeat(50);
-    const command = `ACCESS_TOKEN=$(__kaijibot_missing_redos_guard__)\ncat > /tmp/out.html << 'EOF'\n${htmlBlock}\nEOF`;
+    const command = `ACCESS_TOKEN=$(__allbot_missing_redos_guard__)\ncat > /tmp/out.html << 'EOF'\n${htmlBlock}\nEOF`;
 
     const start = Date.now();
     // The command itself will fail — we only care that the interpreter

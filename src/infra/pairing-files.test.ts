@@ -8,10 +8,10 @@ import {
 
 describe("pairing file helpers", () => {
   it("resolves pairing file paths from explicit base dirs", () => {
-    expect(resolvePairingPaths("/tmp/kaijibot-state", "devices")).toEqual({
-      dir: path.join("/tmp/kaijibot-state", "devices"),
-      pendingPath: path.join("/tmp/kaijibot-state", "devices", "pending.json"),
-      pairedPath: path.join("/tmp/kaijibot-state", "devices", "paired.json"),
+    expect(resolvePairingPaths("/tmp/allbot-state", "devices")).toEqual({
+      dir: path.join("/tmp/allbot-state", "devices"),
+      pendingPath: path.join("/tmp/allbot-state", "devices", "pending.json"),
+      pairedPath: path.join("/tmp/allbot-state", "devices", "paired.json"),
     });
   });
 

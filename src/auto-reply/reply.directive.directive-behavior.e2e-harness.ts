@@ -123,10 +123,10 @@ export async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise
     },
     {
       env: {
-        KAIJIBOT_AGENT_DIR: (home) => path.join(home, ".kaijibot", "agent"),
-        PI_CODING_AGENT_DIR: (home) => path.join(home, ".kaijibot", "agent"),
+        ALLBOT_AGENT_DIR: (home) => path.join(home, ".allbot", "agent"),
+        PI_CODING_AGENT_DIR: (home) => path.join(home, ".allbot", "agent"),
       },
-      prefix: "kaijibot-reply-",
+      prefix: "allbot-reply-",
     },
   );
 }
@@ -143,7 +143,7 @@ export function makeWhatsAppDirectiveConfig(
   return withFullRuntimeReplyConfig({
     agents: {
       defaults: {
-        workspace: path.join(home, "kaijibot"),
+        workspace: path.join(home, "allbot"),
         ...defaults,
       },
     },
@@ -270,7 +270,7 @@ export function makeRestrictedElevatedDisabledConfig(home: string) {
     agents: {
       defaults: {
         model: "anthropic/claude-opus-4-6",
-        workspace: path.join(home, "kaijibot"),
+        workspace: path.join(home, "allbot"),
       },
       list: [
         {

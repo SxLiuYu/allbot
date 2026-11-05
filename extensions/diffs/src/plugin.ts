@@ -1,5 +1,5 @@
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir, type KaijiBotPluginApi } from "../api.js";
+import { resolvePreferredAllBotTmpDir, type AllBotPluginApi } from "../api.js";
 import {
   resolveDiffsPluginDefaults,
   resolveDiffsPluginSecurity,
@@ -10,12 +10,12 @@ import { DIFFS_AGENT_GUIDANCE } from "./prompt-guidance.js";
 import { DiffArtifactStore } from "./store.js";
 import { createDiffsTool } from "./tool.js";
 
-export function registerDiffsPlugin(api: KaijiBotPluginApi): void {
+export function registerDiffsPlugin(api: AllBotPluginApi): void {
   const defaults = resolveDiffsPluginDefaults(api.pluginConfig);
   const security = resolveDiffsPluginSecurity(api.pluginConfig);
   const viewerBaseUrl = resolveDiffsPluginViewerBaseUrl(api.pluginConfig);
   const store = new DiffArtifactStore({
-    rootDir: path.join(resolvePreferredKaijiBotTmpDir(), "kaijibot-diffs"),
+    rootDir: path.join(resolvePreferredAllBotTmpDir(), "allbot-diffs"),
     logger: api.logger,
   });
 

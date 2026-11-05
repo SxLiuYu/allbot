@@ -51,7 +51,7 @@ vi.mock("../plugins/tools.js", () => ({
   getPluginToolMeta: noPluginToolMeta,
 }));
 
-vi.mock("../agents/kaijibot-tools.js", () => {
+vi.mock("../agents/allbot-tools.js", () => {
   const tools = [
     {
       name: "cron",
@@ -65,7 +65,7 @@ vi.mock("../agents/kaijibot-tools.js", () => {
     },
   ];
   return {
-    createKaijiBotTools: () => tools,
+    createAllBotTools: () => tools,
   };
 });
 
@@ -114,7 +114,7 @@ async function invoke(tool: string, scopes = "operator.write") {
     headers: {
       "content-type": "application/json",
       authorization: `Bearer ${TEST_GATEWAY_TOKEN}`,
-      "x-kaijibot-scopes": scopes,
+      "x-allbot-scopes": scopes,
     },
     body: JSON.stringify({ tool, action: "status", args: {}, sessionKey: "main" }),
   });

@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { getDmHistoryLimitFromSessionKey } from "./pi-embedded-runner.js";
 
 describe("getDmHistoryLimitFromSessionKey", () => {
   it("keeps backward compatibility for dm/direct session kinds", () => {
     const config = {
       channels: { telegram: { dmHistoryLimit: 10 } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(getDmHistoryLimitFromSessionKey("telegram:dm:123", config)).toBe(10);
     expect(getDmHistoryLimitFromSessionKey("telegram:direct:123", config)).toBe(10);
@@ -15,7 +15,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
   it("returns historyLimit for channel and group session kinds", () => {
     const config = {
       channels: { discord: { historyLimit: 12, dmHistoryLimit: 5 } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(getDmHistoryLimitFromSessionKey("discord:channel:123", config)).toBe(12);
     expect(getDmHistoryLimitFromSessionKey("discord:group:456", config)).toBe(12);
@@ -24,7 +24,7 @@ describe("getDmHistoryLimitFromSessionKey", () => {
   it("returns undefined for unsupported session kinds", () => {
     const config = {
       channels: { discord: { historyLimit: 12, dmHistoryLimit: 5 } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(getDmHistoryLimitFromSessionKey("discord:slash:123", config)).toBeUndefined();
   });

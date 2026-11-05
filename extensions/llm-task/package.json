@@ -1,17 +1,17 @@
 {
-  "name": "@kaijibot/llm-task",
+  "name": "@allbot/llm-task",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot JSON-only LLM task plugin",
+  "description": "AllBot JSON-only LLM task plugin",
   "type": "module",
   "dependencies": {
     "ajv": "^8.18.0",
     "typebox": "^1.1"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

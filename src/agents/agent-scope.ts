@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveAgentModelFallbackValues } from "../config/model-input.js";
 import { resolveStateDir } from "../config/paths.js";
 import type { AgentDefaultsConfig } from "../config/types.agent-defaults.js";
@@ -37,7 +37,7 @@ function stripNullBytes(s: string): string {
 
 export { resolveAgentIdFromSessionKey };
 
-type AgentEntry = NonNullable<NonNullable<KaijiBotConfig["agents"]>["list"]>[number];
+type AgentEntry = NonNullable<NonNullable<AllBotConfig["agents"]>["list"]>[number];
 
 type ResolvedAgentConfig = {
   name?: string;
@@ -63,7 +63,7 @@ type ResolvedAgentConfig = {
 
 let defaultAgentWarned = false;
 
-export function listAgentEntries(cfg: KaijiBotConfig): AgentEntry[] {
+export function listAgentEntries(cfg: AllBotConfig): AgentEntry[] {
   const list = cfg.agents?.list;
   if (!Array.isArray(list)) {
     return [];
@@ -71,7 +71,7 @@ export function listAgentEntries(cfg: KaijiBotConfig): AgentEntry[] {
   return list.filter((entry): entry is AgentEntry => Boolean(entry && typeof entry === "object"));
 }
 
-export function listAgentIds(cfg: KaijiBotConfig): string[] {
+export function listAgentIds(cfg: AllBotConfig): string[] {
   const agents = listAgentEntries(cfg);
   if (agents.length === 0) {
     return [DEFAULT_AGENT_ID];
@@ -89,7 +89,7 @@ export function listAgentIds(cfg: KaijiBotConfig): string[] {
   return ids.length > 0 ? ids : [DEFAULT_AGENT_ID];
 }
 
-export function resolveDefaultAgentId(cfg: KaijiBotConfig): string {
+export function resolveDefaultAgentId(cfg: AllBotConfig): string {
   const agents = listAgentEntries(cfg);
   if (agents.length === 0) {
     return DEFAULT_AGENT_ID;
@@ -105,7 +105,7 @@ export function resolveDefaultAgentId(cfg: KaijiBotConfig): string {
 
 export function resolveSessionAgentIds(params: {
   sessionKey?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
 }): {
   defaultAgentId: string;
@@ -124,18 +124,18 @@ export function resolveSessionAgentIds(params: {
 
 export function resolveSessionAgentId(params: {
   sessionKey?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }): string {
   return resolveSessionAgentIds(params).sessionAgentId;
 }
 
-function resolveAgentEntry(cfg: KaijiBotConfig, agentId: string): AgentEntry | undefined {
+function resolveAgentEntry(cfg: AllBotConfig, agentId: string): AgentEntry | undefined {
   const id = normalizeAgentId(agentId);
   return listAgentEntries(cfg).find((entry) => normalizeAgentId(entry.id) === id);
 }
 
 export function resolveAgentConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): ResolvedAgentConfig | undefined {
   const id = normalizeAgentId(agentId);
@@ -171,14 +171,14 @@ export function resolveAgentConfig(
 }
 
 export function resolveAgentSkillsFilter(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): string[] | undefined {
   return resolveEffectiveAgentSkillFilter(cfg, agentId);
 }
 
 export function resolveAgentExplicitModelPrimary(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): string | undefined {
   const raw = resolveAgentConfig(cfg, agentId)?.model;
@@ -186,7 +186,7 @@ export function resolveAgentExplicitModelPrimary(
 }
 
 export function resolveAgentEffectiveModelPrimary(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): string | undefined {
   return (
@@ -196,12 +196,12 @@ export function resolveAgentEffectiveModelPrimary(
 }
 
 // Backward-compatible alias. Prefer explicit/effective helpers at new call sites.
-export function resolveAgentModelPrimary(cfg: KaijiBotConfig, agentId: string): string | undefined {
+export function resolveAgentModelPrimary(cfg: AllBotConfig, agentId: string): string | undefined {
   return resolveAgentExplicitModelPrimary(cfg, agentId);
 }
 
 export function resolveAgentModelFallbacksOverride(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): string[] | undefined {
   const raw = resolveAgentConfig(cfg, agentId)?.model;
@@ -227,7 +227,7 @@ export function resolveFallbackAgentId(params: {
 }
 
 export function resolveRunModelFallbacksOverride(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   agentId?: string | null;
   sessionKey?: string | null;
 }): string[] | undefined {
@@ -241,7 +241,7 @@ export function resolveRunModelFallbacksOverride(params: {
 }
 
 export function hasConfiguredModelFallbacks(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   agentId?: string | null;
   sessionKey?: string | null;
 }): boolean {
@@ -251,7 +251,7 @@ export function hasConfiguredModelFallbacks(params: {
 }
 
 export function resolveEffectiveModelFallbacks(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   hasSessionModelOverride: boolean;
 }): string[] | undefined {
@@ -263,7 +263,7 @@ export function resolveEffectiveModelFallbacks(params: {
   return agentFallbacksOverride ?? defaultFallbacks;
 }
 
-export function resolveAgentWorkspaceDir(cfg: KaijiBotConfig, agentId: string) {
+export function resolveAgentWorkspaceDir(cfg: AllBotConfig, agentId: string) {
   const id = normalizeAgentId(agentId);
   const configured = resolveAgentConfig(cfg, id)?.workspace?.trim();
   if (configured) {
@@ -308,7 +308,7 @@ function isPathWithinRoot(candidatePath: string, rootPath: string): boolean {
 }
 
 export function resolveAgentIdsByWorkspacePath(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   workspacePath: string,
 ): string[] {
   const normalizedWorkspacePath = normalizePathForComparison(workspacePath);
@@ -336,14 +336,14 @@ export function resolveAgentIdsByWorkspacePath(
 }
 
 export function resolveAgentIdByWorkspacePath(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   workspacePath: string,
 ): string | undefined {
   return resolveAgentIdsByWorkspacePath(cfg, workspacePath)[0];
 }
 
 export function resolveAgentDir(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   env: NodeJS.ProcessEnv = process.env,
 ) {

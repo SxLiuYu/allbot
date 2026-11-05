@@ -7,11 +7,11 @@ read_when:
 title: "Messages"
 ---
 
-> 💡 **KaijiBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。KaijiBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
+> 💡 **AllBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。AllBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
 
 # Messages
 
-This page ties together how KaijiBot handles inbound messages, sessions, queueing,
+This page ties together how AllBot handles inbound messages, sessions, queueing,
 streaming, and reasoning visibility.
 
 ## Message flow (high level)
@@ -34,7 +34,7 @@ See [Configuration](/gateway/configuration) for full schema.
 
 ## Inbound dedupe
 
-Channels can redeliver the same message after reconnects. KaijiBot keeps a
+Channels can redeliver the same message after reconnects. AllBot keeps a
 short-lived cache keyed by channel/account/peer/session/message id so duplicate
 deliveries do not trigger another agent run.
 
@@ -83,7 +83,7 @@ Details: [Session management](/concepts/session).
 
 ## Inbound bodies and history context
 
-KaijiBot separates the **prompt body** from the **command body**:
+AllBot separates the **prompt body** from the **command body**:
 
 - `Body`: prompt text sent to the agent. This may include channel envelopes and
   optional history wrappers.
@@ -138,7 +138,7 @@ Details: [Streaming + chunking](/concepts/streaming).
 
 ## Reasoning visibility and tokens
 
-KaijiBot can expose or hide model reasoning:
+AllBot can expose or hide model reasoning:
 
 - `/reasoning on|off|stream` controls visibility.
 - Reasoning content still counts toward token usage when produced by the model.

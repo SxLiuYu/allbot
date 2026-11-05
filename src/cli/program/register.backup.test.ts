@@ -91,12 +91,12 @@ describe("registerBackupCommand", () => {
   });
 
   it("runs backup verify with forwarded options", async () => {
-    await runCli(["backup", "verify", "/tmp/kaijibot-backup.tar.gz", "--json"]);
+    await runCli(["backup", "verify", "/tmp/allbot-backup.tar.gz", "--json"]);
 
     expect(backupVerifyCommand).toHaveBeenCalledWith(
       runtime,
       expect.objectContaining({
-        archive: "/tmp/kaijibot-backup.tar.gz",
+        archive: "/tmp/allbot-backup.tar.gz",
         json: true,
       }),
     );

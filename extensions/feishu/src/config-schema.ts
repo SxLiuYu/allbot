@@ -1,5 +1,5 @@
-import { normalizeAccountId } from "kaijibot/plugin-sdk/account-id";
-import { z } from "kaijibot/plugin-sdk/zod";
+import { normalizeAccountId } from "allbot/plugin-sdk/account-id";
+import { z } from "allbot/plugin-sdk/zod";
 export { z };
 import { buildSecretInputSchema, hasConfiguredSecretInput } from "./secret-input.js";
 

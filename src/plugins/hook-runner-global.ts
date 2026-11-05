@@ -16,7 +16,7 @@ type HookRunnerGlobalState = {
   registry: PluginRegistry | null;
 };
 
-const hookRunnerGlobalStateKey = Symbol.for("kaijibot.plugins.hook-runner-global-state");
+const hookRunnerGlobalStateKey = Symbol.for("allbot.plugins.hook-runner-global-state");
 const getState = () =>
   resolveGlobalSingleton<HookRunnerGlobalState>(hookRunnerGlobalStateKey, () => ({
     hookRunner: null,

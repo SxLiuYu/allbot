@@ -32,7 +32,7 @@ const defaultSubagentAnnounceOutputDeps: SubagentAnnounceOutputDeps = {
 let subagentAnnounceOutputDeps: SubagentAnnounceOutputDeps = defaultSubagentAnnounceOutputDeps;
 
 function isFastTestMode() {
-  return process.env.KAIJIBOT_TEST_FAST === "1";
+  return process.env.ALLBOT_TEST_FAST === "1";
 }
 
 type ToolResultMessage = {

@@ -17,7 +17,7 @@ export {
   listActiveMemoryPublicArtifacts,
 } from "../plugins/memory-state.js";
 export { parseAgentSessionKey } from "../routing/session-key.js";
-export type { KaijiBotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
 export type { MemoryCitationsMode } from "../config/types.memory.js";
 export type {
   MemoryFlushPlan,
@@ -28,4 +28,4 @@ export type {
   MemoryPluginRuntime,
   MemoryPromptSectionBuilder,
 } from "../plugins/memory-state.js";
-export type { KaijiBotPluginApi } from "../plugins/types.js";
+export type { AllBotPluginApi } from "../plugins/types.js";

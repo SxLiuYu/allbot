@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { resolveSendPolicy } from "./send-policy.js";
 
 describe("resolveSendPolicy", () => {
   const cfgWithRules = (
-    rules: NonNullable<NonNullable<KaijiBotConfig["session"]>["sendPolicy"]>["rules"],
+    rules: NonNullable<NonNullable<AllBotConfig["session"]>["sendPolicy"]>["rules"],
   ) =>
     ({
       session: {
@@ -14,17 +14,17 @@ describe("resolveSendPolicy", () => {
           rules,
         },
       },
-    }) as KaijiBotConfig;
+    }) as AllBotConfig;
 
   it("defaults to allow", () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     expect(resolveSendPolicy({ cfg })).toBe("allow");
   });
 
   it("entry override wins", () => {
     const cfg = {
       session: { sendPolicy: { default: "allow" } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const entry: SessionEntry = {
       sessionId: "s",
       updatedAt: 0,

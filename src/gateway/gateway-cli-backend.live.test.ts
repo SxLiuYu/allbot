@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { resolveCliBackendConfig, resolveCliBackendLiveTest } from "../agents/cli-backends.js";
 import { isLiveTestEnabled } from "../agents/live-test-helpers.js";
 import { parseModelRef } from "../agents/model-selection.js";
-import { clearRuntimeConfigSnapshot, type KaijiBotConfig } from "../config/config.js";
+import { clearRuntimeConfigSnapshot, type AllBotConfig } from "../config/config.js";
 import { isTruthyEnvValue } from "../infra/env.js";
 import {
   applyCliBackendLiveEnv,
@@ -32,9 +32,9 @@ import { startGatewayServer } from "./server.js";
 import { extractPayloadText } from "./test-helpers.agent-results.js";
 
 const LIVE = isLiveTestEnabled();
-const CLI_LIVE = isTruthyEnvValue(process.env.KAIJIBOT_LIVE_CLI_BACKEND);
-const CLI_RESUME = isTruthyEnvValue(process.env.KAIJIBOT_LIVE_CLI_BACKEND_RESUME_PROBE);
-const CLI_DEBUG = isTruthyEnvValue(process.env.KAIJIBOT_LIVE_CLI_BACKEND_DEBUG);
+const CLI_LIVE = isTruthyEnvValue(process.env.ALLBOT_LIVE_CLI_BACKEND);
+const CLI_RESUME = isTruthyEnvValue(process.env.ALLBOT_LIVE_CLI_BACKEND_RESUME_PROBE);
+const CLI_DEBUG = isTruthyEnvValue(process.env.ALLBOT_LIVE_CLI_BACKEND_DEBUG);
 const describeLive = LIVE && CLI_LIVE ? describe : describe.skip;
 
 const DEFAULT_PROVIDER = "claude-cli";
@@ -56,8 +56,8 @@ describeLive("gateway live (cli backend)", () => {
     async () => {
       const preservedEnv = new Set(
         parseJsonStringArray(
-          "KAIJIBOT_LIVE_CLI_BACKEND_PRESERVE_ENV",
-          process.env.KAIJIBOT_LIVE_CLI_BACKEND_PRESERVE_ENV,
+          "ALLBOT_LIVE_CLI_BACKEND_PRESERVE_ENV",
+          process.env.ALLBOT_LIVE_CLI_BACKEND_PRESERVE_ENV,
         ) ?? [],
       );
       const previousEnv = snapshotCliBackendLiveEnv();
@@ -66,15 +66,15 @@ describeLive("gateway live (cli backend)", () => {
       applyCliBackendLiveEnv(preservedEnv);
 
       const token = `test-${randomUUID()}`;
-      process.env.KAIJIBOT_GATEWAY_TOKEN = token;
+      process.env.ALLBOT_GATEWAY_TOKEN = token;
       const port = await getFreeGatewayPort();
       logCliBackendLiveStep("env-ready", { port });
 
-      const rawModel = process.env.KAIJIBOT_LIVE_CLI_BACKEND_MODEL ?? DEFAULT_MODEL;
+      const rawModel = process.env.ALLBOT_LIVE_CLI_BACKEND_MODEL ?? DEFAULT_MODEL;
       const parsed = parseModelRef(rawModel, "claude-cli");
       if (!parsed) {
         throw new Error(
-          `KAIJIBOT_LIVE_CLI_BACKEND_MODEL must resolve to a CLI backend model. Got: ${rawModel}`,
+          `ALLBOT_LIVE_CLI_BACKEND_MODEL must resolve to a CLI backend model. Got: ${rawModel}`,
         );
       }
 
@@ -97,26 +97,26 @@ describeLive("gateway live (cli backend)", () => {
       });
       const providerDefaults = backendResolved?.config;
 
-      const cliCommand = process.env.KAIJIBOT_LIVE_CLI_BACKEND_COMMAND ?? providerDefaults?.command;
+      const cliCommand = process.env.ALLBOT_LIVE_CLI_BACKEND_COMMAND ?? providerDefaults?.command;
       if (!cliCommand) {
         throw new Error(
-          `KAIJIBOT_LIVE_CLI_BACKEND_COMMAND is required for provider "${providerId}".`,
+          `ALLBOT_LIVE_CLI_BACKEND_COMMAND is required for provider "${providerId}".`,
         );
       }
 
       const baseCliArgs =
         parseJsonStringArray(
-          "KAIJIBOT_LIVE_CLI_BACKEND_ARGS",
-          process.env.KAIJIBOT_LIVE_CLI_BACKEND_ARGS,
+          "ALLBOT_LIVE_CLI_BACKEND_ARGS",
+          process.env.ALLBOT_LIVE_CLI_BACKEND_ARGS,
         ) ?? providerDefaults?.args;
       if (!baseCliArgs || baseCliArgs.length === 0) {
-        throw new Error(`KAIJIBOT_LIVE_CLI_BACKEND_ARGS is required for provider "${providerId}".`);
+        throw new Error(`ALLBOT_LIVE_CLI_BACKEND_ARGS is required for provider "${providerId}".`);
       }
 
       const cliClearEnv =
         parseJsonStringArray(
-          "KAIJIBOT_LIVE_CLI_BACKEND_CLEAR_ENV",
-          process.env.KAIJIBOT_LIVE_CLI_BACKEND_CLEAR_ENV,
+          "ALLBOT_LIVE_CLI_BACKEND_CLEAR_ENV",
+          process.env.ALLBOT_LIVE_CLI_BACKEND_CLEAR_ENV,
         ) ??
         providerDefaults?.clearEnv ??
         [];
@@ -127,26 +127,26 @@ describeLive("gateway live (cli backend)", () => {
           .filter((entry): entry is [string, string] => typeof entry[1] === "string"),
       );
       const cliImageArg =
-        process.env.KAIJIBOT_LIVE_CLI_BACKEND_IMAGE_ARG?.trim() || providerDefaults?.imageArg;
+        process.env.ALLBOT_LIVE_CLI_BACKEND_IMAGE_ARG?.trim() || providerDefaults?.imageArg;
       const cliImageMode =
-        parseImageMode(process.env.KAIJIBOT_LIVE_CLI_BACKEND_IMAGE_MODE) ??
+        parseImageMode(process.env.ALLBOT_LIVE_CLI_BACKEND_IMAGE_MODE) ??
         providerDefaults?.imageMode;
       if (cliImageMode && !cliImageArg) {
         throw new Error(
-          "KAIJIBOT_LIVE_CLI_BACKEND_IMAGE_MODE requires KAIJIBOT_LIVE_CLI_BACKEND_IMAGE_ARG.",
+          "ALLBOT_LIVE_CLI_BACKEND_IMAGE_MODE requires ALLBOT_LIVE_CLI_BACKEND_IMAGE_ARG.",
         );
       }
 
-      const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-live-cli-"));
+      const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-live-cli-"));
       const stateDir = path.join(tempDir, "state");
       await fs.mkdir(stateDir, { recursive: true });
-      process.env.KAIJIBOT_STATE_DIR = stateDir;
+      process.env.ALLBOT_STATE_DIR = stateDir;
       const bundleMcp = backendResolved?.bundleMcp === true;
       const bootstrapWorkspace =
         backendResolved?.bundleMcpMode === "claude-config-file"
           ? await createBootstrapWorkspace(tempDir)
           : null;
-      const disableMcpConfig = process.env.KAIJIBOT_LIVE_CLI_BACKEND_DISABLE_MCP_CONFIG !== "0";
+      const disableMcpConfig = process.env.ALLBOT_LIVE_CLI_BACKEND_DISABLE_MCP_CONFIG !== "0";
       let cliArgs = baseCliArgs;
       if (
         bundleMcp &&
@@ -158,8 +158,8 @@ describeLive("gateway live (cli backend)", () => {
         cliArgs = withClaudeMcpConfigOverrides(baseCliArgs, mcpConfigPath);
       }
 
-      const cfg: KaijiBotConfig = {};
-      const cfgWithCliBackends = cfg as KaijiBotConfig & {
+      const cfg: AllBotConfig = {};
+      const cfgWithCliBackends = cfg as AllBotConfig & {
         agents?: {
           defaults?: {
             cliBackends?: Record<string, Record<string, unknown>>;
@@ -200,9 +200,9 @@ describeLive("gateway live (cli backend)", () => {
           },
         },
       };
-      const tempConfigPath = path.join(tempDir, "kaijibot.json");
+      const tempConfigPath = path.join(tempDir, "allbot.json");
       await fs.writeFile(tempConfigPath, `${JSON.stringify(nextCfg, null, 2)}\n`);
-      process.env.KAIJIBOT_CONFIG_PATH = tempConfigPath;
+      process.env.ALLBOT_CONFIG_PATH = tempConfigPath;
       const deviceIdentity = await ensurePairedTestGatewayClientIdentity();
       logCliBackendLiveStep("config-written", {
         tempConfigPath,

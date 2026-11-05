@@ -1,6 +1,6 @@
 import type { ReplyPayload } from "../../auto-reply/types.js";
 import type { ConfiguredBindingRule } from "../../config/bindings.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { LegacyConfigRule } from "../../config/legacy.shared.js";
 import type { GroupToolPolicyConfig } from "../../config/types.tools.js";
 import type { ChannelApprovalNativeRuntimeAdapter } from "../../infra/approval-handler-runtime.js";
@@ -67,34 +67,34 @@ type BivariantCallback<T extends (...args: never[]) => unknown> = {
 
 export type ChannelSetupAdapter = {
   resolveAccountId?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     input?: ChannelSetupInput;
   }) => string;
   resolveBindingAccountId?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     accountId?: string;
   }) => string | undefined;
   applyAccountName?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     name?: string;
-  }) => KaijiBotConfig;
+  }) => AllBotConfig;
   applyAccountConfig: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     input: ChannelSetupInput;
-  }) => KaijiBotConfig;
+  }) => AllBotConfig;
   afterAccountConfigWritten?: (params: {
-    previousCfg: KaijiBotConfig;
-    cfg: KaijiBotConfig;
+    previousCfg: AllBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     input: ChannelSetupInput;
     runtime: RuntimeEnv;
   }) => Promise<void> | void;
   validateInput?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     input: ChannelSetupInput;
   }) => string | null;
@@ -106,38 +106,38 @@ export type ChannelSetupAdapter = {
 };
 
 export type ChannelConfigAdapter<ResolvedAccount> = {
-  listAccountIds: (cfg: KaijiBotConfig) => string[];
-  resolveAccount: (cfg: KaijiBotConfig, accountId?: string | null) => ResolvedAccount;
-  inspectAccount?: (cfg: KaijiBotConfig, accountId?: string | null) => unknown;
-  defaultAccountId?: (cfg: KaijiBotConfig) => string;
+  listAccountIds: (cfg: AllBotConfig) => string[];
+  resolveAccount: (cfg: AllBotConfig, accountId?: string | null) => ResolvedAccount;
+  inspectAccount?: (cfg: AllBotConfig, accountId?: string | null) => unknown;
+  defaultAccountId?: (cfg: AllBotConfig) => string;
   setAccountEnabled?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     enabled: boolean;
-  }) => KaijiBotConfig;
-  deleteAccount?: (params: { cfg: KaijiBotConfig; accountId: string }) => KaijiBotConfig;
-  isEnabled?: BivariantCallback<(account: ResolvedAccount, cfg: KaijiBotConfig) => boolean>;
-  disabledReason?: BivariantCallback<(account: ResolvedAccount, cfg: KaijiBotConfig) => string>;
+  }) => AllBotConfig;
+  deleteAccount?: (params: { cfg: AllBotConfig; accountId: string }) => AllBotConfig;
+  isEnabled?: BivariantCallback<(account: ResolvedAccount, cfg: AllBotConfig) => boolean>;
+  disabledReason?: BivariantCallback<(account: ResolvedAccount, cfg: AllBotConfig) => string>;
   isConfigured?: BivariantCallback<
-    (account: ResolvedAccount, cfg: KaijiBotConfig) => boolean | Promise<boolean>
+    (account: ResolvedAccount, cfg: AllBotConfig) => boolean | Promise<boolean>
   >;
-  unconfiguredReason?: BivariantCallback<(account: ResolvedAccount, cfg: KaijiBotConfig) => string>;
+  unconfiguredReason?: BivariantCallback<(account: ResolvedAccount, cfg: AllBotConfig) => string>;
   describeAccount?: BivariantCallback<
-    (account: ResolvedAccount, cfg: KaijiBotConfig) => ChannelAccountSnapshot
+    (account: ResolvedAccount, cfg: AllBotConfig) => ChannelAccountSnapshot
   >;
   resolveAllowFrom?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
   }) => Array<string | number> | undefined;
   formatAllowFrom?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     allowFrom: Array<string | number>;
   }) => string[];
-  hasConfiguredState?: (params: { cfg: KaijiBotConfig; env?: NodeJS.ProcessEnv }) => boolean;
-  hasPersistedAuthState?: (params: { cfg: KaijiBotConfig; env?: NodeJS.ProcessEnv }) => boolean;
+  hasConfiguredState?: (params: { cfg: AllBotConfig; env?: NodeJS.ProcessEnv }) => boolean;
+  hasPersistedAuthState?: (params: { cfg: AllBotConfig; env?: NodeJS.ProcessEnv }) => boolean;
   resolveDefaultTo?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
   }) => string | undefined;
 };
@@ -150,7 +150,7 @@ export type ChannelSecretsAdapter = {
     value: unknown;
   }>;
   collectRuntimeConfigAssignments?: (params: {
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     defaults: SecretDefaults | undefined;
     context: ResolverContext;
   }) => void;
@@ -163,7 +163,7 @@ export type ChannelGroupAdapter = {
 };
 
 export type ChannelOutboundContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   to: string;
   text: string;
   mediaUrl?: string;
@@ -214,18 +214,18 @@ export type ChannelOutboundAdapter = {
   normalizePayload?: (params: { payload: ReplyPayload }) => ReplyPayload | null;
   shouldSkipPlainTextSanitization?: (params: { payload: ReplyPayload }) => boolean;
   resolveEffectiveTextChunkLimit?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     fallbackLimit?: number;
   }) => number | undefined;
   shouldSuppressLocalPayloadPrompt?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     payload: ReplyPayload;
     hint?: ChannelOutboundPayloadHint;
   }) => boolean;
   beforeDeliverPayload?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     target: ChannelOutboundTargetRef;
     payload: ReplyPayload;
     hint?: ChannelOutboundPayloadHint;
@@ -247,7 +247,7 @@ export type ChannelOutboundAdapter = {
     targetThreadId?: string;
   }) => boolean;
   resolveTarget?: (params: {
-    cfg?: KaijiBotConfig;
+    cfg?: AllBotConfig;
     to?: string;
     allowFrom?: string[];
     accountId?: string | null;
@@ -269,13 +269,13 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
   buildChannelSummary?: BivariantCallback<
     (params: {
       account: ResolvedAccount;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       defaultAccountId: string;
       snapshot: ChannelAccountSnapshot;
     }) => Record<string, unknown> | Promise<Record<string, unknown>>
   >;
   probeAccount?: BivariantCallback<
-    (params: { account: ResolvedAccount; timeoutMs: number; cfg: KaijiBotConfig }) => Promise<Probe>
+    (params: { account: ResolvedAccount; timeoutMs: number; cfg: AllBotConfig }) => Promise<Probe>
   >;
   formatCapabilitiesProbe?: BivariantCallback<
     (params: { probe: Probe }) => ChannelCapabilitiesDisplayLine[]
@@ -284,7 +284,7 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
     (params: {
       account: ResolvedAccount;
       timeoutMs: number;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       probe?: Probe;
     }) => Promise<Audit>
   >;
@@ -292,7 +292,7 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
     (params: {
       account: ResolvedAccount;
       timeoutMs: number;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       probe?: Probe;
       audit?: Audit;
       target?: string;
@@ -301,7 +301,7 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
   buildAccountSnapshot?: BivariantCallback<
     (params: {
       account: ResolvedAccount;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       runtime?: ChannelAccountSnapshot;
       probe?: Probe;
       audit?: Audit;
@@ -310,7 +310,7 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
   logSelfId?: BivariantCallback<
     (params: {
       account: ResolvedAccount;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       runtime: RuntimeEnv;
       includeChannelPrefix?: boolean;
     }) => void
@@ -318,7 +318,7 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
   resolveAccountState?: BivariantCallback<
     (params: {
       account: ResolvedAccount;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       configured: boolean;
       enabled: boolean;
     }) => ChannelAccountState
@@ -327,7 +327,7 @@ export type ChannelStatusAdapter<ResolvedAccount, Probe = unknown, Audit = unkno
 };
 
 export type ChannelGatewayContext<ResolvedAccount = unknown> = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   account: ResolvedAccount;
   runtime: RuntimeEnv;
@@ -418,7 +418,7 @@ export type ChannelLoginWithQrWaitResult = {
 };
 
 export type ChannelLogoutContext<ResolvedAccount = unknown> = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   account: ResolvedAccount;
   runtime: RuntimeEnv;
@@ -429,7 +429,7 @@ export type ChannelPairingAdapter = {
   idLabel: string;
   normalizeAllowEntry?: (entry: string) => string;
   notifyApproval?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     id: string;
     accountId?: string;
     runtime?: RuntimeEnv;
@@ -439,7 +439,7 @@ export type ChannelPairingAdapter = {
 export type ChannelGatewayAdapter<ResolvedAccount = unknown> = {
   startAccount?: (ctx: ChannelGatewayContext<ResolvedAccount>) => Promise<unknown>;
   stopAccount?: (ctx: ChannelGatewayContext<ResolvedAccount>) => Promise<void>;
-  resolveGatewayAuthBypassPaths?: (params: { cfg: KaijiBotConfig }) => string[];
+  resolveGatewayAuthBypassPaths?: (params: { cfg: AllBotConfig }) => string[];
   loginWithQrStart?: (params: {
     accountId?: string;
     force?: boolean;
@@ -455,7 +455,7 @@ export type ChannelGatewayAdapter<ResolvedAccount = unknown> = {
 
 export type ChannelAuthAdapter = {
   login?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     runtime: RuntimeEnv;
     verbose?: boolean;
@@ -465,12 +465,12 @@ export type ChannelAuthAdapter = {
 
 export type ChannelHeartbeatAdapter = {
   checkReady?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     deps?: ChannelHeartbeatDeps;
   }) => Promise<{ ok: boolean; reason: string }>;
   resolveRecipients?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     opts?: { to?: string; all?: boolean; accountId?: string };
   }) => {
     recipients: string[];
@@ -479,13 +479,13 @@ export type ChannelHeartbeatAdapter = {
 };
 
 type ChannelDirectorySelfParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   runtime: RuntimeEnv;
 };
 
 type ChannelDirectoryListParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   query?: string | null;
   limit?: number | null;
@@ -493,7 +493,7 @@ type ChannelDirectoryListParams = {
 };
 
 type ChannelDirectoryListGroupMembersParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   groupId: string;
   limit?: number | null;
@@ -523,7 +523,7 @@ export type ChannelResolveResult = {
 
 export type ChannelResolverAdapter = {
   resolveTargets: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     inputs: string[];
     kind: ChannelResolveKind;
@@ -533,7 +533,7 @@ export type ChannelResolverAdapter = {
 
 export type ChannelElevatedAdapter = {
   allowFromFallback?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
   }) => Array<string | number> | undefined;
 };
@@ -569,7 +569,7 @@ export type ChannelCommandAdapter = {
 };
 
 export type ChannelDoctorConfigMutation = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changes: string[];
   warnings?: string[];
 };
@@ -596,25 +596,25 @@ export type ChannelDoctorAdapter = {
   groupAllowFromFallbackToAllowFrom?: boolean;
   warnOnEmptyGroupSenderAllowlist?: boolean;
   legacyConfigRules?: LegacyConfigRule[];
-  normalizeCompatibilityConfig?: (params: { cfg: KaijiBotConfig }) => ChannelDoctorConfigMutation;
+  normalizeCompatibilityConfig?: (params: { cfg: AllBotConfig }) => ChannelDoctorConfigMutation;
   collectPreviewWarnings?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     doctorFixCommand: string;
   }) => string[] | Promise<string[]>;
   collectMutableAllowlistWarnings?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
   }) => string[] | Promise<string[]>;
   repairConfig?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     doctorFixCommand: string;
   }) => ChannelDoctorConfigMutation | Promise<ChannelDoctorConfigMutation>;
   runConfigSequence?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     env: NodeJS.ProcessEnv;
     shouldRepair: boolean;
   }) => ChannelDoctorSequenceResult | Promise<ChannelDoctorSequenceResult>;
   cleanStaleConfig?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
   }) => ChannelDoctorConfigMutation | Promise<ChannelDoctorConfigMutation>;
   collectEmptyAllowlistExtraWarnings?: (
     params: ChannelDoctorEmptyAllowlistAccountContext,
@@ -626,18 +626,18 @@ export type ChannelDoctorAdapter = {
 
 export type ChannelLifecycleAdapter = {
   onAccountConfigChanged?: (params: {
-    prevCfg: KaijiBotConfig;
-    nextCfg: KaijiBotConfig;
+    prevCfg: AllBotConfig;
+    nextCfg: AllBotConfig;
     accountId: string;
     runtime: RuntimeEnv;
   }) => Promise<void> | void;
   onAccountRemoved?: (params: {
-    prevCfg: KaijiBotConfig;
+    prevCfg: AllBotConfig;
     accountId: string;
     runtime: RuntimeEnv;
   }) => Promise<void> | void;
   runStartupMaintenance?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     env?: NodeJS.ProcessEnv;
     log: {
       info?: (message: string) => void;
@@ -647,7 +647,7 @@ export type ChannelLifecycleAdapter = {
     logPrefix?: string;
   }) => Promise<void> | void;
   detectLegacyStateMigrations?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     env: NodeJS.ProcessEnv;
     stateDir: string;
     oauthDir: string;
@@ -655,9 +655,9 @@ export type ChannelLifecycleAdapter = {
 };
 
 export type ChannelApprovalDeliveryAdapter = {
-  hasConfiguredDmRoute?: (params: { cfg: KaijiBotConfig }) => boolean;
+  hasConfiguredDmRoute?: (params: { cfg: AllBotConfig }) => boolean;
   shouldSuppressForwardingFallback?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     approvalKind: ChannelApprovalKind;
     target: ChannelApprovalForwardTarget;
     request: ExecApprovalRequest;
@@ -692,19 +692,19 @@ export type ChannelApprovalNativeDeliveryCapabilities = {
 
 export type ChannelApprovalNativeAdapter = {
   describeDeliveryCapabilities: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     approvalKind: ChannelApprovalKind;
     request: ChannelApprovalNativeRequest;
   }) => ChannelApprovalNativeDeliveryCapabilities;
   resolveOriginTarget?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     approvalKind: ChannelApprovalKind;
     request: ChannelApprovalNativeRequest;
   }) => ChannelApprovalNativeTarget | null | Promise<ChannelApprovalNativeTarget | null>;
   resolveApproverDmTargets?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     approvalKind: ChannelApprovalKind;
     request: ChannelApprovalNativeRequest;
@@ -714,26 +714,26 @@ export type ChannelApprovalNativeAdapter = {
 export type ChannelApprovalRenderAdapter = {
   exec?: {
     buildPendingPayload?: (params: {
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       request: ExecApprovalRequest;
       target: ChannelApprovalForwardTarget;
       nowMs: number;
     }) => ReplyPayload | null;
     buildResolvedPayload?: (params: {
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       resolved: ExecApprovalResolved;
       target: ChannelApprovalForwardTarget;
     }) => ReplyPayload | null;
   };
   plugin?: {
     buildPendingPayload?: (params: {
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       request: PluginApprovalRequest;
       target: ChannelApprovalForwardTarget;
       nowMs: number;
     }) => ReplyPayload | null;
     buildResolvedPayload?: (params: {
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       resolved: PluginApprovalResolved;
       target: ChannelApprovalForwardTarget;
     }) => ReplyPayload | null;
@@ -754,7 +754,7 @@ export type ChannelApprovalAdapter = {
 
 export type ChannelApprovalCapability = ChannelApprovalAdapter & {
   authorizeActorAction?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     senderId?: string | null;
     action: "approve";
@@ -764,19 +764,19 @@ export type ChannelApprovalCapability = ChannelApprovalAdapter & {
     reason?: string;
   };
   getActionAvailabilityState?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     action: "approve";
     approvalKind?: ChannelApprovalKind;
   }) => ChannelActionAvailabilityState;
   /** Exec-native client availability for the initiating surface; distinct from same-chat auth. */
   getExecInitiatingSurfaceState?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     action: "approve";
   }) => ChannelActionAvailabilityState;
   resolveApproveCommandBehavior?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     senderId?: string | null;
     approvalKind: ChannelApprovalKind;
@@ -785,7 +785,7 @@ export type ChannelApprovalCapability = ChannelApprovalAdapter & {
 
 export type ChannelAllowlistAdapter = {
   applyConfigEdit?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     parsedConfig: Record<string, unknown>;
     accountId?: string | null;
     scope: "dm" | "group";
@@ -813,7 +813,7 @@ export type ChannelAllowlistAdapter = {
           }
       >
     | null;
-  readConfig?: (params: { cfg: KaijiBotConfig; accountId?: string | null }) =>
+  readConfig?: (params: { cfg: AllBotConfig; accountId?: string | null }) =>
     | {
         dmAllowFrom?: Array<string | number>;
         groupAllowFrom?: Array<string | number>;
@@ -829,7 +829,7 @@ export type ChannelAllowlistAdapter = {
         groupOverrides?: Array<{ label: string; entries: Array<string | number> }>;
       }>;
   resolveNames?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     scope: "dm" | "group";
     entries: string[];
@@ -943,7 +943,7 @@ export type ChannelConversationBindingSupport = {
     idleTimeoutMs?: number;
     maxAgeMs?: number;
   }>;
-  createManager?: (params: { cfg: KaijiBotConfig; accountId?: string | null }) =>
+  createManager?: (params: { cfg: AllBotConfig; accountId?: string | null }) =>
     | {
         stop: () => void | Promise<void>;
       }
@@ -954,7 +954,7 @@ export type ChannelConversationBindingSupport = {
 
 export type ChannelSecurityAdapter<ResolvedAccount = unknown> = {
   applyConfigFixes?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     env: NodeJS.ProcessEnv;
   }) => ChannelDoctorConfigMutation | Promise<ChannelDoctorConfigMutation>;
   resolveDmPolicy?: BivariantCallback<
@@ -966,7 +966,7 @@ export type ChannelSecurityAdapter<ResolvedAccount = unknown> = {
   collectAuditFindings?: BivariantCallback<
     (
       ctx: ChannelSecurityContext<ResolvedAccount> & {
-        sourceConfig: KaijiBotConfig;
+        sourceConfig: AllBotConfig;
         orderedAccountIds: string[];
         hasExplicitAccountPath: boolean;
       },

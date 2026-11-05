@@ -7,15 +7,15 @@ describe("buildPlatformRuntimeLogHints", () => {
       buildPlatformRuntimeLogHints({
         platform: "darwin",
         env: {
-          KAIJIBOT_STATE_DIR: "/tmp/kaijibot-state",
-          KAIJIBOT_LOG_PREFIX: "gateway",
+          ALLBOT_STATE_DIR: "/tmp/allbot-state",
+          ALLBOT_LOG_PREFIX: "gateway",
         },
-        systemdServiceName: "kaijibot-gateway",
-        windowsTaskName: "KaijiBot Gateway",
+        systemdServiceName: "allbot-gateway",
+        windowsTaskName: "AllBot Gateway",
       }),
     ).toEqual([
-      "Launchd stdout (if installed): /tmp/kaijibot-state/logs/gateway.log",
-      "Launchd stderr (if installed): /tmp/kaijibot-state/logs/gateway.err.log",
+      "Launchd stdout (if installed): /tmp/allbot-state/logs/gateway.log",
+      "Launchd stderr (if installed): /tmp/allbot-state/logs/gateway.err.log",
     ]);
   });
 
@@ -23,17 +23,17 @@ describe("buildPlatformRuntimeLogHints", () => {
     expect(
       buildPlatformRuntimeLogHints({
         platform: "linux",
-        systemdServiceName: "kaijibot-gateway",
-        windowsTaskName: "KaijiBot Gateway",
+        systemdServiceName: "allbot-gateway",
+        windowsTaskName: "AllBot Gateway",
       }),
-    ).toEqual(["Logs: journalctl --user -u kaijibot-gateway.service -n 200 --no-pager"]);
+    ).toEqual(["Logs: journalctl --user -u allbot-gateway.service -n 200 --no-pager"]);
     expect(
       buildPlatformRuntimeLogHints({
         platform: "win32",
-        systemdServiceName: "kaijibot-gateway",
-        windowsTaskName: "KaijiBot Gateway",
+        systemdServiceName: "allbot-gateway",
+        windowsTaskName: "AllBot Gateway",
       }),
-    ).toEqual(['Logs: schtasks /Query /TN "KaijiBot Gateway" /V /FO LIST']);
+    ).toEqual(['Logs: schtasks /Query /TN "AllBot Gateway" /V /FO LIST']);
   });
 });
 
@@ -42,30 +42,30 @@ describe("buildPlatformServiceStartHints", () => {
     expect(
       buildPlatformServiceStartHints({
         platform: "darwin",
-        installCommand: "kaijibot gateway install",
-        startCommand: "kaijibot gateway",
-        launchAgentPlistPath: "~/Library/LaunchAgents/com.kaijibot.gateway.plist",
-        systemdServiceName: "kaijibot-gateway",
-        windowsTaskName: "KaijiBot Gateway",
+        installCommand: "allbot gateway install",
+        startCommand: "allbot gateway",
+        launchAgentPlistPath: "~/Library/LaunchAgents/com.allbot.gateway.plist",
+        systemdServiceName: "allbot-gateway",
+        windowsTaskName: "AllBot Gateway",
       }),
     ).toEqual([
-      "kaijibot gateway install",
-      "kaijibot gateway",
-      "launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.kaijibot.gateway.plist",
+      "allbot gateway install",
+      "allbot gateway",
+      "launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.allbot.gateway.plist",
     ]);
     expect(
       buildPlatformServiceStartHints({
         platform: "linux",
-        installCommand: "kaijibot gateway install",
-        startCommand: "kaijibot gateway",
-        launchAgentPlistPath: "~/Library/LaunchAgents/com.kaijibot.gateway.plist",
-        systemdServiceName: "kaijibot-gateway",
-        windowsTaskName: "KaijiBot Gateway",
+        installCommand: "allbot gateway install",
+        startCommand: "allbot gateway",
+        launchAgentPlistPath: "~/Library/LaunchAgents/com.allbot.gateway.plist",
+        systemdServiceName: "allbot-gateway",
+        windowsTaskName: "AllBot Gateway",
       }),
     ).toEqual([
-      "kaijibot gateway install",
-      "kaijibot gateway",
-      "systemctl --user start kaijibot-gateway.service",
+      "allbot gateway install",
+      "allbot gateway",
+      "systemctl --user start allbot-gateway.service",
     ]);
   });
 });

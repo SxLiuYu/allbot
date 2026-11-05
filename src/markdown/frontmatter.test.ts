@@ -21,7 +21,7 @@ description: |
 name: session-memory
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "disk",
         "events": ["command:new"],
@@ -33,17 +33,17 @@ metadata:
     expect(result.metadata).toBeDefined();
 
     const parsed = JSON5.parse(result.metadata ?? "");
-    expect(parsed.kaijibot?.emoji).toBe("disk");
+    expect(parsed.allbot?.emoji).toBe("disk");
   });
 
   it("preserves inline JSON values", () => {
     const content = `---
 name: inline-json
-metadata: {"kaijibot": {"events": ["test"]}}
+metadata: {"allbot": {"events": ["test"]}}
 ---
 `;
     const result = parseFrontmatterBlock(content);
-    expect(result.metadata).toBe('{"kaijibot": {"events": ["test"]}}');
+    expect(result.metadata).toBe('{"allbot": {"events": ["test"]}}');
   });
 
   it("stringifies YAML objects and arrays", () => {
@@ -55,7 +55,7 @@ tags:
   - alpha
   - beta
 metadata:
-  kaijibot:
+  allbot:
     events:
       - command:new
 ---
@@ -65,7 +65,7 @@ metadata:
     expect(result.retries).toBe("3");
     expect(JSON.parse(result.tags ?? "[]")).toEqual(["alpha", "beta"]);
     const parsed = JSON5.parse(result.metadata ?? "");
-    expect(parsed.kaijibot?.events).toEqual(["command:new"]);
+    expect(parsed.allbot?.events).toEqual(["command:new"]);
   });
 
   it("preserves inline description values containing colons", () => {
@@ -91,10 +91,10 @@ description: |-
     const content = `---
 name: sample-skill
 metadata:
-  kaijibot: true
+  allbot: true
 ---`;
     const result = parseFrontmatterBlock(content);
-    expect(result.metadata).toBe('{"kaijibot":true}');
+    expect(result.metadata).toBe('{"allbot":true}');
   });
 
   it("returns empty when frontmatter is missing", () => {

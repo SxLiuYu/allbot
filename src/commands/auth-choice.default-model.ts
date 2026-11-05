@@ -1,17 +1,17 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import { ensureModelAllowlistEntry } from "./model-allowlist.js";
 
 export async function applyDefaultModelChoice(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   setDefaultModel: boolean;
   defaultModel: string;
-  applyDefaultConfig: (config: KaijiBotConfig) => KaijiBotConfig;
-  applyProviderConfig: (config: KaijiBotConfig) => KaijiBotConfig;
+  applyDefaultConfig: (config: AllBotConfig) => AllBotConfig;
+  applyProviderConfig: (config: AllBotConfig) => AllBotConfig;
   noteDefault?: string;
   noteAgentModel: (model: string) => Promise<void>;
   prompter: WizardPrompter;
-}): Promise<{ config: KaijiBotConfig; agentModelOverride?: string }> {
+}): Promise<{ config: AllBotConfig; agentModelOverride?: string }> {
   if (params.setDefaultModel) {
     const next = params.applyDefaultConfig(params.config);
     if (params.noteDefault) {

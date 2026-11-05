@@ -41,8 +41,8 @@ function parsePayload(element: HTMLScriptElement): DiffViewerPayload {
 function getCards(): Array<{ host: HTMLElement; payload: DiffViewerPayload }> {
   const cards: Array<{ host: HTMLElement; payload: DiffViewerPayload }> = [];
   for (const card of document.querySelectorAll<HTMLElement>(".oc-diff-card")) {
-    const host = card.querySelector<HTMLElement>("[data-kaijibot-diff-host]");
-    const payloadNode = card.querySelector<HTMLScriptElement>("[data-kaijibot-diff-payload]");
+    const host = card.querySelector<HTMLElement>("[data-allbot-diff-host]");
+    const payloadNode = card.querySelector<HTMLScriptElement>("[data-allbot-diff-payload]");
     if (!host || !payloadNode) {
       continue;
     }
@@ -335,9 +335,9 @@ async function hydrateViewer(): Promise<void> {
 async function main(): Promise<void> {
   try {
     await hydrateViewer();
-    document.documentElement.dataset.kaijibotDiffsReady = "true";
+    document.documentElement.dataset.allbotDiffsReady = "true";
   } catch (error) {
-    document.documentElement.dataset.kaijibotDiffsError = "true";
+    document.documentElement.dataset.allbotDiffsError = "true";
     console.error("Failed to hydrate diff viewer", error);
   }
 }

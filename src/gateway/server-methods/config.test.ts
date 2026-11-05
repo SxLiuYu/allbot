@@ -24,16 +24,16 @@ function invokeExecFileCallback(args: unknown[], error: Error | null) {
 
 describe("resolveConfigOpenCommand", () => {
   it("uses open on macOS", () => {
-    expect(resolveConfigOpenCommand("/tmp/kaijibot.json", "darwin")).toEqual({
+    expect(resolveConfigOpenCommand("/tmp/allbot.json", "darwin")).toEqual({
       command: "open",
-      args: ["/tmp/kaijibot.json"],
+      args: ["/tmp/allbot.json"],
     });
   });
 
   it("uses xdg-open on Linux", () => {
-    expect(resolveConfigOpenCommand("/tmp/kaijibot.json", "linux")).toEqual({
+    expect(resolveConfigOpenCommand("/tmp/allbot.json", "linux")).toEqual({
       command: "xdg-open",
-      args: ["/tmp/kaijibot.json"],
+      args: ["/tmp/allbot.json"],
     });
   });
 
@@ -52,12 +52,12 @@ describe("resolveConfigOpenCommand", () => {
 
 describe("config.openFile", () => {
   afterEach(() => {
-    delete process.env.KAIJIBOT_CONFIG_PATH;
+    delete process.env.ALLBOT_CONFIG_PATH;
     vi.clearAllMocks();
   });
 
   it("opens the configured file without shell interpolation", async () => {
-    process.env.KAIJIBOT_CONFIG_PATH = "/tmp/config $(touch pwned).json";
+    process.env.ALLBOT_CONFIG_PATH = "/tmp/config $(touch pwned).json";
     execFileMock.mockImplementation((...args: unknown[]) => {
       expect(["open", "xdg-open", "powershell.exe"]).toContain(args[0]);
       expect(args[1]).toEqual(["/tmp/config $(touch pwned).json"]);
@@ -79,7 +79,7 @@ describe("config.openFile", () => {
   });
 
   it("returns a generic error and logs details when the opener fails", async () => {
-    process.env.KAIJIBOT_CONFIG_PATH = "/tmp/config.json";
+    process.env.ALLBOT_CONFIG_PATH = "/tmp/config.json";
     execFileMock.mockImplementation((...args: unknown[]) => {
       invokeExecFileCallback(
         args,

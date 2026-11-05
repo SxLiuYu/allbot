@@ -29,7 +29,7 @@ import {
   listSubagentRunsForController,
   resolveSubagentSessionStatus,
 } from "../agents/subagent-registry-read.js";
-import { type KaijiBotConfig, loadConfig } from "../config/config.js";
+import { type AllBotConfig, loadConfig } from "../config/config.js";
 import { resolveAgentModelFallbackValues } from "../config/model-input.js";
 import { resolveStateDir } from "../config/paths.js";
 import {
@@ -81,7 +81,7 @@ import type {
 export {
   archiveFileOnDisk,
   archiveSessionTranscripts,
-  attachKaijiBotTranscriptMeta,
+  attachAllBotTranscriptMeta,
   capArrayByJsonBytes,
   readFirstUserMessageFromTranscript,
   readLastMessagePreviewFromTranscript,
@@ -112,7 +112,7 @@ function tryResolveExistingPath(value: string): string | null {
 }
 
 function resolveIdentityAvatarUrl(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   avatar: string | undefined,
 ): string | undefined {
@@ -237,7 +237,7 @@ function resolveLatestCompactionCheckpoint(
 }
 
 function resolveEstimatedSessionCostUsd(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   provider?: string;
   model?: string;
   entry?: Pick<
@@ -328,7 +328,7 @@ function resolveChildSessionKeys(
 }
 
 function resolveTranscriptUsageFallback(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   key: string;
   entry?: SessionEntry;
   storePath: string;
@@ -591,7 +591,7 @@ function listExistingAgentIdsFromDisk(): string[] {
   }
 }
 
-function listConfiguredAgentIds(cfg: KaijiBotConfig): string[] {
+function listConfiguredAgentIds(cfg: AllBotConfig): string[] {
   const ids = new Set<string>();
   const defaultId = normalizeAgentId(resolveDefaultAgentId(cfg));
   ids.add(defaultId);
@@ -632,7 +632,7 @@ function normalizeFallbackList(values: readonly string[]): string[] {
 }
 
 function resolveGatewayAgentModel(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): GatewayAgentRow["model"] | undefined {
   const primary = resolveAgentEffectiveModelPrimary(cfg, agentId)?.trim();
@@ -648,7 +648,7 @@ function resolveGatewayAgentModel(
   };
 }
 
-export function listAgentsForGateway(cfg: KaijiBotConfig): {
+export function listAgentsForGateway(cfg: AllBotConfig): {
   defaultId: string;
   mainKey: string;
   scope: SessionScope;
@@ -720,12 +720,12 @@ function canonicalizeSessionKeyForAgent(agentId: string, key: string): string {
   return `agent:${normalizeAgentId(agentId)}:${lowered}`;
 }
 
-function resolveDefaultStoreAgentId(cfg: KaijiBotConfig): string {
+function resolveDefaultStoreAgentId(cfg: AllBotConfig): string {
   return normalizeAgentId(resolveDefaultAgentId(cfg));
 }
 
 export function resolveSessionStoreKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
 }): string {
   const raw = normalizeOptionalString(params.sessionKey) ?? "";
@@ -761,7 +761,7 @@ export function resolveSessionStoreKey(params: {
   return canonicalizeSessionKeyForAgent(agentId, lowered);
 }
 
-function resolveSessionStoreAgentId(cfg: KaijiBotConfig, canonicalKey: string): string {
+function resolveSessionStoreAgentId(cfg: AllBotConfig, canonicalKey: string): string {
   if (canonicalKey === "global" || canonicalKey === "unknown") {
     return resolveDefaultStoreAgentId(cfg);
   }
@@ -773,7 +773,7 @@ function resolveSessionStoreAgentId(cfg: KaijiBotConfig, canonicalKey: string): 
 }
 
 export function canonicalizeSpawnedByForAgent(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   spawnedBy?: string,
 ): string | undefined {
@@ -798,7 +798,7 @@ export function canonicalizeSpawnedByForAgent(
 }
 
 function buildGatewaySessionStoreScanTargets(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   key: string;
   canonicalKey: string;
   agentId: string;
@@ -821,7 +821,7 @@ function buildGatewaySessionStoreScanTargets(params: {
 }
 
 function resolveGatewaySessionStoreCandidates(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): SessionStoreTarget[] {
   const storeConfig = cfg.session?.store;
@@ -843,7 +843,7 @@ function resolveGatewaySessionStoreCandidates(
 }
 
 function resolveGatewaySessionStoreLookup(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   key: string;
   canonicalKey: string;
   agentId: string;
@@ -893,7 +893,7 @@ function resolveGatewaySessionStoreLookup(params: {
 }
 
 export function resolveGatewaySessionStoreTarget(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   key: string;
   scanLegacyKeys?: boolean;
   store?: Record<string, SessionEntry>;
@@ -952,7 +952,7 @@ export function resolveGatewaySessionStoreTarget(params: {
 
 // Merge with existing entry based on latest timestamp to ensure data consistency and avoid overwriting with less complete data.
 function mergeSessionEntryIntoCombined(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   combined: Record<string, SessionEntry>;
   entry: SessionEntry;
   agentId: string;
@@ -980,7 +980,7 @@ function mergeSessionEntryIntoCombined(params: {
   }
 }
 
-export function loadCombinedSessionStoreForGateway(cfg: KaijiBotConfig): {
+export function loadCombinedSessionStoreForGateway(cfg: AllBotConfig): {
   storePath: string;
   store: Record<string, SessionEntry>;
 } {
@@ -1026,7 +1026,7 @@ export function loadCombinedSessionStoreForGateway(cfg: KaijiBotConfig): {
   return { storePath, store: combined };
 }
 
-export function getSessionDefaults(cfg: KaijiBotConfig): GatewaySessionsDefaults {
+export function getSessionDefaults(cfg: AllBotConfig): GatewaySessionsDefaults {
   let resolved: { provider: string; model: string } | undefined;
   try {
     resolved = resolveConfiguredModelRef({
@@ -1053,7 +1053,7 @@ export function getSessionDefaults(cfg: KaijiBotConfig): GatewaySessionsDefaults
 }
 
 export function resolveSessionModelRef(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   entry?:
     | SessionEntry
     | Pick<SessionEntry, "model" | "modelProvider" | "modelOverride" | "providerOverride">,
@@ -1165,7 +1165,7 @@ export async function resolveGatewayModelSupportsImages(params: {
 }
 
 export function resolveSessionModelIdentityRef(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   entry?:
     | SessionEntry
     | Pick<SessionEntry, "model" | "modelProvider" | "modelOverride" | "providerOverride">,
@@ -1214,7 +1214,7 @@ export function resolveSessionModelIdentityRef(
 }
 
 export function buildGatewaySessionRow(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   storePath: string;
   store: Record<string, SessionEntry>;
   key: string;
@@ -1428,7 +1428,7 @@ export function loadGatewaySessionRow(
 }
 
 export function listSessionsFromStore(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   storePath: string;
   store: Record<string, SessionEntry>;
   opts: import("./protocol/index.js").SessionsListParams;

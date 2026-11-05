@@ -74,7 +74,7 @@ function wellFormedSkillMd(name: string, description: string): string {
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-evo-pipeline-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-evo-pipeline-"));
   store = new EvolutionStore(tempDir);
   engine = new EvolutionEngine(store);
   writer = new SkillPersistenceWriter(tempDir);

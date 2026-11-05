@@ -142,10 +142,10 @@ export const en: TranslationMap = {
           "Install the missing package manager manually, then rerun the update command.",
         eaccesDetected:
           "Detected permission failure (EACCES). Re-run with a writable global prefix or sudo (for system-managed Node installs).",
-        eaccesExample: "Example: npm config set prefix ~/.local && npm i -g kaijibot@latest",
+        eaccesExample: "Example: npm config set prefix ~/.local && npm i -g allbot@latest",
         nativeDepFailure:
           "Detected native optional dependency build failure. The updater retries with --omit=optional automatically.",
-        nativeDepExample: "If it still fails: npm i -g kaijibot@latest --omit=optional",
+        nativeDepExample: "If it still fails: npm i -g allbot@latest --omit=optional",
       },
       result: {
         heading: "Update Result:",
@@ -159,7 +159,7 @@ export const en: TranslationMap = {
       },
       wizard: {
         requiresTty:
-          "Update wizard requires a TTY. Use `kaijibot update --channel <stable|beta|dev>` instead.",
+          "Update wizard requires a TTY. Use `allbot update --channel <stable|beta|dev>` instead.",
         cancelled: "Update cancelled.",
         channelSelect: "Update channel",
         keepCurrent: "Keep current ({channel})",
@@ -169,12 +169,12 @@ export const en: TranslationMap = {
         betaHint: "Prereleases (npm beta)",
         dev: "Dev",
         devHint: "Git main",
-        createGitCheckout: "Create a git checkout at {dir}? (override via KAIJIBOT_GIT_DIR)",
+        createGitCheckout: "Create a git checkout at {dir}? (override via ALLBOT_GIT_DIR)",
         restartPrompt: "Restart the gateway service after update?",
       },
     },
     banner: {
-      title: "👾 KaijiBot",
+      title: "👾 AllBot",
       commitUnknown: "unknown",
     },
     help: {
@@ -188,40 +188,40 @@ export const en: TranslationMap = {
       },
       example: {
         "0": {
-          command: "kaijibot models --help",
+          command: "allbot models --help",
           description: "Show detailed help for the models command.",
         },
         "1": {
-          command: "kaijibot channels login --verbose",
+          command: "allbot channels login --verbose",
           description: "Link personal WhatsApp Web and show QR + connection logs.",
         },
         "2": {
-          command: 'kaijibot message send --target +15555550123 --message "Hi" --json',
+          command: 'allbot message send --target +15555550123 --message "Hi" --json',
           description: "Send via your web session and print JSON result.",
         },
         "3": {
-          command: "kaijibot gateway --port 18789",
+          command: "allbot gateway --port 18789",
           description: "Run the WebSocket Gateway locally.",
         },
         "4": {
-          command: "kaijibot --dev gateway",
+          command: "allbot --dev gateway",
           description: "Run a dev Gateway (isolated state/config) on ws://127.0.0.1:19001.",
         },
         "5": {
-          command: "kaijibot gateway --force",
+          command: "allbot gateway --force",
           description: "Kill anything bound to the default gateway port, then start it.",
         },
         "6": {
-          command: "kaijibot gateway ...",
+          command: "allbot gateway ...",
           description: "Gateway control via WebSocket.",
         },
         "7": {
-          command: 'kaijibot agent --to +15555550123 --message "Run summary" --deliver',
+          command: 'allbot agent --to +15555550123 --message "Run summary" --deliver',
           description:
             "Talk directly to the agent using the Gateway; optionally send the WhatsApp reply.",
         },
         "8": {
-          command: 'kaijibot message send --channel feishu --target ou_xxx --message "Hi"',
+          command: 'allbot message send --channel feishu --target ou_xxx --message "Hi"',
           description: "Send via your Telegram bot.",
         },
       },
@@ -233,7 +233,7 @@ export const en: TranslationMap = {
       onboard: {
         description: "Interactive onboarding for the gateway, workspace, and skills",
         options: {
-          workspace: "Agent workspace directory (default: ~/.kaijibot/workspace)",
+          workspace: "Agent workspace directory (default: ~/.allbot/workspace)",
           reset:
             "Reset config + credentials + sessions before running onboard (workspace only with --reset-scope full)",
           resetScope: "Reset scope: config|config+creds+sessions|full",
@@ -261,7 +261,7 @@ export const en: TranslationMap = {
           gatewayAuth: "Gateway auth: token|password",
           gatewayToken: "Gateway token (token auth)",
           gatewayTokenRefEnv:
-            "Gateway token SecretRef env var name (token auth; e.g. KAIJIBOT_GATEWAY_TOKEN)",
+            "Gateway token SecretRef env var name (token auth; e.g. ALLBOT_GATEWAY_TOKEN)",
           gatewayPassword: "Gateway password (password auth)",
           remoteUrl: "Remote Gateway WebSocket URL",
           remoteToken: "Remote Gateway token (optional)",
@@ -289,7 +289,7 @@ export const en: TranslationMap = {
           "Non-interactive config helpers (get/set/unset/file/validate). Default: starts guided setup.",
       },
       backup: {
-        description: "Create and verify local backup archives for KaijiBot state",
+        description: "Create and verify local backup archives for AllBot state",
       },
       doctor: {
         description: "Health checks + quick fixes for the gateway and channels",
@@ -304,17 +304,17 @@ export const en: TranslationMap = {
         description: "Uninstall the gateway service + local data (CLI remains)",
       },
       migrate: {
-        description: "Migrate data from OpenClaw or legacy installations to KaijiBot",
+        description: "Migrate data from OpenClaw or legacy installations to AllBot",
       },
       "android-install": {
         description:
-          "Set up KaijiBot on Android/Termux (auto-installs packages, boot script, battery settings)",
+          "Set up AllBot on Android/Termux (auto-installs packages, boot script, battery settings)",
       },
       message: {
         description: "Send, read, and manage messages",
       },
       mcp: {
-        description: "Manage KaijiBot MCP config and channel bridge",
+        description: "Manage AllBot MCP config and channel bridge",
       },
       agent: {
         description: "Run one agent turn via the Gateway",
@@ -383,7 +383,7 @@ export const en: TranslationMap = {
         description: "DNS helpers for wide-area discovery (Tailscale + CoreDNS)",
       },
       docs: {
-        description: "Search the live KaijiBot docs",
+        description: "Search the live AllBot docs",
       },
       qa: {
         description: "Run QA scenarios and launch the private QA debugger UI",
@@ -404,7 +404,7 @@ export const en: TranslationMap = {
         description: "Secure DM pairing (approve inbound requests)",
       },
       plugins: {
-        description: "Manage KaijiBot plugins and extensions",
+        description: "Manage AllBot plugins and extensions",
       },
       channels: {
         description: "Manage connected chat channels (Telegram, Discord, etc.)",
@@ -426,7 +426,7 @@ export const en: TranslationMap = {
         description: "Manage soul presets (MBTI-based personality profiles)",
       },
       update: {
-        description: "Update KaijiBot and inspect update channel status",
+        description: "Update AllBot and inspect update channel status",
       },
       completion: {
         description: "Generate shell completion script",
@@ -434,7 +434,7 @@ export const en: TranslationMap = {
     },
     wizard: {
       welcome: {
-        body: "Welcome to KaijiBot 👾\n\nKaijiBot is an AI assistant with system access:\n- Can read/write files, run commands, search the web\n- Learns your preferences and interests over time (cognitive system)\n- May proactively reach out to share valuable insights\n\nSecurity notes:\n- Do not expose the Gateway in untrusted network environments\n- Do not place API Keys or sensitive information where agents can access them",
+        body: "Welcome to AllBot 👾\n\nAllBot is an AI assistant with system access:\n- Can read/write files, run commands, search the web\n- Learns your preferences and interests over time (cognitive system)\n- May proactively reach out to share valuable insights\n\nSecurity notes:\n- Do not expose the Gateway in untrusted network environments\n- Do not place API Keys or sensitive information where agents can access them",
         title: "Security notice",
         confirmPrompt: "I understand the above. Continue setup?",
       },
@@ -443,7 +443,7 @@ export const en: TranslationMap = {
         title: "📋 Pre-setup checklist",
         confirmPrompt: "I have the above ready. Continue setup?",
       },
-      intro: "KaijiBot setup wizard",
+      intro: "AllBot setup wizard",
       cancelledOutro: "Setup cancelled. Come back when you're ready!",
       invalidConfigOutro: "Config is invalid. Run `{doctorCmd}` to fix it, then re-run setup.",
       flow: {
@@ -498,7 +498,7 @@ export const en: TranslationMap = {
         tuiLabel: "Launch in TUI (recommended)",
         webLabel: "Open the web dashboard",
         laterLabel: "Later",
-        tuiGreeting: "Hello! I'm your KaijiBot assistant.",
+        tuiGreeting: "Hello! I'm your AllBot assistant.",
       },
       security: {
         notice:
@@ -506,10 +506,10 @@ export const en: TranslationMap = {
         title: "Security notice",
       },
       whatNow: {
-        body: "Next: explore KaijiBot's cognitive features and start chatting with your bot.",
+        body: "Next: explore AllBot's cognitive features and start chatting with your bot.",
       },
       outro: {
-        opened: "Setup complete. The dashboard is open — keep that tab to manage KaijiBot.",
+        opened: "Setup complete. The dashboard is open — keep that tab to manage AllBot.",
         background: "Setup complete. Dashboard link:",
         default: "Setup complete.",
       },
@@ -537,8 +537,8 @@ export const en: TranslationMap = {
         enableMessage: "Enable web_fetch (keyless HTTP fetching)?",
       },
       intro: {
-        update: "KaijiBot update wizard",
-        configure: "KaijiBot configuration",
+        update: "AllBot update wizard",
+        configure: "AllBot configuration",
       },
       invalidConfigOutro:
         "Invalid configuration. Run `{doctorCmd}` to fix, then re-run configuration.",
@@ -659,10 +659,10 @@ export const en: TranslationMap = {
         success: "Disabled hook: {emoji} {name}",
       },
       install: {
-        deprecated: "`kaijibot hooks install` is deprecated; use `kaijibot plugins install`.",
+        deprecated: "`allbot hooks install` is deprecated; use `allbot plugins install`.",
       },
       update: {
-        deprecated: "`kaijibot hooks update` is deprecated; use `kaijibot plugins update`.",
+        deprecated: "`allbot hooks update` is deprecated; use `allbot plugins update`.",
       },
     },
     tool: {
@@ -792,7 +792,7 @@ export const en: TranslationMap = {
       },
       run: {
         warningPassword:
-          "Warning: --password can be exposed via process listings. Prefer --password-file or KAIJIBOT_GATEWAY_PASSWORD.",
+          "Warning: --password can be exposed via process listings. Prefer --password-file or ALLBOT_GATEWAY_PASSWORD.",
         resetRequiresDev: "Use --reset with --dev.",
         invalidWsLog: 'Invalid --ws-log (use "auto", "full", "compact")',
         invalidPort: "Invalid port",
@@ -819,14 +819,14 @@ export const en: TranslationMap = {
         error: {
           passwordNotConfigured: "Gateway auth is set to password, but no password is configured.",
           passwordNotConfiguredHint:
-            "Set gateway.auth.password (or KAIJIBOT_GATEWAY_PASSWORD), or pass --password.",
+            "Set gateway.auth.password (or ALLBOT_GATEWAY_PASSWORD), or pass --password.",
           refusingBind: "Refusing to bind gateway to {bind} without auth.",
           containerDetected:
             "Container environment detected \u2014 the gateway defaults to bind=auto (0.0.0.0) for port-forwarding compatibility.",
           containerHint:
-            "Set KAIJIBOT_GATEWAY_TOKEN or KAIJIBOT_GATEWAY_PASSWORD, or pass --token/--password to start with auth.",
+            "Set ALLBOT_GATEWAY_TOKEN or ALLBOT_GATEWAY_PASSWORD, or pass --token/--password to start with auth.",
           bindHint:
-            "Set gateway.auth.token/password (or KAIJIBOT_GATEWAY_TOKEN/KAIJIBOT_GATEWAY_PASSWORD) or pass --token/--password.",
+            "Set gateway.auth.token/password (or ALLBOT_GATEWAY_TOKEN/ALLBOT_GATEWAY_PASSWORD) or pass --token/--password.",
           failedToStart:
             "Gateway failed to start: {message}\nIf the gateway is supervised, stop it with: {cmd}",
           failedToStartGeneric: "Gateway failed to start: {message}",
@@ -893,7 +893,7 @@ export const en: TranslationMap = {
       opt: {
         statusJson: "Output JSON (alias for `models status --json`)",
         statusPlain: "Plain output (alias for `models status --plain`)",
-        agent: "Agent id to inspect (overrides KAIJIBOT_AGENT_DIR/PI_CODING_AGENT_DIR)",
+        agent: "Agent id to inspect (overrides ALLBOT_AGENT_DIR/PI_CODING_AGENT_DIR)",
         all: "Show full model catalog",
         local: "Filter to local models",
         provider: "Filter by provider",
@@ -951,7 +951,7 @@ export const en: TranslationMap = {
       setup: {
         title: "DNS setup",
         recommendedConfig:
-          "Recommended config ($KAIJIBOT_CONFIG_PATH, default ~/.kaijibot/kaijibot.json):",
+          "Recommended config ($ALLBOT_CONFIG_PATH, default ~/.allbot/allbot.json):",
         tailscaleAdmin: "Tailscale admin (DNS → Nameservers):",
         addNameserver: "- Add nameserver: {ip}",
         thisMachineIpv4: "<this machine's tailnet IPv4>",
@@ -959,7 +959,7 @@ export const en: TranslationMap = {
         runWithApply: "Run with --apply to install CoreDNS and configure it.",
         startingCoreDNS: "Starting CoreDNS (sudo)…",
         noteEnableDiscovery:
-          "Note: enable discovery.wideArea.enabled in the active KaijiBot config ($KAIJIBOT_CONFIG_PATH, default ~/.kaijibot/kaijibot.json) on the gateway and restart the gateway so it writes the DNS-SD zone.",
+          "Note: enable discovery.wideArea.enabled in the active AllBot config ($ALLBOT_CONFIG_PATH, default ~/.allbot/allbot.json) on the gateway and restart the gateway so it writes the DNS-SD zone.",
       },
     },
     daemon: {
@@ -994,7 +994,7 @@ export const en: TranslationMap = {
         rootCause:
           "Root cause: CLI and service are using different config paths (likely a profile/state-dir mismatch).",
         fixConfigMismatch:
-          "Fix: rerun `{gatewayInstallCmd}` from the same --profile / KAIJIBOT_STATE_DIR you expect.",
+          "Fix: rerun `{gatewayInstallCmd}` from the same --profile / ALLBOT_STATE_DIR you expect.",
         warmUp: "Warm-up: launch agents can take a few seconds. Try again shortly.",
         rpcOk: "ok",
         rpcFailed: "failed",
@@ -1119,10 +1119,10 @@ export const en: TranslationMap = {
       install: {
         linkedHookPack: "Linked hook pack path: {path}",
         linkedPlugin: "Linked plugin path: {path}",
-        configInvalid: "Config invalid; run `kaijibot doctor --fix` before installing plugins.",
-        configUnparseable: "Config file could not be parsed; run `kaijibot doctor` to repair it.",
+        configInvalid: "Config invalid; run `allbot doctor --fix` before installing plugins.",
+        configUnparseable: "Config file could not be parsed; run `allbot doctor` to repair it.",
         configInvalidBundledRecovery:
-          "Config invalid outside the bundled recovery path for {plugin}; run `kaijibot doctor --fix` before reinstalling it.",
+          "Config invalid outside the bundled recovery path for {plugin}; run `allbot doctor --fix` before reinstalling it.",
         linkNotMarketplace: "`--link` is not supported with `--marketplace`.",
         pinNotMarketplace: "`--pin` is not supported with `--marketplace`.",
         forceNotLink: "`--force` is not supported with `--link`.",
@@ -1215,7 +1215,7 @@ export const en: TranslationMap = {
       },
     },
     runMain: {
-      uncaughtException: "[kaijibot] Uncaught exception:",
+      uncaughtException: "[allbot] Uncaught exception:",
     },
     prompt: {
       yesNo: " [Y/n] ",

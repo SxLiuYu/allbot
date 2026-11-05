@@ -10,7 +10,7 @@ const PUBLIC_CONTRACT_REFERENCE_FILES = [
   "docs/plugins/architecture.md",
   "src/plugins/contracts/plugin-sdk-subpaths.test.ts",
 ] as const;
-const PLUGIN_SDK_SUBPATH_PATTERN = /kaijibot\/plugin-sdk\/([a-z0-9][a-z0-9-]*)\b/g;
+const PLUGIN_SDK_SUBPATH_PATTERN = /allbot\/plugin-sdk\/([a-z0-9][a-z0-9-]*)\b/g;
 
 function collectPluginSdkPackageExports(): string[] {
   const packageJson = JSON.parse(readFileSync(resolve(REPO_ROOT, "package.json"), "utf8")) as {
@@ -153,7 +153,7 @@ describe("plugin-sdk package contract guardrails", () => {
         continue;
       }
       failures.push(
-        `${reference.file} references kaijibot/plugin-sdk/${reference.subpath}, but ${reference.subpath} is missing from ${missingFrom.join(" and ")}`,
+        `${reference.file} references allbot/plugin-sdk/${reference.subpath}, but ${reference.subpath} is missing from ${missingFrom.join(" and ")}`,
       );
     }
 

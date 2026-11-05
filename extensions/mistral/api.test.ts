@@ -1,5 +1,5 @@
-import { registerSingleProviderPlugin } from "kaijibot/plugin-sdk/plugin-test-runtime";
-import type { ProviderPlugin } from "kaijibot/plugin-sdk/provider-model-shared";
+import { registerSingleProviderPlugin } from "allbot/plugin-sdk/plugin-test-runtime";
+import type { ProviderPlugin } from "allbot/plugin-sdk/provider-model-shared";
 import { describe, expect, it } from "vitest";
 import {
   applyMistralModelCompat,
@@ -83,7 +83,7 @@ describe.skipIf(process.env.CI)("resolveMistralCompatPatch", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("applyMistralModelCompat", () => {
   it("applies the Mistral request-shape compat flags", () => {
     const normalized = applyMistralModelCompat({});

@@ -40,11 +40,11 @@ providerHttpMocks.fetchWithTimeoutGuardedMock.mockImplementation(async (...args:
   };
 });
 
-vi.mock("kaijibot/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("allbot/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: providerHttpMocks.resolveApiKeyForProviderMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
+vi.mock("allbot/plugin-sdk/provider-http", () => ({
   assertOkOrThrowHttpError: providerHttpMocks.assertOkOrThrowHttpErrorMock,
   fetchWithTimeout: providerHttpMocks.fetchWithTimeoutMock,
   fetchWithTimeoutGuarded: providerHttpMocks.fetchWithTimeoutGuardedMock,

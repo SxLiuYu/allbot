@@ -24,10 +24,10 @@ describe("installScheduledTask", () => {
   async function withUserProfileDir(
     run: (tmpDir: string, env: Record<string, string>) => Promise<void>,
   ) {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-schtasks-install-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-schtasks-install-"));
     const env = {
       USERPROFILE: tmpDir,
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
     try {
       await run(tmpDir, env);
@@ -99,9 +99,9 @@ describe("installScheduledTask", () => {
       expect(parsed?.environment).not.toHaveProperty("OC_EMPTY");
 
       expect(schtasksCalls[0]).toEqual(["/Query"]);
-      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "AllBot Gateway"]);
       expect(schtasksCalls[2]?.[0]).toBe("/Change");
-      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 
@@ -152,9 +152,9 @@ describe("installScheduledTask", () => {
       });
 
       expect(schtasksCalls[0]).toEqual(["/Query"]);
-      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "AllBot Gateway"]);
       expect(schtasksCalls[2]?.[0]).toBe("/Create");
-      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 
@@ -174,10 +174,10 @@ describe("installScheduledTask", () => {
       });
 
       expect(schtasksCalls[0]).toEqual(["/Query"]);
-      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "AllBot Gateway"]);
       expect(schtasksCalls[2]?.[0]).toBe("/Change");
       expect(schtasksCalls[3]?.[0]).toBe("/Create");
-      expect(schtasksCalls[4]).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[4]).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 
@@ -200,9 +200,9 @@ describe("installScheduledTask", () => {
       ).rejects.toThrow("schtasks run failed: ERROR: Access is denied.");
 
       expect(schtasksCalls[0]).toEqual(["/Query"]);
-      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "AllBot Gateway"]);
       expect(schtasksCalls[2]?.[0]).toBe("/Change");
-      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 
@@ -225,9 +225,9 @@ describe("installScheduledTask", () => {
       ).rejects.toThrow("schtasks run failed: ERROR: Access is denied.");
 
       expect(schtasksCalls[0]).toEqual(["/Query"]);
-      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[1]).toEqual(["/Query", "/TN", "AllBot Gateway"]);
       expect(schtasksCalls[2]?.[0]).toBe("/Create");
-      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls[3]).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 
@@ -239,13 +239,13 @@ describe("installScheduledTask", () => {
         programArguments: ["node", "gateway.js"],
         environment: {
           PATH: "C:\\Windows\\System32;C:\\Program Files\\Docker\\Docker\\resources\\bin",
-          KAIJIBOT_GATEWAY_PORT: "18789",
+          ALLBOT_GATEWAY_PORT: "18789",
         },
       });
 
       const script = await fs.readFile(scriptPath, "utf8");
       expect(script).not.toContain('set "PATH=');
-      expect(script).toContain('set "KAIJIBOT_GATEWAY_PORT=18789"');
+      expect(script).toContain('set "ALLBOT_GATEWAY_PORT=18789"');
     });
   });
 });

@@ -1,23 +1,23 @@
 ---
-summary: "Use Mistral models and Voxtral transcription with KaijiBot"
+summary: "Use Mistral models and Voxtral transcription with AllBot"
 read_when:
-  - You want to use Mistral models in KaijiBot
+  - You want to use Mistral models in AllBot
   - You need Mistral API key onboarding and model refs
 title: "Mistral"
 ---
 
 # Mistral
 
-KaijiBot supports Mistral for both text/image model routing (`mistral/...`) and
+AllBot supports Mistral for both text/image model routing (`mistral/...`) and
 audio transcription via Voxtral in media understanding.
 Mistral can also be used for memory embeddings (`memorySearch.provider = "mistral"`).
 
 ## CLI setup
 
 ```bash
-kaijibot onboard --auth-choice mistral-api-key
+allbot onboard --auth-choice mistral-api-key
 # or non-interactive
-kaijibot onboard --mistral-api-key "$MISTRAL_API_KEY"
+allbot onboard --mistral-api-key "$MISTRAL_API_KEY"
 ```
 
 ## Config snippet (LLM provider)
@@ -31,7 +31,7 @@ kaijibot onboard --mistral-api-key "$MISTRAL_API_KEY"
 
 ## Built-in LLM catalog
 
-KaijiBot currently ships this bundled Mistral catalog:
+AllBot currently ships this bundled Mistral catalog:
 
 | Model ref                        | Input       | Context | Max output | Notes                                                            |
 | -------------------------------- | ----------- | ------- | ---------- | ---------------------------------------------------------------- |
@@ -62,7 +62,7 @@ KaijiBot currently ships this bundled Mistral catalog:
 
 `mistral/mistral-small-latest` maps to Mistral Small 4 and supports [adjustable reasoning](https://docs.mistral.ai/capabilities/reasoning/adjustable) on the Chat Completions API via `reasoning_effort` (`none` minimizes extra thinking in the output; `high` surfaces full thinking traces before the final answer).
 
-KaijiBot maps the session **thinking** level to Mistral’s API:
+AllBot maps the session **thinking** level to Mistral’s API:
 
 - **off** / **minimal** → `none`
 - **low** / **medium** / **high** / **xhigh** / **adaptive** → `high`

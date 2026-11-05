@@ -54,19 +54,19 @@ export function registerAgentCommands(program: Command, args: { agentChannelOpti
         `
 ${theme.heading("Examples:")}
 ${formatHelpExamples([
-  ['kaijibot agent --to +15555550123 --message "status update"', "Start a new session."],
-  ['kaijibot agent --agent ops --message "Summarize logs"', "Use a specific agent."],
+  ['allbot agent --to +15555550123 --message "status update"', "Start a new session."],
+  ['allbot agent --agent ops --message "Summarize logs"', "Use a specific agent."],
   [
-    'kaijibot agent --session-id 1234 --message "Summarize inbox" --thinking medium',
+    'allbot agent --session-id 1234 --message "Summarize inbox" --thinking medium',
     "Target a session with explicit thinking level.",
   ],
   [
-    'kaijibot agent --to +15555550123 --message "Trace logs" --verbose on --json',
+    'allbot agent --to +15555550123 --message "Trace logs" --verbose on --json',
     "Enable verbose logging and JSON output.",
   ],
-  ['kaijibot agent --to +15555550123 --message "Summon reply" --deliver', "Deliver reply."],
+  ['allbot agent --to +15555550123 --message "Summon reply" --deliver', "Deliver reply."],
   [
-    'kaijibot agent --agent ops --message "Generate report" --deliver --reply-channel feishu --reply-to ou_xxx',
+    'allbot agent --agent ops --message "Generate report" --deliver --reply-channel feishu --reply-to ou_xxx',
     "Send reply to a different channel/target.",
   ],
 ])}
@@ -221,14 +221,14 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/agent", "gitee.com/kaiji1126/kaij
         `
 ${theme.heading("Examples:")}
 ${formatHelpExamples([
-  ['kaijibot agents set-identity --agent main --name "KaijiBot" --emoji "👾"', "Set name + emoji."],
-  ["kaijibot agents set-identity --agent main --avatar avatars/kaijibot.png", "Set avatar path."],
+  ['allbot agents set-identity --agent main --name "AllBot" --emoji "👾"', "Set name + emoji."],
+  ["allbot agents set-identity --agent main --avatar avatars/allbot.png", "Set avatar path."],
   [
-    "kaijibot agents set-identity --workspace ~/.kaijibot/workspace --from-identity",
+    "allbot agents set-identity --workspace ~/.allbot/workspace --from-identity",
     "Load from IDENTITY.md.",
   ],
   [
-    "kaijibot agents set-identity --identity-file ~/.kaijibot/workspace/IDENTITY.md --agent main",
+    "allbot agents set-identity --identity-file ~/.allbot/workspace/IDENTITY.md --agent main",
     "Use a specific IDENTITY.md.",
   ],
 ])}

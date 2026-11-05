@@ -8,7 +8,7 @@ import {
 import { normalizeBundledPluginArtifactSubpath } from "../plugins/public-surface-runtime.js";
 import { resolveLoaderPackageRoot } from "../plugins/sdk-alias.js";
 
-const KAIJIBOT_PACKAGE_ROOT =
+const ALLBOT_PACKAGE_ROOT =
   resolveLoaderPackageRoot({
     modulePath: fileURLToPath(import.meta.url),
     moduleUrl: import.meta.url,
@@ -49,7 +49,7 @@ export function resolveRelativeBundledPluginPublicModuleId(params: {
   const fromFilePath = fileURLToPath(params.fromModuleUrl);
   const artifactBasename = normalizeBundledPluginArtifactSubpath(params.artifactBasename);
   const targetPath = path.resolve(
-    KAIJIBOT_PACKAGE_ROOT,
+    ALLBOT_PACKAGE_ROOT,
     "extensions",
     metadata.dirName,
     artifactBasename,

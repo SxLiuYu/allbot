@@ -6,7 +6,7 @@ import {
   normalizeProviderConfigForConfigDefaults,
 } from "./provider-policy.js";
 import { normalizeTalkConfig } from "./talk.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 import type { ModelDefinitionConfig } from "./types.models.js";
 
 type WarnState = { warned: boolean };
@@ -88,7 +88,7 @@ export type SessionDefaultsOptions = {
   warnState?: WarnState;
 };
 
-export function applyMessageDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyMessageDefaults(cfg: AllBotConfig): AllBotConfig {
   const messages = cfg.messages;
   const hasAckScope = messages?.ackReactionScope !== undefined;
   if (hasAckScope) {
@@ -104,9 +104,9 @@ export function applyMessageDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
 }
 
 export function applySessionDefaults(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   options: SessionDefaultsOptions = {},
-): KaijiBotConfig {
+): AllBotConfig {
   const session = cfg.session;
   if (!session || session.mainKey === undefined) {
     return cfg;
@@ -116,7 +116,7 @@ export function applySessionDefaults(
   const warn = options.warn ?? console.warn;
   const warnState = options.warnState ?? defaultWarnState;
 
-  const next: KaijiBotConfig = {
+  const next: AllBotConfig = {
     ...cfg,
     session: { ...session, mainKey: "main" },
   };
@@ -129,11 +129,11 @@ export function applySessionDefaults(
   return next;
 }
 
-export function applyTalkConfigNormalization(config: KaijiBotConfig): KaijiBotConfig {
+export function applyTalkConfigNormalization(config: AllBotConfig): AllBotConfig {
   return normalizeTalkConfig(config);
 }
 
-export function applyModelDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyModelDefaults(cfg: AllBotConfig): AllBotConfig {
   let mutated = false;
   let nextCfg = cfg;
 
@@ -281,7 +281,7 @@ export function applyModelDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-export function applyAgentDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyAgentDefaults(cfg: AllBotConfig): AllBotConfig {
   const agents = cfg.agents;
   const defaults = agents?.defaults;
   const hasMax =
@@ -322,7 +322,7 @@ export function applyAgentDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-export function applyLoggingDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyLoggingDefaults(cfg: AllBotConfig): AllBotConfig {
   const logging = cfg.logging;
   if (!logging) {
     return cfg;
@@ -339,7 +339,7 @@ export function applyLoggingDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-export function applyContextPruningDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyContextPruningDefaults(cfg: AllBotConfig): AllBotConfig {
   if (!cfg.agents?.defaults) {
     return cfg;
   }
@@ -352,7 +352,7 @@ export function applyContextPruningDefaults(cfg: KaijiBotConfig): KaijiBotConfig
   );
 }
 
-export function applyCompactionDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyCompactionDefaults(cfg: AllBotConfig): AllBotConfig {
   const defaults = cfg.agents?.defaults;
   if (!defaults) {
     return cfg;
@@ -377,7 +377,7 @@ export function applyCompactionDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-export function applyCognitiveDefaults(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyCognitiveDefaults(cfg: AllBotConfig): AllBotConfig {
   const cognitive = cfg.cognitive;
   let mutated = cognitive === undefined;
   const next = { ...cognitive };

@@ -1,1 +1,1 @@
-export * from "kaijibot/plugin-sdk/diffs";
+export * from "allbot/plugin-sdk/diffs";

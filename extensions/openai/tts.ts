@@ -3,7 +3,7 @@ import {
   readResponseTextLimited,
   trimToUndefined,
   truncateErrorDetail,
-} from "kaijibot/plugin-sdk/speech";
+} from "allbot/plugin-sdk/speech";
 
 export const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
 

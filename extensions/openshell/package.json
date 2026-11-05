@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/openshell-sandbox",
+  "name": "@allbot/openshell-sandbox",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot OpenShell sandbox backend",
+  "description": "AllBot OpenShell sandbox backend",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

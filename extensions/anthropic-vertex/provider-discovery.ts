@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
 import { homedir, platform } from "node:os";
 import { join } from "node:path";
-import type { ProviderCatalogContext } from "kaijibot/plugin-sdk/provider-catalog-shared";
+import type { ProviderCatalogContext } from "allbot/plugin-sdk/provider-catalog-shared";
 import type {
   ModelDefinitionConfig,
   ModelProviderConfig,
-} from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/provider-model-shared";
 
 const PROVIDER_ID = "anthropic-vertex";
 const ANTHROPIC_VERTEX_DEFAULT_REGION = "global";

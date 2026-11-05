@@ -7,7 +7,7 @@ import {
 import { isRecord } from "../../utils.js";
 import { stringEnum } from "../schema/typebox.js";
 import { type AnyAgentTool, jsonResult, readStringParam } from "./common.js";
-import { isKaijiBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
+import { isAllBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
 
 const MCP_CONFIG_ACTIONS = ["list", "show", "set", "unset"] as const;
 
@@ -29,7 +29,7 @@ export function createMcpConfigTool(): AnyAgentTool {
   return {
     label: "MCP Config",
     name: "mcp_config",
-    ownerOnly: isKaijiBotOwnerOnlyCoreToolName("mcp_config"),
+    ownerOnly: isAllBotOwnerOnlyCoreToolName("mcp_config"),
     description: `List, inspect, add, or remove MCP server configurations. When the user asks to connect, set up, add, configure, or remove an MCP server/tool, use this tool. Actions: "list" all servers, "show" one server's config by name, "set" a server (provide name + JSON server config), "unset" a server by name. Config changes take effect on the next agent turn. Example: action="set", name="context7", server='{"command":"npx","args":["-y","@context7/mcp"]}'`,
     parameters: McpConfigToolSchema,
     execute: async (_toolCallId, args) => {

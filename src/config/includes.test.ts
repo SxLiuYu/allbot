@@ -13,17 +13,17 @@ import {
 
 const ROOT_DIR = path.parse(process.cwd()).root;
 const CONFIG_DIR = path.join(ROOT_DIR, "config");
-const ETC_KAIJIBOT_DIR = path.join(ROOT_DIR, "etc", "kaijibot");
+const ETC_ALLBOT_DIR = path.join(ROOT_DIR, "etc", "allbot");
 const SHARED_DIR = path.join(ROOT_DIR, "shared");
 
-const DEFAULT_BASE_PATH = path.join(CONFIG_DIR, "kaijibot.json");
+const DEFAULT_BASE_PATH = path.join(CONFIG_DIR, "allbot.json");
 
 function configPath(...parts: string[]) {
   return path.join(CONFIG_DIR, ...parts);
 }
 
-function etcKaijiBotPath(...parts: string[]) {
-  return path.join(ETC_KAIJIBOT_DIR, ...parts);
+function etcAllBotPath(...parts: string[]) {
+  return path.join(ETC_ALLBOT_DIR, ...parts);
 }
 
 function sharedPath(...parts: string[]) {
@@ -80,7 +80,7 @@ describe("resolveConfigIncludes", () => {
   });
 
   it("rejects absolute path outside config directory (CWE-22)", () => {
-    const absolute = etcKaijiBotPath("agents.json");
+    const absolute = etcAllBotPath("agents.json");
     const files = { [absolute]: { list: [{ id: "main" }] } };
     const obj = { agents: { $include: absolute } };
     expectResolveIncludeError(() => resolve(obj, files), /escapes config directory/);
@@ -314,7 +314,7 @@ describe("resolveConfigIncludes", () => {
         resolve(
           { $include: "../../shared/common.json" },
           { [sharedPath("common.json")]: { shared: true } },
-          configPath("sub", "kaijibot.json"),
+          configPath("sub", "allbot.json"),
         ),
       /escapes config directory/,
     );
@@ -595,7 +595,7 @@ describe("security: path traversal protection (CWE-22)", () => {
     });
 
     it("allows include files when the config root path is a symlink", async () => {
-      await withTempDir({ prefix: "kaijibot-includes-symlink-" }, async (tempRoot) => {
+      await withTempDir({ prefix: "allbot-includes-symlink-" }, async (tempRoot) => {
         const realRoot = path.join(tempRoot, "real");
         const linkRoot = path.join(tempRoot, "link");
         await fs.mkdir(path.join(realRoot, "includes"), { recursive: true });
@@ -608,7 +608,7 @@ describe("security: path traversal protection (CWE-22)", () => {
 
         const result = resolveConfigIncludes(
           { $include: "./includes/extra.json5" },
-          path.join(linkRoot, "kaijibot.json"),
+          path.join(linkRoot, "allbot.json"),
         );
         expect(result).toEqual({ logging: { redactSensitive: "tools" } });
       });
@@ -618,7 +618,7 @@ describe("security: path traversal protection (CWE-22)", () => {
       if (process.platform === "win32") {
         return;
       }
-      await withTempDir({ prefix: "kaijibot-includes-hardlink-" }, async (tempRoot) => {
+      await withTempDir({ prefix: "allbot-includes-hardlink-" }, async (tempRoot) => {
         const configDir = path.join(tempRoot, "config");
         const outsideDir = path.join(tempRoot, "outside");
         await fs.mkdir(configDir, { recursive: true });
@@ -638,14 +638,14 @@ describe("security: path traversal protection (CWE-22)", () => {
         expect(() =>
           resolveConfigIncludes(
             { $include: "./extra.json5" },
-            path.join(configDir, "kaijibot.json"),
+            path.join(configDir, "allbot.json"),
           ),
         ).toThrow(/security checks|hardlink/i);
       });
     });
 
     it("rejects oversized include files", async () => {
-      await withTempDir({ prefix: "kaijibot-includes-big-" }, async (tempRoot) => {
+      await withTempDir({ prefix: "allbot-includes-big-" }, async (tempRoot) => {
         const configDir = path.join(tempRoot, "config");
         await fs.mkdir(configDir, { recursive: true });
         const includePath = path.join(configDir, "big.json5");
@@ -653,7 +653,7 @@ describe("security: path traversal protection (CWE-22)", () => {
         await fs.writeFile(includePath, `{"blob":"${payload}"}`, "utf-8");
 
         expect(() =>
-          resolveConfigIncludes({ $include: "./big.json5" }, path.join(configDir, "kaijibot.json")),
+          resolveConfigIncludes({ $include: "./big.json5" }, path.join(configDir, "allbot.json")),
         ).toThrow(/security checks|max/i);
       });
     });

@@ -68,9 +68,9 @@ describe("gateway auth compatibility baseline", () => {
     let prevToken: string | undefined;
 
     beforeAll(async () => {
-      prevToken = process.env.KAIJIBOT_GATEWAY_TOKEN;
+      prevToken = process.env.ALLBOT_GATEWAY_TOKEN;
       testState.gatewayAuth = { mode: "token", token: "secret" };
-      process.env.KAIJIBOT_GATEWAY_TOKEN = "secret";
+      process.env.ALLBOT_GATEWAY_TOKEN = "secret";
       port = await getFreePort();
       server = await startGatewayServer(port);
     });
@@ -154,7 +154,7 @@ describe("gateway auth compatibility baseline", () => {
     test("keeps local backend device-token reconnects out of pairing", async () => {
       const identityPath = path.join(
         os.tmpdir(),
-        `kaijibot-backend-device-${process.pid}-${port}.json`,
+        `allbot-backend-device-${process.pid}-${port}.json`,
       );
       const { loadOrCreateDeviceIdentity, publicKeyRawBase64UrlFromPem } =
         await import("../infra/device-identity.js");
@@ -221,9 +221,9 @@ describe("gateway auth compatibility baseline", () => {
     let prevToken: string | undefined;
 
     beforeAll(async () => {
-      prevToken = process.env.KAIJIBOT_GATEWAY_TOKEN;
+      prevToken = process.env.ALLBOT_GATEWAY_TOKEN;
       testState.gatewayAuth = { mode: "password", password: "secret" };
-      delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+      delete process.env.ALLBOT_GATEWAY_TOKEN;
       port = await getFreePort();
       server = await startGatewayServer(port);
     });
@@ -270,9 +270,9 @@ describe("gateway auth compatibility baseline", () => {
     let prevToken: string | undefined;
 
     beforeAll(async () => {
-      prevToken = process.env.KAIJIBOT_GATEWAY_TOKEN;
+      prevToken = process.env.ALLBOT_GATEWAY_TOKEN;
       testState.gatewayAuth = { mode: "none" };
-      delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+      delete process.env.ALLBOT_GATEWAY_TOKEN;
       port = await getFreePort();
       server = await startGatewayServer(port);
     });

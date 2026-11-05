@@ -1,2 +1,2 @@
-/** Root KaijiBot configuration Zod schema — the full `kaijibot.json` shape. */
-export { KaijiBotSchema } from "../config/zod-schema.js";
+/** Root AllBot configuration Zod schema — the full `allbot.json` shape. */
+export { AllBotSchema } from "../config/zod-schema.js";

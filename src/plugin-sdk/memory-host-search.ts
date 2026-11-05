@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { RegisteredMemorySearchManager } from "../plugins/memory-state.js";
 
 type ActiveMemorySearchPurpose = "default" | "status";
@@ -15,7 +15,7 @@ async function loadMemoryHostSearchRuntime(): Promise<MemoryHostSearchRuntimeMod
 }
 
 export async function getActiveMemorySearchManager(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   purpose?: ActiveMemorySearchPurpose;
 }): Promise<ActiveMemorySearchManagerResult> {
@@ -23,7 +23,7 @@ export async function getActiveMemorySearchManager(params: {
   return await runtime.getActiveMemorySearchManager(params);
 }
 
-export async function closeActiveMemorySearchManagers(cfg?: KaijiBotConfig): Promise<void> {
+export async function closeActiveMemorySearchManagers(cfg?: AllBotConfig): Promise<void> {
   const runtime = await loadMemoryHostSearchRuntime();
   await runtime.closeActiveMemorySearchManagers(cfg);
 }

@@ -125,7 +125,7 @@ function renderInstalledSkillCard(skill: SkillStatusEntry, props: SkillsManagerP
           `
         : nothing}
       <div class="skills-entry-actions">
-        ${skill.source === "kaijibot-managed"
+        ${skill.source === "allbot-managed"
           ? html`
               <button class="btn" ?disabled=${isActing} @click=${() => props.onUpdate(skill.name)}>
                 ${isActing ? "Updating…" : "Update"}

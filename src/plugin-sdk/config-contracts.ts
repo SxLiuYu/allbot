@@ -13,7 +13,7 @@ export type {
   GroupPolicy,
   GroupToolPolicyBySenderConfig,
   GroupToolPolicyConfig,
-  KaijiBotConfig,
+  AllBotConfig,
   MarkdownConfig,
   MarkdownTableMode,
   ReplyToMode,

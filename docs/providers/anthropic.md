@@ -1,25 +1,25 @@
 ---
-summary: "Use Anthropic Claude via API keys or Claude CLI in KaijiBot"
+summary: "Use Anthropic Claude via API keys or Claude CLI in AllBot"
 read_when:
-  - You want to use Anthropic models in KaijiBot
+  - You want to use Anthropic models in AllBot
 title: "Anthropic"
 ---
 
 # Anthropic (Claude)
 
 Anthropic builds the **Claude** model family and provides access via an API and
-Claude CLI. In KaijiBot, Anthropic API keys and Claude CLI reuse are both
+Claude CLI. In AllBot, Anthropic API keys and Claude CLI reuse are both
 supported. Existing legacy Anthropic token profiles are still honored at
 runtime if they are already configured.
 
 <Warning>
-Anthropic staff told us KaijiBot-style Claude CLI usage is allowed again, so
-KaijiBot treats Claude CLI reuse and `claude -p` usage as sanctioned for this
+Anthropic staff told us AllBot-style Claude CLI usage is allowed again, so
+AllBot treats Claude CLI reuse and `claude -p` usage as sanctioned for this
 integration unless Anthropic publishes a new policy.
 
 For long-lived gateway hosts, Anthropic API keys are still the clearest and
 most predictable production path. If you already use Claude CLI on the host,
-KaijiBot can reuse that login directly.
+AllBot can reuse that login directly.
 
 Anthropic's current public docs:
 
@@ -30,7 +30,7 @@ Anthropic's current public docs:
 - [Using Claude Code with your Team or Enterprise plan](https://support.anthropic.com/en/articles/11845131-using-claude-code-with-your-team-or-enterprise-plan/)
 
 If you want the clearest billing path, use an Anthropic API key instead.
-KaijiBot also supports other subscription-style options, including [OpenAI
+AllBot also supports other subscription-style options, including [OpenAI
 Codex](/providers/openai), [Qwen Cloud Coding Plan](/providers/qwen),
 [MiniMax Coding Plan](/providers/minimax), and [Z.AI / GLM Coding
 Plan](/providers/glm).
@@ -44,11 +44,11 @@ Create your API key in the Anthropic Console.
 ### CLI setup
 
 ```bash
-kaijibot onboard
+allbot onboard
 # choose: Anthropic API key
 
 # or non-interactive
-kaijibot onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
+allbot onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
 ```
 
 ### Anthropic config snippet
@@ -62,7 +62,7 @@ kaijibot onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
 
 ## Thinking defaults (Claude 4.6)
 
-- Anthropic Claude 4.6 models default to `adaptive` thinking in KaijiBot when no explicit thinking level is set.
+- Anthropic Claude 4.6 models default to `adaptive` thinking in AllBot when no explicit thinking level is set.
 - You can override per-message (`/think:<level>`) or in model params:
   `agents.defaults.models["anthropic/<model>"].params.thinking`.
 - Related Anthropic docs:
@@ -71,7 +71,7 @@ kaijibot onboard --anthropic-api-key "$ANTHROPIC_API_KEY"
 
 ## Fast mode (Anthropic API)
 
-KaijiBot's shared `/fast` toggle also supports direct public Anthropic traffic, including API-key and OAuth-authenticated requests sent to `api.anthropic.com`.
+AllBot's shared `/fast` toggle also supports direct public Anthropic traffic, including API-key and OAuth-authenticated requests sent to `api.anthropic.com`.
 
 - `/fast on` maps to `service_tier: "auto"`
 - `/fast off` maps to `service_tier: "standard_only"`
@@ -93,13 +93,13 @@ KaijiBot's shared `/fast` toggle also supports direct public Anthropic traffic, 
 
 Important limits:
 
-- KaijiBot only injects Anthropic service tiers for direct `api.anthropic.com` requests. If you route `anthropic/*` through a proxy or gateway, `/fast` leaves `service_tier` untouched.
+- AllBot only injects Anthropic service tiers for direct `api.anthropic.com` requests. If you route `anthropic/*` through a proxy or gateway, `/fast` leaves `service_tier` untouched.
 - Explicit Anthropic `serviceTier` or `service_tier` model params override the `/fast` default when both are set.
 - Anthropic reports the effective tier on the response under `usage.service_tier`. On accounts without Priority Tier capacity, `service_tier: "auto"` may still resolve to `standard`.
 
 ## Prompt caching (Anthropic API)
 
-KaijiBot supports Anthropic's prompt caching feature. This is **API-only**; legacy Anthropic token auth does not honor cache settings.
+AllBot supports Anthropic's prompt caching feature. This is **API-only**; legacy Anthropic token auth does not honor cache settings.
 
 ### Configuration
 
@@ -127,7 +127,7 @@ Use the `cacheRetention` parameter in your model config:
 
 ### Defaults
 
-When using Anthropic API Key authentication, KaijiBot automatically applies `cacheRetention: "short"` (5-minute cache) for all Anthropic models. You can override this by explicitly setting `cacheRetention` in your config.
+When using Anthropic API Key authentication, AllBot automatically applies `cacheRetention: "short"` (5-minute cache) for all Anthropic models. You can override this by explicitly setting `cacheRetention` in your config.
 
 ### Per-agent cacheRetention overrides
 
@@ -167,7 +167,7 @@ This lets one agent keep a long-lived cache while another agent on the same mode
 
 ## 1M context window (Anthropic beta)
 
-Anthropic's 1M context window is beta-gated. In KaijiBot, enable it per model
+Anthropic's 1M context window is beta-gated. In AllBot, enable it per model
 with `params.context1m: true` for supported Opus/Sonnet models.
 
 ```json5
@@ -184,7 +184,7 @@ with `params.context1m: true` for supported Opus/Sonnet models.
 }
 ```
 
-KaijiBot maps this to `anthropic-beta: context-1m-2025-08-07` on Anthropic
+AllBot maps this to `anthropic-beta: context-1m-2025-08-07` on Anthropic
 requests.
 
 This only activates when `params.context1m` is explicitly set to `true` for
@@ -194,16 +194,16 @@ Requirement: Anthropic must allow long-context usage on that credential.
 
 Note: Anthropic currently rejects `context-1m-*` beta requests when using
 legacy Anthropic token auth (`sk-ant-oat-*`). If you configure
-`context1m: true` with that legacy auth mode, KaijiBot logs a warning and
+`context1m: true` with that legacy auth mode, AllBot logs a warning and
 falls back to the standard context window by skipping the context1m beta
 header while keeping the required OAuth betas.
 
 ## Claude CLI backend
 
-The bundled Anthropic `claude-cli` backend is supported in KaijiBot.
+The bundled Anthropic `claude-cli` backend is supported in AllBot.
 
 - Anthropic staff told us this usage is allowed again.
-- KaijiBot therefore treats Claude CLI reuse and `claude -p` usage as
+- AllBot therefore treats Claude CLI reuse and `claude -p` usage as
   sanctioned for this integration unless Anthropic publishes a new policy.
 - Anthropic API keys remain the clearest production path for always-on gateway
   hosts and explicit server-side billing control.
@@ -212,10 +212,10 @@ The bundled Anthropic `claude-cli` backend is supported in KaijiBot.
 ## Notes
 
 - Anthropic's public Claude Code docs still document direct CLI usage such as
-  `claude -p`, and Anthropic staff told us KaijiBot-style Claude CLI usage is
+  `claude -p`, and Anthropic staff told us AllBot-style Claude CLI usage is
   allowed again. We are treating that guidance as settled unless Anthropic
   publishes a new policy change.
-- Anthropic setup-token remains available in KaijiBot as a supported token-auth path, but KaijiBot now prefers Claude CLI reuse and `claude -p` when available.
+- Anthropic setup-token remains available in AllBot as a supported token-auth path, but AllBot now prefers Claude CLI reuse and `claude -p` when available.
 - Auth details + reuse rules are in [/concepts/oauth](/concepts/oauth).
 
 ## Troubleshooting
@@ -229,16 +229,16 @@ The bundled Anthropic `claude-cli` backend is supported in KaijiBot.
 
 - Auth is **per agent**. New agents don’t inherit the main agent’s keys.
 - Re-run onboarding for that agent, or configure an API key on the gateway
-  host, then verify with `kaijibot models status`.
+  host, then verify with `allbot models status`.
 
 **No credentials found for profile `anthropic:default`**
 
-- Run `kaijibot models status` to see which auth profile is active.
+- Run `allbot models status` to see which auth profile is active.
 - Re-run onboarding, or configure an API key for that profile path.
 
 **No available auth profile (all in cooldown/unavailable)**
 
-- Check `kaijibot models status --json` for `auth.unusableProfiles`.
+- Check `allbot models status --json` for `auth.unusableProfiles`.
 - Anthropic rate-limit cooldowns can be model-scoped, so a sibling Anthropic
   model may still be usable even when the current one is cooling down.
 - Add another Anthropic profile or wait for cooldown.

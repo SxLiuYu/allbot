@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTaskStepReportTool } from "../../agents/tools/task-tool.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createTempHomeEnv } from "../../test-utils/temp-home.js";
 import { TaskRunner } from "./runner.js";
 import { createTaskSafely } from "./service.js";
@@ -36,7 +36,7 @@ describe("task lifecycle e2e (T1)", () => {
   let heartbeats: Array<{ reason: string; sessionKey: string }>;
 
   beforeAll(async () => {
-    tempHome = await createTempHomeEnv("kaijibot-task-e2e-");
+    tempHome = await createTempHomeEnv("allbot-task-e2e-");
   });
 
   afterAll(async () => {
@@ -44,7 +44,7 @@ describe("task lifecycle e2e (T1)", () => {
   });
 
   beforeEach(() => {
-    storeDir = mkdtempSync(join(tmpdir(), "kaijibot-task-e2e-store-"));
+    storeDir = mkdtempSync(join(tmpdir(), "allbot-task-e2e-store-"));
     store = new TaskStore(storeDir);
     enqueued = [];
     heartbeats = [];
@@ -84,10 +84,10 @@ describe("task lifecycle e2e (T1)", () => {
     });
   }
 
-  function config(tasksEnabledFlag: boolean): KaijiBotConfig {
+  function config(tasksEnabledFlag: boolean): AllBotConfig {
     return {
       cognitive: { enabled: true, tasks: { enabled: tasksEnabledFlag } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
   }
 
   it("flag off → creation rejected, nothing runs", async () => {

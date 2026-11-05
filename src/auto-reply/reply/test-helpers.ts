@@ -21,7 +21,7 @@ export function createMockTypingController(
 export function createMockFollowupRun(
   overrides: Partial<Omit<FollowupRun, "run">> & { run?: Partial<FollowupRun["run"]> } = {},
 ): FollowupRun {
-  const skipProviderRuntimeHints = process.env.KAIJIBOT_TEST_FAST === "1";
+  const skipProviderRuntimeHints = process.env.ALLBOT_TEST_FAST === "1";
   const base: FollowupRun = {
     prompt: "hello",
     summaryLine: "hello",

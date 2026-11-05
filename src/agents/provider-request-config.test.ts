@@ -387,9 +387,9 @@ describe("provider request config", () => {
     });
 
     expect(resolved).toMatchObject({
-      originator: "kaijibot",
+      originator: "allbot",
       version: expect.any(String),
-      "User-Agent": expect.stringMatching(/^kaijibot\//),
+      "User-Agent": expect.stringMatching(/^allbot\//),
       "X-Custom": "1",
     });
   });
@@ -409,7 +409,7 @@ describe("provider request config", () => {
 
     expect(resolved).toEqual({
       "HTTP-Referer": "https://gitee.com/kaiji1126/kaijibot",
-      "X-OpenRouter-Title": "KaijiBot",
+      "X-OpenRouter-Title": "AllBot",
       "X-OpenRouter-Categories": "cli-agent",
       "X-Custom": "1",
     });
@@ -431,7 +431,7 @@ describe("provider request config", () => {
     expect(
       Object.keys(resolved ?? {}).filter((key) => key.toLowerCase() === "user-agent"),
     ).toHaveLength(1);
-    expect(resolved?.["User-Agent"]).toMatch(/^kaijibot\//);
+    expect(resolved?.["User-Agent"]).toMatch(/^allbot\//);
   });
 
   it("drops forbidden header keys while merging", () => {
@@ -480,9 +480,9 @@ describe("provider request config", () => {
     expect(resolved.capabilities.allowsResponsesStore).toBe(true);
     expect(resolved.headers).toMatchObject({
       authorization: "Bearer test-key",
-      originator: "kaijibot",
+      originator: "allbot",
       version: expect.any(String),
-      "User-Agent": expect.stringMatching(/^kaijibot\//),
+      "User-Agent": expect.stringMatching(/^allbot\//),
       "X-Custom": "1",
     });
   });

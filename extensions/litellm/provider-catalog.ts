@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 import { buildLitellmModelDefinition, LITELLM_BASE_URL } from "./onboard.js";
 
 export function buildLitellmProvider(): ModelProviderConfig {

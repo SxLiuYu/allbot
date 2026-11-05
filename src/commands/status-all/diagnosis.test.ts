@@ -64,8 +64,8 @@ function createBaseParams(
 describe("status-all diagnosis port checks", () => {
   it("treats same-process dual-stack loopback listeners as healthy", async () => {
     const params = createBaseParams([
-      { pid: 5001, commandLine: "kaijibot-gateway", address: "127.0.0.1:18789" },
-      { pid: 5001, commandLine: "kaijibot-gateway", address: "[::1]:18789" },
+      { pid: 5001, commandLine: "allbot-gateway", address: "127.0.0.1:18789" },
+      { pid: 5001, commandLine: "allbot-gateway", address: "[::1]:18789" },
     ]);
 
     await appendStatusAllDiagnosis(params);
@@ -78,8 +78,8 @@ describe("status-all diagnosis port checks", () => {
 
   it("keeps warning for multi-process listener conflicts", async () => {
     const params = createBaseParams([
-      { pid: 5001, commandLine: "kaijibot-gateway", address: "127.0.0.1:18789" },
-      { pid: 5002, commandLine: "kaijibot-gateway", address: "[::1]:18789" },
+      { pid: 5001, commandLine: "allbot-gateway", address: "127.0.0.1:18789" },
+      { pid: 5002, commandLine: "allbot-gateway", address: "[::1]:18789" },
     ]);
 
     await appendStatusAllDiagnosis(params);

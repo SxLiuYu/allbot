@@ -138,7 +138,7 @@ export async function withStagedArchiveDestination<T>(params: {
   destinationRealDir: string;
   run: (stagingDir: string) => Promise<T>;
 }): Promise<T> {
-  const stagingDir = await fs.mkdtemp(path.join(params.destinationRealDir, ".kaijibot-archive-"));
+  const stagingDir = await fs.mkdtemp(path.join(params.destinationRealDir, ".allbot-archive-"));
   try {
     return await params.run(stagingDir);
   } finally {

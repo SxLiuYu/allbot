@@ -1,5 +1,5 @@
 import type { SubagentRunRecord } from "../../agents/subagent-registry.types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { handleSubagentsSendAction } from "./commands-subagents/action-send.js";
 
 export function buildSubagentRun(): SubagentRunRecord {
@@ -16,7 +16,7 @@ export function buildSubagentRun(): SubagentRunRecord {
 }
 
 export function buildSubagentsSendContext(params?: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   handledPrefix?: string;
   requesterKey?: string;
   runs?: SubagentRunRecord[];
@@ -29,7 +29,7 @@ export function buildSubagentsSendContext(params?: {
         ({
           commands: { text: true },
           channels: { whatsapp: { allowFrom: ["*"] } },
-        } as KaijiBotConfig),
+        } as AllBotConfig),
       ctx: {},
       command: {
         channel: "whatsapp",

@@ -11,7 +11,7 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const hashFile = path.join(rootDir, "src", "canvas-host", "a2ui", ".bundle.hash");
 const outputFile = path.join(rootDir, "src", "canvas-host", "a2ui", "a2ui.bundle.js");
 const a2uiRendererDir = path.join(rootDir, "vendor", "a2ui", "renderers", "lit");
-const a2uiAppDir = path.join(rootDir, "apps", "shared", "KaijiBotKit", "Tools", "CanvasA2UI");
+const a2uiAppDir = path.join(rootDir, "apps", "shared", "AllBotKit", "Tools", "CanvasA2UI");
 const inputPaths = [
   path.join(rootDir, "package.json"),
   path.join(rootDir, "pnpm-lock.yaml"),
@@ -103,9 +103,9 @@ async function main() {
       console.log("A2UI sources missing; keeping prebuilt bundle.");
       return;
     }
-    if (process.env.KAIJIBOT_SPARSE_PROFILE || process.env.KAIJIBOT_A2UI_SKIP_MISSING === "1") {
+    if (process.env.ALLBOT_SPARSE_PROFILE || process.env.ALLBOT_A2UI_SKIP_MISSING === "1") {
       console.error(
-        "A2UI sources missing; skipping bundle because KAIJIBOT_A2UI_SKIP_MISSING=1 or KAIJIBOT_SPARSE_PROFILE is set.",
+        "A2UI sources missing; skipping bundle because ALLBOT_A2UI_SKIP_MISSING=1 or ALLBOT_SPARSE_PROFILE is set.",
       );
       return;
     }

@@ -108,7 +108,7 @@ export async function runGatewayLoop(params: {
       );
     } else {
       gatewayLog.info(
-        `restart mode: in-process restart (${respawn.detail ?? "KAIJIBOT_NO_RESPAWN"})`,
+        `restart mode: in-process restart (${respawn.detail ?? "ALLBOT_NO_RESPAWN"})`,
       );
     }
     if (hadLock && !(await reacquireLockForInProcessRestart())) {

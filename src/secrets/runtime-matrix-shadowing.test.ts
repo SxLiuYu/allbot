@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
@@ -40,8 +40,8 @@ vi.mock("../channels/plugins/bootstrap-registry.js", () => {
   };
 });
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function createTestProvider(params: {
@@ -158,7 +158,7 @@ describe("secrets runtime snapshot matrix shadowing", () => {
       env: {
         MATRIX_OPS_ACCESS_TOKEN: "ops-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -246,7 +246,7 @@ describe("secrets runtime snapshot matrix shadowing", () => {
     const snapshot = await prepareSecretsRuntimeSnapshot({
       config: asConfig(config),
       env,
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -335,7 +335,7 @@ describe("secrets runtime snapshot matrix shadowing", () => {
     const snapshot = await prepareSecretsRuntimeSnapshot({
       config: asConfig(config),
       env,
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 

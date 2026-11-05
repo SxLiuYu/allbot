@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { openBoundaryFileSync } from "../infra/boundary-file-read.js";
 import { parseFrontmatterBlock } from "../markdown/frontmatter.js";
 import { isPathInsideWithRealpath } from "../security/scan-paths.js";
@@ -167,7 +167,7 @@ function loadBundleCommandsFromRoot(params: {
 
 export function loadEnabledClaudeBundleCommands(params: {
   workspaceDir: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): ClaudeBundleCommandSpec[] {
   const registry = loadPluginManifestRegistry({
     workspaceDir: params.workspaceDir,

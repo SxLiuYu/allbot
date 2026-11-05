@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import { getMemorySearchManager, type MemoryIndexManager } from "./index.js";
 
 export async function createMemoryManagerOrThrow(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId = "main",
 ): Promise<MemoryIndexManager> {
   const result = await getMemorySearchManager({ cfg, agentId });

@@ -16,7 +16,7 @@ describe("buildWebchatAudioContentBlocksFromReplyPayloads", () => {
   });
 
   it("embeds a local audio file as a base64 gateway chat block", () => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-webchat-audio-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-webchat-audio-"));
     const audioPath = path.join(tmpDir, "clip.mp3");
     fs.writeFileSync(audioPath, Buffer.from([0xff, 0xfb, 0x90, 0x00]));
 
@@ -44,7 +44,7 @@ describe("buildWebchatAudioContentBlocksFromReplyPayloads", () => {
   });
 
   it("skips non-audio local files", () => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-webchat-audio-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-webchat-audio-"));
     const imagePath = path.join(tmpDir, "clip.png");
     fs.writeFileSync(imagePath, Buffer.from([0x89, 0x50, 0x4e, 0x47]));
 
@@ -54,7 +54,7 @@ describe("buildWebchatAudioContentBlocksFromReplyPayloads", () => {
   });
 
   it("dedupes repeated paths", () => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-webchat-audio-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-webchat-audio-"));
     const audioPath = path.join(tmpDir, "clip.mp3");
     fs.writeFileSync(audioPath, Buffer.from([0x00]));
 
@@ -66,7 +66,7 @@ describe("buildWebchatAudioContentBlocksFromReplyPayloads", () => {
   });
 
   it("embeds file:// URLs pointing at a local file", () => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-webchat-audio-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-webchat-audio-"));
     const audioPath = path.join(tmpDir, "clip.mp3");
     fs.writeFileSync(audioPath, Buffer.from([0x01]));
 
@@ -78,7 +78,7 @@ describe("buildWebchatAudioContentBlocksFromReplyPayloads", () => {
   });
 
   it("does not read file contents when stat reports size over the cap", () => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-webchat-audio-"));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-webchat-audio-"));
     const audioPath = path.join(tmpDir, "huge.mp3");
     fs.writeFileSync(audioPath, Buffer.from([0x02]));
 

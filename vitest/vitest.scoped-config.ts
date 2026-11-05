@@ -135,7 +135,7 @@ export function createScopedVitestConfig(
     environment?: string;
     exclude?: string[];
     argv?: string[];
-    includeKaijiBotRuntimeSetup?: boolean;
+    includeAllBotRuntimeSetup?: boolean;
     isolate?: boolean;
     name?: string;
     pool?: "forks" | "threads";
@@ -149,7 +149,7 @@ export function createScopedVitestConfig(
   const baseTest = sharedVitestConfig.test ?? {};
   const scopedDir = options?.dir;
   const env = options?.env;
-  const includeFromEnv = loadPatternListFromEnv("KAIJIBOT_VITEST_INCLUDE_FILE", env);
+  const includeFromEnv = loadPatternListFromEnv("ALLBOT_VITEST_INCLUDE_FILE", env);
   const cliInclude = narrowIncludePatternsForCli(include, options?.argv);
   const exclude = relativizeScopedPatterns(
     [...(baseTest.exclude ?? []), ...unitFastTestFiles, ...(options?.exclude ?? [])],
@@ -161,7 +161,7 @@ export function createScopedVitestConfig(
       "test/setup-state-dir-isolation.ts",
       ...(baseTest.setupFiles ?? []),
       ...(options?.setupFiles ?? []),
-      ...(options?.includeKaijibotRuntimeSetup === false ? [] : ["test/setup-kaijibot-runtime.ts"]),
+      ...(options?.includeAllbotRuntimeSetup === false ? [] : ["test/setup-allbot-runtime.ts"]),
     ]),
   ];
   const useNonIsolatedRunner = options?.useNonIsolatedRunner ?? !isolate;

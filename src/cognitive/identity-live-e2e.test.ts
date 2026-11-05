@@ -1,7 +1,7 @@
 /**
  * Live e2e test for the cognitive identity system.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/identity-live-e2e.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/identity-live-e2e.test.ts
  *
  * Phase 1 (no LLM): resolveCognitiveUserId + stores + consolidation + dmScope
  * Phase 2 (LLM):    full evolution pipeline for operator session
@@ -14,7 +14,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { resetHeartbeatWakeStateForTests } from "../infra/heartbeat-wake.js";
 import { peekSystemEventEntries, resetSystemEventsForTest } from "../infra/system-events.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 
 let tempDir: string;
@@ -169,7 +169,7 @@ describe("Phase 1: resolveCognitiveUserId end-to-end with stores", () => {
   it("senderId takes priority over sessionKey", async () => {
     const { resolveCognitiveUserId } = await import("./identity.js");
     expect(resolveCognitiveUserId("agent:main:main", "ou_feishu_user")).toBe("ou_feishu_user");
-    expect(resolveCognitiveUserId("agent:main:feishu:direct:ou_x", "kaijibot-tui")).toBe(
+    expect(resolveCognitiveUserId("agent:main:feishu:direct:ou_x", "allbot-tui")).toBe(
       "operator",
     );
   });

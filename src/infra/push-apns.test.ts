@@ -22,7 +22,7 @@ function createDirectApnsSendFixture(params: {
       nodeId: params.nodeId,
       transport: "direct" as const,
       token: "ABCD1234ABCD1234ABCD1234ABCD1234",
-      topic: "ai.kaijibot.ios",
+      topic: "ai.allbot.ios",
       environment: params.environment,
       updatedAtMs: 1,
     },
@@ -55,14 +55,14 @@ function createRelayApnsSendFixture(params: {
       relayHandle: params.relayHandle ?? "relay-handle-12345678",
       sendGrant: "send-grant-123",
       installationId: "install-123",
-      topic: "ai.kaijibot.ios",
+      topic: "ai.allbot.ios",
       environment: "production" as const,
       distribution: "official" as const,
       updatedAtMs: 1,
       tokenDebugSuffix: params.tokenDebugSuffix,
     },
     relayConfig: {
-      baseUrl: "https://relay.kaijibot.test",
+      baseUrl: "https://relay.allbot.test",
       timeoutMs: 2_500,
     },
     gatewayIdentity: {
@@ -106,7 +106,7 @@ describe("push APNs send semantics", () => {
         alert: { title: "Wake", body: "Ping" },
         sound: "default",
       },
-      kaijibot: {
+      allbot: {
         kind: "push.test",
         nodeId: "ios-node-alert",
       },
@@ -143,7 +143,7 @@ describe("push APNs send semantics", () => {
       aps: {
         "content-available": 1,
       },
-      kaijibot: {
+      allbot: {
         kind: "node.wake",
         reason: "node.invoke",
         nodeId: "ios-node-wake",
@@ -184,19 +184,19 @@ describe("push APNs send semantics", () => {
       aps: {
         alert: {
           title: "Exec approval required",
-          body: "Open KaijiBot to review this request.",
+          body: "Open AllBot to review this request.",
         },
         sound: "default",
-        category: "kaijibot.exec-approval",
+        category: "allbot.exec-approval",
         "content-available": 1,
       },
-      kaijibot: {
+      allbot: {
         kind: "exec.approval.requested",
         approvalId: "approval-123",
       },
     });
     expect(sent?.payload).not.toMatchObject({
-      kaijibot: {
+      allbot: {
         host: expect.anything(),
         nodeId: expect.anything(),
         agentId: expect.anything(),
@@ -235,7 +235,7 @@ describe("push APNs send semantics", () => {
       aps: {
         "content-available": 1,
       },
-      kaijibot: {
+      allbot: {
         kind: "exec.approval.resolved",
         approvalId: "approval-123",
       },
@@ -321,7 +321,7 @@ describe("push APNs send semantics", () => {
 
     const sent = send.mock.calls[0]?.[0];
     expect(sent?.payload).toMatchObject({
-      kaijibot: {
+      allbot: {
         kind: "node.wake",
         reason: "node.invoke",
         nodeId: "ios-node-wake-default-reason",
@@ -410,7 +410,7 @@ describe("push APNs send semantics", () => {
       priority: "5",
       payload: {
         aps: { "content-available": 1 },
-        kaijibot: {
+        allbot: {
           kind: "node.wake",
           reason: "queue.retry",
           nodeId: "ios-node-relay-wake",
@@ -452,18 +452,18 @@ describe("push APNs send semantics", () => {
       aps: {
         alert: {
           title: "Exec approval required",
-          body: "Open KaijiBot to review this request.",
+          body: "Open AllBot to review this request.",
         },
-        category: "kaijibot.exec-approval",
+        category: "allbot.exec-approval",
         "content-available": 1,
       },
-      kaijibot: {
+      allbot: {
         kind: "exec.approval.requested",
         approvalId: "approval-relay-1",
       },
     });
     expect(sent?.payload).not.toMatchObject({
-      kaijibot: {
+      allbot: {
         commandText: expect.anything(),
         host: expect.anything(),
         nodeId: expect.anything(),

@@ -10,7 +10,7 @@ import {
   setRuntimeConfigSnapshot,
   setRuntimeConfigSnapshotRefreshHandler,
 } from "./runtime-snapshot.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
 function resetRuntimeConfigState(): void {
   setRuntimeConfigSnapshotRefreshHandler(null);
@@ -25,7 +25,7 @@ describe("runtime snapshot state", () => {
   it("pins the first successful load in memory until the snapshot is cleared", () => {
     let freshPort = 18789;
     let loadCount = 0;
-    const loadFresh = (): KaijiBotConfig => {
+    const loadFresh = (): AllBotConfig => {
       loadCount += 1;
       return { gateway: { port: freshPort } };
     };
@@ -43,7 +43,7 @@ describe("runtime snapshot state", () => {
   });
 
   it("returns the source snapshot when runtime snapshot is active", () => {
-    const sourceConfig: KaijiBotConfig = {
+    const sourceConfig: AllBotConfig = {
       models: {
         providers: {
           openai: {
@@ -54,7 +54,7 @@ describe("runtime snapshot state", () => {
         },
       },
     };
-    const runtimeConfig: KaijiBotConfig = {
+    const runtimeConfig: AllBotConfig = {
       models: {
         providers: {
           openai: {
@@ -79,10 +79,10 @@ describe("runtime snapshot state", () => {
 
   it("refreshes both snapshots from disk after a write when source + runtime snapshots exist", async () => {
     const notifyCommittedWrite = vi.fn();
-    const loadFreshConfig = vi.fn<() => KaijiBotConfig>(() => ({
+    const loadFreshConfig = vi.fn<() => AllBotConfig>(() => ({
       gateway: { auth: { mode: "token" } },
     }));
-    const nextSourceConfig: KaijiBotConfig = {
+    const nextSourceConfig: AllBotConfig = {
       gateway: { auth: { mode: "token" } },
       models: {
         providers: {
@@ -150,7 +150,7 @@ describe("runtime snapshot state", () => {
 
   it("keeps the last-known-good runtime snapshot active while specialized refresh is pending", async () => {
     const notifyCommittedWrite = vi.fn();
-    const loadFreshConfig = vi.fn<() => KaijiBotConfig>(() => ({
+    const loadFreshConfig = vi.fn<() => AllBotConfig>(() => ({
       gateway: { auth: { mode: "token" } },
     }));
     let releaseRefresh!: () => void;
@@ -222,7 +222,7 @@ describe("runtime snapshot state", () => {
   });
 
   it("notifies registered write listeners with committed runtime snapshots", () => {
-    const seen: Array<{ configPath: string; runtimeConfig: KaijiBotConfig }> = [];
+    const seen: Array<{ configPath: string; runtimeConfig: AllBotConfig }> = [];
     const unsubscribe = registerRuntimeConfigWriteListener((event) => {
       seen.push({
         configPath: event.configPath,
@@ -232,7 +232,7 @@ describe("runtime snapshot state", () => {
 
     try {
       notifyRuntimeConfigWriteListeners({
-        configPath: "/tmp/kaijibot.json",
+        configPath: "/tmp/allbot.json",
         sourceConfig: { gateway: { port: 18789 } },
         runtimeConfig: { gateway: { port: 19003 } },
         persistedHash: "abc123",
@@ -244,7 +244,7 @@ describe("runtime snapshot state", () => {
 
     expect(seen).toEqual([
       {
-        configPath: "/tmp/kaijibot.json",
+        configPath: "/tmp/allbot.json",
         runtimeConfig: { gateway: { port: 19003 } },
       },
     ]);

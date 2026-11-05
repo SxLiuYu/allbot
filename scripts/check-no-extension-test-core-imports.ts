@@ -4,15 +4,15 @@ import { collectFilesSync, relativeToCwd } from "./check-file-utils.js";
 
 const FORBIDDEN_PATTERNS: Array<{ pattern: RegExp; hint: string }> = [
   {
-    pattern: /["']kaijibot\/plugin-sdk["']/,
-    hint: "Use kaijibot/plugin-sdk/<subpath> instead of the monolithic root entry.",
+    pattern: /["']allbot\/plugin-sdk["']/,
+    hint: "Use allbot/plugin-sdk/<subpath> instead of the monolithic root entry.",
   },
   {
-    pattern: /["']kaijibot\/plugin-sdk\/test-utils["']/,
-    hint: "Use kaijibot/plugin-sdk/testing for the public extension test surface.",
+    pattern: /["']allbot\/plugin-sdk\/test-utils["']/,
+    hint: "Use allbot/plugin-sdk/testing for the public extension test surface.",
   },
   {
-    pattern: /["']kaijibot\/plugin-sdk\/compat["']/,
+    pattern: /["']allbot\/plugin-sdk\/compat["']/,
     hint: "Use a focused public plugin-sdk subpath instead of compat.",
   },
   {
@@ -21,7 +21,7 @@ const FORBIDDEN_PATTERNS: Array<{ pattern: RegExp; hint: string }> = [
   },
   {
     pattern: /["'](?:\.\.\/)+(?:src\/test-utils\/)[^"']+["']/,
-    hint: "Use test/helpers/plugins/* for repo-only helpers, or kaijibot/plugin-sdk/testing for public surfaces.",
+    hint: "Use test/helpers/plugins/* for repo-only helpers, or allbot/plugin-sdk/testing for public surfaces.",
   },
   {
     pattern: /["'](?:\.\.\/)+(?:src\/plugins\/types\.js)["']/,

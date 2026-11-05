@@ -13,7 +13,7 @@ import type {
 import {
   readConfigFileSnapshot,
   replaceConfigFile,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../../config/config.js";
 import { danger } from "../../globals.js";
 import { formatErrorMessage } from "../../infra/errors.js";
@@ -133,7 +133,7 @@ function renderDisplayLine(line: ChannelCapabilitiesDisplayLine) {
 
 async function resolveChannelReports(params: {
   plugin: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   timeoutMs: number;
   accountOverride?: string;
   target?: string;

@@ -285,15 +285,15 @@ describe("buildServiceEnvironment", () => {
     } else {
       expect(env.PATH).toContain("/usr/bin");
     }
-    expect(env.KAIJIBOT_GATEWAY_PORT).toBe("18789");
-    expect(env.KAIJIBOT_GATEWAY_TOKEN).toBeUndefined();
-    expect(env.KAIJIBOT_SERVICE_MARKER).toBe("kaijibot");
-    expect(env.KAIJIBOT_SERVICE_KIND).toBe("gateway");
-    expect(typeof env.KAIJIBOT_SERVICE_VERSION).toBe("string");
-    expect(env.KAIJIBOT_SYSTEMD_UNIT).toBe("kaijibot-gateway.service");
-    expect(env.KAIJIBOT_WINDOWS_TASK_NAME).toBe("KaijiBot Gateway");
+    expect(env.ALLBOT_GATEWAY_PORT).toBe("18789");
+    expect(env.ALLBOT_GATEWAY_TOKEN).toBeUndefined();
+    expect(env.ALLBOT_SERVICE_MARKER).toBe("allbot");
+    expect(env.ALLBOT_SERVICE_KIND).toBe("gateway");
+    expect(typeof env.ALLBOT_SERVICE_VERSION).toBe("string");
+    expect(env.ALLBOT_SYSTEMD_UNIT).toBe("allbot-gateway.service");
+    expect(env.ALLBOT_WINDOWS_TASK_NAME).toBe("AllBot Gateway");
     if (process.platform === "darwin") {
-      expect(env.KAIJIBOT_LAUNCHD_LABEL).toBe("ai.kaijibot.gateway");
+      expect(env.ALLBOT_LAUNCHD_LABEL).toBe("ai.allbot.gateway");
     }
   });
 
@@ -315,13 +315,13 @@ describe("buildServiceEnvironment", () => {
 
   it("uses profile-specific unit and label", () => {
     const env = buildServiceEnvironment({
-      env: { HOME: "/home/user", KAIJIBOT_PROFILE: "work" },
+      env: { HOME: "/home/user", ALLBOT_PROFILE: "work" },
       port: 18789,
     });
-    expect(env.KAIJIBOT_SYSTEMD_UNIT).toBe("kaijibot-gateway-work.service");
-    expect(env.KAIJIBOT_WINDOWS_TASK_NAME).toBe("KaijiBot Gateway (work)");
+    expect(env.ALLBOT_SYSTEMD_UNIT).toBe("allbot-gateway-work.service");
+    expect(env.ALLBOT_WINDOWS_TASK_NAME).toBe("AllBot Gateway (work)");
     if (process.platform === "darwin") {
-      expect(env.KAIJIBOT_LAUNCHD_LABEL).toBe("ai.kaijibot.work");
+      expect(env.ALLBOT_LAUNCHD_LABEL).toBe("ai.allbot.work");
     }
   });
 
@@ -356,7 +356,7 @@ describe("buildServiceEnvironment", () => {
     });
 
     expect(env).not.toHaveProperty("PATH");
-    expect(env.KAIJIBOT_WINDOWS_TASK_NAME).toBe("KaijiBot Gateway");
+    expect(env.ALLBOT_WINDOWS_TASK_NAME).toBe("AllBot Gateway");
   });
 
   it("prepends extra runtime directories to the gateway service PATH", () => {
@@ -381,21 +381,21 @@ describe("buildNodeServiceEnvironment", () => {
     expect(env.HOME).toBe("/home/user");
   });
 
-  it("passes through KAIJIBOT_GATEWAY_TOKEN for node services", () => {
+  it("passes through ALLBOT_GATEWAY_TOKEN for node services", () => {
     const env = buildNodeServiceEnvironment({
-      env: { HOME: "/home/user", KAIJIBOT_GATEWAY_TOKEN: " node-token " },
+      env: { HOME: "/home/user", ALLBOT_GATEWAY_TOKEN: " node-token " },
     });
-    expect(env.KAIJIBOT_GATEWAY_TOKEN).toBe("node-token");
+    expect(env.ALLBOT_GATEWAY_TOKEN).toBe("node-token");
   });
 
-  it("omits KAIJIBOT_GATEWAY_TOKEN when the env var is empty", () => {
+  it("omits ALLBOT_GATEWAY_TOKEN when the env var is empty", () => {
     const env = buildNodeServiceEnvironment({
       env: {
         HOME: "/home/user",
-        KAIJIBOT_GATEWAY_TOKEN: "   ",
+        ALLBOT_GATEWAY_TOKEN: "   ",
       },
     });
-    expect(env.KAIJIBOT_GATEWAY_TOKEN).toBeUndefined();
+    expect(env.ALLBOT_GATEWAY_TOKEN).toBeUndefined();
   });
 
   it("forwards proxy environment variables for node services", () => {
@@ -486,32 +486,32 @@ describe("shared Node TLS env defaults", () => {
 describe("resolveGatewayStateDir", () => {
   it("uses the default state dir when no overrides are set", () => {
     const env = { HOME: "/Users/test" };
-    expect(resolveGatewayStateDir(env)).toBe(path.join("/Users/test", ".kaijibot"));
+    expect(resolveGatewayStateDir(env)).toBe(path.join("/Users/test", ".allbot"));
   });
 
   it("appends the profile suffix when set", () => {
-    const env = { HOME: "/Users/test", KAIJIBOT_PROFILE: "rescue" };
-    expect(resolveGatewayStateDir(env)).toBe(path.join("/Users/test", ".kaijibot-rescue"));
+    const env = { HOME: "/Users/test", ALLBOT_PROFILE: "rescue" };
+    expect(resolveGatewayStateDir(env)).toBe(path.join("/Users/test", ".allbot-rescue"));
   });
 
   it("treats default profiles as the base state dir", () => {
-    const env = { HOME: "/Users/test", KAIJIBOT_PROFILE: "Default" };
-    expect(resolveGatewayStateDir(env)).toBe(path.join("/Users/test", ".kaijibot"));
+    const env = { HOME: "/Users/test", ALLBOT_PROFILE: "Default" };
+    expect(resolveGatewayStateDir(env)).toBe(path.join("/Users/test", ".allbot"));
   });
 
-  it("uses KAIJIBOT_STATE_DIR when provided", () => {
-    const env = { HOME: "/Users/test", KAIJIBOT_STATE_DIR: "/var/lib/kaijibot" };
-    expect(resolveGatewayStateDir(env)).toBe(path.resolve("/var/lib/kaijibot"));
+  it("uses ALLBOT_STATE_DIR when provided", () => {
+    const env = { HOME: "/Users/test", ALLBOT_STATE_DIR: "/var/lib/allbot" };
+    expect(resolveGatewayStateDir(env)).toBe(path.resolve("/var/lib/allbot"));
   });
 
-  it("expands ~ in KAIJIBOT_STATE_DIR", () => {
-    const env = { HOME: "/Users/test", KAIJIBOT_STATE_DIR: "~/kaijibot-state" };
-    expect(resolveGatewayStateDir(env)).toBe(path.resolve("/Users/test/kaijibot-state"));
+  it("expands ~ in ALLBOT_STATE_DIR", () => {
+    const env = { HOME: "/Users/test", ALLBOT_STATE_DIR: "~/allbot-state" };
+    expect(resolveGatewayStateDir(env)).toBe(path.resolve("/Users/test/allbot-state"));
   });
 
   it("preserves Windows absolute paths without HOME", () => {
-    const env = { KAIJIBOT_STATE_DIR: "C:\\State\\kaijibot" };
-    expect(resolveGatewayStateDir(env)).toBe("C:\\State\\kaijibot");
+    const env = { ALLBOT_STATE_DIR: "C:\\State\\allbot" };
+    expect(resolveGatewayStateDir(env)).toBe("C:\\State\\allbot");
   });
 });
 

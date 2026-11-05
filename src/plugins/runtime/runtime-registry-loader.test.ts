@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createEmptyPluginRegistry } from "../registry.js";
 
 const mocks = vi.hoisted(() => ({
-  loadKaijiBotPlugins: vi.fn<typeof import("../loader.js").loadKaijiBotPlugins>(),
+  loadAllBotPlugins: vi.fn<typeof import("../loader.js").loadAllBotPlugins>(),
   getActivePluginRegistry: vi.fn<typeof import("../runtime.js").getActivePluginRegistry>(),
   resolveConfiguredChannelPluginIds:
     vi.fn<typeof import("../channel-plugin-ids.js").resolveConfiguredChannelPluginIds>(),
@@ -22,8 +22,8 @@ let ensurePluginRegistryLoaded: typeof import("./runtime-registry-loader.js").en
 let resetPluginRegistryLoadedForTests: typeof import("./runtime-registry-loader.js").__testing.resetPluginRegistryLoadedForTests;
 
 vi.mock("../loader.js", () => ({
-  loadKaijiBotPlugins: (...args: Parameters<typeof mocks.loadKaijiBotPlugins>) =>
-    mocks.loadKaijiBotPlugins(...args),
+  loadAllBotPlugins: (...args: Parameters<typeof mocks.loadAllBotPlugins>) =>
+    mocks.loadAllBotPlugins(...args),
 }));
 
 vi.mock("../runtime.js", () => ({
@@ -60,7 +60,7 @@ describe("ensurePluginRegistryLoaded", () => {
   });
 
   beforeEach(() => {
-    mocks.loadKaijiBotPlugins.mockReset();
+    mocks.loadAllBotPlugins.mockReset();
     mocks.getActivePluginRegistry.mockReset();
     mocks.resolveConfiguredChannelPluginIds.mockReset();
     mocks.resolveChannelPluginIds.mockReset();
@@ -99,7 +99,7 @@ describe("ensurePluginRegistryLoaded", () => {
         },
       },
     };
-    const env = { HOME: "/tmp/kaijibot-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/allbot-home" } as NodeJS.ProcessEnv;
 
     mocks.resolveConfiguredChannelPluginIds.mockReturnValue(["demo-channel"]);
     ensurePluginRegistryLoaded({
@@ -120,7 +120,7 @@ describe("ensurePluginRegistryLoaded", () => {
       config: rawConfig,
       env,
     });
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: resolvedConfig,
         activationSourceConfig: { plugins: { allow: ["demo-channel"] } },
@@ -146,12 +146,12 @@ describe("ensurePluginRegistryLoaded", () => {
       onlyPluginIds: ["demo-b"],
     });
 
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenCalledTimes(2);
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenNthCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenCalledTimes(2);
+    expect(mocks.loadAllBotPlugins).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({ onlyPluginIds: ["demo-a"] }),
     );
-    expect(mocks.loadKaijiBotPlugins).toHaveBeenNthCalledWith(
+    expect(mocks.loadAllBotPlugins).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({ onlyPluginIds: ["demo-b"] }),
     );

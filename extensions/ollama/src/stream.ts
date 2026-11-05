@@ -10,24 +10,24 @@ import type {
   Usage,
 } from "@earendil-works/pi-ai";
 import { createAssistantMessageEventStream, streamSimple } from "@earendil-works/pi-ai";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import type {
-  KaijiBotConfig,
+  AllBotConfig,
   ProviderRuntimeModel,
   ProviderWrapStreamFnContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { isNonSecretApiKeyMarker } from "kaijibot/plugin-sdk/provider-auth";
+} from "allbot/plugin-sdk/plugin-entry";
+import { isNonSecretApiKeyMarker } from "allbot/plugin-sdk/provider-auth";
 import {
   DEFAULT_CONTEXT_TOKENS,
   normalizeProviderId,
-} from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/provider-model-shared";
 import {
   createMoonshotThinkingWrapper,
   resolveMoonshotThinkingType,
   streamWithPayloadPatch,
-} from "kaijibot/plugin-sdk/provider-stream-shared";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
-import { normalizeLowercaseStringOrEmpty, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-stream-shared";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
+import { normalizeLowercaseStringOrEmpty, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import { OLLAMA_DEFAULT_BASE_URL } from "./defaults.js";
 import {
   parseJsonObjectPreservingUnsafeIntegers,
@@ -54,7 +54,7 @@ export function resolveOllamaBaseUrlForRun(params: {
 }
 
 export function resolveConfiguredOllamaProviderConfig(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   providerId?: string;
 }) {
   const providerId = params.providerId?.trim();
@@ -114,7 +114,7 @@ export function isOllamaCompatProvider(model: {
 }
 
 export function resolveOllamaCompatNumCtxEnabled(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   providerId?: string;
 }): boolean {
   return resolveConfiguredOllamaProviderConfig(params)?.injectNumCtxForOpenAICompat ?? true;
@@ -122,7 +122,7 @@ export function resolveOllamaCompatNumCtxEnabled(params: {
 
 export function shouldInjectOllamaCompatNumCtx(params: {
   model: { api?: string; provider?: string; baseUrl?: string };
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   providerId?: string;
 }): boolean {
   if (params.model.api !== "openai-completions") {

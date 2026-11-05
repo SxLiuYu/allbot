@@ -1,15 +1,15 @@
 ---
 title: "fal"
-summary: "fal image and video generation setup in KaijiBot"
+summary: "fal image and video generation setup in AllBot"
 read_when:
-  - You want to use fal image generation in KaijiBot
+  - You want to use fal image generation in AllBot
   - You need the FAL_KEY auth flow
   - You want fal defaults for image_generate or video_generate
 ---
 
 # fal
 
-KaijiBot ships a bundled `fal` provider for hosted image and video generation.
+AllBot ships a bundled `fal` provider for hosted image and video generation.
 
 - Provider: `fal`
 - Auth: `FAL_KEY` (canonical; `FAL_API_KEY` also works as a fallback)
@@ -20,7 +20,7 @@ KaijiBot ships a bundled `fal` provider for hosted image and video generation.
 1. Set the API key:
 
 ```bash
-kaijibot onboard --auth-choice fal-api-key
+allbot onboard --auth-choice fal-api-key
 ```
 
 2. Set a default image model:

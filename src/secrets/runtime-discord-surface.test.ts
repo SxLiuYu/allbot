@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { loadBundledChannelSecretContractApi } from "./channel-contract-api.js";
@@ -29,8 +29,8 @@ vi.mock("../channels/plugins/bootstrap-registry.js", () => {
   };
 });
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;
@@ -78,7 +78,7 @@ describe("secrets runtime snapshot discord surface", () => {
           },
         }),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => loadAuthStoreWithProfiles({}),
       }),
     ).rejects.toThrow('Environment variable "MISSING_DISCORD_BASE_TOKEN" is missing or empty.');
@@ -104,7 +104,7 @@ describe("secrets runtime snapshot discord surface", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -133,7 +133,7 @@ describe("secrets runtime snapshot discord surface", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -189,7 +189,7 @@ describe("secrets runtime snapshot discord surface", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -282,7 +282,7 @@ describe("secrets runtime snapshot discord surface", () => {
         DISCORD_BASE_PK_TOKEN: "base-pk-token",
         DISCORD_ENABLED_OVERRIDE_TTS_OPENAI: "enabled-override-tts-openai",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -362,7 +362,7 @@ describe("secrets runtime snapshot discord surface", () => {
       env: {
         DISCORD_ENABLED_ONLY_TTS_OPENAI: "enabled-only-tts-openai",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -419,7 +419,7 @@ describe("secrets runtime snapshot discord surface", () => {
         env: {
           DISCORD_BASE_TTS_OK: "base-tts-openai",
         },
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => loadAuthStoreWithProfiles({}),
       }),
     ).rejects.toThrow(

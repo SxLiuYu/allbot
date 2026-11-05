@@ -40,7 +40,7 @@ export function detectMigrationSource(homedir: () => string = os.homedir): Migra
 }
 
 export function detectScenario(targetDir: string): MigrationScenario {
-  const configPath = path.join(targetDir, "kaijibot.json");
+  const configPath = path.join(targetDir, "allbot.json");
   try {
     if (fs.existsSync(configPath)) {
       return "import";

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { bundledPluginRootAt } from "../../test/helpers/bundled-plugin-paths.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const APP_ROOT = "/app";
 
@@ -47,8 +47,8 @@ function createSuccessfulNpmUpdateResult(params?: {
 }) {
   return {
     ok: true,
-    pluginId: params?.pluginId ?? "opik-kaijibot",
-    targetDir: params?.targetDir ?? "/tmp/opik-kaijibot",
+    pluginId: params?.pluginId ?? "opik-allbot",
+    targetDir: params?.targetDir ?? "/tmp/opik-allbot",
     version: params?.version ?? "0.2.6",
     extensions: ["index.ts"],
     ...(params?.npmResolution ? { npmResolution: params.npmResolution } : {}),
@@ -85,7 +85,7 @@ function createMarketplaceInstallConfig(params: {
   marketplaceSource: string;
   marketplacePlugin: string;
   marketplaceName?: string;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     plugins: {
       installs: {
@@ -108,7 +108,7 @@ function createClawHubInstallConfig(params: {
   clawhubPackage: string;
   clawhubFamily: "bundle-plugin" | "code-plugin";
   clawhubChannel: "community" | "official" | "private";
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     plugins: {
       installs: {
@@ -131,7 +131,7 @@ function createBundledPathInstallConfig(params: {
   installPath: string;
   sourcePath?: string;
   spec?: string;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     plugins: {
       load: { paths: params.loadPaths },
@@ -155,10 +155,10 @@ function createCodexAppServerInstallConfig(params: {
   return {
     plugins: {
       installs: {
-        "kaijibot-codex-app-server": {
+        "allbot-codex-app-server": {
           source: "npm" as const,
           spec: params.spec,
-          installPath: "/tmp/kaijibot-codex-app-server",
+          installPath: "/tmp/allbot-codex-app-server",
           ...(params.resolvedName ? { resolvedName: params.resolvedName } : {}),
           ...(params.resolvedSpec ? { resolvedSpec: params.resolvedSpec } : {}),
         },
@@ -186,7 +186,7 @@ function createBundledSource(params?: { pluginId?: string; localPath?: string; n
   return {
     pluginId,
     localPath: params?.localPath ?? appBundledPluginRoot(pluginId),
-    npmSpec: params?.npmSpec ?? `@kaijibot/${pluginId}`,
+    npmSpec: params?.npmSpec ?? `@allbot/${pluginId}`,
   };
 }
 
@@ -216,10 +216,10 @@ function expectCodexAppServerInstallState(params: {
   version: string;
   resolvedSpec?: string;
 }) {
-  expect(params.result.config.plugins?.installs?.["kaijibot-codex-app-server"]).toMatchObject({
+  expect(params.result.config.plugins?.installs?.["allbot-codex-app-server"]).toMatchObject({
     source: "npm",
     spec: params.spec,
-    installPath: "/tmp/kaijibot-codex-app-server",
+    installPath: "/tmp/allbot-codex-app-server",
     version: params.version,
     ...(params.resolvedSpec ? { resolvedSpec: params.resolvedSpec } : {}),
   });
@@ -237,52 +237,52 @@ describe("updateNpmInstalledPlugins", () => {
     {
       name: "skips integrity drift checks for unpinned npm specs during dry-run updates",
       config: createNpmInstallConfig({
-        pluginId: "opik-kaijibot",
-        spec: "@opik/opik-kaijibot",
+        pluginId: "opik-allbot",
+        spec: "@opik/opik-allbot",
         integrity: "sha512-old",
-        installPath: "/tmp/opik-kaijibot",
+        installPath: "/tmp/opik-allbot",
       }),
-      pluginIds: ["opik-kaijibot"],
+      pluginIds: ["opik-allbot"],
       dryRun: true,
       expectedCall: {
-        spec: "@opik/opik-kaijibot",
+        spec: "@opik/opik-allbot",
         expectedIntegrity: undefined,
       },
     },
     {
       name: "keeps integrity drift checks for exact-version npm specs during dry-run updates",
       config: createNpmInstallConfig({
-        pluginId: "opik-kaijibot",
-        spec: "@opik/opik-kaijibot@0.2.5",
+        pluginId: "opik-allbot",
+        spec: "@opik/opik-allbot@0.2.5",
         integrity: "sha512-old",
-        installPath: "/tmp/opik-kaijibot",
+        installPath: "/tmp/opik-allbot",
       }),
-      pluginIds: ["opik-kaijibot"],
+      pluginIds: ["opik-allbot"],
       dryRun: true,
       expectedCall: {
-        spec: "@opik/opik-kaijibot@0.2.5",
+        spec: "@opik/opik-allbot@0.2.5",
         expectedIntegrity: "sha512-old",
       },
     },
     {
       name: "skips recorded integrity checks when an explicit npm version override changes the spec",
       config: createNpmInstallConfig({
-        pluginId: "kaijibot-codex-app-server",
-        spec: "kaijibot-codex-app-server@0.2.0-beta.3",
+        pluginId: "allbot-codex-app-server",
+        spec: "allbot-codex-app-server@0.2.0-beta.3",
         integrity: "sha512-old",
-        installPath: "/tmp/kaijibot-codex-app-server",
+        installPath: "/tmp/allbot-codex-app-server",
       }),
-      pluginIds: ["kaijibot-codex-app-server"],
+      pluginIds: ["allbot-codex-app-server"],
       specOverrides: {
-        "kaijibot-codex-app-server": "kaijibot-codex-app-server@0.2.0-beta.4",
+        "allbot-codex-app-server": "allbot-codex-app-server@0.2.0-beta.4",
       },
       installerResult: createSuccessfulNpmUpdateResult({
-        pluginId: "kaijibot-codex-app-server",
-        targetDir: "/tmp/kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
+        targetDir: "/tmp/allbot-codex-app-server",
         version: "0.2.0-beta.4",
       }),
       expectedCall: {
-        spec: "kaijibot-codex-app-server@0.2.0-beta.4",
+        spec: "allbot-codex-app-server@0.2.0-beta.4",
         expectedIntegrity: undefined,
       },
     },
@@ -310,15 +310,15 @@ describe("updateNpmInstalledPlugins", () => {
       installerResult: {
         ok: false,
         code: "npm_package_not_found",
-        error: "Package not found on npm: @kaijibot/missing.",
+        error: "Package not found on npm: @allbot/missing.",
       },
       config: createNpmInstallConfig({
         pluginId: "missing",
-        spec: "@kaijibot/missing",
+        spec: "@allbot/missing",
         installPath: "/tmp/missing",
       }),
       pluginId: "missing",
-      expectedMessage: "Failed to check missing: npm package not found for @kaijibot/missing.",
+      expectedMessage: "Failed to check missing: npm package not found for @allbot/missing.",
     },
     {
       name: "falls back to raw installer error for unknown error codes",
@@ -358,42 +358,42 @@ describe("updateNpmInstalledPlugins", () => {
       name: "reuses a recorded npm dist-tag spec for id-based updates",
       installerResult: {
         ok: true,
-        pluginId: "kaijibot-codex-app-server",
-        targetDir: "/tmp/kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
+        targetDir: "/tmp/allbot-codex-app-server",
         version: "0.2.0-beta.4",
         extensions: ["index.ts"],
       },
       config: createCodexAppServerInstallConfig({
-        spec: "kaijibot-codex-app-server@beta",
-        resolvedName: "kaijibot-codex-app-server",
-        resolvedSpec: "kaijibot-codex-app-server@0.2.0-beta.3",
+        spec: "allbot-codex-app-server@beta",
+        resolvedName: "allbot-codex-app-server",
+        resolvedSpec: "allbot-codex-app-server@0.2.0-beta.3",
       }),
-      expectedSpec: "kaijibot-codex-app-server@beta",
+      expectedSpec: "allbot-codex-app-server@beta",
       expectedVersion: "0.2.0-beta.4",
     },
     {
       name: "uses and persists an explicit npm spec override during updates",
       installerResult: {
         ok: true,
-        pluginId: "kaijibot-codex-app-server",
-        targetDir: "/tmp/kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
+        targetDir: "/tmp/allbot-codex-app-server",
         version: "0.2.0-beta.4",
         extensions: ["index.ts"],
         npmResolution: {
-          name: "kaijibot-codex-app-server",
+          name: "allbot-codex-app-server",
           version: "0.2.0-beta.4",
-          resolvedSpec: "kaijibot-codex-app-server@0.2.0-beta.4",
+          resolvedSpec: "allbot-codex-app-server@0.2.0-beta.4",
         },
       },
       config: createCodexAppServerInstallConfig({
-        spec: "kaijibot-codex-app-server",
+        spec: "allbot-codex-app-server",
       }),
       specOverrides: {
-        "kaijibot-codex-app-server": "kaijibot-codex-app-server@beta",
+        "allbot-codex-app-server": "allbot-codex-app-server@beta",
       },
-      expectedSpec: "kaijibot-codex-app-server@beta",
+      expectedSpec: "allbot-codex-app-server@beta",
       expectedVersion: "0.2.0-beta.4",
-      expectedResolvedSpec: "kaijibot-codex-app-server@0.2.0-beta.4",
+      expectedResolvedSpec: "allbot-codex-app-server@0.2.0-beta.4",
     },
   ] as const)(
     "$name",
@@ -409,13 +409,13 @@ describe("updateNpmInstalledPlugins", () => {
 
       const result = await updateNpmInstalledPlugins({
         config,
-        pluginIds: ["kaijibot-codex-app-server"],
+        pluginIds: ["allbot-codex-app-server"],
         ...(specOverrides ? { specOverrides } : {}),
       });
 
       expectNpmUpdateCall({
         spec: expectedSpec,
-        expectedPluginId: "kaijibot-codex-app-server",
+        expectedPluginId: "allbot-codex-app-server",
       });
       expectCodexAppServerInstallState({
         result,
@@ -478,8 +478,8 @@ describe("updateNpmInstalledPlugins", () => {
   it("migrates legacy unscoped install keys when a scoped npm package updates", async () => {
     installPluginFromNpmSpecMock.mockResolvedValue({
       ok: true,
-      pluginId: "@kaijibot/voice-call",
-      targetDir: "/tmp/kaijibot-voice-call",
+      pluginId: "@allbot/voice-call",
+      targetDir: "/tmp/allbot-voice-call",
       version: "0.0.2",
       extensions: ["index.ts"],
     });
@@ -499,7 +499,7 @@ describe("updateNpmInstalledPlugins", () => {
           installs: {
             "voice-call": {
               source: "npm",
-              spec: "@kaijibot/voice-call",
+              spec: "@allbot/voice-call",
               installPath: "/tmp/voice-call",
             },
           },
@@ -510,22 +510,22 @@ describe("updateNpmInstalledPlugins", () => {
 
     expect(installPluginFromNpmSpecMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        spec: "@kaijibot/voice-call",
+        spec: "@allbot/voice-call",
         expectedPluginId: "voice-call",
       }),
     );
-    expect(result.config.plugins?.allow).toEqual(["@kaijibot/voice-call"]);
-    expect(result.config.plugins?.deny).toEqual(["@kaijibot/voice-call"]);
-    expect(result.config.plugins?.slots?.memory).toBe("@kaijibot/voice-call");
-    expect(result.config.plugins?.entries?.["@kaijibot/voice-call"]).toEqual({
+    expect(result.config.plugins?.allow).toEqual(["@allbot/voice-call"]);
+    expect(result.config.plugins?.deny).toEqual(["@allbot/voice-call"]);
+    expect(result.config.plugins?.slots?.memory).toBe("@allbot/voice-call");
+    expect(result.config.plugins?.entries?.["@allbot/voice-call"]).toEqual({
       enabled: false,
       hooks: { allowPromptInjection: false },
     });
     expect(result.config.plugins?.entries?.["voice-call"]).toBeUndefined();
-    expect(result.config.plugins?.installs?.["@kaijibot/voice-call"]).toMatchObject({
+    expect(result.config.plugins?.installs?.["@allbot/voice-call"]).toMatchObject({
       source: "npm",
-      spec: "@kaijibot/voice-call",
-      installPath: "/tmp/kaijibot-voice-call",
+      spec: "@allbot/voice-call",
+      installPath: "/tmp/allbot-voice-call",
       version: "0.0.2",
     });
     expect(result.config.plugins?.installs?.["voice-call"]).toBeUndefined();
@@ -609,25 +609,25 @@ describe("updateNpmInstalledPlugins", () => {
   it("forwards dangerous force unsafe install to plugin update installers", async () => {
     installPluginFromNpmSpecMock.mockResolvedValue(
       createSuccessfulNpmUpdateResult({
-        pluginId: "kaijibot-codex-app-server",
-        targetDir: "/tmp/kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
+        targetDir: "/tmp/allbot-codex-app-server",
         version: "0.2.0-beta.4",
       }),
     );
 
     await updateNpmInstalledPlugins({
       config: createCodexAppServerInstallConfig({
-        spec: "kaijibot-codex-app-server@beta",
+        spec: "allbot-codex-app-server@beta",
       }),
-      pluginIds: ["kaijibot-codex-app-server"],
+      pluginIds: ["allbot-codex-app-server"],
       dangerouslyForceUnsafeInstall: true,
     });
 
     expect(installPluginFromNpmSpecMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        spec: "kaijibot-codex-app-server@beta",
+        spec: "allbot-codex-app-server@beta",
         dangerouslyForceUnsafeInstall: true,
-        expectedPluginId: "kaijibot-codex-app-server",
+        expectedPluginId: "allbot-codex-app-server",
       }),
     );
   });
@@ -645,7 +645,7 @@ describe("syncPluginsForUpdateChannel", () => {
       config: createBundledPathInstallConfig({
         loadPaths: [appBundledPluginRoot("feishu")],
         installPath: appBundledPluginRoot("feishu"),
-        spec: "@kaijibot/feishu",
+        spec: "@allbot/feishu",
       }),
       expectedChanged: false,
       expectedLoadPaths: [appBundledPluginRoot("feishu")],
@@ -656,7 +656,7 @@ describe("syncPluginsForUpdateChannel", () => {
       config: createBundledPathInstallConfig({
         loadPaths: [],
         installPath: "/tmp/old-feishu",
-        spec: "@kaijibot/feishu",
+        spec: "@allbot/feishu",
       }),
       expectedChanged: true,
       expectedLoadPaths: [appBundledPluginRoot("feishu")],
@@ -680,14 +680,14 @@ describe("syncPluginsForUpdateChannel", () => {
         install: result.config.plugins?.installs?.feishu,
         sourcePath: appBundledPluginRoot("feishu"),
         installPath: expectedInstallPath,
-        spec: "@kaijibot/feishu",
+        spec: "@allbot/feishu",
       });
     },
   );
 
   it("forwards an explicit env to bundled plugin source resolution", async () => {
     resolveBundledPluginSourcesMock.mockReturnValue(new Map());
-    const env = { KAIJIBOT_HOME: "/srv/kaijibot-home" } as NodeJS.ProcessEnv;
+    const env = { ALLBOT_HOME: "/srv/allbot-home" } as NodeJS.ProcessEnv;
 
     await syncPluginsForUpdateChannel({
       channel: "beta",
@@ -703,7 +703,7 @@ describe("syncPluginsForUpdateChannel", () => {
   });
 
   it("uses the provided env when matching bundled load and install paths", async () => {
-    const bundledHome = "/tmp/kaijibot-home";
+    const bundledHome = "/tmp/allbot-home";
     mockBundledSources(
       createBundledSource({
         localPath: `${bundledHome}/plugins/feishu`,
@@ -717,7 +717,7 @@ describe("syncPluginsForUpdateChannel", () => {
         channel: "beta",
         env: {
           ...process.env,
-          KAIJIBOT_HOME: bundledHome,
+          ALLBOT_HOME: bundledHome,
           HOME: "/tmp/ignored-home",
         },
         config: {
@@ -728,7 +728,7 @@ describe("syncPluginsForUpdateChannel", () => {
                 source: "path",
                 sourcePath: "~/plugins/feishu",
                 installPath: "~/plugins/feishu",
-                spec: "@kaijibot/feishu",
+                spec: "@allbot/feishu",
               },
             },
           },

@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import { DEEPINFRA_BASE_URL } from "./provider-models.js";
 
 export { DEEPINFRA_BASE_URL };

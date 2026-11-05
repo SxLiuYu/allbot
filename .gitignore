@@ -8,7 +8,7 @@ dist-runtime/
 bun.lock
 bun.lockb
 coverage
-__kaijibot_vitest__/
+__allbot_vitest__/
 __pycache__/
 *.pyc
 .tsbuildinfo
@@ -60,7 +60,7 @@ tmp/
 .codegraph/
 
 # Build temp directories
-kaijibot-path-alias-*/
+allbot-path-alias-*/
 
 # Agent credentials and memory (NEVER COMMIT)
 /memory/
@@ -72,6 +72,6 @@ package-lock.json
 .agent/
 skills-lock.json
 *.omo
-kaijibot@*
+allbot@*
 /node
 state/

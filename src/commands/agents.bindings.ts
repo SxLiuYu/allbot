@@ -2,7 +2,7 @@ import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import { getChannelPlugin, normalizeChannelId } from "../channels/plugins/index.js";
 import type { ChannelId } from "../channels/plugins/types.js";
 import { isRouteBinding, listRouteBindings } from "../config/bindings.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentRouteBinding } from "../config/types.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAgentId } from "../routing/session-key.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -68,10 +68,10 @@ export function describeBinding(binding: AgentRouteBinding) {
 }
 
 export function applyAgentBindings(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   bindings: AgentRouteBinding[],
 ): {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   added: AgentRouteBinding[];
   updated: AgentRouteBinding[];
   skipped: AgentRouteBinding[];
@@ -154,10 +154,10 @@ export function applyAgentBindings(
 }
 
 export function removeAgentBindings(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   bindings: AgentRouteBinding[],
 ): {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   removed: AgentRouteBinding[];
   missing: AgentRouteBinding[];
   conflicts: Array<{ binding: AgentRouteBinding; existingAgentId: string }>;
@@ -221,7 +221,7 @@ export function removeAgentBindings(
   };
 }
 
-function resolveDefaultAccountId(cfg: KaijiBotConfig, provider: ChannelId): string {
+function resolveDefaultAccountId(cfg: AllBotConfig, provider: ChannelId): string {
   const plugin = getChannelPlugin(provider);
   if (!plugin) {
     return DEFAULT_ACCOUNT_ID;
@@ -231,7 +231,7 @@ function resolveDefaultAccountId(cfg: KaijiBotConfig, provider: ChannelId): stri
 
 function resolveBindingAccountId(params: {
   channel: ChannelId;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentId: string;
   explicitAccountId?: string;
 }): string | undefined {
@@ -259,7 +259,7 @@ function resolveBindingAccountId(params: {
 export function buildChannelBindings(params: {
   agentId: string;
   selection: ChannelChoice[];
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   accountIds?: Partial<Record<ChannelChoice, string>>;
 }): AgentRouteBinding[] {
   const bindings: AgentRouteBinding[] = [];
@@ -283,7 +283,7 @@ export function buildChannelBindings(params: {
 export function parseBindingSpecs(params: {
   agentId: string;
   specs?: string[];
-  config: KaijiBotConfig;
+  config: AllBotConfig;
 }): { bindings: AgentRouteBinding[]; errors: string[] } {
   const bindings: AgentRouteBinding[] = [];
   const errors: string[] = [];

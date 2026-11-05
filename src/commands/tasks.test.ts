@@ -12,7 +12,7 @@ import {
 import { withTempDir } from "../test-helpers/temp-dir.js";
 import { tasksAuditCommand, tasksMaintenanceCommand } from "./tasks.js";
 
-const ORIGINAL_STATE_DIR = process.env.KAIJIBOT_STATE_DIR;
+const ORIGINAL_STATE_DIR = process.env.ALLBOT_STATE_DIR;
 
 function createRuntime(): RuntimeEnv {
   return {
@@ -23,8 +23,8 @@ function createRuntime(): RuntimeEnv {
 }
 
 async function withTaskCommandStateDir(run: () => Promise<void>): Promise<void> {
-  await withTempDir({ prefix: "kaijibot-tasks-command-" }, async (root) => {
-    process.env.KAIJIBOT_STATE_DIR = root;
+  await withTempDir({ prefix: "allbot-tasks-command-" }, async (root) => {
+    process.env.ALLBOT_STATE_DIR = root;
     resetTaskRegistryDeliveryRuntimeForTests();
     resetTaskRegistryForTests({ persist: false });
     resetTaskFlowRegistryForTests({ persist: false });
@@ -46,9 +46,9 @@ describe("tasks commands", () => {
   afterEach(() => {
     vi.useRealTimers();
     if (ORIGINAL_STATE_DIR === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = ORIGINAL_STATE_DIR;
+      process.env.ALLBOT_STATE_DIR = ORIGINAL_STATE_DIR;
     }
     resetTaskRegistryDeliveryRuntimeForTests();
     resetTaskRegistryForTests({ persist: false });

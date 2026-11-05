@@ -10,8 +10,8 @@ const readConfigFileSnapshotForWrite = vi.fn().mockResolvedValue({
   writeOptions: {},
 });
 const setRuntimeConfigSnapshot = vi.fn();
-const ensureKaijiBotModelsJson = vi.fn().mockResolvedValue(undefined);
-const resolveKaijiBotAgentDir = vi.fn().mockReturnValue("/tmp/kaijibot-agent");
+const ensureAllBotModelsJson = vi.fn().mockResolvedValue(undefined);
+const resolveAllBotAgentDir = vi.fn().mockReturnValue("/tmp/allbot-agent");
 const ensureAuthProfileStore = vi.fn().mockReturnValue({ version: 1, profiles: {} });
 const listProfilesForProvider = vi.fn().mockReturnValue([]);
 const resolveEnvApiKey = vi.fn().mockReturnValue(undefined);
@@ -65,8 +65,8 @@ vi.mock("./models/list.runtime.js", () => {
 
   return {
     ensureAuthProfileStore,
-    ensureKaijiBotModelsJson,
-    resolveKaijiBotAgentDir,
+    ensureAllBotModelsJson,
+    resolveAllBotAgentDir,
     listProfilesForProvider,
     resolveEnvApiKey,
     resolveAwsSdkEnvVarName,
@@ -131,7 +131,7 @@ beforeEach(() => {
   getRuntimeConfig.mockReset();
   getRuntimeConfig.mockReturnValue({});
   listProfilesForProvider.mockReturnValue([]);
-  ensureKaijiBotModelsJson.mockClear();
+  ensureAllBotModelsJson.mockClear();
   shouldSuppressBuiltInModel.mockReset();
   shouldSuppressBuiltInModel.mockReturnValue(false);
   readConfigFileSnapshotForWrite.mockClear();
@@ -384,7 +384,7 @@ describe("models list/status", () => {
 
     await loadModelRegistry(resolvedConfig as never);
 
-    expect(ensureKaijiBotModelsJson).not.toHaveBeenCalled();
+    expect(ensureAllBotModelsJson).not.toHaveBeenCalled();
   });
 
   it("filters stale direct OpenAI spark rows from models list and registry views", async () => {
@@ -438,8 +438,8 @@ describe("models list/status", () => {
 
     await modelsListCommand({ all: true, json: true }, runtime);
 
-    expect(ensureKaijiBotModelsJson).toHaveBeenCalled();
-    expect(ensureKaijiBotModelsJson.mock.calls[0]?.[0]).toEqual(sourceConfig);
+    expect(ensureAllBotModelsJson).toHaveBeenCalled();
+    expect(ensureAllBotModelsJson.mock.calls[0]?.[0]).toEqual(sourceConfig);
   });
 
   it("toModelRow does not crash without cfg/authStore when availability is undefined", async () => {

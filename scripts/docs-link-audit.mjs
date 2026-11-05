@@ -242,7 +242,7 @@ export function sanitizeDocsConfigForEnglishOnly(value) {
 }
 
 export function prepareAnchorAuditDocsDir(sourceDir = DOCS_DIR) {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-docs-anchor-audit-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-docs-anchor-audit-"));
   fs.cpSync(sourceDir, tempDir, { recursive: true });
 
   for (const entry of fs.readdirSync(tempDir, { withFileTypes: true })) {

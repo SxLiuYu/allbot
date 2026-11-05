@@ -7,7 +7,7 @@ type MockRegistryToolEntry = {
   factory: (ctx: unknown) => unknown;
 };
 
-const loadKaijiBotPluginsMock = vi.fn();
+const loadAllBotPluginsMock = vi.fn();
 const resolveRuntimePluginRegistryMock = vi.fn();
 const applyPluginAutoEnableMock = vi.fn();
 
@@ -74,7 +74,7 @@ function setRegistry(entries: MockRegistryToolEntry[]) {
       message: string;
     }>,
   };
-  loadKaijiBotPluginsMock.mockReturnValue(registry);
+  loadAllBotPluginsMock.mockReturnValue(registry);
   return registry;
 }
 
@@ -164,7 +164,7 @@ function expectResolvedToolNames(
 }
 
 function expectLoaderCall(overrides: Record<string, unknown>) {
-  expect(loadKaijiBotPluginsMock).toHaveBeenCalledWith(expect.objectContaining(overrides));
+  expect(loadAllBotPluginsMock).toHaveBeenCalledWith(expect.objectContaining(overrides));
 }
 
 function expectSingleDiagnosticMessage(
@@ -199,10 +199,10 @@ describe("resolvePluginTools optional tools", () => {
   });
 
   beforeEach(() => {
-    loadKaijiBotPluginsMock.mockClear();
+    loadAllBotPluginsMock.mockClear();
     resolveRuntimePluginRegistryMock.mockReset();
     resolveRuntimePluginRegistryMock.mockImplementation((params) =>
-      loadKaijiBotPluginsMock(params),
+      loadAllBotPluginsMock(params),
     );
     applyPluginAutoEnableMock.mockReset();
     applyPluginAutoEnableMock.mockImplementation(({ config }: { config: unknown }) => ({
@@ -283,11 +283,11 @@ describe("resolvePluginTools optional tools", () => {
     {
       name: "forwards an explicit env to plugin loading",
       params: {
-        env: { KAIJIBOT_HOME: "/srv/kaijibot-home" } as NodeJS.ProcessEnv,
+        env: { ALLBOT_HOME: "/srv/allbot-home" } as NodeJS.ProcessEnv,
         toolAllowlist: ["optional_tool"],
       },
       expectedLoaderCall: {
-        env: { KAIJIBOT_HOME: "/srv/kaijibot-home" },
+        env: { ALLBOT_HOME: "/srv/allbot-home" },
       },
     },
     {
@@ -350,7 +350,7 @@ describe("resolvePluginTools optional tools", () => {
     );
 
     expectResolvedToolNames(tools, ["optional_tool"]);
-    expect(loadKaijiBotPluginsMock).not.toHaveBeenCalled();
+    expect(loadAllBotPluginsMock).not.toHaveBeenCalled();
   });
 
   it("reuses the active registry for gateway-bindable tool loads before reloading", () => {
@@ -367,7 +367,7 @@ describe("resolvePluginTools optional tools", () => {
 
     expectResolvedToolNames(tools, ["optional_tool"]);
     expect(resolveRuntimePluginRegistryMock).not.toHaveBeenCalled();
-    expect(loadKaijiBotPluginsMock).not.toHaveBeenCalled();
+    expect(loadAllBotPluginsMock).not.toHaveBeenCalled();
   });
 
   it("loads plugin tools when gateway-bindable tool loads have no active registry", () => {
@@ -405,7 +405,7 @@ describe("resolvePluginTools optional tools", () => {
       toolAllowlist: ["optional_tool"],
     });
 
-    expect(loadKaijiBotPluginsMock).toHaveBeenCalledWith(
+    expect(loadAllBotPluginsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         runtimeOptions: {
           allowGatewaySubagentBinding: true,

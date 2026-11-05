@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import {
   createConfigHandlerHarness,
   createConfigWriteSnapshot,
@@ -21,7 +21,7 @@ vi.mock("../../config/config.js", async () => {
     await vi.importActual<typeof import("../../config/config.js")>("../../config/config.js");
   return {
     ...actual,
-    createConfigIO: () => ({ configPath: "/tmp/kaijibot.json" }),
+    createConfigIO: () => ({ configPath: "/tmp/allbot.json" }),
     readConfigFileSnapshotForWrite: readConfigFileSnapshotForWriteMock,
     validateConfigObjectWithPlugins: validateConfigObjectWithPluginsMock,
     writeConfigFile: writeConfigFileMock,
@@ -47,7 +47,7 @@ afterEach(() => {
 });
 
 beforeEach(() => {
-  validateConfigObjectWithPluginsMock.mockImplementation((config: KaijiBotConfig) => ({
+  validateConfigObjectWithPluginsMock.mockImplementation((config: AllBotConfig) => ({
     ok: true,
     config,
   }));
@@ -56,7 +56,7 @@ beforeEach(() => {
 
 describe("config shared auth disconnects", () => {
   it("does not disconnect shared-auth clients for config.set auth writes without restart", async () => {
-    const prevConfig: KaijiBotConfig = {
+    const prevConfig: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -64,7 +64,7 @@ describe("config shared auth disconnects", () => {
         },
       },
     };
-    const nextConfig: KaijiBotConfig = {
+    const nextConfig: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -91,7 +91,7 @@ describe("config shared auth disconnects", () => {
   });
 
   it("lets the config reloader own hybrid-mode auth restarts", async () => {
-    const prevConfig: KaijiBotConfig = {
+    const prevConfig: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -118,7 +118,7 @@ describe("config shared auth disconnects", () => {
   });
 
   it("does not disconnect shared-auth clients when config.patch changes only inactive password auth", async () => {
-    const prevConfig: KaijiBotConfig = {
+    const prevConfig: AllBotConfig = {
       gateway: {
         auth: {
           mode: "token",
@@ -145,7 +145,7 @@ describe("config shared auth disconnects", () => {
   });
 
   it("still schedules a direct restart for hot mode when the reloader cannot apply the change", async () => {
-    const prevConfig: KaijiBotConfig = {
+    const prevConfig: AllBotConfig = {
       gateway: {
         reload: {
           mode: "hot",

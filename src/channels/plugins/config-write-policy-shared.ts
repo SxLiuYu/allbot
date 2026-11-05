@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveAccountEntry } from "../../routing/account-lookup.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../../routing/session-key.js";
 
@@ -46,7 +46,7 @@ function listConfigWriteTargetScopes<TChannelId extends string>(
 }
 
 function resolveChannelConfig<TChannelId extends string>(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channelId?: TChannelId | null,
 ): ChannelConfigWithAccounts | undefined {
   if (!channelId) {
@@ -63,7 +63,7 @@ function resolveChannelAccountConfig(
 }
 
 export function resolveChannelConfigWritesShared<TChannelId extends string>(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId?: TChannelId | null;
   accountId?: string | null;
 }): boolean {
@@ -77,7 +77,7 @@ export function resolveChannelConfigWritesShared<TChannelId extends string>(para
 }
 
 export function authorizeConfigWriteShared<TChannelId extends string>(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   origin?: ConfigWriteScopeLike<TChannelId>;
   target?: ConfigWriteTargetLike<TChannelId>;
   allowBypass?: boolean;

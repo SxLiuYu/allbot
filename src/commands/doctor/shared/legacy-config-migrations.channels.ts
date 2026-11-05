@@ -500,13 +500,13 @@ const THREAD_BINDING_RULES: LegacyConfigRule[] = [
   {
     path: ["session", "threadBindings"],
     message:
-      'session.threadBindings.ttlHours was renamed to session.threadBindings.idleHours. Run "kaijibot doctor --fix".',
+      'session.threadBindings.ttlHours was renamed to session.threadBindings.idleHours. Run "allbot doctor --fix".',
     match: (value) => hasLegacyThreadBindingTtl(value),
   },
   {
     path: ["channels"],
     message:
-      'channels.<id>.threadBindings.ttlHours was renamed to channels.<id>.threadBindings.idleHours. Run "kaijibot doctor --fix".',
+      'channels.<id>.threadBindings.ttlHours was renamed to channels.<id>.threadBindings.idleHours. Run "allbot doctor --fix".',
     match: (value) => hasLegacyThreadBindingTtlInAnyChannel(value),
   },
 ];
@@ -515,37 +515,37 @@ const CHANNEL_STREAMING_RULES: LegacyConfigRule[] = [
   {
     path: ["channels", "telegram"],
     message:
-      'channels.telegram.streamMode, channels.telegram.streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.telegram.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "kaijibot doctor --fix".',
+      'channels.telegram.streamMode, channels.telegram.streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.telegram.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyTelegramStreamingKeys(value),
   },
   {
     path: ["channels", "telegram", "accounts"],
     message:
-      'channels.telegram.accounts.<id>.streamMode, streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.telegram.accounts.<id>.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "kaijibot doctor --fix".',
+      'channels.telegram.accounts.<id>.streamMode, streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.telegram.accounts.<id>.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyKeysInAccounts(value, hasLegacyTelegramStreamingKeys),
   },
   {
     path: ["channels", "discord"],
     message:
-      'channels.discord.streamMode, channels.discord.streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.discord.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "kaijibot doctor --fix".',
+      'channels.discord.streamMode, channels.discord.streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.discord.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyDiscordStreamingKeys(value),
   },
   {
     path: ["channels", "discord", "accounts"],
     message:
-      'channels.discord.accounts.<id>.streamMode, streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.discord.accounts.<id>.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "kaijibot doctor --fix".',
+      'channels.discord.accounts.<id>.streamMode, streaming (scalar), chunkMode, blockStreaming, draftChunk, and blockStreamingCoalesce are legacy; use channels.discord.accounts.<id>.streaming.{mode,chunkMode,preview.chunk,block.enabled,block.coalesce} instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyKeysInAccounts(value, hasLegacyDiscordStreamingKeys),
   },
   {
     path: ["channels", "slack"],
     message:
-      'channels.slack.streamMode, channels.slack.streaming (scalar), chunkMode, blockStreaming, blockStreamingCoalesce, and nativeStreaming are legacy; use channels.slack.streaming.{mode,chunkMode,block.enabled,block.coalesce,nativeTransport} instead. Run "kaijibot doctor --fix".',
+      'channels.slack.streamMode, channels.slack.streaming (scalar), chunkMode, blockStreaming, blockStreamingCoalesce, and nativeStreaming are legacy; use channels.slack.streaming.{mode,chunkMode,block.enabled,block.coalesce,nativeTransport} instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacySlackStreamingKeys(value),
   },
   {
     path: ["channels", "slack", "accounts"],
     message:
-      'channels.slack.accounts.<id>.streamMode, streaming (scalar), chunkMode, blockStreaming, blockStreamingCoalesce, and nativeStreaming are legacy; use channels.slack.accounts.<id>.streaming.{mode,chunkMode,block.enabled,block.coalesce,nativeTransport} instead. Run "kaijibot doctor --fix".',
+      'channels.slack.accounts.<id>.streamMode, streaming (scalar), chunkMode, blockStreaming, blockStreamingCoalesce, and nativeStreaming are legacy; use channels.slack.accounts.<id>.streaming.{mode,chunkMode,block.enabled,block.coalesce,nativeTransport} instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyKeysInAccounts(value, hasLegacySlackStreamingKeys),
   },
 ];
@@ -554,37 +554,37 @@ const CHANNEL_ENABLED_ALIAS_RULES: LegacyConfigRule[] = [
   {
     path: ["channels", "slack"],
     message:
-      'channels.slack.channels.<id>.allow is legacy; use channels.slack.channels.<id>.enabled instead. Run "kaijibot doctor --fix".',
+      'channels.slack.channels.<id>.allow is legacy; use channels.slack.channels.<id>.enabled instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacySlackChannelAllowAlias(value),
   },
   {
     path: ["channels", "slack", "accounts"],
     message:
-      'channels.slack.accounts.<id>.channels.<id>.allow is legacy; use channels.slack.accounts.<id>.channels.<id>.enabled instead. Run "kaijibot doctor --fix".',
+      'channels.slack.accounts.<id>.channels.<id>.allow is legacy; use channels.slack.accounts.<id>.channels.<id>.enabled instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyKeysInAccounts(value, hasLegacySlackChannelAllowAlias),
   },
   {
     path: ["channels", "googlechat"],
     message:
-      'channels.googlechat.groups.<id>.allow is legacy; use channels.googlechat.groups.<id>.enabled instead. Run "kaijibot doctor --fix".',
+      'channels.googlechat.groups.<id>.allow is legacy; use channels.googlechat.groups.<id>.enabled instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyGoogleChatGroupAllowAlias(value),
   },
   {
     path: ["channels", "googlechat", "accounts"],
     message:
-      'channels.googlechat.accounts.<id>.groups.<id>.allow is legacy; use channels.googlechat.accounts.<id>.groups.<id>.enabled instead. Run "kaijibot doctor --fix".',
+      'channels.googlechat.accounts.<id>.groups.<id>.allow is legacy; use channels.googlechat.accounts.<id>.groups.<id>.enabled instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyKeysInAccounts(value, hasLegacyGoogleChatGroupAllowAlias),
   },
   {
     path: ["channels", "discord"],
     message:
-      'channels.discord.guilds.<id>.channels.<id>.allow is legacy; use channels.discord.guilds.<id>.channels.<id>.enabled instead. Run "kaijibot doctor --fix".',
+      'channels.discord.guilds.<id>.channels.<id>.allow is legacy; use channels.discord.guilds.<id>.channels.<id>.enabled instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyDiscordGuildChannelAllowAlias(value),
   },
   {
     path: ["channels", "discord", "accounts"],
     message:
-      'channels.discord.accounts.<id>.guilds.<id>.channels.<id>.allow is legacy; use channels.discord.accounts.<id>.guilds.<id>.channels.<id>.enabled instead. Run "kaijibot doctor --fix".',
+      'channels.discord.accounts.<id>.guilds.<id>.channels.<id>.allow is legacy; use channels.discord.accounts.<id>.guilds.<id>.channels.<id>.enabled instead. Run "allbot doctor --fix".',
     match: (value) => hasLegacyKeysInAccounts(value, hasLegacyDiscordGuildChannelAllowAlias),
   },
 ];

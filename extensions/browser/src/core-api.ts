@@ -80,14 +80,14 @@ export {
   selectDefaultNodeFromList,
   stringEnum,
   theme,
-} from "kaijibot/plugin-sdk/browser-setup-tools";
+} from "allbot/plugin-sdk/browser-setup-tools";
 export {
   loadConfig,
   normalizePluginsConfig,
   parseBooleanValue,
   resolveEffectiveEnableState,
   shortenHomePath,
-} from "kaijibot/plugin-sdk/browser-config-runtime";
+} from "allbot/plugin-sdk/browser-config-runtime";
 export {
   addGatewayClientOptions,
   callGatewayFromCli,
@@ -100,16 +100,16 @@ export {
   runCommandWithRuntime,
   safeParseJson,
   withTimeout,
-} from "kaijibot/plugin-sdk/browser-node-runtime";
+} from "allbot/plugin-sdk/browser-node-runtime";
 export {
   createSubsystemLogger,
   wrapExternalContent,
-} from "kaijibot/plugin-sdk/browser-security-runtime";
-export type { AnyAgentTool, NodeListNode } from "kaijibot/plugin-sdk/browser-setup-tools";
-export type { KaijiBotConfig } from "kaijibot/plugin-sdk/browser-config-runtime";
+} from "allbot/plugin-sdk/browser-security-runtime";
+export type { AnyAgentTool, NodeListNode } from "allbot/plugin-sdk/browser-setup-tools";
+export type { AllBotConfig } from "allbot/plugin-sdk/browser-config-runtime";
 export type {
   GatewayRequestHandlers,
   GatewayRpcOpts,
   NodeSession,
-  KaijiBotPluginService,
-} from "kaijibot/plugin-sdk/browser-node-runtime";
+  AllBotPluginService,
+} from "allbot/plugin-sdk/browser-node-runtime";

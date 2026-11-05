@@ -1,8 +1,8 @@
-import { mapAllowFromEntries } from "kaijibot/plugin-sdk/channel-config-helpers";
+import { mapAllowFromEntries } from "allbot/plugin-sdk/channel-config-helpers";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
 import type { ChannelOutboundTargetMode } from "../../channels/plugins/types.js";
 import { formatCliCommand } from "../../cli/command-format.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { GatewayMessageChannel } from "../../utils/message-channel.js";
 import { INTERNAL_MESSAGE_CHANNEL } from "../../utils/message-channel.js";
 import { missingTargetError } from "./target-errors.js";
@@ -13,14 +13,14 @@ export type ResolveOutboundTargetParams = {
   channel: GatewayMessageChannel;
   to?: string;
   allowFrom?: string[];
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   accountId?: string | null;
   mode?: ChannelOutboundTargetMode;
 };
 
 function buildWebChatDeliveryError(): Error {
   return new Error(
-    `Delivering to WebChat is not supported via \`${formatCliCommand("kaijibot agent")}\`; use WhatsApp/Telegram or run with --deliver=false.`,
+    `Delivering to WebChat is not supported via \`${formatCliCommand("allbot agent")}\`; use WhatsApp/Telegram or run with --deliver=false.`,
   );
 }
 

@@ -6,25 +6,25 @@ import {
   validateExternalCodePluginPackageJson,
 } from "./index.js";
 
-describe("@kaijibot/plugin-package-contract", () => {
-  it("normalizes the KaijiBot compatibility block for external plugins", () => {
+describe("@allbot/plugin-package-contract", () => {
+  it("normalizes the AllBot compatibility block for external plugins", () => {
     expect(
       normalizeExternalPluginCompatibility({
         version: "1.2.3",
-        kaijibot: {
+        allbot: {
           compat: {
             pluginApi: ">=2026.3.24-beta.2",
             minGatewayVersion: "2026.3.24-beta.2",
           },
           build: {
-            kaijibotVersion: "2026.3.24-beta.2",
+            allbotVersion: "2026.3.24-beta.2",
             pluginSdkVersion: "0.9.0",
           },
         },
       }),
     ).toEqual({
       pluginApiRange: ">=2026.3.24-beta.2",
-      builtWithKaijiBotVersion: "2026.3.24-beta.2",
+      builtWithAllBotVersion: "2026.3.24-beta.2",
       pluginSdkVersion: "0.9.0",
       minGatewayVersion: "2026.3.24-beta.2",
     });
@@ -34,7 +34,7 @@ describe("@kaijibot/plugin-package-contract", () => {
     expect(
       normalizeExternalPluginCompatibility({
         version: "1.2.3",
-        kaijibot: {
+        allbot: {
           compat: {
             pluginApi: ">=1.0.0",
           },
@@ -45,40 +45,40 @@ describe("@kaijibot/plugin-package-contract", () => {
       }),
     ).toEqual({
       pluginApiRange: ">=1.0.0",
-      builtWithKaijiBotVersion: "1.2.3",
+      builtWithAllBotVersion: "1.2.3",
       minGatewayVersion: "2026.3.24-beta.2",
     });
   });
 
   it("lists the required external code-plugin fields", () => {
     expect(EXTERNAL_CODE_PLUGIN_REQUIRED_FIELD_PATHS).toEqual([
-      "kaijibot.compat.pluginApi",
-      "kaijibot.build.kaijibotVersion",
+      "allbot.compat.pluginApi",
+      "allbot.build.allbotVersion",
     ]);
   });
 
   it("reports missing required fields with stable field paths", () => {
     const packageJson = {
-      kaijibot: {
+      allbot: {
         compat: {},
         build: {},
       },
     };
 
     expect(listMissingExternalCodePluginFieldPaths(packageJson)).toEqual([
-      "kaijibot.compat.pluginApi",
-      "kaijibot.build.kaijibotVersion",
+      "allbot.compat.pluginApi",
+      "allbot.build.allbotVersion",
     ]);
     expect(validateExternalCodePluginPackageJson(packageJson).issues).toEqual([
       {
-        fieldPath: "kaijibot.compat.pluginApi",
+        fieldPath: "allbot.compat.pluginApi",
         message:
-          "kaijibot.compat.pluginApi is required for external code plugins published to ClawHub.",
+          "allbot.compat.pluginApi is required for external code plugins published to ClawHub.",
       },
       {
-        fieldPath: "kaijibot.build.kaijibotVersion",
+        fieldPath: "allbot.build.allbotVersion",
         message:
-          "kaijibot.build.kaijibotVersion is required for external code plugins published to ClawHub.",
+          "allbot.build.allbotVersion is required for external code plugins published to ClawHub.",
       },
     ]);
   });

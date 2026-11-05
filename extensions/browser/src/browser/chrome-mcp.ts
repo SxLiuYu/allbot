@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { normalizeOptionalString, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import { asRecord } from "../record-shared.js";
 import type { ChromeMcpSnapshotNode } from "./chrome-mcp.snapshot.js";
 import type { BrowserTab } from "./client.js";
@@ -227,7 +227,7 @@ async function createRealSession(
   });
   const client = new Client(
     {
-      name: "kaijibot-browser",
+      name: "allbot-browser",
       version: "0.0.0",
     },
     {},
@@ -332,7 +332,7 @@ async function callTool(
 }
 
 async function withTempFile<T>(fn: (filePath: string) => Promise<T>): Promise<T> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-chrome-mcp-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-chrome-mcp-"));
   const filePath = path.join(dir, randomUUID());
   try {
     return await fn(filePath);

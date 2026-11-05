@@ -5,17 +5,17 @@ read_when:
 title: "Agent Runtime"
 ---
 
-> 💡 **KaijiBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。KaijiBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
+> 💡 **AllBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。AllBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
 
 # Agent Runtime
 
-KaijiBot runs a single embedded agent runtime.
+AllBot runs a single embedded agent runtime.
 
 ## Workspace (required)
 
-KaijiBot uses a single agent workspace directory (`agents.defaults.workspace`) as the agent’s **only** working directory (`cwd`) for tools and context.
+AllBot uses a single agent workspace directory (`agents.defaults.workspace`) as the agent’s **only** working directory (`cwd`) for tools and context.
 
-Recommended: use `kaijibot setup` to create `~/.kaijibot/kaijibot.json` if missing and initialize the workspace files.
+Recommended: use `allbot setup` to create `~/.allbot/allbot.json` if missing and initialize the workspace files.
 
 Full workspace layout + backup guide: [Agent workspace](/concepts/agent-workspace)
 
@@ -25,7 +25,7 @@ per-session workspaces under `agents.defaults.sandbox.workspaceRoot` (see
 
 ## Bootstrap files (injected)
 
-Inside `agents.defaults.workspace`, KaijiBot expects these user-editable files:
+Inside `agents.defaults.workspace`, AllBot expects these user-editable files:
 
 - `AGENTS.md` — operating instructions + “memory”
 - `SOUL.md` — persona, boundaries, tone
@@ -34,11 +34,11 @@ Inside `agents.defaults.workspace`, KaijiBot expects these user-editable files:
 - `IDENTITY.md` — agent name/vibe/emoji
 - `USER.md` — user profile + preferred address
 
-On the first turn of a new session, KaijiBot injects the contents of these files directly into the agent context.
+On the first turn of a new session, AllBot injects the contents of these files directly into the agent context.
 
 Blank files are skipped. Large files are trimmed and truncated with a marker so prompts stay lean (read the file for full content).
 
-If a file is missing, KaijiBot injects a single “missing file” marker line (and `kaijibot setup` will create a safe default template).
+If a file is missing, AllBot injects a single “missing file” marker line (and `allbot setup` will create a safe default template).
 
 `BOOTSTRAP.md` is only created for a **brand new workspace** (no other bootstrap files present). If you delete it after completing the ritual, it should not be recreated on later restarts.
 
@@ -57,12 +57,12 @@ guidance for how _you_ want them used.
 
 ## Skills
 
-KaijiBot loads skills from these locations (highest precedence first):
+AllBot loads skills from these locations (highest precedence first):
 
 - Workspace: `<workspace>/skills`
 - Project agent skills: `<workspace>/.agents/skills`
 - Personal agent skills: `~/.agents/skills`
-- Managed/local: `~/.kaijibot/skills`
+- Managed/local: `~/.allbot/skills`
 - Bundled (shipped with the install)
 - Extra skill folders: `skills.load.extraDirs`
 
@@ -72,15 +72,15 @@ Skills can be gated by config/env (see `skills` in [Gateway configuration](/gate
 
 The embedded agent runtime is built on the Pi agent core (models, tools, and
 prompt pipeline). Session management, discovery, tool wiring, and channel
-delivery are KaijiBot-owned layers on top of that core.
+delivery are AllBot-owned layers on top of that core.
 
 ## Sessions
 
 Session transcripts are stored as JSONL at:
 
-- `~/.kaijibot/agents/<agentId>/sessions/<SessionId>.jsonl`
+- `~/.allbot/agents/<agentId>/sessions/<SessionId>.jsonl`
 
-The session ID is stable and chosen by KaijiBot.
+The session ID is stable and chosen by AllBot.
 Legacy session folders from other tools are not read.
 
 ## Steering while streaming
@@ -113,10 +113,10 @@ Model refs in config (for example `agents.defaults.model` and `agents.defaults.m
 
 - Use `provider/model` when configuring models.
 - If the model ID itself contains `/` (OpenRouter-style), include the provider prefix (example: `openrouter/moonshotai/kimi-k2`).
-- If you omit the provider, KaijiBot tries an alias first, then a unique
+- If you omit the provider, AllBot tries an alias first, then a unique
   configured-provider match for that exact model id, and only then falls back
   to the configured default provider. If that provider no longer exposes the
-  configured default model, KaijiBot falls back to the first configured
+  configured default model, AllBot falls back to the first configured
   provider/model instead of surfacing a stale removed-provider default.
 
 ## Configuration (minimal)

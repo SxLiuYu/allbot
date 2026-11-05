@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withTempDir } from "../test-helpers/temp-dir.js";
 import { migrateOrphanedSessionKeys } from "./state-migrations.js";
 
@@ -18,7 +18,7 @@ async function withStateFixture(
   run: (params: { tmpDir: string; stateDir: string }) => Promise<void>,
 ): Promise<void> {
   await withTempDir({ prefix: "orphan-keys-test-" }, async (tmpDir) => {
-    const stateDir = path.join(tmpDir, ".kaijibot");
+    const stateDir = path.join(tmpDir, ".allbot");
     fs.mkdirSync(stateDir, { recursive: true });
     await run({ tmpDir, stateDir });
   });
@@ -35,11 +35,11 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work" },
         agents: { list: [{ id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const result = await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       expect(result.changes.length).toBeGreaterThan(0);
@@ -61,11 +61,11 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work" },
         agents: { list: [{ id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       const store = readStore(storePath);
@@ -84,11 +84,11 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work" },
         agents: { list: [{ id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const result = await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       expect(result.changes).toHaveLength(0);
@@ -101,11 +101,11 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work" },
         agents: { list: [{ id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const result = await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       expect(result.changes).toHaveLength(0);
@@ -123,9 +123,9 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work" },
         agents: { list: [{ id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
-      const env = { KAIJIBOT_STATE_DIR: stateDir };
+      const env = { ALLBOT_STATE_DIR: stateDir };
       await migrateOrphanedSessionKeys({ cfg, env });
       const result2 = await migrateOrphanedSessionKeys({ cfg, env });
 
@@ -148,11 +148,11 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work", store: sharedStorePath },
         agents: { list: [{ id: "main" }, { id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       const store = readStore(sharedStorePath);
@@ -178,11 +178,11 @@ describe("migrateOrphanedSessionKeys", () => {
       const cfg = {
         session: { mainKey: "work", store: sharedStorePath },
         agents: { list: [{ id: "main" }, { id: "ops", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       const store = readStore(sharedStorePath);
@@ -200,11 +200,11 @@ describe("migrateOrphanedSessionKeys", () => {
         "agent:main:main": { sessionId: "abc-123", updatedAt: 1000 },
       });
 
-      const cfg = {} as KaijiBotConfig;
+      const cfg = {} as AllBotConfig;
 
       const result = await migrateOrphanedSessionKeys({
         cfg,
-        env: { KAIJIBOT_STATE_DIR: stateDir },
+        env: { ALLBOT_STATE_DIR: stateDir },
       });
 
       expect(result.changes).toHaveLength(0);

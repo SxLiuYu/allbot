@@ -5,7 +5,7 @@ import type {
   ThinkLevel,
   VerboseLevel,
 } from "../../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import {
   loadSessionStore,
@@ -154,7 +154,7 @@ function formatSessionTaskLine(params: {
 }
 
 async function resolveModelOverride(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   raw: string;
   sessionEntry?: SessionEntry;
   agentId: string;
@@ -219,7 +219,7 @@ async function resolveModelOverride(params: {
 
 export function createSessionStatusTool(opts?: {
   agentSessionKey?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sandboxed?: boolean;
 }): AnyAgentTool {
   return {

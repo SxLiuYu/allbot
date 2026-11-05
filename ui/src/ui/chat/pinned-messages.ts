@@ -1,6 +1,6 @@
 import { getSafeLocalStorage } from "../../local-storage.ts";
 
-const PREFIX = "kaijibot:pinned:";
+const PREFIX = "allbot:pinned:";
 
 export class PinnedMessages {
   private key: string;

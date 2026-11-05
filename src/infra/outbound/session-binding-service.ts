@@ -149,7 +149,7 @@ function resolveAdapterCapabilities(
   };
 }
 
-const SESSION_BINDING_ADAPTERS_KEY = Symbol.for("kaijibot.sessionBinding.adapters");
+const SESSION_BINDING_ADAPTERS_KEY = Symbol.for("allbot.sessionBinding.adapters");
 
 type SessionBindingAdapterRegistration = {
   adapter: SessionBindingAdapter;

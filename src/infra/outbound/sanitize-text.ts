@@ -7,8 +7,8 @@
  * Converts common inline HTML to lightweight-markup equivalents used by
  * WhatsApp/Signal/Telegram and strips any remaining tags.
  *
- * @see https://github.com/kaijibot/kaijibot/issues/31884
- * @see https://github.com/kaijibot/kaijibot/issues/18558
+ * @see https://github.com/allbot/allbot/issues/31884
+ * @see https://github.com/allbot/allbot/issues/18558
  */
 
 /**

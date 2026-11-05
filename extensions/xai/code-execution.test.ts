@@ -1,4 +1,4 @@
-import { withFetchPreconnect } from "kaijibot/plugin-sdk/testing";
+import { withFetchPreconnect } from "allbot/plugin-sdk/testing";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createCodeExecutionTool } from "./code-execution.js";
 

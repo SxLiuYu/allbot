@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 const mocks = vi.hoisted(() => ({
   readConfigFileSnapshot: vi.fn(),
@@ -28,7 +28,7 @@ describe("models/shared", () => {
   });
 
   it("returns config when snapshot is valid", async () => {
-    const cfg = { providers: {} } as unknown as KaijiBotConfig;
+    const cfg = { providers: {} } as unknown as AllBotConfig;
     mocks.readConfigFileSnapshot.mockResolvedValue({
       valid: true,
       runtimeConfig: cfg,
@@ -41,17 +41,17 @@ describe("models/shared", () => {
   it("throws formatted issues when snapshot is invalid", async () => {
     mocks.readConfigFileSnapshot.mockResolvedValue({
       valid: false,
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       issues: [{ path: "providers.openai.apiKey", message: "Required" }],
     });
 
     await expect(shared.loadValidConfigOrThrow()).rejects.toThrowError(
-      "Invalid config at /tmp/kaijibot.json\n- providers.openai.apiKey: Required",
+      "Invalid config at /tmp/allbot.json\n- providers.openai.apiKey: Required",
     );
   });
 
   it("updateConfig writes mutated config", async () => {
-    const cfg = { update: { channel: "stable" } } as unknown as KaijiBotConfig;
+    const cfg = { update: { channel: "stable" } } as unknown as AllBotConfig;
     mocks.readConfigFileSnapshot.mockResolvedValue({
       valid: true,
       hash: "config-1",

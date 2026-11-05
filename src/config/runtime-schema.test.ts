@@ -7,9 +7,9 @@ import {
   resetPluginRuntimeStateForTest,
   setActivePluginRegistry,
 } from "../plugins/runtime.js";
-import type { ConfigFileSnapshot, KaijiBotConfig } from "./types.js";
+import type { ConfigFileSnapshot, AllBotConfig } from "./types.js";
 
-const mockLoadConfig = vi.hoisted(() => vi.fn<() => KaijiBotConfig>());
+const mockLoadConfig = vi.hoisted(() => vi.fn<() => AllBotConfig>());
 const mockReadConfigFileSnapshot = vi.hoisted(() => vi.fn<() => Promise<ConfigFileSnapshot>>());
 const mockLoadPluginManifestRegistry = vi.hoisted(() => vi.fn());
 
@@ -27,9 +27,9 @@ vi.mock("../plugins/manifest-registry.js", () => ({
   loadPluginManifestRegistry: (...args: unknown[]) => mockLoadPluginManifestRegistry(...args),
 }));
 
-function makeSnapshot(params: { valid: boolean; config?: KaijiBotConfig }): ConfigFileSnapshot {
+function makeSnapshot(params: { valid: boolean; config?: AllBotConfig }): ConfigFileSnapshot {
   return {
-    path: "/tmp/kaijibot.json",
+    path: "/tmp/allbot.json",
     exists: true,
     raw: "{}",
     parsed: params.config ?? {},

@@ -1,5 +1,5 @@
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
-import type { KaijiBotConfig } from "../../config/config.js";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PollInput } from "../../polls.js";
 import { normalizePollInput } from "../../polls.js";
 import {
@@ -60,7 +60,7 @@ type MessageSendParams = {
   dryRun?: boolean;
   bestEffort?: boolean;
   deps?: OutboundSendDeps;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   gateway?: MessageGatewayOptions;
   idempotencyKey?: string;
   mirror?: OutboundMirror;
@@ -91,7 +91,7 @@ type MessagePollParams = {
   silent?: boolean;
   isAnonymous?: boolean;
   dryRun?: boolean;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   gateway?: MessageGatewayOptions;
   idempotencyKey?: string;
 };
@@ -142,7 +142,7 @@ function buildMessagePollResult(params: {
 }
 
 async function resolveRequiredChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
 }): Promise<string> {
   return (
@@ -153,7 +153,7 @@ async function resolveRequiredChannel(params: {
   ).channel;
 }
 
-function resolveRequiredPlugin(channel: string, cfg: KaijiBotConfig) {
+function resolveRequiredPlugin(channel: string, cfg: AllBotConfig) {
   const plugin = resolveOutboundChannelPlugin({ channel, cfg });
   if (!plugin) {
     throw new Error(`Unknown channel: ${channel}`);
@@ -201,7 +201,7 @@ async function callMessageGateway<T>(params: {
   });
 }
 
-async function resolveMessageConfig(cfg?: KaijiBotConfig): Promise<KaijiBotConfig> {
+async function resolveMessageConfig(cfg?: AllBotConfig): Promise<AllBotConfig> {
   if (cfg) {
     return cfg;
   }

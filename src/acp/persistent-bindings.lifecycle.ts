@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionAcpMeta } from "../config/sessions/types.js";
 import { logVerbose } from "../globals.js";
 import { formatErrorMessage } from "../infra/errors.js";
@@ -14,7 +14,7 @@ import {
 import { readAcpSessionEntry } from "./runtime/session-meta.js";
 
 function sessionMatchesConfiguredBinding(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   spec: ConfiguredAcpBindingSpec;
   meta: SessionAcpMeta;
 }): boolean {
@@ -54,7 +54,7 @@ function sessionMatchesConfiguredBinding(params: {
 }
 
 export async function ensureConfiguredAcpBindingSession(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   spec: ConfiguredAcpBindingSpec;
 }): Promise<{ ok: true; sessionKey: string } | { ok: false; sessionKey: string; error: string }> {
   const sessionKey = buildConfiguredAcpSessionKey(params.spec);
@@ -116,7 +116,7 @@ export async function ensureConfiguredAcpBindingSession(params: {
 }
 
 export async function ensureConfiguredAcpBindingReady(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   configuredBinding: ResolvedConfiguredAcpBinding | null;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!params.configuredBinding) {
@@ -136,7 +136,7 @@ export async function ensureConfiguredAcpBindingReady(params: {
 }
 
 export async function resetAcpSessionInPlace(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   reason: "new" | "reset";
   clearMeta?: boolean;

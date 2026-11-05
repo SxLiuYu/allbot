@@ -147,7 +147,7 @@ const expectedSortedCatalog = (): ModelCatalogRpcEntry[] => [
   },
 ];
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
   const listModels = async () => rpcReq<{ models: ModelCatalogRpcEntry[] }>(ws, "models.list");
 
@@ -157,9 +157,9 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
   };
 
   const withModelsConfig = async <T>(config: unknown, run: () => Promise<T>): Promise<T> => {
-    const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+    const configPath = process.env.ALLBOT_CONFIG_PATH;
     if (!configPath) {
-      throw new Error("Missing KAIJIBOT_CONFIG_PATH");
+      throw new Error("Missing ALLBOT_CONFIG_PATH");
     }
     let previousConfig: string | undefined;
     try {
@@ -189,7 +189,7 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
   };
 
   const withTempHome = async <T>(fn: (homeDir: string) => Promise<T>): Promise<T> => {
-    const tempHome = await createTempHomeEnv("kaijibot-home-");
+    const tempHome = await createTempHomeEnv("allbot-home-");
     try {
       return await fn(tempHome.home);
     } finally {
@@ -227,7 +227,7 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
       await withTempHome(async (homeDir) => {
         const initial = await rpcReq<{ triggers: string[] }>(ws, "voicewake.get");
         expect(initial.ok).toBe(true);
-        expect(initial.payload?.triggers).toEqual(["kaijibot", "claude", "computer"]);
+        expect(initial.payload?.triggers).toEqual(["allbot", "claude", "computer"]);
 
         const changedP = onceMessage(
           ws,
@@ -252,7 +252,7 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
         expect(after.payload?.triggers).toEqual(["hi", "there"]);
 
         const onDisk = JSON.parse(
-          await fs.readFile(path.join(homeDir, ".kaijibot", "settings", "voicewake.json"), "utf8"),
+          await fs.readFile(path.join(homeDir, ".allbot", "settings", "voicewake.json"), "utf8"),
         ) as { triggers?: unknown; updatedAtMs?: unknown };
         expect(onDisk.triggers).toEqual(["hi", "there"]);
         expect(typeof onDisk.updatedAtMs).toBe("number");
@@ -282,7 +282,7 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
       const first = (await firstEventP) as { event?: string; payload?: unknown };
       expect(first.event).toBe("voicewake.changed");
       expect((first.payload as { triggers?: unknown } | undefined)?.triggers).toEqual([
-        "kaijibot",
+        "allbot",
         "claude",
         "computer",
       ]);
@@ -292,14 +292,14 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
         (o) => o.type === "event" && o.event === "voicewake.changed",
       );
       const setRes = await rpcReq(ws, "voicewake.set", {
-        triggers: ["kaijibot", "computer"],
+        triggers: ["allbot", "computer"],
       });
       expect(setRes.ok).toBe(true);
 
       const broadcast = (await broadcastP) as { event?: string; payload?: unknown };
       expect(broadcast.event).toBe("voicewake.changed");
       expect((broadcast.payload as { triggers?: unknown } | undefined)?.triggers).toEqual([
-        "kaijibot",
+        "allbot",
         "computer",
       ]);
 
@@ -457,15 +457,15 @@ describe.skipIf(process.env.CI)("gateway server models + voicewake", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway server misc", () => {
   test("hello-ok advertises the gateway port for canvas host", async () => {
-    await withEnvAsync({ KAIJIBOT_GATEWAY_TOKEN: "secret" }, async () => {
+    await withEnvAsync({ ALLBOT_GATEWAY_TOKEN: "secret" }, async () => {
       testTailnetIPv4.value = "100.64.0.1";
       testState.gatewayBind = "lan";
       const canvasPort = await getFreePort();
       testState.canvasHostPort = canvasPort;
-      await withEnvAsync({ KAIJIBOT_CANVAS_HOST_PORT: String(canvasPort) }, async () => {
+      await withEnvAsync({ ALLBOT_CANVAS_HOST_PORT: String(canvasPort) }, async () => {
         const testPort = await getFreePort();
         const canvasHostUrl = resolveCanvasHostUrl({
           canvasPort,
@@ -524,11 +524,11 @@ describe.skipIf(process.env.CI)("gateway server misc", () => {
     }
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   test.skipIf(process.env.CI)("auto-enables configured channel plugins on startup", async () => {
-    const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+    const configPath = process.env.ALLBOT_CONFIG_PATH;
     if (!configPath) {
-      throw new Error("Missing KAIJIBOT_CONFIG_PATH");
+      throw new Error("Missing ALLBOT_CONFIG_PATH");
     }
     await fs.mkdir(path.dirname(configPath), { recursive: true });
     await fs.writeFile(

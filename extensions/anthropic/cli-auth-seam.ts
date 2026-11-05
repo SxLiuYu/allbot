@@ -1,4 +1,4 @@
-import { readClaudeCliCredentialsCached } from "kaijibot/plugin-sdk/provider-auth";
+import { readClaudeCliCredentialsCached } from "allbot/plugin-sdk/provider-auth";
 
 export function readClaudeCliCredentialsForSetup() {
   return readClaudeCliCredentialsCached();

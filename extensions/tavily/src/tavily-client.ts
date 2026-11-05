@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
 import {
   DEFAULT_CACHE_TTL_MINUTES,
   normalizeCacheKey,
@@ -6,8 +6,8 @@ import {
   readCache,
   resolveCacheTtlMs,
   writeCache,
-} from "kaijibot/plugin-sdk/provider-web-search";
-import { wrapExternalContent, wrapWebContent } from "kaijibot/plugin-sdk/security-runtime";
+} from "allbot/plugin-sdk/provider-web-search";
+import { wrapExternalContent, wrapWebContent } from "allbot/plugin-sdk/security-runtime";
 import {
   DEFAULT_TAVILY_BASE_URL,
   resolveTavilyApiKey,
@@ -27,7 +27,7 @@ const EXTRACT_CACHE = new Map<
 const DEFAULT_SEARCH_COUNT = 5;
 
 export type TavilySearchParams = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   query: string;
   searchDepth?: string;
   topic?: string;
@@ -40,7 +40,7 @@ export type TavilySearchParams = {
 };
 
 export type TavilyExtractParams = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   urls: string[];
   query?: string;
   extractDepth?: string;
@@ -131,7 +131,7 @@ export async function runTavilySearch(
       apiKey,
       body,
       errorLabel: "Tavily Search",
-      extraHeaders: { "X-Client-Source": "kaijibot" },
+      extraHeaders: { "X-Client-Source": "allbot" },
     },
     async (response) => (await response.json()) as Record<string, unknown>,
   );
@@ -221,7 +221,7 @@ export async function runTavilyExtract(
       apiKey,
       body,
       errorLabel: "Tavily Extract",
-      extraHeaders: { "X-Client-Source": "kaijibot" },
+      extraHeaders: { "X-Client-Source": "allbot" },
     },
     async (response) => (await response.json()) as Record<string, unknown>,
   );

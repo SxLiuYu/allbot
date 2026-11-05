@@ -2,9 +2,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveDiscoveryOverrides } from "./models-config.overrides.js";
-import { planKaijiBotModelsJsonWithDeps, type ModelsJsonPlan } from "./models-config.plan.js";
+import { planAllBotModelsJsonWithDeps, type ModelsJsonPlan } from "./models-config.plan.js";
 
 function writeModelsDevCache(agentDir: string) {
   mkdirSync(join(agentDir, "cache"), { recursive: true });
@@ -101,7 +101,7 @@ describe("resolveDiscoveryOverrides", () => {
   });
 });
 
-describe("planKaijiBotModelsJson with discovery overrides", () => {
+describe("planAllBotModelsJson with discovery overrides", () => {
   let tempDir: string;
 
   beforeEach(() => {
@@ -112,7 +112,7 @@ describe("planKaijiBotModelsJson with discovery overrides", () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  function minimalConfig(): KaijiBotConfig {
+  function minimalConfig(): AllBotConfig {
     return {
       models: {
         providers: {
@@ -134,11 +134,11 @@ describe("planKaijiBotModelsJson with discovery overrides", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
   }
 
-  async function runPlan(agentDir: string, cfg: KaijiBotConfig): Promise<ModelsJsonPlan> {
-    return planKaijiBotModelsJsonWithDeps(
+  async function runPlan(agentDir: string, cfg: AllBotConfig): Promise<ModelsJsonPlan> {
+    return planAllBotModelsJsonWithDeps(
       {
         cfg,
         agentDir,

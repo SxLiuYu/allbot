@@ -3,8 +3,8 @@ import { resolveCliArgvInvocation } from "./argv-invocation.js";
 
 describe("argv-invocation", () => {
   it("resolves root help and empty command path", () => {
-    expect(resolveCliArgvInvocation(["node", "kaijibot", "--help"])).toEqual({
-      argv: ["node", "kaijibot", "--help"],
+    expect(resolveCliArgvInvocation(["node", "allbot", "--help"])).toEqual({
+      argv: ["node", "allbot", "--help"],
       commandPath: [],
       primary: null,
       hasHelpOrVersion: true,
@@ -14,9 +14,9 @@ describe("argv-invocation", () => {
 
   it("resolves command path and primary with root options", () => {
     expect(
-      resolveCliArgvInvocation(["node", "kaijibot", "--profile", "work", "gateway", "status"]),
+      resolveCliArgvInvocation(["node", "allbot", "--profile", "work", "gateway", "status"]),
     ).toEqual({
-      argv: ["node", "kaijibot", "--profile", "work", "gateway", "status"],
+      argv: ["node", "allbot", "--profile", "work", "gateway", "status"],
       commandPath: ["gateway", "status"],
       primary: "gateway",
       hasHelpOrVersion: false,

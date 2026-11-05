@@ -1,6 +1,6 @@
 import type { AgentTool } from "@earendil-works/pi-agent-core";
 import type { TSchema } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   inspectProviderToolSchemasWithPlugin,
   normalizeProviderToolSchemasWithPlugin,
@@ -12,7 +12,7 @@ import { log } from "./logger.js";
 type ProviderToolSchemaParams<TSchemaType extends TSchema = TSchema, TResult = unknown> = {
   tools: AgentTool<TSchemaType, TResult>[];
   provider: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   modelId?: string;

@@ -1,6 +1,6 @@
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ensureKaijiBotCliOnPath } from "./path-env.js";
+import { ensureAllBotCliOnPath } from "./path-env.js";
 
 const state = vi.hoisted(() => ({
   dirs: new Set<string>(),
@@ -44,11 +44,11 @@ vi.mock("./env.js", () => ({
   isTruthyEnvValue: (value?: string) => value === "1" || value === "true",
 }));
 
-describe("ensureKaijiBotCliOnPath", () => {
+describe("ensureAllBotCliOnPath", () => {
   const envKeys = [
     "PATH",
-    "KAIJIBOT_PATH_BOOTSTRAPPED",
-    "KAIJIBOT_ALLOW_PROJECT_LOCAL_BIN",
+    "ALLBOT_PATH_BOOTSTRAPPED",
+    "ALLBOT_ALLOW_PROJECT_LOCAL_BIN",
     "MISE_DATA_DIR",
     "HOMEBREW_PREFIX",
     "HOMEBREW_BREW_FILE",
@@ -78,9 +78,9 @@ describe("ensureKaijiBotCliOnPath", () => {
   });
 
   function setupAppCliRoot(name: string) {
-    const tmp = abs(`/tmp/kaijibot-path/${name}`);
+    const tmp = abs(`/tmp/allbot-path/${name}`);
     const appBinDir = path.join(tmp, "AppBin");
-    const appCli = path.join(appBinDir, "kaijibot");
+    const appCli = path.join(appBinDir, "allbot");
     setDir(tmp);
     setDir(appBinDir);
     setExe(appCli);
@@ -94,14 +94,14 @@ describe("ensureKaijiBotCliOnPath", () => {
     platform: NodeJS.Platform;
     allowProjectLocalBin?: boolean;
   }) {
-    ensureKaijiBotCliOnPath(params);
+    ensureAllBotCliOnPath(params);
     return (process.env.PATH ?? "").split(path.delimiter);
   }
 
   function resetBootstrapEnv(pathValue = "/usr/bin") {
     process.env.PATH = pathValue;
-    delete process.env.KAIJIBOT_PATH_BOOTSTRAPPED;
-    delete process.env.KAIJIBOT_ALLOW_PROJECT_LOCAL_BIN;
+    delete process.env.ALLBOT_PATH_BOOTSTRAPPED;
+    delete process.env.ALLBOT_ALLOW_PROJECT_LOCAL_BIN;
     delete process.env.HOMEBREW_PREFIX;
     delete process.env.HOMEBREW_BREW_FILE;
     delete process.env.XDG_BIN_HOME;
@@ -118,7 +118,7 @@ describe("ensureKaijiBotCliOnPath", () => {
     }
   }
 
-  it("prepends the bundled app bin dir when a sibling kaijibot exists", () => {
+  it("prepends the bundled app bin dir when a sibling allbot exists", () => {
     const { tmp, appBinDir, appCli } = setupAppCliRoot("case-bundled");
     resetBootstrapEnv();
 
@@ -132,7 +132,7 @@ describe("ensureKaijiBotCliOnPath", () => {
   });
 
   it("keeps the current runtime directory ahead of system PATH hardening", () => {
-    const tmp = abs("/tmp/kaijibot-path/case-runtime-dir");
+    const tmp = abs("/tmp/allbot-path/case-runtime-dir");
     const nodeBinDir = path.join(tmp, "node-bin");
     const nodeExec = path.join(nodeBinDir, "node");
     setDir(tmp);
@@ -153,8 +153,8 @@ describe("ensureKaijiBotCliOnPath", () => {
 
   it("is idempotent", () => {
     process.env.PATH = "/bin";
-    process.env.KAIJIBOT_PATH_BOOTSTRAPPED = "1";
-    ensureKaijiBotCliOnPath({
+    process.env.ALLBOT_PATH_BOOTSTRAPPED = "1";
+    ensureAllBotCliOnPath({
       execPath: "/tmp/does-not-matter",
       cwd: "/tmp",
       homeDir: "/tmp",
@@ -198,7 +198,7 @@ describe("ensureKaijiBotCliOnPath", () => {
     ({ envValue, allowProjectLocalBin }) => {
       const { tmp, appCli } = setupAppCliRoot("case-project-local");
       const localBinDir = path.join(tmp, "node_modules", ".bin");
-      const localCli = path.join(localBinDir, "kaijibot");
+      const localCli = path.join(localBinDir, "allbot");
       setDir(path.join(tmp, "node_modules"));
       setDir(localBinDir);
       setExe(localCli);
@@ -215,9 +215,9 @@ describe("ensureKaijiBotCliOnPath", () => {
 
       resetBootstrapEnv();
       if (envValue === undefined) {
-        delete process.env.KAIJIBOT_ALLOW_PROJECT_LOCAL_BIN;
+        delete process.env.ALLBOT_ALLOW_PROJECT_LOCAL_BIN;
       } else {
-        process.env.KAIJIBOT_ALLOW_PROJECT_LOCAL_BIN = envValue;
+        process.env.ALLBOT_ALLOW_PROJECT_LOCAL_BIN = envValue;
       }
 
       const withOptIn = bootstrapPath({
@@ -317,7 +317,7 @@ describe("ensureKaijiBotCliOnPath", () => {
     {
       name: "appends Linuxbrew dirs after system dirs",
       setup: () => {
-        const tmp = abs("/tmp/kaijibot-path/case-linuxbrew");
+        const tmp = abs("/tmp/allbot-path/case-linuxbrew");
         const execDir = path.join(tmp, "exec");
         setDir(tmp);
         setDir(execDir);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { runDoctorRepairSequence } from "./repair-sequencing.js";
 
 describe("doctor repair sequencing", () => {
@@ -26,7 +26,7 @@ describe("doctor repair sequencing", () => {
               },
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         candidate: {
           channels: {
             discord: {
@@ -47,11 +47,11 @@ describe("doctor repair sequencing", () => {
               },
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         pendingChanges: false,
         fixHints: [],
       },
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     expect(result.state.pendingChanges).toBe(true);
@@ -86,18 +86,18 @@ describe("doctor repair sequencing", () => {
               allowFrom: [106232522769186816],
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         candidate: {
           channels: {
             discord: {
               allowFrom: [106232522769186816],
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         pendingChanges: false,
         fixHints: [],
       },
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     // Discord's unsafe-numeric-id warning lived in the discord channel doctor

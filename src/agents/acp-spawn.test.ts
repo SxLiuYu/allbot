@@ -7,7 +7,7 @@ import type { AcpInitializeSessionInput } from "../acp/control-plane/manager.typ
 import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import * as sessionPaths from "../config/sessions/paths.js";
 import * as sessionStore from "../config/sessions/store.js";
@@ -24,7 +24,7 @@ import {
 import { resetTaskRegistryForTests } from "../tasks/task-registry.js";
 import * as acpSpawnParentStream from "./acp-spawn-parent-stream.js";
 
-function createDefaultSpawnConfig(): KaijiBotConfig {
+function createDefaultSpawnConfig(): AllBotConfig {
   return {
     acp: {
       enabled: true,
@@ -112,7 +112,7 @@ type CrossAgentWorkspaceFixture = {
   targetWorkspace: string;
 };
 
-function replaceSpawnConfig(next: KaijiBotConfig): void {
+function replaceSpawnConfig(next: AllBotConfig): void {
   const current = hoisted.state.cfg as Record<string, unknown>;
   for (const key of Object.keys(current)) {
     delete current[key];
@@ -196,7 +196,7 @@ async function createCrossAgentWorkspaceFixture(options?: {
   targetDirName?: string;
   createTargetWorkspace?: boolean;
 }): Promise<CrossAgentWorkspaceFixture> {
-  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-acp-spawn-"));
+  const workspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-acp-spawn-"));
   const mainWorkspace = path.join(workspaceRoot, "main");
   const targetWorkspace = path.join(workspaceRoot, options?.targetDirName?.trim() || "claude-code");
   await fs.mkdir(mainWorkspace, { recursive: true });

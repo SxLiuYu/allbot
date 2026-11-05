@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `kaijibot docs` (search the live docs index)"
+summary: "CLI reference for `allbot docs` (search the live docs index)"
 read_when:
-  - You want to search the live KaijiBot docs from the terminal
+  - You want to search the live AllBot docs from the terminal
 title: "docs"
 ---
 
-# `kaijibot docs`
+# `allbot docs`
 
 Search the live docs index.
 
@@ -16,13 +16,13 @@ Arguments:
 Examples:
 
 ```bash
-kaijibot docs
-kaijibot docs browser existing-session
-kaijibot docs sandbox allowHostControl
-kaijibot docs gateway token secretref
+allbot docs
+allbot docs browser existing-session
+allbot docs sandbox allowHostControl
+allbot docs gateway token secretref
 ```
 
 Notes:
 
-- With no query, `kaijibot docs` opens the live docs search entrypoint.
+- With no query, `allbot docs` opens the live docs search entrypoint.
 - Multi-word queries are passed through as one search request.

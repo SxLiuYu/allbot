@@ -1,1 +1,1 @@
-export { parseBooleanValue } from "kaijibot/plugin-sdk/browser-config-runtime";
+export { parseBooleanValue } from "allbot/plugin-sdk/browser-config-runtime";

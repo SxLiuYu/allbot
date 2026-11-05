@@ -14,7 +14,7 @@ import {
 import { DEFAULT_PROVIDER, DEFAULT_MODEL } from "../agents/defaults.js";
 import { parseModelRef } from "../agents/model-selection.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 
@@ -25,7 +25,7 @@ const log = createSubsystemLogger("llm-slug-generator");
  */
 export async function generateSlugViaLLM(params: {
   sessionContent: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<string | null> {
   let tempSessionFile: string | null = null;
 
@@ -35,7 +35,7 @@ export async function generateSlugViaLLM(params: {
     const agentDir = resolveAgentDir(params.cfg, agentId);
 
     // Create a temporary session file for this one-off LLM call
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-slug-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-slug-"));
     tempSessionFile = path.join(tempDir, "session.jsonl");
 
     const prompt = `Based on this conversation, generate a short 1-2 word filename slug (lowercase, hyphen-separated, no file extension).

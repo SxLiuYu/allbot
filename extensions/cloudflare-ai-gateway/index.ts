@@ -1,4 +1,4 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 import {
   applyAuthProfileConfig,
   buildApiKeyCredential,
@@ -9,8 +9,8 @@ import {
   normalizeOptionalSecretInput,
   upsertAuthProfile,
   validateApiKeyInput,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { buildCloudflareAiGatewayCatalogProvider } from "./catalog-provider.js";
 import { CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF } from "./models.js";
 import { applyCloudflareAiGatewayConfig, buildCloudflareAiGatewayConfigPatch } from "./onboard.js";

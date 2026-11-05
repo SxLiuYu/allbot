@@ -5,7 +5,7 @@ import type { PluginRuntime } from "../plugins/runtime/types.js";
 import type { PluginDiagnostic } from "../plugins/types.js";
 import type { GatewayRequestContext, GatewayRequestOptions } from "./server-methods/types.js";
 
-const loadKaijiBotPlugins = vi.hoisted(() => vi.fn());
+const loadAllBotPlugins = vi.hoisted(() => vi.fn());
 const resolveGatewayStartupPluginIds = vi.hoisted(() => vi.fn(() => ["discord", "telegram"]));
 const applyPluginAutoEnable = vi.hoisted(() =>
   vi.fn(({ config }) => ({ config, changes: [], autoEnabledReasons: {} })),
@@ -21,7 +21,7 @@ const handleGatewayRequest = vi.hoisted(() =>
 );
 
 vi.mock("../plugins/loader.js", () => ({
-  loadKaijiBotPlugins,
+  loadAllBotPlugins,
 }));
 
 vi.mock("../plugins/channel-plugin-ids.js", () => ({
@@ -147,7 +147,7 @@ async function createSubagentRuntime(
   cfg: Record<string, unknown> = {},
 ): Promise<PluginRuntime["subagent"]> {
   const log = createTestLog();
-  loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+  loadAllBotPlugins.mockReturnValue(createRegistry([]));
   serverPluginBootstrapModule.loadGatewayStartupPlugins({
     cfg,
     workspaceDir: "/tmp",
@@ -155,7 +155,7 @@ async function createSubagentRuntime(
     coreGatewayHandlers: {},
     baseMethods: [],
   });
-  const call = loadKaijiBotPlugins.mock.calls.at(-1)?.[0] as
+  const call = loadAllBotPlugins.mock.calls.at(-1)?.[0] as
     | { runtimeOptions?: { allowGatewaySubagentBinding?: boolean } }
     | undefined;
   if (call?.runtimeOptions?.allowGatewaySubagentBinding !== true) {
@@ -205,7 +205,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  loadKaijiBotPlugins.mockReset();
+  loadAllBotPlugins.mockReset();
   resolveGatewayStartupPluginIds.mockReset().mockReturnValue(["discord", "telegram"]);
   applyPluginAutoEnable
     .mockReset()
@@ -248,7 +248,7 @@ describe("loadGatewayPlugins", () => {
         message: "failed to load plugin: boom",
       },
     ];
-    loadKaijiBotPlugins.mockReturnValue(createRegistry(diagnostics));
+    loadAllBotPlugins.mockReturnValue(createRegistry(diagnostics));
     const log = loadGatewayStartupPluginsForTest();
 
     expect(log.error).toHaveBeenCalledWith(
@@ -258,7 +258,7 @@ describe("loadGatewayPlugins", () => {
   });
 
   test("loads only gateway startup plugin ids", async () => {
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
     loadGatewayPluginsForTest();
 
     expect(applyPluginAutoEnable).toHaveBeenCalledWith({
@@ -271,7 +271,7 @@ describe("loadGatewayPlugins", () => {
       workspaceDir: "/tmp",
       env: process.env,
     });
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         onlyPluginIds: ["discord", "telegram"],
       }),
@@ -279,14 +279,14 @@ describe("loadGatewayPlugins", () => {
   });
 
   test("reuses the provided startup plugin scope without recomputing it", async () => {
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
 
     loadGatewayPluginsForTest({
       pluginIds: ["browser"],
     });
 
     expect(resolveGatewayStartupPluginIds).not.toHaveBeenCalled();
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         onlyPluginIds: ["browser"],
       }),
@@ -295,7 +295,7 @@ describe("loadGatewayPlugins", () => {
 
   test("pins the initial startup channel registry against later active-registry churn", async () => {
     const startupRegistry = createRegistry([]);
-    loadKaijiBotPlugins.mockReturnValue(startupRegistry);
+    loadAllBotPlugins.mockReturnValue(startupRegistry);
 
     loadGatewayStartupPluginsForTest({
       pluginIds: ["slack"],
@@ -320,7 +320,7 @@ describe("loadGatewayPlugins", () => {
         slack: ["slack configured"],
       },
     });
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
 
     loadGatewayStartupPluginsForTest({
       cfg: resolvedConfig,
@@ -333,7 +333,7 @@ describe("loadGatewayPlugins", () => {
       config: rawConfig,
       env: process.env,
     });
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: resolvedConfig,
         activationSourceConfig: rawConfig,
@@ -356,7 +356,7 @@ describe("loadGatewayPlugins", () => {
       baseMethods: ["sessions.get"],
     });
 
-    expect(loadKaijiBotPlugins).not.toHaveBeenCalled();
+    expect(loadAllBotPlugins).not.toHaveBeenCalled();
     expect(result.pluginRegistry.plugins).toEqual([]);
     expect(result.gatewayMethods).toEqual(["sessions.get"]);
   });
@@ -384,7 +384,7 @@ describe("loadGatewayPlugins", () => {
         slack: ["slack configured"],
       },
     });
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
 
     loadGatewayPluginsForTest();
 
@@ -394,7 +394,7 @@ describe("loadGatewayPlugins", () => {
       workspaceDir: "/tmp",
       env: process.env,
     });
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: autoEnabledConfig,
         activationSourceConfig: {},
@@ -415,7 +415,7 @@ describe("loadGatewayPlugins", () => {
         slack: ["slack configured"],
       },
     });
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
 
     loadGatewayPluginsForTest({
       cfg: resolvedConfig,
@@ -432,7 +432,7 @@ describe("loadGatewayPlugins", () => {
       workspaceDir: "/tmp",
       env: process.env,
     });
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: resolvedConfig,
         activationSourceConfig: rawConfig,
@@ -444,10 +444,10 @@ describe("loadGatewayPlugins", () => {
   });
 
   test("provides subagent runtime with sessions.get method aliases", async () => {
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
     loadGatewayPluginsForTest();
 
-    const call = loadKaijiBotPlugins.mock.calls.at(-1)?.[0] as
+    const call = loadAllBotPlugins.mock.calls.at(-1)?.[0] as
       | { runtimeOptions?: { allowGatewaySubagentBinding?: boolean } }
       | undefined;
     expect(call?.runtimeOptions?.allowGatewaySubagentBinding).toBe(true);
@@ -723,12 +723,12 @@ describe("loadGatewayPlugins", () => {
   });
 
   test("can prefer setup-runtime channel plugins during startup loads", async () => {
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
     loadGatewayPluginsForTest({
       preferSetupRuntimeForChannelPlugins: true,
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         preferSetupRuntimeForChannelPlugins: true,
       }),
@@ -736,7 +736,7 @@ describe("loadGatewayPlugins", () => {
   });
 
   test("primes configured bindings during gateway startup", async () => {
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
     const cfg = {};
     const autoEnabledConfig = { channels: { slack: { enabled: true } }, autoEnabled: true };
     applyPluginAutoEnable.mockReturnValue({
@@ -795,7 +795,7 @@ describe("loadGatewayPlugins", () => {
         message: "failed to load plugin: boom",
       },
     ];
-    loadKaijiBotPlugins.mockReturnValue(createRegistry(diagnostics));
+    loadAllBotPlugins.mockReturnValue(createRegistry(diagnostics));
     const log = createTestLog();
 
     reloadDeferredGatewayPlugins({
@@ -813,7 +813,7 @@ describe("loadGatewayPlugins", () => {
 
   test("reuses the initial startup plugin scope during deferred reloads", async () => {
     const { reloadDeferredGatewayPlugins } = serverPluginBootstrapModule;
-    loadKaijiBotPlugins.mockReturnValue(createRegistry([]));
+    loadAllBotPlugins.mockReturnValue(createRegistry([]));
 
     reloadDeferredGatewayPlugins({
       cfg: {},
@@ -826,7 +826,7 @@ describe("loadGatewayPlugins", () => {
     });
 
     expect(resolveGatewayStartupPluginIds).not.toHaveBeenCalled();
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         onlyPluginIds: ["discord"],
       }),
@@ -837,7 +837,7 @@ describe("loadGatewayPlugins", () => {
     const { prepareGatewayPluginLoad } = serverPluginBootstrapModule;
     const order: string[] = [];
     const pluginRegistry = createRegistry([]);
-    loadKaijiBotPlugins.mockReturnValue(pluginRegistry);
+    loadAllBotPlugins.mockReturnValue(pluginRegistry);
     primeConfiguredBindingRegistry.mockImplementation(() => {
       order.push("prime");
       return { bindingCount: 0, channelCount: 0 };

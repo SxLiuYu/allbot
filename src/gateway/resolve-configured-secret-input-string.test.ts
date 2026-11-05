@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import {
   resolveConfiguredSecretInputWithFallback,
   resolveRequiredConfiguredSecretRefInputString,
 } from "./resolve-configured-secret-input-string.js";
 
-function createConfig(value: unknown): KaijiBotConfig {
+function createConfig(value: unknown): AllBotConfig {
   return {
     gateway: {
       auth: {
@@ -17,7 +17,7 @@ function createConfig(value: unknown): KaijiBotConfig {
         default: { source: "env" },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("resolveConfiguredSecretInputWithFallback", () => {

@@ -10,5 +10,5 @@ export {
   withEnvAsync,
   withFetchPreconnect,
   isLiveTestEnabled,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/testing";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/testing";

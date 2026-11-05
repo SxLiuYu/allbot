@@ -1,25 +1,25 @@
-import { createChannelPairingController } from "kaijibot/plugin-sdk/channel-pairing";
+import { createChannelPairingController } from "allbot/plugin-sdk/channel-pairing";
 import {
   ensureConfiguredBindingRouteReady,
   resolveConfiguredBindingRoute,
-} from "kaijibot/plugin-sdk/conversation-runtime";
-import { getSessionBindingService } from "kaijibot/plugin-sdk/conversation-runtime";
-import { resolveAgentOutboundIdentity } from "kaijibot/plugin-sdk/outbound-runtime";
+} from "allbot/plugin-sdk/conversation-runtime";
+import { getSessionBindingService } from "allbot/plugin-sdk/conversation-runtime";
+import { resolveAgentOutboundIdentity } from "allbot/plugin-sdk/outbound-runtime";
 import {
   buildPendingHistoryContextFromMap,
   clearHistoryEntriesIfEnabled,
   DEFAULT_GROUP_HISTORY_LIMIT,
   recordPendingHistoryEntryIfEnabled,
   type HistoryEntry,
-} from "kaijibot/plugin-sdk/reply-history";
-import { deriveLastRoutePolicy } from "kaijibot/plugin-sdk/routing";
-import { resolveAgentIdFromSessionKey } from "kaijibot/plugin-sdk/routing";
+} from "allbot/plugin-sdk/reply-history";
+import { deriveLastRoutePolicy } from "allbot/plugin-sdk/routing";
+import { resolveAgentIdFromSessionKey } from "allbot/plugin-sdk/routing";
 import {
   resolveDefaultGroupPolicy,
   resolveOpenProviderRuntimeGroupPolicy,
   warnMissingProviderGroupPolicyFallbackOnce,
-} from "kaijibot/plugin-sdk/runtime-group-policy";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/runtime-group-policy";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import {
   checkBotMentioned,

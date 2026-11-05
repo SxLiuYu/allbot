@@ -8,7 +8,7 @@ title: "Agent Send"
 
 # Agent Send
 
-`kaijibot agent` runs a single agent turn from the command line without needing
+`allbot agent` runs a single agent turn from the command line without needing
 an inbound chat message. Use it for scripted workflows, testing, and
 programmatic delivery.
 
@@ -17,7 +17,7 @@ programmatic delivery.
 <Steps>
   <Step title="Run a simple agent turn">
     ```bash
-    kaijibot agent --message "What is the weather today?"
+    allbot agent --message "What is the weather today?"
     ```
 
     This sends the message through the Gateway and prints the reply.
@@ -27,13 +27,13 @@ programmatic delivery.
   <Step title="Target a specific agent or session">
     ```bash
     # Target a specific agent
-    kaijibot agent --agent ops --message "Summarize logs"
+    allbot agent --agent ops --message "Summarize logs"
 
     # Target a phone number (derives session key)
-    kaijibot agent --to +15555550123 --message "Status update"
+    allbot agent --to +15555550123 --message "Status update"
 
     # Reuse an existing session
-    kaijibot agent --session-id abc123 --message "Continue the task"
+    allbot agent --session-id abc123 --message "Continue the task"
     ```
 
   </Step>
@@ -41,10 +41,10 @@ programmatic delivery.
   <Step title="Deliver the reply to a channel">
     ```bash
     # Deliver to WhatsApp (default channel)
-    kaijibot agent --to +15555550123 --message "Report ready" --deliver
+    allbot agent --to +15555550123 --message "Report ready" --deliver
 
     # Deliver to Slack
-    kaijibot agent --agent ops --message "Generate report" \
+    allbot agent --agent ops --message "Generate report" \
       --deliver --reply-channel slack --reply-to "#reports"
     ```
 
@@ -84,13 +84,13 @@ programmatic delivery.
 
 ```bash
 # Simple turn with JSON output
-kaijibot agent --to +15555550123 --message "Trace logs" --verbose on --json
+allbot agent --to +15555550123 --message "Trace logs" --verbose on --json
 
 # Turn with thinking level
-kaijibot agent --session-id 1234 --message "Summarize inbox" --thinking medium
+allbot agent --session-id 1234 --message "Summarize inbox" --thinking medium
 
 # Deliver to a different channel than the session
-kaijibot agent --agent ops --message "Alert" --deliver --reply-channel telegram --reply-to "@admin"
+allbot agent --agent ops --message "Alert" --deliver --reply-channel telegram --reply-to "@admin"
 ```
 
 ## Related

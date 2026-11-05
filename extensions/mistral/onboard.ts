@@ -1,7 +1,7 @@
 import {
   createDefaultModelPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildMistralModelDefinition,
   MISTRAL_BASE_URL,
@@ -12,7 +12,7 @@ export const MISTRAL_DEFAULT_MODEL_REF = `mistral/${MISTRAL_DEFAULT_MODEL_ID}`;
 
 const mistralPresetAppliers = createDefaultModelPresetAppliers({
   primaryModelRef: MISTRAL_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => ({
+  resolveParams: (_cfg: AllBotConfig) => ({
     providerId: "mistral",
     api: "openai-completions",
     baseUrl: MISTRAL_BASE_URL,
@@ -22,10 +22,10 @@ const mistralPresetAppliers = createDefaultModelPresetAppliers({
   }),
 });
 
-export function applyMistralProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyMistralProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return mistralPresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyMistralConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyMistralConfig(cfg: AllBotConfig): AllBotConfig {
   return mistralPresetAppliers.applyConfig(cfg);
 }

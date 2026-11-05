@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/github-copilot-provider",
+  "name": "@allbot/github-copilot-provider",
   "version": "2026.4.12",
   "private": true,
-  "description": "KaijiBot GitHub Copilot provider plugin",
+  "description": "AllBot GitHub Copilot provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

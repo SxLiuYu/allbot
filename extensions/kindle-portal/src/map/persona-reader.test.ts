@@ -59,8 +59,8 @@ describe("readPersona", () => {
       "agent-a",
       "ou_1",
       JSON.stringify({
-        identity: { displayName: "Kaiji" },
-        coreTraits: { 称呼: "Kaiji" },
+        identity: { displayName: "AllBot" },
+        coreTraits: { 称呼: "AllBot" },
         domains: {
           rust: { phase: "stable", depth: 3, recurrence: 5 },
           distributed: { phase: "emergent", depth: 1, recurrence: 2 },
@@ -81,12 +81,12 @@ describe("readPersona", () => {
       "agent-a",
       "ou_1",
       JSON.stringify({
-        identity: { displayName: "Kaiji" },
+        identity: { displayName: "AllBot" },
         domains: { x: { phase: "stable" } },
       }),
     );
     const tree = await readPersona(tmp, "agent-a", "ou_1");
-    expect(tree?.identity?.displayName).toBe("Kaiji");
+    expect(tree?.identity?.displayName).toBe("AllBot");
   });
 
   it("missing file returns null", async () => {

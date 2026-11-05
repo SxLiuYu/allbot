@@ -11,7 +11,7 @@ import {
 } from "./defaults.js";
 import { normalizeExecSafeBinProfilesInConfig } from "./normalize-exec-safe-bin.js";
 import { normalizeConfigPaths } from "./normalize-paths.js";
-import type { KaijiBotConfig, ResolvedSourceConfig, RuntimeConfig } from "./types.js";
+import type { AllBotConfig, ResolvedSourceConfig, RuntimeConfig } from "./types.js";
 
 export type ConfigMaterializationMode = "load" | "missing" | "snapshot";
 
@@ -43,16 +43,16 @@ const MATERIALIZATION_PROFILES: Record<ConfigMaterializationMode, Materializatio
   },
 };
 
-export function asResolvedSourceConfig(config: KaijiBotConfig): ResolvedSourceConfig {
+export function asResolvedSourceConfig(config: AllBotConfig): ResolvedSourceConfig {
   return config as ResolvedSourceConfig;
 }
 
-export function asRuntimeConfig(config: KaijiBotConfig): RuntimeConfig {
+export function asRuntimeConfig(config: AllBotConfig): RuntimeConfig {
   return config as RuntimeConfig;
 }
 
 export function materializeRuntimeConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   mode: ConfigMaterializationMode,
 ): RuntimeConfig {
   const profile = MATERIALIZATION_PROFILES[mode];

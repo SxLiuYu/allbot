@@ -21,7 +21,7 @@ describe("guardSessionManager transcript updates", () => {
     listeners.push(onSessionTranscriptUpdate((update) => updates.push(update)));
 
     const sm = SessionManager.inMemory();
-    const sessionFile = "/tmp/kaijibot-session-message-events.jsonl";
+    const sessionFile = "/tmp/allbot-session-message-events.jsonl";
     Object.assign(sm, {
       getSessionFile: () => sessionFile,
     });

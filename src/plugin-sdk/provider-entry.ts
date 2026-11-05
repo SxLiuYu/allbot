@@ -8,9 +8,9 @@ import type {
 } from "../plugins/types.js";
 import { definePluginEntry } from "./plugin-entry.js";
 import type {
-  KaijiBotPluginApi,
-  KaijiBotPluginConfigSchema,
-  KaijiBotPluginDefinition,
+  AllBotPluginApi,
+  AllBotPluginConfigSchema,
+  AllBotPluginDefinition,
 } from "./plugin-entry.js";
 import { buildSingleProviderApiKeyCatalog } from "./provider-catalog-shared.js";
 
@@ -42,8 +42,8 @@ export type SingleProviderPluginOptions = {
   id: string;
   name: string;
   description: string;
-  kind?: KaijiBotPluginDefinition["kind"];
-  configSchema?: KaijiBotPluginConfigSchema | (() => KaijiBotPluginConfigSchema);
+  kind?: AllBotPluginDefinition["kind"];
+  configSchema?: AllBotPluginConfigSchema | (() => AllBotPluginConfigSchema);
   provider?: {
     id?: string;
     label: string;
@@ -56,7 +56,7 @@ export type SingleProviderPluginOptions = {
     ProviderPlugin,
     "id" | "label" | "docsPath" | "aliases" | "envVars" | "auth" | "catalog"
   >;
-  register?: (api: KaijiBotPluginApi) => void;
+  register?: (api: AllBotPluginApi) => void;
 };
 
 function resolveWizardSetup(params: {

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 const dockerMocks = vi.hoisted(() => ({
   dockerContainerState: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("./docker.js", async () => {
 
 const { dockerSandboxBackendManager } = await import("./docker-backend.js");
 
-function createConfig(): KaijiBotConfig {
+function createConfig(): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -30,11 +30,11 @@ function createConfig(): KaijiBotConfig {
           scope: "session",
           workspaceAccess: "none",
           docker: {
-            image: "kaijibot-sandbox:bookworm-slim",
+            image: "allbot-sandbox:bookworm-slim",
           },
           browser: {
             enabled: true,
-            image: "kaijibot-sandbox-browser:bookworm-slim",
+            image: "allbot-sandbox-browser:bookworm-slim",
           },
         },
       },
@@ -60,7 +60,7 @@ describe("docker sandbox backend manager", () => {
   it("matches ordinary sandbox runtimes against sandbox.docker.image", async () => {
     dockerMocks.execDocker.mockResolvedValueOnce({
       code: 0,
-      stdout: "kaijibot-sandbox:bookworm-slim\n",
+      stdout: "allbot-sandbox:bookworm-slim\n",
       stderr: "",
     });
 
@@ -81,7 +81,7 @@ describe("docker sandbox backend manager", () => {
 
     expect(result).toEqual({
       running: true,
-      actualConfigLabel: "kaijibot-sandbox:bookworm-slim",
+      actualConfigLabel: "allbot-sandbox:bookworm-slim",
       configLabelMatch: true,
     });
   });
@@ -89,7 +89,7 @@ describe("docker sandbox backend manager", () => {
   it("matches browser runtimes against sandbox.browser.image", async () => {
     dockerMocks.execDocker.mockResolvedValueOnce({
       code: 0,
-      stdout: "kaijibot-sandbox-browser:bookworm-slim\n",
+      stdout: "allbot-sandbox-browser:bookworm-slim\n",
       stderr: "",
     });
 
@@ -110,7 +110,7 @@ describe("docker sandbox backend manager", () => {
 
     expect(result).toEqual({
       running: true,
-      actualConfigLabel: "kaijibot-sandbox-browser:bookworm-slim",
+      actualConfigLabel: "allbot-sandbox-browser:bookworm-slim",
       configLabelMatch: true,
     });
   });
@@ -118,7 +118,7 @@ describe("docker sandbox backend manager", () => {
   it("defaults docker-backed runtime matching to sandbox.docker.image when label kind is missing", async () => {
     dockerMocks.execDocker.mockResolvedValueOnce({
       code: 0,
-      stdout: "kaijibot-sandbox:bookworm-slim\n",
+      stdout: "allbot-sandbox:bookworm-slim\n",
       stderr: "",
     });
 
@@ -138,7 +138,7 @@ describe("docker sandbox backend manager", () => {
 
     expect(result).toEqual({
       running: true,
-      actualConfigLabel: "kaijibot-sandbox:bookworm-slim",
+      actualConfigLabel: "allbot-sandbox:bookworm-slim",
       configLabelMatch: true,
     });
   });

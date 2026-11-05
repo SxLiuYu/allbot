@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionBindingRecord } from "../../infra/outbound/session-binding-service.js";
 import type {
   AcpRuntime,
@@ -67,14 +67,14 @@ const internalHookMocks = vi.hoisted(() => ({
 }));
 const acpMocks = vi.hoisted(() => ({
   listAcpSessionEntries: vi.fn(async () => []),
-  readAcpSessionEntry: vi.fn<(params: { sessionKey: string; cfg?: KaijiBotConfig }) => unknown>(
+  readAcpSessionEntry: vi.fn<(params: { sessionKey: string; cfg?: AllBotConfig }) => unknown>(
     () => null,
   ),
   getAcpRuntimeBackend: vi.fn<() => unknown>(() => null),
   upsertAcpSessionMeta: vi.fn<
     (params: {
       sessionKey: string;
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       mutate: (
         current: Record<string, unknown> | undefined,
         entry: { acp?: Record<string, unknown> } | undefined,
@@ -139,7 +139,7 @@ const ttsMocks = vi.hoisted(() => {
     normalizeTtsAutoMode: vi.fn((value: unknown) =>
       typeof value === "string" ? value : undefined,
     ),
-    resolveTtsConfig: vi.fn((_cfg: KaijiBotConfig) => ({ mode: "final" })),
+    resolveTtsConfig: vi.fn((_cfg: AllBotConfig) => ({ mode: "final" })),
   };
 });
 const threadInfoMocks = vi.hoisted(() => ({
@@ -319,7 +319,7 @@ vi.mock("./dispatch-acp-manager.runtime.js", () => ({
 vi.mock("../../tts/tts.js", () => ({
   maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
   normalizeTtsAutoMode: (value: unknown) => ttsMocks.normalizeTtsAutoMode(value),
-  resolveTtsConfig: (cfg: KaijiBotConfig) => ttsMocks.resolveTtsConfig(cfg),
+  resolveTtsConfig: (cfg: AllBotConfig) => ttsMocks.resolveTtsConfig(cfg),
 }));
 vi.mock("../../tts/tts.runtime.js", () => ({
   maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
@@ -336,16 +336,16 @@ vi.mock("./dispatch-acp-tts.runtime.js", () => ({
   maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
 }));
 vi.mock("./dispatch-acp-session.runtime.js", () => ({
-  readAcpSessionEntry: (params: { sessionKey: string; cfg?: KaijiBotConfig }) =>
+  readAcpSessionEntry: (params: { sessionKey: string; cfg?: AllBotConfig }) =>
     acpMocks.readAcpSessionEntry(params),
 }));
 vi.mock("../../tts/tts-config.js", () => ({
   normalizeTtsAutoMode: (value: unknown) => ttsMocks.normalizeTtsAutoMode(value),
-  resolveConfiguredTtsMode: (cfg: KaijiBotConfig) => ttsMocks.resolveTtsConfig(cfg).mode,
+  resolveConfiguredTtsMode: (cfg: AllBotConfig) => ttsMocks.resolveTtsConfig(cfg).mode,
 }));
 
 const noAbortResult = { handled: false, aborted: false } as const;
-const emptyConfig = {} as KaijiBotConfig;
+const emptyConfig = {} as AllBotConfig;
 let dispatchReplyFromConfig: typeof import("./dispatch-from-config.js").dispatchReplyFromConfig;
 let resetInboundDedupe: typeof import("./inbound-dedupe.js").resetInboundDedupe;
 let tryDispatchAcpReplyHook: typeof import("../../plugin-sdk/acp-runtime.js").tryDispatchAcpReplyHook;
@@ -434,7 +434,7 @@ function createAcpRuntime(events: AcpRuntimeEvent[]): MockAcpRuntime {
 
 function createMockAcpSessionManager() {
   return {
-    resolveSession: (params: { cfg: KaijiBotConfig; sessionKey: string }) => {
+    resolveSession: (params: { cfg: AllBotConfig; sessionKey: string }) => {
       const entry = acpMocks.readAcpSessionEntry({
         cfg: params.cfg,
         sessionKey: params.sessionKey,
@@ -478,7 +478,7 @@ function createMockAcpSessionManager() {
     }),
     runTurn: vi.fn(
       async (params: {
-        cfg: KaijiBotConfig;
+        cfg: AllBotConfig;
         sessionKey: string;
         text?: string;
         attachments?: unknown[];
@@ -655,7 +655,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       _opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => ({ text: "hi" }) satisfies ReplyPayload;
     await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
 
@@ -680,7 +680,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       _opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => ({ text: "hi" }) satisfies ReplyPayload;
     await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
 
@@ -900,7 +900,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       _opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => ({ text: "hi" }) satisfies ReplyPayload;
     await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
 
@@ -924,7 +924,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       _opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => ({ text: "hi" }) satisfies ReplyPayload;
     await dispatchReplyFromConfig({ ctx, cfg, dispatcher, replyResolver });
 
@@ -953,7 +953,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       expect(opts?.onToolResult).toBeDefined();
       await opts?.onToolResult?.({
@@ -986,7 +986,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       expect(opts?.onToolResult).toBeDefined();
       expect(typeof opts?.onToolResult).toBe("function");
@@ -1009,7 +1009,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       expect(opts?.onToolResult).toBeDefined();
       await opts?.onToolResult?.({ text: "🔧 exec: ls" });
@@ -1043,7 +1043,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       await opts?.onToolResult?.({ text: "🔧 exec: ls" });
       return { text: "done" } satisfies ReplyPayload;
@@ -1069,7 +1069,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       await opts?.onToolResult?.({
         text: "Approval required.\n\n```txt\n/approve 117ba06d allow-once\n```",
@@ -1114,7 +1114,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       // Simulate tool result emission
       await opts?.onToolResult?.({ text: "🔧 exec: ls" });
@@ -1141,7 +1141,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       expect(opts?.onToolResult).toBeDefined();
       await opts?.onToolResult?.({ text: "🔧 tools/sessions_send" });
@@ -1173,7 +1173,7 @@ describe("dispatchReplyFromConfig", () => {
           verboseDefault: "on",
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "telegram",
@@ -1183,7 +1183,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       await opts?.onPlanUpdate?.({
         phase: "update",
@@ -1223,7 +1223,7 @@ describe("dispatchReplyFromConfig", () => {
           verboseDefault: "on",
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "telegram",
@@ -1233,7 +1233,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       await opts?.onPatchSummary?.({
         phase: "end",
@@ -1265,7 +1265,7 @@ describe("dispatchReplyFromConfig", () => {
           verboseDefault: "on",
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "telegram",
@@ -1276,7 +1276,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       await opts?.onPlanUpdate?.({
         phase: "update",
@@ -1313,7 +1313,7 @@ describe("dispatchReplyFromConfig", () => {
     const replyResolver = async (
       _ctx: MsgContext,
       opts?: GetReplyOptions,
-      _cfg?: KaijiBotConfig,
+      _cfg?: AllBotConfig,
     ) => {
       await opts?.onToolResult?.({
         text: "Approval required.\n\n```txt\n/approve 117ba06d allow-once\n```",
@@ -1446,7 +1446,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { coalesceIdleMs: 0, maxChunkChars: 128 },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1515,7 +1515,7 @@ describe("dispatchReplyFromConfig", () => {
           dispatch: { enabled: true },
           stream: { coalesceIdleMs: 0, maxChunkChars: 128 },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       dispatcher,
       replyOptions: {
         runId: "run-acp-lifecycle-end",
@@ -1577,7 +1577,7 @@ describe("dispatchReplyFromConfig", () => {
           dispatch: { enabled: true },
           stream: { coalesceIdleMs: 0, maxChunkChars: 128 },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       dispatcher,
       replyOptions: {
         runId: "run-acp-lifecycle-error",
@@ -1644,7 +1644,7 @@ describe("dispatchReplyFromConfig", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1726,7 +1726,7 @@ describe("dispatchReplyFromConfig", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1784,7 +1784,7 @@ describe("dispatchReplyFromConfig", () => {
           defaultAccount: "work",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const replyResolver = vi.fn(async () => undefined);
     const ctx = buildTestCtx({
@@ -1850,7 +1850,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { coalesceIdleMs: 0, maxChunkChars: 256 },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1903,7 +1903,7 @@ describe("dispatchReplyFromConfig", () => {
         dispatch: { enabled: true },
         stream: { coalesceIdleMs: 0, maxChunkChars: 256 },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1948,7 +1948,7 @@ describe("dispatchReplyFromConfig", () => {
         enabled: true,
         dispatch: { enabled: true },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -1998,7 +1998,7 @@ describe("dispatchReplyFromConfig", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "discord",
@@ -2231,7 +2231,7 @@ describe("dispatchReplyFromConfig", () => {
 
   it("emits diagnostics when enabled", async () => {
     setNoAbort();
-    const cfg = { diagnostics: { enabled: true } } as KaijiBotConfig;
+    const cfg = { diagnostics: { enabled: true } } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({
       Provider: "slack",
@@ -2265,7 +2265,7 @@ describe("dispatchReplyFromConfig", () => {
       ((hookName?: string) =>
         hookName === "inbound_claim" || hookName === "message_received") as () => boolean,
     );
-    hookMocks.registry.plugins = [{ id: "kaijibot-codex-app-server", status: "loaded" }];
+    hookMocks.registry.plugins = [{ id: "allbot-codex-app-server", status: "loaded" }];
     hookMocks.runner.runInboundClaimForPluginOutcome.mockResolvedValue({
       status: "handled",
       result: { handled: true },
@@ -2283,8 +2283,8 @@ describe("dispatchReplyFromConfig", () => {
       boundAt: 1710000000000,
       metadata: {
         pluginBindingOwner: "plugin",
-        pluginId: "kaijibot-codex-app-server",
-        pluginRoot: "/Users/huntharo/github/kaijibot-app-server",
+        pluginId: "allbot-codex-app-server",
+        pluginRoot: "/Users/huntharo/github/allbot-app-server",
       },
     } satisfies SessionBindingRecord);
     const cfg = emptyConfig;
@@ -2313,7 +2313,7 @@ describe("dispatchReplyFromConfig", () => {
     expect(result).toEqual({ queuedFinal: false, counts: { tool: 0, block: 0, final: 0 } });
     expect(sessionBindingMocks.touch).toHaveBeenCalledWith("binding-1");
     expect(hookMocks.runner.runInboundClaimForPluginOutcome).toHaveBeenCalledWith(
-      "kaijibot-codex-app-server",
+      "allbot-codex-app-server",
       expect.objectContaining({
         channel: "discord",
         accountId: "default",
@@ -2336,7 +2336,7 @@ describe("dispatchReplyFromConfig", () => {
       ((hookName?: string) =>
         hookName === "inbound_claim" || hookName === "message_received") as () => boolean,
     );
-    hookMocks.registry.plugins = [{ id: "kaijibot-codex-app-server", status: "loaded" }];
+    hookMocks.registry.plugins = [{ id: "allbot-codex-app-server", status: "loaded" }];
     hookMocks.runner.runInboundClaimForPluginOutcome.mockResolvedValue({
       status: "handled",
       result: { handled: true },
@@ -2354,8 +2354,8 @@ describe("dispatchReplyFromConfig", () => {
       boundAt: 1710000000000,
       metadata: {
         pluginBindingOwner: "plugin",
-        pluginId: "kaijibot-codex-app-server",
-        pluginRoot: "/Users/huntharo/github/kaijibot-app-server",
+        pluginId: "allbot-codex-app-server",
+        pluginRoot: "/Users/huntharo/github/allbot-app-server",
       },
     } satisfies SessionBindingRecord);
     const cfg = emptyConfig;
@@ -2385,7 +2385,7 @@ describe("dispatchReplyFromConfig", () => {
     expect(result).toEqual({ queuedFinal: false, counts: { tool: 0, block: 0, final: 0 } });
     expect(sessionBindingMocks.touch).toHaveBeenCalledWith("binding-dm-1");
     expect(hookMocks.runner.runInboundClaimForPluginOutcome).toHaveBeenCalledWith(
-      "kaijibot-codex-app-server",
+      "allbot-codex-app-server",
       expect.objectContaining({
         channel: "discord",
         accountId: "default",
@@ -2402,7 +2402,7 @@ describe("dispatchReplyFromConfig", () => {
     expect(replyResolver).not.toHaveBeenCalled();
   });
 
-  it("falls back to KaijiBot once per startup when a bound plugin is missing", async () => {
+  it("falls back to AllBot once per startup when a bound plugin is missing", async () => {
     setNoAbort();
     hookMocks.runner.hasHooks.mockImplementation(
       ((hookName?: string) =>
@@ -2424,14 +2424,14 @@ describe("dispatchReplyFromConfig", () => {
       boundAt: 1710000000000,
       metadata: {
         pluginBindingOwner: "plugin",
-        pluginId: "kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
         pluginName: "Codex App Server",
-        pluginRoot: "/Users/huntharo/github/kaijibot-app-server",
+        pluginRoot: "/Users/huntharo/github/allbot-app-server",
         detachHint: "/codex_detach",
       },
     } satisfies SessionBindingRecord);
 
-    const replyResolver = vi.fn(async () => ({ text: "kaijibot fallback" }) satisfies ReplyPayload);
+    const replyResolver = vi.fn(async () => ({ text: "allbot fallback" }) satisfies ReplyPayload);
 
     const firstDispatcher = createDispatcher();
     await dispatchReplyFromConfig({
@@ -2487,13 +2487,13 @@ describe("dispatchReplyFromConfig", () => {
     expect(hookMocks.runner.runInboundClaim).not.toHaveBeenCalled();
   });
 
-  it("falls back to KaijiBot when the bound plugin is loaded but has no inbound_claim handler", async () => {
+  it("falls back to AllBot when the bound plugin is loaded but has no inbound_claim handler", async () => {
     setNoAbort();
     hookMocks.runner.hasHooks.mockImplementation(
       ((hookName?: string) =>
         hookName === "inbound_claim" || hookName === "message_received") as () => boolean,
     );
-    hookMocks.registry.plugins = [{ id: "kaijibot-codex-app-server", status: "loaded" }];
+    hookMocks.registry.plugins = [{ id: "allbot-codex-app-server", status: "loaded" }];
     hookMocks.runner.runInboundClaimForPluginOutcome.mockResolvedValue({
       status: "no_handler",
     });
@@ -2510,13 +2510,13 @@ describe("dispatchReplyFromConfig", () => {
       boundAt: 1710000000000,
       metadata: {
         pluginBindingOwner: "plugin",
-        pluginId: "kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
         pluginName: "Codex App Server",
-        pluginRoot: "/Users/huntharo/github/kaijibot-app-server",
+        pluginRoot: "/Users/huntharo/github/allbot-app-server",
       },
     } satisfies SessionBindingRecord);
     const dispatcher = createDispatcher();
-    const replyResolver = vi.fn(async () => ({ text: "kaijibot fallback" }) satisfies ReplyPayload);
+    const replyResolver = vi.fn(async () => ({ text: "allbot fallback" }) satisfies ReplyPayload);
 
     await dispatchReplyFromConfig({
       ctx: buildTestCtx({
@@ -2551,7 +2551,7 @@ describe("dispatchReplyFromConfig", () => {
       ((hookName?: string) =>
         hookName === "inbound_claim" || hookName === "message_received") as () => boolean,
     );
-    hookMocks.registry.plugins = [{ id: "kaijibot-codex-app-server", status: "loaded" }];
+    hookMocks.registry.plugins = [{ id: "allbot-codex-app-server", status: "loaded" }];
     hookMocks.runner.runInboundClaimForPluginOutcome.mockResolvedValue({
       status: "declined",
     });
@@ -2568,9 +2568,9 @@ describe("dispatchReplyFromConfig", () => {
       boundAt: 1710000000000,
       metadata: {
         pluginBindingOwner: "plugin",
-        pluginId: "kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
         pluginName: "Codex App Server",
-        pluginRoot: "/Users/huntharo/github/kaijibot-app-server",
+        pluginRoot: "/Users/huntharo/github/allbot-app-server",
         detachHint: "/codex_detach",
       },
     } satisfies SessionBindingRecord);
@@ -2609,7 +2609,7 @@ describe("dispatchReplyFromConfig", () => {
       ((hookName?: string) =>
         hookName === "inbound_claim" || hookName === "message_received") as () => boolean,
     );
-    hookMocks.registry.plugins = [{ id: "kaijibot-codex-app-server", status: "loaded" }];
+    hookMocks.registry.plugins = [{ id: "allbot-codex-app-server", status: "loaded" }];
     hookMocks.runner.runInboundClaimForPluginOutcome.mockResolvedValue({
       status: "error",
       error: "boom",
@@ -2627,9 +2627,9 @@ describe("dispatchReplyFromConfig", () => {
       boundAt: 1710000000000,
       metadata: {
         pluginBindingOwner: "plugin",
-        pluginId: "kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
         pluginName: "Codex App Server",
-        pluginRoot: "/Users/huntharo/github/kaijibot-app-server",
+        pluginRoot: "/Users/huntharo/github/allbot-app-server",
       },
     } satisfies SessionBindingRecord);
     const dispatcher = createDispatcher();
@@ -2664,7 +2664,7 @@ describe("dispatchReplyFromConfig", () => {
 
   it("marks diagnostics skipped for duplicate inbound messages", async () => {
     setNoAbort();
-    const cfg = { diagnostics: { enabled: true } } as KaijiBotConfig;
+    const cfg = { diagnostics: { enabled: true } } as AllBotConfig;
     const ctx = buildTestCtx({
       Provider: "whatsapp",
       OriginatingChannel: "whatsapp",
@@ -2697,13 +2697,13 @@ describe("dispatchReplyFromConfig", () => {
 
     const overrideCfg = {
       agents: { defaults: { userTimezone: "America/New_York" } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
-    let receivedCfg: KaijiBotConfig | undefined;
+    let receivedCfg: AllBotConfig | undefined;
     const replyResolver = async (
       _ctx: MsgContext,
       _opts?: GetReplyOptions,
-      cfgArg?: KaijiBotConfig,
+      cfgArg?: AllBotConfig,
     ) => {
       receivedCfg = cfgArg;
       return { text: "hi" } satisfies ReplyPayload;
@@ -2722,15 +2722,15 @@ describe("dispatchReplyFromConfig", () => {
 
   it("does not pass cfg as implicit configOverride when configOverride is not provided", async () => {
     setNoAbort();
-    const cfg = { agents: { defaults: { userTimezone: "UTC" } } } as KaijiBotConfig;
+    const cfg = { agents: { defaults: { userTimezone: "UTC" } } } as AllBotConfig;
     const dispatcher = createDispatcher();
     const ctx = buildTestCtx({ Provider: "telegram", Surface: "telegram" });
 
-    let receivedCfg: KaijiBotConfig | undefined;
+    let receivedCfg: AllBotConfig | undefined;
     const replyResolver = async (
       _ctx: MsgContext,
       _opts?: GetReplyOptions,
-      cfgArg?: KaijiBotConfig,
+      cfgArg?: AllBotConfig,
     ) => {
       receivedCfg = cfgArg;
       return { text: "hi" } satisfies ReplyPayload;

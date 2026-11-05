@@ -4,18 +4,18 @@ import { buildSystemdUnit } from "./systemd-unit.js";
 describe("buildSystemdUnit", () => {
   it("quotes arguments with whitespace", () => {
     const unit = buildSystemdUnit({
-      description: "KaijiBot Gateway",
-      programArguments: ["/usr/bin/kaijibot", "gateway", "--name", "My Bot"],
+      description: "AllBot Gateway",
+      programArguments: ["/usr/bin/allbot", "gateway", "--name", "My Bot"],
       environment: {},
     });
     const execStart = unit.split("\n").find((line) => line.startsWith("ExecStart="));
-    expect(execStart).toBe('ExecStart=/usr/bin/kaijibot gateway --name "My Bot"');
+    expect(execStart).toBe('ExecStart=/usr/bin/allbot gateway --name "My Bot"');
   });
 
   it("renders control-group kill mode for child-process cleanup", () => {
     const unit = buildSystemdUnit({
-      description: "KaijiBot Gateway",
-      programArguments: ["/usr/bin/kaijibot", "gateway", "run"],
+      description: "AllBot Gateway",
+      programArguments: ["/usr/bin/allbot", "gateway", "run"],
       environment: {},
     });
     expect(unit).toContain("KillMode=control-group");
@@ -27,8 +27,8 @@ describe("buildSystemdUnit", () => {
   it("rejects environment values with line breaks", () => {
     expect(() =>
       buildSystemdUnit({
-        description: "KaijiBot Gateway",
-        programArguments: ["/usr/bin/kaijibot", "gateway", "start"],
+        description: "AllBot Gateway",
+        programArguments: ["/usr/bin/allbot", "gateway", "start"],
         environment: {
           INJECT: "ok\nExecStartPre=/bin/touch /tmp/oc15789_rce",
         },

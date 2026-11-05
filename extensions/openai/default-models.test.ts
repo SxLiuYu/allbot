@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/provider-onboard";
+import type { AllBotConfig } from "allbot/plugin-sdk/provider-onboard";
 import { describe, expect, it } from "vitest";
 import { applyOpenAIConfig, applyOpenAIProviderConfig, OPENAI_DEFAULT_MODEL } from "./api.js";
 
@@ -29,7 +29,7 @@ describe("openai default models", () => {
   it("overrides model.primary while preserving fallbacks", () => {
     const next = applyOpenAIConfig({
       agents: { defaults: { model: { primary: "anthropic/claude-opus-4-6", fallbacks: [] } } },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
     expect(next.agents?.defaults?.model).toEqual({ primary: OPENAI_DEFAULT_MODEL, fallbacks: [] });
   });
 });

@@ -1,9 +1,9 @@
 import type { PersonaTree } from "../../cognitive/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MemorySearchResult } from "../../memory-host-sdk/host/types.js";
 
 export interface AutoRecallOptions {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   persona: PersonaTree | undefined;
   maxTopics?: number;

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { resolveCronStyleNow } from "../../agents/current-time.js";
 import { resolveUserTimezone } from "../../agents/date-time.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { openBoundaryFile } from "../../infra/boundary-file-read.js";
 import { normalizeLowercaseStringOrEmpty } from "../../shared/string-coerce.js";
 
@@ -63,7 +63,7 @@ function formatDateStamp(nowMs: number, timezone: string): string {
  */
 export async function readPostCompactionContext(
   workspaceDir: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   nowMs?: number,
 ): Promise<string | null> {
   const agentsPath = path.join(workspaceDir, "AGENTS.md");

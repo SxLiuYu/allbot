@@ -1,4 +1,4 @@
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import { isParentOwnedBackgroundAcpSession } from "../../acp/session-interaction-mode.js";
 import { resolveAgentConfig, resolveSessionAgentId } from "../../agents/agent-scope.js";
 import {
@@ -6,7 +6,7 @@ import {
   touchConversationBindingRecord,
 } from "../../bindings/records.js";
 import { shouldSuppressLocalExecApprovalPrompt } from "../../channels/plugins/exec-approval-local.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { parseSessionThreadInfo } from "../../config/sessions/thread-info.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import { logVerbose } from "../../globals.js";
@@ -135,7 +135,7 @@ const isInboundAudioContext = (ctx: FinalizedMsgContext): boolean => {
 
 const resolveSessionStoreLookup = (
   ctx: FinalizedMsgContext,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): {
   sessionKey?: string;
   storePath?: string;
@@ -195,14 +195,14 @@ export type DispatchFromConfigResult = {
 
 export async function dispatchReplyFromConfig(params: {
   ctx: FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcher: ReplyDispatcher;
   replyOptions?: Omit<GetReplyOptions, "onToolResult" | "onBlockReply">;
   replyResolver?: typeof import("./get-reply-from-config.runtime.js").getReplyFromConfig;
   fastAbortResolver?: typeof import("./abort.runtime.js").tryFastAbortFromMessage;
   formatAbortReplyTextResolver?: typeof import("./abort.runtime.js").formatAbortReplyText;
   /** Optional config override passed to getReplyFromConfig (e.g. per-sender timezone). */
-  configOverride?: KaijiBotConfig;
+  configOverride?: AllBotConfig;
 }): Promise<DispatchFromConfigResult> {
   const { ctx, cfg, dispatcher } = params;
   const diagnosticsEnabled = isDiagnosticsEnabled(cfg);

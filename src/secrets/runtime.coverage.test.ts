@@ -2,14 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginOrigin } from "../plugins/types.js";
 import { getPath, setPathCreateStrict } from "./path-utils.js";
 import { canonicalizeSecretTargetCoverageId } from "./target-registry-test-helpers.js";
 
 type SecretRegistryEntry = {
   id: string;
-  configFile: "kaijibot.json" | "auth-profiles.json";
+  configFile: "allbot.json" | "auth-profiles.json";
   pathPattern: string;
   refPathPattern?: string;
   secretShape: "secret_input" | "sibling_ref";
@@ -20,7 +20,7 @@ type SecretRegistryEntry = {
 type SecretRefCredentialMatrix = {
   entries: Array<{
     id: string;
-    configFile: "kaijibot.json" | "auth-profiles.json";
+    configFile: "allbot.json" | "auth-profiles.json";
     path: string;
     refPath?: string;
     secretShape: SecretRegistryEntry["secretShape"];
@@ -50,10 +50,10 @@ function loadCoverageRegistryEntries(): SecretRegistryEntry[] {
 }
 
 const COVERAGE_REGISTRY_ENTRIES = loadCoverageRegistryEntries();
-const DEBUG_COVERAGE_BATCHES = process.env.KAIJIBOT_DEBUG_RUNTIME_COVERAGE === "1";
+const DEBUG_COVERAGE_BATCHES = process.env.ALLBOT_DEBUG_RUNTIME_COVERAGE === "1";
 const COVERAGE_LOADABLE_PLUGIN_ORIGINS =
   buildCoverageLoadablePluginOrigins(COVERAGE_REGISTRY_ENTRIES);
-const PLUGIN_OWNED_KAIJIBOT_COVERAGE_EXCLUSIONS = new Set([
+const PLUGIN_OWNED_ALLBOT_COVERAGE_EXCLUSIONS = new Set([
   "channels.googlechat.accounts.*.serviceAccount",
   "tools.web.fetch.firecrawl.apiKey",
 ]);
@@ -234,8 +234,8 @@ function batchUsesRuntimeWebToolsOnly(batch: readonly SecretRegistryEntry[]): bo
   );
 }
 
-function applyConfigForKaijiBotTarget(
-  config: KaijiBotConfig,
+function applyConfigForAllBotTarget(
+  config: AllBotConfig,
   entry: SecretRegistryEntry,
   envId: string,
   wildcardToken: string,
@@ -409,7 +409,7 @@ function applyAuthStoreTarget(
 }
 
 async function prepareConfigCoverageSnapshot(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   loadablePluginOrigins?: ReadonlyMap<string, PluginOrigin>;
   includeRuntimeWebTools?: boolean;
@@ -462,7 +462,7 @@ async function prepareConfigCoverageSnapshot(params: {
 }
 
 async function prepareAuthCoverageSnapshot(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   agentDirs: string[];
   loadAuthStore: (agentDir?: string) => AuthProfileStore;
@@ -515,23 +515,23 @@ describe("secrets runtime target coverage", () => {
     ({ resolveSecretRefValues } = resolver);
   });
 
-  it("handles every kaijibot.json registry target when configured as active", async () => {
+  it("handles every allbot.json registry target when configured as active", async () => {
     const entries = COVERAGE_REGISTRY_ENTRIES.filter(
       (entry) =>
-        entry.configFile === "kaijibot.json" &&
-        !PLUGIN_OWNED_KAIJIBOT_COVERAGE_EXCLUSIONS.has(entry.id),
+        entry.configFile === "allbot.json" &&
+        !PLUGIN_OWNED_ALLBOT_COVERAGE_EXCLUSIONS.has(entry.id),
     );
     for (const batch of buildCoverageBatches(entries)) {
-      logCoverageBatch("kaijibot.json", batch);
-      const config = {} as KaijiBotConfig;
+      logCoverageBatch("allbot.json", batch);
+      const config = {} as AllBotConfig;
       const env: Record<string, string> = {};
       for (const [index, entry] of batch.entries()) {
-        const envId = `KAIJIBOT_SECRET_TARGET_${entry.id}`;
+        const envId = `ALLBOT_SECRET_TARGET_${entry.id}`;
         const runtimeEnvId = resolveCoverageEnvId(entry, envId);
         const expectedValue = `resolved-${entry.id}`;
         const wildcardToken = resolveCoverageWildcardToken(index);
         env[runtimeEnvId] = expectedValue;
-        applyConfigForKaijiBotTarget(config, entry, envId, wildcardToken);
+        applyConfigForAllBotTarget(config, entry, envId, wildcardToken);
       }
       const snapshot = await prepareConfigCoverageSnapshot({
         config,
@@ -562,14 +562,14 @@ describe("secrets runtime target coverage", () => {
         profiles: {},
       };
       for (const [index, entry] of batch.entries()) {
-        const envId = `KAIJIBOT_AUTH_SECRET_TARGET_${entry.id}`;
+        const envId = `ALLBOT_AUTH_SECRET_TARGET_${entry.id}`;
         env[envId] = `resolved-${entry.id}`;
         applyAuthStoreTarget(authStore, entry, envId, resolveCoverageWildcardToken(index));
       }
       const snapshot = await prepareAuthCoverageSnapshot({
-        config: {} as KaijiBotConfig,
+        config: {} as AllBotConfig,
         env,
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => authStore,
       });
       const resolvedStore = snapshot.authStores[0]?.store;

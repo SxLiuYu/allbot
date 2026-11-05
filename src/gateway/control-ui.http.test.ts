@@ -13,7 +13,7 @@ describe("handleControlUiHttpRequest", () => {
     indexHtml?: string;
     fn: (tmp: string) => Promise<T>;
   }) {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ui-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ui-"));
     try {
       await fs.writeFile(path.join(tmp, "index.html"), params.indexHtml ?? "<html></html>\n");
       return await params.fn(tmp);
@@ -96,7 +96,7 @@ describe("handleControlUiHttpRequest", () => {
     siblingDir: string;
     fn: (paths: { root: string; sibling: string }) => Promise<T>;
   }) {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ui-root-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ui-root-"));
     try {
       const root = path.join(tmp, "ui");
       const sibling = path.join(tmp, params.siblingDir);
@@ -206,10 +206,10 @@ describe("handleControlUiHttpRequest", () => {
       fn: async (tmp) => {
         const { res, end } = makeMockHttpResponse();
         const handled = handleControlUiHttpRequest(
-          { url: `/kaijibot${CONTROL_UI_BOOTSTRAP_CONFIG_PATH}`, method: "GET" } as IncomingMessage,
+          { url: `/allbot${CONTROL_UI_BOOTSTRAP_CONFIG_PATH}`, method: "GET" } as IncomingMessage,
           res,
           {
-            basePath: "/kaijibot",
+            basePath: "/allbot",
             root: { kind: "resolved", path: tmp },
             config: {
               agents: { defaults: { workspace: tmp } },
@@ -219,9 +219,9 @@ describe("handleControlUiHttpRequest", () => {
         );
         expect(handled).toBe(true);
         const parsed = parseBootstrapPayload(end);
-        expect(parsed.basePath).toBe("/kaijibot");
+        expect(parsed.basePath).toBe("/allbot");
         expect(parsed.assistantName).toBe("Ops");
-        expect(parsed.assistantAvatar).toBe("/kaijibot/avatar/main");
+        expect(parsed.assistantAvatar).toBe("/allbot/avatar/main");
         expect(parsed).not.toHaveProperty("assistantAgentId");
         expect(parsed).not.toHaveProperty("serverVersion");
       },
@@ -229,7 +229,7 @@ describe("handleControlUiHttpRequest", () => {
   });
 
   it("serves local avatar bytes through hardened avatar handler", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-avatar-http-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-avatar-http-"));
     try {
       const avatarPath = path.join(tmp, "main.png");
       await fs.writeFile(avatarPath, "avatar-bytes\n");
@@ -249,8 +249,8 @@ describe("handleControlUiHttpRequest", () => {
   });
 
   it("rejects avatar symlink paths from resolver", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-avatar-http-link-"));
-    const outside = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-avatar-http-outside-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-avatar-http-link-"));
+    const outside = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-avatar-http-outside-"));
     try {
       const outsideFile = path.join(outside, "secret.txt");
       await fs.writeFile(outsideFile, "outside-secret\n");
@@ -274,7 +274,7 @@ describe("handleControlUiHttpRequest", () => {
     await withControlUiRoot({
       fn: async (tmp) => {
         const assetsDir = path.join(tmp, "assets");
-        const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ui-outside-"));
+        const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ui-outside-"));
         try {
           const outsideFile = path.join(outsideDir, "secret.txt");
           await fs.mkdir(assetsDir, { recursive: true });
@@ -337,7 +337,7 @@ describe("handleControlUiHttpRequest", () => {
   it("rejects symlinked SPA fallback index.html outside control-ui root", async () => {
     await withControlUiRoot({
       fn: async (tmp) => {
-        const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ui-index-outside-"));
+        const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ui-index-outside-"));
         try {
           const outsideIndex = path.join(outsideDir, "index.html");
           await fs.writeFile(outsideIndex, "<html>outside</html>\n");
@@ -360,7 +360,7 @@ describe("handleControlUiHttpRequest", () => {
   it("rejects hardlinked index.html for non-package control-ui roots", async () => {
     await withControlUiRoot({
       fn: async (tmp) => {
-        const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ui-index-hardlink-"));
+        const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ui-index-hardlink-"));
         try {
           const outsideIndex = path.join(outsideDir, "index.html");
           await fs.writeFile(outsideIndex, "<html>outside-hardlink</html>\n");
@@ -442,7 +442,7 @@ describe("handleControlUiHttpRequest", () => {
         const handled = handleControlUiHttpRequest(
           { url: "/bluebubbles-webhook", method: "POST" } as IncomingMessage,
           res,
-          { basePath: "/kaijibot", root: { kind: "resolved", path: tmp } },
+          { basePath: "/allbot", root: { kind: "resolved", path: tmp } },
         );
         expect(handled).toBe(false);
       },
@@ -496,12 +496,12 @@ describe("handleControlUiHttpRequest", () => {
   it("falls through POST requests under configured basePath (plugin webhook passthrough)", async () => {
     await withControlUiRoot({
       fn: async (tmp) => {
-        for (const route of ["/kaijibot", "/kaijibot/", "/kaijibot/some-page"]) {
+        for (const route of ["/allbot", "/allbot/", "/allbot/some-page"]) {
           const { handled, end } = runControlUiRequest({
             url: route,
             method: "POST",
             rootPath: tmp,
-            basePath: "/kaijibot",
+            basePath: "/allbot",
           });
           expect(handled, `POST to ${route} should pass through to plugin handlers`).toBe(false);
           expect(end, `POST to ${route} should not write a response`).not.toHaveBeenCalled();
@@ -520,10 +520,10 @@ describe("handleControlUiHttpRequest", () => {
         const secretPathUrl = secretPath.split(path.sep).join("/");
         const absolutePathUrl = secretPathUrl.startsWith("/") ? secretPathUrl : `/${secretPathUrl}`;
         const { res, end, handled } = runControlUiRequest({
-          url: `/kaijibot/${absolutePathUrl}`,
+          url: `/allbot/${absolutePathUrl}`,
           method: "GET",
           rootPath: root,
-          basePath: "/kaijibot",
+          basePath: "/allbot",
         });
         expectNotFoundResponse({ handled, res, end });
       },
@@ -549,10 +549,10 @@ describe("handleControlUiHttpRequest", () => {
         }
 
         const { res, end, handled } = runControlUiRequest({
-          url: "/kaijibot/assets/leak.txt",
+          url: "/allbot/assets/leak.txt",
           method: "GET",
           rootPath: root,
-          basePath: "/kaijibot",
+          basePath: "/allbot",
         });
         expectNotFoundResponse({ handled, res, end });
       },
@@ -565,7 +565,7 @@ describe("handleControlUiHttpRequest", () => {
         fn: async (tmp) => {
           await fs.writeFile(
             path.join(tmp, "manifest.webmanifest"),
-            JSON.stringify({ name: "KaijiBot" }),
+            JSON.stringify({ name: "AllBot" }),
           );
           const { res, setHeader } = makeMockHttpResponse();
           handleControlUiHttpRequest(

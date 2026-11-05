@@ -1,4 +1,4 @@
-import type { ProviderPlugin } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ProviderPlugin } from "allbot/plugin-sdk/provider-model-shared";
 
 export function createOpenrouterProvider(): ProviderPlugin {
   return {

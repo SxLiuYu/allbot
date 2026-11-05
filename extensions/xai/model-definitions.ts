@@ -1,5 +1,5 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 
 export const XAI_BASE_URL = "https://api.x.ai/v1";
 export const XAI_DEFAULT_MODEL_ID = "grok-4";

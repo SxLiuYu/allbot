@@ -117,7 +117,7 @@ function instantiatePiModelRegistry(
   return new Registry(authStorage, modelsJsonPath);
 }
 
-function createKaijiBotModelRegistry(
+function createAllBotModelRegistry(
   authStorage: PiAuthStorage,
   modelsJsonPath: string,
   agentDir: string,
@@ -138,7 +138,7 @@ function createKaijiBotModelRegistry(
 }
 
 export function scrubLegacyStaticAuthJsonEntriesForDiscovery(pathname: string): void {
-  if (process.env.KAIJIBOT_AUTH_STORE_READONLY === "1") {
+  if (process.env.ALLBOT_AUTH_STORE_READONLY === "1") {
     return;
   }
   if (!fs.existsSync(pathname)) {
@@ -285,5 +285,5 @@ export function discoverAuthStorage(agentDir: string): PiAuthStorage {
 }
 
 export function discoverModels(authStorage: PiAuthStorage, agentDir: string): PiModelRegistry {
-  return createKaijiBotModelRegistry(authStorage, path.join(agentDir, "models.json"), agentDir);
+  return createAllBotModelRegistry(authStorage, path.join(agentDir, "models.json"), agentDir);
 }

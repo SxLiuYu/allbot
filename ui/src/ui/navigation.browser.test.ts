@@ -28,7 +28,7 @@ async function confirmPendingGatewayChange(app: ReturnType<typeof mountApp>) {
 }
 
 function expectConfirmedGatewayChange(app: ReturnType<typeof mountApp>) {
-  expect(app.settings.gatewayUrl).toBe("wss://other-gateway.example/kaijibot");
+  expect(app.settings.gatewayUrl).toBe("wss://other-gateway.example/allbot");
   expect(app.settings.token).toBe("abc123");
   expect(window.location.search).toBe("");
   expect(window.location.hash).toBe("");
@@ -53,22 +53,22 @@ describe("control UI routing", () => {
   });
 
   it("infers nested base paths", async () => {
-    const app = mountApp("/apps/kaijibot/cron");
+    const app = mountApp("/apps/allbot/cron");
     await app.updateComplete;
 
-    expect(app.basePath).toBe("/apps/kaijibot");
+    expect(app.basePath).toBe("/apps/allbot");
     expect(app.tab).toBe("cron");
-    expect(window.location.pathname).toBe("/apps/kaijibot/cron");
+    expect(window.location.pathname).toBe("/apps/allbot/cron");
   });
 
   it("honors explicit base path overrides", async () => {
-    window.__KAIJIBOT_CONTROL_UI_BASE_PATH__ = "/kaijibot";
-    const app = mountApp("/kaijibot/sessions");
+    window.__ALLBOT_CONTROL_UI_BASE_PATH__ = "/allbot";
+    const app = mountApp("/allbot/sessions");
     await app.updateComplete;
 
-    expect(app.basePath).toBe("/kaijibot");
+    expect(app.basePath).toBe("/allbot");
     expect(app.tab).toBe("sessions");
-    expect(window.location.pathname).toBe("/kaijibot/sessions");
+    expect(window.location.pathname).toBe("/allbot/sessions");
   });
 
   it("updates the URL when clicking nav items", async () => {
@@ -404,7 +404,7 @@ describe("control UI routing", () => {
     await app.updateComplete;
 
     expect(app.settings.token).toBe("abc123");
-    expect(JSON.parse(localStorage.getItem("kaijibot.control.settings.v1") ?? "{}").token).toBe(
+    expect(JSON.parse(localStorage.getItem("allbot.control.settings.v1") ?? "{}").token).toBe(
       undefined,
     );
     expect(window.location.pathname).toBe("/ui/settings");
@@ -422,17 +422,17 @@ describe("control UI routing", () => {
 
   it("hydrates token from URL hash when settings already set", async () => {
     localStorage.setItem(
-      "kaijibot.control.settings.v1",
-      JSON.stringify({ token: "existing-token", gatewayUrl: "wss://gateway.example/kaijibot" }),
+      "allbot.control.settings.v1",
+      JSON.stringify({ token: "existing-token", gatewayUrl: "wss://gateway.example/allbot" }),
     );
     const app = mountApp("/ui/settings#token=abc123");
     await app.updateComplete;
 
     expect(app.settings.token).toBe("abc123");
-    expect(JSON.parse(localStorage.getItem("kaijibot.control.settings.v1") ?? "{}")).toMatchObject({
-      gatewayUrl: "wss://gateway.example/kaijibot",
+    expect(JSON.parse(localStorage.getItem("allbot.control.settings.v1") ?? "{}")).toMatchObject({
+      gatewayUrl: "wss://gateway.example/allbot",
     });
-    expect(JSON.parse(localStorage.getItem("kaijibot.control.settings.v1") ?? "{}").token).toBe(
+    expect(JSON.parse(localStorage.getItem("allbot.control.settings.v1") ?? "{}").token).toBe(
       undefined,
     );
     expect(window.location.pathname).toBe("/ui/settings");
@@ -444,7 +444,7 @@ describe("control UI routing", () => {
     await app.updateComplete;
 
     expect(app.settings.token).toBe("abc123");
-    expect(JSON.parse(localStorage.getItem("kaijibot.control.settings.v1") ?? "{}").token).toBe(
+    expect(JSON.parse(localStorage.getItem("allbot.control.settings.v1") ?? "{}").token).toBe(
       undefined,
     );
     expect(window.location.pathname).toBe("/ui/settings");
@@ -459,21 +459,21 @@ describe("control UI routing", () => {
       'input[placeholder="ws://100.x.y.z:18789"]',
     );
     expect(gatewayUrlInput).not.toBeNull();
-    gatewayUrlInput!.value = "wss://other-gateway.example/kaijibot";
+    gatewayUrlInput!.value = "wss://other-gateway.example/allbot";
     gatewayUrlInput!.dispatchEvent(new Event("input", { bubbles: true }));
     await app.updateComplete;
 
-    expect(app.settings.gatewayUrl).toBe("wss://other-gateway.example/kaijibot");
+    expect(app.settings.gatewayUrl).toBe("wss://other-gateway.example/allbot");
     expect(app.settings.token).toBe("");
   });
 
   it("keeps a hash token pending until the gateway URL change is confirmed", async () => {
     const app = mountApp(
-      "/ui/settings?gatewayUrl=wss://other-gateway.example/kaijibot#token=abc123",
+      "/ui/settings?gatewayUrl=wss://other-gateway.example/allbot#token=abc123",
     );
     await app.updateComplete;
 
-    expect(app.settings.gatewayUrl).not.toBe("wss://other-gateway.example/kaijibot");
+    expect(app.settings.gatewayUrl).not.toBe("wss://other-gateway.example/allbot");
     expect(app.settings.token).toBe("");
 
     await confirmPendingGatewayChange(app);
@@ -483,11 +483,11 @@ describe("control UI routing", () => {
 
   it("keeps a query token pending until the gateway URL change is confirmed", async () => {
     const app = mountApp(
-      "/ui/settings?gatewayUrl=wss://other-gateway.example/kaijibot&token=abc123",
+      "/ui/settings?gatewayUrl=wss://other-gateway.example/allbot&token=abc123",
     );
     await app.updateComplete;
 
-    expect(app.settings.gatewayUrl).not.toBe("wss://other-gateway.example/kaijibot");
+    expect(app.settings.gatewayUrl).not.toBe("wss://other-gateway.example/allbot");
     expect(app.settings.token).toBe("");
 
     await confirmPendingGatewayChange(app);
@@ -504,7 +504,7 @@ describe("control UI routing", () => {
     await refreshed.updateComplete;
 
     expect(refreshed.settings.token).toBe("abc123");
-    expect(JSON.parse(localStorage.getItem("kaijibot.control.settings.v1") ?? "{}").token).toBe(
+    expect(JSON.parse(localStorage.getItem("allbot.control.settings.v1") ?? "{}").token).toBe(
       undefined,
     );
   });

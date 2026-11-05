@@ -9,4 +9,4 @@ export {
   KILOCODE_MODEL_CATALOG,
 } from "./provider-models.js";
 
-export type { KilocodeModelCatalogEntry } from "kaijibot/plugin-sdk/provider-model-shared";
+export type { KilocodeModelCatalogEntry } from "allbot/plugin-sdk/provider-model-shared";

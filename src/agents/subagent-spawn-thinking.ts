@@ -1,5 +1,5 @@
 import { normalizeThinkLevel } from "../auto-reply/thinking.shared.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : undefined;
@@ -11,7 +11,7 @@ function readString(value: Record<string, unknown>, key: string): string | undef
 }
 
 export function resolveSubagentThinkingOverride(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   targetAgentConfig?: unknown;
   thinkingOverrideRaw?: string;
 }) {

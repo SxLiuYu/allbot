@@ -1,6 +1,6 @@
 import { requireBundledChannelPlugin } from "../../../src/channels/plugins/bundled.js";
 import type { ChannelPlugin } from "../../../src/channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 
 type ActionsContractEntry = {
   id: string;
@@ -8,7 +8,7 @@ type ActionsContractEntry = {
   unsupportedAction?: string;
   cases: Array<{
     name: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     expectedActions: string[];
     expectedCapabilities?: string[];
     beforeTest?: () => void;
@@ -33,7 +33,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 appToken: "xapp-test",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: [
             "send",
             "react",
@@ -63,7 +63,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 },
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: [
             "send",
             "react",
@@ -89,7 +89,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 enabled: true,
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: [],
           expectedCapabilities: [],
         },
@@ -110,7 +110,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 baseUrl: "https://chat.example.com",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: ["send", "react"],
           expectedCapabilities: ["buttons"],
         },
@@ -125,7 +125,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 actions: { reactions: false },
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: ["send"],
           expectedCapabilities: ["buttons"],
         },
@@ -137,7 +137,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 enabled: true,
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: [],
           expectedCapabilities: [],
         },
@@ -155,7 +155,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 botToken: "123:telegram-test-token",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: [
             "send",
             "poll",
@@ -202,7 +202,7 @@ export function getActionContractRegistry(): ActionsContractEntry[] {
                 },
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           expectedActions: ["send", "poll", "react", "reactions", "emoji-list"],
           expectedCapabilities: ["interactive", "components"],
         },

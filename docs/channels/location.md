@@ -8,7 +8,7 @@ title: "Channel Location Parsing"
 
 # Channel location parsing
 
-KaijiBot normalizes shared locations from chat channels into:
+AllBot normalizes shared locations from chat channels into:
 
 - human-readable text appended to the inbound body, and
 - structured fields in the auto-reply context payload.

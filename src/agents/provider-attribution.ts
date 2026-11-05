@@ -109,8 +109,8 @@ export type ProviderRequestCapabilities = ProviderRequestPolicyResolution & {
   compatibilityFamily?: ProviderRequestCompatibilityFamily;
 };
 
-const KAIJIBOT_ATTRIBUTION_PRODUCT = "KaijiBot";
-const KAIJIBOT_ATTRIBUTION_ORIGINATOR = "kaijibot";
+const ALLBOT_ATTRIBUTION_PRODUCT = "AllBot";
+const ALLBOT_ATTRIBUTION_ORIGINATOR = "allbot";
 
 const LOCAL_ENDPOINT_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 const MOONSHOT_NATIVE_BASE_URLS = new Set([
@@ -127,8 +127,8 @@ const OPENAI_RESPONSES_APIS = new Set(["openai-responses", "azure-openai-respons
 const OPENAI_RESPONSES_PROVIDERS = new Set(["openai", "azure-openai", "azure-openai-responses"]);
 const MOONSHOT_COMPAT_PROVIDERS = new Set(["moonshot", "kimi"]);
 
-function formatKaijiBotUserAgent(version: string): string {
-  return `${KAIJIBOT_ATTRIBUTION_ORIGINATOR}/${version}`;
+function formatAllBotUserAgent(version: string): string {
+  return `${ALLBOT_ATTRIBUTION_ORIGINATOR}/${version}`;
 }
 
 function tryParseHostname(value: string): string | undefined {
@@ -320,7 +320,7 @@ export function resolveProviderAttributionIdentity(
   env: RuntimeVersionEnv = process.env as RuntimeVersionEnv,
 ): ProviderAttributionIdentity {
   return {
-    product: KAIJIBOT_ATTRIBUTION_PRODUCT,
+    product: ALLBOT_ATTRIBUTION_PRODUCT,
     version: resolveRuntimeServiceVersion(env),
   };
 }
@@ -335,7 +335,7 @@ function buildOpenRouterAttributionPolicy(
     verification: "vendor-documented",
     hook: "request-headers",
     docsUrl: "https://openrouter.ai/docs/app-attribution",
-    reviewNote: "Documented app attribution headers. Verified in KaijiBot runtime wrapper.",
+    reviewNote: "Documented app attribution headers. Verified in AllBot runtime wrapper.",
     ...identity,
     headers: {
       "HTTP-Referer": "https://gitee.com/kaiji1126/kaijibot",
@@ -358,9 +358,9 @@ function buildOpenAIAttributionPolicy(
       "OpenAI native traffic supports hidden originator/User-Agent attribution. Verified against the Codex wire contract.",
     ...identity,
     headers: {
-      originator: KAIJIBOT_ATTRIBUTION_ORIGINATOR,
+      originator: ALLBOT_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatKaijiBotUserAgent(identity.version),
+      "User-Agent": formatAllBotUserAgent(identity.version),
     },
   };
 }
@@ -378,9 +378,9 @@ function buildOpenAICodexAttributionPolicy(
       "OpenAI Codex ChatGPT-backed traffic supports the same hidden originator/User-Agent attribution contract.",
     ...identity,
     headers: {
-      originator: KAIJIBOT_ATTRIBUTION_ORIGINATOR,
+      originator: ALLBOT_ATTRIBUTION_ORIGINATOR,
       version: identity.version,
-      "User-Agent": formatKaijiBotUserAgent(identity.version),
+      "User-Agent": formatAllBotUserAgent(identity.version),
     },
   };
 }

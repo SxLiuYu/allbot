@@ -1,6 +1,6 @@
 import { resolveGlobalSingleton } from "../shared/global-singleton.js";
 
-const warningFilterKey = Symbol.for("kaijibot.warning-filter");
+const warningFilterKey = Symbol.for("allbot.warning-filter");
 
 export type ProcessWarning = {
   code?: string;

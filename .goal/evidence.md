@@ -69,8 +69,8 @@ M1 用 8 轮（参考预算 12）。三个提交：任务系统基础（16 文�
 
 浏览器扩展已有积木（全部确认，文件级证据在探索报告）：
 
-- **Profile 体系**：`browser.profiles` 配置项（`src/config/types.browser.ts:1-14`），每 profile 持久 user-data-dir = `CONFIG_DIR/browser/<name>/user-data`（`chrome.ts:81-83`），`launchKaijiBotChrome`（chrome.ts:297）按 profile 拉起 Chrome；`createBrowserProfilesService.createProfile` 程序化建 profile（profiles-service.ts:85）。**登录态跨重启持久是 user-data-dir 的天然属性**（只有 reset-profile 清空）——T6 的"runner 重启后登录态有效"直接成立，无需新机制。
-- **Agent 维度缺失**：profile 全局按名共享；但 `KaijiBotPluginToolContext` 带 `agentId`（`src/plugins/types.ts:149`），browser 工具工厂每会话创建（plugin-registration.ts:29-34）——**per-agent profile 可在扩展侧用命名约定实现**。
+- **Profile 体系**：`browser.profiles` 配置项（`src/config/types.browser.ts:1-14`），每 profile 持久 user-data-dir = `CONFIG_DIR/browser/<name>/user-data`（`chrome.ts:81-83`），`launchAllBotChrome`（chrome.ts:297）按 profile 拉起 Chrome；`createBrowserProfilesService.createProfile` 程序化建 profile（profiles-service.ts:85）。**登录态跨重启持久是 user-data-dir 的天然属性**（只有 reset-profile 清空）——T6 的"runner 重启后登录态有效"直接成立，无需新机制。
+- **Agent 维度缺失**：profile 全局按名共享；但 `AllBotPluginToolContext` 带 `agentId`（`src/plugins/types.ts:149`），browser 工具工厂每会话创建（plugin-registration.ts:29-34）——**per-agent profile 可在扩展侧用命名约定实现**。
 - **无登录会话概念**：最接近的是 `driver: "existing-session"`（attach 已运行的 Chrome）。M2 登录会话 = 拉 headed Chrome 到 agent 专属 profile + 用户人工登录，cookies 落 user-data-dir。
 - **Agent 浏览器流**：browser 工具（动作式）→ 环回控制服务器 HTTP / node proxy → dispatcher → 路由；CDP 直驱动作在 browser-tool.actions.ts（决策 5 既定路线）。
 - **Security audit**：`extensions/browser/src/security-audit.ts` 现有 4 个 checkId（control_invalid_config / control_no_auth / remote_cdp_http / remote_cdp_private_host），新增 check 顺位加入即可。
@@ -109,12 +109,12 @@ M1 用 8 轮（参考预算 12）。三个提交：任务系统基础（16 文�
 
 | 轮  | 机制点                                                                                                                                                                                                                                                                                                                                                                                                                                                | 证据                                                                                                                                                                                  |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R4  | `login` 动作：schema 加 action；执行流 = flag/agentId/sandbox-node 门禁 → 凭证类参数显式拒绝（password/username/credentials/secret/token，红线：不收密码）→ ensureAgentBrowserProfile → 运行中实例先停（headless 窗口用户看不见）→ `browserStart(headed:true)` → 可选打开登录页 → 返回 profile 名与指引；服务端 `/start?headed=1`（ensureBrowserAvailable(forceHeaded) → launchKaijiBotChrome 单次 headless 覆盖 ×2 处）+ client browserStart(headed) | browser-tool.test 6 个 login 新例（拉起+重启运行实例/无实例不停/flag off 拒绝/凭证参数拒绝/无 agentId 拒绝/sandbox 拒绝）+ 5 文件 64/64；tsgo/check PASS；已提交                      |
-| R5  | **T6 会话持久化**：真 Chrome（Chrome for Testing 147，`playwright-core install chromium` 装入 ~/.cache，零仓库依赖变更）+ 本地测试页（/login 种 Max-Age cookie，/whoami 回显）→ launchKaijiBotChrome → cookie 生效 → 停 → 重启 → 同 cookie 仍在。**顺带修出并修复一个预存生产 bug**（见下）                                                                                                                                                           | `login-session-persistence.integration.test.ts` 本地真浏览器 PASS；chrome.test 22/22（含 2 个 stop 新例）；CI 隔离模式下 extensions lane 81 文件中仅 3 个环境性失败（见坑位）；已提交 |
+| R4  | `login` 动作：schema 加 action；执行流 = flag/agentId/sandbox-node 门禁 → 凭证类参数显式拒绝（password/username/credentials/secret/token，红线：不收密码）→ ensureAgentBrowserProfile → 运行中实例先停（headless 窗口用户看不见）→ `browserStart(headed:true)` → 可选打开登录页 → 返回 profile 名与指引；服务端 `/start?headed=1`（ensureBrowserAvailable(forceHeaded) → launchAllBotChrome 单次 headless 覆盖 ×2 处）+ client browserStart(headed) | browser-tool.test 6 个 login 新例（拉起+重启运行实例/无实例不停/flag off 拒绝/凭证参数拒绝/无 agentId 拒绝/sandbox 拒绝）+ 5 文件 64/64；tsgo/check PASS；已提交                      |
+| R5  | **T6 会话持久化**：真 Chrome（Chrome for Testing 147，`playwright-core install chromium` 装入 ~/.cache，零仓库依赖变更）+ 本地测试页（/login 种 Max-Age cookie，/whoami 回显）→ launchAllBotChrome → cookie 生效 → 停 → 重启 → 同 cookie 仍在。**顺带修出并修复一个预存生产 bug**（见下）                                                                                                                                                           | `login-session-persistence.integration.test.ts` 本地真浏览器 PASS；chrome.test 22/22（含 2 个 stop 新例）；CI 隔离模式下 extensions lane 81 文件中仅 3 个环境性失败（见坑位）；已提交 |
 
 ### T6 揭出的预存生产 bug（已修，chrome.ts）
 
-`stopKaijiBotChrome` 的等待循环条件 `!proc.exitCode && proc.killed` 永真（`killed` 只是 kill() 调用标志；信号终止的进程 exitCode 恒为 null），循环立即 break → **SIGTERM 后瞬间 SIGKILL**，Chrome 从不落盘 cookie。实证：SIGTERM 停止后 `Default/Cookies` SQLite 表空；CDP `Browser.close` 优雅退出后 cookie 存活。修复：stop 先走 CDP `Browser.close` 优雅关闭（5s 预算，flush profile stores），成功则等真实退出（`exitCode !== null || signalCode != null`）；失败回退 SIGTERM→等待→SIGKILL。此 bug 影响所有既有 stop 路径（网关关停/stop 动作）的 profile 状态落盘，不止登录代理。
+`stopAllBotChrome` 的等待循环条件 `!proc.exitCode && proc.killed` 永真（`killed` 只是 kill() 调用标志；信号终止的进程 exitCode 恒为 null），循环立即 break → **SIGTERM 后瞬间 SIGKILL**，Chrome 从不落盘 cookie。实证：SIGTERM 停止后 `Default/Cookies` SQLite 表空；CDP `Browser.close` 优雅退出后 cookie 存活。修复：stop 先走 CDP `Browser.close` 优雅关闭（5s 预算，flush profile stores），成功则等真实退出（`exitCode !== null || signalCode != null`）；失败回退 SIGTERM→等待→SIGKILL。此 bug 影响所有既有 stop 路径（网关关停/stop 动作）的 profile 状态落盘，不止登录代理。
 
 坑位记录（诚实）：
 
@@ -138,7 +138,7 @@ T8 注记：flag-diff 脚本原先硬编码 cognitive config，对 extensions ta
 - T7 ✅ 浏览器步骤任务 e2e（本地真浏览器复现）
 - T8 ⏳ 本地判据全绿（flag-diff 611/611 exit 0 + 默认 false 锚定 + 套件仅环境性失败）——**最终以 CI 双远端绿为准**
 - 提交序列：R2 flag 同步 / R3 agent-profiles / R4 login 动作 / R5 优雅停止修复+T6 / R6 T7 / R7 审计+flag-diff（含 1 个 lint 修复提交）
-- M2 额外产出：修出并修复预存生产 bug `stopKaijiBotChrome`（SIGTERM 后立即 SIGKILL，profile 状态从不落盘——影响所有 stop 路径）
+- M2 额外产出：修出并修复预存生产 bug `stopAllBotChrome`（SIGTERM 后立即 SIGKILL，profile 状态从不落盘——影响所有 stop 路径）
 - CI 41326775671：Install ✅ / Check ✅ / Test 首跑唯一失败为已知 preauth 时序 flake（10-23 起预存，M1 同款）→ 已 rerun --failed
 
 ## M2 里程碑收口 ✅（2026-11-02）
@@ -152,11 +152,11 @@ T8 注记：flag-diff 脚本原先硬编码 cognitive config，对 extensions ta
 
 ## M3 设计摸底（读代码轮，无代码改动）
 
-已有积木（探索报告，文件级引用已核）：跨 agent 派发（gateway `agent` RPC + `spawnSubagentDirect` subagent-spawn.ts:707，allowAgents 门控 :451-471）、完成推送（announce 流把 task_completion 内部事件推回请求方会话 subagent-announce.ts:560-619）、M1 任务系统全套、按会话 wake 惯用法（enqueueSystemEvent + requestHeartbeatNow，可唤醒任意 agent 会话）、每 agent workspace 解析（agent-scope.ts:266-287）+ `.kaijibot/` 子目录惯例。
+已有积木（探索报告，文件级引用已核）：跨 agent 派发（gateway `agent` RPC + `spawnSubagentDirect` subagent-spawn.ts:707，allowAgents 门控 :451-471）、完成推送（announce 流把 task_completion 内部事件推回请求方会话 subagent-announce.ts:560-619）、M1 任务系统全套、按会话 wake 惯用法（enqueueSystemEvent + requestHeartbeatNow，可唤醒任意 agent 会话）、每 agent workspace 解析（agent-scope.ts:266-287）+ `.allbot/` 子目录惯例。
 
 **真缺口**：① TaskRecord 无 parentTaskId/assignedAgentId；② `"blocked"` 是死状态（无人设置、claimNext 忽略）；③ 无父任务聚合（子终态→父推进）；④ 无每 task 共享工作区/工作记忆文件；⑤ 步驱动只跑任务自身 agent 的会话（server.impl.ts:1851-1863）；⑥ 无任务 gateway RPC（M4 也要用）。
 
-**M3 轮次规划**：R1 TaskRecord 扩展（parentTaskId/assignedAgentId/listByParent + blocked 真实语义：claim 跳过、unblock→queued）→ R2 子任务指派（task_create 加 assignToAgent 走 allowAgents 门 + 共享任务目录 `<workspace>/.kaijibot/tasks/<id>/` + WORKING_MEMORY.md + 子任务步驱动按 assignedAgentId 解析会话）→ R3 聚合钩子（子终态 → 全子终态检查 → 父 blocked→queued + 父会话 wake，父下一步读子结果汇总）→ R4 T9 双 agent e2e → R5 T10 全量收口。
+**M3 轮次规划**：R1 TaskRecord 扩展（parentTaskId/assignedAgentId/listByParent + blocked 真实语义：claim 跳过、unblock→queued）→ R2 子任务指派（task_create 加 assignToAgent 走 allowAgents 门 + 共享任务目录 `<workspace>/.allbot/tasks/<id>/` + WORKING_MEMORY.md + 子任务步驱动按 assignedAgentId 解析会话）→ R3 聚合钩子（子终态 → 全子终态检查 → 父 blocked→queued + 父会话 wake，父下一步读子结果汇总）→ R4 T9 双 agent e2e → R5 T10 全量收口。
 
 ## M3-R1/R2 轮次记录
 
@@ -171,7 +171,7 @@ T8 注记：flag-diff 脚本原先硬编码 cognitive config，对 extensions ta
 
 | 轮  | 机制点                                                                                                                                                                                                                                                                                                                                                    | 证据                                                                                                                                                |
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R3  | 聚合：runner `onTaskTerminal` 钩子（done/failed/halt 后调用、错误吞掉只记日志）；`aggregate.ts`——子任务终态 → 父 blocked 且全兄弟终态 → 父 re-queue + `subtaskResults[]` 落盘 + wakeParent（无会话则 60s tick 兜底）；步驱动提示词扩展：子任务结果段 + 共享工作区段（`resolveSharedTaskDir`，网关接线为父 agent workspace 下 `.kaijibot/tasks/<rootId>`） | aggregation.test 3/3（全终态才放行/部分等待、非子/未停靠忽略、全链：子 done→父释放→下一步提示含结果→汇总交付）；全套 43/43；tsgo/check PASS；已提交 |
+| R3  | 聚合：runner `onTaskTerminal` 钩子（done/failed/halt 后调用、错误吞掉只记日志）；`aggregate.ts`——子任务终态 → 父 blocked 且全兄弟终态 → 父 re-queue + `subtaskResults[]` 落盘 + wakeParent（无会话则 60s tick 兜底）；步驱动提示词扩展：子任务结果段 + 共享工作区段（`resolveSharedTaskDir`，网关接线为父 agent workspace 下 `.allbot/tasks/<rootId>`） | aggregation.test 3/3（全终态才放行/部分等待、非子/未停靠忽略、全链：子 done→父释放→下一步提示含结果→汇总交付）；全套 43/43；tsgo/check PASS；已提交 |
 | R4  | **T9 双 agent e2e**：真 task_create 工具拆两子（researcher/writer 各一，store 对齐运行时 CONFIG_DIR）→ 两实例各自 runner 生产步驱动 + 真 task_step_report 无人值守执行 → 第二子完成后聚合释放父 → 父步 2 提示含两路结果与共享区路径 → 合并交付。断言：三条任务轨迹（父 2 步 + 两子各 1 步）、双结果进父 result、3 条完成交付                              | multi-agent.integration.test.ts 1/1（一次通过）；全套 44/44；check PASS；已提交                                                                     |
 | R5  | T10：全套 `src/cognitive/tasks` 44/44 + 全量 pnpm test 以 CI 为准（本地全量不可靠，M1/M2 既定）                                                                                                                                                                                                                                                           | 推双远端 + CI（见里程碑收口）                                                                                                                       |
 
@@ -187,11 +187,11 @@ T8 注记：flag-diff 脚本原先硬编码 cognitive config，对 extensions ta
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1  | **T11 RPC**：协议面 additive——`schema/tasks.ts`（TasksList/GetParamsSchema）→ protocol-schemas 注册 → types → validators；`cognitiveTaskHandlers`：`tasks.list`（活跃快照默认，includeFinished 可选，agent/user 过滤，updatedAt 降序）+ `tasks.get`（findTaskAcrossAgents 全记录含完整 steps）                                                            | gateway lane tasks.test 5/5（快照+预算字段+排序/过滤+含完结/坏参拒绝/全记录 steps/跨 agent 解析+404）；protocol index.test 8/8；tsgo/check PASS；已提交           |
 | R2  | **Control UI 任务面板**：`views/tasks.ts`（状态色 pill、步骤 x/y、相对时间、点击展开完整执行轨迹：steps trail + 子任务结果 + 最终结果；"显示已完结"切换）+ `controllers/tasks.ts`（loadTasks/loadTaskDetail）+ navigation "tasks" tab（/tasks, zap 图标）+ app/view-state/render/settings 接线 + i18n en/de/zh-CN（de 差距保持 151 不扩大：2 键双语都加） | navigation.test 通过；translate.test 仅既存 de 差距失败（619 vs 770 = 差 151，与基线一致未弱化）；tsgo/check PASS；已提交                                         |
-| R3  | **T12 演示凭证**：`scripts/demo-tasks-audit.mjs`——连真实网关（--url/--token 或读 ~/.kaijibot 配置）走 connect → tasks.list →（首个任务）tasks.get 打印执行轨迹；`--get <id> --user <uid>` 查指定任务；连不上 10s 超时清晰报错（本机 ws 端口黑洞验证）                                                                                                     | 脚本 connect-timeout 路径实测（Error: connect timeout: ws://127.0.0.1:1）；完整链路等 operator 在实机网关上复核（需开 cognitive.tasks.enabled——实机验证仍需同意） |
+| R3  | **T12 演示凭证**：`scripts/demo-tasks-audit.mjs`——连真实网关（--url/--token 或读 ~/.allbot 配置）走 connect → tasks.list →（首个任务）tasks.get 打印执行轨迹；`--get <id> --user <uid>` 查指定任务；连不上 10s 超时清晰报错（本机 ws 端口黑洞验证）                                                                                                     | 脚本 connect-timeout 路径实测（Error: connect timeout: ws://127.0.0.1:1）；完整链路等 operator 在实机网关上复核（需开 cognitive.tasks.enabled——实机验证仍需同意） |
 
 **T12 复现步骤（operator 实机）**：
 
-1. `kaijibot config set cognitive.tasks.enabled true && pnpm gw:deploy`
+1. `allbot config set cognitive.tasks.enabled true && pnpm gw:deploy`
 2. 在聊天/飞书对 agent 说「帮我建一个任务：<多步目标>」
 3. `node scripts/demo-tasks-audit.mjs` → 打印任务列表 + 首任务执行轨迹
 4. 打开 Control UI → 任务 tab → 同一轨迹的渲染视图（列表点击展开 steps/子任务结果/最终结果）
@@ -223,13 +223,13 @@ T8 注记：flag-diff 脚本原先硬编码 cognitive config，对 extensions ta
 
 ## 留给 operator 的实机验证清单（需同意，未动生产配置）
 
-1. `kaijibot config set cognitive.tasks.enabled true && pnpm gw:deploy` → 飞书/聊天委派任务 → Control UI「任务」tab 看轨迹（T12 实机走查）
-2. `kaijibot config set browser.proxy.enabled true` → agent 调 `browser action=login` 人工登录一次 → 重启网关后登录态仍在（T6 实机形态）
+1. `allbot config set cognitive.tasks.enabled true && pnpm gw:deploy` → 飞书/聊天委派任务 → Control UI「任务」tab 看轨迹（T12 实机走查）
+2. `allbot config set browser.proxy.enabled true` → agent 调 `browser action=login` 人工登录一次 → 重启网关后登录态仍在（T6 实机形态）
 3. 多 agent：配置 agents.list（researcher/writer）→ 父任务步骤里 `task_create(assignToAgent, parentTaskId)` 拆分（T9 实机形态）
 
 ## 整程额外修出的预存生产 bug（本目标范围外收益）
 
-1. `stopKaijiBotChrome`：SIGTERM 后立即 SIGKILL，Chrome profile 状态从不落盘（M2/T6）
+1. `stopAllBotChrome`：SIGTERM 后立即 SIGKILL，Chrome profile 状态从不落盘（M2/T6）
 2. flag-diff 脚本对 extensions 目标 0/0 空跑假绿（M2/T8）
 3. scheduler 快照清账本复位 / media TTL 误删一级目录 / chat.send MediaPath 永不匹配（对抗审查轮）
 
@@ -254,12 +254,12 @@ T8 注记：flag-diff 脚本原先硬编码 cognitive config，对 extensions ta
 
 ## 实证结果 ✅（key 刷新后完成，2026-11-02）
 
-- **链路打通**：解析/编译/执行正常，真实到达 `api.z.ai` 并收到应答。首次尝试阻塞于过期凭据（本机两处 `ZAI_API_KEY` 均 401 "token expired or incorrect"，直连 curl 探针证实；本机网关自 2026-08-20 后未运行）→ operator 刷新 `~/.kaijibot/.env` 后完成。
+- **链路打通**：解析/编译/执行正常，真实到达 `api.z.ai` 并收到应答。首次尝试阻塞于过期凭据（本机两处 `ZAI_API_KEY` 均 401 "token expired or incorrect"，直连 curl 探针证实；本机网关自 2026-08-20 后未运行）→ operator 刷新 `~/.allbot/.env` 后完成。
 - **真模型两用例最终 2×2 连续全绿**（两轮完整运行，4/4 真模型断言）：
   1. 步握手 ✅：`task_step_report`，taskId 逐字匹配、stepIndex=1、summary 实质、done=true
   2. 拆分判断 ✅：可并行目标拆出 ≥2 个 `task_create`，每个 `parentTaskId` 逐字正确挂接（此前 T9 只有测试驱动的拆分；现在是模型自己的判断）
 - **过程中修出的第 5 个真模型行为问题**：首跑模型一步完成工作但报 `done: false`（认为才第 1/3 步不该标完成）→ 生产影响为每任务多烧一步预算（有界，不挂死）。修复：done 指引行补「summary 已含最终结果时应立即置 true，不必为凑满步骤数而留到后续步骤」。修复后连续两轮 done=true 稳定。
-- 复核命令：`set -a && . ~/.kaijibot/.env && set +a && KAIJIBOT_LIVE_TEST=1 corepack pnpm test:live src/cognitive/tasks/task-step-prompt.live.test.ts`
+- 复核命令：`set -a && . ~/.allbot/.env && set +a && ALLBOT_LIVE_TEST=1 corepack pnpm test:live src/cognitive/tasks/task-step-prompt.live.test.ts`
 - 回归：`pnpm test src/cognitive/tasks` 44/44 绿（含新断言锚定）；`pnpm format` + `pnpm check` 全绿。
 
 ## 提交
@@ -316,8 +316,8 @@ operator 拍板：多数用户以飞书为唯一界面，看不到 Control UI—
 ## 生产实机上线（operator dogfood 通过：「试了，不错」）
 
 - `cognitive.tasks.enabled=true` + 生产模型 `agents.defaults.model.primary=zai/glm-5.3-flash` 写入运行配置；`gw:deploy` 启动；boot log：`agent model: zai/glm-5.3-flash` + `cognitive task runner started`；飞书 WS 双 profile 已连。
-- **过程中排掉的两层过期 key 遮蔽**（401 根因）：① 项目 `.env` 旧 key 遮蔽 `~/.kaijibot/.env` 新 key（env 源优先级：进程 env → 项目 .env → home .env）；② `~/.kaijibot/agents/main/agent/auth-profiles.json` 的 `zai:default` 存储优先级高于 env，仍持旧 key（头 7b0c）——推理走此存储，状态页配额探针走另一路径，**导致"状态页健康但推理 401"的误导性假象**。修复两处后以真实 agent turn 实证（status ok，回复"正常"，zai/glm-5.3-flash，真实 token 计费）。教训入档：验证推理链必须打真实推理，不能只看状态探针。
-- 顺带发现 AGENTS.md 的 `kaijibot config set agent.model` 已过时（实际键 `agents.defaults.model.primary`）。
+- **过程中排掉的两层过期 key 遮蔽**（401 根因）：① 项目 `.env` 旧 key 遮蔽 `~/.allbot/.env` 新 key（env 源优先级：进程 env → 项目 .env → home .env）；② `~/.allbot/agents/main/agent/auth-profiles.json` 的 `zai:default` 存储优先级高于 env，仍持旧 key（头 7b0c）——推理走此存储，状态页配额探针走另一路径，**导致"状态页健康但推理 401"的误导性假象**。修复两处后以真实 agent turn 实证（status ok，回复"正常"，zai/glm-5.3-flash，真实 token 计费）。教训入档：验证推理链必须打真实推理，不能只看状态探针。
+- 顺带发现 AGENTS.md 的 `allbot config set agent.model` 已过时（实际键 `agents.defaults.model.primary`）。
 
 ## 仓库默认值翻转（operator 同意链：先 dogfood → 本轮翻转）
 
@@ -355,8 +355,8 @@ operator 拍板：多数用户以飞书为唯一界面，看不到 Control UI—
 # R29 — v2026.11.02 发版收口（2026-11-02）
 
 - 主干 CI 41472094004 全绿（22 分钟）→ `release.sh 2026.11.02` → tag + 双远端 + Release tarball 上传成功。
-- **npm 发版事故与处置（流程教训入档）**：首次 publish-npm job 日志显示完全成功（`+ kaijibot@2026.11.2`、provenance 签发 logIndex 3643641387），但 registry 上版本端点 404、packument 无此版本、40+ 分钟未落地——**npm 侧"接受但未摄取"失败，状态页/成功日志在此场景下是假信号**。处置：版本未落地即重发合法 → `gh run rerun --job` 仅重跑 publish-npm → 约 5 分钟后落地，`npm view kaijibot version` = **2026.11.2**（semver 规范化剥掉日期前导零；下次发版版本号直接用不补零写法，tag 名与 npm 版本号保持一致）。
-- 终态：npm latest = 2026.11.2 ✅；GitHub Release tarball = kaijibot-2026.11.02.tgz ✅；Android 安装链路 ✅。
+- **npm 发版事故与处置（流程教训入档）**：首次 publish-npm job 日志显示完全成功（`+ allbot@2026.11.2`、provenance 签发 logIndex 3643641387），但 registry 上版本端点 404、packument 无此版本、40+ 分钟未落地——**npm 侧"接受但未摄取"失败，状态页/成功日志在此场景下是假信号**。处置：版本未落地即重发合法 → `gh run rerun --job` 仅重跑 publish-npm → 约 5 分钟后落地，`npm view allbot version` = **2026.11.2**（semver 规范化剥掉日期前导零；下次发版版本号直接用不补零写法，tag 名与 npm 版本号保持一致）。
+- 终态：npm latest = 2026.11.2 ✅；GitHub Release tarball = allbot-2026.11.02.tgz ✅；Android 安装链路 ✅。
 - 验证发布成功以 **registry 版本端点 200** 为准，publish job success 不足为凭。
 
 # R30 — CI flake 链根治 + 仓库清理（2026-11-02/03）

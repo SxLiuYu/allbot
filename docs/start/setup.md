@@ -1,5 +1,5 @@
 ---
-summary: "Advanced setup and development workflows for KaijiBot"
+summary: "Advanced setup and development workflows for AllBot"
 read_when:
   - Setting up a new machine
   - You want “latest + greatest” without breaking your personal setup
@@ -15,8 +15,8 @@ For onboarding details, see [Onboarding (CLI)](/start/wizard).
 
 ## TL;DR
 
-- **Tailoring lives outside the repo:** `~/.kaijibot/workspace` (workspace) + `~/.kaijibot/kaijibot.json` (config).
-- **Standard workflow:** run `kaijibot setup`, configure Feishu credentials, then start the Gateway.
+- **Tailoring lives outside the repo:** `~/.allbot/workspace` (workspace) + `~/.allbot/allbot.json` (config).
+- **Standard workflow:** run `allbot setup`, configure Feishu credentials, then start the Gateway.
 - **Bleeding edge workflow:** run the Gateway yourself via `pnpm gateway:watch` for hot-reload development.
 
 ## Prereqs (from source)
@@ -29,29 +29,29 @@ For onboarding details, see [Onboarding (CLI)](/start/wizard).
 
 If you want “100% tailored to me” _and_ easy updates, keep your customization in:
 
-- **Config:** `~/.kaijibot/kaijibot.json` (JSON/JSON5-ish)
-- **Workspace:** `~/.kaijibot/workspace` (skills, prompts, memories; make it a private git repo)
+- **Config:** `~/.allbot/allbot.json` (JSON/JSON5-ish)
+- **Workspace:** `~/.allbot/workspace` (skills, prompts, memories; make it a private git repo)
 
 Bootstrap once:
 
 ```bash
-kaijibot setup
+allbot setup
 ```
 
 From inside this repo, use the local CLI entry:
 
 ```bash
-kaijibot setup
+allbot setup
 ```
 
-If you don’t have a global install yet, run it via `pnpm kaijibot setup` (or `bun run kaijibot setup` if you are using the Bun workflow).
+If you don’t have a global install yet, run it via `pnpm allbot setup` (or `bun run allbot setup` if you are using the Bun workflow).
 
 ## Run the Gateway from this repo
 
 After `pnpm build`, you can run the packaged CLI directly:
 
 ```bash
-node kaijibot.mjs gateway --port 18789 --verbose
+node allbot.mjs gateway --port 18789 --verbose
 ```
 
 ## Standard workflow (Feishu channel)
@@ -59,14 +59,14 @@ node kaijibot.mjs gateway --port 18789 --verbose
 1. Run setup:
 
 ```bash
-kaijibot setup
+allbot setup
 ```
 
 2. Configure Feishu credentials:
 
 ```bash
-kaijibot config set channels.feishu.appId "your-app-id"
-kaijibot config set channels.feishu.appSecret "your-app-secret"
+allbot config set channels.feishu.appId "your-app-id"
+allbot config set channels.feishu.appSecret "your-app-secret"
 ```
 
 Create your Feishu app at [open.feishu.cn](https://open.feishu.cn/) and enable
@@ -75,18 +75,18 @@ WebSocket events.
 3. Start the Gateway:
 
 ```bash
-kaijibot gateway
+allbot gateway
 ```
 
 4. Sanity check:
 
 ```bash
-kaijibot health
+allbot health
 ```
 
 If onboarding is not available in your build:
 
-- Run `kaijibot setup`, then `kaijibot gateway` manually.
+- Run `allbot setup`, then `allbot gateway` manually.
 
 ## Bleeding edge workflow (Gateway in a terminal)
 
@@ -112,17 +112,17 @@ bun run gateway:watch
 ### 2) Verify
 
 ```bash
-kaijibot health
+allbot health
 ```
 
 ### Common footguns
 
 - **Wrong port:** Gateway WS defaults to `ws://127.0.0.1:18789`; keep app + CLI on the same port.
 - **Where state lives:**
-  - Channel/provider state: `~/.kaijibot/credentials/`
-  - Model auth profiles: `~/.kaijibot/agents/<agentId>/agent/auth-profiles.json`
-  - Sessions: `~/.kaijibot/agents/<agentId>/sessions/`
-  - Logs: `/tmp/kaijibot/`
+  - Channel/provider state: `~/.allbot/credentials/`
+  - Model auth profiles: `~/.allbot/agents/<agentId>/agent/auth-profiles.json`
+  - Sessions: `~/.allbot/agents/<agentId>/sessions/`
+  - Logs: `/tmp/allbot/`
 
 ## Credential storage map
 
@@ -130,16 +130,16 @@ Use this when debugging auth or deciding what to back up:
 
 - **Feishu credentials**: `channels.feishu.appId` and `channels.feishu.appSecret` in config or env
 - **Pairing allowlists**:
-  - `~/.kaijibot/credentials/<channel>-allowFrom.json` (default account)
-  - `~/.kaijibot/credentials/<channel>-<accountId>-allowFrom.json` (non-default accounts)
-- **Model auth profiles**: `~/.kaijibot/agents/<agentId>/agent/auth-profiles.json`
-- **File-backed secrets payload (optional)**: `~/.kaijibot/secrets.json`
-- **Legacy OAuth import**: `~/.kaijibot/credentials/oauth.json`
+  - `~/.allbot/credentials/<channel>-allowFrom.json` (default account)
+  - `~/.allbot/credentials/<channel>-<accountId>-allowFrom.json` (non-default accounts)
+- **Model auth profiles**: `~/.allbot/agents/<agentId>/agent/auth-profiles.json`
+- **File-backed secrets payload (optional)**: `~/.allbot/secrets.json`
+- **Legacy OAuth import**: `~/.allbot/credentials/oauth.json`
   More detail: [Security](/gateway/security#credential-storage-map).
 
 ## Updating (without wrecking your setup)
 
-- Keep `~/.kaijibot/workspace` and `~/.kaijibot/` as “your stuff”; don’t put personal prompts/config into the `kaijibot` repo.
+- Keep `~/.allbot/workspace` and `~/.allbot/` as “your stuff”; don’t put personal prompts/config into the `allbot` repo.
 - Updating source: `git pull` + your chosen package-manager install step (`pnpm install` by default; `bun install` for Bun workflow) + keep using the matching `gateway:watch` command.
 
 ## Linux (systemd user service)
@@ -160,4 +160,4 @@ user service (no lingering needed). See [Gateway runbook](/gateway) for the syst
 - [Gateway runbook](/gateway) (flags, supervision, ports)
 - [Gateway configuration](/gateway/configuration) (config schema + examples)
 - [Feishu](/channels/feishu) (App ID, App Secret, WebSocket event setup)
-- [KaijiBot assistant setup](/start/kaijibot)
+- [AllBot assistant setup](/start/allbot)

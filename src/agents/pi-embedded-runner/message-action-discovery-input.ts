@@ -1,7 +1,7 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 export function buildEmbeddedMessageActionDiscoveryInput(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   channel: string;
   currentChannelId?: string | null;
   currentThreadTs?: string | null;

@@ -14,7 +14,7 @@ vi.mock("../../config/config.js", () => ({
   loadConfig: mocks.loadConfig,
   readConfigFileSnapshot: vi.fn(async () => ({
     config: {},
-    path: "kaijibot.config.json",
+    path: "allbot.config.json",
     raw: "{}",
   })),
 }));

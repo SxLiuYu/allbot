@@ -60,7 +60,7 @@ export const CognitiveFeedbackSchema = z
 /**
  * Fields retained in the config loader for backward compatibility but no
  * longer read by any production code. They are stripped before validation
- * with a deprecation warning so existing kaijibot.json files keep working.
+ * with a deprecation warning so existing allbot.json files keep working.
  */
 const DEPRECATED_EVOLUTION_KEYS = [
   "minComplexity",
@@ -77,7 +77,7 @@ export const CognitiveEvolutionSchema = z
       for (const key of DEPRECATED_EVOLUTION_KEYS) {
         if (key in obj) {
           console.warn(
-            `[kaijibot] config.cognitive.evolution.${key} is deprecated, ignored, and will be removed in a future version. Remove it from your kaijibot.json.`,
+            `[allbot] config.cognitive.evolution.${key} is deprecated, ignored, and will be removed in a future version. Remove it from your allbot.json.`,
           );
           delete obj[key];
         }

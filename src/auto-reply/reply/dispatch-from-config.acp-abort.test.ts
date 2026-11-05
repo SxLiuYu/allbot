@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type {
   AcpRuntime,
   AcpRuntimeEnsureInput,
@@ -54,7 +54,7 @@ function setNoAbort() {
 
 function createMockAcpSessionManager() {
   return {
-    resolveSession: (params: { cfg: KaijiBotConfig; sessionKey: string }) => {
+    resolveSession: (params: { cfg: AllBotConfig; sessionKey: string }) => {
       const entry = acpMocks.readAcpSessionEntry({
         cfg: params.cfg,
         sessionKey: params.sessionKey,
@@ -82,7 +82,7 @@ function createMockAcpSessionManager() {
     }),
     runTurn: vi.fn(
       async (params: {
-        cfg: KaijiBotConfig;
+        cfg: AllBotConfig;
         sessionKey: string;
         text?: string;
         attachments?: unknown[];
@@ -244,7 +244,7 @@ describe("dispatchReplyFromConfig ACP abort", () => {
           enabled: true,
           dispatch: { enabled: true },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       dispatcher,
       replyOptions: { abortSignal: abortController.signal },
     });

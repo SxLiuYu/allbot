@@ -24,8 +24,8 @@ describe("agents/context eager warmup", () => {
   });
 
   it.each([
-    ["models", ["node", "kaijibot", "models", "set", "openai/gpt-5.4"]],
-    ["agent", ["node", "kaijibot", "agent", "--message", "ok"]],
+    ["models", ["node", "allbot", "models", "set", "openai/gpt-5.4"]],
+    ["agent", ["node", "allbot", "agent", "--message", "ok"]],
   ])("does not eager-load config for %s commands on import", async (_label, argv) => {
     process.argv = argv;
     await import("./context.js");
@@ -34,7 +34,7 @@ describe("agents/context eager warmup", () => {
   });
 
   it("does not eager-load config when onboard imports command-auth through plugin-sdk", async () => {
-    process.argv = ["node", "kaijibot", "onboard"];
+    process.argv = ["node", "allbot", "onboard"];
 
     await import("../plugin-sdk/command-auth.js");
 
@@ -42,7 +42,7 @@ describe("agents/context eager warmup", () => {
   });
 
   it("does not eager-load config when pairing approve imports command-auth through plugin-sdk", async () => {
-    process.argv = ["node", "kaijibot", "pairing", "approve", "feishu", "BAH8YVB3"];
+    process.argv = ["node", "allbot", "pairing", "approve", "feishu", "BAH8YVB3"];
 
     await import("../plugin-sdk/command-auth.js");
 
@@ -50,7 +50,7 @@ describe("agents/context eager warmup", () => {
   });
 
   it("does not eager-load config when channels login imports command-auth through plugin-sdk", async () => {
-    process.argv = ["node", "kaijibot", "channels", "login", "--channel", "kaijibot-weixin"];
+    process.argv = ["node", "allbot", "channels", "login", "--channel", "allbot-weixin"];
 
     await import("../plugin-sdk/command-auth.js");
 

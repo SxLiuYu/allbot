@@ -13,7 +13,7 @@ import { migrateWorkspace } from "./migrate-workspace.js";
 import type { DataType, MigrationOptions, MigrationSource } from "./types.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-openclaw-migrator-test-");
+const createTempDir = () => tempDirs.make("allbot-openclaw-migrator-test-");
 
 afterEach(async () => {
   await tempDirs.cleanup();
@@ -113,7 +113,7 @@ describe("detectMigrationSource", () => {
 // ─── migrate-config.ts ────────────────────────────────────────────────────────
 
 describe("migrateConfig", () => {
-  it("creates new config from source with KaijiBot defaults", async () => {
+  it("creates new config from source with AllBot defaults", async () => {
     const sourceDir = await createTempDir();
     const targetDir = await createTempDir();
     const source = makeSource(sourceDir);
@@ -126,7 +126,7 @@ describe("migrateConfig", () => {
     expect(result.changes[0]!.kind).toBe("create");
 
     const written = JSON.parse(
-      await fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8"),
+      await fs.readFile(path.join(targetDir, "allbot.json"), "utf-8"),
     ) as Record<string, unknown>;
     expect(written.agent).toEqual({ model: "gpt-4" });
     expect((written.cognitive as Record<string, unknown>).enabled).toBe(true);
@@ -142,7 +142,7 @@ describe("migrateConfig", () => {
     await migrateConfig(source, targetDir, defaultOptions());
 
     const written = JSON.parse(
-      await fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8"),
+      await fs.readFile(path.join(targetDir, "allbot.json"), "utf-8"),
     ) as Record<string, unknown>;
     expect((written.cognitive as Record<string, unknown>).enabled).toBe(false);
     expect((written.cognitive as Record<string, unknown>).proactive).toBeDefined();
@@ -155,7 +155,7 @@ describe("migrateConfig", () => {
     const source = makeSource(sourceDir);
 
     await fs.writeFile(source.configPath, JSON.stringify({ agent: { model: "gpt-4" } }));
-    await fs.writeFile(path.join(targetDir, "kaijibot.json"), JSON.stringify({ existing: true }));
+    await fs.writeFile(path.join(targetDir, "allbot.json"), JSON.stringify({ existing: true }));
 
     const result = await migrateConfig(source, targetDir, defaultOptions());
 
@@ -164,7 +164,7 @@ describe("migrateConfig", () => {
     expect(result.changes).toHaveLength(0);
 
     const targetContent = JSON.parse(
-      await fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8"),
+      await fs.readFile(path.join(targetDir, "allbot.json"), "utf-8"),
     ) as Record<string, unknown>;
     expect(targetContent.existing).toBe(true);
     expect(targetContent.agent).toBeUndefined();
@@ -177,7 +177,7 @@ describe("migrateConfig", () => {
 
     const configContent = JSON.stringify({ agent: { model: "gpt-4" } });
     await fs.writeFile(source.configPath, configContent);
-    await fs.writeFile(path.join(targetDir, "kaijibot.json"), configContent);
+    await fs.writeFile(path.join(targetDir, "allbot.json"), configContent);
 
     const result = await migrateConfig(source, targetDir, defaultOptions());
 
@@ -191,7 +191,7 @@ describe("migrateConfig", () => {
     const source = makeSource(sourceDir);
 
     await fs.writeFile(source.configPath, JSON.stringify({ agent: { model: "gpt-4" } }));
-    await fs.writeFile(path.join(targetDir, "kaijibot.json"), JSON.stringify({ existing: true }));
+    await fs.writeFile(path.join(targetDir, "allbot.json"), JSON.stringify({ existing: true }));
 
     const result = await migrateConfig(source, targetDir, defaultOptions({ overwrite: true }));
 
@@ -199,7 +199,7 @@ describe("migrateConfig", () => {
     expect(result.changes[0]!.kind).toBe("merge");
 
     const written = JSON.parse(
-      await fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8"),
+      await fs.readFile(path.join(targetDir, "allbot.json"), "utf-8"),
     ) as Record<string, unknown>;
     expect(written.existing).toBe(true);
     expect(written.agent).toBeDefined();
@@ -217,7 +217,7 @@ describe("migrateConfig", () => {
     expect(result.changes).toHaveLength(1);
     expect(result.changes[0]!.detail).toContain("Would create");
 
-    await expect(fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8")).rejects.toMatchObject(
+    await expect(fs.readFile(path.join(targetDir, "allbot.json"), "utf-8")).rejects.toMatchObject(
       { code: "ENOENT" },
     );
   });
@@ -1054,14 +1054,14 @@ describe("runMigration", () => {
 // ─── detectScenario ─────────────────────────────────────────────────────────
 
 describe("detectScenario", () => {
-  it("returns 'fresh' when no kaijibot.json exists", () => {
+  it("returns 'fresh' when no allbot.json exists", () => {
     const scenario = detectScenario("/nonexistent/path");
     expect(scenario).toBe("fresh");
   });
 
-  it("returns 'import' when kaijibot.json exists", async () => {
+  it("returns 'import' when allbot.json exists", async () => {
     const dir = await createTempDir();
-    await fs.writeFile(path.join(dir, "kaijibot.json"), "{}");
+    await fs.writeFile(path.join(dir, "allbot.json"), "{}");
     const scenario = detectScenario(dir);
     expect(scenario).toBe("import");
   });
@@ -1279,32 +1279,32 @@ describe("runImportMigration", () => {
 // ─── rewriteConfigPaths ─────────────────────────────────────────────────────
 
 describe("rewriteConfigPaths", () => {
-  it("rewrites ~/.openclaw/ paths to ~/.kaijibot/", () => {
+  it("rewrites ~/.openclaw/ paths to ~/.allbot/", () => {
     const config = {
       workspacePath: "~/.openclaw/workspace",
       nested: {
         dataDir: "~/.openclaw/data/files",
       },
     };
-    const result = rewriteConfigPaths(config, "/home/user/.openclaw", "/home/user/.kaijibot");
-    expect(result.workspacePath).toBe("~/.kaijibot/workspace");
-    expect((result.nested as Record<string, unknown>).dataDir).toBe("~/.kaijibot/data/files");
+    const result = rewriteConfigPaths(config, "/home/user/.openclaw", "/home/user/.allbot");
+    expect(result.workspacePath).toBe("~/.allbot/workspace");
+    expect((result.nested as Record<string, unknown>).dataDir).toBe("~/.allbot/data/files");
   });
 
-  it("rewrites ~/.clawdbot/ paths to ~/.kaijibot/", () => {
+  it("rewrites ~/.clawdbot/ paths to ~/.allbot/", () => {
     const config = {
       path: "~/.clawdbot/something",
     };
-    const result = rewriteConfigPaths(config, "/home/user/.clawdbot", "/home/user/.kaijibot");
-    expect(result.path).toBe("~/.kaijibot/something");
+    const result = rewriteConfigPaths(config, "/home/user/.clawdbot", "/home/user/.allbot");
+    expect(result.path).toBe("~/.allbot/something");
   });
 
-  it("rewrites ~/.moltbot/ paths to ~/.kaijibot/", () => {
+  it("rewrites ~/.moltbot/ paths to ~/.allbot/", () => {
     const config = {
       path: "~/.moltbot/something",
     };
-    const result = rewriteConfigPaths(config, "/home/user/.moltbot", "/home/user/.kaijibot");
-    expect(result.path).toBe("~/.kaijibot/something");
+    const result = rewriteConfigPaths(config, "/home/user/.moltbot", "/home/user/.allbot");
+    expect(result.path).toBe("~/.allbot/something");
   });
 
   it("rewrites absolute paths under sourceDir to targetDir", () => {
@@ -1312,9 +1312,9 @@ describe("rewriteConfigPaths", () => {
       workspacePath: "/home/user/.openclaw/workspace-researcher",
       dataDir: "/home/user/.openclaw/data",
     };
-    const result = rewriteConfigPaths(config, "/home/user/.openclaw", "/home/user/.kaijibot");
-    expect(result.workspacePath).toBe(path.normalize("/home/user/.kaijibot/workspace-researcher"));
-    expect(result.dataDir).toBe(path.normalize("/home/user/.kaijibot/data"));
+    const result = rewriteConfigPaths(config, "/home/user/.openclaw", "/home/user/.allbot");
+    expect(result.workspacePath).toBe(path.normalize("/home/user/.allbot/workspace-researcher"));
+    expect(result.dataDir).toBe(path.normalize("/home/user/.allbot/data"));
   });
 
   it("rewrites ~/ style absolute paths under sourceDir", () => {
@@ -1324,9 +1324,9 @@ describe("rewriteConfigPaths", () => {
     const result = rewriteConfigPaths(
       config,
       path.join(os.homedir(), ".openclaw"),
-      path.join(os.homedir(), ".kaijibot"),
+      path.join(os.homedir(), ".allbot"),
     );
-    expect(result.workspacePath).toBe("~/.kaijibot/workspace-researcher");
+    expect(result.workspacePath).toBe("~/.allbot/workspace-researcher");
   });
 
   it("preserves non-matching paths unchanged", () => {
@@ -1335,7 +1335,7 @@ describe("rewriteConfigPaths", () => {
       someUrl: "https://example.com/path",
       unrelatedPath: "/usr/local/bin",
     };
-    const result = rewriteConfigPaths(config, "/home/user/.openclaw", "/home/user/.kaijibot");
+    const result = rewriteConfigPaths(config, "/home/user/.openclaw", "/home/user/.allbot");
     expect(result.model).toBe("gpt-4");
     expect(result.someUrl).toBe("https://example.com/path");
     expect(result.unrelatedPath).toBe("/usr/local/bin");
@@ -1353,17 +1353,17 @@ describe("rewriteConfigPaths", () => {
     const result = rewriteConfigPaths(
       config,
       path.join(os.homedir(), ".openclaw"),
-      path.join(os.homedir(), ".kaijibot"),
+      path.join(os.homedir(), ".allbot"),
     );
     const list = (result.agents as Record<string, unknown>).list as Array<Record<string, unknown>>;
-    expect(list[0]!.workspace).toBe("~/.kaijibot/workspace-researcher");
-    expect(list[1]!.workspace).toBe("~/.kaijibot/workspace-coder");
+    expect(list[0]!.workspace).toBe("~/.allbot/workspace-researcher");
+    expect(list[1]!.workspace).toBe("~/.allbot/workspace-coder");
   });
 
   it("does not mutate the original config", () => {
     const original = { path: "~/.openclaw/workspace" };
     const copy = JSON.parse(JSON.stringify(original));
-    rewriteConfigPaths(original, "/home/user/.openclaw", "/home/user/.kaijibot");
+    rewriteConfigPaths(original, "/home/user/.openclaw", "/home/user/.allbot");
     expect(original).toEqual(copy);
   });
 });
@@ -1388,10 +1388,10 @@ describe("migrateConfig path rewriting", () => {
     await migrateConfig(source, targetDir, defaultOptions());
 
     const written = JSON.parse(
-      await fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8"),
+      await fs.readFile(path.join(targetDir, "allbot.json"), "utf-8"),
     ) as Record<string, unknown>;
-    expect(written.workspacePath).toBe("~/.kaijibot/workspace");
-    expect((written.nested as Record<string, unknown>).dataDir).toBe("~/.kaijibot/data");
+    expect(written.workspacePath).toBe("~/.allbot/workspace");
+    expect((written.nested as Record<string, unknown>).dataDir).toBe("~/.allbot/data");
     expect(written.agent).toEqual({ model: "gpt-4" });
   });
 
@@ -1413,7 +1413,7 @@ describe("migrateConfig path rewriting", () => {
     await migrateConfig(source, targetDir, defaultOptions());
 
     const written = JSON.parse(
-      await fs.readFile(path.join(targetDir, "kaijibot.json"), "utf-8"),
+      await fs.readFile(path.join(targetDir, "allbot.json"), "utf-8"),
     ) as Record<string, unknown>;
     const agents = written.agents as Record<string, unknown>;
     const list = agents.list as Array<Record<string, unknown>>;

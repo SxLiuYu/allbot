@@ -112,7 +112,7 @@ export function waitForQueueDebounce(queue: {
   debounceMs: number;
   lastEnqueuedAt: number;
 }): Promise<void> {
-  if (process.env.KAIJIBOT_TEST_FAST === "1") {
+  if (process.env.ALLBOT_TEST_FAST === "1") {
     return Promise.resolve();
   }
   const debounceMs = Math.max(0, queue.debounceMs);

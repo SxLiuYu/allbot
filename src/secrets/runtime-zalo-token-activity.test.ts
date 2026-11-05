@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { loadBundledChannelSecretContractApi } from "./channel-contract-api.js";
@@ -29,8 +29,8 @@ vi.mock("../channels/plugins/bootstrap-registry.js", () => {
   };
 });
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;
@@ -71,7 +71,7 @@ describe("secrets runtime snapshot zalo token activity", () => {
       env: {
         ZALO_BOT_TOKEN: "resolved-zalo-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -98,7 +98,7 @@ describe("secrets runtime snapshot zalo token activity", () => {
       env: {
         ZALO_WORK_BOT_TOKEN: "resolved-zalo-work-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -128,7 +128,7 @@ describe("secrets runtime snapshot zalo token activity", () => {
       env: {
         ZALO_TOP_LEVEL_TOKEN: "resolved-zalo-top-level-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -155,7 +155,7 @@ describe("secrets runtime snapshot zalo token activity", () => {
       env: {
         ZALO_DEFAULT_TOKEN: "resolved-zalo-default-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 

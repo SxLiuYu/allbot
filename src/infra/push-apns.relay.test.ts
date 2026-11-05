@@ -48,15 +48,15 @@ describe("push-apns.relay", () => {
       expect(resolveApnsRelayConfigFromEnv({} as NodeJS.ProcessEnv)).toEqual({
         ok: false,
         error:
-          "APNs relay config missing: set gateway.push.apns.relay.baseUrl or KAIJIBOT_APNS_RELAY_BASE_URL",
+          "APNs relay config missing: set gateway.push.apns.relay.baseUrl or ALLBOT_APNS_RELAY_BASE_URL",
       });
     });
 
     it("lets env overrides win and clamps tiny timeout values", () => {
       const resolved = resolveApnsRelayConfigFromEnv(
         {
-          KAIJIBOT_APNS_RELAY_BASE_URL: " https://relay-override.example.com/base/ ",
-          KAIJIBOT_APNS_RELAY_TIMEOUT_MS: "999",
+          ALLBOT_APNS_RELAY_BASE_URL: " https://relay-override.example.com/base/ ",
+          ALLBOT_APNS_RELAY_TIMEOUT_MS: "999",
         } as NodeJS.ProcessEnv,
         {
           push: {
@@ -81,9 +81,9 @@ describe("push-apns.relay", () => {
 
     it("allows loopback http URLs for alternate truthy env values", () => {
       const resolved = resolveApnsRelayConfigFromEnv({
-        KAIJIBOT_APNS_RELAY_BASE_URL: "http://[::1]:8787",
-        KAIJIBOT_APNS_RELAY_ALLOW_HTTP: "yes",
-        KAIJIBOT_APNS_RELAY_TIMEOUT_MS: "nope",
+        ALLBOT_APNS_RELAY_BASE_URL: "http://[::1]:8787",
+        ALLBOT_APNS_RELAY_ALLOW_HTTP: "yes",
+        ALLBOT_APNS_RELAY_TIMEOUT_MS: "nope",
       } as NodeJS.ProcessEnv);
 
       expect(resolved).toMatchObject({
@@ -98,25 +98,25 @@ describe("push-apns.relay", () => {
     it.each([
       {
         name: "unsupported protocol",
-        env: { KAIJIBOT_APNS_RELAY_BASE_URL: "ftp://relay.example.com" },
+        env: { ALLBOT_APNS_RELAY_BASE_URL: "ftp://relay.example.com" },
         expected: "unsupported protocol",
       },
       {
         name: "http non-loopback host",
         env: {
-          KAIJIBOT_APNS_RELAY_BASE_URL: "http://relay.example.com",
-          KAIJIBOT_APNS_RELAY_ALLOW_HTTP: "true",
+          ALLBOT_APNS_RELAY_BASE_URL: "http://relay.example.com",
+          ALLBOT_APNS_RELAY_ALLOW_HTTP: "true",
         },
         expected: "loopback hosts",
       },
       {
         name: "query string",
-        env: { KAIJIBOT_APNS_RELAY_BASE_URL: "https://relay.example.com/path?debug=1" },
+        env: { ALLBOT_APNS_RELAY_BASE_URL: "https://relay.example.com/path?debug=1" },
         expected: "query and fragment are not allowed",
       },
       {
         name: "userinfo",
-        env: { KAIJIBOT_APNS_RELAY_BASE_URL: "https://user:pass@relay.example.com/path" },
+        env: { ALLBOT_APNS_RELAY_BASE_URL: "https://user:pass@relay.example.com/path" },
         expected: "userinfo is not allowed",
       },
     ])("rejects invalid relay URL: $name", ({ env, expected }) => {
@@ -180,7 +180,7 @@ describe("push-apns.relay", () => {
         verifyDeviceSignature(
           relayGatewayIdentity.publicKey,
           [
-            "kaijibot-relay-send-v1",
+            "allbot-relay-send-v1",
             sent?.gatewayDeviceId,
             String(sent?.signedAtMs),
             sent?.bodyJson,

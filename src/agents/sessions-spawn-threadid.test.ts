@@ -4,7 +4,7 @@ import {
   getCallGatewayMock,
   getSessionsSpawnTool,
   setSessionsSpawnConfigOverride,
-} from "./kaijibot-tools.subagents.sessions-spawn.test-harness.js";
+} from "./allbot-tools.subagents.sessions-spawn.test-harness.js";
 import {
   listSubagentRunsForRequester,
   resetSubagentRegistryForTests,

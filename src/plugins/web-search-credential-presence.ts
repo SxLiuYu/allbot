@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginManifestRecord } from "./manifest-registry.js";
 import { resolvePluginWebSearchProviders } from "./web-search-providers.runtime.js";
 
@@ -10,7 +10,7 @@ function hasConfiguredCredentialValue(value: unknown): boolean {
 }
 
 export function hasConfiguredWebSearchCredential(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   searchConfig?: Record<string, unknown>;
   origin?: PluginManifestRecord["origin"];

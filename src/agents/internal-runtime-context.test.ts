@@ -21,7 +21,7 @@ describe("internal runtime context codec", () => {
       "Visible intro",
       "",
       INTERNAL_RUNTIME_CONTEXT_BEGIN,
-      "KaijiBot runtime context (internal):",
+      "AllBot runtime context (internal):",
       "This context is runtime-generated, not user-authored. Keep internal details private.",
       "",
       "[Internal task completion event]",

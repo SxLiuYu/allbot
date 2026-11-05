@@ -92,9 +92,9 @@ const originForPort = (port: number) => `http://127.0.0.1:${port}`;
 
 function restoreGatewayToken(prevToken: string | undefined) {
   if (prevToken === undefined) {
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
   } else {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = prevToken;
+    process.env.ALLBOT_GATEWAY_TOKEN = prevToken;
   }
 }
 
@@ -201,7 +201,7 @@ function resolveGatewayTokenOrEnv(): string {
   const token =
     typeof (testState.gatewayAuth as { token?: unknown } | undefined)?.token === "string"
       ? ((testState.gatewayAuth as { token?: string }).token ?? undefined)
-      : process.env.KAIJIBOT_GATEWAY_TOKEN;
+      : process.env.ALLBOT_GATEWAY_TOKEN;
   expect(typeof token).toBe("string");
   return String(token ?? "");
 }
@@ -330,7 +330,7 @@ async function startRateLimitedTokenServerWithPairedDeviceToken() {
   const { server, ws, port, prevToken } = await startServerWithClient(undefined, {
     controlUiEnabled: true,
   });
-  const deviceIdentityPath = nextAuthIdentityPath("kaijibot-auth-rate-limit");
+  const deviceIdentityPath = nextAuthIdentityPath("allbot-auth-rate-limit");
   try {
     const initial = await connectReq(ws, { token: "secret", deviceIdentityPath });
     if (!initial.ok) {
@@ -353,7 +353,7 @@ async function ensurePairedDeviceTokenForCurrentIdentity(ws: WebSocket): Promise
   deviceToken: string;
   deviceIdentityPath: string;
 }> {
-  const deviceIdentityPath = nextAuthIdentityPath("kaijibot-auth-device");
+  const deviceIdentityPath = nextAuthIdentityPath("allbot-auth-device");
 
   const res = await connectReq(ws, { token: "secret", deviceIdentityPath });
   if (!res.ok) {

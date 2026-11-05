@@ -4,17 +4,17 @@ import {
   getRuntimeConfig,
   readSourceConfigSnapshotForWrite,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
   getModelsCommandSecretTargetIds,
 } from "./load-config.runtime.js";
 
 export type LoadedModelsConfig = {
-  sourceConfig: KaijiBotConfig;
-  resolvedConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  resolvedConfig: AllBotConfig;
   diagnostics: string[];
 };
 
-async function loadSourceConfigSnapshot(fallback: KaijiBotConfig): Promise<KaijiBotConfig> {
+async function loadSourceConfigSnapshot(fallback: AllBotConfig): Promise<AllBotConfig> {
   try {
     const { snapshot } = await readSourceConfigSnapshotForWrite();
     if (snapshot.valid) {
@@ -49,6 +49,6 @@ export async function loadModelsConfigWithSource(params: {
 export async function loadModelsConfig(params: {
   commandName: string;
   runtime?: RuntimeEnv;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   return (await loadModelsConfigWithSource(params)).resolvedConfig;
 }

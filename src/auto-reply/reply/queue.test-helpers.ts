@@ -1,5 +1,5 @@
 import { afterAll, beforeAll } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { defaultRuntime } from "../../runtime.js";
 import type { FollowupRun } from "./queue.js";
 
@@ -35,7 +35,7 @@ export function createQueueTestRun(params: {
       sessionId: "sess",
       sessionFile: "/tmp/session.json",
       workspaceDir: "/tmp",
-      config: {} as KaijiBotConfig,
+      config: {} as AllBotConfig,
       provider: "openai",
       model: "gpt-test",
       timeoutMs: 10_000,

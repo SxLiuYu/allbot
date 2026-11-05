@@ -1,11 +1,11 @@
 import {
   normalizeOptionalString,
   normalizeOptionalTrimmedStringList,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import {
   type BrowserConfig,
   type BrowserProfileConfig,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import { resolveGatewayPort } from "../config/paths.js";
 import {
@@ -20,9 +20,9 @@ import {
   DEFAULT_AI_SNAPSHOT_MAX_CHARS,
   DEFAULT_BROWSER_DEFAULT_PROFILE_NAME,
   DEFAULT_BROWSER_EVALUATE_ENABLED,
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_ENABLED,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_ENABLED,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
 } from "./constants.js";
 import { resolveBrowserControlAuth, type BrowserControlAuth } from "./control-auth.js";
 import { DEFAULT_UPLOAD_DIR } from "./paths.js";
@@ -31,9 +31,9 @@ export {
   DEFAULT_AI_SNAPSHOT_MAX_CHARS,
   DEFAULT_BROWSER_DEFAULT_PROFILE_NAME,
   DEFAULT_BROWSER_EVALUATE_ENABLED,
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_ENABLED,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_ENABLED,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
   DEFAULT_UPLOAD_DIR,
   parseBrowserHttpUrl,
   redactCdpUrl,
@@ -74,7 +74,7 @@ export type ResolvedBrowserProfile = {
   cdpIsLoopback: boolean;
   userDataDir?: string;
   color: string;
-  driver: "kaijibot" | "existing-session";
+  driver: "allbot" | "existing-session";
   attachOnly: boolean;
 };
 
@@ -83,11 +83,11 @@ const DEFAULT_BROWSER_CDP_PORT_RANGE_START = 18800;
 function normalizeHexColor(raw: string | undefined): string {
   const value = (raw ?? "").trim();
   if (!value) {
-    return DEFAULT_KAIJIBOT_BROWSER_COLOR;
+    return DEFAULT_ALLBOT_BROWSER_COLOR;
   }
   const normalized = value.startsWith("#") ? value : `#${value}`;
   if (!/^#[0-9a-fA-F]{6}$/.test(normalized)) {
-    return DEFAULT_KAIJIBOT_BROWSER_COLOR;
+    return DEFAULT_ALLBOT_BROWSER_COLOR;
   }
   return normalized.toUpperCase();
 }
@@ -159,8 +159,8 @@ function ensureDefaultProfile(
   legacyCdpUrl?: string,
 ): Record<string, BrowserProfileConfig> {
   const result = { ...profiles };
-  if (!result[DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME]) {
-    result[DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME] = {
+  if (!result[DEFAULT_ALLBOT_BROWSER_PROFILE_NAME]) {
+    result[DEFAULT_ALLBOT_BROWSER_PROFILE_NAME] = {
       cdpPort: legacyCdpPort ?? derivedDefaultCdpPort ?? DEFAULT_BROWSER_CDP_PORT_RANGE_START,
       color: defaultColor,
       ...(legacyCdpUrl ? { cdpUrl: legacyCdpUrl } : {}),
@@ -186,9 +186,9 @@ function ensureDefaultUserBrowserProfile(
 
 export function resolveBrowserConfig(
   cfg: BrowserConfig | undefined,
-  rootConfig?: KaijiBotConfig,
+  rootConfig?: AllBotConfig,
 ): ResolvedBrowserConfig {
-  const enabled = cfg?.enabled ?? DEFAULT_KAIJIBOT_BROWSER_ENABLED;
+  const enabled = cfg?.enabled ?? DEFAULT_ALLBOT_BROWSER_ENABLED;
   const evaluateEnabled = cfg?.evaluateEnabled ?? DEFAULT_BROWSER_EVALUATE_ENABLED;
   const gatewayPort = resolveGatewayPort(rootConfig);
   const controlPort = deriveDefaultBrowserControlPort(gatewayPort ?? DEFAULT_BROWSER_CONTROL_PORT);
@@ -258,8 +258,8 @@ export function resolveBrowserConfig(
     defaultProfileFromConfig ??
     (profiles[DEFAULT_BROWSER_DEFAULT_PROFILE_NAME]
       ? DEFAULT_BROWSER_DEFAULT_PROFILE_NAME
-      : profiles[DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME]
-        ? DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME
+      : profiles[DEFAULT_ALLBOT_BROWSER_PROFILE_NAME]
+        ? DEFAULT_ALLBOT_BROWSER_PROFILE_NAME
         : "user");
 
   const extraArgs = Array.isArray(cfg?.extraArgs)
@@ -305,7 +305,7 @@ export function resolveProfile(
   let cdpHost = resolved.cdpHost;
   let cdpPort = profile.cdpPort ?? 0;
   let cdpUrl = "";
-  const driver = profile.driver === "existing-session" ? "existing-session" : "kaijibot";
+  const driver = profile.driver === "existing-session" ? "existing-session" : "allbot";
 
   if (driver === "existing-session") {
     return {

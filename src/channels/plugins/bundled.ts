@@ -1,7 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { formatErrorMessage } from "../../infra/errors.js";
-import { resolveKaijiBotPackageRootSync } from "../../infra/kaijibot-root.js";
+import { resolveAllBotPackageRootSync } from "../../infra/allbot-root.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type {
   BundledChannelEntryContract,
@@ -23,8 +23,8 @@ type GeneratedBundledChannelEntry = {
 };
 
 const log = createSubsystemLogger("channels");
-const KAIJIBOT_PACKAGE_ROOT =
-  resolveKaijiBotPackageRootSync({
+const ALLBOT_PACKAGE_ROOT =
+  resolveAllBotPackageRootSync({
     argv1: process.argv[1],
     cwd: process.cwd(),
     moduleUrl: import.meta.url.startsWith("file:") ? import.meta.url : undefined,
@@ -88,7 +88,7 @@ function resolveBundledChannelBoundaryRoot(params: {
   modulePath: string;
 }): string {
   const distRoot = path.resolve(
-    KAIJIBOT_PACKAGE_ROOT,
+    ALLBOT_PACKAGE_ROOT,
     "dist",
     "extensions",
     params.metadata.dirName,
@@ -96,7 +96,7 @@ function resolveBundledChannelBoundaryRoot(params: {
   if (params.modulePath === distRoot || params.modulePath.startsWith(`${distRoot}${path.sep}`)) {
     return distRoot;
   }
-  return path.resolve(KAIJIBOT_PACKAGE_ROOT, "extensions", params.metadata.dirName);
+  return path.resolve(ALLBOT_PACKAGE_ROOT, "extensions", params.metadata.dirName);
 }
 
 function resolveGeneratedBundledChannelModulePath(params: {
@@ -107,7 +107,7 @@ function resolveGeneratedBundledChannelModulePath(params: {
     return null;
   }
   const resolved = resolveBundledChannelGeneratedPath(
-    KAIJIBOT_PACKAGE_ROOT,
+    ALLBOT_PACKAGE_ROOT,
     params.entry,
     params.metadata.dirName,
   );

@@ -83,9 +83,9 @@ describe("entry root version fast path", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     originalArgv = [...process.argv];
-    originalGatewayToken = process.env.KAIJIBOT_GATEWAY_TOKEN;
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-    process.argv = ["node", "kaijibot", "--version"];
+    originalGatewayToken = process.env.ALLBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
+    process.argv = ["node", "allbot", "--version"];
     exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(((_code?: number) => undefined) as typeof process.exit);
@@ -94,9 +94,9 @@ describe("entry root version fast path", () => {
   afterEach(() => {
     process.argv = originalArgv;
     if (originalGatewayToken === undefined) {
-      delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+      delete process.env.ALLBOT_GATEWAY_TOKEN;
     } else {
-      process.env.KAIJIBOT_GATEWAY_TOKEN = originalGatewayToken;
+      process.env.ALLBOT_GATEWAY_TOKEN = originalGatewayToken;
     }
     exitSpy.mockRestore();
   });
@@ -106,7 +106,7 @@ describe("entry root version fast path", () => {
 
     await importEntry("commit-tagged");
     await vi.waitFor(() => {
-      expect(logSpy).toHaveBeenCalledWith("KaijiBot 9.9.9-test (abc1234)");
+      expect(logSpy).toHaveBeenCalledWith("AllBot 9.9.9-test (abc1234)");
       expect(exitSpy).toHaveBeenCalledWith(0);
     });
 
@@ -119,7 +119,7 @@ describe("entry root version fast path", () => {
 
     await importEntry("plain-version");
     await vi.waitFor(() => {
-      expect(logSpy).toHaveBeenCalledWith("KaijiBot 9.9.9-test");
+      expect(logSpy).toHaveBeenCalledWith("AllBot 9.9.9-test");
       expect(exitSpy).toHaveBeenCalledWith(0);
     });
 
@@ -132,7 +132,7 @@ describe("entry root version fast path", () => {
 
     await importEntry("container-target");
     await vi.waitFor(() => {
-      expect(runCliMock).toHaveBeenCalledWith(["node", "kaijibot", "--version"]);
+      expect(runCliMock).toHaveBeenCalledWith(["node", "allbot", "--version"]);
     });
     expect(logSpy).not.toHaveBeenCalled();
     expect(exitSpy).not.toHaveBeenCalled();
@@ -142,12 +142,12 @@ describe("entry root version fast path", () => {
 
   it("allows root version container mode when gateway override env vars are set", async () => {
     resolveCliContainerTargetMock.mockReturnValue("demo");
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "demo-token";
+    process.env.ALLBOT_GATEWAY_TOKEN = "demo-token";
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     await importEntry("gateway-override");
     await vi.waitFor(() => {
-      expect(runCliMock).toHaveBeenCalledWith(["node", "kaijibot", "--version"]);
+      expect(runCliMock).toHaveBeenCalledWith(["node", "allbot", "--version"]);
     });
     expect(errorSpy).not.toHaveBeenCalled();
     expect(exitSpy).not.toHaveBeenCalled();

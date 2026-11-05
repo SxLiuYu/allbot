@@ -1,5 +1,5 @@
 import { resolveSubagentLabel, sortSubagentRuns } from "../auto-reply/reply/subagents-utils.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { loadSessionStore } from "../config/sessions/store-load.js";
 import type { SessionEntry } from "../config/sessions/types.js";
@@ -52,7 +52,7 @@ export type SessionEntryResolution = {
 };
 
 function resolveStorePathForKey(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   key: string,
   parsed?: ParsedAgentSessionKey | null,
 ) {
@@ -62,7 +62,7 @@ function resolveStorePathForKey(
 }
 
 export function resolveSessionEntryForKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   key: string;
   cache: Map<string, Record<string, SessionEntry>>;
 }): SessionEntryResolution {
@@ -198,7 +198,7 @@ function buildListText(params: {
 }
 
 export function buildSubagentList(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runs: SubagentRunRecord[];
   recentMinutes: number;
   taskMaxChars?: number;

@@ -1,25 +1,25 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import type {
   ProviderAuthContext,
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   ensureAuthProfileStore,
   listProfilesForProvider,
   type OAuthCredential,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { buildOauthProviderAuthResult } from "kaijibot/plugin-sdk/provider-auth";
-import { loginOpenAICodexOAuth } from "kaijibot/plugin-sdk/provider-auth-login";
+} from "allbot/plugin-sdk/provider-auth";
+import { buildOauthProviderAuthResult } from "allbot/plugin-sdk/provider-auth";
+import { loginOpenAICodexOAuth } from "allbot/plugin-sdk/provider-auth-login";
 import {
   DEFAULT_CONTEXT_TOKENS,
   normalizeModelCompat,
   normalizeProviderId,
   type ProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
-import { fetchCodexUsage } from "kaijibot/plugin-sdk/provider-usage";
-import { normalizeLowercaseStringOrEmpty, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
+import { fetchCodexUsage } from "allbot/plugin-sdk/provider-usage";
+import { normalizeLowercaseStringOrEmpty, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import { OPENAI_CODEX_DEFAULT_MODEL } from "./default-models.js";
 import { resolveCodexAuthIdentity } from "./openai-codex-auth-identity.js";
 import { buildOpenAICodexProvider } from "./openai-codex-catalog.js";
@@ -233,7 +233,7 @@ function buildOpenAICodexAuthDoctorHint(ctx: { profileId?: string }) {
   if (ctx.profileId !== CODEX_CLI_PROFILE_ID) {
     return undefined;
   }
-  return "Deprecated profile. Run `kaijibot models auth login --provider openai-codex` or `kaijibot configure`.";
+  return "Deprecated profile. Run `allbot models auth login --provider openai-codex` or `allbot configure`.";
 }
 
 export function buildOpenAICodexProviderPlugin(): ProviderPlugin {

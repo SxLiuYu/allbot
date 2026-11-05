@@ -9,7 +9,7 @@ import {
   resolveShellFromEnv,
   usesSlowDynamicCompletion,
 } from "../cli/completion-cli.js";
-import { resolveKaijiBotPackageRoot } from "../infra/kaijibot-root.js";
+import { resolveAllBotPackageRoot } from "../infra/allbot-root.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { note } from "../terminal/note.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
@@ -18,7 +18,7 @@ type CompletionShell = "zsh" | "bash" | "fish" | "powershell";
 
 /** Generate the completion cache by spawning the CLI. */
 async function generateCompletionCache(): Promise<boolean> {
-  const root = await resolveKaijiBotPackageRoot({
+  const root = await resolveAllBotPackageRoot({
     moduleUrl: import.meta.url,
     argv1: process.argv[1],
     cwd: process.cwd(),
@@ -27,7 +27,7 @@ async function generateCompletionCache(): Promise<boolean> {
     return false;
   }
 
-  const binPath = path.join(root, "kaijibot.mjs");
+  const binPath = path.join(root, "allbot.mjs");
   const result = spawnSync(process.execPath, [binPath, "completion", "--write-state"], {
     cwd: root,
     env: process.env,
@@ -42,13 +42,13 @@ export type ShellCompletionStatus = {
   profileInstalled: boolean;
   cacheExists: boolean;
   cachePath: string;
-  /** True if profile uses slow dynamic pattern like `source <(kaijibot completion ...)` */
+  /** True if profile uses slow dynamic pattern like `source <(allbot completion ...)` */
   usesSlowPattern: boolean;
 };
 
 /** Check the status of shell completion for the current shell. */
 export async function checkShellCompletionStatus(
-  binName = "kaijibot",
+  binName = "allbot",
 ): Promise<ShellCompletionStatus> {
   const shell = resolveShellFromEnv() as CompletionShell;
   const profileInstalled = await isCompletionInstalled(shell, binName);
@@ -167,7 +167,7 @@ export async function doctorShellCompletion(
  * cases where profile has completion but no cache.
  * This is a silent fix - no prompts.
  */
-export async function ensureCompletionCacheExists(binName = "kaijibot"): Promise<boolean> {
+export async function ensureCompletionCacheExists(binName = "allbot"): Promise<boolean> {
   const shell = resolveShellFromEnv() as CompletionShell;
   const cacheExists = await completionCacheExists(shell, binName);
 

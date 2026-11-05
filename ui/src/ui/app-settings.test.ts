@@ -233,7 +233,7 @@ describe("applySettingsFromUrl", () => {
   it("hydrates query token params and strips them from the URL", () => {
     setTestWindowUrl("https://control.example/ui/settings?token=abc123");
     const host = createHost("settings");
-    host.settings.gatewayUrl = "wss://control.example/kaijibot";
+    host.settings.gatewayUrl = "wss://control.example/allbot";
 
     applySettingsFromUrl(host);
 
@@ -243,15 +243,15 @@ describe("applySettingsFromUrl", () => {
 
   it("keeps query token params pending when a gatewayUrl confirmation is required", () => {
     setTestWindowUrl(
-      "https://control.example/ui/settings?gatewayUrl=wss://other-gateway.example/kaijibot&token=abc123",
+      "https://control.example/ui/settings?gatewayUrl=wss://other-gateway.example/allbot&token=abc123",
     );
     const host = createHost("settings");
-    host.settings.gatewayUrl = "wss://control.example/kaijibot";
+    host.settings.gatewayUrl = "wss://control.example/allbot";
 
     applySettingsFromUrl(host);
 
     expect(host.settings.token).toBe("");
-    expect(host.pendingGatewayUrl).toBe("wss://other-gateway.example/kaijibot");
+    expect(host.pendingGatewayUrl).toBe("wss://other-gateway.example/allbot");
     expect(host.pendingGatewayToken).toBe("abc123");
     expect(window.location.search).toBe("");
   });
@@ -259,7 +259,7 @@ describe("applySettingsFromUrl", () => {
   it("prefers fragment tokens over legacy query tokens when both are present", () => {
     setTestWindowUrl("https://control.example/ui/settings?token=query-token#token=hash-token");
     const host = createHost("settings");
-    host.settings.gatewayUrl = "wss://control.example/kaijibot";
+    host.settings.gatewayUrl = "wss://control.example/allbot";
 
     applySettingsFromUrl(host);
 

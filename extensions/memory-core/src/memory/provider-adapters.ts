@@ -1,5 +1,5 @@
 import fsSync from "node:fs";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_LMSTUDIO_EMBEDDING_MODEL,
@@ -21,10 +21,10 @@ import {
   runOpenAiEmbeddingBatches,
   runVoyageEmbeddingBatches,
   type MemoryEmbeddingProviderAdapter,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
-import { resolveUserPath } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import { getProviderEnvVars } from "kaijibot/plugin-sdk/provider-env-vars";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
+import { resolveUserPath } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import { getProviderEnvVars } from "allbot/plugin-sdk/provider-env-vars";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { filterUnregisteredMemoryEmbeddingProviderAdapters } from "./provider-adapter-registration.js";
 
 export type BuiltinMemoryEmbeddingProviderDoctorMetadata = {
@@ -82,7 +82,7 @@ function formatLocalSetupError(err: unknown): string {
     "To enable local embeddings:",
     "1) Use Node 24 (recommended for installs/updates; Node 22 LTS, currently 22.14+, remains supported)",
     missing
-      ? "2) Reinstall KaijiBot (this should install node-llama-cpp): npm i -g kaijibot@latest"
+      ? "2) Reinstall AllBot (this should install node-llama-cpp): npm i -g allbot@latest"
       : null,
     "3) If you use pnpm: pnpm approve-builds (select node-llama-cpp), then pnpm rebuild node-llama-cpp",
     ...["openai", "gemini", "voyage", "mistral"].map(

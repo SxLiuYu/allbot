@@ -67,7 +67,7 @@ ${Object.entries(INSIGHT_CATEGORY_DESCRIPTIONS)
 2. Mark as shouldKeep=false if it is:
    - A generic/vague statement that provides no actionable knowledge (e.g. "正在讨论...", "涉及...", "持续监控...")
    - A duplicate or near-duplicate of another insight in this list
-   - About the user configuring/using this specific bot (KaijiBot) rather than domain knowledge
+   - About the user configuring/using this specific bot (AllBot) rather than domain knowledge
    - A description of what the user is currently doing (transient) rather than lasting knowledge
 3. For insights marked shouldKeep=true, optionally rewrite the text to be more concise and specific if the original is wordy or imprecise.
 
@@ -152,7 +152,7 @@ async function main() {
 
   for (const [key, val] of Object.entries(persona.identity.coreTraits)) {
     const v = val as { value: string; confidence: number; source: string; evidenceCount: number };
-    if (key === "角色" && v.value === "kaijibot用户") {
+    if (key === "角色" && v.value === "allbot用户") {
       traitsToRemove.push(key);
       console.log(`  REMOVE: ${key} = "${v.value}" (meaningless, conf=${v.confidence.toFixed(2)})`);
       continue;
@@ -269,7 +269,7 @@ async function main() {
   });
   console.log(`  ${before} → ${persona.recentFocus.length} focus items`);
 
-  const tmpPath = join(tmpdir(), `kaijibot-persona-clean-${randomUUID()}.json`);
+  const tmpPath = join(tmpdir(), `allbot-persona-clean-${randomUUID()}.json`);
   await writeFile(tmpPath, JSON.stringify(persona, null, 2), "utf-8");
 
   const backupPath = PERSONA_PATH + ".bak";

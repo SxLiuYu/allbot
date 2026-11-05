@@ -11,13 +11,13 @@ import type {
 import { registerProviders, requireProvider } from "./contracts-testkit.js";
 
 type LoginOpenAICodexOAuth =
-  (typeof import("kaijibot/plugin-sdk/provider-auth-login"))["loginOpenAICodexOAuth"];
+  (typeof import("allbot/plugin-sdk/provider-auth-login"))["loginOpenAICodexOAuth"];
 type CreateVpsAwareHandlers =
   (typeof import("../../../src/plugins/provider-oauth-flow.js"))["createVpsAwareOAuthHandlers"];
 type EnsureAuthProfileStore =
-  typeof import("kaijibot/plugin-sdk/provider-auth").ensureAuthProfileStore;
+  typeof import("allbot/plugin-sdk/provider-auth").ensureAuthProfileStore;
 type ListProfilesForProvider =
-  typeof import("kaijibot/plugin-sdk/provider-auth").listProfilesForProvider;
+  typeof import("allbot/plugin-sdk/provider-auth").listProfilesForProvider;
 
 const loginOpenAICodexOAuthMock = vi.hoisted(() => vi.fn<LoginOpenAICodexOAuth>());
 const ensureAuthProfileStoreMock = vi.hoisted(() => vi.fn<EnsureAuthProfileStore>());
@@ -26,9 +26,9 @@ const providerAuthContractModules = vi.hoisted(() => ({
   openAIIndexModuleUrl: new URL("../../../extensions/openai/index.ts", import.meta.url).href,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-auth-login", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/provider-auth-login")>(
-    "kaijibot/plugin-sdk/provider-auth-login",
+vi.mock("allbot/plugin-sdk/provider-auth-login", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/provider-auth-login")>(
+    "allbot/plugin-sdk/provider-auth-login",
   );
   return {
     ...actual,
@@ -36,9 +36,9 @@ vi.mock("kaijibot/plugin-sdk/provider-auth-login", async () => {
   };
 });
 
-vi.mock("kaijibot/plugin-sdk/provider-auth", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/provider-auth")>(
-    "kaijibot/plugin-sdk/provider-auth",
+vi.mock("allbot/plugin-sdk/provider-auth", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/provider-auth")>(
+    "allbot/plugin-sdk/provider-auth",
   );
   return {
     ...actual,

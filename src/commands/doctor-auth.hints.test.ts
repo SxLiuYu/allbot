@@ -35,7 +35,7 @@ describe("resolveUnusableProfileHint", () => {
           "OAuth token refresh failed for openai-codex: refresh_token_reused. Please try again or re-authenticate.",
       }),
     ).toBe(
-      "- openai-codex:default: re-auth required [refresh_token_reused] — Run `kaijibot models auth login --provider openai-codex`.",
+      "- openai-codex:default: re-auth required [refresh_token_reused] — Run `allbot models auth login --provider openai-codex`.",
     );
   });
 
@@ -48,7 +48,7 @@ describe("resolveUnusableProfileHint", () => {
           "OAuth token refresh failed for openai-codex: temporary upstream issue. Please try again or re-authenticate.",
       }),
     ).toBe(
-      "- openai-codex:default: OAuth refresh failed — Try again; if this persists, run `kaijibot models auth login --provider openai-codex`.",
+      "- openai-codex:default: OAuth refresh failed — Try again; if this persists, run `allbot models auth login --provider openai-codex`.",
     );
   });
 
@@ -61,7 +61,7 @@ describe("resolveUnusableProfileHint", () => {
           "OAuth token refresh failed for openai-codex`\nrm -rf /: invalid_grant. Please try again or re-authenticate.",
       }),
     ).toBe(
-      "- openai-codex:default: re-auth required [invalid_grant] — Run `kaijibot models auth login --provider openai-codex`.",
+      "- openai-codex:default: re-auth required [invalid_grant] — Run `allbot models auth login --provider openai-codex`.",
     );
   });
 });

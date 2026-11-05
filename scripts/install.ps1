@@ -1,11 +1,11 @@
-# KaijiBot Installer for Windows (PowerShell)
+# AllBot Installer for Windows (PowerShell)
 # Usage: iwr -useb https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.ps1 | iex
 # Or: & ([scriptblock]::Create((iwr -useb https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.ps1))) -NoOnboard
 
 param(
     [string]$InstallMethod = "npm",
     [string]$Tag = "latest",
-    [string]$GitDir = "$env:USERPROFILE\kaijibot",
+    [string]$GitDir = "$env:USERPROFILE\allbot",
     [switch]$NoOnboard,
     [switch]$NoGitUpdate,
     [switch]$DryRun
@@ -34,8 +34,8 @@ function Write-Host {
 
 function Write-Banner {
     Write-Host ""
-    Write-Host "${ACCENT}  🦞 KaijiBot Installer$NC" -Level info
-    Write-Host "${MUTED}  All your chats, one KaijiBot.$NC" -Level info
+    Write-Host "${ACCENT}  🦞 AllBot Installer$NC" -Level info
+    Write-Host "${MUTED}  All your chats, one AllBot.$NC" -Level info
     Write-Host ""
 }
 
@@ -201,17 +201,17 @@ function Ensure-Git {
     return Install-Git
 }
 
-function Install-KaijiBotNpm {
+function Install-AllBotNpm {
     param([string]$Target = "latest")
 
     $installSpec = Resolve-PackageInstallSpec -Target $Target
     
-    Write-Host "Installing KaijiBot ($installSpec)..." -Level info
+    Write-Host "Installing AllBot ($installSpec)..." -Level info
     
     try {
         # Use -ExecutionPolicy Bypass to handle restricted execution policy
         npm install -g $installSpec --no-fund --no-audit 2>&1
-        Write-Host "KaijiBot installed" -Level success
+        Write-Host "AllBot installed" -Level success
         return $true
     } catch {
         Write-Host "npm install failed: $_" -Level error
@@ -219,10 +219,10 @@ function Install-KaijiBotNpm {
     }
 }
 
-function Install-KaijiBotGit {
+function Install-AllBotGit {
     param([string]$RepoDir, [switch]$Update)
     
-    Write-Host "Installing KaijiBot from git..." -Level info
+    Write-Host "Installing AllBot from git..." -Level info
     
     if (!(Test-Path $RepoDir)) {
         Write-Host "  Cloning repository..." -Level info
@@ -254,10 +254,10 @@ function Install-KaijiBotGit {
     
     @"
 @echo off
-node "%~dp0..\kaijibot\dist\entry.js" %*
-"@ | Out-File -FilePath "$wrapperDir\kaijibot.cmd" -Encoding ASCII -Force
+node "%~dp0..\allbot\dist\entry.js" %*
+"@ | Out-File -FilePath "$wrapperDir\allbot.cmd" -Encoding ASCII -Force
     
-    Write-Host "KaijiBot installed" -Level success
+    Write-Host "AllBot installed" -Level success
     return $true
 }
 
@@ -278,15 +278,15 @@ function Resolve-PackageInstallSpec {
 
     $trimmed = $Target.Trim()
     if ([string]::IsNullOrWhiteSpace($trimmed)) {
-        return "kaijibot@latest"
+        return "allbot@latest"
     }
     if ($trimmed.ToLowerInvariant() -eq "main") {
-        return "github:Kaiji-Z/kaijibot#main"
+        return "github:Kaiji-Z/allbot#main"
     }
     if (Test-ExplicitPackageInstallSpec -Target $trimmed) {
         return $trimmed
     }
-    return "kaijibot@$trimmed"
+    return "allbot@$trimmed"
 }
 
 function Add-ToPath {
@@ -322,9 +322,9 @@ function Main {
         }
         
         if ($DryRun) {
-            Write-Host "[DRY RUN] Would install KaijiBot from git to $GitDir" -Level info
+            Write-Host "[DRY RUN] Would install AllBot from git to $GitDir" -Level info
         } else {
-            Install-KaijiBotGit -RepoDir $GitDir -Update:(-not $NoGitUpdate)
+            Install-AllBotGit -RepoDir $GitDir -Update:(-not $NoGitUpdate)
         }
     } else {
         # npm method
@@ -333,9 +333,9 @@ function Main {
         }
         
         if ($DryRun) {
-            Write-Host "[DRY RUN] Would install KaijiBot via npm ($((Resolve-PackageInstallSpec -Target $Tag)))" -Level info
+            Write-Host "[DRY RUN] Would install AllBot via npm ($((Resolve-PackageInstallSpec -Target $Tag)))" -Level info
         } else {
-            if (!(Install-KaijiBotNpm -Target $Tag)) {
+            if (!(Install-AllBotNpm -Target $Tag)) {
                 exit 1
             }
         }
@@ -351,11 +351,11 @@ function Main {
     
     if (!$NoOnboard -and !$DryRun) {
         Write-Host ""
-        Write-Host "Run 'kaijibot onboard' to complete setup" -Level info
+        Write-Host "Run 'allbot onboard' to complete setup" -Level info
     }
     
     Write-Host ""
-    Write-Host "🦞 KaijiBot installed successfully!" -Level success
+    Write-Host "🦞 AllBot installed successfully!" -Level success
 }
 
 Main

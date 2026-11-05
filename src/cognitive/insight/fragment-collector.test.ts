@@ -1,6 +1,6 @@
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import type { FragmentCollectorDeps } from "./fragment-collector.js";
 import {
@@ -97,8 +97,8 @@ function makePersona(overrides?: Partial<PersonaTree>): PersonaTree {
   };
 }
 
-function makeConfig(): KaijiBotConfig {
-  return {} as KaijiBotConfig;
+function makeConfig(): AllBotConfig {
+  return {} as AllBotConfig;
 }
 
 function validFragmentResponse(): string {

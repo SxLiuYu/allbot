@@ -83,7 +83,7 @@ export const sessionMessages: unknown[] = [
   },
 ];
 export const sessionAbortCompactionMock: Mock<(reason?: unknown) => void> = vi.fn();
-export const createKaijiBotCodingToolsMock = vi.fn(() => []);
+export const createAllBotCodingToolsMock = vi.fn(() => []);
 export const resolveEmbeddedAgentStreamFnMock: Mock<
   (params?: unknown) => MockEmbeddedAgentStreamFn
 > = vi.fn((_params?: unknown) => vi.fn());
@@ -183,8 +183,8 @@ export function resetCompactHooksHarnessMocks(): void {
 
   triggerInternalHook.mockReset();
   resetCompactSessionStateMocks();
-  createKaijiBotCodingToolsMock.mockReset();
-  createKaijiBotCodingToolsMock.mockReturnValue([]);
+  createAllBotCodingToolsMock.mockReset();
+  createAllBotCodingToolsMock.mockReturnValue([]);
 }
 
 export async function loadCompactHooksHarness(): Promise<{
@@ -283,7 +283,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../models-config.js", () => ({
-    ensureKaijiBotModelsJson: vi.fn(async () => {}),
+    ensureAllBotModelsJson: vi.fn(async () => {}),
   }));
 
   vi.doMock("../model-auth.js", () => ({
@@ -346,7 +346,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../docs-path.js", () => ({
-    resolveKaijiBotDocsPath: vi.fn(async () => undefined),
+    resolveAllBotDocsPath: vi.fn(async () => undefined),
   }));
 
   vi.doMock("../channel-tools.js", () => ({
@@ -355,7 +355,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../pi-tools.js", () => ({
-    createKaijiBotCodingTools: createKaijiBotCodingToolsMock,
+    createAllBotCodingTools: createAllBotCodingToolsMock,
   }));
 
   vi.doMock("./replay-history.js", () => ({
@@ -453,7 +453,7 @@ export async function loadCompactHooksHarness(): Promise<{
   }));
 
   vi.doMock("../agent-paths.js", () => ({
-    resolveKaijiBotAgentDir: vi.fn(() => "/tmp"),
+    resolveAllBotAgentDir: vi.fn(() => "/tmp"),
   }));
 
   vi.doMock("../agent-scope.js", () => ({

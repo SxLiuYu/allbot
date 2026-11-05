@@ -9,10 +9,10 @@ import {
   splitSetupEntries,
   type ChannelSetupDmPolicy,
   type ChannelSetupWizard,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type SecretInput,
-} from "kaijibot/plugin-sdk/setup";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/setup";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 import {
   inspectFeishuCredentials,
   resolveDefaultFeishuAccountId,
@@ -27,7 +27,7 @@ const channel = "feishu" as const;
 
 type ScopedFeishuConfig = Partial<FeishuConfig> & Partial<FeishuAccountConfig>;
 
-function getScopedFeishuConfig(cfg: KaijiBotConfig, accountId: string): ScopedFeishuConfig {
+function getScopedFeishuConfig(cfg: AllBotConfig, accountId: string): ScopedFeishuConfig {
   const feishuCfg = cfg.channels?.feishu as FeishuConfig | undefined;
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return feishuCfg ?? {};
@@ -36,10 +36,10 @@ function getScopedFeishuConfig(cfg: KaijiBotConfig, accountId: string): ScopedFe
 }
 
 function patchFeishuConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId: string,
   patch: Record<string, unknown>,
-): KaijiBotConfig {
+): AllBotConfig {
   const feishuCfg = cfg.channels?.feishu as FeishuConfig | undefined;
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return patchTopLevelChannelConfigSection({
@@ -68,30 +68,30 @@ function patchFeishuConfig(
 }
 
 function setFeishuAllowFrom(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId: string,
   allowFrom: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   return patchFeishuConfig(cfg, accountId, { allowFrom });
 }
 
 function setFeishuGroupPolicy(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId: string,
   groupPolicy: "open" | "allowlist" | "disabled",
-): KaijiBotConfig {
+): AllBotConfig {
   return patchFeishuConfig(cfg, accountId, { groupPolicy });
 }
 
 function setFeishuGroupAllowFrom(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId: string,
   groupAllowFrom: string[],
-): KaijiBotConfig {
+): AllBotConfig {
   return patchFeishuConfig(cfg, accountId, { groupAllowFrom });
 }
 
-function isFeishuConfigured(cfg: KaijiBotConfig, accountId?: string | null): boolean {
+function isFeishuConfigured(cfg: AllBotConfig, accountId?: string | null): boolean {
   const feishuCfg = ((cfg.channels?.feishu as FeishuConfig | undefined) ?? {}) as FeishuConfig;
   const resolvedAccountId = normalizeString(accountId) ?? resolveDefaultFeishuAccountId(cfg);
 
@@ -138,10 +138,10 @@ function isFeishuConfigured(cfg: KaijiBotConfig, accountId?: string | null): boo
 }
 
 async function promptFeishuAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   prompter: Parameters<NonNullable<ChannelSetupDmPolicy["promptAllowFrom"]>>[0]["prompter"];
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const existingAllowFrom =
     resolveFeishuAccount({
       cfg: params.cfg,

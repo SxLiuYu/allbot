@@ -4,7 +4,7 @@ import path from "node:path";
 import { resolveBrewPathDirs } from "./brew.js";
 import { isTruthyEnvValue } from "./env.js";
 
-type EnsureKaijiBotPathOpts = {
+type EnsureAllBotPathOpts = {
   execPath?: string;
   cwd?: string;
   homeDir?: string;
@@ -49,7 +49,7 @@ function mergePath(params: { existing: string; prepend?: string[]; append?: stri
   return merged.join(path.delimiter);
 }
 
-function candidateBinDirs(opts: EnsureKaijiBotPathOpts): { prepend: string[]; append: string[] } {
+function candidateBinDirs(opts: EnsureAllBotPathOpts): { prepend: string[]; append: string[] } {
   const execPath = opts.execPath ?? process.execPath;
   const cwd = opts.cwd ?? process.cwd();
   const homeDir = opts.homeDir ?? os.homedir();
@@ -59,7 +59,7 @@ function candidateBinDirs(opts: EnsureKaijiBotPathOpts): { prepend: string[]; ap
   const append: string[] = [];
 
   // Keep the active runtime directory ahead of PATH hardening so shebang-based
-  // subprocesses keep using the same Node/Bun the current KaijiBot process is on.
+  // subprocesses keep using the same Node/Bun the current AllBot process is on.
   try {
     const execDir = path.dirname(execPath);
     if (isExecutable(execPath)) {
@@ -69,10 +69,10 @@ function candidateBinDirs(opts: EnsureKaijiBotPathOpts): { prepend: string[]; ap
     // ignore
   }
 
-  // Bundled macOS app: `kaijibot` lives next to the executable (process.execPath).
+  // Bundled macOS app: `allbot` lives next to the executable (process.execPath).
   try {
     const execDir = path.dirname(execPath);
-    const siblingCli = path.join(execDir, "kaijibot");
+    const siblingCli = path.join(execDir, "allbot");
     if (isExecutable(siblingCli)) {
       prepend.push(execDir);
     }
@@ -84,10 +84,10 @@ function candidateBinDirs(opts: EnsureKaijiBotPathOpts): { prepend: string[]; ap
   // disabled by default; if an operator explicitly enables it, only append (never prepend).
   const allowProjectLocalBin =
     opts.allowProjectLocalBin === true ||
-    isTruthyEnvValue(process.env.KAIJIBOT_ALLOW_PROJECT_LOCAL_BIN);
+    isTruthyEnvValue(process.env.ALLBOT_ALLOW_PROJECT_LOCAL_BIN);
   if (allowProjectLocalBin) {
     const localBinDir = path.join(cwd, "node_modules", ".bin");
-    if (isExecutable(path.join(localBinDir, "kaijibot"))) {
+    if (isExecutable(path.join(localBinDir, "allbot"))) {
       append.push(localBinDir);
     }
   }
@@ -98,7 +98,7 @@ function candidateBinDirs(opts: EnsureKaijiBotPathOpts): { prepend: string[]; ap
 
   // User-writable / package-manager directories are appended so they never
   // shadow trusted OS binaries.
-  // This includes Brew/Homebrew dirs, which are useful for finding `kaijibot`
+  // This includes Brew/Homebrew dirs, which are useful for finding `allbot`
   // in launchd/minimal environments but must not be treated as trusted.
   append.push(...resolveBrewPathDirs({ homeDir }));
   const miseDataDir = process.env.MISE_DATA_DIR ?? path.join(homeDir, ".local", "share", "mise");
@@ -121,14 +121,14 @@ function candidateBinDirs(opts: EnsureKaijiBotPathOpts): { prepend: string[]; ap
 }
 
 /**
- * Best-effort PATH bootstrap so skills that require the `kaijibot` CLI can run
+ * Best-effort PATH bootstrap so skills that require the `allbot` CLI can run
  * under launchd/minimal environments (and inside the macOS app bundle).
  */
-export function ensureKaijiBotCliOnPath(opts: EnsureKaijiBotPathOpts = {}) {
-  if (isTruthyEnvValue(process.env.KAIJIBOT_PATH_BOOTSTRAPPED)) {
+export function ensureAllBotCliOnPath(opts: EnsureAllBotPathOpts = {}) {
+  if (isTruthyEnvValue(process.env.ALLBOT_PATH_BOOTSTRAPPED)) {
     return;
   }
-  process.env.KAIJIBOT_PATH_BOOTSTRAPPED = "1";
+  process.env.ALLBOT_PATH_BOOTSTRAPPED = "1";
 
   const existing = opts.pathEnv ?? process.env.PATH ?? "";
   const { prepend, append } = candidateBinDirs(opts);

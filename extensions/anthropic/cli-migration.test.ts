@@ -1,7 +1,7 @@
 import type {
   ProviderAuthContext,
   ProviderAuthMethodNonInteractiveContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import { describe, expect, it, vi } from "vitest";
 
 const { readClaudeCliCredentialsForSetup, readClaudeCliCredentialsForSetupNonInteractive } =
@@ -41,8 +41,8 @@ function createProviderAuthContext(
     config,
     opts: {},
     env: {},
-    agentDir: "/tmp/kaijibot/agents/main",
-    workspaceDir: "/tmp/kaijibot/workspace",
+    agentDir: "/tmp/allbot/agents/main",
+    workspaceDir: "/tmp/allbot/workspace",
     prompter: createTestWizardPrompter(),
     runtime: {
       log: vi.fn(),
@@ -71,8 +71,8 @@ function createProviderAuthMethodNonInteractiveContext(
       error: vi.fn(),
       exit: vi.fn(),
     },
-    agentDir: "/tmp/kaijibot/agents/main",
-    workspaceDir: "/tmp/kaijibot/workspace",
+    agentDir: "/tmp/allbot/agents/main",
+    workspaceDir: "/tmp/allbot/workspace",
     resolveApiKey: vi.fn(async () => null),
     toApiKeyCredential: vi.fn(() => null),
   };

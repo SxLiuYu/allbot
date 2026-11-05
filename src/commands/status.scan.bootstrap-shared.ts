@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import type { UpdateCheckResult } from "../infra/update-check.js";
 import { runExec } from "../process/exec.js";
 import { createEmptyTaskAuditSummary } from "../tasks/task-registry.audit.shared.js";
@@ -59,7 +59,7 @@ type StatusScanExecRunner = (
 
 export async function createStatusScanCoreBootstrap<TAgentStatus>(params: {
   coldStart: boolean;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   hasConfiguredChannels: boolean;
   opts: { timeoutMs?: number; all?: boolean };
   getTailnetHostname: (runner: StatusScanExecRunner) => Promise<string | null>;
@@ -68,7 +68,7 @@ export async function createStatusScanCoreBootstrap<TAgentStatus>(params: {
     fetchGit: boolean;
     includeRegistry: boolean;
   }) => Promise<UpdateCheckResult>;
-  getAgentLocalStatuses: (cfg: KaijiBotConfig) => Promise<TAgentStatus>;
+  getAgentLocalStatuses: (cfg: AllBotConfig) => Promise<TAgentStatus>;
 }) {
   const tailscaleMode = params.cfg.gateway?.tailscale?.mode ?? "off";
   const skipColdStartNetworkChecks = shouldSkipStatusScanNetworkChecks({
@@ -121,8 +121,8 @@ export async function createStatusScanCoreBootstrap<TAgentStatus>(params: {
 
 export async function createStatusScanBootstrap<TAgentStatus, TSummary>(params: {
   coldStart: boolean;
-  cfg: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig: AllBotConfig;
   hasConfiguredChannels: boolean;
   opts: { timeoutMs?: number; all?: boolean };
   getTailnetHostname: (runner: StatusScanExecRunner) => Promise<string | null>;
@@ -131,10 +131,10 @@ export async function createStatusScanBootstrap<TAgentStatus, TSummary>(params: 
     fetchGit: boolean;
     includeRegistry: boolean;
   }) => Promise<UpdateCheckResult>;
-  getAgentLocalStatuses: (cfg: KaijiBotConfig) => Promise<TAgentStatus>;
+  getAgentLocalStatuses: (cfg: AllBotConfig) => Promise<TAgentStatus>;
   getStatusSummary: (params: {
-    config: KaijiBotConfig;
-    sourceConfig: KaijiBotConfig;
+    config: AllBotConfig;
+    sourceConfig: AllBotConfig;
   }) => Promise<TSummary>;
 }) {
   const core = await createStatusScanCoreBootstrap<TAgentStatus>({

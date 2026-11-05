@@ -50,7 +50,7 @@ export function buildGatewayStatusWarnings(params: {
   if (params.localTlsLoadError) {
     warnings.push({
       code: "local_tls_runtime_unavailable",
-      message: `Local gateway TLS is enabled but KaijiBot could not load the local certificate fingerprint: ${params.localTlsLoadError}`,
+      message: `Local gateway TLS is enabled but AllBot could not load the local certificate fingerprint: ${params.localTlsLoadError}`,
       targetIds: ["localLoopback"],
     });
   }

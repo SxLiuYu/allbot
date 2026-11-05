@@ -4,7 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import { promisify } from "node:util";
 import { danger, shouldLogVerbose } from "../globals.js";
-import { markKaijiBotExecEnv } from "../infra/kaijibot-exec-env.js";
+import { markAllBotExecEnv } from "../infra/allbot-exec-env.js";
 import { logDebug, logError } from "../logger.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import { resolveCommandStdio } from "./spawn-utils.js";
@@ -244,7 +244,7 @@ export function resolveCommandEnv(params: {
       resolvedEnv.npm_config_fund = "false";
     }
   }
-  return markKaijiBotExecEnv(resolvedEnv);
+  return markAllBotExecEnv(resolvedEnv);
 }
 
 export async function runCommandWithTimeout(

@@ -1,14 +1,14 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 
 export type DoctorConfigMutationState = {
-  cfg: KaijiBotConfig;
-  candidate: KaijiBotConfig;
+  cfg: AllBotConfig;
+  candidate: AllBotConfig;
   pendingChanges: boolean;
   fixHints: string[];
 };
 
 export type DoctorConfigMutationResult = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changes: string[];
 };
 

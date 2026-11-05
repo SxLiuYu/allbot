@@ -1,11 +1,11 @@
 import path from "node:path";
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { resolvePathFromInput } from "../../agents/path-policy.js";
 import { assertMediaNotDataUrl, resolveSandboxedMediaSource } from "../../agents/sandbox-paths.js";
 import { ensureSandboxWorkspaceForSession } from "../../agents/sandbox.js";
 import { resolveEffectiveToolFsWorkspaceOnly } from "../../agents/tool-fs-policy.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { logVerbose } from "../../globals.js";
 import { saveMediaSource } from "../../media/store.js";
 import { resolveConfigDir } from "../../utils.js";
@@ -16,7 +16,7 @@ const FILE_URL_RE = /^file:\/\//i;
 const WINDOWS_DRIVE_RE = /^[a-zA-Z]:[\\/]/;
 const SCHEME_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
 const HAS_FILE_EXT_RE = /\.\w{1,10}$/;
-const AGENT_STATE_MEDIA_DIRNAME = path.join(".kaijibot", "media");
+const AGENT_STATE_MEDIA_DIRNAME = path.join(".allbot", "media");
 const MANAGED_GLOBAL_MEDIA_SUBDIRS = new Set(["outbound"]);
 
 function isPathInside(root: string, candidate: string): boolean {
@@ -67,7 +67,7 @@ function getPayloadMediaList(payload: ReplyPayload): string[] {
 }
 
 export function createReplyMediaPathNormalizer(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey?: string;
   workspaceDir: string;
 }): (payload: ReplyPayload) => Promise<ReplyPayload> {

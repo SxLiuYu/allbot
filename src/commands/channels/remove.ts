@@ -4,7 +4,7 @@ import {
   listChannelPlugins,
   normalizeChannelId,
 } from "../../channels/plugins/index.js";
-import { replaceConfigFile, type KaijiBotConfig } from "../../config/config.js";
+import { replaceConfigFile, type AllBotConfig } from "../../config/config.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../../routing/session-key.js";
 import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -23,7 +23,7 @@ export type ChannelsRemoveOptions = {
   delete?: boolean;
 };
 
-function listAccountIds(cfg: KaijiBotConfig, channel: ChatChannel): string[] {
+function listAccountIds(cfg: AllBotConfig, channel: ChatChannel): string[] {
   const plugin = getChannelPlugin(channel);
   if (!plugin) {
     return [];
@@ -41,7 +41,7 @@ export async function channelsRemoveCommand(
     return;
   }
   const baseHash = configSnapshot.hash;
-  let cfg = (configSnapshot.sourceConfig ?? configSnapshot.config) as KaijiBotConfig;
+  let cfg = (configSnapshot.sourceConfig ?? configSnapshot.config) as AllBotConfig;
 
   const useWizard = shouldUseWizard(params);
   const prompter = useWizard ? createClackPrompter() : null;

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import { resolveElevatedPermissions } from "./reply-elevated.js";
 
-function buildConfig(allowFrom: string[]): KaijiBotConfig {
+function buildConfig(allowFrom: string[]): AllBotConfig {
   return {
     tools: {
       elevated: {
@@ -12,7 +12,7 @@ function buildConfig(allowFrom: string[]): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function buildContext(overrides?: Partial<MsgContext>): MsgContext {

@@ -1,29 +1,29 @@
-import { describeAccountSnapshot } from "kaijibot/plugin-sdk/account-helpers";
-import { formatAllowFromLowercase } from "kaijibot/plugin-sdk/allow-from";
-import { createMessageToolCardSchema } from "kaijibot/plugin-sdk/channel-actions";
+import { describeAccountSnapshot } from "allbot/plugin-sdk/account-helpers";
+import { formatAllowFromLowercase } from "allbot/plugin-sdk/allow-from";
+import { createMessageToolCardSchema } from "allbot/plugin-sdk/channel-actions";
 import {
   adaptScopedAccountAccessor,
   createHybridChannelConfigAdapter,
-} from "kaijibot/plugin-sdk/channel-config-helpers";
+} from "allbot/plugin-sdk/channel-config-helpers";
 import type {
   ChannelMessageActionAdapter,
   ChannelMessageToolDiscovery,
-} from "kaijibot/plugin-sdk/channel-contract";
-import { createChatChannelPlugin } from "kaijibot/plugin-sdk/channel-core";
-import { createPairingPrefixStripper } from "kaijibot/plugin-sdk/channel-pairing";
+} from "allbot/plugin-sdk/channel-contract";
+import { createChatChannelPlugin } from "allbot/plugin-sdk/channel-core";
+import { createPairingPrefixStripper } from "allbot/plugin-sdk/channel-pairing";
 import {
   createAllowlistProviderGroupPolicyWarningCollector,
   projectConfigAccountIdWarningCollector,
-} from "kaijibot/plugin-sdk/channel-policy";
-import { getSessionBindingService } from "kaijibot/plugin-sdk/conversation-runtime";
+} from "allbot/plugin-sdk/channel-policy";
+import { getSessionBindingService } from "allbot/plugin-sdk/conversation-runtime";
 import {
   createChannelDirectoryAdapter,
   createRuntimeDirectoryLiveAdapter,
-} from "kaijibot/plugin-sdk/directory-runtime";
-import { createLazyRuntimeNamedExport } from "kaijibot/plugin-sdk/lazy-runtime";
-import { createRuntimeOutboundDelegates } from "kaijibot/plugin-sdk/outbound-runtime";
-import { createComputedAccountStatusAdapter } from "kaijibot/plugin-sdk/status-helpers";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/directory-runtime";
+import { createLazyRuntimeNamedExport } from "allbot/plugin-sdk/lazy-runtime";
+import { createRuntimeOutboundDelegates } from "allbot/plugin-sdk/outbound-runtime";
+import { createComputedAccountStatusAdapter } from "allbot/plugin-sdk/status-helpers";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import {
   inspectFeishuCredentials,
   listEnabledFeishuAccounts,

@@ -6,7 +6,7 @@ import {
   addSubagentRunForTests,
   resetSubagentRegistryForTests,
 } from "../agents/subagent-registry.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { withStateDirEnv } from "../test-helpers/state-dir-env.js";
 import { withEnv } from "../test-utils/env.js";
@@ -27,7 +27,7 @@ describe("listSessionsFromStore subagent metadata", () => {
   const cfg = {
     session: { mainKey: "main" },
     agents: { list: [{ id: "main", default: true }] },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 
   test("includes subagent status timing and direct child session keys", () => {
     const now = Date.now();
@@ -593,7 +593,7 @@ describe("listSessionsFromStore subagent metadata", () => {
   });
 
   test("uses persisted active subagent runs when the local worker only has terminal snapshots", async () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-session-utils-subagent-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-session-utils-subagent-"));
     const stateDir = path.join(tempRoot, "state");
     fs.mkdirSync(stateDir, { recursive: true });
     try {
@@ -639,8 +639,8 @@ describe("listSessionsFromStore subagent metadata", () => {
 
       const row = withEnv(
         {
-          KAIJIBOT_STATE_DIR: stateDir,
-          KAIJIBOT_TEST_READ_SUBAGENT_RUNS_FROM_DISK: "1",
+          ALLBOT_STATE_DIR: stateDir,
+          ALLBOT_TEST_READ_SUBAGENT_RUNS_FROM_DISK: "1",
         },
         () => {
           const result = listSessionsFromStore({
@@ -822,7 +822,7 @@ describe("listSessionsFromStore subagent metadata", () => {
 
 describe("loadCombinedSessionStoreForGateway includes disk-only agents (#32804)", () => {
   test("ACP agent sessions are visible even when agents.list is configured", async () => {
-    await withStateDirEnv("kaijibot-acp-vis-", async ({ stateDir }) => {
+    await withStateDirEnv("allbot-acp-vis-", async ({ stateDir }) => {
       const customRoot = path.join(stateDir, "custom-state");
       const agentsDir = path.join(customRoot, "agents");
       const mainDir = path.join(agentsDir, "main", "sessions");
@@ -854,7 +854,7 @@ describe("loadCombinedSessionStoreForGateway includes disk-only agents (#32804)"
         agents: {
           list: [{ id: "main", default: true }],
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const { store } = loadCombinedSessionStoreForGateway(cfg);
       expect(store["agent:main:main"]).toBeDefined();

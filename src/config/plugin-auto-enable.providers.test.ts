@@ -10,7 +10,7 @@ afterEach(() => {
   resetPluginAutoEnableTestState();
 });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("applyPluginAutoEnable providers", () => {
   it("auto-enables provider auth plugins when profiles exist", () => {
     const result = applyPluginAutoEnable({
@@ -248,7 +248,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable providers", () => {
     expect(result.changes).toContain("acme tool configured, enabled automatically.");
   });
 
-  // Skip on CI: requires upstream-only plugin (acpx) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only plugin (acpx) not bundled in AllBot
   it.skipIf(process.env.CI)("auto-enables acpx plugin when ACP is configured", () => {
     const result = applyPluginAutoEnable({
       config: {

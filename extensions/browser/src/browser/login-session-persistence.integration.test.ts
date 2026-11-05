@@ -16,7 +16,7 @@ import os from "node:os";
 import path from "node:path";
 import { chromium } from "playwright-core";
 import { expect, it } from "vitest";
-import { launchKaijiBotChrome, stopKaijiBotChrome } from "./chrome.js";
+import { launchAllBotChrome, stopAllBotChrome } from "./chrome.js";
 import { resolveBrowserConfig, type ResolvedBrowserProfile } from "./config.js";
 
 function findChromiumExecutable(): string | null {
@@ -120,13 +120,13 @@ function startLoginTestServer(sessionToken: string): Promise<TestServer> {
       // session cookies (no Max-Age) die with the browser process by design.
       res.writeHead(200, {
         "Content-Type": "text/html",
-        "Set-Cookie": `kaijibot_session=${sessionToken}; Path=/; Max-Age=604800; HttpOnly`,
+        "Set-Cookie": `allbot_session=${sessionToken}; Path=/; Max-Age=604800; HttpOnly`,
       });
       res.end("<html><body>logged in</body></html>");
       return;
     }
     const cookie = req.headers.cookie ?? "";
-    const match = /kaijibot_session=([^;]+)/.exec(cookie);
+    const match = /allbot_session=([^;]+)/.exec(cookie);
     res.writeHead(200, { "Content-Type": "text/html" });
     res.end(`<html><body>session:${match?.[1] ?? "anonymous"}</body></html>`);
   });
@@ -166,11 +166,11 @@ maybeIt(
       cdpHost: "127.0.0.1",
       cdpIsLoopback: true,
       color: "#0066CC",
-      driver: "kaijibot",
+      driver: "allbot",
       attachOnly: false,
     };
 
-    let running = await launchKaijiBotChrome(resolved, profile);
+    let running = await launchAllBotChrome(resolved, profile);
     try {
       // "Manual login": the login page sets the session cookie in the profile.
       let pw = await chromium.connectOverCDP(`http://localhost:${cdpPort}`);
@@ -185,10 +185,10 @@ maybeIt(
       await pw.close();
 
       // Runner restart: stop Chrome, relaunch on the same persistent profile.
-      await stopKaijiBotChrome(running);
+      await stopAllBotChrome(running);
       await waitForChromeExit(running.proc);
       await waitForPortFree(cdpPort);
-      running = await launchKaijiBotChrome(resolved, profile);
+      running = await launchAllBotChrome(resolved, profile);
 
       pw = await chromium.connectOverCDP(`http://localhost:${cdpPort}`);
       context = pw.contexts()[0] ?? (await pw.newContext());
@@ -198,7 +198,7 @@ maybeIt(
       expect(whoamiAfterRestart).toContain(`session:${sessionToken}`);
       await pw.close();
     } finally {
-      await stopKaijiBotChrome(running).catch(() => {});
+      await stopAllBotChrome(running).catch(() => {});
       await server.close();
     }
   },

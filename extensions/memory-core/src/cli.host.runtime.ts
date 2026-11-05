@@ -11,16 +11,16 @@ export {
   withManager,
   withProgress,
   withProgressTotals,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-cli";
+} from "allbot/plugin-sdk/memory-core-host-runtime-cli";
 export {
   loadConfig,
   resolveDefaultAgentId,
   resolveSessionTranscriptsDirForAgent,
   resolveStateDir,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-runtime-core";
 export {
   listMemoryFiles,
   normalizeExtraMemoryPaths,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-files";
+} from "allbot/plugin-sdk/memory-core-host-runtime-files";
 export { getMemorySearchManager } from "./memory/index.js";

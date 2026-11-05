@@ -107,7 +107,7 @@ describe("registerDirectoryCli", () => {
       configChanged: true,
     });
 
-    const program = new Command().name("kaijibot");
+    const program = new Command().name("allbot");
     registerDirectoryCli(program);
 
     await program.parseAsync(["directory", "self", "--channel", "demo-directory", "--json"], {
@@ -154,7 +154,7 @@ describe("registerDirectoryCli", () => {
       directory: { self },
     });
 
-    const program = new Command().name("kaijibot");
+    const program = new Command().name("allbot");
     registerDirectoryCli(program);
 
     await program.parseAsync(["directory", "self", "--json"], { from: "user" });

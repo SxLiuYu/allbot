@@ -2484,12 +2484,12 @@ describe("createOpenAIWebSocketStreamFn", () => {
 
     const firstPayload = firstManager.sentEvents[0] as { metadata?: Record<string, string> };
     const secondPayload = secondManager.sentEvents[0] as { metadata?: Record<string, string> };
-    expect(firstPayload.metadata?.kaijibot_session_id).toBe("sess-turn-metadata-retry");
-    expect(firstPayload.metadata?.kaijibot_transport).toBe("websocket");
-    expect(firstPayload.metadata?.kaijibot_turn_id).toBeTruthy();
-    expect(secondPayload.metadata?.kaijibot_turn_id).toBe(firstPayload.metadata?.kaijibot_turn_id);
-    expect(firstPayload.metadata?.kaijibot_turn_attempt).toBe("1");
-    expect(secondPayload.metadata?.kaijibot_turn_attempt).toBe("2");
+    expect(firstPayload.metadata?.allbot_session_id).toBe("sess-turn-metadata-retry");
+    expect(firstPayload.metadata?.allbot_transport).toBe("websocket");
+    expect(firstPayload.metadata?.allbot_turn_id).toBeTruthy();
+    expect(secondPayload.metadata?.allbot_turn_id).toBe(firstPayload.metadata?.allbot_turn_id);
+    expect(firstPayload.metadata?.allbot_turn_attempt).toBe("1");
+    expect(secondPayload.metadata?.allbot_turn_attempt).toBe("2");
   });
 
   it("keeps websocket degraded for the session until the cool-down expires", async () => {

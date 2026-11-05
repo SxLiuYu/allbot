@@ -8,30 +8,30 @@ import {
 } from "./task-owner-access.js";
 import { createTaskRecord, resetTaskRegistryForTests } from "./task-registry.js";
 
-const ORIGINAL_STATE_DIR = process.env.KAIJIBOT_STATE_DIR;
+const ORIGINAL_STATE_DIR = process.env.ALLBOT_STATE_DIR;
 
 afterEach(() => {
   resetTaskRegistryForTests({ persist: false });
   if (ORIGINAL_STATE_DIR == null) {
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_STATE_DIR;
   } else {
-    process.env.KAIJIBOT_STATE_DIR = ORIGINAL_STATE_DIR;
+    process.env.ALLBOT_STATE_DIR = ORIGINAL_STATE_DIR;
   }
 });
 
 async function withTaskRegistryTempDir<T>(run: () => Promise<T> | T): Promise<T> {
-  return await withTempDir({ prefix: "kaijibot-task-owner-access-" }, async (root) => {
-    const previousStateDir = process.env.KAIJIBOT_STATE_DIR;
-    process.env.KAIJIBOT_STATE_DIR = root;
+  return await withTempDir({ prefix: "allbot-task-owner-access-" }, async (root) => {
+    const previousStateDir = process.env.ALLBOT_STATE_DIR;
+    process.env.ALLBOT_STATE_DIR = root;
     resetTaskRegistryForTests({ persist: false });
     try {
       return await run();
     } finally {
       resetTaskRegistryForTests({ persist: false });
       if (previousStateDir == null) {
-        delete process.env.KAIJIBOT_STATE_DIR;
+        delete process.env.ALLBOT_STATE_DIR;
       } else {
-        process.env.KAIJIBOT_STATE_DIR = previousStateDir;
+        process.env.ALLBOT_STATE_DIR = previousStateDir;
       }
     }
   });

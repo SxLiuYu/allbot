@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 
 const log = createSubsystemLogger("cognitive/evolution/skill-usage");
@@ -7,7 +7,7 @@ export type SkillUsageTrackParams = {
   toolMetas: ReadonlyArray<{ toolName: string; meta?: string }>;
   configDir: string;
   /** Full config when available, so a custom agent workspace is honored. */
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   /** Agent whose workspace owns the skills (defaults to "main"). */
   agentId?: string;
 };

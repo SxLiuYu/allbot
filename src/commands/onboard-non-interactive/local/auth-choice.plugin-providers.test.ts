@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { applyNonInteractivePluginProviderChoice } from "./auth-choice.plugin-providers.js";
 
 const resolvePreferredProviderForAuthChoice = vi.hoisted(() => vi.fn(async () => undefined));
@@ -50,11 +50,11 @@ describe("applyNonInteractivePluginProviderChoice", () => {
     });
 
     const result = await applyNonInteractivePluginProviderChoice({
-      nextConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      nextConfig: { agents: { defaults: {} } } as AllBotConfig,
       authChoice: "provider-plugin:vllm:custom",
       opts: {} as never,
       runtime: runtime as never,
-      baseConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      baseConfig: { agents: { defaults: {} } } as AllBotConfig,
       resolveApiKey: vi.fn(),
       toApiKeyCredential: vi.fn(),
     });
@@ -82,11 +82,11 @@ describe("applyNonInteractivePluginProviderChoice", () => {
     const runtime = createRuntime();
 
     const result = await applyNonInteractivePluginProviderChoice({
-      nextConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      nextConfig: { agents: { defaults: {} } } as AllBotConfig,
       authChoice: "provider-plugin:workspace-provider:api-key",
       opts: {} as never,
       runtime: runtime as never,
-      baseConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      baseConfig: { agents: { defaults: {} } } as AllBotConfig,
       resolveApiKey: vi.fn(),
       toApiKeyCredential: vi.fn(),
     });
@@ -110,11 +110,11 @@ describe("applyNonInteractivePluginProviderChoice", () => {
     } as never);
 
     const result = await applyNonInteractivePluginProviderChoice({
-      nextConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      nextConfig: { agents: { defaults: {} } } as AllBotConfig,
       authChoice: "workspace-provider-api-key",
       opts: {} as never,
       runtime: runtime as never,
-      baseConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      baseConfig: { agents: { defaults: {} } } as AllBotConfig,
       resolveApiKey: vi.fn(),
       toApiKeyCredential: vi.fn(),
     });
@@ -162,11 +162,11 @@ describe("applyNonInteractivePluginProviderChoice", () => {
     });
 
     const result = await applyNonInteractivePluginProviderChoice({
-      nextConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      nextConfig: { agents: { defaults: {} } } as AllBotConfig,
       authChoice: "provider-plugin:demo-provider:custom",
       opts: {} as never,
       runtime: runtime as never,
-      baseConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      baseConfig: { agents: { defaults: {} } } as AllBotConfig,
       resolveApiKey: vi.fn(),
       toApiKeyCredential: vi.fn(),
     });
@@ -187,11 +187,11 @@ describe("applyNonInteractivePluginProviderChoice", () => {
     resolvePreferredProviderForAuthChoice.mockResolvedValue(undefined);
 
     await applyNonInteractivePluginProviderChoice({
-      nextConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      nextConfig: { agents: { defaults: {} } } as AllBotConfig,
       authChoice: "openai-api-key",
       opts: {} as never,
       runtime: runtime as never,
-      baseConfig: { agents: { defaults: {} } } as KaijiBotConfig,
+      baseConfig: { agents: { defaults: {} } } as AllBotConfig,
       resolveApiKey: vi.fn(),
       toApiKeyCredential: vi.fn(),
     });

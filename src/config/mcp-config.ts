@@ -1,7 +1,7 @@
 import { isRecord } from "../utils.js";
 import { readSourceConfigSnapshot } from "./io.js";
 import { replaceConfigFile } from "./mutate.js";
-import type { KaijiBotConfig } from "./types.kaijibot.js";
+import type { AllBotConfig } from "./types.allbot.js";
 import { validateConfigObjectWithPlugins } from "./validation.js";
 
 export type ConfigMcpServers = Record<string, Record<string, unknown>>;
@@ -10,7 +10,7 @@ type ConfigMcpReadResult =
   | {
       ok: true;
       path: string;
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       mcpServers: ConfigMcpServers;
       baseHash?: string;
     }
@@ -20,7 +20,7 @@ type ConfigMcpWriteResult =
   | {
       ok: true;
       path: string;
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       mcpServers: ConfigMcpServers;
       removed?: boolean;
     }

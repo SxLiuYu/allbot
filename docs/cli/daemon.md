@@ -1,26 +1,26 @@
 ---
-summary: "CLI reference for `kaijibot daemon` (legacy alias for gateway service management)"
+summary: "CLI reference for `allbot daemon` (legacy alias for gateway service management)"
 read_when:
-  - You still use `kaijibot daemon ...` in scripts
+  - You still use `allbot daemon ...` in scripts
   - You need service lifecycle commands (install/start/stop/restart/status)
 title: "daemon"
 ---
 
-# `kaijibot daemon`
+# `allbot daemon`
 
 Legacy alias for Gateway service management commands.
 
-`kaijibot daemon ...` maps to the same service control surface as `kaijibot gateway ...` service commands.
+`allbot daemon ...` maps to the same service control surface as `allbot gateway ...` service commands.
 
 ## Usage
 
 ```bash
-kaijibot daemon status
-kaijibot daemon install
-kaijibot daemon start
-kaijibot daemon stop
-kaijibot daemon restart
-kaijibot daemon uninstall
+allbot daemon status
+allbot daemon install
+allbot daemon start
+allbot daemon stop
+allbot daemon restart
+allbot daemon uninstall
 ```
 
 ## Subcommands
@@ -54,4 +54,4 @@ Notes:
 
 ## Prefer
 
-Use [`kaijibot gateway`](/cli/gateway) for current docs and examples.
+Use [`allbot gateway`](/cli/gateway) for current docs and examples.

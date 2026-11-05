@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withTempDir } from "../test-helpers/temp-dir.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { runCapability } from "./runner.js";
@@ -10,8 +10,8 @@ describe("runCapability video provider wiring", () => {
     let seenBaseUrl: string | undefined;
     let seenHeaders: Record<string, string> | undefined;
 
-    await withTempDir({ prefix: "kaijibot-video-auth-" }, async (isolatedAgentDir) => {
-      await withVideoFixture("kaijibot-video-merge", async ({ ctx, media, cache }) => {
+    await withTempDir({ prefix: "allbot-video-auth-" }, async (isolatedAgentDir) => {
+      await withVideoFixture("allbot-video-merge", async ({ ctx, media, cache }) => {
         const cfg = {
           models: {
             providers: {
@@ -41,7 +41,7 @@ describe("runCapability video provider wiring", () => {
               },
             },
           },
-        } as unknown as KaijiBotConfig;
+        } as unknown as AllBotConfig;
 
         const result = await runCapability({
           capability: "video",
@@ -79,17 +79,17 @@ describe("runCapability video provider wiring", () => {
   });
 
   it("auto-selects moonshot for video when google is unavailable", async () => {
-    await withTempDir({ prefix: "kaijibot-video-agent-" }, async (isolatedAgentDir) => {
+    await withTempDir({ prefix: "allbot-video-agent-" }, async (isolatedAgentDir) => {
       await withEnvAsync(
         {
           GEMINI_API_KEY: undefined,
           GOOGLE_API_KEY: undefined,
           MOONSHOT_API_KEY: undefined,
-          KAIJIBOT_AGENT_DIR: isolatedAgentDir,
+          ALLBOT_AGENT_DIR: isolatedAgentDir,
           PI_CODING_AGENT_DIR: isolatedAgentDir,
         },
         async () => {
-          await withVideoFixture("kaijibot-video-auto-moonshot", async ({ ctx, media, cache }) => {
+          await withVideoFixture("allbot-video-auto-moonshot", async ({ ctx, media, cache }) => {
             const cfg = {
               models: {
                 providers: {
@@ -107,7 +107,7 @@ describe("runCapability video provider wiring", () => {
                   },
                 },
               },
-            } as unknown as KaijiBotConfig;
+            } as unknown as AllBotConfig;
 
             const result = await runCapability({
               capability: "video",

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   createReplyRuntimeMocks,
   createTempHomeHarness,
@@ -12,13 +12,13 @@ import { loadReplyModuleForTest } from "./get-reply.test-loader.js";
 
 let getReplyFromConfig: typeof import("../reply.js").getReplyFromConfig;
 const agentMocks = createReplyRuntimeMocks();
-const { withTempHome } = createTempHomeHarness({ prefix: "kaijibot-getreply-fast-" });
+const { withTempHome } = createTempHomeHarness({ prefix: "allbot-getreply-fast-" });
 
 installReplyRuntimeMocks(agentMocks);
 
 describe("getReplyFromConfig fast-path runtime", () => {
   beforeEach(async () => {
-    vi.stubEnv("KAIJIBOT_TEST_FAST", "1");
+    vi.stubEnv("ALLBOT_TEST_FAST", "1");
     resetReplyRuntimeMocks(agentMocks);
     ({ getReplyFromConfig } = await loadReplyModuleForTest({ cacheKey: import.meta.url }));
   });
@@ -52,7 +52,7 @@ describe("getReplyFromConfig fast-path runtime", () => {
           ChatType: "direct",
         },
         {},
-        makeReplyConfig(home) as KaijiBotConfig,
+        makeReplyConfig(home) as AllBotConfig,
       );
 
       const text = Array.isArray(res) ? res[0]?.text : res?.text;

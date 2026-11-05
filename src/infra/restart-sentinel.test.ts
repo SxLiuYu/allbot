@@ -15,10 +15,10 @@ import {
 } from "./restart-sentinel.js";
 
 async function withRestartSentinelStateDir(run: () => Promise<void>): Promise<void> {
-  const envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR"]);
+  const envSnapshot = captureEnv(["ALLBOT_STATE_DIR"]);
   try {
-    await withTempDir({ prefix: "kaijibot-sentinel-" }, async (tempDir) => {
-      process.env.KAIJIBOT_STATE_DIR = tempDir;
+    await withTempDir({ prefix: "allbot-sentinel-" }, async (tempDir) => {
+      process.env.ALLBOT_STATE_DIR = tempDir;
       await run();
     });
   } finally {
@@ -114,7 +114,7 @@ describe("restart sentinel", () => {
       status: "error" as const,
       ts: Date.now(),
       message: "Patch failed",
-      doctorHint: "Run kaijibot doctor",
+      doctorHint: "Run allbot doctor",
       stats: { mode: "patch", reason: "validation failed" },
     };
 
@@ -123,7 +123,7 @@ describe("restart sentinel", () => {
         "Gateway restart config-patch error (patch)",
         "Patch failed",
         "Reason: validation failed",
-        "Run kaijibot doctor",
+        "Run allbot doctor",
       ].join("\n"),
     );
   });
@@ -195,7 +195,7 @@ describe("restart sentinel message dedup", () => {
 
   it("formats the non-interactive doctor command", () => {
     expect(formatDoctorNonInteractiveHint({ PATH: "/usr/bin:/bin" })).toContain(
-      "kaijibot doctor --non-interactive",
+      "allbot doctor --non-interactive",
     );
   });
 });

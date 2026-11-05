@@ -11,14 +11,14 @@ import {
 } from "../agents/provider-request-config.js";
 import type { MsgContext } from "../auto-reply/templating.js";
 import { applyTemplate } from "../auto-reply/templating.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type {
   MediaUnderstandingConfig,
   MediaUnderstandingModelConfig,
 } from "../config/types.tools.js";
 import { logVerbose, shouldLogVerbose } from "../globals.js";
 import { resolveProxyFetchFromEnv } from "../infra/net/proxy-fetch.js";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { runFfmpeg } from "../media/ffmpeg-exec.js";
 import { runExec } from "../process/exec.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
@@ -353,7 +353,7 @@ export function buildModelDecision(params: {
 function resolveEntryRunOptions(params: {
   capability: MediaUnderstandingCapability;
   entry: MediaUnderstandingModelConfig;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   config?: MediaUnderstandingConfig;
 }): { maxBytes: number; maxChars?: number; timeoutMs: number; prompt: string } {
   const { capability, entry, cfg } = params;
@@ -389,7 +389,7 @@ function resolveAudioRequestOverrides(config: MediaUnderstandingConfig | undefin
 
 async function resolveProviderExecutionAuth(params: {
   providerId: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   entry: MediaUnderstandingModelConfig;
   agentDir?: string;
 }) {
@@ -411,7 +411,7 @@ async function resolveProviderExecutionAuth(params: {
 
 async function resolveProviderExecutionContext(params: {
   providerId: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   entry: MediaUnderstandingModelConfig;
   config?: MediaUnderstandingConfig;
   agentDir?: string;
@@ -472,7 +472,7 @@ function assertMinAudioSize(params: { size: number; attachmentIndex: number }): 
 export async function runProviderEntry(params: {
   capability: MediaUnderstandingCapability;
   entry: MediaUnderstandingModelConfig;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
   attachmentIndex: number;
   cache: MediaAttachmentCache;
@@ -659,7 +659,7 @@ export async function runProviderEntry(params: {
 export async function runCliEntry(params: {
   capability: MediaUnderstandingCapability;
   entry: MediaUnderstandingModelConfig;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
   attachmentIndex: number;
   cache: MediaAttachmentCache;
@@ -688,7 +688,7 @@ export async function runCliEntry(params: {
     assertMinAudioSize({ size: stat.size, attachmentIndex: params.attachmentIndex });
   }
   const outputDir = await fs.mkdtemp(
-    path.join(resolvePreferredKaijiBotTmpDir(), "kaijibot-media-cli-"),
+    path.join(resolvePreferredAllBotTmpDir(), "allbot-media-cli-"),
   );
   const mediaPath = await resolveCliMediaPath({
     capability,

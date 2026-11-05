@@ -7,7 +7,7 @@ status: active
 
 # Sandbox vs Tool Policy vs Elevated
 
-KaijiBot has three related (but different) controls:
+AllBot has three related (but different) controls:
 
 1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) decides **where tools run** (Docker vs host).
 2. **Tool policy** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) decides **which tools are available/allowed**.
@@ -15,13 +15,13 @@ KaijiBot has three related (but different) controls:
 
 ## Quick debug
 
-Use the inspector to see what KaijiBot is _actually_ doing:
+Use the inspector to see what AllBot is _actually_ doing:
 
 ```bash
-kaijibot sandbox explain
-kaijibot sandbox explain --session agent:main:main
-kaijibot sandbox explain --agent work
-kaijibot sandbox explain --json
+allbot sandbox explain
+allbot sandbox explain --session agent:main:main
+allbot sandbox explain --agent work
+allbot sandbox explain --json
 ```
 
 It prints:
@@ -46,7 +46,7 @@ See [Sandboxing](/gateway/sandboxing) for the full matrix (scope, workspace moun
 - `docker.binds` _pierces_ the sandbox filesystem: whatever you mount is visible inside the container with the mode you set (`:ro` or `:rw`).
 - Default is read-write if you omit the mode; prefer `:ro` for source/secrets.
 - `scope: "shared"` ignores per-agent binds (only global binds apply).
-- KaijiBot validates bind sources twice: first on the normalized source path, then again after resolving through the deepest existing ancestor. Symlink-parent escapes do not bypass blocked-path or allowed-root checks.
+- AllBot validates bind sources twice: first on the normalized source path, then again after resolving through the deepest existing ancestor. Symlink-parent escapes do not bypass blocked-path or allowed-root checks.
 - Non-existent leaf paths are still checked safely. If `/workspace/alias-out/new-file` resolves through a symlinked parent to a blocked path or outside the configured allowed roots, the bind is rejected.
 - Binding `/var/run/docker.sock` effectively hands host control to the sandbox; only do this intentionally.
 - Workspace access (`workspaceAccess: "ro"`/`"rw"`) is independent of bind modes.
@@ -99,7 +99,7 @@ Available groups:
 - `group:nodes`: `nodes`
 - `group:agents`: `agents_list`
 - `group:media`: `image`, `image_generate`, `video_generate`, `tts`
-- `group:kaijibot`: all built-in KaijiBot tools (excludes provider plugins)
+- `group:allbot`: all built-in AllBot tools (excludes provider plugins)
 
 ## Elevated: exec-only "run on host"
 

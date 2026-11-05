@@ -6,7 +6,7 @@ import {
   type ThinkLevel,
   type VerboseLevel,
 } from "../../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   evaluateSessionFreshness,
   loadSessionStore,
@@ -52,7 +52,7 @@ function buildExplicitSessionIdSessionKey(params: { sessionId: string; agentId?:
 }
 
 function collectSessionIdMatchesForRequest(opts: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionStore: Record<string, SessionEntry>;
   storePath: string;
   storeAgentId?: string;
@@ -101,7 +101,7 @@ function collectSessionIdMatchesForRequest(opts: {
  * into that agent's main session key.
  */
 export function resolveStoredSessionKeyForSessionId(opts: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionId: string;
   agentId?: string;
 }): SessionKeyResolution {
@@ -127,7 +127,7 @@ export function resolveStoredSessionKeyForSessionId(opts: {
 }
 
 export function resolveSessionKeyForRequest(opts: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   to?: string;
   sessionId?: string;
   sessionKey?: string;
@@ -193,7 +193,7 @@ export function resolveSessionKeyForRequest(opts: {
 }
 
 export function resolveSession(opts: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   to?: string;
   sessionId?: string;
   sessionKey?: string;

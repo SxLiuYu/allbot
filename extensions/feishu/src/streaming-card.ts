@@ -3,7 +3,7 @@
  */
 
 import type { Client } from "@larksuiteoapi/node-sdk";
-import { fetchWithSsrFGuard } from "kaijibot/plugin-sdk/ssrf-runtime";
+import { fetchWithSsrFGuard } from "allbot/plugin-sdk/ssrf-runtime";
 import {
   CARD_PHASES,
   type CardPhase,

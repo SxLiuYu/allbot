@@ -29,8 +29,8 @@ export type {
   MemoryPluginPublicArtifactsProvider,
   MemoryPluginRuntime,
   MemoryPromptSectionBuilder,
-  KaijiBotConfig,
-  KaijiBotPluginApi,
+  AllBotConfig,
+  AllBotPluginApi,
 } from "./memory-core-host-runtime-core.js";
 export {
   colorize,

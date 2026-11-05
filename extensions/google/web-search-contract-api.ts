@@ -1,7 +1,7 @@
 import {
   createWebSearchProviderContractFields,
   type WebSearchProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-web-search-config-contract";
+} from "allbot/plugin-sdk/provider-web-search-config-contract";
 
 export function createGeminiWebSearchProvider(): WebSearchProviderPlugin {
   const credentialPath = "plugins.entries.google.config.webSearch.apiKey";

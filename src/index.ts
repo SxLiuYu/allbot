@@ -90,13 +90,13 @@ if (isMain) {
   installUnhandledRejectionHandler();
 
   process.on("uncaughtException", (error) => {
-    console.error("[kaijibot] Uncaught exception:", formatUncaughtError(error));
+    console.error("[allbot] Uncaught exception:", formatUncaughtError(error));
     restoreTerminalState("uncaught exception", { resumeStdinIfPaused: false });
     process.exit(1);
   });
 
   void runLegacyCliEntry(process.argv).catch((err) => {
-    console.error("[kaijibot] CLI failed:", formatUncaughtError(err));
+    console.error("[allbot] CLI failed:", formatUncaughtError(err));
     restoreTerminalState("legacy cli failure", { resumeStdinIfPaused: false });
     process.exit(1);
   });

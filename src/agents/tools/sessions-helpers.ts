@@ -33,7 +33,7 @@ export {
   sanitizeTextContent,
   stripToolMessages,
 } from "./chat-history-text.js";
-import { type KaijiBotConfig, loadConfig } from "../../config/config.js";
+import { type AllBotConfig, loadConfig } from "../../config/config.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 
 export type SessionKind = "main" | "group" | "cron" | "hook" | "node" | "other";
@@ -90,7 +90,7 @@ export type SessionListRow = {
 export function resolveSessionToolContext(opts?: {
   agentSessionKey?: string;
   sandboxed?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }) {
   const cfg = opts?.config ?? loadConfig();
   return {

@@ -74,7 +74,7 @@ describe("web_search date normalization", () => {
 
 describe("web_search unsupported filter response", () => {
   it("returns undefined when no unsupported filter is set", () => {
-    expect(buildUnsupportedSearchFilterResponse({ query: "kaijibot" }, "gemini")).toBeUndefined();
+    expect(buildUnsupportedSearchFilterResponse({ query: "allbot" }, "gemini")).toBeUndefined();
   });
 
   it("maps non-date filters to provider-specific unsupported errors", () => {

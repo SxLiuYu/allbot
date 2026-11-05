@@ -1,8 +1,8 @@
 import {
   defineBundledChannelEntry,
   loadBundledEntryExportSync,
-} from "kaijibot/plugin-sdk/channel-entry-contract";
-import type { KaijiBotPluginApi } from "kaijibot/plugin-sdk/channel-entry-contract";
+} from "allbot/plugin-sdk/channel-entry-contract";
+import type { AllBotPluginApi } from "allbot/plugin-sdk/channel-entry-contract";
 
 type FeishuSubagentHooksModule = typeof import("./api.js");
 
@@ -13,64 +13,64 @@ function loadFeishuSubagentHooksModule() {
   return feishuSubagentHooksPromise;
 }
 
-function registerFeishuDocTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuDocTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuDocTools",
   });
   register(api);
 }
 
-function registerFeishuChatTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuChatTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuChatTools",
   });
   register(api);
 }
 
-function registerFeishuWikiTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuWikiTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuWikiTools",
   });
   register(api);
 }
 
-function registerFeishuDriveTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuDriveTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuDriveTools",
   });
   register(api);
 }
 
-function registerFeishuPermTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuPermTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuPermTools",
   });
   register(api);
 }
 
-function registerFeishuBitableTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuBitableTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuBitableTools",
   });
   register(api);
 }
 
-function registerFeishuVcTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuVcTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuVcTools",
   });
   register(api);
 }
 
-function registerFeishuTaskTools(api: KaijiBotPluginApi) {
-  const register = loadBundledEntryExportSync<(api: KaijiBotPluginApi) => void>(import.meta.url, {
+function registerFeishuTaskTools(api: AllBotPluginApi) {
+  const register = loadBundledEntryExportSync<(api: AllBotPluginApi) => void>(import.meta.url, {
     specifier: "./api.js",
     exportName: "registerFeishuTaskTools",
   });

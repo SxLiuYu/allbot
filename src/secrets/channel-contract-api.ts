@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadBundledPluginPublicArtifactModuleSync } from "../plugins/public-surface-loader.js";
 import type { ResolverContext, SecretDefaults } from "./runtime-shared.js";
 import type { SecretTargetRegistryEntry } from "./target-registry-types.js";
@@ -10,7 +10,7 @@ type UnsupportedSecretRefConfigCandidate = {
 
 type BundledChannelContractApi = {
   collectRuntimeConfigAssignments?: (params: {
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     defaults: SecretDefaults | undefined;
     context: ResolverContext;
   }) => void;
@@ -38,7 +38,7 @@ function loadBundledChannelPublicArtifact(
       ) {
         continue;
       }
-      if (process.env.KAIJIBOT_DEBUG_CHANNEL_CONTRACT_API === "1") {
+      if (process.env.ALLBOT_DEBUG_CHANNEL_CONTRACT_API === "1") {
         const detail = error instanceof Error ? error.message : String(error);
         process.stderr.write(
           `[channel-contract-api] failed to load ${channelId}/${artifactBasename}: ${detail}\n`,

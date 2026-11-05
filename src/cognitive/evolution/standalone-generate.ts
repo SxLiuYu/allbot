@@ -3,7 +3,7 @@ import { completeSimple, type Api, type Model, type TextContent } from "@earendi
 import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { prepareSimpleCompletionModel } from "../../agents/simple-completion-runtime.js";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 
 const log = createSubsystemLogger("cognitive/evolution/standalone-generate");
@@ -27,12 +27,12 @@ function isTextBlock(block: { type: string }): block is TextContent {
   return block.type === "text";
 }
 
-function isBackgroundBatchEnabled(cfg: KaijiBotConfig): boolean {
+function isBackgroundBatchEnabled(cfg: AllBotConfig): boolean {
   return cfg.agents?.defaults?.backgroundBatch === true;
 }
 
 export async function createStandaloneGenerateText(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   options?: StandaloneGenerateOptions,
 ): Promise<StandaloneGenerateTextFn> {
   let provider: string;
@@ -79,18 +79,18 @@ export async function createStandaloneGenerateText(
 export type StandaloneGenerateDeps = {
   complete: typeof completeSimple;
   prepareModel: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
   ) => Promise<{ model: Model<Api>; auth: ResolvedProviderAuth } | { error: string }>;
 };
 
 export function createStandaloneGenerateTextWithDeps(
   deps: StandaloneGenerateDeps,
   options?: StandaloneGenerateOptions,
-): (cfg: KaijiBotConfig) => Promise<StandaloneGenerateTextFn> {
+): (cfg: AllBotConfig) => Promise<StandaloneGenerateTextFn> {
   const maxTokens = options?.maxTokens ?? 4000;
   const timeout = options?.timeout ?? 60_000;
 
-  return async (cfg: KaijiBotConfig): Promise<StandaloneGenerateTextFn> => {
+  return async (cfg: AllBotConfig): Promise<StandaloneGenerateTextFn> => {
     const prepared = await deps.prepareModel(cfg);
     if ("error" in prepared) {
       throw new Error(`Cannot create standalone generateText: ${prepared.error}`);
@@ -319,7 +319,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 export async function createStandaloneGenerateTextBatch(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   options?: BatchGenerateOptions,
 ): Promise<StandaloneGenerateTextFn> {
   const resolved = resolveDefaultModelForAgent({ cfg });
@@ -363,13 +363,13 @@ export type BackgroundGenerateDeps = {
 export function createStandaloneGenerateTextBatchWithDeps(
   deps: BackgroundGenerateDeps,
   options?: BatchGenerateOptions,
-): (cfg: KaijiBotConfig) => Promise<StandaloneGenerateTextFn> {
+): (cfg: AllBotConfig) => Promise<StandaloneGenerateTextFn> {
   const maxTokens = options?.maxTokens ?? 4000;
   const requestTimeoutMs = options?.timeout ?? 60_000;
   const pollIntervalMs = options?.pollIntervalMs ?? 30_000;
   const batchTimeoutMs = options?.batchTimeoutMs ?? 24 * 60 * 60 * 1000;
 
-  return async (cfg: KaijiBotConfig): Promise<StandaloneGenerateTextFn> => {
+  return async (cfg: AllBotConfig): Promise<StandaloneGenerateTextFn> => {
     const prepared = await deps.batch.prepareModel(cfg);
     if ("error" in prepared) {
       throw new Error(`Cannot create standalone batch generateText: ${prepared.error}`);
@@ -398,7 +398,7 @@ export function createStandaloneGenerateTextBatchWithDeps(
  * summary — all non-latency-sensitive single-turn LLM callers.
  */
 export async function createBackgroundGenerateText(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   options?: StandaloneGenerateOptions,
 ): Promise<StandaloneGenerateTextFn> {
   if (isBackgroundBatchEnabled(cfg)) {

@@ -62,10 +62,10 @@ function resolveImportedExternalId(message: unknown): string | undefined {
     return undefined;
   }
   const meta =
-    "__kaijibot" in message &&
-    (message as { __kaijibot?: unknown }).__kaijibot &&
-    typeof (message as { __kaijibot?: unknown }).__kaijibot === "object"
-      ? ((message as { __kaijibot?: Record<string, unknown> }).__kaijibot ?? {})
+    "__allbot" in message &&
+    (message as { __allbot?: unknown }).__allbot &&
+    typeof (message as { __allbot?: unknown }).__allbot === "object"
+      ? ((message as { __allbot?: Record<string, unknown> }).__allbot ?? {})
       : undefined;
   return normalizeOptionalString(meta?.externalId);
 }

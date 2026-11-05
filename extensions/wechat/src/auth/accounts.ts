@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { normalizeAccountId } from "kaijibot/plugin-sdk/account-id";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/core";
+import { normalizeAccountId } from "allbot/plugin-sdk/account-id";
+import type { AllBotConfig } from "allbot/plugin-sdk/core";
 import { resolveStateDir } from "../storage/state-dir.js";
 import { logger } from "../util/logger.js";
 import { resolveFrameworkAllowFromPath } from "./pairing.js";
@@ -256,19 +256,19 @@ export function clearWeixinAccount(accountId: string): void {
 }
 
 /**
- * Resolve the kaijibot.json config file path.
- * Checks KAIJIBOT_CONFIG env var, then state dir.
+ * Resolve the allbot.json config file path.
+ * Checks ALLBOT_CONFIG env var, then state dir.
  */
 function resolveConfigPath(): string {
-  const envPath = process.env.KAIJIBOT_CONFIG?.trim();
+  const envPath = process.env.ALLBOT_CONFIG?.trim();
   if (envPath) {
     return envPath;
   }
-  return path.join(resolveStateDir(), "kaijibot.json");
+  return path.join(resolveStateDir(), "allbot.json");
 }
 
 /**
- * Read `routeTag` from kaijibot.json (for callers without an `KaijiBotConfig` object).
+ * Read `routeTag` from allbot.json (for callers without an `AllBotConfig` object).
  * Checks per-account `channels.<id>.accounts[accountId].routeTag` first, then section-level
  * `channels.<id>.routeTag`. Matches `feat_weixin_extension` behavior; channel key is `"wechat"`.
  *
@@ -322,7 +322,7 @@ export function loadConfigRouteTag(accountId?: string): string | undefined {
 }
 
 /**
- * Read `botAgent` from `channels.wechat.botAgent` in kaijibot.json.
+ * Read `botAgent` from `channels.wechat.botAgent` in allbot.json.
  * Returns the raw configured string (caller is responsible for sanitization)
  * or undefined when not set. Reuses the cached channel section.
  */
@@ -336,16 +336,16 @@ export function loadConfigBotAgent(): string | undefined {
 }
 
 /**
- * Bump `channels.wechat.channelConfigUpdatedAt` in kaijibot.json on each successful login
+ * Bump `channels.wechat.channelConfigUpdatedAt` in allbot.json on each successful login
  * so the gateway reloads config from disk (no empty `accounts: {}` placeholder).
  */
 export async function triggerWeixinChannelReload(): Promise<void> {
   try {
-    const { loadConfig, writeConfigFile } = await import("kaijibot/plugin-sdk/config-runtime");
+    const { loadConfig, writeConfigFile } = await import("allbot/plugin-sdk/config-runtime");
     const cfg = loadConfig();
     const channels = (cfg.channels ?? {}) as Record<string, unknown>;
     const existing = (channels["wechat"] as Record<string, unknown> | undefined) ?? {};
-    const updated: KaijiBotConfig = {
+    const updated: AllBotConfig = {
       ...cfg,
       channels: {
         ...channels,
@@ -356,7 +356,7 @@ export async function triggerWeixinChannelReload(): Promise<void> {
       },
     };
     await writeConfigFile(updated);
-    logger.info("triggerWeixinChannelReload: wrote channel config to kaijibot.json");
+    logger.info("triggerWeixinChannelReload: wrote channel config to allbot.json");
   } catch (err) {
     logger.warn(`triggerWeixinChannelReload: failed to update config: ${String(err)}`);
   }
@@ -381,7 +381,7 @@ type WeixinAccountConfig = {
   name?: string;
   enabled?: boolean;
   cdnBaseUrl?: string;
-  /** Optional SKRouteTag source; read from kaijibot.json when `accountId` is passed to `loadConfigRouteTag`. */
+  /** Optional SKRouteTag source; read from allbot.json when `accountId` is passed to `loadConfigRouteTag`. */
   routeTag?: number | string;
 };
 
@@ -392,13 +392,13 @@ type WeixinSectionConfig = WeixinAccountConfig & {
 };
 
 /** List accountIds from the index file (written at QR login). */
-export function listWeixinAccountIds(_cfg: KaijiBotConfig): string[] {
+export function listWeixinAccountIds(_cfg: AllBotConfig): string[] {
   return listIndexedWeixinAccountIds();
 }
 
 /** Resolve a weixin account by ID, merging config and stored credentials. */
 export function resolveWeixinAccount(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId?: string | null,
 ): ResolvedWeixinAccount {
   const raw = accountId?.trim();

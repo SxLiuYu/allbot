@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-contracts";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-contracts";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   testing,
@@ -13,7 +13,7 @@ describe("buildMistralRealtimeTranscriptionProvider", () => {
   it("normalizes nested provider config", () => {
     const provider = buildMistralRealtimeTranscriptionProvider();
     const resolved = provider.resolveConfig?.({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       rawConfig: {
         providers: {
           mistral: {

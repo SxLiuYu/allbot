@@ -34,7 +34,7 @@
 /** A scoring dimension name, e.g. "quality". */
 export type Dimension = string;
 
-/** KaijiBot standard dimensions (VERIFICATION.md §8.4). */
+/** AllBot standard dimensions (VERIFICATION.md §8.4). */
 export const DEFAULT_DIMENSIONS = ["quality", "relevance", "novelty", "safety"] as const;
 
 /** Human-readable guidance per standard dimension, injected into the judge prompt. */
@@ -58,7 +58,7 @@ export type GenerateText = (prompt: string) => Promise<string>;
 export type SupervisorOptions = {
   /** Required: the clean-context LLM caller (e.g. from createStandaloneGenerateText). */
   generateText: GenerateText;
-  /** Scoring dimensions. Defaults to the KaijiBot standard 4 (§8.4). */
+  /** Scoring dimensions. Defaults to the AllBot standard 4 (§8.4). */
   dimensions?: readonly Dimension[];
   /** Per-dimension guidance text shown to the judge. Defaults to DEFAULT_DIMENSION_GUIDE. */
   dimensionGuide?: Record<string, string>;

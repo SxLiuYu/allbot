@@ -8,7 +8,7 @@ import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
 } from "../shared/string-coerce.js";
-import type { KaijiBotConfig } from "./config-runtime.js";
+import type { AllBotConfig } from "./config-runtime.js";
 import { normalizeAccountId } from "./routing.js";
 
 type ApprovalRequest = ExecApprovalRequest | PluginApprovalRequest;
@@ -23,11 +23,11 @@ type ChannelApprovalConfig = {
 };
 
 type ApprovalProfileParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 };
 
-function isApprovalTargetsMode(cfg: KaijiBotConfig): boolean {
+function isApprovalTargetsMode(cfg: AllBotConfig): boolean {
   const execApprovals = cfg.approvals?.exec;
   if (!execApprovals?.enabled) {
     return false;
@@ -48,7 +48,7 @@ export function isChannelExecApprovalClientEnabledFromConfig(params: {
 }
 
 export function isChannelExecApprovalTargetRecipient(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   senderId?: string | null;
   accountId?: string | null;
   channel: string;

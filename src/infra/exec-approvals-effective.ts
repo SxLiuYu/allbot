@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
 import {
   DEFAULT_EXEC_APPROVAL_ASK_FALLBACK,
@@ -14,7 +14,7 @@ import {
 
 const DEFAULT_REQUESTED_SECURITY: ExecSecurity = "full";
 const DEFAULT_REQUESTED_ASK: ExecAsk = "off";
-const DEFAULT_HOST_PATH = "~/.kaijibot/exec-approvals.json";
+const DEFAULT_HOST_PATH = "~/.allbot/exec-approvals.json";
 const REQUESTED_DEFAULT_LABEL = {
   security: DEFAULT_REQUESTED_SECURITY,
   ask: DEFAULT_REQUESTED_ASK,
@@ -56,7 +56,7 @@ function formatRequestedSource(params: {
   defaultValue: ExecSecurity | ExecAsk;
 }): string {
   return params.sourcePath === "__default__"
-    ? `KaijiBot default (${params.defaultValue})`
+    ? `AllBot default (${params.defaultValue})`
     : `${params.sourcePath}.${params.field}`;
 }
 
@@ -97,7 +97,7 @@ function formatHostFieldSource(params: {
     return `${params.hostPath} ${params.sourceSuffix}`;
   }
   if (params.field === "askFallback") {
-    return `KaijiBot default (${DEFAULT_EXEC_APPROVAL_ASK_FALLBACK})`;
+    return `AllBot default (${DEFAULT_EXEC_APPROVAL_ASK_FALLBACK})`;
   }
   return "inherits requested tool policy";
 }
@@ -114,7 +114,7 @@ function resolveAskNote(params: {
 }
 
 export function collectExecPolicyScopeSnapshots(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   approvals: ExecApprovalsFile;
   hostPath?: string;
 }): ExecPolicyScopeSnapshot[] {

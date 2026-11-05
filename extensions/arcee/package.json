@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/arcee-provider",
+  "name": "@allbot/arcee-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Arcee provider plugin",
+  "description": "AllBot Arcee provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

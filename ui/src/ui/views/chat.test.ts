@@ -220,7 +220,7 @@ function createProps(overrides: Partial<ChatProps> = {}): ChatProps {
     error: null,
     sessions: createSessions(),
     focusMode: false,
-    assistantName: "KaijiBot",
+    assistantName: "AllBot",
     assistantAvatar: null,
     onRefresh: () => undefined,
     onToggleFocusMode: () => undefined,
@@ -403,7 +403,7 @@ describe("chat view", () => {
           assistantName: "Assistant",
           assistantAvatar: "A",
           assistantAvatarUrl: null,
-          basePath: "/kaijibot/",
+          basePath: "/allbot/",
         }),
       ),
       container,
@@ -413,7 +413,7 @@ describe("chat view", () => {
       ".agent-chat__welcome .agent-chat__avatar--logo img",
     );
     expect(logoImage).not.toBeNull();
-    expect(logoImage?.getAttribute("src")).toBe("/kaijibot/favicon.svg");
+    expect(logoImage?.getAttribute("src")).toBe("/allbot/favicon.svg");
   });
 
   it("keeps grouped assistant avatar fallbacks under the mounted base path", () => {
@@ -424,7 +424,7 @@ describe("chat view", () => {
           assistantName: "Assistant",
           assistantAvatar: "A",
           assistantAvatarUrl: null,
-          basePath: "/kaijibot/",
+          basePath: "/allbot/",
           messages: [
             {
               role: "assistant",
@@ -441,7 +441,7 @@ describe("chat view", () => {
       ".chat-group.assistant .chat-avatar--logo",
     );
     expect(groupedLogo).not.toBeNull();
-    expect(groupedLogo?.getAttribute("src")).toBe("/kaijibot/favicon.svg");
+    expect(groupedLogo?.getAttribute("src")).toBe("/allbot/favicon.svg");
   });
 
   it("renders compacting indicator as a badge", () => {

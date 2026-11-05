@@ -1,15 +1,15 @@
-import type { KaijiBotPluginApi } from "kaijibot/plugin-sdk/plugin-runtime";
+import type { AllBotPluginApi } from "allbot/plugin-sdk/plugin-runtime";
 
-type TestPluginApiInput = Partial<KaijiBotPluginApi>;
+type TestPluginApiInput = Partial<AllBotPluginApi>;
 
-export function createTestPluginApi(api: TestPluginApiInput = {}): KaijiBotPluginApi {
+export function createTestPluginApi(api: TestPluginApiInput = {}): AllBotPluginApi {
   return {
     id: "test-plugin",
     name: "test-plugin",
     source: "test",
     registrationMode: "full",
     config: {},
-    runtime: {} as KaijiBotPluginApi["runtime"],
+    runtime: {} as AllBotPluginApi["runtime"],
     logger: { info() {}, warn() {}, error() {}, debug() {} },
     registerTool() {},
     registerHook() {},

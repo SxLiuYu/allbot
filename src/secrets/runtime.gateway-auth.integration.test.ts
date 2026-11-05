@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig, writeConfigFile } from "../config/config.js";
 import { withTempHome } from "../config/home-env.test-harness.js";
 import { withEnvAsync } from "../test-utils/env.js";
@@ -36,9 +36,9 @@ describe("secrets runtime snapshot gateway-auth integration", () => {
   it("fails fast at startup when gateway auth SecretRef is active and unresolved", async () => {
     await withEnvAsync(
       {
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-        KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-        KAIJIBOT_VERSION: undefined,
+        ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+        ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+        ALLBOT_VERSION: undefined,
       },
       async () => {
         await expect(
@@ -56,7 +56,7 @@ describe("secrets runtime snapshot gateway-auth integration", () => {
               },
             }),
             env: {},
-            agentDirs: ["/tmp/kaijibot-agent-main"],
+            agentDirs: ["/tmp/allbot-agent-main"],
             loadablePluginOrigins: EMPTY_LOADABLE_PLUGIN_ORIGINS,
             loadAuthStore: () => ({ version: 1, profiles: {} }),
           }),
@@ -68,7 +68,7 @@ describe("secrets runtime snapshot gateway-auth integration", () => {
   it(
     "keeps last-known-good runtime snapshot active when reload introduces unresolved active gateway auth refs",
     async () => {
-      await withTempHome("kaijibot-secrets-runtime-gateway-auth-reload-lkg-", async (home) => {
+      await withTempHome("allbot-secrets-runtime-gateway-auth-reload-lkg-", async (home) => {
         const initialTokenRef = {
           source: "env",
           provider: "default",
@@ -92,7 +92,7 @@ describe("secrets runtime snapshot gateway-auth integration", () => {
           env: {
             GATEWAY_AUTH_TOKEN: "gateway-runtime-token",
           },
-          agentDirs: ["/tmp/kaijibot-agent-main"],
+          agentDirs: ["/tmp/allbot-agent-main"],
           loadablePluginOrigins: EMPTY_LOADABLE_PLUGIN_ORIGINS,
           loadAuthStore: () => loadAuthStoreWithProfiles({}),
         });
@@ -118,8 +118,8 @@ describe("secrets runtime snapshot gateway-auth integration", () => {
         expect(activeAfterFailure?.sourceConfig.gateway?.auth?.token).toEqual(initialTokenRef);
 
         const persistedConfig = JSON.parse(
-          await fs.readFile(path.join(home, ".kaijibot", "kaijibot.json"), "utf8"),
-        ) as KaijiBotConfig;
+          await fs.readFile(path.join(home, ".allbot", "allbot.json"), "utf8"),
+        ) as AllBotConfig;
         expect(persistedConfig.gateway?.auth?.token).toEqual(missingTokenRef);
       });
     },

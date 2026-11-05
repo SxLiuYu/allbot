@@ -5,7 +5,7 @@ export type ServiceStatusSummary = {
   label: string;
   installed: boolean | null;
   loaded: boolean;
-  managedByKaijiBot: boolean;
+  managedByAllBot: boolean;
   externallyManaged: boolean;
   loadedText: string;
   runtime: GatewayServiceRuntime | undefined;
@@ -17,9 +17,9 @@ export async function readServiceStatusSummary(
 ): Promise<ServiceStatusSummary> {
   try {
     const state = await readGatewayServiceState(service, { env: process.env });
-    const managedByKaijiBot = state.installed;
-    const externallyManaged = !managedByKaijiBot && state.running;
-    const installed = managedByKaijiBot || externallyManaged;
+    const managedByAllBot = state.installed;
+    const externallyManaged = !managedByAllBot && state.running;
+    const installed = managedByAllBot || externallyManaged;
     const loadedText = externallyManaged
       ? "running (externally managed)"
       : state.loaded
@@ -29,7 +29,7 @@ export async function readServiceStatusSummary(
       label: service.label,
       installed,
       loaded: state.loaded,
-      managedByKaijiBot,
+      managedByAllBot,
       externallyManaged,
       loadedText,
       runtime: state.runtime,
@@ -39,7 +39,7 @@ export async function readServiceStatusSummary(
       label: fallbackLabel,
       installed: null,
       loaded: false,
-      managedByKaijiBot: false,
+      managedByAllBot: false,
       externallyManaged: false,
       loadedText: "unknown",
       runtime: undefined,

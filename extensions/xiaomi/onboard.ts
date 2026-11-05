@@ -1,14 +1,14 @@
 import {
   createDefaultModelsPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import { buildXiaomiProvider, XIAOMI_DEFAULT_MODEL_ID } from "./provider-catalog.js";
 
 export const XIAOMI_DEFAULT_MODEL_REF = `xiaomi/${XIAOMI_DEFAULT_MODEL_ID}`;
 
 const xiaomiPresetAppliers = createDefaultModelsPresetAppliers({
   primaryModelRef: XIAOMI_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => {
+  resolveParams: (_cfg: AllBotConfig) => {
     const defaultProvider = buildXiaomiProvider();
     return {
       providerId: "xiaomi",
@@ -21,10 +21,10 @@ const xiaomiPresetAppliers = createDefaultModelsPresetAppliers({
   },
 });
 
-export function applyXiaomiProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyXiaomiProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return xiaomiPresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyXiaomiConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyXiaomiConfig(cfg: AllBotConfig): AllBotConfig {
   return xiaomiPresetAppliers.applyConfig(cfg);
 }

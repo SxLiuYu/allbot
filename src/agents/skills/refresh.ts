@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import chokidar, { type FSWatcher } from "chokidar";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import { CONFIG_DIR, resolveUserPath } from "../../utils.js";
@@ -53,7 +53,7 @@ export const DEFAULT_SKILLS_WATCH_IGNORED: RegExp[] = [
   /(^|[\\/])\.cache([\\/]|$)/,
 ];
 
-function resolveWatchPaths(workspaceDir: string, config?: KaijiBotConfig): string[] {
+function resolveWatchPaths(workspaceDir: string, config?: AllBotConfig): string[] {
   const paths: string[] = [];
   if (workspaceDir.trim()) {
     paths.push(path.join(workspaceDir, "skills"));
@@ -78,7 +78,7 @@ function toWatchGlobRoot(raw: string): string {
   return raw.replaceAll("\\", "/").replace(/\/+$/, "");
 }
 
-function resolveWatchTargets(workspaceDir: string, config?: KaijiBotConfig): string[] {
+function resolveWatchTargets(workspaceDir: string, config?: AllBotConfig): string[] {
   // Skills are defined by SKILL.md; watch only those files to avoid traversing
   // or watching unrelated large trees (e.g. datasets) that can exhaust FDs.
   const targets = new Set<string>();
@@ -92,7 +92,7 @@ function resolveWatchTargets(workspaceDir: string, config?: KaijiBotConfig): str
   return Array.from(targets).toSorted();
 }
 
-export function ensureSkillsWatcher(params: { workspaceDir: string; config?: KaijiBotConfig }) {
+export function ensureSkillsWatcher(params: { workspaceDir: string; config?: AllBotConfig }) {
   const workspaceDir = params.workspaceDir.trim();
   if (!workspaceDir) {
     return;

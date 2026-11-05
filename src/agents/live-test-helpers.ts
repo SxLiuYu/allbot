@@ -6,13 +6,13 @@ export function isLiveTestEnabled(
   extraEnvVars: readonly string[] = [],
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {
-  return [...extraEnvVars, "LIVE", "KAIJIBOT_LIVE_TEST"].some((name) =>
+  return [...extraEnvVars, "LIVE", "ALLBOT_LIVE_TEST"].some((name) =>
     isTruthyEnvValue(env[name]),
   );
 }
 
 export function isLiveProfileKeyModeEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
-  return isTruthyEnvValue(env.KAIJIBOT_LIVE_REQUIRE_PROFILE_KEYS);
+  return isTruthyEnvValue(env.ALLBOT_LIVE_REQUIRE_PROFILE_KEYS);
 }
 
 export function createSingleUserPromptMessage(content = LIVE_OK_PROMPT) {

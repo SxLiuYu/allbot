@@ -1,5 +1,5 @@
 import { resolveGatewayPort } from "../../config/config.js";
-import type { KaijiBotConfig } from "../../config/types.js";
+import type { AllBotConfig } from "../../config/types.js";
 import { resolveControlUiLinks } from "../../gateway/control-ui-links.js";
 import { formatDurationPrecise } from "../../infra/format-time/format-duration.ts";
 import {
@@ -48,7 +48,7 @@ type StatusGatewaySelf =
 type StatusManagedService = {
   label: string;
   installed: boolean | null;
-  managedByKaijiBot?: boolean;
+  managedByAllBot?: boolean;
   loadedText: string;
   runtimeShort?: string | null;
   runtime?: {
@@ -139,7 +139,7 @@ export function formatStatusTailscaleValue(params: {
 export function formatStatusServiceValue(params: {
   label: string;
   installed: boolean;
-  managedByKaijiBot?: boolean;
+  managedByAllBot?: boolean;
   loadedText: string;
   runtimeShort?: string | null;
   runtimeStatus?: string | null;
@@ -148,7 +148,7 @@ export function formatStatusServiceValue(params: {
   if (!params.installed) {
     return `${params.label} not installed`;
   }
-  const installedPrefix = params.managedByKaijiBot ? "installed · " : "";
+  const installedPrefix = params.managedByAllBot ? "installed · " : "";
   const runtimeSuffix = params.runtimeShort
     ? ` · ${params.runtimeShort}`
     : [
@@ -159,7 +159,7 @@ export function formatStatusServiceValue(params: {
 }
 
 export function resolveStatusDashboardUrl(params: {
-  cfg: Pick<KaijiBotConfig, "gateway">;
+  cfg: Pick<AllBotConfig, "gateway">;
 }): string | null {
   if (!(params.cfg.gateway?.controlUi?.enabled ?? true)) {
     return null;
@@ -221,7 +221,7 @@ export function buildStatusOverviewRows(params: {
 }
 
 export function buildStatusOverviewSurfaceRows(params: {
-  cfg: Pick<KaijiBotConfig, "update" | "gateway">;
+  cfg: Pick<AllBotConfig, "update" | "gateway">;
   update: StatusUpdateLike;
   tailscaleMode: string;
   tailscaleDns?: string | null;
@@ -380,7 +380,7 @@ export function buildGatewayStatusSummaryParts(params: {
 }
 
 export function buildStatusGatewaySurfaceValues(params: {
-  cfg: Pick<KaijiBotConfig, "gateway">;
+  cfg: Pick<AllBotConfig, "gateway">;
   gatewayMode: "local" | "remote";
   remoteUrlMissing: boolean;
   gatewayConnection: StatusGatewayConnection;
@@ -430,7 +430,7 @@ export function buildStatusGatewaySurfaceValues(params: {
     gatewayServiceValue: formatStatusServiceValue({
       label: params.gatewayService.label,
       installed: params.gatewayService.installed !== false,
-      managedByKaijiBot: params.gatewayService.managedByKaijiBot,
+      managedByAllBot: params.gatewayService.managedByAllBot,
       loadedText: params.gatewayService.loadedText,
       runtimeShort: params.gatewayService.runtimeShort,
       runtimeStatus: params.gatewayService.runtime?.status,
@@ -439,7 +439,7 @@ export function buildStatusGatewaySurfaceValues(params: {
     nodeServiceValue: formatStatusServiceValue({
       label: params.nodeService.label,
       installed: params.nodeService.installed !== false,
-      managedByKaijiBot: params.nodeService.managedByKaijiBot,
+      managedByAllBot: params.nodeService.managedByAllBot,
       loadedText: params.nodeService.loadedText,
       runtimeShort: params.nodeService.runtimeShort,
       runtimeStatus: params.nodeService.runtime?.status,

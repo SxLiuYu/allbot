@@ -2,32 +2,32 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { resolveHomeRelativePath, resolveRequiredHomeDir } from "../infra/home-dir.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
 /**
- * Nix mode detection: When KAIJIBOT_NIX_MODE=1, the gateway is running under Nix.
+ * Nix mode detection: When ALLBOT_NIX_MODE=1, the gateway is running under Nix.
  * In this mode:
  * - No auto-install flows should be attempted
  * - Missing dependencies should produce actionable Nix-specific error messages
  * - Config is managed externally (read-only from Nix perspective)
  */
 export function resolveIsNixMode(env: NodeJS.ProcessEnv = process.env): boolean {
-  return env.KAIJIBOT_NIX_MODE === "1";
+  return env.ALLBOT_NIX_MODE === "1";
 }
 
 export const isNixMode = resolveIsNixMode();
 
 // Support the remaining legacy pre-rebrand state dir.
 const LEGACY_STATE_DIRNAMES = [".clawdbot"] as const;
-const NEW_STATE_DIRNAME = ".kaijibot";
-const CONFIG_FILENAME = "kaijibot.json";
+const NEW_STATE_DIRNAME = ".allbot";
+const CONFIG_FILENAME = "allbot.json";
 const LEGACY_CONFIG_FILENAMES = ["clawdbot.json"] as const;
 
 function resolveDefaultHomeDir(): string {
   return resolveRequiredHomeDir(process.env, os.homedir);
 }
 
-/** Build a homedir thunk that respects KAIJIBOT_HOME for the given env. */
+/** Build a homedir thunk that respects ALLBOT_HOME for the given env. */
 function envHomedir(env: NodeJS.ProcessEnv): () => string {
   return () => resolveRequiredHomeDir(env, os.homedir);
 }
@@ -54,20 +54,20 @@ export function resolveNewStateDir(homedir: () => string = resolveDefaultHomeDir
 
 /**
  * State directory for mutable data (sessions, logs, caches).
- * Can be overridden via KAIJIBOT_STATE_DIR.
- * Default: ~/.kaijibot
+ * Can be overridden via ALLBOT_STATE_DIR.
+ * Default: ~/.allbot
  */
 export function resolveStateDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = envHomedir(env),
 ): string {
   const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
-  const override = env.KAIJIBOT_STATE_DIR?.trim();
+  const override = env.ALLBOT_STATE_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, effectiveHomedir);
   }
   const newDir = newStateDir(effectiveHomedir);
-  if (env.KAIJIBOT_TEST_FAST === "1") {
+  if (env.ALLBOT_TEST_FAST === "1") {
     return newDir;
   }
   const legacyDirs = legacyStateDirs(effectiveHomedir);
@@ -100,14 +100,14 @@ export const STATE_DIR = resolveStateDir();
 
 /**
  * Config file path (JSON or JSON5).
- * Can be overridden via KAIJIBOT_CONFIG_PATH.
- * Default: ~/.kaijibot/kaijibot.json (or $KAIJIBOT_STATE_DIR/kaijibot.json)
+ * Can be overridden via ALLBOT_CONFIG_PATH.
+ * Default: ~/.allbot/allbot.json (or $ALLBOT_STATE_DIR/allbot.json)
  */
 export function resolveCanonicalConfigPath(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, envHomedir(env)),
 ): string {
-  const override = env.KAIJIBOT_CONFIG_PATH?.trim();
+  const override = env.ALLBOT_CONFIG_PATH?.trim();
   if (override) {
     return resolveUserPath(override, env, envHomedir(env));
   }
@@ -122,7 +122,7 @@ export function resolveConfigPathCandidate(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = envHomedir(env),
 ): string {
-  if (env.KAIJIBOT_TEST_FAST === "1") {
+  if (env.ALLBOT_TEST_FAST === "1") {
     return resolveCanonicalConfigPath(env, resolveStateDir(env, homedir));
   }
   const candidates = resolveDefaultConfigCandidates(env, homedir);
@@ -147,14 +147,14 @@ export function resolveConfigPath(
   stateDir: string = resolveStateDir(env, envHomedir(env)),
   homedir: () => string = envHomedir(env),
 ): string {
-  const override = env.KAIJIBOT_CONFIG_PATH?.trim();
+  const override = env.ALLBOT_CONFIG_PATH?.trim();
   if (override) {
     return resolveUserPath(override, env, homedir);
   }
-  if (env.KAIJIBOT_TEST_FAST === "1") {
+  if (env.ALLBOT_TEST_FAST === "1") {
     return path.join(stateDir, CONFIG_FILENAME);
   }
-  const stateOverride = env.KAIJIBOT_STATE_DIR?.trim();
+  const stateOverride = env.ALLBOT_STATE_DIR?.trim();
   const candidates = [
     path.join(stateDir, CONFIG_FILENAME),
     ...LEGACY_CONFIG_FILENAMES.map((name) => path.join(stateDir, name)),
@@ -190,15 +190,15 @@ export function resolveDefaultConfigCandidates(
   homedir: () => string = envHomedir(env),
 ): string[] {
   const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
-  const explicit = env.KAIJIBOT_CONFIG_PATH?.trim();
+  const explicit = env.ALLBOT_CONFIG_PATH?.trim();
   if (explicit) {
     return [resolveUserPath(explicit, env, effectiveHomedir)];
   }
 
   const candidates: string[] = [];
-  const kaijibotStateDir = env.KAIJIBOT_STATE_DIR?.trim();
-  if (kaijibotStateDir) {
-    const resolved = resolveUserPath(kaijibotStateDir, env, effectiveHomedir);
+  const allbotStateDir = env.ALLBOT_STATE_DIR?.trim();
+  if (allbotStateDir) {
+    const resolved = resolveUserPath(allbotStateDir, env, effectiveHomedir);
     candidates.push(path.join(resolved, CONFIG_FILENAME));
     candidates.push(...LEGACY_CONFIG_FILENAMES.map((name) => path.join(resolved, name)));
   }
@@ -215,12 +215,12 @@ export const DEFAULT_GATEWAY_PORT = 18789;
 
 /**
  * Gateway lock directory (ephemeral).
- * Default: os.tmpdir()/kaijibot-<uid> (uid suffix when available).
+ * Default: os.tmpdir()/allbot-<uid> (uid suffix when available).
  */
 export function resolveGatewayLockDir(tmpdir: () => string = os.tmpdir): string {
   const base = tmpdir();
   const uid = typeof process.getuid === "function" ? process.getuid() : undefined;
-  const suffix = uid != null ? `kaijibot-${uid}` : "kaijibot";
+  const suffix = uid != null ? `allbot-${uid}` : "allbot";
   return path.join(base, suffix);
 }
 
@@ -230,14 +230,14 @@ const OAUTH_FILENAME = "oauth.json";
  * OAuth credentials storage directory.
  *
  * Precedence:
- * - `KAIJIBOT_OAUTH_DIR` (explicit override)
+ * - `ALLBOT_OAUTH_DIR` (explicit override)
  * - `$*_STATE_DIR/credentials` (canonical server/default)
  */
 export function resolveOAuthDir(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, envHomedir(env)),
 ): string {
-  const override = env.KAIJIBOT_OAUTH_DIR?.trim();
+  const override = env.ALLBOT_OAUTH_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, envHomedir(env));
   }
@@ -283,10 +283,10 @@ function parseGatewayPortEnvValue(raw: string | undefined): number | null {
 }
 
 export function resolveGatewayPort(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): number {
-  const envRaw = env.KAIJIBOT_GATEWAY_PORT?.trim();
+  const envRaw = env.ALLBOT_GATEWAY_PORT?.trim();
   const envPort = parseGatewayPortEnvValue(envRaw);
   if (envPort !== null) {
     return envPort;

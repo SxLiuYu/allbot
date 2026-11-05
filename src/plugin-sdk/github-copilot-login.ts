@@ -1,4 +1,4 @@
-type FacadeModule = typeof import("@kaijibot/github-copilot/api.js");
+type FacadeModule = typeof import("@allbot/github-copilot/api.js");
 import { loadBundledPluginPublicSurfaceModuleSync } from "./facade-loader.js";
 
 function loadFacadeModule(): FacadeModule {

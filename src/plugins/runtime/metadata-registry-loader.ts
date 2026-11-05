@@ -1,11 +1,11 @@
-import type { KaijiBotConfig } from "../../config/config.js";
-import { loadKaijiBotPlugins } from "../loader.js";
+import type { AllBotConfig } from "../../config/config.js";
+import { loadAllBotPlugins } from "../loader.js";
 import type { PluginRegistry } from "../registry.js";
 import { buildPluginRuntimeLoadOptions, resolvePluginRuntimeLoadContext } from "./load-context.js";
 
 export function loadPluginMetadataRegistrySnapshot(options?: {
-  config?: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config?: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   workspaceDir?: string;
   onlyPluginIds?: string[];
@@ -13,7 +13,7 @@ export function loadPluginMetadataRegistrySnapshot(options?: {
 }): PluginRegistry {
   const context = resolvePluginRuntimeLoadContext(options);
 
-  return loadKaijiBotPlugins(
+  return loadAllBotPlugins(
     buildPluginRuntimeLoadOptions(context, {
       throwOnLoadError: true,
       cache: false,

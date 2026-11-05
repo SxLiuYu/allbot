@@ -35,9 +35,9 @@ const prepareDeps = {
   resolveBootstrapContextForRun: resolveBootstrapContextForRunImpl,
   getActiveMcpLoopbackRuntime,
   createMcpLoopbackServerConfig,
-  resolveKaijiBotDocsPath: async (
-    params: Parameters<typeof import("../docs-path.js").resolveKaijiBotDocsPath>[0],
-  ) => (await import("../docs-path.js")).resolveKaijiBotDocsPath(params),
+  resolveAllBotDocsPath: async (
+    params: Parameters<typeof import("../docs-path.js").resolveAllBotDocsPath>[0],
+  ) => (await import("../docs-path.js")).resolveAllBotDocsPath(params),
 };
 
 export function setCliRunnerPrepareTestDeps(overrides: Partial<typeof prepareDeps>): void {
@@ -126,11 +126,11 @@ export async function prepareCliRunContext(
       : undefined,
     env: mcpLoopbackRuntime
       ? {
-          KAIJIBOT_MCP_TOKEN: mcpLoopbackRuntime.token,
-          KAIJIBOT_MCP_AGENT_ID: sessionAgentId ?? "",
-          KAIJIBOT_MCP_ACCOUNT_ID: params.agentAccountId ?? "",
-          KAIJIBOT_MCP_SESSION_KEY: params.sessionKey ?? "",
-          KAIJIBOT_MCP_MESSAGE_CHANNEL: params.messageProvider ?? "",
+          ALLBOT_MCP_TOKEN: mcpLoopbackRuntime.token,
+          ALLBOT_MCP_AGENT_ID: sessionAgentId ?? "",
+          ALLBOT_MCP_ACCOUNT_ID: params.agentAccountId ?? "",
+          ALLBOT_MCP_SESSION_KEY: params.sessionKey ?? "",
+          ALLBOT_MCP_MESSAGE_CHANNEL: params.messageProvider ?? "",
         }
       : undefined,
     warn: (message) => cliBackendLog.warn(message),
@@ -156,7 +156,7 @@ export async function prepareCliRunContext(
     agentId: sessionAgentId,
     defaultAgentId,
   });
-  const docsPath = await prepareDeps.resolveKaijiBotDocsPath({
+  const docsPath = await prepareDeps.resolveAllBotDocsPath({
     workspaceDir,
     argv1: process.argv[1],
     cwd: process.cwd(),

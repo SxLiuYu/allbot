@@ -1,5 +1,5 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { applyPluginAutoEnable } from "../../config/plugin-auto-enable.js";
 import { resolveRuntimePluginRegistry } from "../../plugins/loader.js";
 import {
@@ -16,7 +16,7 @@ export function resetOutboundChannelBootstrapStateForTests(): void {
 
 export function bootstrapOutboundChannelPlugin(params: {
   channel: DeliverableMessageChannel;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): void {
   const cfg = params.cfg;
   if (!cfg) {

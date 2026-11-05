@@ -1,5 +1,5 @@
 import { getRuntimeConfig } from "../config/config.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { emitDiagnosticEvent } from "../infra/diagnostic-events.js";
 import {
   diagnosticSessionStates,
@@ -38,7 +38,7 @@ function markActivity() {
   lastActivityAt = Date.now();
 }
 
-export function resolveStuckSessionWarnMs(config?: KaijiBotConfig): number {
+export function resolveStuckSessionWarnMs(config?: AllBotConfig): number {
   const raw = config?.diagnostics?.stuckSessionWarnMs;
   if (typeof raw !== "number" || !Number.isFinite(raw)) {
     return DEFAULT_STUCK_SESSION_WARN_MS;
@@ -331,8 +331,8 @@ export function logActiveRuns() {
 let heartbeatInterval: NodeJS.Timeout | null = null;
 
 export function startDiagnosticHeartbeat(
-  config?: KaijiBotConfig,
-  opts?: { getConfig?: () => KaijiBotConfig },
+  config?: AllBotConfig,
+  opts?: { getConfig?: () => AllBotConfig },
 ) {
   if (heartbeatInterval) {
     return;

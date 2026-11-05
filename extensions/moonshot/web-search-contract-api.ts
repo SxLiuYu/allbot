@@ -1,7 +1,7 @@
 import {
   createWebSearchProviderContractFields,
   type WebSearchProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-web-search-config-contract";
+} from "allbot/plugin-sdk/provider-web-search-config-contract";
 
 export function createKimiWebSearchProvider(): WebSearchProviderPlugin {
   const credentialPath = "plugins.entries.moonshot.config.webSearch.apiKey";

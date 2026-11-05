@@ -1,5 +1,5 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { MediaNormalizationEntry } from "../media-generation/runtime-shared.js";
 
 export type MusicGenerationOutputFormat = "mp3" | "wav";
@@ -20,7 +20,7 @@ export type MusicGenerationSourceImage = {
 };
 
 export type MusicGenerationProviderConfiguredContext = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
 };
 
@@ -28,7 +28,7 @@ export type MusicGenerationRequest = {
   provider: string;
   model: string;
   prompt: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   authStore?: AuthProfileStore;
   timeoutMs?: number;

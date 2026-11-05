@@ -3,7 +3,7 @@ import path from "node:path";
 import { withTempHome as withTempHomeBase } from "../../test/helpers/temp-home.js";
 import { resetPluginLoaderTestStateForTest } from "../plugins/loader.test-fixtures.js";
 import { clearPluginSetupRegistryCache } from "../plugins/setup-registry.js";
-import { resetConfigRuntimeState, type KaijiBotConfig } from "./config.js";
+import { resetConfigRuntimeState, type AllBotConfig } from "./config.js";
 
 function resetConfigTestRuntimeState(): void {
   resetConfigRuntimeState();
@@ -15,17 +15,17 @@ export async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise
   resetConfigTestRuntimeState();
   try {
     return await withTempHomeBase(fn, {
-      prefix: "kaijibot-config-",
+      prefix: "allbot-config-",
       env: {
-        KAIJIBOT_CONFIG_PATH: undefined,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-        KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
-        KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: undefined,
-        KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE: undefined,
-        KAIJIBOT_PLUGIN_CATALOG_PATHS: undefined,
-        KAIJIBOT_MPM_CATALOG_PATHS: undefined,
-        KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS: undefined,
-        KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS: undefined,
+        ALLBOT_CONFIG_PATH: undefined,
+        ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+        ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+        ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: undefined,
+        ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE: undefined,
+        ALLBOT_PLUGIN_CATALOG_PATHS: undefined,
+        ALLBOT_MPM_CATALOG_PATHS: undefined,
+        ALLBOT_PLUGIN_DISCOVERY_CACHE_MS: undefined,
+        ALLBOT_PLUGIN_MANIFEST_CACHE_MS: undefined,
       },
     });
   } finally {
@@ -33,8 +33,8 @@ export async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise
   }
 }
 
-export async function writeKaijiBotConfig(home: string, config: unknown): Promise<string> {
-  const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+export async function writeAllBotConfig(home: string, config: unknown): Promise<string> {
+  const configPath = path.join(home, ".allbot", "allbot.json");
   await fs.mkdir(path.dirname(configPath), { recursive: true });
   await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
   return configPath;
@@ -47,9 +47,9 @@ export async function writeStateDirDotEnv(
     stateDir?: string;
   },
 ): Promise<{ dotEnvPath: string; stateDir: string }> {
-  const stateDir = params?.stateDir ?? params?.env?.KAIJIBOT_STATE_DIR?.trim();
+  const stateDir = params?.stateDir ?? params?.env?.ALLBOT_STATE_DIR?.trim();
   if (!stateDir) {
-    throw new Error("Expected KAIJIBOT_STATE_DIR or explicit stateDir for .env test setup");
+    throw new Error("Expected ALLBOT_STATE_DIR or explicit stateDir for .env test setup");
   }
   const dotEnvPath = path.join(stateDir, ".env");
   await fs.mkdir(path.dirname(dotEnvPath), { recursive: true });
@@ -62,7 +62,7 @@ export async function withTempHomeConfig<T>(
   fn: (params: { home: string; configPath: string }) => Promise<T>,
 ): Promise<T> {
   return withTempHome(async (home) => {
-    const configPath = await writeKaijiBotConfig(home, config);
+    const configPath = await writeAllBotConfig(home, config);
     return fn({ home, configPath });
   });
 }
@@ -98,7 +98,7 @@ export async function withEnvOverride<T>(
 
 export function buildWebSearchProviderConfig(params: {
   provider: NonNullable<
-    NonNullable<NonNullable<NonNullable<KaijiBotConfig["tools"]>["web"]>["search"]>["provider"]
+    NonNullable<NonNullable<NonNullable<AllBotConfig["tools"]>["web"]>["search"]>["provider"]
   >;
   enabled?: boolean;
   providerConfig?: Record<string, unknown>;

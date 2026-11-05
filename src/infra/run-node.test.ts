@@ -18,10 +18,10 @@ const ROOT_TSDOWN = "tsdown.config.ts";
 const DIST_ENTRY = "dist/entry.js";
 const BUILD_STAMP = "dist/.buildstamp";
 const EXTENSION_SRC = bundledPluginFile("demo", "src/index.ts");
-const EXTENSION_MANIFEST = bundledPluginFile("demo", "kaijibot.plugin.json");
+const EXTENSION_MANIFEST = bundledPluginFile("demo", "allbot.plugin.json");
 const EXTENSION_PACKAGE = bundledPluginFile("demo", "package.json");
 const EXTENSION_README = bundledPluginFile("demo", "README.md");
-const DIST_EXTENSION_MANIFEST = bundledDistPluginFile("demo", "kaijibot.plugin.json");
+const DIST_EXTENSION_MANIFEST = bundledDistPluginFile("demo", "allbot.plugin.json");
 const DIST_EXTENSION_PACKAGE = bundledDistPluginFile("demo", "package.json");
 
 const OLD_TIME = new Date("2026-03-13T10:00:00.000Z");
@@ -30,7 +30,7 @@ const NEW_TIME = new Date("2026-03-13T12:00:01.000Z");
 
 const BASE_PROJECT_FILES = {
   [ROOT_TSCONFIG]: "{}\n",
-  [ROOT_PACKAGE]: '{"name":"kaijibot-test"}\n',
+  [ROOT_PACKAGE]: '{"name":"allbot-test"}\n',
   [DIST_ENTRY]: "console.log('built');\n",
   [BUILD_STAMP]: '{"head":"abc123"}\n',
 } as const;
@@ -66,7 +66,7 @@ function expectedBuildSpawn() {
 }
 
 function statusCommandSpawn() {
-  return [process.execPath, "kaijibot.mjs", "status"];
+  return [process.execPath, "allbot.mjs", "status"];
 }
 
 function resolvePath(tmp: string, relativePath: string) {
@@ -177,7 +177,7 @@ async function runStatusCommand(params: {
     args: ["status"],
     env: {
       ...process.env,
-      KAIJIBOT_RUNNER_LOG: "0",
+      ALLBOT_RUNNER_LOG: "0",
       ...params.env,
     },
     spawn: params.spawn,
@@ -198,7 +198,7 @@ describe("run-node script", () => {
   it.runIf(process.platform !== "win32")(
     "preserves control-ui assets by building with tsdown --no-clean",
     async () => {
-      await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+      await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
         const argsPath = resolvePath(tmp, ".build-args.txt");
         const indexPath = resolvePath(tmp, "dist/control-ui/index.html");
 
@@ -225,8 +225,8 @@ describe("run-node script", () => {
           args: ["--version"],
           env: {
             ...process.env,
-            KAIJIBOT_FORCE_BUILD: "1",
-            KAIJIBOT_RUNNER_LOG: "0",
+            ALLBOT_FORCE_BUILD: "1",
+            ALLBOT_RUNNER_LOG: "0",
           },
           spawn,
           execPath: process.execPath,
@@ -240,14 +240,14 @@ describe("run-node script", () => {
         await expect(fs.readFile(indexPath, "utf-8")).resolves.toContain("sentinel");
         expect(nodeCalls).toEqual([
           [process.execPath, "scripts/tsdown-build.mjs", "--no-clean"],
-          [process.execPath, "kaijibot.mjs", "--version"],
+          [process.execPath, "allbot.mjs", "--version"],
         ]);
       });
     },
   );
 
   it("copies bundled plugin metadata after rebuilding from a clean dist", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await writeRuntimePostBuildScaffold(tmp);
       await writeProjectFiles(tmp, {
         [EXTENSION_MANIFEST]: '{"id":"demo","configSchema":{"type":"object"}}\n',
@@ -255,7 +255,7 @@ describe("run-node script", () => {
           JSON.stringify(
             {
               name: "demo",
-              kaijibot: {
+              allbot: {
                 extensions: ["./src/index.ts", "./nested/entry.mts"],
               },
             },
@@ -273,7 +273,7 @@ describe("run-node script", () => {
       const exitCode = await runStatusCommand({
         tmp,
         spawn,
-        env: { KAIJIBOT_FORCE_BUILD: "1" },
+        env: { ALLBOT_FORCE_BUILD: "1" },
       });
 
       expect(exitCode).toBe(0);
@@ -296,7 +296,7 @@ describe("run-node script", () => {
   });
 
   it("skips rebuilding when dist is current and the source tree is clean", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -317,7 +317,7 @@ describe("run-node script", () => {
   });
 
   it("skips runtime postbuild restaging in watch mode when dist is already current", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -335,7 +335,7 @@ describe("run-node script", () => {
         tmp,
         spawn,
         spawnSync,
-        env: { KAIJIBOT_WATCH_MODE: "1" },
+        env: { ALLBOT_WATCH_MODE: "1" },
         runRuntimePostBuild,
       });
 
@@ -346,7 +346,7 @@ describe("run-node script", () => {
   });
 
   it("returns the build exit code when the compiler step fails", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       const spawn = (cmd: string, args: string[] = []) => {
         if (cmd === process.execPath && args[0] === "scripts/tsdown-build.mjs") {
           return createExitedProcess(23);
@@ -359,8 +359,8 @@ describe("run-node script", () => {
         args: ["status"],
         env: {
           ...process.env,
-          KAIJIBOT_FORCE_BUILD: "1",
-          KAIJIBOT_RUNNER_LOG: "0",
+          ALLBOT_FORCE_BUILD: "1",
+          ALLBOT_RUNNER_LOG: "0",
         },
         spawn,
         execPath: process.execPath,
@@ -371,8 +371,8 @@ describe("run-node script", () => {
     });
   });
 
-  it("forwards wrapper SIGTERM to the active kaijibot child and returns 143", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+  it("forwards wrapper SIGTERM to the active allbot child and returns 143", async () => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -412,7 +412,7 @@ describe("run-node script", () => {
         args: ["status"],
         env: {
           ...process.env,
-          KAIJIBOT_RUNNER_LOG: "0",
+          ALLBOT_RUNNER_LOG: "0",
         },
         process: fakeProcess,
         spawn,
@@ -425,7 +425,7 @@ describe("run-node script", () => {
       expect(exitCode).toBe(143);
       expect(spawn).toHaveBeenCalledWith(
         process.execPath,
-        ["kaijibot.mjs", "status"],
+        ["allbot.mjs", "status"],
         expect.objectContaining({ stdio: "inherit" }),
       );
       expect(child.kill).toHaveBeenCalledWith("SIGTERM");
@@ -435,7 +435,7 @@ describe("run-node script", () => {
   });
 
   it("rebuilds when extension sources are newer than the build stamp", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [EXTENSION_SRC]: "export const extensionValue = 1;\n",
@@ -453,7 +453,7 @@ describe("run-node script", () => {
   });
 
   it("rebuilds when git HEAD changes even if source mtimes do not exceed the old build stamp", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -474,13 +474,13 @@ describe("run-node script", () => {
   });
 
   it("skips rebuilding when extension package metadata is newer than the build stamp", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [EXTENSION_MANIFEST]: '{"id":"demo","configSchema":{"type":"object"}}\n',
-          [EXTENSION_PACKAGE]: '{"name":"demo","kaijibot":{"extensions":["./index.ts"]}}\n',
+          [EXTENSION_PACKAGE]: '{"name":"demo","allbot":{"extensions":["./index.ts"]}}\n',
           [ROOT_TSDOWN]: "export default {};\n",
-          [DIST_EXTENSION_PACKAGE]: '{"name":"demo","kaijibot":{"extensions":["./stale.js"]}}\n',
+          [DIST_EXTENSION_PACKAGE]: '{"name":"demo","allbot":{"extensions":["./stale.js"]}}\n',
         },
         oldPaths: [EXTENSION_MANIFEST, ROOT_TSCONFIG, ROOT_PACKAGE, ROOT_TSDOWN],
         buildPaths: [DIST_ENTRY, BUILD_STAMP, DIST_EXTENSION_PACKAGE],
@@ -499,7 +499,7 @@ describe("run-node script", () => {
   });
 
   it("skips rebuilding for dirty non-source files under extensions", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -529,7 +529,7 @@ describe("run-node script", () => {
   });
 
   it("skips rebuilding for dirty extension manifests that only affect runtime reload", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -562,7 +562,7 @@ describe("run-node script", () => {
   });
 
   it("reports dirty watched source trees as an explicit build reason", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -585,7 +585,7 @@ describe("run-node script", () => {
   });
 
   it("reports a clean tree explicitly when dist is current", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -609,7 +609,7 @@ describe("run-node script", () => {
   });
 
   it("repairs missing bundled plugin metadata without rerunning tsdown", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -640,7 +640,7 @@ describe("run-node script", () => {
   });
 
   it("removes stale bundled plugin metadata when the source manifest is gone", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -676,7 +676,7 @@ describe("run-node script", () => {
   });
 
   it("skips rebuilding when only non-source extension files are newer than the build stamp", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",
@@ -697,7 +697,7 @@ describe("run-node script", () => {
   });
 
   it("rebuilds when tsdown config is newer than the build stamp", async () => {
-    await withTempDir({ prefix: "kaijibot-run-node-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-run-node-" }, async (tmp) => {
       await setupTrackedProject(tmp, {
         files: {
           [ROOT_SRC]: "export const value = 1;\n",

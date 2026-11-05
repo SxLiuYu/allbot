@@ -40,7 +40,7 @@ type SessionQueue = {
   lastContextKey: string | null;
 };
 
-const SYSTEM_EVENT_QUEUES_KEY = Symbol.for("kaijibot.systemEvents.queues");
+const SYSTEM_EVENT_QUEUES_KEY = Symbol.for("allbot.systemEvents.queues");
 
 const queues = resolveGlobalMap<string, SessionQueue>(SYSTEM_EVENT_QUEUES_KEY);
 

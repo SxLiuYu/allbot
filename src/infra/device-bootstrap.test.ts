@@ -16,7 +16,7 @@ import {
 import { loadOrCreateDeviceIdentity, publicKeyRawBase64UrlFromPem } from "./device-identity.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-device-bootstrap-test-");
+const createTempDir = () => tempDirs.make("allbot-device-bootstrap-test-");
 
 function resolveBootstrapPath(baseDir: string): string {
   return path.join(baseDir, "devices", "bootstrap.json");

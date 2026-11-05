@@ -11,17 +11,17 @@ import { makeBrowserServerState, mockLaunchedChrome } from "./server-context.tes
 function setupEnsureBrowserAvailableHarness() {
   vi.useFakeTimers();
 
-  const launchKaijiBotChrome = vi.mocked(chromeModule.launchKaijiBotChrome);
-  const stopKaijiBotChrome = vi.mocked(chromeModule.stopKaijiBotChrome);
+  const launchAllBotChrome = vi.mocked(chromeModule.launchAllBotChrome);
+  const stopAllBotChrome = vi.mocked(chromeModule.stopAllBotChrome);
   const isChromeReachable = vi.mocked(chromeModule.isChromeReachable);
   const isChromeCdpReady = vi.mocked(chromeModule.isChromeCdpReady);
   isChromeReachable.mockResolvedValue(false);
 
   const state = makeBrowserServerState();
   const ctx = createBrowserRouteContext({ getState: () => state });
-  const profile = ctx.forProfile("kaijibot");
+  const profile = ctx.forProfile("allbot");
 
-  return { launchKaijiBotChrome, stopKaijiBotChrome, isChromeCdpReady, profile };
+  return { launchAllBotChrome, stopAllBotChrome, isChromeCdpReady, profile };
 }
 
 afterEach(() => {
@@ -32,37 +32,37 @@ afterEach(() => {
 
 describe("browser server-context ensureBrowserAvailable", () => {
   it("waits for CDP readiness after launching to avoid follow-up PortInUseError races (#21149)", async () => {
-    const { launchKaijiBotChrome, stopKaijiBotChrome, isChromeCdpReady, profile } =
+    const { launchAllBotChrome, stopAllBotChrome, isChromeCdpReady, profile } =
       setupEnsureBrowserAvailableHarness();
     isChromeCdpReady.mockResolvedValueOnce(false).mockResolvedValue(true);
-    mockLaunchedChrome(launchKaijiBotChrome, 123);
+    mockLaunchedChrome(launchAllBotChrome, 123);
 
     const promise = profile.ensureBrowserAvailable();
     await vi.advanceTimersByTimeAsync(100);
     await expect(promise).resolves.toBeUndefined();
 
-    expect(launchKaijiBotChrome).toHaveBeenCalledTimes(1);
+    expect(launchAllBotChrome).toHaveBeenCalledTimes(1);
     expect(isChromeCdpReady).toHaveBeenCalled();
-    expect(stopKaijiBotChrome).not.toHaveBeenCalled();
+    expect(stopAllBotChrome).not.toHaveBeenCalled();
   });
 
   it("stops launched chrome when CDP readiness never arrives", async () => {
-    const { launchKaijiBotChrome, stopKaijiBotChrome, isChromeCdpReady, profile } =
+    const { launchAllBotChrome, stopAllBotChrome, isChromeCdpReady, profile } =
       setupEnsureBrowserAvailableHarness();
     isChromeCdpReady.mockResolvedValue(false);
-    mockLaunchedChrome(launchKaijiBotChrome, 321);
+    mockLaunchedChrome(launchAllBotChrome, 321);
 
     const promise = profile.ensureBrowserAvailable();
     const rejected = expect(promise).rejects.toThrow("not reachable after start");
     await vi.advanceTimersByTimeAsync(8100);
     await rejected;
 
-    expect(launchKaijiBotChrome).toHaveBeenCalledTimes(1);
-    expect(stopKaijiBotChrome).toHaveBeenCalledTimes(1);
+    expect(launchAllBotChrome).toHaveBeenCalledTimes(1);
+    expect(stopAllBotChrome).toHaveBeenCalledTimes(1);
   });
 
   it("reuses a pre-existing loopback browser after an initial short probe miss", async () => {
-    const { launchKaijiBotChrome, stopKaijiBotChrome, isChromeCdpReady, profile } =
+    const { launchAllBotChrome, stopAllBotChrome, isChromeCdpReady, profile } =
       setupEnsureBrowserAvailableHarness();
     const isChromeReachable = vi.mocked(chromeModule.isChromeReachable);
 
@@ -87,22 +87,22 @@ describe("browser server-context ensureBrowserAvailable", () => {
         allowPrivateNetwork: true,
       },
     );
-    expect(launchKaijiBotChrome).not.toHaveBeenCalled();
-    expect(stopKaijiBotChrome).not.toHaveBeenCalled();
+    expect(launchAllBotChrome).not.toHaveBeenCalled();
+    expect(stopAllBotChrome).not.toHaveBeenCalled();
   });
 
   it("retries remote CDP websocket reachability once before failing", async () => {
-    const { launchKaijiBotChrome, stopKaijiBotChrome, isChromeCdpReady } =
+    const { launchAllBotChrome, stopAllBotChrome, isChromeCdpReady } =
       setupEnsureBrowserAvailableHarness();
     const isChromeReachable = vi.mocked(chromeModule.isChromeReachable);
 
     const state = makeBrowserServerState();
-    state.resolved.profiles.kaijibot = {
+    state.resolved.profiles.allbot = {
       cdpUrl: "ws://browserless:3001",
       color: "#00AA00",
     };
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const profile = ctx.forProfile("kaijibot");
+    const profile = ctx.forProfile("allbot");
     const expectedRemoteHttpTimeoutMs = state.resolved.remoteCdpTimeoutMs;
     const expectedRemoteWsTimeoutMs = state.resolved.remoteCdpHandshakeTimeoutMs;
 
@@ -131,7 +131,7 @@ describe("browser server-context ensureBrowserAvailable", () => {
         allowPrivateNetwork: true,
       },
     );
-    expect(launchKaijiBotChrome).not.toHaveBeenCalled();
-    expect(stopKaijiBotChrome).not.toHaveBeenCalled();
+    expect(launchAllBotChrome).not.toHaveBeenCalled();
+    expect(stopAllBotChrome).not.toHaveBeenCalled();
   });
 });

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { isPathInside } from "../../infra/path-guards.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -11,7 +11,7 @@ import { resolveEffectiveAgentSkillFilter } from "./agent-filter.js";
 import { resolveBundledSkillsDir } from "./bundled-dir.js";
 import { shouldIncludeSkill } from "./config.js";
 import { normalizeSkillFilter } from "./filter.js";
-import { resolveKaijiBotMetadata, resolveSkillInvocationPolicy } from "./frontmatter.js";
+import { resolveAllBotMetadata, resolveSkillInvocationPolicy } from "./frontmatter.js";
 import { loadSkillsFromDirSafe, readSkillFrontmatterSafe } from "./local-loader.js";
 import { resolvePluginSkillDirs } from "./plugin-skills.js";
 import { serializeByKey } from "./serialize.js";
@@ -58,7 +58,7 @@ function isSkillVisibleInAvailableSkillsPrompt(entry: SkillEntry): boolean {
 
 function filterSkillEntries(
   entries: SkillEntry[],
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
   skillFilter?: string[],
   eligibility?: SkillEligibilityContext,
 ): SkillEntry[] {
@@ -93,7 +93,7 @@ type ResolvedSkillsLimits = {
   maxSkillFileBytes: number;
 };
 
-function resolveSkillsLimits(config?: KaijiBotConfig): ResolvedSkillsLimits {
+function resolveSkillsLimits(config?: AllBotConfig): ResolvedSkillsLimits {
   const limits = config?.skills?.limits;
   return {
     maxCandidatesPerRoot: limits?.maxCandidatesPerRoot ?? DEFAULT_MAX_CANDIDATES_PER_ROOT,
@@ -250,7 +250,7 @@ function unwrapLoadedSkills(loaded: unknown): Skill[] {
 function loadSkillEntries(
   workspaceDir: string,
   opts?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     managedSkillsDir?: string;
     bundledSkillsDir?: string;
   },
@@ -422,24 +422,24 @@ function loadSkillEntries(
   const bundledSkills = bundledSkillsDir
     ? loadSkills({
         dir: bundledSkillsDir,
-        source: "kaijibot-bundled",
+        source: "allbot-bundled",
       })
     : [];
   const extraSkills = mergedExtraDirs.flatMap((dir) => {
     const resolved = resolveUserPath(dir);
     return loadSkills({
       dir: resolved,
-      source: "kaijibot-extra",
+      source: "allbot-extra",
     });
   });
   const managedSkills = loadSkills({
     dir: managedSkillsDir,
-    source: "kaijibot-managed",
+    source: "allbot-managed",
   });
   const agentSkillsDir = path.join(workspaceDir, "skills", "agent");
   const agentSkills = loadSkills({
     dir: agentSkillsDir,
-    source: "kaijibot-agent-created",
+    source: "allbot-agent-created",
   });
   const personalAgentsSkillsDir = path.resolve(os.homedir(), ".agents", "skills");
   const personalAgentsSkills = loadSkills({
@@ -453,7 +453,7 @@ function loadSkillEntries(
   });
   const workspaceSkills = loadSkills({
     dir: workspaceSkillsDir,
-    source: "kaijibot-workspace",
+    source: "allbot-workspace",
   });
 
   const merged = new Map<string, Skill>();
@@ -491,7 +491,7 @@ function loadSkillEntries(
     return {
       skill,
       frontmatter,
-      metadata: resolveKaijiBotMetadata(frontmatter),
+      metadata: resolveAllBotMetadata(frontmatter),
       invocation,
       exposure: {
         includeInRuntimeRegistry: true,
@@ -542,7 +542,7 @@ export function formatSkillsCompact(skills: Skill[]): string {
 // Budget reserved for the compact-mode warning line prepended by the caller.
 const COMPACT_WARNING_OVERHEAD = 150;
 
-function applySkillsPromptLimits(params: { skills: Skill[]; config?: KaijiBotConfig }): {
+function applySkillsPromptLimits(params: { skills: Skill[]; config?: AllBotConfig }): {
   skillsForPrompt: Skill[];
   truncated: boolean;
   compact: boolean;
@@ -617,7 +617,7 @@ export function buildWorkspaceSkillsPrompt(
 }
 
 type WorkspaceSkillBuildOptions = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   managedSkillsDir?: string;
   bundledSkillsDir?: string;
   entries?: SkillEntry[];
@@ -668,9 +668,9 @@ function resolveWorkspaceSkillPromptState(
     config: opts?.config,
   });
   const truncationNote = truncated
-    ? `⚠️ Skills truncated: included ${skillsForPrompt.length} of ${resolvedSkills.length}${compact ? " (compact format, descriptions omitted)" : ""}. Run \`kaijibot skills check\` to audit.`
+    ? `⚠️ Skills truncated: included ${skillsForPrompt.length} of ${resolvedSkills.length}${compact ? " (compact format, descriptions omitted)" : ""}. Run \`allbot skills check\` to audit.`
     : compact
-      ? `⚠️ Skills catalog using compact format (descriptions omitted). Run \`kaijibot skills check\` to audit.`
+      ? `⚠️ Skills catalog using compact format (descriptions omitted). Run \`allbot skills check\` to audit.`
       : "";
   const prompt = [
     remoteNote,
@@ -685,7 +685,7 @@ function resolveWorkspaceSkillPromptState(
 export function resolveSkillsPromptForRun(params: {
   skillsSnapshot?: SkillSnapshot;
   entries?: SkillEntry[];
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir: string;
   agentId?: string;
 }): string {
@@ -707,7 +707,7 @@ export function resolveSkillsPromptForRun(params: {
 export function loadWorkspaceSkillEntries(
   workspaceDir: string,
   opts?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     managedSkillsDir?: string;
     bundledSkillsDir?: string;
     skillFilter?: string[];
@@ -726,7 +726,7 @@ export function loadWorkspaceSkillEntries(
 export function loadVisibleWorkspaceSkillEntries(
   workspaceDir: string,
   opts?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     managedSkillsDir?: string;
     bundledSkillsDir?: string;
     skillFilter?: string[];
@@ -781,7 +781,7 @@ function resolveSyncedSkillDestinationPath(params: {
 export async function syncSkillsToWorkspace(params: {
   sourceWorkspaceDir: string;
   targetWorkspaceDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   skillFilter?: string[];
   agentId?: string;
   eligibility?: SkillEligibilityContext;
@@ -848,7 +848,7 @@ export async function syncSkillsToWorkspace(params: {
 
 export function filterWorkspaceSkillEntries(
   entries: SkillEntry[],
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
 ): SkillEntry[] {
   return filterSkillEntries(entries, config);
 }
@@ -856,7 +856,7 @@ export function filterWorkspaceSkillEntries(
 export function filterWorkspaceSkillEntriesWithOptions(
   entries: SkillEntry[],
   opts?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     skillFilter?: string[];
     eligibility?: SkillEligibilityContext;
   },

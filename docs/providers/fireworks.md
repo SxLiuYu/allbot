@@ -1,13 +1,13 @@
 ---
 summary: "Fireworks setup (auth + model selection)"
 read_when:
-  - You want to use Fireworks with KaijiBot
+  - You want to use Fireworks with AllBot
   - You need the Fireworks API key env var or default model id
 ---
 
 # Fireworks
 
-[Fireworks](https://fireworks.ai) exposes open-weight and routed models through an OpenAI-compatible API. KaijiBot now includes a bundled Fireworks provider plugin.
+[Fireworks](https://fireworks.ai) exposes open-weight and routed models through an OpenAI-compatible API. AllBot now includes a bundled Fireworks provider plugin.
 
 - Provider: `fireworks`
 - Auth: `FIREWORKS_API_KEY`
@@ -20,15 +20,15 @@ read_when:
 Set up Fireworks auth through onboarding:
 
 ```bash
-kaijibot onboard --auth-choice fireworks-api-key
+allbot onboard --auth-choice fireworks-api-key
 ```
 
-This stores your Fireworks key in KaijiBot config and sets the Fire Pass starter model as the default.
+This stores your Fireworks key in AllBot config and sets the Fire Pass starter model as the default.
 
 ## Non-interactive example
 
 ```bash
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice fireworks-api-key \
   --fireworks-api-key "$FIREWORKS_API_KEY" \
@@ -50,7 +50,7 @@ help a launchd/systemd daemon unless that environment is imported there as well.
 
 ## Custom Fireworks model ids
 
-KaijiBot accepts dynamic Fireworks model ids too. Use the exact model or router id shown by Fireworks and prefix it with `fireworks/`.
+AllBot accepts dynamic Fireworks model ids too. Use the exact model or router id shown by Fireworks and prefix it with `fireworks/`.
 
 Example:
 

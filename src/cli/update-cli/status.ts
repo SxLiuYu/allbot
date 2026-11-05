@@ -101,7 +101,7 @@ export async function updateStatusCommand(opts: UpdateStatusOptions): Promise<vo
     },
   ];
 
-  defaultRuntime.log(theme.heading("KaijiBot update status"));
+  defaultRuntime.log(theme.heading("AllBot update status"));
   defaultRuntime.log("");
   defaultRuntime.log(
     renderTable({

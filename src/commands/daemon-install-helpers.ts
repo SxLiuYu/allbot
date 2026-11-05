@@ -6,7 +6,7 @@ import {
 } from "../agents/auth-profiles.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { collectDurableServiceEnvVars } from "../config/state-dir-dotenv.js";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { resolveGatewayLaunchAgentLabel } from "../daemon/constants.js";
 import { resolveGatewayProgramArguments } from "../daemon/program-args.js";
 import { buildServiceEnvironment } from "../daemon/service-env.js";
@@ -31,7 +31,7 @@ export type GatewayInstallPlan = {
   environment: Record<string, string | undefined>;
 };
 
-const MANAGED_SERVICE_ENV_KEYS_VAR = "KAIJIBOT_SERVICE_MANAGED_ENV_KEYS";
+const MANAGED_SERVICE_ENV_KEYS_VAR = "ALLBOT_SERVICE_MANAGED_ENV_KEYS";
 
 function collectAuthProfileServiceEnvVars(params: {
   env: Record<string, string | undefined>;
@@ -164,7 +164,7 @@ function collectPreservedExistingServiceEnvVars(
       upper === "HOME" ||
       upper === "PATH" ||
       upper === "TMPDIR" ||
-      upper.startsWith("KAIJIBOT_")
+      upper.startsWith("ALLBOT_")
     ) {
       continue;
     }
@@ -185,7 +185,7 @@ function collectPreservedExistingServiceEnvVars(
 
 function buildGatewayInstallEnvironment(params: {
   env: Record<string, string | undefined>;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   authStore?: AuthProfileStore;
   warn?: DaemonInstallWarnFn;
   serviceEnvironment: Record<string, string | undefined>;
@@ -234,7 +234,7 @@ export async function buildGatewayInstallPlan(params: {
   nodePath?: string;
   warn?: DaemonInstallWarnFn;
   /** Full config to extract env vars from (env vars + inline env keys). */
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   authStore?: AuthProfileStore;
 }): Promise<GatewayInstallPlan> {
   const { devMode, nodePath } = await resolveDaemonInstallRuntimeInputs({
@@ -261,7 +261,7 @@ export async function buildGatewayInstallPlan(params: {
     port: params.port,
     launchdLabel:
       process.platform === "darwin"
-        ? resolveGatewayLaunchAgentLabel(params.env.KAIJIBOT_PROFILE)
+        ? resolveGatewayLaunchAgentLabel(params.env.ALLBOT_PROFILE)
         : undefined,
     extraPathDirs: resolveDaemonNodeBinDir(nodePath),
   });
@@ -284,5 +284,5 @@ export async function buildGatewayInstallPlan(params: {
 export function gatewayInstallErrorHint(platform = process.platform): string {
   return platform === "win32"
     ? "Tip: native Windows now falls back to a per-user Startup-folder login item when Scheduled Task creation is denied; if install still fails, rerun from an elevated PowerShell or skip service install."
-    : `Tip: rerun \`${formatCliCommand("kaijibot gateway install")}\` after fixing the error.`;
+    : `Tip: rerun \`${formatCliCommand("allbot gateway install")}\` after fixing the error.`;
 }

@@ -1,6 +1,6 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { ensureModelAllowlistEntry } from "kaijibot/plugin-sdk/provider-onboard";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { ensureModelAllowlistEntry } from "allbot/plugin-sdk/provider-onboard";
 import { DOUBAO_CODING_MODEL_CATALOG, DOUBAO_MODEL_CATALOG } from "./models.js";
 import { buildDoubaoCodingProvider, buildDoubaoProvider } from "./provider-catalog.js";
 

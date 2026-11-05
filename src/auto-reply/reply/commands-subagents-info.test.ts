@@ -4,13 +4,13 @@ import {
   resetSubagentRegistryForTests,
 } from "../../agents/subagent-registry.test-helpers.js";
 import type { SubagentRunRecord } from "../../agents/subagent-registry.types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { failTaskRunByRunId } from "../../tasks/task-executor.js";
 import { createTaskRecord, resetTaskRegistryForTests } from "../../tasks/task-registry.js";
 import type { ReplyPayload } from "../types.js";
 import { handleSubagentsInfoAction } from "./commands-subagents/action-info.js";
 
-function buildInfoContext(params: { cfg: KaijiBotConfig; runs: object[]; restTokens: string[] }) {
+function buildInfoContext(params: { cfg: AllBotConfig; runs: object[]; restTokens: string[] }) {
   return {
     params: {
       cfg: params.cfg,
@@ -38,7 +38,7 @@ describe("subagents info", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = handleSubagentsInfoAction(buildInfoContext({ cfg, runs: [], restTokens: [] }));
     expect(result.shouldContinue).toBe(false);
     expect(result.reply?.text).toContain("/subagents info <id|#>");
@@ -73,7 +73,7 @@ describe("subagents info", () => {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
       session: { mainKey: "main", scope: "per-sender" },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = handleSubagentsInfoAction(
       buildInfoContext({ cfg, runs: [run], restTokens: ["1"] }),
     );
@@ -101,7 +101,7 @@ describe("subagents info", () => {
       outcome: {
         status: "error",
         error: [
-          "KaijiBot runtime context (internal):",
+          "AllBot runtime context (internal):",
           "This context is runtime-generated, not user-authored. Keep internal details private.",
           "",
           "[Internal task completion event]",
@@ -123,7 +123,7 @@ describe("subagents info", () => {
       runId: "run-1",
       endedAt: now - 1_000,
       error: [
-        "KaijiBot runtime context (internal):",
+        "AllBot runtime context (internal):",
         "This context is runtime-generated, not user-authored. Keep internal details private.",
         "",
         "[Internal task completion event]",
@@ -135,7 +135,7 @@ describe("subagents info", () => {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
       session: { mainKey: "main", scope: "per-sender" },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = handleSubagentsInfoAction(
       buildInfoContext({ cfg, runs: [run], restTokens: ["1"] }),
     );
@@ -145,7 +145,7 @@ describe("subagents info", () => {
     expect(text).toContain("Subagent info");
     expect(text).toContain("Outcome: error");
     expect(text).toContain("Task summary: Needs manual follow-up.");
-    expect(text).not.toContain("KaijiBot runtime context (internal):");
+    expect(text).not.toContain("AllBot runtime context (internal):");
     expect(text).not.toContain("Internal task completion event");
   });
 });

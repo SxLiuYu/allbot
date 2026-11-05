@@ -1,17 +1,17 @@
-import type { KaijiBotConfig, HumanDelayConfig, IdentityConfig } from "../config/config.js";
+import type { AllBotConfig, HumanDelayConfig, IdentityConfig } from "../config/config.js";
 import { resolveAgentConfig } from "./agent-scope.js";
 
 const DEFAULT_ACK_REACTION = "👀";
 
 export function resolveAgentIdentity(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): IdentityConfig | undefined {
   return resolveAgentConfig(cfg, agentId)?.identity;
 }
 
 export function resolveAckReaction(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   opts?: { channel?: string; accountId?: string },
 ): string {
@@ -46,7 +46,7 @@ export function resolveAckReaction(
 }
 
 export function resolveIdentityNamePrefix(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): string | undefined {
   const name = resolveAgentIdentity(cfg, agentId)?.name?.trim();
@@ -57,7 +57,7 @@ export function resolveIdentityNamePrefix(
 }
 
 export function resolveMessagePrefix(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   opts?: { configured?: string; hasAllowFrom?: boolean; fallback?: string },
 ): string {
@@ -71,12 +71,12 @@ export function resolveMessagePrefix(
     return "";
   }
 
-  return resolveIdentityNamePrefix(cfg, agentId) ?? opts?.fallback ?? "[kaijibot]";
+  return resolveIdentityNamePrefix(cfg, agentId) ?? opts?.fallback ?? "[allbot]";
 }
 
 /** Helper to extract a channel config value by dynamic key. */
 function getChannelConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel: string,
 ): Record<string, unknown> | undefined {
   const channels = cfg.channels as Record<string, unknown> | undefined;
@@ -87,7 +87,7 @@ function getChannelConfig(
 }
 
 export function resolveResponsePrefix(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   opts?: { channel?: string; accountId?: string },
 ): string | undefined {
@@ -128,7 +128,7 @@ export function resolveResponsePrefix(
 }
 
 export function resolveEffectiveMessagesConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
   opts?: {
     hasAllowFrom?: boolean;
@@ -150,7 +150,7 @@ export function resolveEffectiveMessagesConfig(
 }
 
 export function resolveHumanDelayConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): HumanDelayConfig | undefined {
   const defaults = cfg.agents?.defaults?.humanDelay;

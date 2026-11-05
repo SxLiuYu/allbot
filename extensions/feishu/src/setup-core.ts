@@ -1,16 +1,16 @@
 import {
   DEFAULT_ACCOUNT_ID,
   type ChannelSetupAdapter,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/setup";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/setup";
 import { resolveDefaultFeishuAccountId } from "./accounts.js";
 import type { FeishuConfig } from "./types.js";
 
 export function setFeishuNamedAccountEnabled(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId: string,
   enabled: boolean,
-): KaijiBotConfig {
+): AllBotConfig {
   const feishuCfg = cfg.channels?.feishu as FeishuConfig | undefined;
   return {
     ...cfg,

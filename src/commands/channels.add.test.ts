@@ -176,7 +176,7 @@ function setMinimalChannelsAddRegistryForTests(): void {
   );
 }
 
-function registerMSTeamsSetupPlugin(pluginId = "@kaijibot/msteams-plugin"): void {
+function registerMSTeamsSetupPlugin(pluginId = "@allbot/msteams-plugin"): void {
   vi.mocked(loadChannelSetupPluginRegistrySnapshotForChannel).mockReturnValue(
     createTestRegistry([{ pluginId, plugin: createMSTeamsSetupPlugin(), source: "test" }]),
   );
@@ -324,7 +324,7 @@ describe("channelsAddCommand", () => {
     // After install the flow resolves the setup plugin through the read-only
     // scoped snapshot instead of mutating the active registry.
     expect(loadChannelSetupPluginRegistrySnapshotForChannel).toHaveBeenCalledWith(
-      expect.objectContaining({ channel: "msteams", pluginId: "@kaijibot/msteams-plugin" }),
+      expect.objectContaining({ channel: "msteams", pluginId: "@allbot/msteams-plugin" }),
     );
     expect(configMocks.writeConfigFile).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -345,7 +345,7 @@ describe("channelsAddCommand", () => {
     manifestRegistryMocks.loadPluginManifestRegistry.mockReturnValue({
       plugins: [
         {
-          id: "@kaijibot/msteams-plugin",
+          id: "@allbot/msteams-plugin",
           channels: ["msteams"],
         } as never,
       ],
@@ -365,7 +365,7 @@ describe("channelsAddCommand", () => {
 
     expect(ensureChannelSetupPluginInstalled).not.toHaveBeenCalled();
     expect(loadChannelSetupPluginRegistrySnapshotForChannel).toHaveBeenCalledWith(
-      expect.objectContaining({ channel: "msteams", pluginId: "@kaijibot/msteams-plugin" }),
+      expect.objectContaining({ channel: "msteams", pluginId: "@allbot/msteams-plugin" }),
     );
     expect(configMocks.writeConfigFile).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -381,7 +381,7 @@ describe("channelsAddCommand", () => {
     setActivePluginRegistry(createTestRegistry());
     const catalogEntry: ChannelPluginCatalogEntry = {
       id: "msteams",
-      pluginId: "@kaijibot/msteams-plugin",
+      pluginId: "@allbot/msteams-plugin",
       meta: {
         id: "msteams",
         label: "Microsoft Teams",
@@ -390,7 +390,7 @@ describe("channelsAddCommand", () => {
         blurb: "teams channel",
       },
       install: {
-        npmSpec: "@kaijibot/msteams",
+        npmSpec: "@allbot/msteams",
       },
     };
     catalogMocks.listChannelPluginCatalogEntries.mockReturnValue([catalogEntry]);

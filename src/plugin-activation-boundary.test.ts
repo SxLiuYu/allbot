@@ -33,8 +33,8 @@ describe("plugin activation boundary", () => {
     | Promise<{
         DEFAULT_AI_SNAPSHOT_MAX_CHARS: typeof import("./plugin-sdk/browser-config.js").DEFAULT_AI_SNAPSHOT_MAX_CHARS;
         DEFAULT_BROWSER_EVALUATE_ENABLED: typeof import("./plugin-sdk/browser-config.js").DEFAULT_BROWSER_EVALUATE_ENABLED;
-        DEFAULT_KAIJIBOT_BROWSER_COLOR: typeof import("./plugin-sdk/browser-config.js").DEFAULT_KAIJIBOT_BROWSER_COLOR;
-        DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME: typeof import("./plugin-sdk/browser-config.js").DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME;
+        DEFAULT_ALLBOT_BROWSER_COLOR: typeof import("./plugin-sdk/browser-config.js").DEFAULT_ALLBOT_BROWSER_COLOR;
+        DEFAULT_ALLBOT_BROWSER_PROFILE_NAME: typeof import("./plugin-sdk/browser-config.js").DEFAULT_ALLBOT_BROWSER_PROFILE_NAME;
         DEFAULT_UPLOAD_DIR: typeof import("./plugin-sdk/browser-config.js").DEFAULT_UPLOAD_DIR;
         closeTrackedBrowserTabsForSessions: typeof import("./plugin-sdk/browser-maintenance.js").closeTrackedBrowserTabsForSessions;
         parseBrowserMajorVersion: typeof import("./plugin-sdk/browser-host-inspection.js").parseBrowserMajorVersion;
@@ -82,8 +82,8 @@ describe("plugin activation boundary", () => {
     ]).then(([config, inspection, maintenance]) => ({
       DEFAULT_AI_SNAPSHOT_MAX_CHARS: config.DEFAULT_AI_SNAPSHOT_MAX_CHARS,
       DEFAULT_BROWSER_EVALUATE_ENABLED: config.DEFAULT_BROWSER_EVALUATE_ENABLED,
-      DEFAULT_KAIJIBOT_BROWSER_COLOR: config.DEFAULT_KAIJIBOT_BROWSER_COLOR,
-      DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME: config.DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+      DEFAULT_ALLBOT_BROWSER_COLOR: config.DEFAULT_ALLBOT_BROWSER_COLOR,
+      DEFAULT_ALLBOT_BROWSER_PROFILE_NAME: config.DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
       DEFAULT_UPLOAD_DIR: config.DEFAULT_UPLOAD_DIR,
       closeTrackedBrowserTabsForSessions: maintenance.closeTrackedBrowserTabsForSessions,
       parseBrowserMajorVersion: inspection.parseBrowserMajorVersion,
@@ -126,7 +126,7 @@ describe("plugin activation boundary", () => {
     expect(
       isStaticallyChannelConfigured({}, "irc", {
         IRC_HOST: "irc.example.com",
-        IRC_NICK: "kaijibot",
+        IRC_NICK: "allbot",
       }),
     ).toBe(true);
     expect(isStaticallyChannelConfigured({}, "whatsapp", {})).toBe(false);
@@ -160,8 +160,8 @@ describe("plugin activation boundary", () => {
 
     expect(browser.DEFAULT_AI_SNAPSHOT_MAX_CHARS).toBe(80_000);
     expect(browser.DEFAULT_BROWSER_EVALUATE_ENABLED).toBe(true);
-    expect(browser.DEFAULT_KAIJIBOT_BROWSER_COLOR).toBe("#FF4500");
-    expect(browser.DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME).toBe("kaijibot");
+    expect(browser.DEFAULT_ALLBOT_BROWSER_COLOR).toBe("#FF4500");
+    expect(browser.DEFAULT_ALLBOT_BROWSER_PROFILE_NAME).toBe("allbot");
     expect(browser.DEFAULT_UPLOAD_DIR).toContain("uploads");
     expect(loadBundledPluginPublicSurfaceModuleSync).not.toHaveBeenCalled();
     expect(browser.parseBrowserMajorVersion("Google Chrome 144.0.7534.0")).toBe(144);
@@ -170,9 +170,9 @@ describe("plugin activation boundary", () => {
       password: undefined,
     });
     const resolved = browser.resolveBrowserConfig(undefined, {});
-    expect(browser.resolveProfile(resolved, "kaijibot")).toEqual(
+    expect(browser.resolveProfile(resolved, "allbot")).toEqual(
       expect.objectContaining({
-        name: "kaijibot",
+        name: "allbot",
         cdpHost: "127.0.0.1",
       }),
     );

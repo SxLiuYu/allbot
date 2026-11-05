@@ -42,7 +42,7 @@ export function applySessionStoreMigrations(store: Record<string, SessionEntry>)
     }
   }
 
-  // KaijiBot migration: move legacy agent:main:main with feishu delivery to
+  // AllBot migration: move legacy agent:main:main with feishu delivery to
   // per-user session key (agent:main:feishu:direct:ou_xxx). This ensures
   // existing conversation data is accessible under the new dmScope default.
   const legacyEntry = store[MAIN_SESSION_KEY];

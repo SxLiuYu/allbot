@@ -119,9 +119,9 @@ vi.mock("./send.js", () => ({
   sendMessageFeishu: sendMessageFeishuMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/conversation-runtime", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/conversation-runtime")>(
-    "kaijibot/plugin-sdk/conversation-runtime",
+vi.mock("allbot/plugin-sdk/conversation-runtime", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/conversation-runtime")>(
+    "allbot/plugin-sdk/conversation-runtime",
   );
   return {
     ...actual,

@@ -7,10 +7,10 @@ export type SkillGroup = {
 };
 
 const SKILL_SOURCE_GROUPS: Array<{ id: string; label: string; sources: string[] }> = [
-  { id: "workspace", label: "Workspace Skills", sources: ["kaijibot-workspace"] },
-  { id: "built-in", label: "Built-in Skills", sources: ["kaijibot-bundled"] },
-  { id: "installed", label: "Installed Skills", sources: ["kaijibot-managed"] },
-  { id: "extra", label: "Extra Skills", sources: ["kaijibot-extra"] },
+  { id: "workspace", label: "Workspace Skills", sources: ["allbot-workspace"] },
+  { id: "built-in", label: "Built-in Skills", sources: ["allbot-bundled"] },
+  { id: "installed", label: "Installed Skills", sources: ["allbot-managed"] },
+  { id: "extra", label: "Extra Skills", sources: ["allbot-extra"] },
 ];
 
 export function groupSkills(skills: SkillStatusEntry[]): SkillGroup[] {

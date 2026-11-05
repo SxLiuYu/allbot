@@ -18,7 +18,7 @@ const hookMocks = vi.hoisted(() => ({
 }));
 
 let cfg: Record<string, unknown> = {};
-let lastCreateKaijiBotToolsContext: Record<string, unknown> | undefined;
+let lastCreateAllBotToolsContext: Record<string, unknown> | undefined;
 
 // Perf: keep this suite pure unit. Mock heavyweight config/session modules.
 vi.mock("../config/config.js", () => ({
@@ -69,7 +69,7 @@ vi.mock("../plugins/tools.js", () => ({
 
 // Perf: the real tool factory instantiates many tools per request; for these HTTP
 // routing/policy tests we only need a small set of tool names.
-vi.mock("../agents/kaijibot-tools.js", () => {
+vi.mock("../agents/allbot-tools.js", () => {
   const toolInputError = (message: string) => {
     const err = new Error(message);
     err.name = "ToolInputError";
@@ -99,8 +99,8 @@ vi.mock("../agents/kaijibot-tools.js", () => {
       execute: async () => ({
         ok: true,
         route: {
-          agentTo: lastCreateKaijiBotToolsContext?.agentTo,
-          agentThreadId: lastCreateKaijiBotToolsContext?.agentThreadId,
+          agentTo: lastCreateAllBotToolsContext?.agentTo,
+          agentThreadId: lastCreateAllBotToolsContext?.agentThreadId,
         },
       }),
     },
@@ -184,8 +184,8 @@ vi.mock("../agents/kaijibot-tools.js", () => {
   ];
 
   return {
-    createKaijiBotTools: (ctx: Record<string, unknown>) => {
-      lastCreateKaijiBotToolsContext = ctx;
+    createAllBotTools: (ctx: Record<string, unknown>) => {
+      lastCreateAllBotToolsContext = ctx;
       return tools;
     },
   };
@@ -249,11 +249,11 @@ afterAll(async () => {
 });
 
 beforeEach(() => {
-  delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-  delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
+  delete process.env.ALLBOT_GATEWAY_TOKEN;
+  delete process.env.ALLBOT_GATEWAY_PASSWORD;
   pluginHttpHandlers = [];
   cfg = {};
-  lastCreateKaijiBotToolsContext = undefined;
+  lastCreateAllBotToolsContext = undefined;
   hookMocks.resolveToolLoopDetectionConfig.mockClear();
   hookMocks.resolveToolLoopDetectionConfig.mockImplementation(() => ({ warnAt: 3 }));
   hookMocks.runBeforeToolCallHook.mockClear();
@@ -266,8 +266,8 @@ beforeEach(() => {
   vi.mocked(authorizeHttpGatewayConnect).mockResolvedValue({ ok: true });
 });
 
-const gatewayAuthHeaders = () => ({ "x-kaijibot-scopes": "operator.write" });
-const gatewayAdminHeaders = () => ({ "x-kaijibot-scopes": "operator.admin" });
+const gatewayAuthHeaders = () => ({ "x-allbot-scopes": "operator.write" });
+const gatewayAdminHeaders = () => ({ "x-allbot-scopes": "operator.admin" });
 
 const allowAgentsListForMain = () => {
   cfg = {
@@ -393,8 +393,8 @@ describe("POST /tools/invoke", () => {
     const body = await res.json();
     expect(body.ok).toBe(true);
     expect(body).toHaveProperty("result");
-    expect(lastCreateKaijiBotToolsContext?.allowMediaInvokeCommands).toBe(true);
-    expect(lastCreateKaijiBotToolsContext?.disablePluginTools).toBe(true);
+    expect(lastCreateAllBotToolsContext?.allowMediaInvokeCommands).toBe(true);
+    expect(lastCreateAllBotToolsContext?.disablePluginTools).toBe(true);
     expect(hookMocks.runBeforeToolCallHook).toHaveBeenCalledWith(
       expect.objectContaining({
         toolName: "agents_list",
@@ -412,7 +412,7 @@ describe("POST /tools/invoke", () => {
     const res = await invokeAgentsListAuthed({ sessionKey: "main" });
 
     expect(res.status).toBe(200);
-    expect(lastCreateKaijiBotToolsContext?.allowGatewaySubagentBinding).toBe(true);
+    expect(lastCreateAllBotToolsContext?.allowGatewaySubagentBinding).toBe(true);
   });
 
   it("keeps plugin tools enabled for non-core tool invokes", async () => {
@@ -425,7 +425,7 @@ describe("POST /tools/invoke", () => {
     });
 
     expect(res.status).toBe(200);
-    expect(lastCreateKaijiBotToolsContext?.disablePluginTools).toBe(false);
+    expect(lastCreateAllBotToolsContext?.disablePluginTools).toBe(false);
   });
 
   it("blocks tool execution when before_tool_call rejects the invoke", async () => {
@@ -599,8 +599,8 @@ describe("POST /tools/invoke", () => {
       port: sharedPort,
       headers: {
         ...gatewayAuthHeaders(),
-        "x-kaijibot-message-to": "channel:24514",
-        "x-kaijibot-thread-id": "thread-24514",
+        "x-allbot-message-to": "channel:24514",
+        "x-allbot-thread-id": "thread-24514",
       },
       tool: "sessions_spawn",
       sessionKey: "main",
@@ -762,7 +762,7 @@ describe("POST /tools/invoke", () => {
     const res = await invokeTool({
       port: sharedPort,
       headers: {
-        "x-kaijibot-scopes": "",
+        "x-allbot-scopes": "",
       },
       tool: "agents_list",
       sessionKey: "main",
@@ -833,7 +833,7 @@ describe("POST /tools/invoke", () => {
       port: sharedPort,
       headers: {
         authorization: "Bearer secret",
-        "x-kaijibot-scopes": "operator.approvals",
+        "x-allbot-scopes": "operator.approvals",
       },
       tool: "owner_only_test",
       sessionKey: "main",

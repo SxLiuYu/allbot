@@ -10,7 +10,7 @@ const getChannelPluginMock = vi.hoisted(() => vi.fn((_channel: unknown) => undef
 vi.mock("../../channels/plugins/index.js", () => ({
   getChannelPlugin: getChannelPluginMock,
 }));
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("formatOutboundDeliverySummary", () => {
   it.each([
     {

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveSecretInputRef } from "../config/types.secrets.js";
 import {
   resolveManifestContractPluginIds,
@@ -55,7 +55,7 @@ const loadRuntimeWebToolsPublicArtifacts = createLazyRuntimeSurface(
   (mod) => mod,
 );
 
-type FetchConfig = NonNullable<KaijiBotConfig["tools"]>["web"] extends infer Web
+type FetchConfig = NonNullable<AllBotConfig["tools"]>["web"] extends infer Web
   ? Web extends { fetch?: infer Fetch }
     ? Fetch
     : undefined
@@ -66,7 +66,7 @@ type SecretResolutionSource =
   | WebFetchCredentialResolutionSource;
 
 function hasPluginScopedWebToolConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   key: "webSearch" | "webFetch",
 ): boolean {
   const entries = config.plugins?.entries;
@@ -83,7 +83,7 @@ function hasPluginScopedWebToolConfig(
 }
 
 function inferSingleBundledPluginScopedWebToolConfigOwner(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   key: "webSearch" | "webFetch",
 ): string | undefined {
   const entries = config.plugins?.entries;
@@ -108,7 +108,7 @@ function inferSingleBundledPluginScopedWebToolConfigOwner(
 }
 
 function inferExactBundledPluginScopedWebToolConfigOwner(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   key: "webSearch" | "webFetch";
   pluginId: string;
 }): string | undefined {
@@ -120,7 +120,7 @@ function inferExactBundledPluginScopedWebToolConfigOwner(params: {
   return isRecord(pluginConfig?.[params.key]) ? params.pluginId : undefined;
 }
 
-function hasCustomWebSearchPluginRisk(config: KaijiBotConfig): boolean {
+function hasCustomWebSearchPluginRisk(config: AllBotConfig): boolean {
   const plugins = config.plugins;
   if (!plugins) {
     return false;
@@ -182,7 +182,7 @@ function buildUnresolvedReason(params: {
 }
 
 async function resolveSecretInputWithEnvFallback(params: {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   context: ResolverContext;
   defaults: SecretDefaults | undefined;
   value: unknown;
@@ -295,7 +295,7 @@ async function resolveSecretInputWithEnvFallback(params: {
 }
 
 function setResolvedWebSearchApiKey(params: {
-  resolvedConfig: KaijiBotConfig;
+  resolvedConfig: AllBotConfig;
   provider: PluginWebSearchProviderEntry;
   value: string;
 }): void {
@@ -312,7 +312,7 @@ function setResolvedWebSearchApiKey(params: {
 }
 
 async function resolveBundledWebSearchProviders(params: {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   context: ResolverContext;
   configuredBundledPluginId?: string;
   onlyPluginIds?: readonly string[];
@@ -367,7 +367,7 @@ async function resolveBundledWebSearchProviders(params: {
 }
 
 async function resolveBundledWebFetchProviders(params: {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   context: ResolverContext;
   configuredBundledPluginId?: string;
 }): Promise<PluginWebFetchProviderEntry[]> {
@@ -409,7 +409,7 @@ async function resolveBundledWebFetchProviders(params: {
 
 function readConfiguredProviderCredential(params: {
   provider: PluginWebSearchProviderEntry;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   search: Record<string, unknown> | undefined;
 }): unknown {
   const configuredValue = params.provider.getConfiguredCredentialValue?.(params.config);
@@ -426,7 +426,7 @@ function inactivePathsForProvider(provider: PluginWebSearchProviderEntry): strin
 }
 
 function setResolvedWebFetchApiKey(params: {
-  resolvedConfig: KaijiBotConfig;
+  resolvedConfig: AllBotConfig;
   provider: PluginWebFetchProviderEntry;
   value: string;
 }): void {
@@ -442,7 +442,7 @@ function setResolvedWebFetchApiKey(params: {
 
 function readConfiguredFetchProviderCredential(params: {
   provider: PluginWebFetchProviderEntry;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   fetch: Record<string, unknown> | undefined;
 }): unknown {
   const configuredValue = params.provider.getConfiguredCredentialValue?.(params.config);
@@ -459,8 +459,8 @@ function inactivePathsForFetchProvider(provider: PluginWebFetchProviderEntry): s
 }
 
 export async function resolveRuntimeWebTools(params: {
-  sourceConfig: KaijiBotConfig;
-  resolvedConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  resolvedConfig: AllBotConfig;
   context: ResolverContext;
 }): Promise<RuntimeWebToolsMetadata> {
   const defaults = params.sourceConfig.secrets?.defaults;

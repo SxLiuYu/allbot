@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const { getMemorySearchManagerMock } = vi.hoisted(() => ({
   getMemorySearchManagerMock: vi.fn(),
@@ -16,11 +16,11 @@ vi.mock("../plugins/memory-runtime.js", () => ({
 
 import { startGatewayMemoryBackend } from "./server-startup-memory.js";
 
-function createQmdConfig(agents: KaijiBotConfig["agents"]): KaijiBotConfig {
+function createQmdConfig(agents: AllBotConfig["agents"]): AllBotConfig {
   return {
     agents,
     memory: { backend: "qmd", qmd: {} },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createGatewayLogMock() {
@@ -31,7 +31,7 @@ describe("startGatewayMemoryBackend", () => {
   beforeEach(() => {
     getMemorySearchManagerMock.mockClear();
     resolveActiveMemoryBackendConfigMock.mockReset();
-    resolveActiveMemoryBackendConfigMock.mockImplementation(({ cfg }: { cfg: KaijiBotConfig }) => ({
+    resolveActiveMemoryBackendConfigMock.mockImplementation(({ cfg }: { cfg: AllBotConfig }) => ({
       backend: cfg.memory?.backend === "qmd" ? "qmd" : "builtin",
       qmd: cfg.memory?.backend === "qmd" ? {} : undefined,
     }));
@@ -41,7 +41,7 @@ describe("startGatewayMemoryBackend", () => {
     const cfg = {
       agents: { list: [{ id: "main", default: true }] },
       memory: { backend: "builtin" },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const log = { info: vi.fn(), warn: vi.fn() };
 
     await startGatewayMemoryBackend({ cfg, log });

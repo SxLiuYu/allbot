@@ -483,7 +483,7 @@ export function createHooksRequestHandler(
       res.statusCode = 400;
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end(
-        "Hook token must be provided via Authorization: Bearer <token> or X-KaijiBot-Token header (query parameters are not allowed).",
+        "Hook token must be provided via Authorization: Bearer <token> or X-AllBot-Token header (query parameters are not allowed).",
       );
       return true;
     }
@@ -1126,17 +1126,17 @@ export function attachGatewayUpgradeHandler(opts: {
         wss.handleUpgrade(req, socket, head, (ws) => {
           (
             ws as unknown as import("ws").WebSocket & {
-              __kaijibotPreauthBudgetClaimed?: boolean;
-              __kaijibotPreauthBudgetKey?: string;
+              __allbotPreauthBudgetClaimed?: boolean;
+              __allbotPreauthBudgetKey?: string;
             }
-          ).__kaijibotPreauthBudgetKey = preauthBudgetKey;
+          ).__allbotPreauthBudgetKey = preauthBudgetKey;
           wss.emit("connection", ws, req);
           const budgetClaimed = Boolean(
             (
               ws as unknown as import("ws").WebSocket & {
-                __kaijibotPreauthBudgetClaimed?: boolean;
+                __allbotPreauthBudgetClaimed?: boolean;
               }
-            ).__kaijibotPreauthBudgetClaimed,
+            ).__allbotPreauthBudgetClaimed,
           );
           if (budgetClaimed) {
             budgetTransferred = true;

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveGatewayPort } from "../config/config.js";
 import { isValidEnvSecretRefId, type SecretInput } from "../config/types.secrets.js";
 import {
@@ -27,10 +27,10 @@ type GatewayAuthChoice = "token" | "password" | "trusted-proxy";
 type GatewayTokenInputMode = "plaintext" | "ref";
 
 export async function promptGatewayConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   runtime: RuntimeEnv,
 ): Promise<{
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   port: number;
   token?: string;
 }> {
@@ -194,12 +194,12 @@ export async function promptGatewayConfig(
       const envVar = guardCancel(
         await text({
           message: "Gateway token env var",
-          initialValue: "KAIJIBOT_GATEWAY_TOKEN",
-          placeholder: "KAIJIBOT_GATEWAY_TOKEN",
+          initialValue: "ALLBOT_GATEWAY_TOKEN",
+          placeholder: "ALLBOT_GATEWAY_TOKEN",
           validate: (value) => {
             const candidate = normalizeOptionalString(value) ?? "";
             if (!isValidEnvSecretRefId(candidate)) {
-              return "Use an env var name like KAIJIBOT_GATEWAY_TOKEN.";
+              return "Use an env var name like ALLBOT_GATEWAY_TOKEN.";
             }
             const resolved = process.env[candidate]?.trim();
             if (!resolved) {
@@ -218,7 +218,7 @@ export async function promptGatewayConfig(
         }),
         id: envVarName,
       };
-      note(`Validated ${envVarName}. KaijiBot will store a token SecretRef.`, "Gateway token");
+      note(`Validated ${envVarName}. AllBot will store a token SecretRef.`, "Gateway token");
     } else {
       const tokenInput = guardCancel(
         await text({
@@ -246,7 +246,7 @@ export async function promptGatewayConfig(
   if (authMode === "trusted-proxy") {
     note(
       [
-        "Trusted proxy mode: KaijiBot trusts user identity from a reverse proxy.",
+        "Trusted proxy mode: AllBot trusts user identity from a reverse proxy.",
         "The proxy must authenticate users and pass identity via headers.",
         "Only requests from specified proxy IPs will be trusted.",
         "",

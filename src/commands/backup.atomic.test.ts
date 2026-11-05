@@ -23,12 +23,12 @@ describe("backupCreateCommand atomic archive write", () => {
 
   async function resetTempHome() {
     await fs.rm(tempHome.home, { recursive: true, force: true });
-    await fs.mkdir(path.join(tempHome.home, ".kaijibot"), { recursive: true });
-    delete process.env.KAIJIBOT_CONFIG_PATH;
+    await fs.mkdir(path.join(tempHome.home, ".allbot"), { recursive: true });
+    delete process.env.ALLBOT_CONFIG_PATH;
   }
 
   beforeAll(async () => {
-    tempHome = await createTempHomeEnv("kaijibot-backup-atomic-test-");
+    tempHome = await createTempHomeEnv("allbot-backup-atomic-test-");
   });
 
   beforeEach(async () => {
@@ -46,10 +46,10 @@ describe("backupCreateCommand atomic archive write", () => {
   });
 
   it("does not leave a partial final archive behind when tar creation fails", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-failure-"));
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-failure-"));
     try {
-      await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+      await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
       await fs.writeFile(path.join(stateDir, "state.txt"), "state\n", "utf8");
 
       tarCreateMock.mockRejectedValueOnce(new Error("disk full"));
@@ -63,7 +63,7 @@ describe("backupCreateCommand atomic archive write", () => {
       vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
         await resolveBackupPlanFromPaths({
           stateDir,
-          configPath: path.join(stateDir, "kaijibot.json"),
+          configPath: path.join(stateDir, "allbot.json"),
           oauthDir: path.join(stateDir, "credentials"),
           includeWorkspace: false,
           configInsideState: true,
@@ -87,12 +87,12 @@ describe("backupCreateCommand atomic archive write", () => {
   });
 
   it("does not overwrite an archive created after readiness checks complete", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-race-"));
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-race-"));
     const realLink = fs.link.bind(fs);
     const linkSpy = vi.spyOn(fs, "link");
     try {
-      await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+      await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
       await fs.writeFile(path.join(stateDir, "state.txt"), "state\n", "utf8");
 
       tarCreateMock.mockImplementationOnce(async ({ file }: { file: string }) => {
@@ -112,7 +112,7 @@ describe("backupCreateCommand atomic archive write", () => {
       vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
         await resolveBackupPlanFromPaths({
           stateDir,
-          configPath: path.join(stateDir, "kaijibot.json"),
+          configPath: path.join(stateDir, "allbot.json"),
           oauthDir: path.join(stateDir, "credentials"),
           includeWorkspace: false,
           configInsideState: true,
@@ -135,11 +135,11 @@ describe("backupCreateCommand atomic archive write", () => {
   });
 
   it("falls back to exclusive copy when hard-link publication is unsupported", async () => {
-    const stateDir = path.join(tempHome.home, ".kaijibot");
-    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-copy-fallback-"));
+    const stateDir = path.join(tempHome.home, ".allbot");
+    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-copy-fallback-"));
     const linkSpy = vi.spyOn(fs, "link");
     try {
-      await fs.writeFile(path.join(stateDir, "kaijibot.json"), JSON.stringify({}), "utf8");
+      await fs.writeFile(path.join(stateDir, "allbot.json"), JSON.stringify({}), "utf8");
       await fs.writeFile(path.join(stateDir, "state.txt"), "state\n", "utf8");
 
       tarCreateMock.mockImplementationOnce(async ({ file }: { file: string }) => {
@@ -158,7 +158,7 @@ describe("backupCreateCommand atomic archive write", () => {
       vi.spyOn(backupShared, "resolveBackupPlanFromDisk").mockResolvedValue(
         await resolveBackupPlanFromPaths({
           stateDir,
-          configPath: path.join(stateDir, "kaijibot.json"),
+          configPath: path.join(stateDir, "allbot.json"),
           oauthDir: path.join(stateDir, "credentials"),
           includeWorkspace: false,
           configInsideState: true,

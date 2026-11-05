@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# KaijiBot Release Script
+# AllBot Release Script
 # Usage: bash scripts/release.sh 2026.6.28
 #
 # npm publishing happens in GitHub Actions via npm trusted publishing (OIDC)
@@ -12,7 +12,7 @@ set -euo pipefail
 
 VERSION="${1:?Usage: bash scripts/release.sh <version>}"
 
-echo "=== Releasing KaijiBot v${VERSION} ==="
+echo "=== Releasing AllBot v${VERSION} ==="
 
 # 1. Bump version
 node -e "
@@ -39,8 +39,8 @@ echo "[3/3] Pushed. CI will publish to npm (trusted publishing) and upload the t
 echo ""
 echo "=== Done! ==="
 echo "Watch CI:  https://github.com/Kaiji-Z/kaijibot/actions"
-echo "npm:      npm install -g kaijibot@${VERSION}   (available after CI finishes)"
-echo "tarball:  https://github.com/Kaiji-Z/kaijibot/releases/download/v${VERSION}/kaijibot-${VERSION}.tgz"
+echo "npm:      npm install -g allbot@${VERSION}   (available after CI finishes)"
+echo "tarball:  https://github.com/Kaiji-Z/kaijibot/releases/download/v${VERSION}/allbot-${VERSION}.tgz"
 echo ""
 echo "Note: publish-npm job requires the npm trusted publisher registration"
 echo "      (workflow filename: publish-tarball.yml). If it is not set up yet,"

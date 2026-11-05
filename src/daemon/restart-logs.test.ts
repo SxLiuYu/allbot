@@ -17,7 +17,7 @@ afterEach(() => {
 
 const baseEnv = () => ({
   HOME: "/home/testuser",
-  KAIJIBOT_STATE_DIR: "/tmp/kaijibot-test-state",
+  ALLBOT_STATE_DIR: "/tmp/allbot-test-state",
 });
 
 describe("resolveGatewayLogPaths", () => {
@@ -25,13 +25,13 @@ describe("resolveGatewayLogPaths", () => {
     const env = baseEnv();
     const result = resolveGatewayLogPaths(env);
 
-    expect(result.logDir).toBe(path.join(env.KAIJIBOT_STATE_DIR!, "logs"));
+    expect(result.logDir).toBe(path.join(env.ALLBOT_STATE_DIR!, "logs"));
     expect(result.stdoutPath).toBe(path.join(result.logDir, "gateway.log"));
     expect(result.stderrPath).toBe(path.join(result.logDir, "gateway.err.log"));
   });
 
-  it("respects KAIJIBOT_LOG_PREFIX", () => {
-    const env = { ...baseEnv(), KAIJIBOT_LOG_PREFIX: "custom-prefix" };
+  it("respects ALLBOT_LOG_PREFIX", () => {
+    const env = { ...baseEnv(), ALLBOT_LOG_PREFIX: "custom-prefix" };
     const result = resolveGatewayLogPaths(env);
 
     expect(result.stdoutPath).toBe(path.join(result.logDir, "custom-prefix.log"));
@@ -45,7 +45,7 @@ describe("resolveGatewayRestartLogPath", () => {
     const result = resolveGatewayRestartLogPath(env);
 
     expect(result.endsWith("gateway-restart.log")).toBe(true);
-    expect(result).toBe(path.join(env.KAIJIBOT_STATE_DIR!, "logs", "gateway-restart.log"));
+    expect(result).toBe(path.join(env.ALLBOT_STATE_DIR!, "logs", "gateway-restart.log"));
   });
 });
 
@@ -62,7 +62,7 @@ describe("resolveGatewaySupervisorLogPaths", () => {
     const env = baseEnv();
     const result = resolveGatewaySupervisorLogPaths(env, { platform: "darwin" });
 
-    expect(result.logDir).toContain("Library/Logs/kaijibot");
+    expect(result.logDir).toContain("Library/Logs/allbot");
     expect(result.stdoutPath).toMatch(/gateway\.log$/);
   });
 });
@@ -86,7 +86,7 @@ describe("renderCmdRestartLogSetup", () => {
 
     expect(result.lines.length).toBeGreaterThanOrEqual(2);
     expect(result.lines[0]).toContain("mkdir");
-    expect(result.lines[1]).toContain("kaijibot restart log initialized");
+    expect(result.lines[1]).toContain("allbot restart log initialized");
     expect(result.quotedLogPath).toContain("gateway-restart.log");
   });
 });

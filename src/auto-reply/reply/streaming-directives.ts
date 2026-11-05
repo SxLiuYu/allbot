@@ -1,4 +1,4 @@
-import { hasOutboundReplyContent } from "kaijibot/plugin-sdk/reply-payload";
+import { hasOutboundReplyContent } from "allbot/plugin-sdk/reply-payload";
 import { splitMediaFromOutput } from "../../media/parse.js";
 import { parseInlineDirectives } from "../../utils/directive-tags.js";
 import {

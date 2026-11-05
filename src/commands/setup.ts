@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import JSON5 from "json5";
 import { z } from "zod";
 import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../agents/workspace.js";
-import { type KaijiBotConfig, createConfigIO, writeConfigFile } from "../config/config.js";
+import { type AllBotConfig, createConfigIO, writeConfigFile } from "../config/config.js";
 import { formatConfigPath, logConfigUpdated } from "../config/logging.js";
 import { resolveSessionTranscriptsDir } from "../config/sessions.js";
 import type { RuntimeEnv } from "../runtime.js";
@@ -14,12 +14,12 @@ const JsonRecordSchema = z.record(z.string(), z.unknown());
 
 async function readConfigFileRaw(configPath: string): Promise<{
   exists: boolean;
-  parsed: KaijiBotConfig;
+  parsed: AllBotConfig;
 }> {
   try {
     const raw = await fs.readFile(configPath, "utf-8");
     const parsed = safeParseWithSchema(JsonRecordSchema, JSON5.parse(raw));
-    return { exists: true, parsed: (parsed ?? {}) as KaijiBotConfig };
+    return { exists: true, parsed: (parsed ?? {}) as AllBotConfig };
   } catch {
     return { exists: false, parsed: {} };
   }
@@ -42,7 +42,7 @@ export async function setupCommand(
 
   const workspace = desiredWorkspace ?? defaults.workspace ?? DEFAULT_AGENT_WORKSPACE_DIR;
 
-  const next: KaijiBotConfig = {
+  const next: AllBotConfig = {
     ...cfg,
     agents: {
       ...cfg.agents,

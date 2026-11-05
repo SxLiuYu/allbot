@@ -1,1 +1,1 @@
-export { resolvePreferredKaijiBotTmpDir } from "../../infra/tmp-kaijibot-dir.js";
+export { resolvePreferredAllBotTmpDir } from "../../infra/tmp-allbot-dir.js";

@@ -1,11 +1,11 @@
-import { readConfiguredProviderCatalogEntries } from "kaijibot/plugin-sdk/provider-catalog-shared";
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
+import { readConfiguredProviderCatalogEntries } from "allbot/plugin-sdk/provider-catalog-shared";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
 import {
   createOpenRouterSystemCacheWrapper,
   createOpenRouterWrapper,
   isProxyReasoningUnsupported,
-} from "kaijibot/plugin-sdk/provider-stream";
+} from "allbot/plugin-sdk/provider-stream";
 import { deepinfraMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import { applyDeepInfraConfig } from "./onboard.js";
 import { buildDeepInfraProvider } from "./provider-catalog.js";

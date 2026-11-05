@@ -10,8 +10,8 @@ async function withTempConfig(
   config: unknown,
   run: (configPath: string) => Promise<void>,
 ): Promise<void> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-talk-"));
-  const configPath = path.join(dir, "kaijibot.json");
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-talk-"));
+  const configPath = path.join(dir, "allbot.json");
   await fs.writeFile(configPath, JSON.stringify(config, null, 2));
   try {
     await run(configPath);

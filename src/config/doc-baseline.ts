@@ -3,7 +3,7 @@ import fsSync from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveKaijiBotPackageRootSync } from "../infra/kaijibot-root.js";
+import { resolveAllBotPackageRootSync } from "../infra/allbot-root.js";
 import { FIELD_HELP } from "./schema.help.js";
 import type { ConfigSchemaResponse } from "./schema.js";
 import { schemaHasChildren } from "./schema.shared.js";
@@ -101,13 +101,13 @@ const uiHintIndexCache = new WeakMap<
 const schemaHasChildrenCache = new WeakMap<JsonSchemaObject, boolean>();
 
 function logConfigDocBaselineDebug(message: string): void {
-  if (process.env.KAIJIBOT_CONFIG_DOC_BASELINE_DEBUG === "1") {
+  if (process.env.ALLBOT_CONFIG_DOC_BASELINE_DEBUG === "1") {
     console.error(`[config-doc-baseline] ${message}`);
   }
 }
 
 function resolveRepoRoot(): string {
-  const fromPackage = resolveKaijiBotPackageRootSync({
+  const fromPackage = resolveAllBotPackageRootSync({
     cwd: path.dirname(fileURLToPath(import.meta.url)),
     moduleUrl: import.meta.url,
   });
@@ -360,8 +360,8 @@ async function loadBundledConfigSchemaResponse(): Promise<ConfigSchemaResponse> 
   const env = {
     ...process.env,
     HOME: os.tmpdir(),
-    KAIJIBOT_STATE_DIR: path.join(os.tmpdir(), "kaijibot-config-doc-baseline-state"),
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "extensions"),
+    ALLBOT_STATE_DIR: path.join(os.tmpdir(), "allbot-config-doc-baseline-state"),
+    ALLBOT_BUNDLED_PLUGINS_DIR: path.join(repoRoot, "extensions"),
   };
 
   const manifestRegistry = runtime.loadPluginManifestRegistry({

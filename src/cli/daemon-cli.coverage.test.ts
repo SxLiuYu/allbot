@@ -35,8 +35,8 @@ const buildGatewayInstallPlan = vi.fn(
     programArguments: ["/bin/node", "cli", "gateway", "--port", String(params.port)],
     workingDirectory: process.cwd(),
     environment: {
-      KAIJIBOT_GATEWAY_PORT: String(params.port),
-      ...(params.token ? { KAIJIBOT_GATEWAY_TOKEN: params.token } : {}),
+      ALLBOT_GATEWAY_PORT: String(params.port),
+      ...(params.token ? { ALLBOT_GATEWAY_TOKEN: params.token } : {}),
     },
   }),
 );
@@ -158,15 +158,15 @@ describe("daemon-cli coverage", () => {
   beforeEach(() => {
     daemonProgram = createDaemonProgram();
     envSnapshot = captureEnv([
-      "KAIJIBOT_STATE_DIR",
-      "KAIJIBOT_CONFIG_PATH",
-      "KAIJIBOT_GATEWAY_PORT",
-      "KAIJIBOT_PROFILE",
+      "ALLBOT_STATE_DIR",
+      "ALLBOT_CONFIG_PATH",
+      "ALLBOT_GATEWAY_PORT",
+      "ALLBOT_PROFILE",
     ]);
-    process.env.KAIJIBOT_STATE_DIR = "/tmp/kaijibot-cli-state";
-    process.env.KAIJIBOT_CONFIG_PATH = "/tmp/kaijibot-cli-state/kaijibot.json";
-    delete process.env.KAIJIBOT_GATEWAY_PORT;
-    delete process.env.KAIJIBOT_PROFILE;
+    process.env.ALLBOT_STATE_DIR = "/tmp/allbot-cli-state";
+    process.env.ALLBOT_CONFIG_PATH = "/tmp/allbot-cli-state/allbot.json";
+    delete process.env.ALLBOT_GATEWAY_PORT;
+    delete process.env.ALLBOT_PROFILE;
     serviceReadCommand.mockResolvedValue(null);
     resolveGatewayProbeAuthSafeWithSecretInputs.mockClear();
     findExtraGatewayServices.mockClear();
@@ -199,12 +199,12 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        KAIJIBOT_PROFILE: "dev",
-        KAIJIBOT_STATE_DIR: "/tmp/kaijibot-daemon-state",
-        KAIJIBOT_CONFIG_PATH: "/tmp/kaijibot-daemon-state/kaijibot.json",
-        KAIJIBOT_GATEWAY_PORT: "19001",
+        ALLBOT_PROFILE: "dev",
+        ALLBOT_STATE_DIR: "/tmp/allbot-daemon-state",
+        ALLBOT_CONFIG_PATH: "/tmp/allbot-daemon-state/allbot.json",
+        ALLBOT_GATEWAY_PORT: "19001",
       },
-      sourcePath: "/tmp/ai.kaijibot.gateway.plist",
+      sourcePath: "/tmp/ai.allbot.gateway.plist",
     });
 
     await runDaemonCommand(["daemon", "status", "--json"]);
@@ -276,7 +276,7 @@ describe("daemon-cli coverage", () => {
         GOPATH: "/Users/test/.local/gopath",
         GOBIN: "/Users/test/.local/gopath/bin",
       },
-      sourcePath: "/tmp/ai.kaijibot.gateway.plist",
+      sourcePath: "/tmp/ai.allbot.gateway.plist",
     });
 
     await runDaemonCommand(["daemon", "install", "--force", "--json"]);

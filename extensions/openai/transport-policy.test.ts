@@ -1,4 +1,4 @@
-import type { ProviderRuntimeModel } from "kaijibot/plugin-sdk/plugin-entry";
+import type { ProviderRuntimeModel } from "allbot/plugin-sdk/plugin-entry";
 import { describe, expect, it } from "vitest";
 import {
   resolveOpenAITransportTurnState,
@@ -40,15 +40,15 @@ describe("openai transport policy", () => {
     ).toMatchObject({
       headers: {
         "x-client-request-id": "session-123",
-        "x-kaijibot-session-id": "session-123",
-        "x-kaijibot-turn-id": "turn-123",
-        "x-kaijibot-turn-attempt": "2",
+        "x-allbot-session-id": "session-123",
+        "x-allbot-turn-id": "turn-123",
+        "x-allbot-turn-attempt": "2",
       },
       metadata: {
-        kaijibot_session_id: "session-123",
-        kaijibot_turn_id: "turn-123",
-        kaijibot_turn_attempt: "2",
-        kaijibot_transport: "websocket",
+        allbot_session_id: "session-123",
+        allbot_turn_id: "turn-123",
+        allbot_turn_attempt: "2",
+        allbot_transport: "websocket",
       },
     });
   });
@@ -78,7 +78,7 @@ describe("openai transport policy", () => {
     ).toMatchObject({
       headers: {
         "x-client-request-id": "session-123",
-        "x-kaijibot-session-id": "session-123",
+        "x-allbot-session-id": "session-123",
       },
       degradeCooldownMs: 60_000,
     });
@@ -99,7 +99,7 @@ describe("openai transport policy", () => {
     ).toMatchObject({
       headers: {
         "x-client-request-id": "session-123",
-        "x-kaijibot-session-id": "session-123",
+        "x-allbot-session-id": "session-123",
       },
       degradeCooldownMs: 60_000,
     });
@@ -121,7 +121,7 @@ describe("openai transport policy", () => {
     ).toMatchObject({
       headers: {
         "x-client-request-id": "session-123",
-        "x-kaijibot-session-id": "session-123",
+        "x-allbot-session-id": "session-123",
       },
       degradeCooldownMs: 60_000,
     });

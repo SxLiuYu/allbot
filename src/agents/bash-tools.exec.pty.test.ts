@@ -23,15 +23,15 @@ test("exec supports pty output", async () => {
   expect(text).toContain("ok");
 });
 
-test("exec sets KAIJIBOT_SHELL in pty mode", async () => {
+test("exec sets ALLBOT_SHELL in pty mode", async () => {
   const tool = createExecTool({
     allowBackground: false,
     host: "gateway",
     security: "full",
     ask: "off",
   });
-  const result = await tool.execute("toolcall-kaijibot-shell", {
-    command: "node -e \"process.stdout.write(process.env.KAIJIBOT_SHELL || '')\"",
+  const result = await tool.execute("toolcall-allbot-shell", {
+    command: "node -e \"process.stdout.write(process.env.ALLBOT_SHELL || '')\"",
     pty: true,
   });
 

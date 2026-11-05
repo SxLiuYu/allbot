@@ -1,12 +1,12 @@
 import { intro, note, outro, spinner } from "@clack/prompts";
-import { stylePromptTitle } from "kaijibot/plugin-sdk/cli-runtime";
-import { logConfigUpdated, updateConfig } from "kaijibot/plugin-sdk/config-runtime";
+import { stylePromptTitle } from "allbot/plugin-sdk/cli-runtime";
+import { logConfigUpdated, updateConfig } from "allbot/plugin-sdk/config-runtime";
 import {
   applyAuthProfileConfig,
   ensureAuthProfileStore,
   upsertAuthProfile,
-} from "kaijibot/plugin-sdk/provider-auth";
-import type { RuntimeEnv } from "kaijibot/plugin-sdk/runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import type { RuntimeEnv } from "allbot/plugin-sdk/runtime";
 
 const CLIENT_ID = "Iv1.b507a08c87ecfe98";
 const DEVICE_CODE_URL = "https://github.com/login/device/code";

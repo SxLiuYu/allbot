@@ -1,6 +1,6 @@
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { assertOkOrThrowHttpError, postJsonRequest } from "kaijibot/plugin-sdk/provider-http";
-import type { VideoGenerationProvider } from "kaijibot/plugin-sdk/video-generation";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { assertOkOrThrowHttpError, postJsonRequest } from "allbot/plugin-sdk/provider-http";
+import type { VideoGenerationProvider } from "allbot/plugin-sdk/video-generation";
 import {
   DEFAULT_VYDRA_VIDEO_MODEL,
   downloadVydraAsset,

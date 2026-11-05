@@ -153,7 +153,7 @@ describe("sanitizeUserFacingText", () => {
     "rewrites disk-space failures with errorContext: %s",
     (input) => {
       expect(sanitizeUserFacingText(input, { errorContext: true })).toBe(
-        "KaijiBot could not write local session data because the disk is full. Free some disk space and try again.",
+        "AllBot could not write local session data because the disk is full. Free some disk space and try again.",
       );
     },
   );
@@ -200,7 +200,7 @@ describe("sanitizeUserFacingText", () => {
   it("strips marked internal runtime context blocks but keeps real reply text", () => {
     const input = [
       INTERNAL_RUNTIME_CONTEXT_BEGIN,
-      "KaijiBot runtime context (internal):",
+      "AllBot runtime context (internal):",
       "This context is runtime-generated, not user-authored. Keep internal details private.",
       "",
       "[Internal task completion event]",
@@ -249,7 +249,7 @@ describe("sanitizeUserFacingText", () => {
 
   it("drops legacy unmarked internal runtime context when it leaks into user-facing text", () => {
     const input = [
-      "KaijiBot runtime context (internal):",
+      "AllBot runtime context (internal):",
       "This context is runtime-generated, not user-authored. Keep internal details private.",
       "",
       "[Internal task completion event]",
@@ -263,7 +263,7 @@ describe("sanitizeUserFacingText", () => {
     const input = [
       "Visible intro.",
       "",
-      "KaijiBot runtime context (internal):",
+      "AllBot runtime context (internal):",
       "This context is runtime-generated, not user-authored. Keep internal details private.",
       "",
       "[Internal task completion event]",
@@ -290,7 +290,7 @@ describe("sanitizeUserFacingText", () => {
 
   it("does not strip ordinary text that merely mentions internal marker strings", () => {
     const input = [
-      "The literal header `KaijiBot runtime context (internal):` appears in this note.",
+      "The literal header `AllBot runtime context (internal):` appears in this note.",
       "The phrase `[Internal task completion event]` is also mentioned as an example.",
     ].join("\n");
 
@@ -299,7 +299,7 @@ describe("sanitizeUserFacingText", () => {
 
   it("does not strip text that starts with the legacy header phrase but is not the canonical block", () => {
     const input =
-      "KaijiBot runtime context (internal): is the label used by the old runtime block formatter.";
+      "AllBot runtime context (internal): is the label used by the old runtime block formatter.";
 
     expect(sanitizeUserFacingText(input)).toBe(input);
   });

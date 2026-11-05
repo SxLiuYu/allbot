@@ -9,7 +9,7 @@ title: "SearXNG Search"
 
 # SearXNG Search
 
-KaijiBot supports [SearXNG](https://docs.searxng.org/) as a **self-hosted,
+AllBot supports [SearXNG](https://docs.searxng.org/) as a **self-hosted,
 key-free** `web_search` provider. SearXNG is an open-source meta-search engine
 that aggregates results from Google, Bing, DuckDuckGo, and other sources.
 
@@ -33,7 +33,7 @@ Advantages:
   </Step>
   <Step title="Configure">
     ```bash
-    kaijibot configure --section web
+    allbot configure --section web
     # Select "searxng" as the provider
     ```
 

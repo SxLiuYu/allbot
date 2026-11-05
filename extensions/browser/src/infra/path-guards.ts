@@ -1,1 +1,1 @@
-export { isNotFoundPathError, isPathInside } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { isNotFoundPathError, isPathInside } from "allbot/plugin-sdk/browser-security-runtime";

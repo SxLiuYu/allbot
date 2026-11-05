@@ -5,7 +5,7 @@ import { createFixtureSuite } from "../test-utils/fixture-suite.js";
 import { writeSkill } from "./skills.e2e-test-helpers.js";
 import { buildWorkspaceSkillsPrompt } from "./skills.js";
 
-const fixtureSuite = createFixtureSuite("kaijibot-skills-prompt-suite-");
+const fixtureSuite = createFixtureSuite("allbot-skills-prompt-suite-");
 
 beforeAll(async () => {
   await fixtureSuite.setup();
@@ -63,31 +63,31 @@ describe("buildWorkspaceSkillsPrompt", () => {
       dir: path.join(skillsDir, "bin-skill"),
       name: "bin-skill",
       description: "Needs a bin",
-      metadata: '{"kaijibot":{"requires":{"bins":["fakebin"]}}}',
+      metadata: '{"allbot":{"requires":{"bins":["fakebin"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "anybin-skill"),
       name: "anybin-skill",
       description: "Needs any bin",
-      metadata: '{"kaijibot":{"requires":{"anyBins":["missingbin","fakebin"]}}}',
+      metadata: '{"allbot":{"requires":{"anyBins":["missingbin","fakebin"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "config-skill"),
       name: "config-skill",
       description: "Needs config",
-      metadata: '{"kaijibot":{"requires":{"config":["browser.enabled"]}}}',
+      metadata: '{"allbot":{"requires":{"config":["browser.enabled"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "always-skill"),
       name: "always-skill",
       description: "Always on",
-      metadata: '{"kaijibot":{"always":true,"requires":{"env":["MISSING"]}}}',
+      metadata: '{"allbot":{"always":true,"requires":{"env":["MISSING"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "env-skill"),
       name: "env-skill",
       description: "Needs env",
-      metadata: '{"kaijibot":{"requires":{"env":["ENV_KEY"]},"primaryEnv":"ENV_KEY"}}',
+      metadata: '{"allbot":{"requires":{"env":["ENV_KEY"]},"primaryEnv":"ENV_KEY"}}',
     });
 
     const managedSkillsDir = path.join(workspaceDir, ".managed");
@@ -140,7 +140,7 @@ describe("buildWorkspaceSkillsPrompt", () => {
       dir: skillDir,
       name: "alias-skill",
       description: "Uses skillKey",
-      metadata: '{"kaijibot":{"skillKey":"alias"}}',
+      metadata: '{"allbot":{"skillKey":"alias"}}',
     });
 
     const prompt = withEnv({ HOME: workspaceDir, PATH: "" }, () =>

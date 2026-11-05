@@ -29,7 +29,7 @@ export async function migrateCommand(
   opts: MigrationCommandOptions,
 ): Promise<void> {
   if (!opts.json) {
-    runtime.log(theme.heading("KaijiBot Migration Tool"));
+    runtime.log(theme.heading("AllBot Migration Tool"));
     runtime.log("");
   }
 
@@ -55,7 +55,7 @@ export async function migrateCommand(
     configFilename: "openclaw.json",
   };
 
-  const targetDir = path.resolve(os.homedir(), ".kaijibot");
+  const targetDir = path.resolve(os.homedir(), ".allbot");
 
   const scenario: MigrationScenario =
     opts.scenario === "auto" || !opts.scenario ? detectScenario(targetDir) : opts.scenario;
@@ -104,7 +104,7 @@ export async function migrateCommand(
 
   runtime.log("");
   runtime.log(
-    `  ${theme.warn("⚠")} This will apply ${preview.totalChanges} change(s) to your KaijiBot installation.`,
+    `  ${theme.warn("⚠")} This will apply ${preview.totalChanges} change(s) to your AllBot installation.`,
   );
 
   if (preview.totalWarnings > 0) {
@@ -167,12 +167,12 @@ export async function migrateCommand(
 
   runtime.log("");
   runtime.log(theme.heading("Post-migration steps:"));
-  runtime.log(`  1. Run ${theme.accent("kaijibot doctor")} to verify your installation.`);
+  runtime.log(`  1. Run ${theme.accent("allbot doctor")} to verify your installation.`);
   runtime.log(
-    `  2. Run ${theme.accent("kaijibot memory index --force")} to rebuild search indexes.`,
+    `  2. Run ${theme.accent("allbot memory index --force")} to rebuild search indexes.`,
   );
   runtime.log(
-    `  3. In conversation, ask KaijiBot to ${theme.accent("organize memory")} to restructure imported memory.`,
+    `  3. In conversation, ask AllBot to ${theme.accent("organize memory")} to restructure imported memory.`,
   );
 }
 

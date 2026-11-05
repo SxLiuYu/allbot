@@ -11,7 +11,7 @@ import {
   pruneBundledPluginSourceNodeModules,
 } from "./postinstall-bundled-plugins.mjs";
 
-const logLevel = process.env.KAIJIBOT_BUILD_VERBOSE ? "info" : "warn";
+const logLevel = process.env.ALLBOT_BUILD_VERBOSE ? "info" : "warn";
 const extraArgs = process.argv.slice(2);
 const INEFFECTIVE_DYNAMIC_IMPORT_RE = /\[INEFFECTIVE_DYNAMIC_IMPORT\]/;
 const UNRESOLVED_IMPORT_RE = /\[UNRESOLVED_IMPORT\]/;

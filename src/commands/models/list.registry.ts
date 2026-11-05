@@ -2,7 +2,7 @@ import type { Api, Model } from "@earendil-works/pi-ai";
 import type { ModelRegistry } from "@earendil-works/pi-coding-agent";
 import type { AuthProfileStore } from "../../agents/auth-profiles.js";
 import { shouldSuppressBuiltInModel } from "../../agents/model-suppression.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   formatErrorWithStack,
   MODEL_AVAILABILITY_UNAVAILABLE_CODE,
@@ -15,14 +15,14 @@ import {
   listProfilesForProvider,
   resolveAwsSdkEnvVarName,
   resolveEnvApiKey,
-  resolveKaijiBotAgentDir,
+  resolveAllBotAgentDir,
 } from "./list.runtime.js";
 import type { ModelRow } from "./list.types.js";
 import { isLocalBaseUrl, modelKey } from "./shared.js";
 
 const hasAuthForProvider = (
   provider: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   authStore?: AuthProfileStore,
 ) => {
   if (!cfg || !authStore) {
@@ -81,7 +81,7 @@ function validateAvailableModels(availableModels: unknown): Model<Api>[] {
   return availableModels as Model<Api>[];
 }
 
-function loadAvailableModels(registry: ModelRegistry, cfg: KaijiBotConfig): Model<Api>[] {
+function loadAvailableModels(registry: ModelRegistry, cfg: AllBotConfig): Model<Api>[] {
   let availableModels: unknown;
   try {
     availableModels = registry.getAvailable();
@@ -104,10 +104,10 @@ function loadAvailableModels(registry: ModelRegistry, cfg: KaijiBotConfig): Mode
 }
 
 export async function loadModelRegistry(
-  cfg: KaijiBotConfig,
-  _opts?: { sourceConfig?: KaijiBotConfig },
+  cfg: AllBotConfig,
+  _opts?: { sourceConfig?: AllBotConfig },
 ) {
-  const agentDir = resolveKaijiBotAgentDir();
+  const agentDir = resolveAllBotAgentDir();
   const authStorage = discoverAuthStorage(agentDir);
   const registry = discoverModels(authStorage, agentDir);
   const models = registry.getAll().filter(
@@ -146,7 +146,7 @@ export function toModelRow(params: {
   tags: string[];
   aliases?: string[];
   availableKeys?: Set<string>;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   authStore?: AuthProfileStore;
   allowProviderAvailabilityFallback?: boolean;
 }): ModelRow {

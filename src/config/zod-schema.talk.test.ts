@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { KaijiBotSchema } from "./zod-schema.js";
+import { AllBotSchema } from "./zod-schema.js";
 
-describe("KaijiBotSchema talk validation", () => {
+describe("AllBotSchema talk validation", () => {
   it("accepts a positive integer talk.silenceTimeoutMs", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         talk: {
           silenceTimeoutMs: 1500,
         },
@@ -18,7 +18,7 @@ describe("KaijiBotSchema talk validation", () => {
     ["float", 1500.5],
   ])("rejects %s talk.silenceTimeoutMs", (_label, value) => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         talk: {
           silenceTimeoutMs: value,
         },
@@ -28,7 +28,7 @@ describe("KaijiBotSchema talk validation", () => {
 
   it("rejects talk.provider when it does not match talk.providers", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         talk: {
           provider: "acme",
           providers: {
@@ -43,7 +43,7 @@ describe("KaijiBotSchema talk validation", () => {
 
   it("rejects multi-provider talk config without talk.provider", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         talk: {
           providers: {
             acme: {

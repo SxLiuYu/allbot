@@ -45,14 +45,14 @@ const opts = parseFlagArgs(
   {
     baseline: CLI_STARTUP_BENCH_FIXTURE_PATH,
     report: "",
-    entry: "kaijibot.mjs",
+    entry: "allbot.mjs",
     preset: "all",
     runs: 1,
     warmup: 0,
     timeoutMs: 30_000,
     maxDurationRegressionPct:
-      readEnvNumber("KAIJIBOT_STARTUP_BENCH_MAX_DURATION_REGRESSION_PCT") ?? 20,
-    maxRssRegressionPct: readEnvNumber("KAIJIBOT_STARTUP_BENCH_MAX_RSS_REGRESSION_PCT") ?? 20,
+      readEnvNumber("ALLBOT_STARTUP_BENCH_MAX_DURATION_REGRESSION_PCT") ?? 20,
+    maxRssRegressionPct: readEnvNumber("ALLBOT_STARTUP_BENCH_MAX_RSS_REGRESSION_PCT") ?? 20,
   },
   [
     stringFlag("--baseline", "baseline"),

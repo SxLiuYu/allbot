@@ -1,19 +1,19 @@
 // @ts-nocheck
-import { extensionForMime } from "kaijibot/plugin-sdk/media-mime";
-import { canonicalizeBase64 } from "kaijibot/plugin-sdk/media-runtime";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
+import { extensionForMime } from "allbot/plugin-sdk/media-mime";
+import { canonicalizeBase64 } from "allbot/plugin-sdk/media-runtime";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
 import {
   assertOkOrThrowHttpError,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import type {
   GeneratedVideoAsset,
   VideoGenerationProvider,
   VideoGenerationRequest,
-} from "kaijibot/plugin-sdk/video-generation";
+} from "allbot/plugin-sdk/video-generation";
 import {
   DEEPINFRA_NATIVE_BASE_URL,
   DEEPINFRA_VIDEO_ASPECT_RATIOS,

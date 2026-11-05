@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { KaijiBotSchema } from "./zod-schema.js";
+import { AllBotSchema } from "./zod-schema.js";
 
-describe("KaijiBotSchema cron retention and run-log validation", () => {
+describe("AllBotSchema cron retention and run-log validation", () => {
   it("accepts valid cron.sessionRetention and runLog values", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         cron: {
           sessionRetention: "1h30m",
           runLog: {
@@ -18,7 +18,7 @@ describe("KaijiBotSchema cron retention and run-log validation", () => {
 
   it("rejects invalid cron.sessionRetention", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         cron: {
           sessionRetention: "abc",
         },
@@ -28,7 +28,7 @@ describe("KaijiBotSchema cron retention and run-log validation", () => {
 
   it("rejects invalid cron.runLog.maxBytes", () => {
     expect(() =>
-      KaijiBotSchema.parse({
+      AllBotSchema.parse({
         cron: {
           runLog: {
             maxBytes: "wat",

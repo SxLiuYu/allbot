@@ -85,7 +85,7 @@ describe("maybeInstallDaemon", () => {
       warnings: [],
     });
     buildGatewayInstallPlan.mockResolvedValue({
-      programArguments: ["kaijibot", "gateway", "run"],
+      programArguments: ["allbot", "gateway", "run"],
       workingDirectory: "/tmp",
       environment: {},
     });

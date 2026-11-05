@@ -1,8 +1,8 @@
-import { hasControlCommand } from "kaijibot/plugin-sdk/command-auth";
+import { hasControlCommand } from "allbot/plugin-sdk/command-auth";
 import {
   createInboundDebouncer,
   resolveInboundDebounceMs,
-} from "kaijibot/plugin-sdk/reply-runtime";
+} from "allbot/plugin-sdk/reply-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createNonExitingTypedRuntimeEnv } from "../../../test/helpers/plugins/runtime-env.js";
 import type { ClawdbotConfig, PluginRuntime, RuntimeEnv } from "../runtime-api.js";
@@ -539,7 +539,7 @@ describe("Feishu inbound debounce regressions", () => {
     vi.spyOn(dedup, "tryBeginFeishuMessageProcessing").mockReturnValue(true);
     vi.spyOn(dedup, "recordProcessedFeishuMessage").mockResolvedValue(true);
     vi.spyOn(dedup, "hasProcessedFeishuMessage").mockResolvedValue(false);
-    const onMessage = await setupDebounceMonitor({ botName: "KaijiBot Bot" });
+    const onMessage = await setupDebounceMonitor({ botName: "AllBot Bot" });
 
     await onMessage(
       createTextEvent({
@@ -549,7 +549,7 @@ describe("Feishu inbound debounce regressions", () => {
           {
             key: "@_user_1",
             id: { open_id: "ou_bot" },
-            name: "KaijiBot Bot",
+            name: "AllBot Bot",
           },
         ],
       }),
@@ -562,7 +562,7 @@ describe("Feishu inbound debounce regressions", () => {
     const firstParams = handleFeishuMessageMock.mock.calls[0]?.[0] as
       | { botName?: string }
       | undefined;
-    expect(firstParams?.botName).toBe("KaijiBot Bot");
+    expect(firstParams?.botName).toBe("AllBot Bot");
   });
 
   it("does not synthesize mention-forward intent across separate messages", async () => {

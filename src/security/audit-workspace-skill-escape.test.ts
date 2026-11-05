@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectWorkspaceSkillSymlinkEscapeFindings } from "./audit-extra.async.js";
 
 const isWindows = process.platform === "win32";
@@ -12,7 +12,7 @@ describe("security audit workspace skill path escape findings", () => {
   let caseId = 0;
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-security-audit-workspace-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-security-audit-workspace-"));
   });
 
   afterAll(async () => {
@@ -44,7 +44,7 @@ describe("security audit workspace skill path escape findings", () => {
               path.join(workspaceDir, "skills", "leak", "SKILL.md"),
             );
             const findings = await collectWorkspaceSkillSymlinkEscapeFindings({
-              cfg: { agents: { defaults: { workspace: workspaceDir } } } satisfies KaijiBotConfig,
+              cfg: { agents: { defaults: { workspace: workspaceDir } } } satisfies AllBotConfig,
             });
             const finding = findings.find(
               (entry) => entry.checkId === "skills.workspace.symlink_escape",
@@ -63,7 +63,7 @@ describe("security audit workspace skill path escape findings", () => {
           "utf-8",
         );
         const findings = await collectWorkspaceSkillSymlinkEscapeFindings({
-          cfg: { agents: { defaults: { workspace: workspaceDir } } } satisfies KaijiBotConfig,
+          cfg: { agents: { defaults: { workspace: workspaceDir } } } satisfies AllBotConfig,
         });
         expect(findings.some((entry) => entry.checkId === "skills.workspace.symlink_escape")).toBe(
           false,

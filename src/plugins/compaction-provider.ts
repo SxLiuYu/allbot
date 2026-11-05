@@ -47,7 +47,7 @@ export type RegisteredCompactionProvider = {
 // Registry (process-global singleton)
 // ---------------------------------------------------------------------------
 
-const COMPACTION_PROVIDER_REGISTRY_STATE = Symbol.for("kaijibot.compactionProviderRegistryState");
+const COMPACTION_PROVIDER_REGISTRY_STATE = Symbol.for("allbot.compactionProviderRegistryState");
 
 type CompactionProviderRegistryState = {
   providers: Map<string, RegisteredCompactionProvider>;

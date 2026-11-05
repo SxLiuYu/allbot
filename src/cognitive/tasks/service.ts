@@ -1,5 +1,5 @@
 import { listAgentIds } from "../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { PersonaTree } from "../types.js";
 import { evaluateTaskCreationGate } from "./pacing.js";
@@ -17,7 +17,7 @@ const log = createSubsystemLogger("cognitive/tasks");
 const TASK_CANCELLED_RESULT = "任务已取消";
 
 /** Both the cognitive master switch and the tasks flag must be on. */
-export function tasksEnabled(cfg: KaijiBotConfig | undefined): boolean {
+export function tasksEnabled(cfg: AllBotConfig | undefined): boolean {
   if (!cfg) {
     return false;
   }
@@ -46,7 +46,7 @@ export type CancelTaskResult =
   | { ok: true; task: TaskRecord }
   | { ok: false; code: "not_found" | "already_finished"; reason: string };
 
-function taskLimits(config: KaijiBotConfig | undefined): {
+function taskLimits(config: AllBotConfig | undefined): {
   maxTaskDepth: number;
   maxSubTasks: number;
 } {
@@ -85,7 +85,7 @@ async function resolveTaskDepth(
 
 export type TaskServiceDeps = {
   store: TaskStore;
-  config: KaijiBotConfig | undefined;
+  config: AllBotConfig | undefined;
   /** Fresh persona snapshot for the pacing gate (ledger U, suppressUntil). */
   loadPersona: (agentId: string, userId: string) => Promise<PersonaTree | undefined>;
   /** Kick after successful creation (heartbeat wake / scheduler nudge). */
@@ -139,7 +139,7 @@ export async function createTaskSafely(
 
   const targetAgentId = input.assignToAgent?.trim() || undefined;
   if (targetAgentId && targetAgentId !== agentId) {
-    const knownAgents = listAgentIds(deps.config ?? ({} as KaijiBotConfig));
+    const knownAgents = listAgentIds(deps.config ?? ({} as AllBotConfig));
     if (!knownAgents.includes(targetAgentId)) {
       return {
         ok: false,

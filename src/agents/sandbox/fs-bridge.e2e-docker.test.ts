@@ -32,12 +32,12 @@ describe("sandbox fs bridge docker e2e", () => {
         return;
       }
 
-      const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-fsbridge-e2e-"));
+      const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-fsbridge-e2e-"));
       const workspaceDir = path.join(stateDir, "workspace");
       await fs.mkdir(workspaceDir, { recursive: true });
 
       const suffix = `${process.pid}-${Date.now()}`;
-      const containerName = `kaijibot-fsbridge-${suffix}`.slice(0, 63);
+      const containerName = `allbot-fsbridge-${suffix}`.slice(0, 63);
 
       try {
         const sandbox = createSandboxTestContext({
@@ -49,7 +49,7 @@ describe("sandbox fs bridge docker e2e", () => {
           },
           dockerOverrides: {
             image: DEFAULT_SANDBOX_IMAGE,
-            containerPrefix: "kaijibot-fsbridge-",
+            containerPrefix: "allbot-fsbridge-",
             user: "",
           },
         });

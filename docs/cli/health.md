@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `kaijibot health` (gateway health snapshot via RPC)"
+summary: "CLI reference for `allbot health` (gateway health snapshot via RPC)"
 read_when:
   - You want to quickly check the running Gateway’s health
 title: "health"
 ---
 
-# `kaijibot health`
+# `allbot health`
 
 Fetch health from the running Gateway.
 
@@ -19,16 +19,16 @@ Options:
 Examples:
 
 ```bash
-kaijibot health
-kaijibot health --json
-kaijibot health --timeout 2500
-kaijibot health --verbose
-kaijibot health --debug
+allbot health
+allbot health --json
+allbot health --timeout 2500
+allbot health --verbose
+allbot health --debug
 ```
 
 Notes:
 
-- Default `kaijibot health` asks the running gateway for its health snapshot. When the
+- Default `allbot health` asks the running gateway for its health snapshot. When the
   gateway already has a fresh cached snapshot, it can return that cached payload and
   refresh in the background.
 - `--verbose` forces a live probe, prints gateway connection details, and expands the

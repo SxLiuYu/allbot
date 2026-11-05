@@ -4,26 +4,26 @@ import { afterEach, describe, expect, it } from "vitest";
 import { copyA2uiAssets } from "../../scripts/canvas-a2ui-copy.js";
 import { withTempDir } from "../test-utils/temp-dir.js";
 
-const ORIGINAL_SKIP_MISSING = process.env.KAIJIBOT_A2UI_SKIP_MISSING;
-const ORIGINAL_SPARSE_PROFILE = process.env.KAIJIBOT_SPARSE_PROFILE;
+const ORIGINAL_SKIP_MISSING = process.env.ALLBOT_A2UI_SKIP_MISSING;
+const ORIGINAL_SPARSE_PROFILE = process.env.ALLBOT_SPARSE_PROFILE;
 
 describe("canvas a2ui copy", () => {
   afterEach(() => {
     if (ORIGINAL_SKIP_MISSING === undefined) {
-      delete process.env.KAIJIBOT_A2UI_SKIP_MISSING;
+      delete process.env.ALLBOT_A2UI_SKIP_MISSING;
     } else {
-      process.env.KAIJIBOT_A2UI_SKIP_MISSING = ORIGINAL_SKIP_MISSING;
+      process.env.ALLBOT_A2UI_SKIP_MISSING = ORIGINAL_SKIP_MISSING;
     }
 
     if (ORIGINAL_SPARSE_PROFILE === undefined) {
-      delete process.env.KAIJIBOT_SPARSE_PROFILE;
+      delete process.env.ALLBOT_SPARSE_PROFILE;
     } else {
-      process.env.KAIJIBOT_SPARSE_PROFILE = ORIGINAL_SPARSE_PROFILE;
+      process.env.ALLBOT_SPARSE_PROFILE = ORIGINAL_SPARSE_PROFILE;
     }
   });
 
   async function withA2uiFixture(run: (dir: string) => Promise<void>) {
-    await withTempDir("kaijibot-a2ui-", run);
+    await withTempDir("allbot-a2ui-", run);
   }
 
   it("throws a helpful error when assets are missing", async () => {
@@ -34,18 +34,18 @@ describe("canvas a2ui copy", () => {
     });
   });
 
-  it("skips missing assets when KAIJIBOT_A2UI_SKIP_MISSING=1", async () => {
+  it("skips missing assets when ALLBOT_A2UI_SKIP_MISSING=1", async () => {
     await withA2uiFixture(async (dir) => {
-      process.env.KAIJIBOT_A2UI_SKIP_MISSING = "1";
+      process.env.ALLBOT_A2UI_SKIP_MISSING = "1";
       await expect(
         copyA2uiAssets({ srcDir: dir, outDir: path.join(dir, "out") }),
       ).resolves.toBeUndefined();
     });
   });
 
-  it("skips missing assets when KAIJIBOT_SPARSE_PROFILE is set", async () => {
+  it("skips missing assets when ALLBOT_SPARSE_PROFILE is set", async () => {
     await withA2uiFixture(async (dir) => {
-      process.env.KAIJIBOT_SPARSE_PROFILE = "core";
+      process.env.ALLBOT_SPARSE_PROFILE = "core";
       await expect(
         copyA2uiAssets({ srcDir: dir, outDir: path.join(dir, "out") }),
       ).resolves.toBeUndefined();

@@ -9,7 +9,7 @@ import {
 } from "./install-source-utils.js";
 
 const runCommandWithTimeoutMock = vi.fn();
-const TEMP_DIR_PREFIX = "kaijibot-install-source-utils-";
+const TEMP_DIR_PREFIX = "allbot-install-source-utils-";
 const tempDirs = createTrackedTempDirs();
 
 vi.mock("../process/exec.js", () => ({
@@ -57,8 +57,8 @@ async function expectPackFallsBackToDetectedArchive(params: {
   stdout: string;
   expectedMetadata?: Record<string, unknown>;
 }) {
-  const cwd = await createTempDir("kaijibot-install-source-utils-");
-  const archivePath = path.join(cwd, "kaijibot-plugin-1.2.3.tgz");
+  const cwd = await createTempDir("allbot-install-source-utils-");
+  const archivePath = path.join(cwd, "allbot-plugin-1.2.3.tgz");
   await fs.writeFile(archivePath, "", "utf-8");
   runCommandWithTimeoutMock.mockResolvedValue({
     stdout: params.stdout,
@@ -69,7 +69,7 @@ async function expectPackFallsBackToDetectedArchive(params: {
   });
 
   const result = await packNpmSpecToArchive({
-    spec: "kaijibot-plugin@1.2.3",
+    spec: "allbot-plugin@1.2.3",
     timeoutMs: 5000,
     cwd,
   });
@@ -104,7 +104,7 @@ describe("withTempDir", () => {
     let observedDir = "";
     const markerFile = "marker.txt";
 
-    const value = await withTempDir("kaijibot-install-source-utils-", async (tmpDir) => {
+    const value = await withTempDir("allbot-install-source-utils-", async (tmpDir) => {
       observedDir = tmpDir;
       await fs.writeFile(path.join(tmpDir, markerFile), "ok", "utf-8");
       await expect(fs.stat(path.join(tmpDir, markerFile))).resolves.toBeDefined();
@@ -120,7 +120,7 @@ describe("resolveArchiveSourcePath", () => {
   it.each([
     {
       name: "returns not found error for missing archive paths",
-      path: async () => "/tmp/does-not-exist-kaijibot-archive.tgz",
+      path: async () => "/tmp/does-not-exist-allbot-archive.tgz",
       expected: "archive not found",
     },
     {
@@ -155,36 +155,36 @@ describe("resolveArchiveSourcePath", () => {
 describe("packNpmSpecToArchive", () => {
   it("packs spec and returns archive path using JSON output metadata", async () => {
     const cwd = await createFixtureDir();
-    const archivePath = path.join(cwd, "kaijibot-plugin-1.2.3.tgz");
+    const archivePath = path.join(cwd, "allbot-plugin-1.2.3.tgz");
     await fs.writeFile(archivePath, "", "utf-8");
     mockPackCommandResult({
       stdout: JSON.stringify([
         {
-          id: "kaijibot-plugin@1.2.3",
-          name: "kaijibot-plugin",
+          id: "allbot-plugin@1.2.3",
+          name: "allbot-plugin",
           version: "1.2.3",
-          filename: "kaijibot-plugin-1.2.3.tgz",
+          filename: "allbot-plugin-1.2.3.tgz",
           integrity: "sha512-test-integrity",
           shasum: "abc123",
         },
       ]),
     });
 
-    const result = await runPack("kaijibot-plugin@1.2.3", cwd);
+    const result = await runPack("allbot-plugin@1.2.3", cwd);
 
     expect(result).toEqual({
       ok: true,
       archivePath,
       metadata: {
-        name: "kaijibot-plugin",
+        name: "allbot-plugin",
         version: "1.2.3",
-        resolvedSpec: "kaijibot-plugin@1.2.3",
+        resolvedSpec: "allbot-plugin@1.2.3",
         integrity: "sha512-test-integrity",
         shasum: "abc123",
       },
     });
     expect(runCommandWithTimeoutMock).toHaveBeenCalledWith(
-      ["npm", "pack", "kaijibot-plugin@1.2.3", "--ignore-scripts", "--json"],
+      ["npm", "pack", "allbot-plugin@1.2.3", "--ignore-scripts", "--json"],
       expect.objectContaining({
         cwd,
         timeoutMs: 300_000,
@@ -194,13 +194,13 @@ describe("packNpmSpecToArchive", () => {
 
   it("falls back to parsing final stdout line when npm json output is unavailable", async () => {
     const cwd = await createFixtureDir();
-    const expectedArchivePath = path.join(cwd, "kaijibot-plugin-1.2.3.tgz");
+    const expectedArchivePath = path.join(cwd, "allbot-plugin-1.2.3.tgz");
     await fs.writeFile(expectedArchivePath, "", "utf-8");
     mockPackCommandResult({
-      stdout: "npm notice created package\nkaijibot-plugin-1.2.3.tgz\n",
+      stdout: "npm notice created package\nallbot-plugin-1.2.3.tgz\n",
     });
 
-    const result = await runPack("kaijibot-plugin@1.2.3", cwd);
+    const result = await runPack("allbot-plugin@1.2.3", cwd);
 
     expect(result).toEqual({
       ok: true,
@@ -233,11 +233,11 @@ describe("packNpmSpecToArchive", () => {
     {
       name: "falls back to cwd archive when logged JSON metadata omits filename",
       stdout:
-        'npm notice using cache\n[{"id":"kaijibot-plugin@1.2.3","name":"kaijibot-plugin","version":"1.2.3","integrity":"sha512-test-integrity","shasum":"abc123"}]\n',
+        'npm notice using cache\n[{"id":"allbot-plugin@1.2.3","name":"allbot-plugin","version":"1.2.3","integrity":"sha512-test-integrity","shasum":"abc123"}]\n',
       expectedMetadata: {
-        name: "kaijibot-plugin",
+        name: "allbot-plugin",
         version: "1.2.3",
-        resolvedSpec: "kaijibot-plugin@1.2.3",
+        resolvedSpec: "allbot-plugin@1.2.3",
         integrity: "sha512-test-integrity",
         shasum: "abc123",
       },
@@ -250,14 +250,14 @@ describe("packNpmSpecToArchive", () => {
     const cwd = await createFixtureDir();
     mockPackCommandResult({
       stdout: "",
-      stderr: "npm error code E404\nnpm error 404  '@kaijibot/whatsapp@*' is not in this registry.",
+      stderr: "npm error code E404\nnpm error 404  '@allbot/whatsapp@*' is not in this registry.",
       code: 1,
     });
 
-    const result = await runPack("@kaijibot/whatsapp", cwd);
+    const result = await runPack("@allbot/whatsapp", cwd);
     expectPackError(result, [
       "Package not found on npm",
-      "@kaijibot/whatsapp",
+      "@allbot/whatsapp",
       "gitee.com/kaiji1126/kaijibot/blob/main/docs/tools/plugin.md",
     ]);
   });
@@ -268,7 +268,7 @@ describe("packNpmSpecToArchive", () => {
       stdout: " \n\n",
     });
 
-    const result = await runPack("kaijibot-plugin@1.2.3", cwd, 5000);
+    const result = await runPack("allbot-plugin@1.2.3", cwd, 5000);
 
     expect(result).toEqual({
       ok: false,
@@ -278,24 +278,24 @@ describe("packNpmSpecToArchive", () => {
 
   it("parses scoped metadata from id-only json output even with npm notice prefix", async () => {
     const cwd = await createFixtureDir();
-    await fs.writeFile(path.join(cwd, "kaijibot-plugin-demo-2.0.0.tgz"), "", "utf-8");
+    await fs.writeFile(path.join(cwd, "allbot-plugin-demo-2.0.0.tgz"), "", "utf-8");
     mockPackCommandResult({
       stdout:
         "npm notice creating package\n" +
         JSON.stringify([
           {
-            id: "@kaijibot/plugin-demo@2.0.0",
-            filename: "kaijibot-plugin-demo-2.0.0.tgz",
+            id: "@allbot/plugin-demo@2.0.0",
+            filename: "allbot-plugin-demo-2.0.0.tgz",
           },
         ]),
     });
 
-    const result = await runPack("@kaijibot/plugin-demo@2.0.0", cwd);
+    const result = await runPack("@allbot/plugin-demo@2.0.0", cwd);
     expect(result).toEqual({
       ok: true,
-      archivePath: path.join(cwd, "kaijibot-plugin-demo-2.0.0.tgz"),
+      archivePath: path.join(cwd, "allbot-plugin-demo-2.0.0.tgz"),
       metadata: {
-        resolvedSpec: "@kaijibot/plugin-demo@2.0.0",
+        resolvedSpec: "@allbot/plugin-demo@2.0.0",
       },
     });
   });

@@ -4,27 +4,27 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import chokidar, { FSWatcher } from "chokidar";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   buildCaseInsensitiveExtensionGlob,
   classifyMemoryMultimodalPath,
   getMemoryMultimodalExtensions,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
 import {
   createSubsystemLogger,
   onSessionTranscriptUpdate,
   resolveAgentDir,
   resolveSessionTranscriptsDirForAgent,
   resolveUserPath,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type ResolvedMemorySearchConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import {
   buildSessionEntry,
   listSessionFilesForAgent,
   sessionPathForFile,
   type SessionFileEntry,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
+} from "allbot/plugin-sdk/memory-core-host-engine-qmd";
 import {
   buildFileEntry,
   ensureMemoryIndexSchema,
@@ -36,8 +36,8 @@ import {
   type MemoryFileEntry,
   type MemorySource,
   type MemorySyncProgressUpdate,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import {
   createEmbeddingProvider,
   type EmbeddingProvider,
@@ -122,7 +122,7 @@ export function runDetachedMemorySync(sync: () => Promise<void>, reason: "interv
 }
 
 export abstract class MemoryManagerSyncOps {
-  protected abstract readonly cfg: KaijiBotConfig;
+  protected abstract readonly cfg: AllBotConfig;
   protected abstract readonly agentId: string;
   protected abstract readonly workspaceDir: string;
   protected abstract readonly settings: ResolvedMemorySearchConfig;

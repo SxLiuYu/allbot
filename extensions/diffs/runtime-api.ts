@@ -1,1 +1,1 @@
-export { resolveRequestClientIp } from "kaijibot/plugin-sdk/webhook-ingress";
+export { resolveRequestClientIp } from "allbot/plugin-sdk/webhook-ingress";

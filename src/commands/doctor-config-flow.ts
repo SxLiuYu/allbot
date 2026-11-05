@@ -1,5 +1,5 @@
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { CONFIG_PATH } from "../config/config.js";
 import { findLegacyConfigIssues } from "../config/legacy.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
@@ -42,11 +42,11 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
   const preflight = await runDoctorConfigPreflight();
   let snapshot = preflight.snapshot;
   const baseCfg = preflight.baseConfig;
-  let cfg: KaijiBotConfig = baseCfg;
+  let cfg: AllBotConfig = baseCfg;
   let candidate = structuredClone(baseCfg);
   let pendingChanges = false;
   let fixHints: string[] = [];
-  const doctorFixCommand = formatCliCommand("kaijibot doctor --fix");
+  const doctorFixCommand = formatCliCommand("allbot doctor --fix");
 
   const legacyStep = applyLegacyCompatibilityStep({
     snapshot,
@@ -92,7 +92,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
       [
         "- hooks.internal.handlers: legacy inline hook modules are no longer part of the public config surface.",
         "- Migrate each entry to a managed or workspace hook directory with HOOK.md + handler.js, then enable it through hooks.internal.entries.<hookKey> as needed.",
-        "- kaijibot doctor --fix does not rewrite this shape automatically.",
+        "- allbot doctor --fix does not rewrite this shape automatically.",
       ].join("\n"),
       "Legacy config keys detected",
     );

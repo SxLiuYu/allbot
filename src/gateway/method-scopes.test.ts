@@ -23,7 +23,7 @@ afterEach(() => {
   setActivePluginRegistry(createEmptyPluginRegistry());
 });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("method scope resolution", () => {
   it.each([
     ["sessions.resolve", ["operator.read"]],
@@ -71,7 +71,7 @@ describe.skipIf(process.env.CI)("method scope resolution", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("operator scope authorization", () => {
   it.each([
     ["health", ["operator.read"], { allowed: true }],
@@ -146,7 +146,7 @@ describe.skipIf(process.env.CI)("operator scope authorization", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("plugin approval method registration", () => {
   it("lists all plugin approval methods", () => {
     const methods = listGatewayMethods();
@@ -164,7 +164,7 @@ describe.skipIf(process.env.CI)("plugin approval method registration", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("core gateway method classification", () => {
   it("treats node-role methods as classified even without operator scopes", () => {
     expect(isGatewayMethodClassified("node.pending.drain")).toBe(true);
@@ -178,7 +178,7 @@ describe.skipIf(process.env.CI)("core gateway method classification", () => {
     expect(unclassified).toEqual([]);
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)("classifies every listed gateway method name", () => {
     const unclassified = listGatewayMethods().filter(
       (method) => !isGatewayMethodClassified(method),
@@ -187,7 +187,7 @@ describe.skipIf(process.env.CI)("core gateway method classification", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("CLI default operator scopes", () => {
   it("includes operator.talk.secrets for node-role device pairing approvals", async () => {
     const { CLI_DEFAULT_OPERATOR_SCOPES } = await import("./method-scopes.js");

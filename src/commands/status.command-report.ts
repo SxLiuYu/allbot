@@ -32,7 +32,7 @@ export async function buildStatusCommandReportLines(params: {
   footerLines: string[];
 }) {
   const lines: string[] = [];
-  lines.push(params.heading("KaijiBot status"));
+  lines.push(params.heading("AllBot status"));
 
   appendStatusReportSections({
     lines,

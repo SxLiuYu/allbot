@@ -8,7 +8,7 @@ title: "Bonjour Discovery"
 
 # Bonjour / mDNS discovery
 
-KaijiBot uses Bonjour (mDNS / DNS‑SD) to discover an active Gateway (WebSocket endpoint).
+AllBot uses Bonjour (mDNS / DNS‑SD) to discover an active Gateway (WebSocket endpoint).
 Multicast `local.` browsing is a **LAN-only convenience**. For cross-network discovery, the
 same beacon can also be published through a configured wide-area DNS-SD domain. Discovery is
 still best-effort and does **not** replace SSH or Tailnet-based connectivity.
@@ -22,12 +22,12 @@ boundary. You can keep the same discovery UX by switching to **unicast DNS‑SD*
 High‑level steps:
 
 1. Run a DNS server on the gateway host (reachable over Tailnet).
-2. Publish DNS‑SD records for `_kaijibot-gw._tcp` under a dedicated zone
-   (example: `kaijibot.internal.`).
+2. Publish DNS‑SD records for `_allbot-gw._tcp` under a dedicated zone
+   (example: `allbot.internal.`).
 3. Configure Tailscale **split DNS** so your chosen domain resolves via that
    DNS server for clients (including iOS).
 
-KaijiBot supports any discovery domain; `kaijibot.internal.` is just an example.
+AllBot supports any discovery domain; `allbot.internal.` is just an example.
 iOS/Android nodes browse both `local.` and your configured wide‑area domain.
 
 ### Gateway config (recommended)
@@ -42,19 +42,19 @@ iOS/Android nodes browse both `local.` and your configured wide‑area domain.
 ### One-time DNS server setup (gateway host)
 
 ```bash
-kaijibot dns setup --apply
+allbot dns setup --apply
 ```
 
 This installs CoreDNS and configures it to:
 
 - listen on port 53 only on the gateway’s Tailscale interfaces
-- serve your chosen domain (example: `kaijibot.internal.`) from `~/.kaijibot/dns/<domain>.db`
+- serve your chosen domain (example: `allbot.internal.`) from `~/.allbot/dns/<domain>.db`
 
 Validate from a tailnet‑connected machine:
 
 ```bash
-dns-sd -B _kaijibot-gw._tcp kaijibot.internal.
-dig @<TAILNET_IPV4> -p 53 _kaijibot-gw._tcp.kaijibot.internal PTR +short
+dns-sd -B _allbot-gw._tcp allbot.internal.
+dig @<TAILNET_IPV4> -p 53 _allbot-gw._tcp.allbot.internal PTR +short
 ```
 
 ### Tailscale DNS settings
@@ -65,7 +65,7 @@ In the Tailscale admin console:
 - Add split DNS so your discovery domain uses that nameserver.
 
 Once clients accept tailnet DNS, iOS nodes and CLI discovery can browse
-`_kaijibot-gw._tcp` in your discovery domain without multicast.
+`_allbot-gw._tcp` in your discovery domain without multicast.
 
 ### Gateway listener security (recommended)
 
@@ -74,16 +74,16 @@ access, bind explicitly and keep auth enabled.
 
 For tailnet‑only setups:
 
-- Set `gateway.bind: "tailnet"` in `~/.kaijibot/kaijibot.json`.
+- Set `gateway.bind: "tailnet"` in `~/.allbot/allbot.json`.
 - Restart the Gateway (or restart the macOS menubar app).
 
 ## What advertises
 
-Only the Gateway advertises `_kaijibot-gw._tcp`.
+Only the Gateway advertises `_allbot-gw._tcp`.
 
 ## Service types
 
-- `_kaijibot-gw._tcp` — gateway transport beacon (used by macOS/iOS/Android nodes).
+- `_allbot-gw._tcp` — gateway transport beacon (used by macOS/iOS/Android nodes).
 
 ## TXT keys (non-secret hints)
 
@@ -116,13 +116,13 @@ Useful built‑in tools:
 - Browse instances:
 
   ```bash
-  dns-sd -B _kaijibot-gw._tcp local.
+  dns-sd -B _allbot-gw._tcp local.
   ```
 
 - Resolve one instance (replace `<instance>`):
 
   ```bash
-  dns-sd -L "<instance>" _kaijibot-gw._tcp local.
+  dns-sd -L "<instance>" _allbot-gw._tcp local.
   ```
 
 If browsing works but resolving fails, you’re usually hitting a LAN policy or
@@ -139,7 +139,7 @@ The Gateway writes a rolling log file (printed on startup as
 
 ## Debugging on iOS node
 
-The iOS node uses `NWBrowser` to discover `_kaijibot-gw._tcp`.
+The iOS node uses `NWBrowser` to discover `_allbot-gw._tcp`.
 
 To capture logs:
 
@@ -167,11 +167,11 @@ sequences (e.g. spaces become `\032`).
 
 ## Disabling / configuration
 
-- `KAIJIBOT_DISABLE_BONJOUR=1` disables advertising (legacy: `KAIJIBOT_DISABLE_BONJOUR`).
-- `gateway.bind` in `~/.kaijibot/kaijibot.json` controls the Gateway bind mode.
-- `KAIJIBOT_SSH_PORT` overrides the SSH port when `sshPort` is advertised (legacy: `KAIJIBOT_SSH_PORT`).
-- `KAIJIBOT_TAILNET_DNS` publishes a MagicDNS hint in TXT (legacy: `KAIJIBOT_TAILNET_DNS`).
-- `KAIJIBOT_CLI_PATH` overrides the advertised CLI path (legacy: `KAIJIBOT_CLI_PATH`).
+- `ALLBOT_DISABLE_BONJOUR=1` disables advertising (legacy: `ALLBOT_DISABLE_BONJOUR`).
+- `gateway.bind` in `~/.allbot/allbot.json` controls the Gateway bind mode.
+- `ALLBOT_SSH_PORT` overrides the SSH port when `sshPort` is advertised (legacy: `ALLBOT_SSH_PORT`).
+- `ALLBOT_TAILNET_DNS` publishes a MagicDNS hint in TXT (legacy: `ALLBOT_TAILNET_DNS`).
+- `ALLBOT_CLI_PATH` overrides the advertised CLI path (legacy: `ALLBOT_CLI_PATH`).
 
 ## Related docs
 

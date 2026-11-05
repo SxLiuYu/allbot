@@ -1,4 +1,4 @@
-import type { AnyAgentTool, KaijiBotPluginApi } from "../runtime-api.js";
+import type { AnyAgentTool, AllBotPluginApi } from "../runtime-api.js";
 
 type ToolContextLike = {
   agentAccountId?: string;
@@ -39,10 +39,10 @@ function asToolLike(tool: AnyAgentTool, fallbackName?: string): ToolLike {
   };
 }
 
-export function createToolFactoryHarness(cfg: KaijiBotPluginApi["config"]) {
+export function createToolFactoryHarness(cfg: AllBotPluginApi["config"]) {
   const registered: RegisteredTool[] = [];
 
-  const api: Pick<KaijiBotPluginApi, "config" | "logger" | "registerTool"> = {
+  const api: Pick<AllBotPluginApi, "config" | "logger" | "registerTool"> = {
     config: cfg,
     logger: {
       info: () => {},
@@ -75,7 +75,7 @@ export function createToolFactoryHarness(cfg: KaijiBotPluginApi["config"]) {
   };
 
   return {
-    api: api as KaijiBotPluginApi,
+    api: api as AllBotPluginApi,
     resolveTool,
   };
 }

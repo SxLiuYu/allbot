@@ -23,7 +23,7 @@ type HolidayId =
  * `holidayId`; holiday entries do, and are only active on their dates.
  */
 interface TaglineEntry {
-  /** Stable identifier used for KAIJIBOT_TAGLINE_INDEX lookup. */
+  /** Stable identifier used for ALLBOT_TAGLINE_INDEX lookup. */
   id: string;
   /** Localized text, resolved from the CLI i18n bundle. */
   text: string;
@@ -181,7 +181,7 @@ const PHILOSOPHICAL_COUNT = 30;
  * Build the tagline pool for the active locale. The shape is deterministic
  * regardless of locale: 30 philosophical entries followed by 10 holiday
  * entries in {@link HOLIDAY_ORDER}. Indices stay stable across locale
- * switches so `KAIJIBOT_TAGLINE_INDEX` continues to behave predictably.
+ * switches so `ALLBOT_TAGLINE_INDEX` continues to behave predictably.
  */
 function buildTaglinePool(): TaglineEntry[] {
   const philosophical: TaglineEntry[] = [];
@@ -237,7 +237,7 @@ export function pickTagline(options: TaglineOptions = {}): string {
     return cliI18n.t("cli.tagline.default");
   }
   const env = options.env ?? process.env;
-  const override = env?.KAIJIBOT_TAGLINE_INDEX;
+  const override = env?.ALLBOT_TAGLINE_INDEX;
   if (override !== undefined) {
     const parsed = Number.parseInt(override, 10);
     if (!Number.isNaN(parsed) && parsed >= 0) {

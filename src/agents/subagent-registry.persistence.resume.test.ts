@@ -61,7 +61,7 @@ let callGatewayModule: typeof import("../gateway/call.js");
 let agentEventsModule: typeof import("../infra/agent-events.js");
 
 describe("subagent registry persistence resume", () => {
-  const envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR"]);
+  const envSnapshot = captureEnv(["ALLBOT_STATE_DIR"]);
   let tempStateDir: string | null = null;
 
   const resolveSessionStorePath = (stateDir: string, agentId: string) =>
@@ -142,8 +142,8 @@ describe("subagent registry persistence resume", () => {
   });
 
   it("persists runs to disk and resumes after restart", async () => {
-    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-subagent-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+    tempStateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-subagent-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
     const registryPath = path.join(tempStateDir, "subagents", "runs.json");
     hoisted.registryPath = registryPath;
 

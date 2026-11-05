@@ -1,6 +1,6 @@
 import { normalizeChannelId as normalizePluginChannelId } from "../../channels/plugins/index.js";
 import type { ChannelThreadingAdapter } from "../../channels/plugins/types.core.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { ReplyToMode } from "../../config/types.js";
 import { normalizeOptionalLowercaseString } from "../../shared/string-coerce.js";
 import type { OriginatingChannelType } from "../templating.js";
@@ -24,7 +24,7 @@ function normalizeReplyToModeChatType(
 }
 
 export function resolveConfiguredReplyToMode(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel?: OriginatingChannelType,
   chatType?: string | null,
 ): ReplyToMode {
@@ -52,7 +52,7 @@ export function resolveConfiguredReplyToMode(
 }
 
 export function resolveReplyToModeWithThreading(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   threading: ChannelThreadingAdapter | undefined,
   params: {
     channel?: OriginatingChannelType;
@@ -69,7 +69,7 @@ export function resolveReplyToModeWithThreading(
 }
 
 export function resolveReplyToMode(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel?: OriginatingChannelType,
   accountId?: string | null,
   chatType?: string | null,

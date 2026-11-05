@@ -10,7 +10,7 @@ type WebFetchProvidersSharedModule = typeof import("./web-fetch-providers.shared
 let loaderModule: LoaderModule;
 let manifestRegistryModule: ManifestRegistryModule;
 let webFetchProvidersSharedModule: WebFetchProvidersSharedModule;
-let loadKaijiBotPluginsMock: ReturnType<typeof vi.fn>;
+let loadAllBotPluginsMock: ReturnType<typeof vi.fn>;
 let setActivePluginRegistry: RuntimeModule["setActivePluginRegistry"];
 let resolvePluginWebFetchProviders: WebFetchProvidersRuntimeModule["resolvePluginWebFetchProviders"];
 let resetWebFetchProviderSnapshotCacheForTests: WebFetchProvidersRuntimeModule["__testing"]["resetWebFetchProviderSnapshotCacheForTests"];
@@ -19,7 +19,7 @@ const DEFAULT_WORKSPACE = "/tmp/workspace";
 
 function createWebFetchEnv(overrides?: Partial<NodeJS.ProcessEnv>) {
   return {
-    KAIJIBOT_HOME: "/tmp/kaijibot-home",
+    ALLBOT_HOME: "/tmp/allbot-home",
     ...overrides,
   } as NodeJS.ProcessEnv;
 }
@@ -40,7 +40,7 @@ function createManifestRegistryFixture() {
         origin: "bundled",
         rootDir: "/tmp/firecrawl",
         source: "/tmp/firecrawl/index.js",
-        manifestPath: "/tmp/firecrawl/kaijibot.plugin.json",
+        manifestPath: "/tmp/firecrawl/allbot.plugin.json",
         channels: [],
         providers: [],
         skills: [],
@@ -52,7 +52,7 @@ function createManifestRegistryFixture() {
         origin: "bundled",
         rootDir: "/tmp/noise",
         source: "/tmp/noise/index.js",
-        manifestPath: "/tmp/noise/kaijibot.plugin.json",
+        manifestPath: "/tmp/noise/allbot.plugin.json",
         channels: [],
         providers: [],
         skills: [],
@@ -109,8 +109,8 @@ describe("resolvePluginWebFetchProviders", () => {
         ? R
         : never,
     );
-    loadKaijiBotPluginsMock = vi
-      .spyOn(loaderModule, "loadKaijiBotPlugins")
+    loadAllBotPluginsMock = vi
+      .spyOn(loaderModule, "loadAllBotPlugins")
       .mockImplementation(() => {
         const registry = createEmptyPluginRegistry();
         registry.webFetchProviders = [createRuntimeWebFetchProvider()];
@@ -130,14 +130,14 @@ describe("resolvePluginWebFetchProviders", () => {
     expect(providers.map((provider) => `${provider.pluginId}:${provider.id}`)).toEqual([
       "firecrawl:firecrawl",
     ]);
-    expect(loadKaijiBotPluginsMock).toHaveBeenCalledTimes(1);
+    expect(loadAllBotPluginsMock).toHaveBeenCalledTimes(1);
   });
 
   it("does not force a fresh snapshot load when the same web-provider load is already in flight", () => {
     const inFlightSpy = vi
       .spyOn(loaderModule, "isPluginRegistryLoadInFlight")
       .mockReturnValue(true);
-    loadKaijiBotPluginsMock.mockImplementation(() => {
+    loadAllBotPluginsMock.mockImplementation(() => {
       throw new Error("resolvePluginWebFetchProviders should not bypass the in-flight guard");
     });
 
@@ -157,7 +157,7 @@ describe("resolvePluginWebFetchProviders", () => {
         workspaceDir: DEFAULT_WORKSPACE,
       }),
     );
-    expect(loadKaijiBotPluginsMock).not.toHaveBeenCalled();
+    expect(loadAllBotPluginsMock).not.toHaveBeenCalled();
   });
 
   it("reuses a compatible active registry for snapshot resolution when config is provided", () => {
@@ -193,7 +193,7 @@ describe("resolvePluginWebFetchProviders", () => {
     expect(providers.map((provider) => `${provider.pluginId}:${provider.id}`)).toEqual([
       "firecrawl:firecrawl",
     ]);
-    expect(loadKaijiBotPluginsMock).not.toHaveBeenCalled();
+    expect(loadAllBotPluginsMock).not.toHaveBeenCalled();
   });
 
   it("inherits workspaceDir from the active registry for compatible web-fetch snapshot reuse", () => {
@@ -229,7 +229,7 @@ describe("resolvePluginWebFetchProviders", () => {
     expect(providers.map((provider) => `${provider.pluginId}:${provider.id}`)).toEqual([
       "firecrawl:firecrawl",
     ]);
-    expect(loadKaijiBotPluginsMock).not.toHaveBeenCalled();
+    expect(loadAllBotPluginsMock).not.toHaveBeenCalled();
   });
 
   it("uses the active registry workspace for candidate discovery and snapshot loads when workspaceDir is omitted", () => {
@@ -254,7 +254,7 @@ describe("resolvePluginWebFetchProviders", () => {
         workspaceDir: "/tmp/runtime-workspace",
       }),
     );
-    expect(loadKaijiBotPluginsMock).toHaveBeenCalledWith(
+    expect(loadAllBotPluginsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceDir: "/tmp/runtime-workspace",
         onlyPluginIds: ["firecrawl"],
@@ -280,6 +280,6 @@ describe("resolvePluginWebFetchProviders", () => {
       env,
     });
 
-    expect(loadKaijiBotPluginsMock).toHaveBeenCalledTimes(2);
+    expect(loadAllBotPluginsMock).toHaveBeenCalledTimes(2);
   });
 });

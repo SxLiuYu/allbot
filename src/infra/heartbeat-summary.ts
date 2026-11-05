@@ -5,7 +5,7 @@ import {
   resolveHeartbeatPrompt as resolveHeartbeatPromptText,
 } from "../auto-reply/heartbeat.js";
 import { parseDurationMs } from "../cli/parse-duration.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentDefaultsConfig } from "../config/types.agent-defaults.js";
 import { normalizeAgentId } from "../routing/session-key.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -22,15 +22,15 @@ export type HeartbeatSummary = {
   ackMaxChars: number;
 };
 
-// KaijiBot fork: matches the delivery default in targets.ts (rawTarget===undefined → "last").
+// AllBot fork: matches the delivery default in targets.ts (rawTarget===undefined → "last").
 const DEFAULT_HEARTBEAT_TARGET = "last";
 
-function hasExplicitHeartbeatAgents(cfg: KaijiBotConfig) {
+function hasExplicitHeartbeatAgents(cfg: AllBotConfig) {
   const list = cfg.agents?.list ?? [];
   return list.some((entry) => Boolean(entry?.heartbeat));
 }
 
-export function isHeartbeatEnabledForAgent(cfg: KaijiBotConfig, agentId?: string): boolean {
+export function isHeartbeatEnabledForAgent(cfg: AllBotConfig, agentId?: string): boolean {
   const resolvedAgentId = normalizeAgentId(agentId ?? resolveDefaultAgentId(cfg));
   const list = cfg.agents?.list ?? [];
   const hasExplicit = hasExplicitHeartbeatAgents(cfg);
@@ -43,7 +43,7 @@ export function isHeartbeatEnabledForAgent(cfg: KaijiBotConfig, agentId?: string
 }
 
 export function resolveHeartbeatIntervalMs(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   overrideEvery?: string,
   heartbeat?: HeartbeatConfig,
 ) {
@@ -72,7 +72,7 @@ export function resolveHeartbeatIntervalMs(
 }
 
 export function resolveHeartbeatSummaryForAgent(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId?: string,
 ): HeartbeatSummary {
   const defaults = cfg.agents?.defaults?.heartbeat;

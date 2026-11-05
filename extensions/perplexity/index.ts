@@ -1,4 +1,4 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 import { createPerplexityWebSearchProvider } from "./src/perplexity-web-search-provider.js";
 
 export default definePluginEntry({

@@ -1,7 +1,7 @@
 /**
  * Live verification — real LLM behavior under optimized context engineering.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/agents/context-optimization.live.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/agents/context-optimization.live.test.ts
  *
  * Validates 4 optimization pillars against real LLM (not just code structure):
  *   1. W2.2 — Lost in the Middle: corrections at tail are followed
@@ -15,7 +15,7 @@ import { selectRelevantCorrections } from "../cognitive/correction/injector.js";
 import type { CorrectionRecord } from "../cognitive/correction/types.js";
 import { buildAgentSystemPrompt } from "./system-prompt.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5.2";
@@ -61,7 +61,7 @@ function makeCorrection(overrides?: Partial<CorrectionRecord>): CorrectionRecord
 
 function buildMinimalSystemPrompt(extraSystemPrompt?: string): string {
   return buildAgentSystemPrompt({
-    workspaceDir: "/tmp/kaijibot-live-verify",
+    workspaceDir: "/tmp/allbot-live-verify",
     toolNames: ["read", "exec", "message"],
     userTimezone: "Asia/Shanghai",
     extraSystemPrompt,
@@ -218,7 +218,7 @@ describe.skipIf(!isLive || !ZAI_API_KEY)(
         "project-doc rule overrides cognitive-context rule",
         async () => {
           const systemPrompt = buildAgentSystemPrompt({
-            workspaceDir: "/tmp/kaijibot-live-verify",
+            workspaceDir: "/tmp/allbot-live-verify",
             toolNames: ["read"],
             userTimezone: "Asia/Shanghai",
             contextFiles: [
@@ -253,7 +253,7 @@ describe.skipIf(!isLive || !ZAI_API_KEY)(
         "agent introduces itself correctly with full optimized prompt",
         async () => {
           const systemPrompt = buildAgentSystemPrompt({
-            workspaceDir: "/tmp/kaijibot-live-verify",
+            workspaceDir: "/tmp/allbot-live-verify",
             toolNames: ["read", "exec", "process", "cron", "message", "gateway"],
             userTimezone: "Asia/Shanghai",
             runtimeInfo: {
@@ -279,7 +279,7 @@ describe.skipIf(!isLive || !ZAI_API_KEY)(
           console.log(`\n  Full reply (${reply.length} chars):\n${reply.slice(0, 500)}\n`);
 
           const qualityChecks = {
-            mentionsIdentity: /助手|assistant|kaijibot/i.test(reply),
+            mentionsIdentity: /助手|assistant|allbot/i.test(reply),
             notEmpty: reply.length > 20,
             noGenericList: !/conversational ai|three-layer memory/i.test(reply),
           };

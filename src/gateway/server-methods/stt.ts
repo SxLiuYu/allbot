@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { loadConfig } from "../../config/config.js";
-import { resolvePreferredKaijiBotTmpDir } from "../../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../../infra/tmp-allbot-dir.js";
 import { transcribeAudioFile } from "../../media-understanding/runtime.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
 import { ErrorCodes, errorShape } from "../protocol/index.js";
@@ -89,7 +89,7 @@ export const sttHandlers: GatewayRequestHandlers = {
       fileName: normalizeOptionalString(params.fileName) ?? undefined,
       buffer: decoded.buffer,
     });
-    const tmpRoot = resolvePreferredKaijiBotTmpDir();
+    const tmpRoot = resolvePreferredAllBotTmpDir();
     const tempDir = path.join(tmpRoot, `stt-transcribe-${randomUUID()}`);
     let filePath: string | undefined;
     try {

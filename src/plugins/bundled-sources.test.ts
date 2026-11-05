@@ -12,11 +12,11 @@ function appBundledPluginRoot(pluginId: string): string {
   return bundledPluginRootAt(APP_ROOT, pluginId);
 }
 
-const discoverKaijiBotPluginsMock = vi.fn();
+const discoverAllBotPluginsMock = vi.fn();
 const loadPluginManifestMock = vi.fn();
 
 vi.mock("./discovery.js", () => ({
-  discoverKaijiBotPlugins: (...args: unknown[]) => discoverKaijiBotPluginsMock(...args),
+  discoverAllBotPlugins: (...args: unknown[]) => discoverAllBotPluginsMock(...args),
 }));
 
 vi.mock("./manifest.js", () => ({
@@ -42,7 +42,7 @@ function createBundledCandidate(params: {
 }
 
 function setBundledDiscoveryCandidates(candidates: unknown[]) {
-  discoverKaijiBotPluginsMock.mockReturnValue({
+  discoverAllBotPluginsMock.mockReturnValue({
     candidates,
     diagnostics: [],
   });
@@ -55,7 +55,7 @@ function setBundledManifestIdsByRoot(manifestIds: Record<string, string>) {
       : {
           ok: false,
           error: "invalid manifest",
-          manifestPath: `${rootDir}/kaijibot.plugin.json`,
+          manifestPath: `${rootDir}/allbot.plugin.json`,
         },
   );
 }
@@ -64,11 +64,11 @@ function setBundledLookupFixture() {
   setBundledDiscoveryCandidates([
     createBundledCandidate({
       rootDir: appBundledPluginRoot("feishu"),
-      packageName: "@kaijibot/feishu",
+      packageName: "@allbot/feishu",
     }),
     createBundledCandidate({
       rootDir: appBundledPluginRoot("diffs"),
-      packageName: "@kaijibot/diffs",
+      packageName: "@allbot/diffs",
     }),
   ]);
   setBundledManifestIdsByRoot({
@@ -85,7 +85,7 @@ function createResolvedBundledSource(params: {
   return {
     pluginId: params.pluginId,
     localPath: params.localPath,
-    npmSpec: params.npmSpec ?? `@kaijibot/${params.pluginId}`,
+    npmSpec: params.npmSpec ?? `@allbot/${params.pluginId}`,
   };
 }
 
@@ -122,7 +122,7 @@ function expectBundledSourceLookupCase(params: {
 
 describe("bundled plugin sources", () => {
   beforeEach(() => {
-    discoverKaijiBotPluginsMock.mockReset();
+    discoverAllBotPluginsMock.mockReset();
     loadPluginManifestMock.mockReset();
   });
 
@@ -131,19 +131,19 @@ describe("bundled plugin sources", () => {
       createBundledCandidate({
         origin: "global",
         rootDir: "/global/feishu",
-        packageName: "@kaijibot/feishu",
+        packageName: "@allbot/feishu",
       }),
       createBundledCandidate({
         rootDir: appBundledPluginRoot("feishu"),
-        packageName: "@kaijibot/feishu",
+        packageName: "@allbot/feishu",
       }),
       createBundledCandidate({
         rootDir: appBundledPluginRoot("feishu-dup"),
-        packageName: "@kaijibot/feishu",
+        packageName: "@allbot/feishu",
       }),
       createBundledCandidate({
         rootDir: appBundledPluginRoot("msteams"),
-        packageName: "@kaijibot/msteams",
+        packageName: "@allbot/msteams",
       }),
     ]);
     setBundledManifestIdsByRoot({
@@ -165,12 +165,12 @@ describe("bundled plugin sources", () => {
   it.each([
     [
       "finds bundled source by npm spec",
-      { kind: "npmSpec", value: "@kaijibot/feishu" } as const,
+      { kind: "npmSpec", value: "@allbot/feishu" } as const,
       { pluginId: "feishu", localPath: appBundledPluginRoot("feishu") },
     ],
     [
       "returns undefined for missing npm spec",
-      { kind: "npmSpec", value: "@kaijibot/not-found" } as const,
+      { kind: "npmSpec", value: "@allbot/not-found" } as const,
       undefined,
     ],
     [
@@ -190,7 +190,7 @@ describe("bundled plugin sources", () => {
   it("forwards an explicit env to bundled discovery helpers", () => {
     setBundledDiscoveryCandidates([]);
 
-    const env = { HOME: "/tmp/kaijibot-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/allbot-home" } as NodeJS.ProcessEnv;
 
     resolveBundledPluginSources({
       workspaceDir: "/workspace",
@@ -202,11 +202,11 @@ describe("bundled plugin sources", () => {
       env,
     });
 
-    expect(discoverKaijiBotPluginsMock).toHaveBeenNthCalledWith(1, {
+    expect(discoverAllBotPluginsMock).toHaveBeenNthCalledWith(1, {
       workspaceDir: "/workspace",
       env,
     });
-    expect(discoverKaijiBotPluginsMock).toHaveBeenNthCalledWith(2, {
+    expect(discoverAllBotPluginsMock).toHaveBeenNthCalledWith(2, {
       workspaceDir: "/workspace",
       env,
     });
@@ -237,7 +237,7 @@ describe("bundled plugin sources", () => {
     expect(
       findBundledPluginSourceInMap({
         bundled,
-        lookup: { kind: "npmSpec", value: "@kaijibot/feishu" },
+        lookup: { kind: "npmSpec", value: "@allbot/feishu" },
       })?.pluginId,
     ).toBe("feishu");
   });

@@ -13,7 +13,7 @@ import {
 } from "../channels/plugins/config-write-policy-shared.js";
 import type { ChannelConfigAdapter } from "../channels/plugins/types.adapters.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../routing/session-key.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 import { normalizeStringEntries } from "../shared/string-normalization.js";
@@ -48,13 +48,13 @@ type ChannelConfigAdapterWithAccessors<ResolvedAccount> = Pick<
 >;
 
 function formatPairingApproveHint(channelId: string): string {
-  const listCmd = formatCliCommand(`kaijibot pairing list ${channelId}`);
-  const approveCmd = formatCliCommand(`kaijibot pairing approve ${channelId} <code>`);
+  const listCmd = formatCliCommand(`allbot pairing list ${channelId}`);
+  const approveCmd = formatCliCommand(`allbot pairing approve ${channelId} <code>`);
   return `Approve via: ${listCmd} / ${approveCmd}`;
 }
 
 function buildAccountScopedDmSecurityPolicy(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelKey: string;
   accountId?: string | null;
   fallbackAccountId?: string | null;
@@ -91,7 +91,7 @@ function buildAccountScopedDmSecurityPolicy(params: {
 }
 
 export function resolveChannelConfigWrites(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelId?: string | null;
   accountId?: string | null;
 }): boolean {
@@ -99,7 +99,7 @@ export function resolveChannelConfigWrites(params: {
 }
 
 export function authorizeConfigWrite(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   origin?: ConfigWriteScope;
   target?: ConfigWriteTarget;
   allowBypass?: boolean;
@@ -125,7 +125,7 @@ export function formatConfigWriteDeniedMessage(params: {
   return formatConfigWriteDeniedMessageShared(params);
 }
 
-type ChannelConfigAccessorParams<Config extends KaijiBotConfig = KaijiBotConfig> = {
+type ChannelConfigAccessorParams<Config extends AllBotConfig = AllBotConfig> = {
   cfg: Config;
   accountId?: string | null;
 };
@@ -133,7 +133,7 @@ type ChannelConfigAccessorParams<Config extends KaijiBotConfig = KaijiBotConfig>
 type MultiAccountChannelConfigAdapterParams<
   ResolvedAccount,
   AccessorAccount = ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 > = {
   sectionKey: string;
   listAccountIds: (cfg: Config) => string[];
@@ -171,7 +171,7 @@ export function resolveOptionalConfigString(
 }
 
 /** Adapt `{ cfg, accountId }` accessors to callback sites that pass positional args. */
-export function adaptScopedAccountAccessor<Result, Config extends KaijiBotConfig = KaijiBotConfig>(
+export function adaptScopedAccountAccessor<Result, Config extends AllBotConfig = AllBotConfig>(
   accessor: (params: { cfg: Config; accountId?: string | null }) => Result,
 ): (cfg: Config, accountId?: string | null) => Result {
   return (cfg, accountId) => accessor({ cfg, accountId });
@@ -180,7 +180,7 @@ export function adaptScopedAccountAccessor<Result, Config extends KaijiBotConfig
 /** Build the shared allowlist/default target adapter surface for account-scoped channel configs. */
 export function createScopedAccountConfigAccessors<
   ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   resolveAccount: (params: { cfg: Config; accountId?: string | null }) => ResolvedAccount;
   resolveAllowFrom: (account: ResolvedAccount) => Array<string | number> | null | undefined;
@@ -191,7 +191,7 @@ export function createScopedAccountConfigAccessors<
   "resolveAllowFrom" | "formatAllowFrom" | "resolveDefaultTo"
 > {
   const base = {
-    resolveAllowFrom({ cfg, accountId }: { cfg: KaijiBotConfig; accountId?: string | null }) {
+    resolveAllowFrom({ cfg, accountId }: { cfg: AllBotConfig; accountId?: string | null }) {
       return mapAllowFromEntries(
         params.resolveAllowFrom(params.resolveAccount({ cfg: cfg as Config, accountId })),
       );
@@ -217,18 +217,18 @@ export function createScopedAccountConfigAccessors<
 
 function createNamedAccountConfigBase<
   ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   listAccountIds: (cfg: Config) => string[];
   resolveAccount: (cfg: Config, accountId?: string | null) => ResolvedAccount;
   inspectAccount?: (cfg: Config, accountId?: string | null) => unknown;
   defaultAccountId: (cfg: Config) => string;
   setAccountEnabled: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     enabled: boolean;
-  }) => KaijiBotConfig;
-  deleteAccount: (params: { cfg: KaijiBotConfig; accountId: string }) => KaijiBotConfig;
+  }) => AllBotConfig;
+  deleteAccount: (params: { cfg: AllBotConfig; accountId: string }) => AllBotConfig;
 }): ChannelCrudConfigAdapter<ResolvedAccount> {
   return {
     listAccountIds(cfg) {
@@ -261,7 +261,7 @@ function createNamedAccountConfigBase<
 
 function resolveAccessorAccountWithFallback<
   AccessorAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(
   resolveAccessorAccount:
     | ((params: ChannelConfigAccessorParams<Config>) => AccessorAccount)
@@ -274,7 +274,7 @@ function resolveAccessorAccountWithFallback<
 function createChannelConfigAdapterWithAccessors<
   ResolvedAccount,
   AccessorAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   base: ChannelCrudConfigAdapter<ResolvedAccount>;
   resolveAccessorAccount?: (params: ChannelConfigAccessorParams<Config>) => AccessorAccount;
@@ -300,7 +300,7 @@ function createChannelConfigAdapterWithAccessors<
 function createChannelConfigAdapterFromBase<
   ResolvedAccount,
   AccessorAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   base: ChannelCrudConfigAdapter<ResolvedAccount>;
   resolveAccessorAccount?: (params: ChannelConfigAccessorParams<Config>) => AccessorAccount;
@@ -322,7 +322,7 @@ function createChannelConfigAdapterFromBase<
 /** Build the common CRUD/config helpers for channels that store multiple named accounts. */
 export function createScopedChannelConfigBase<
   ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   sectionKey: string;
   listAccountIds: (cfg: Config) => string[];
@@ -369,7 +369,7 @@ export function createScopedChannelConfigBase<
 export function createScopedChannelConfigAdapter<
   ResolvedAccount,
   AccessorAccount = ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(
   params: MultiAccountChannelConfigAdapterParams<ResolvedAccount, AccessorAccount, Config> & {
     allowTopLevel?: boolean;
@@ -395,7 +395,7 @@ export function createScopedChannelConfigAdapter<
   });
 }
 
-function setTopLevelChannelEnabledInConfigSection<Config extends KaijiBotConfig>(params: {
+function setTopLevelChannelEnabledInConfigSection<Config extends AllBotConfig>(params: {
   cfg: Config;
   sectionKey: string;
   enabled: boolean;
@@ -413,7 +413,7 @@ function setTopLevelChannelEnabledInConfigSection<Config extends KaijiBotConfig>
   } as Config;
 }
 
-function removeTopLevelChannelConfigSection<Config extends KaijiBotConfig>(params: {
+function removeTopLevelChannelConfigSection<Config extends AllBotConfig>(params: {
   cfg: Config;
   sectionKey: string;
 }): Config {
@@ -428,7 +428,7 @@ function removeTopLevelChannelConfigSection<Config extends KaijiBotConfig>(param
   return nextCfg;
 }
 
-function clearTopLevelChannelConfigFields<Config extends KaijiBotConfig>(params: {
+function clearTopLevelChannelConfigFields<Config extends AllBotConfig>(params: {
   cfg: Config;
   sectionKey: string;
   clearBaseFields: string[];
@@ -453,7 +453,7 @@ function clearTopLevelChannelConfigFields<Config extends KaijiBotConfig>(params:
 /** Build CRUD/config helpers for top-level single-account channels. */
 export function createTopLevelChannelConfigBase<
   ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   sectionKey: string;
   resolveAccount: (cfg: Config) => ResolvedAccount;
@@ -510,7 +510,7 @@ export function createTopLevelChannelConfigBase<
 export function createTopLevelChannelConfigAdapter<
   ResolvedAccount,
   AccessorAccount = ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   sectionKey: string;
   resolveAccount: (cfg: Config) => ResolvedAccount;
@@ -547,7 +547,7 @@ export function createTopLevelChannelConfigAdapter<
 /** Build CRUD/config helpers for channels where the default account lives at channel root and named accounts live under `accounts`. */
 export function createHybridChannelConfigBase<
   ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(params: {
   sectionKey: string;
   listAccountIds: (cfg: Config) => string[];
@@ -615,7 +615,7 @@ export function createHybridChannelConfigBase<
 export function createHybridChannelConfigAdapter<
   ResolvedAccount,
   AccessorAccount = ResolvedAccount,
-  Config extends KaijiBotConfig = KaijiBotConfig,
+  Config extends AllBotConfig = AllBotConfig,
 >(
   params: MultiAccountChannelConfigAdapterParams<ResolvedAccount, AccessorAccount, Config> & {
     preserveSectionOnDefaultDelete?: boolean;
@@ -661,7 +661,7 @@ export function createScopedDmSecurityResolver<
     accountId,
     account,
   }: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string | null;
     account: ResolvedAccount;
   }) =>

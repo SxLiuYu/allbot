@@ -1,6 +1,6 @@
 import os from "node:os";
 import path from "node:path";
-import type { KaijiBotConfig, MemorySearchConfig } from "../config/config.js";
+import type { AllBotConfig, MemorySearchConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import type { SecretInput } from "../config/types.secrets.js";
 import {
@@ -380,7 +380,7 @@ function resolveSyncConfig(
 }
 
 export function resolveMemorySearchConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): ResolvedMemorySearchConfig | null {
   const defaults = cfg.agents?.defaults?.memorySearch;
@@ -424,7 +424,7 @@ export function resolveMemorySearchConfig(
 }
 
 export function resolveMemorySearchSyncConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId: string,
 ): ResolvedMemorySearchSyncConfig | null {
   const defaults = cfg.agents?.defaults?.memorySearch;

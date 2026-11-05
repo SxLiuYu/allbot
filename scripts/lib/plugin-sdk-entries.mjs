@@ -12,7 +12,7 @@ export function buildPluginSdkEntrySources() {
 
 export function buildPluginSdkSpecifiers() {
   return pluginSdkEntrypoints.map((entry) =>
-    entry === "index" ? "kaijibot/plugin-sdk" : `kaijibot/plugin-sdk/${entry}`,
+    entry === "index" ? "allbot/plugin-sdk" : `allbot/plugin-sdk/${entry}`,
   );
 }
 

@@ -1,10 +1,10 @@
 import {
   normalizeAccountId,
   resolveMergedAccountConfig,
-} from "kaijibot/plugin-sdk/account-resolution";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/core";
-import { evaluateSenderGroupAccessForPolicy } from "kaijibot/plugin-sdk/group-access";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/account-resolution";
+import type { AllBotConfig } from "allbot/plugin-sdk/core";
+import { evaluateSenderGroupAccessForPolicy } from "allbot/plugin-sdk/group-access";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 import type { AllowlistMatch, ChannelGroupContext, GroupToolPolicyConfig } from "../runtime-api.js";
 import { normalizeFeishuTarget } from "./targets.js";
 import type { FeishuConfig, FeishuGroupConfig } from "./types.js";
@@ -113,7 +113,7 @@ export function isFeishuGroupAllowed(params: {
 
 export function resolveFeishuReplyPolicy(params: {
   isDirectMessage: boolean;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   groupId?: string | null;
   /**

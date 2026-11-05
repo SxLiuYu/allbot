@@ -1,5 +1,5 @@
 import type { PluginManifestRegistry } from "../plugins/manifest-registry.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import { detectPluginAutoEnableCandidates } from "./plugin-auto-enable.detect.js";
 import {
   materializePluginAutoEnableCandidatesInternal,
@@ -11,7 +11,7 @@ import type {
 } from "./plugin-auto-enable.types.js";
 
 export function materializePluginAutoEnableCandidates(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   candidates: readonly PluginAutoEnableCandidate[];
   env?: NodeJS.ProcessEnv;
   manifestRegistry?: PluginManifestRegistry;
@@ -32,7 +32,7 @@ export function materializePluginAutoEnableCandidates(params: {
 }
 
 export function applyPluginAutoEnable(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   manifestRegistry?: PluginManifestRegistry;
 }): PluginAutoEnableResult {

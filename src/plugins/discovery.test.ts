@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { bundledDistPluginFile } from "../../test/helpers/bundled-plugin-paths.js";
-import { clearPluginDiscoveryCache, discoverKaijiBotPlugins } from "./discovery.js";
+import { clearPluginDiscoveryCache, discoverAllBotPlugins } from "./discovery.js";
 import {
   cleanupTrackedTempDirs,
   makeTrackedTempDir,
@@ -12,7 +12,7 @@ import {
 const tempDirs: string[] = [];
 
 function makeTempDir() {
-  return makeTrackedTempDir("kaijibot-plugins", tempDirs);
+  return makeTrackedTempDir("allbot-plugins", tempDirs);
 }
 
 const mkdirSafe = mkdirSafeDir;
@@ -36,9 +36,9 @@ function hasDiagnosticSourceSuffix(
 
 function buildDiscoveryEnv(stateDir: string): NodeJS.ProcessEnv {
   return {
-    KAIJIBOT_STATE_DIR: stateDir,
-    KAIJIBOT_HOME: undefined,
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+    ALLBOT_STATE_DIR: stateDir,
+    ALLBOT_HOME: undefined,
+    ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
   };
 }
 
@@ -48,20 +48,20 @@ function buildCachedDiscoveryEnv(
 ): NodeJS.ProcessEnv {
   return {
     ...buildDiscoveryEnv(stateDir),
-    KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS: "5000",
+    ALLBOT_PLUGIN_DISCOVERY_CACHE_MS: "5000",
     ...overrides,
   };
 }
 
 async function discoverWithStateDir(
   stateDir: string,
-  params: Parameters<typeof discoverKaijiBotPlugins>[0],
+  params: Parameters<typeof discoverAllBotPlugins>[0],
 ) {
-  return discoverKaijiBotPlugins({ ...params, env: buildDiscoveryEnv(stateDir) });
+  return discoverAllBotPlugins({ ...params, env: buildDiscoveryEnv(stateDir) });
 }
 
-function discoverWithCachedEnv(params: Parameters<typeof discoverKaijiBotPlugins>[0]) {
-  return discoverKaijiBotPlugins(params);
+function discoverWithCachedEnv(params: Parameters<typeof discoverAllBotPlugins>[0]) {
+  return discoverAllBotPlugins(params);
 }
 
 function writePluginPackageManifest(params: {
@@ -73,7 +73,7 @@ function writePluginPackageManifest(params: {
     path.join(params.packageDir, "package.json"),
     JSON.stringify({
       name: params.packageName,
-      kaijibot: { extensions: params.extensions },
+      allbot: { extensions: params.extensions },
     }),
     "utf-8",
   );
@@ -81,7 +81,7 @@ function writePluginPackageManifest(params: {
 
 function writePluginManifest(params: { pluginDir: string; id: string }) {
   fs.writeFileSync(
-    path.join(params.pluginDir, "kaijibot.plugin.json"),
+    path.join(params.pluginDir, "allbot.plugin.json"),
     JSON.stringify({
       id: params.id,
       configSchema: { type: "object" },
@@ -174,7 +174,7 @@ function expectEscapesPackageDiagnostic(diagnostics: Array<{ message: string }>)
 }
 
 function expectCandidatePresence(
-  result: Awaited<ReturnType<typeof discoverKaijiBotPlugins>>,
+  result: Awaited<ReturnType<typeof discoverAllBotPlugins>>,
   params: { present?: readonly string[]; absent?: readonly string[] },
 ) {
   const ids = result.candidates.map((candidate) => candidate.idHint);
@@ -262,7 +262,7 @@ afterEach(() => {
   cleanupTrackedTempDirs(tempDirs);
 });
 
-describe("discoverKaijiBotPlugins", () => {
+describe("discoverAllBotPlugins", () => {
   it("discovers global and workspace extensions", async () => {
     const stateDir = makeTempDir();
     const workspaceDir = path.join(stateDir, "workspace");
@@ -271,7 +271,7 @@ describe("discoverKaijiBotPlugins", () => {
     mkdirSafe(globalExt);
     fs.writeFileSync(path.join(globalExt, "alpha.ts"), "export default function () {}", "utf-8");
 
-    const workspaceExt = path.join(workspaceDir, ".kaijibot", "extensions");
+    const workspaceExt = path.join(workspaceDir, ".allbot", "extensions");
     mkdirSafe(workspaceExt);
     fs.writeFileSync(path.join(workspaceExt, "beta.ts"), "export default function () {}", "utf-8");
 
@@ -282,22 +282,22 @@ describe("discoverKaijiBotPlugins", () => {
   it("does not recurse arbitrary workspace directories for plugin auto-discovery", () => {
     const stateDir = makeTempDir();
     const workspaceDir = path.join(stateDir, "workspace");
-    const workspaceExt = path.join(workspaceDir, ".kaijibot", "extensions");
+    const workspaceExt = path.join(workspaceDir, ".allbot", "extensions");
 
     const expectedWorkspacePluginDir = path.join(workspaceExt, "workspace-plugin");
     createPackagePluginWithEntry({
       packageDir: expectedWorkspacePluginDir,
-      packageName: "@kaijibot/workspace-plugin",
+      packageName: "@allbot/workspace-plugin",
       pluginId: "workspace-plugin",
     });
 
     const unrelatedWorkspaceDir = path.join(workspaceDir, "lobster-integrations", "bin");
     createPackagePluginWithEntry({
       packageDir: unrelatedWorkspaceDir,
-      packageName: "@kaijibot/stray-workspace-plugin",
+      packageName: "@allbot/stray-workspace-plugin",
     });
 
-    const result = discoverKaijiBotPlugins({
+    const result = discoverAllBotPlugins({
       workspaceDir,
       env: buildDiscoveryEnv(stateDir),
     });
@@ -313,11 +313,11 @@ describe("discoverKaijiBotPlugins", () => {
     const stateDir = makeTempDir();
     const homeDir = makeTempDir();
     const workspaceRoot = path.join(homeDir, "workspace");
-    const workspaceExt = path.join(workspaceRoot, ".kaijibot", "extensions");
+    const workspaceExt = path.join(workspaceRoot, ".allbot", "extensions");
     mkdirSafe(workspaceExt);
     fs.writeFileSync(path.join(workspaceExt, "tilde-workspace.ts"), "export default {}", "utf-8");
 
-    const result = discoverKaijiBotPlugins({
+    const result = discoverAllBotPlugins({
       workspaceDir: "~/workspace",
       env: {
         ...buildDiscoveryEnv(stateDir),
@@ -371,10 +371,10 @@ describe("discoverKaijiBotPlugins", () => {
     );
     writeStandalonePlugin(path.join(bundledDir, "real-plugin.ts"), "export default {}");
 
-    const { candidates, diagnostics } = discoverKaijiBotPlugins({
+    const { candidates, diagnostics } = discoverAllBotPlugins({
       env: {
         ...buildDiscoveryEnv(stateDir),
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledDir,
+        ALLBOT_BUNDLED_PLUGINS_DIR: bundledDir,
       },
     });
 
@@ -401,11 +401,11 @@ describe("discoverKaijiBotPlugins", () => {
 
   it("does not discover nested node_modules copies under installed plugins", async () => {
     const stateDir = makeTempDir();
-    const pluginDir = path.join(stateDir, "extensions", "opik-kaijibot");
+    const pluginDir = path.join(stateDir, "extensions", "opik-allbot");
     const nestedDiffsDir = path.join(
       pluginDir,
       "node_modules",
-      "kaijibot",
+      "allbot",
       "dist",
       "extensions",
       "diffs",
@@ -415,10 +415,10 @@ describe("discoverKaijiBotPlugins", () => {
 
     writePluginPackageManifest({
       packageDir: pluginDir,
-      packageName: "@opik/opik-kaijibot",
+      packageName: "@opik/opik-allbot",
       extensions: ["./src/index.ts"],
     });
-    writePluginManifest({ pluginDir, id: "opik-kaijibot" });
+    writePluginManifest({ pluginDir, id: "opik-allbot" });
     fs.writeFileSync(
       path.join(pluginDir, "src", "index.ts"),
       "export default function () {}",
@@ -426,8 +426,8 @@ describe("discoverKaijiBotPlugins", () => {
     );
 
     writePluginPackageManifest({
-      packageDir: path.join(pluginDir, "node_modules", "kaijibot"),
-      packageName: "kaijibot",
+      packageDir: path.join(pluginDir, "node_modules", "allbot"),
+      packageName: "allbot",
       extensions: [`./${bundledDistPluginFile("diffs", "index.js")}`],
     });
     writePluginManifest({ pluginDir: nestedDiffsDir, id: "diffs" });
@@ -438,15 +438,15 @@ describe("discoverKaijiBotPlugins", () => {
     );
 
     const { candidates } = await discoverWithStateDir(stateDir, {});
-    expectCandidateOrder(candidates, ["opik-kaijibot"]);
+    expectCandidateOrder(candidates, ["opik-allbot"]);
   });
 
   it("skips dependency and build directories while scanning workspace roots", () => {
     const stateDir = makeTempDir();
     const workspaceDir = path.join(stateDir, "workspace");
-    const workspaceRoot = path.join(workspaceDir, ".kaijibot", "extensions");
+    const workspaceRoot = path.join(workspaceDir, ".allbot", "extensions");
     const workspacePluginDir = path.join(workspaceRoot, "workspace-plugin");
-    const nestedNodeModulesDir = path.join(workspaceRoot, "node_modules", "kaijibot");
+    const nestedNodeModulesDir = path.join(workspaceRoot, "node_modules", "allbot");
     const nestedDistDir = path.join(workspaceRoot, "dist", "extensions", "diffs");
     mkdirSafe(path.join(workspacePluginDir, "src"));
     mkdirSafe(path.join(nestedNodeModulesDir, "src"));
@@ -454,13 +454,13 @@ describe("discoverKaijiBotPlugins", () => {
 
     createPackagePluginWithEntry({
       packageDir: workspacePluginDir,
-      packageName: "@kaijibot/workspace-plugin",
+      packageName: "@allbot/workspace-plugin",
       pluginId: "workspace-plugin",
     });
 
     createPackagePluginWithEntry({
       packageDir: nestedNodeModulesDir,
-      packageName: "kaijibot",
+      packageName: "allbot",
       pluginId: "node-modules-copy",
     });
 
@@ -471,7 +471,7 @@ describe("discoverKaijiBotPlugins", () => {
       "utf-8",
     );
 
-    const { candidates } = discoverKaijiBotPlugins({
+    const { candidates } = discoverAllBotPlugins({
       workspaceDir,
       env: buildDiscoveryEnv(stateDir),
     });
@@ -486,7 +486,7 @@ describe("discoverKaijiBotPlugins", () => {
         const packageDir = path.join(stateDir, "extensions", "voice-call-pack");
         createPackagePluginWithEntry({
           packageDir,
-          packageName: "@kaijibot/voice-call",
+          packageName: "@allbot/voice-call",
           entryPath: "src/index.ts",
         });
         return {};
@@ -499,7 +499,7 @@ describe("discoverKaijiBotPlugins", () => {
         const packageDir = path.join(stateDir, "extensions", "ollama-provider-pack");
         createPackagePluginWithEntry({
           packageDir,
-          packageName: "@kaijibot/ollama-provider",
+          packageName: "@allbot/ollama-provider",
           pluginId: "ollama",
           entryPath: "src/index.ts",
         });
@@ -512,8 +512,8 @@ describe("discoverKaijiBotPlugins", () => {
       name: "normalizes bundled speech package ids to canonical plugin ids",
       setup: (stateDir: string) => {
         for (const [dirName, packageName, pluginId] of [
-          ["elevenlabs-speech-pack", "@kaijibot/elevenlabs-speech", "elevenlabs"],
-          ["microsoft-speech-pack", "@kaijibot/microsoft-speech", "microsoft"],
+          ["elevenlabs-speech-pack", "@allbot/elevenlabs-speech", "elevenlabs"],
+          ["microsoft-speech-pack", "@allbot/microsoft-speech", "microsoft"],
         ] as const) {
           const packageDir = path.join(stateDir, "extensions", dirName);
           createPackagePluginWithEntry({
@@ -534,7 +534,7 @@ describe("discoverKaijiBotPlugins", () => {
         const packageDir = path.join(stateDir, "packs", "demo-plugin-dir");
         createPackagePluginWithEntry({
           packageDir,
-          packageName: "@kaijibot/demo-plugin-dir",
+          packageName: "@allbot/demo-plugin-dir",
           entryPath: "index.js",
         });
         return { extraPaths: [packageDir] };
@@ -634,7 +634,7 @@ describe("discoverKaijiBotPlugins", () => {
     const result = await discoverWithStateDir(stateDir, setup(stateDir));
     const legacy = findCandidateById(result.candidates, "legacy-with-bad-bundle");
 
-    expect(legacy?.format).toBe("kaijibot");
+    expect(legacy?.format).toBe("allbot");
     expect(hasDiagnosticSourceSuffix(result.diagnostics, bundleMarker)).toBe(true);
   });
 
@@ -648,7 +648,7 @@ describe("discoverKaijiBotPlugins", () => {
         mkdirSafe(globalExt);
         writePluginPackageManifest({
           packageDir: globalExt,
-          packageName: "@kaijibot/escape-pack",
+          packageName: "@allbot/escape-pack",
           extensions: ["../../outside.js"],
         });
         fs.writeFileSync(outside, "export default function () {}", "utf-8");
@@ -662,7 +662,7 @@ describe("discoverKaijiBotPlugins", () => {
         mkdirSafe(globalExt);
         writePluginPackageManifest({
           packageDir: globalExt,
-          packageName: "@kaijibot/missing-entry-pack",
+          packageName: "@allbot/missing-entry-pack",
           extensions: ["./missing.ts"],
         });
       },
@@ -685,7 +685,7 @@ describe("discoverKaijiBotPlugins", () => {
         }
         writePluginPackageManifest({
           packageDir: globalExt,
-          packageName: "@kaijibot/pack",
+          packageName: "@allbot/pack",
           extensions: ["./linked/escape.ts"],
         });
       },
@@ -715,7 +715,7 @@ describe("discoverKaijiBotPlugins", () => {
         }
         writePluginPackageManifest({
           packageDir: globalExt,
-          packageName: "@kaijibot/pack",
+          packageName: "@allbot/pack",
           extensions: ["./escape.ts"],
         });
       },
@@ -745,8 +745,8 @@ describe("discoverKaijiBotPlugins", () => {
     fs.writeFileSync(
       outsideManifest,
       JSON.stringify({
-        name: "@kaijibot/pack",
-        kaijibot: { extensions: ["./entry.ts"] },
+        name: "@allbot/pack",
+        allbot: { extensions: ["./entry.ts"] },
       }),
       "utf-8",
     );
@@ -790,12 +790,12 @@ describe("discoverKaijiBotPlugins", () => {
       fs.writeFileSync(path.join(packDir, "index.ts"), "export default function () {}", "utf-8");
       fs.chmodSync(packDir, 0o777);
 
-      const result = discoverKaijiBotPlugins({
+      const result = discoverAllBotPlugins({
         env: {
           ...process.env,
-          KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
-          KAIJIBOT_STATE_DIR: stateDir,
-          KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledDir,
+          ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+          ALLBOT_STATE_DIR: stateDir,
+          ALLBOT_BUNDLED_PLUGINS_DIR: bundledDir,
         },
       });
 

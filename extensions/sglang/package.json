@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/sglang-provider",
+  "name": "@allbot/sglang-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot SGLang provider plugin",
+  "description": "AllBot SGLang provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

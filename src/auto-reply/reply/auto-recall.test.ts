@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { PersonaTree } from "../../cognitive/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MemorySearchResult } from "../../memory-host-sdk/host/types.js";
 import { buildAutoRecallContext } from "./auto-recall.js";
 
@@ -53,7 +53,7 @@ function makeSearchResult(overrides: Partial<MemorySearchResult> = {}): MemorySe
   };
 }
 
-const stubCfg = {} as KaijiBotConfig;
+const stubCfg = {} as AllBotConfig;
 
 describe("buildAutoRecallContext", () => {
   it("returns formatted context when persona has recentFocus with 3 topics", async () => {

@@ -1,6 +1,6 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
-import type { ProviderWrapStreamFnContext } from "kaijibot/plugin-sdk/plugin-entry";
-import { normalizeProviderId } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ProviderWrapStreamFnContext } from "allbot/plugin-sdk/plugin-entry";
+import { normalizeProviderId } from "allbot/plugin-sdk/provider-model-shared";
 
 type QwenThinkingLevel = ProviderWrapStreamFnContext["thinkingLevel"];
 type QwenThinkingFormat = string | undefined;

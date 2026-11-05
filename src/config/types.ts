@@ -9,7 +9,7 @@ export * from "./types.base.js";
 export * from "./types.browser.js";
 export * from "./types.channels.js";
 export * from "./types.cli.js";
-export * from "./types.kaijibot.js";
+export * from "./types.allbot.js";
 export * from "./types.cron.js";
 export * from "./types.gateway.js";
 export * from "./types.hooks.js";

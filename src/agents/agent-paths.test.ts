@@ -3,11 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { withEnv } from "../test-utils/env.js";
-import { resolveKaijiBotAgentDir } from "./agent-paths.js";
+import { resolveAllBotAgentDir } from "./agent-paths.js";
 
-describe("resolveKaijiBotAgentDir", () => {
+describe("resolveAllBotAgentDir", () => {
   const withTempStateDir = async (run: (stateDir: string) => void) => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
     try {
       run(stateDir);
     } finally {
@@ -19,64 +19,64 @@ describe("resolveKaijiBotAgentDir", () => {
     await withTempStateDir((stateDir) => {
       withEnv(
         {
-          KAIJIBOT_STATE_DIR: stateDir,
-          KAIJIBOT_AGENT_DIR: undefined,
+          ALLBOT_STATE_DIR: stateDir,
+          ALLBOT_AGENT_DIR: undefined,
           PI_CODING_AGENT_DIR: undefined,
         },
         () => {
-          const resolved = resolveKaijiBotAgentDir();
+          const resolved = resolveAllBotAgentDir();
           expect(resolved).toBe(path.join(stateDir, "agents", "main", "agent"));
         },
       );
     });
   });
 
-  it("honors KAIJIBOT_AGENT_DIR overrides", async () => {
+  it("honors ALLBOT_AGENT_DIR overrides", async () => {
     await withTempStateDir((stateDir) => {
       const override = path.join(stateDir, "agent");
       withEnv(
         {
-          KAIJIBOT_STATE_DIR: undefined,
-          KAIJIBOT_AGENT_DIR: override,
+          ALLBOT_STATE_DIR: undefined,
+          ALLBOT_AGENT_DIR: override,
           PI_CODING_AGENT_DIR: undefined,
         },
         () => {
-          const resolved = resolveKaijiBotAgentDir();
+          const resolved = resolveAllBotAgentDir();
           expect(resolved).toBe(path.resolve(override));
         },
       );
     });
   });
 
-  it("honors PI_CODING_AGENT_DIR when KAIJIBOT_AGENT_DIR is unset", async () => {
+  it("honors PI_CODING_AGENT_DIR when ALLBOT_AGENT_DIR is unset", async () => {
     await withTempStateDir((stateDir) => {
       const override = path.join(stateDir, "pi-agent");
       withEnv(
         {
-          KAIJIBOT_STATE_DIR: undefined,
-          KAIJIBOT_AGENT_DIR: undefined,
+          ALLBOT_STATE_DIR: undefined,
+          ALLBOT_AGENT_DIR: undefined,
           PI_CODING_AGENT_DIR: override,
         },
         () => {
-          const resolved = resolveKaijiBotAgentDir();
+          const resolved = resolveAllBotAgentDir();
           expect(resolved).toBe(path.resolve(override));
         },
       );
     });
   });
 
-  it("prefers KAIJIBOT_AGENT_DIR over PI_CODING_AGENT_DIR when both are set", async () => {
+  it("prefers ALLBOT_AGENT_DIR over PI_CODING_AGENT_DIR when both are set", async () => {
     await withTempStateDir((stateDir) => {
       const primaryOverride = path.join(stateDir, "primary-agent");
       const fallbackOverride = path.join(stateDir, "fallback-agent");
       withEnv(
         {
-          KAIJIBOT_STATE_DIR: undefined,
-          KAIJIBOT_AGENT_DIR: primaryOverride,
+          ALLBOT_STATE_DIR: undefined,
+          ALLBOT_AGENT_DIR: primaryOverride,
           PI_CODING_AGENT_DIR: fallbackOverride,
         },
         () => {
-          const resolved = resolveKaijiBotAgentDir();
+          const resolved = resolveAllBotAgentDir();
           expect(resolved).toBe(path.resolve(primaryOverride));
         },
       );

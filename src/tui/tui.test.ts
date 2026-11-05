@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { getSlashCommands, parseCommand } from "./commands.js";
 import {
   createBackspaceDeduper,
@@ -111,11 +111,11 @@ describe("resolveTuiSessionKey", () => {
 });
 
 describe("resolveInitialTuiAgentId", () => {
-  const cfg: KaijiBotConfig = {
+  const cfg: AllBotConfig = {
     agents: {
       list: [
-        { id: "main", workspace: "/tmp/kaijibot" },
-        { id: "ops", workspace: "/tmp/kaijibot/projects/ops" },
+        { id: "main", workspace: "/tmp/allbot" },
+        { id: "ops", workspace: "/tmp/allbot/projects/ops" },
       ],
     },
   };
@@ -126,7 +126,7 @@ describe("resolveInitialTuiAgentId", () => {
         cfg,
         fallbackAgentId: "main",
         initialSessionInput: "",
-        cwd: "/tmp/kaijibot/projects/ops/src",
+        cwd: "/tmp/allbot/projects/ops/src",
       }),
     ).toBe("ops");
   });
@@ -137,7 +137,7 @@ describe("resolveInitialTuiAgentId", () => {
         cfg,
         fallbackAgentId: "main",
         initialSessionInput: "agent:main:incident",
-        cwd: "/tmp/kaijibot/projects/ops/src",
+        cwd: "/tmp/allbot/projects/ops/src",
       }),
     ).toBe("main");
   });
@@ -158,8 +158,8 @@ describe("resolveGatewayDisconnectState", () => {
   it("returns pairing recovery guidance when disconnect reason requires pairing", () => {
     const state = resolveGatewayDisconnectState("gateway closed (1008): pairing required");
     expect(state.connectionStatus).toContain("pairing required");
-    expect(state.activityStatus).toBe("pairing required: run kaijibot devices list");
-    expect(state.pairingHint).toContain("kaijibot devices list");
+    expect(state.activityStatus).toBe("pairing required: run allbot devices list");
+    expect(state.pairingHint).toContain("allbot devices list");
   });
 
   it("falls back to idle for generic disconnect reasons", () => {

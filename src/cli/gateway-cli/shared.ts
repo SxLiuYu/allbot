@@ -39,25 +39,25 @@ export function extractGatewayMiskeys(parsed: unknown): {
 }
 
 export function renderGatewayServiceStopHints(env: NodeJS.ProcessEnv = process.env): string[] {
-  const profile = env.KAIJIBOT_PROFILE;
+  const profile = env.ALLBOT_PROFILE;
   switch (process.platform) {
     case "darwin":
       return [
-        `Tip: ${formatCliCommand("kaijibot gateway stop")}`,
+        `Tip: ${formatCliCommand("allbot gateway stop")}`,
         `Or: launchctl bootout gui/$UID/${resolveGatewayLaunchAgentLabel(profile)}`,
       ];
     case "linux":
       return [
-        `Tip: ${formatCliCommand("kaijibot gateway stop")}`,
+        `Tip: ${formatCliCommand("allbot gateway stop")}`,
         `Or: systemctl --user stop ${resolveGatewaySystemdServiceName(profile)}.service`,
       ];
     case "win32":
       return [
-        `Tip: ${formatCliCommand("kaijibot gateway stop")}`,
+        `Tip: ${formatCliCommand("allbot gateway stop")}`,
         `Or: schtasks /End /TN "${resolveGatewayWindowsTaskName(profile)}"`,
       ];
     default:
-      return [`Tip: ${formatCliCommand("kaijibot gateway stop")}`];
+      return [`Tip: ${formatCliCommand("allbot gateway stop")}`];
   }
 }
 
@@ -65,7 +65,7 @@ export async function maybeExplainGatewayServiceStop() {
   const service = tryResolveGatewayService();
   if (!service) {
     defaultRuntime.error(
-      `Gateway already running. Stop it first: ${formatCliCommand("kaijibot gateway stop")}`,
+      `Gateway already running. Stop it first: ${formatCliCommand("allbot gateway stop")}`,
     );
     return;
   }

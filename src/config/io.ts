@@ -83,7 +83,7 @@ import {
   type RuntimeConfigWriteNotification,
 } from "./runtime-snapshot.js";
 import { resolveShellEnvExpectedKeys } from "./shell-env-expected-keys.js";
-import type { KaijiBotConfig, ConfigFileSnapshot, LegacyConfigIssue } from "./types.js";
+import type { AllBotConfig, ConfigFileSnapshot, LegacyConfigIssue } from "./types.js";
 import {
   validateConfigObjectRawWithPlugins,
   validateConfigObjectWithPlugins,
@@ -151,9 +151,9 @@ export type ConfigWriteOptions = {
   unsetPaths?: string[][];
   /**
    * Bypass {@link ConfigClobberProtectionError}. Set this when the caller has
-   * already authorized a deliberate config shrink (e.g. `kaijibot config unset`
+   * already authorized a deliberate config shrink (e.g. `allbot config unset`
    * removing many keys, or an explicit operator-initiated wipe). The env var
-   * `KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` provides the same bypass without
+   * `ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` provides the same bypass without
    * a code change.
    */
   allowConfigClobberShrink?: boolean;
@@ -178,10 +178,10 @@ export class ConfigRuntimeRefreshError extends Error {
  * next payload is much smaller than the last-known-good config AND the prior
  * config had a configured gateway while the new one does not. This signature
  * matches the pattern where a bootstrap stub silently overwrites a real
- * operator config (e.g. an unknown `KAIJIBOT_*_DIR` env var doesn't get
+ * operator config (e.g. an unknown `ALLBOT_*_DIR` env var doesn't get
  * honored, so the gateway writes to the default path).
  *
- * Bypass by setting `KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` in the env or
+ * Bypass by setting `ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` in the env or
  * passing `allowConfigClobberShrink: true` in `ConfigWriteOptions`.
  */
 export class ConfigClobberProtectionError extends Error {
@@ -196,13 +196,13 @@ export class ConfigClobberProtectionError extends Error {
   }) {
     const shrinkPct = Math.round((1 - params.nextBytes / params.lastKnownGoodBytes) * 100);
     super(
-      `Refusing to shrink kaijibot.json from ${params.lastKnownGoodBytes} bytes ` +
+      `Refusing to shrink allbot.json from ${params.lastKnownGoodBytes} bytes ` +
         `(last-known-good) to ${params.nextBytes} bytes (${shrinkPct}% smaller). ` +
         `The previous config had a configured gateway (gateway.mode="${params.previousGatewayMode}"), ` +
         `but the new payload has no gateway section — this is the signature of an accidental ` +
-        `clobber, typically caused by an env-var typo (e.g. KAIJIBOT_CONFIG_DIR is not honored; ` +
-        `the correct name is KAIJIBOT_STATE_DIR). ` +
-        `To proceed anyway, set KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1 in the environment.`,
+        `clobber, typically caused by an env-var typo (e.g. ALLBOT_CONFIG_DIR is not honored; ` +
+        `the correct name is ALLBOT_STATE_DIR). ` +
+        `To proceed anyway, set ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1 in the environment.`,
     );
     this.name = "ConfigClobberProtectionError";
     this.lastKnownGoodBytes = params.lastKnownGoodBytes;
@@ -260,11 +260,11 @@ export function resolveConfigSnapshotHash(snapshot: {
   return hashConfigRaw(snapshot.raw);
 }
 
-function coerceConfig(value: unknown): KaijiBotConfig {
+function coerceConfig(value: unknown): AllBotConfig {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {};
   }
-  return value as KaijiBotConfig;
+  return value as AllBotConfig;
 }
 
 function hasConfigMeta(value: unknown): boolean {
@@ -888,7 +888,7 @@ function warnOnConfigMiskeys(raw: unknown, logger: Pick<typeof console, "warn">)
   }
 }
 
-function stampConfigVersion(cfg: KaijiBotConfig): KaijiBotConfig {
+function stampConfigVersion(cfg: AllBotConfig): AllBotConfig {
   const now = new Date().toISOString();
   return {
     ...cfg,
@@ -900,14 +900,14 @@ function stampConfigVersion(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-function warnIfConfigFromFuture(cfg: KaijiBotConfig, logger: Pick<typeof console, "warn">): void {
+function warnIfConfigFromFuture(cfg: AllBotConfig, logger: Pick<typeof console, "warn">): void {
   const touched = cfg.meta?.lastTouchedVersion;
   if (!touched) {
     return;
   }
   if (shouldWarnOnTouchedVersion(VERSION, touched)) {
     logger.warn(
-      `Config was last written by a newer KaijiBot (${touched}); current version is ${VERSION}.`,
+      `Config was last written by a newer AllBot (${touched}); current version is ${VERSION}.`,
     );
   }
 }
@@ -986,7 +986,7 @@ function resolveConfigForRead(
 ): ConfigReadResolution {
   // Apply config.env to process.env BEFORE substitution so ${VAR} can reference config-defined vars.
   if (resolvedIncludes && typeof resolvedIncludes === "object" && "env" in resolvedIncludes) {
-    applyConfigEnvVars(resolvedIncludes as KaijiBotConfig, env);
+    applyConfigEnvVars(resolvedIncludes as AllBotConfig, env);
   }
 
   // Collect missing env var references as warnings instead of throwing,
@@ -1032,9 +1032,9 @@ function createConfigFileSnapshot(params: {
   exists: boolean;
   raw: string | null;
   parsed: unknown;
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   valid: boolean;
-  runtimeConfig: KaijiBotConfig;
+  runtimeConfig: AllBotConfig;
   hash?: string;
   issues: ConfigFileSnapshot["issues"];
   warnings: ConfigFileSnapshot["warnings"];
@@ -1076,7 +1076,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
     return snapshot;
   }
 
-  function loadConfig(): KaijiBotConfig {
+  function loadConfig(): AllBotConfig {
     try {
       maybeLoadDotEnvForConfig(deps.env);
       if (!deps.fs.existsSync(configPath)) {
@@ -1133,7 +1133,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
         });
         return {};
       }
-      const preValidationDuplicates = findDuplicateAgentDirs(effectiveConfigRaw as KaijiBotConfig, {
+      const preValidationDuplicates = findDuplicateAgentDirs(effectiveConfigRaw as AllBotConfig, {
         env: deps.env,
         homedir: deps.homedir,
       });
@@ -1436,7 +1436,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
   }
 
   async function writeConfigFile(
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     options: ConfigWriteOptions = {},
   ): Promise<{ persistedHash: string }> {
     clearConfigCache();
@@ -1501,7 +1501,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
     // persisted to disk (issue #56772).
     // Apply legacy web-search normalization so that migration results are still
     // persisted even though we bypass validated.config.
-    let cfgToWrite = persistCandidate as KaijiBotConfig;
+    let cfgToWrite = persistCandidate as AllBotConfig;
     try {
       if (deps.fs.existsSync(configPath)) {
         const currentRaw = await deps.fs.promises.readFile(configPath, "utf-8");
@@ -1515,7 +1515,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
             cfgToWrite,
             parsedRes.parsed,
             envForRestore,
-          ) as KaijiBotConfig;
+          ) as AllBotConfig;
         }
       }
     } catch {
@@ -1532,7 +1532,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
     });
     const outputConfigBase =
       envRefMap && changedPaths
-        ? (restoreEnvRefsFromMap(cfgToWrite, "", envRefMap, changedPaths) as KaijiBotConfig)
+        ? (restoreEnvRefsFromMap(cfgToWrite, "", envRefMap, changedPaths) as AllBotConfig)
         : cfgToWrite;
     let outputConfig = outputConfigBase;
     if (options.unsetPaths?.length) {
@@ -1575,16 +1575,16 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
     // Config clobber protection: refuse to silently overwrite a real operator
     // config (one that previously had a configured gateway) with a much smaller
     // stub. This is the signature of an accidental clobber — typically caused
-    // by an env-var typo such as KAIJIBOT_CONFIG_DIR (not honored; the correct
-    // name is KAIJIBOT_STATE_DIR), which makes the gateway write to the default
+    // by an env-var typo such as ALLBOT_CONFIG_DIR (not honored; the correct
+    // name is ALLBOT_STATE_DIR), which makes the gateway write to the default
     // path regardless of the user's intent.
     //
-    // Bypass via env KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1 or option
+    // Bypass via env ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1 or option
     // allowConfigClobberShrink: true. Tests usually don't have a real gateway
     // configured in lastKnownGood, so they pass through unaffected.
     if (
       !options.allowConfigClobberShrink &&
-      deps.env.KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK !== "1" &&
+      deps.env.ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK !== "1" &&
       typeof nextBytes === "number"
     ) {
       const healthState = await readConfigHealthState(deps);
@@ -1608,7 +1608,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
         return;
       }
       const isVitest = deps.env.VITEST === "true";
-      const shouldLogInVitest = deps.env.KAIJIBOT_TEST_CONFIG_OVERWRITE_LOG === "1";
+      const shouldLogInVitest = deps.env.ALLBOT_TEST_CONFIG_OVERWRITE_LOG === "1";
       if (isVitest && !shouldLogInVitest) {
         return;
       }
@@ -1627,7 +1627,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
       }
       // Tests often write minimal configs (missing meta, etc); keep output quiet unless requested.
       const isVitest = deps.env.VITEST === "true";
-      const shouldLogInVitest = deps.env.KAIJIBOT_TEST_CONFIG_WRITE_ANOMALY_LOG === "1";
+      const shouldLogInVitest = deps.env.ALLBOT_TEST_CONFIG_WRITE_ANOMALY_LOG === "1";
       if (isVitest && !shouldLogInVitest) {
         return;
       }
@@ -1734,7 +1734,7 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
 }
 
 // NOTE: These wrappers intentionally do *not* cache the resolved config path at
-// module scope. `KAIJIBOT_CONFIG_PATH` (and friends) are expected to work even
+// module scope. `ALLBOT_CONFIG_PATH` (and friends) are expected to work even
 // when set after the module has been imported (tests, one-off scripts, etc.).
 const AUTO_OWNER_DISPLAY_SECRET_BY_PATH = new Map<string, string>();
 const AUTO_OWNER_DISPLAY_SECRET_PERSIST_IN_FLIGHT = new Set<string>();
@@ -1750,8 +1750,8 @@ export function registerConfigWriteListener(
 }
 
 function isCompatibleTopLevelRuntimeProjectionShape(params: {
-  runtimeSnapshot: KaijiBotConfig;
-  candidate: KaijiBotConfig;
+  runtimeSnapshot: AllBotConfig;
+  candidate: AllBotConfig;
 }): boolean {
   const runtime = params.runtimeSnapshot as Record<string, unknown>;
   const candidate = params.candidate as Record<string, unknown>;
@@ -1778,7 +1778,7 @@ function isCompatibleTopLevelRuntimeProjectionShape(params: {
   return true;
 }
 
-export function projectConfigOntoRuntimeSourceSnapshot(config: KaijiBotConfig): KaijiBotConfig {
+export function projectConfigOntoRuntimeSourceSnapshot(config: AllBotConfig): AllBotConfig {
   const runtimeConfigSnapshot = getRuntimeConfigSnapshotState();
   const runtimeConfigSourceSnapshot = getRuntimeConfigSourceSnapshotState();
   if (!runtimeConfigSnapshot || !runtimeConfigSourceSnapshot) {
@@ -1806,18 +1806,18 @@ export function projectConfigOntoRuntimeSourceSnapshot(config: KaijiBotConfig): 
   return coerceConfig(applyMergePatch(projectedSource, runtimePatch));
 }
 
-export function loadConfig(): KaijiBotConfig {
+export function loadConfig(): AllBotConfig {
   // First successful load becomes the process snapshot. Long-lived runtimes
   // should swap this snapshot via explicit reload/watcher paths instead of
-  // reparsing kaijibot.json on hot code paths.
+  // reparsing allbot.json on hot code paths.
   return loadPinnedRuntimeConfig(() => createConfigIO().loadConfig());
 }
 
-export function getRuntimeConfig(): KaijiBotConfig {
+export function getRuntimeConfig(): AllBotConfig {
   return loadConfig();
 }
 
-export async function readBestEffortConfig(): Promise<KaijiBotConfig> {
+export async function readBestEffortConfig(): Promise<AllBotConfig> {
   const snapshot = await readConfigFileSnapshot();
   return snapshot.valid ? loadConfig() : snapshot.config;
 }
@@ -1839,7 +1839,7 @@ export async function readSourceConfigSnapshotForWrite(): Promise<ReadConfigFile
 }
 
 export async function writeConfigFile(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   options: ConfigWriteOptions = {},
 ): Promise<void> {
   const io = createConfigIO();

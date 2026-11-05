@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Install the sherpa-onnx runtime (local ASR/TTS engine) for KaijiBot on Termux.
+# Install the sherpa-onnx runtime (local ASR/TTS engine) for AllBot on Termux.
 #
 # Strategy:
 #   1. Preferred: download the official static linux-aarch64 build (fully
@@ -9,7 +9,7 @@ set -euo pipefail
 #   2. Fallback: compile from source (needs: pkg install git cmake clang
 #      ninja-bin) — see the bottom of this script and docs/platforms/termux.md.
 #
-# Installs into ~/.kaijibot/sherpa-speech/runtime — the location the
+# Installs into ~/.allbot/sherpa-speech/runtime — the location the
 # sherpa-speech extension resolves automatically.
 
 BOLD='\033[1m'
@@ -19,7 +19,7 @@ info()  { printf "${BOLD}[*]${NC} %s\n" "$*"; }
 ok()    { printf "${SUCCESS}[✓]${NC} %s\n" "$*"; }
 
 SHERPA_VERSION="${SHERPA_ONNX_VERSION:-v1.13.6}"
-STATE_DIR="${KAIJIBOT_STATE_DIR:-$HOME/.kaijibot}"
+STATE_DIR="${ALLBOT_STATE_DIR:-$HOME/.allbot}"
 RUNTIME_DIR="$STATE_DIR/sherpa-speech/runtime"
 MIRROR="${SHERPA_ONNX_DOWNLOAD_MIRROR:-}"
 ARCH="$(uname -m)"
@@ -58,7 +58,7 @@ if curl -fL --connect-timeout 20 --retry 3 -o "$ARCHIVE" "$URL"; then
     rm -f "$ARCHIVE"
     if "$RUNTIME_DIR/bin/sherpa-onnx-offline" --help >/dev/null 2>&1; then
       ok "静态构建可用: $RUNTIME_DIR"
-      info "模型文件会在 KaijiBot 网关启动时自动后台下载（sense-voice 约155MB + kokoro 约347MB）。"
+      info "模型文件会在 AllBot 网关启动时自动后台下载（sense-voice 约155MB + kokoro 约347MB）。"
       exit 0
     fi
     info "静态二进制无法运行，回退到源码编译方案..."
@@ -84,9 +84,9 @@ cat <<FALLBACK
         -DSHERPA_ONNX_ENABLE_CHECK=OFF -DSHERPA_ONNX_ENABLE_PORTAUDIO=OFF \\
         -DBUILD_SHARED_LIBS=OFF
   cmake --build build -j \$(nproc)
-  mkdir -p ~/.kaijibot/sherpa-speech/runtime/bin
+  mkdir -p ~/.allbot/sherpa-speech/runtime/bin
   cp build/bin/sherpa-onnx-offline build/bin/sherpa-onnx-offline-tts \\
-     ~/.kaijibot/sherpa-speech/runtime/bin/
+     ~/.allbot/sherpa-speech/runtime/bin/
 
 免编译后备: proot-distro login ubuntu 后使用官方 linux-aarch64 静态构建,
 详见 docs/platforms/termux.md。

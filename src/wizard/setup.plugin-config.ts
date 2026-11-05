@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginConfigUiHint } from "../plugins/types.js";
 import { getPath, setPathCreateStrict } from "../secrets/path-utils.js";
 import type { WizardPrompter } from "./prompts.js";
@@ -43,7 +43,7 @@ function resolveJsonSchemaProperty(
 }
 
 function getExistingPluginConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   pluginId: string,
 ): Record<string, unknown> {
   return (config.plugins?.entries?.[pluginId]?.config as Record<string, unknown>) ?? {};
@@ -119,7 +119,7 @@ export function discoverUnconfiguredPlugins(params: {
     configSchema?: Record<string, unknown>;
     enabled?: boolean;
   }>;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
 }): ConfigurablePlugin[] {
   const all = discoverConfigurablePlugins(params);
   return all.filter((plugin) => {
@@ -137,11 +137,11 @@ export function discoverUnconfiguredPlugins(params: {
  */
 async function promptPluginFields(params: {
   plugin: ConfigurablePlugin;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   /** When true, show all fields including already-configured ones (for configure flow). */
   showConfigured?: boolean;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const { plugin, config, prompter } = params;
   const existing = getExistingPluginConfig(config, plugin.id);
   const updatedConfig = structuredClone(existing);
@@ -162,10 +162,10 @@ async function promptPluginFields(params: {
     const helpSuffix = hint.help ? ` — ${hint.help}` : "";
 
     // Skip sensitive fields — WizardPrompter has no masked input;
-    // direct users to kaijibot config set or the Web UI instead.
+    // direct users to allbot config set or the Web UI instead.
     if (hint.sensitive) {
       await prompter.note(
-        `"${label}" is sensitive. Set it via:\n  kaijibot config set plugins.entries.${plugin.id}.config.${key} <value>\nor use the Web UI Settings page.`,
+        `"${label}" is sensitive. Set it via:\n  allbot config set plugins.entries.${plugin.id}.config.${key} <value>\nor use the Web UI Settings page.`,
         "Sensitive field",
       );
       continue;
@@ -285,10 +285,10 @@ async function promptPluginFields(params: {
  * Shows unconfigured plugin fields and prompts the user.
  */
 export async function setupPluginConfig(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   workspaceDir?: string;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const { loadPluginManifestRegistry } = await import("../plugins/manifest-registry.js");
   const registry = loadPluginManifestRegistry({
     config: params.config,
@@ -347,10 +347,10 @@ export async function setupPluginConfig(params: {
  * Shows all configurable plugins and all their non-advanced fields.
  */
 export async function configurePluginConfig(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter: WizardPrompter;
   workspaceDir?: string;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const { loadPluginManifestRegistry } = await import("../plugins/manifest-registry.js");
   const registry = loadPluginManifestRegistry({
     config: params.config,

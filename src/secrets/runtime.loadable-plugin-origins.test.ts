@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const loadPluginManifestRegistry = vi.hoisted(() => vi.fn());
 
@@ -7,8 +7,8 @@ vi.mock("./runtime-manifest.runtime.js", () => ({
   loadPluginManifestRegistry,
 }));
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;

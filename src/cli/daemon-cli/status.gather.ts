@@ -5,7 +5,7 @@ import {
   resolveStateDir,
 } from "../../config/config.js";
 import type {
-  KaijiBotConfig,
+  AllBotConfig,
   ConfigFileSnapshot,
   GatewayBindMode,
   GatewayControlUiConfig,
@@ -58,8 +58,8 @@ type PortStatusSummary = {
 
 type DaemonConfigContext = {
   mergedDaemonEnv: Record<string, string | undefined>;
-  cliCfg: KaijiBotConfig;
-  daemonCfg: KaijiBotConfig;
+  cliCfg: AllBotConfig;
+  daemonCfg: AllBotConfig;
   cliConfigSummary: ConfigSummary;
   daemonConfigSummary: ConfigSummary;
   configMismatch: boolean;
@@ -111,7 +111,7 @@ function loadRestartHealthModule() {
   return restartHealthModulePromise;
 }
 
-function resolveSnapshotRuntimeConfig(snapshot: ConfigFileSnapshot | null): KaijiBotConfig | null {
+function resolveSnapshotRuntimeConfig(snapshot: ConfigFileSnapshot | null): AllBotConfig | null {
   if (!snapshot?.valid || !snapshot.runtimeConfig) {
     return null;
   }
@@ -249,8 +249,8 @@ async function loadDaemonConfigContext(
 }
 
 async function resolveGatewayStatusSummary(params: {
-  daemonCfg: KaijiBotConfig;
-  cliCfg: KaijiBotConfig;
+  daemonCfg: AllBotConfig;
+  cliCfg: AllBotConfig;
   mergedDaemonEnv: Record<string, string | undefined>;
   commandProgramArguments?: string[];
   rpcUrlOverride?: string;

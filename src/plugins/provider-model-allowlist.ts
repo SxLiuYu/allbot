@@ -1,12 +1,12 @@
 import { DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { resolveAllowlistModelKey } from "../agents/model-allowlist-ref.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export function ensureModelAllowlistEntry(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   modelRef: string;
   defaultProvider?: string;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const rawModelRef = params.modelRef.trim();
   if (!rawModelRef) {
     return params.cfg;

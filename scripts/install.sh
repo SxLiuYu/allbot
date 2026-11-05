@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# KaijiBot Installer for macOS and Linux
+# AllBot Installer for macOS and Linux
 # Usage: curl -fsSL --proto '=https' --tlsv1.2 https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.sh | bash
 
 BOLD='\033[1m'
@@ -15,7 +15,7 @@ ERROR='\033[38;2;230;57;70m'        # coral-mid     #e63946
 MUTED='\033[38;2;90;100;128m'       # text-muted    #5a6480
 NC='\033[0m' # No Color
 
-DEFAULT_TAGLINE="All your chats, one KaijiBot."
+DEFAULT_TAGLINE="All your chats, one AllBot."
 NODE_DEFAULT_MAJOR=24
 NODE_MIN_MAJOR=22
 NODE_MIN_MINOR=14
@@ -74,7 +74,7 @@ run_remote_bash() {
     /bin/bash "$tmp"
 }
 
-GUM_VERSION="${KAIJIBOT_GUM_VERSION:-0.17.0}"
+GUM_VERSION="${ALLBOT_GUM_VERSION:-0.17.0}"
 GUM=""
 GUM_STATUS="skipped"
 GUM_REASON=""
@@ -236,7 +236,7 @@ print_gum_status() {
 print_installer_banner() {
     if [[ -n "$GUM" ]]; then
         local title tagline hint card
-        title="$("$GUM" style --foreground "#ff4d4d" --bold "🦞 KaijiBot Installer")"
+        title="$("$GUM" style --foreground "#ff4d4d" --bold "🦞 AllBot Installer")"
         tagline="$("$GUM" style --foreground "#8892b0" "$TAGLINE")"
         hint="$("$GUM" style --foreground "#5a6480" "modern installer mode")"
         card="$(printf '%s\n%s\n%s' "$title" "$tagline" "$hint")"
@@ -246,7 +246,7 @@ print_installer_banner() {
     fi
 
     echo -e "${ACCENT}${BOLD}"
-    echo "  🦞 KaijiBot Installer"
+    echo "  🦞 AllBot Installer"
     echo -e "${NC}${INFO}  ${TAGLINE}${NC}"
     echo ""
 }
@@ -354,7 +354,7 @@ show_install_plan() {
     ui_section "Install plan"
     ui_kv "OS" "$OS"
     ui_kv "Install method" "$INSTALL_METHOD"
-    ui_kv "Requested version" "$KAIJIBOT_VERSION"
+    ui_kv "Requested version" "$ALLBOT_VERSION"
     if [[ "$USE_BETA" == "1" ]]; then
         ui_kv "Beta channel" "enabled"
     fi
@@ -475,16 +475,16 @@ cleanup_legacy_submodules() {
     fi
 }
 
-cleanup_npm_kaijibot_paths() {
+cleanup_npm_allbot_paths() {
     local npm_root=""
     npm_root="$(npm root -g 2>/dev/null || true)"
     if [[ -z "$npm_root" || "$npm_root" != *node_modules* ]]; then
         return 1
     fi
-    rm -rf "$npm_root"/.kaijibot-* "$npm_root"/kaijibot 2>/dev/null || true
+    rm -rf "$npm_root"/.allbot-* "$npm_root"/allbot 2>/dev/null || true
 }
 
-extract_kaijibot_conflict_path() {
+extract_allbot_conflict_path() {
     local log="$1"
     local path=""
     path="$(sed -n 's/.*File exists: //p' "$log" | head -n1)"
@@ -498,16 +498,16 @@ extract_kaijibot_conflict_path() {
     return 1
 }
 
-cleanup_kaijibot_bin_conflict() {
+cleanup_allbot_bin_conflict() {
     local bin_path="$1"
     if [[ -z "$bin_path" || ( ! -e "$bin_path" && ! -L "$bin_path" ) ]]; then
         return 1
     fi
     local npm_bin=""
     npm_bin="$(npm_global_bin_dir 2>/dev/null || true)"
-    if [[ -n "$npm_bin" && "$bin_path" != "$npm_bin/kaijibot" ]]; then
+    if [[ -n "$npm_bin" && "$bin_path" != "$npm_bin/allbot" ]]; then
         case "$bin_path" in
-            "/opt/homebrew/bin/kaijibot"|"/usr/local/bin/kaijibot")
+            "/opt/homebrew/bin/allbot"|"/usr/local/bin/allbot")
                 ;;
             *)
                 return 1
@@ -517,9 +517,9 @@ cleanup_kaijibot_bin_conflict() {
     if [[ -L "$bin_path" ]]; then
         local target=""
         target="$(readlink "$bin_path" 2>/dev/null || true)"
-        if [[ "$target" == *"/node_modules/kaijibot/"* ]]; then
+        if [[ "$target" == *"/node_modules/allbot/"* ]]; then
             rm -f "$bin_path"
-            ui_info "Removed stale kaijibot symlink at ${bin_path}"
+            ui_info "Removed stale allbot symlink at ${bin_path}"
             return 0
         fi
         return 1
@@ -527,7 +527,7 @@ cleanup_kaijibot_bin_conflict() {
     local backup=""
     backup="${bin_path}.bak-$(date +%Y%m%d-%H%M%S)"
     if mv "$bin_path" "$backup"; then
-        ui_info "Moved existing kaijibot binary to ${backup}"
+        ui_info "Moved existing allbot binary to ${backup}"
         return 0
     fi
     return 1
@@ -696,7 +696,7 @@ run_npm_global_install() {
         local log_quoted=""
         printf -v cmd_quoted '%q ' "${cmd[@]}"
         printf -v log_quoted '%q' "$log"
-        run_with_spinner "Installing KaijiBot package" bash -c "${cmd_quoted}>${log_quoted} 2>&1"
+        run_with_spinner "Installing AllBot package" bash -c "${cmd_quoted}>${log_quoted} 2>&1"
         return $?
     fi
 
@@ -782,7 +782,7 @@ print_npm_failure_diagnostics() {
     fi
 }
 
-install_kaijibot_npm() {
+install_allbot_npm() {
     local spec="$1"
     local log
     log="$(mktempfile)"
@@ -792,7 +792,7 @@ install_kaijibot_npm() {
             attempted_build_tool_fix=true
             ui_info "Retrying npm install after build tools setup"
             if run_npm_global_install "$spec" "$log"; then
-                ui_success "KaijiBot npm package installed"
+                ui_success "AllBot npm package installed"
                 return 0
             fi
         fi
@@ -808,26 +808,26 @@ install_kaijibot_npm() {
             tail -n 80 "$log" >&2 || true
         fi
 
-        if grep -q "ENOTEMPTY: directory not empty, rename .*kaijibot" "$log"; then
+        if grep -q "ENOTEMPTY: directory not empty, rename .*allbot" "$log"; then
             ui_warn "npm left stale directory; cleaning and retrying"
-            cleanup_npm_kaijibot_paths
+            cleanup_npm_allbot_paths
             if run_npm_global_install "$spec" "$log"; then
-                ui_success "KaijiBot npm package installed"
+                ui_success "AllBot npm package installed"
                 return 0
             fi
             return 1
         fi
         if grep -q "EEXIST" "$log"; then
             local conflict=""
-            conflict="$(extract_kaijibot_conflict_path "$log" || true)"
-            if [[ -n "$conflict" ]] && cleanup_kaijibot_bin_conflict "$conflict"; then
+            conflict="$(extract_allbot_conflict_path "$log" || true)"
+            if [[ -n "$conflict" ]] && cleanup_allbot_bin_conflict "$conflict"; then
                 if run_npm_global_install "$spec" "$log"; then
-                    ui_success "KaijiBot npm package installed"
+                    ui_success "AllBot npm package installed"
                     return 0
                 fi
                 return 1
             fi
-            ui_error "npm failed because an kaijibot binary already exists"
+            ui_error "npm failed because an allbot binary already exists"
             if [[ -n "$conflict" ]]; then
                 ui_info "Remove or move ${conflict}, then retry"
             fi
@@ -835,7 +835,7 @@ install_kaijibot_npm() {
         fi
         return 1
     fi
-    ui_success "KaijiBot npm package installed"
+    ui_success "AllBot npm package installed"
     return 0
 }
 
@@ -947,9 +947,9 @@ pick_tagline() {
         echo "$DEFAULT_TAGLINE"
         return
     fi
-    if [[ -n "${KAIJIBOT_TAGLINE_INDEX:-}" ]]; then
-        if [[ "${KAIJIBOT_TAGLINE_INDEX}" =~ ^[0-9]+$ ]]; then
-            local idx=$((KAIJIBOT_TAGLINE_INDEX % count))
+    if [[ -n "${ALLBOT_TAGLINE_INDEX:-}" ]]; then
+        if [[ "${ALLBOT_TAGLINE_INDEX}" =~ ^[0-9]+$ ]]; then
+            local idx=$((ALLBOT_TAGLINE_INDEX % count))
             echo "${TAGLINES[$idx]}"
             return
         fi
@@ -960,27 +960,27 @@ pick_tagline() {
 
 TAGLINE=$(pick_tagline)
 
-NO_ONBOARD=${KAIJIBOT_NO_ONBOARD:-0}
-NO_PROMPT=${KAIJIBOT_NO_PROMPT:-0}
-DRY_RUN=${KAIJIBOT_DRY_RUN:-0}
-INSTALL_METHOD=${KAIJIBOT_INSTALL_METHOD:-}
-KAIJIBOT_VERSION=${KAIJIBOT_VERSION:-latest}
-USE_BETA=${KAIJIBOT_BETA:-0}
-GIT_DIR_DEFAULT="${HOME}/kaijibot"
-GIT_DIR=${KAIJIBOT_GIT_DIR:-$GIT_DIR_DEFAULT}
-GIT_UPDATE=${KAIJIBOT_GIT_UPDATE:-1}
+NO_ONBOARD=${ALLBOT_NO_ONBOARD:-0}
+NO_PROMPT=${ALLBOT_NO_PROMPT:-0}
+DRY_RUN=${ALLBOT_DRY_RUN:-0}
+INSTALL_METHOD=${ALLBOT_INSTALL_METHOD:-}
+ALLBOT_VERSION=${ALLBOT_VERSION:-latest}
+USE_BETA=${ALLBOT_BETA:-0}
+GIT_DIR_DEFAULT="${HOME}/allbot"
+GIT_DIR=${ALLBOT_GIT_DIR:-$GIT_DIR_DEFAULT}
+GIT_UPDATE=${ALLBOT_GIT_UPDATE:-1}
 SHARP_IGNORE_GLOBAL_LIBVIPS="${SHARP_IGNORE_GLOBAL_LIBVIPS:-1}"
-NPM_LOGLEVEL="${KAIJIBOT_NPM_LOGLEVEL:-error}"
+NPM_LOGLEVEL="${ALLBOT_NPM_LOGLEVEL:-error}"
 NPM_SILENT_FLAG="--silent"
-VERBOSE="${KAIJIBOT_VERBOSE:-0}"
-VERIFY_INSTALL="${KAIJIBOT_VERIFY_INSTALL:-0}"
-KAIJIBOT_BIN=""
+VERBOSE="${ALLBOT_VERBOSE:-0}"
+VERIFY_INSTALL="${ALLBOT_VERIFY_INSTALL:-0}"
+ALLBOT_BIN=""
 PNPM_CMD=()
 HELP=0
 
 print_usage() {
     cat <<EOF
-KaijiBot installer (macOS + Linux)
+AllBot installer (macOS + Linux)
 
 Usage:
   curl -fsSL --proto '=https' --tlsv1.2 https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.sh | bash -s -- [options]
@@ -991,7 +991,7 @@ Options:
   --git, --github                     Shortcut for --install-method git
   --version <version|dist-tag|spec>    npm install target (default: latest; use "main" for GitHub main)
   --beta                               Use beta if available, else latest
-  --git-dir, --dir <path>             Checkout directory (default: ~/kaijibot)
+  --git-dir, --dir <path>             Checkout directory (default: ~/allbot)
   --no-git-update                      Skip git pull for existing checkout
   --no-onboard                          Skip onboarding (non-interactive)
   --no-prompt                           Disable prompts (required in CI/automation)
@@ -1001,17 +1001,17 @@ Options:
   --help, -h                            Show this help
 
 Environment variables:
-  KAIJIBOT_INSTALL_METHOD=git|npm
-  KAIJIBOT_VERSION=latest|next|main|<semver>|<spec>
-  KAIJIBOT_BETA=0|1
-  KAIJIBOT_GIT_DIR=...
-  KAIJIBOT_GIT_UPDATE=0|1
-  KAIJIBOT_NO_PROMPT=1
-  KAIJIBOT_VERIFY_INSTALL=1
-  KAIJIBOT_DRY_RUN=1
-  KAIJIBOT_NO_ONBOARD=1
-  KAIJIBOT_VERBOSE=1
-  KAIJIBOT_NPM_LOGLEVEL=error|warn|notice  Default: error (hide npm deprecation noise)
+  ALLBOT_INSTALL_METHOD=git|npm
+  ALLBOT_VERSION=latest|next|main|<semver>|<spec>
+  ALLBOT_BETA=0|1
+  ALLBOT_GIT_DIR=...
+  ALLBOT_GIT_UPDATE=0|1
+  ALLBOT_NO_PROMPT=1
+  ALLBOT_VERIFY_INSTALL=1
+  ALLBOT_DRY_RUN=1
+  ALLBOT_NO_ONBOARD=1
+  ALLBOT_VERBOSE=1
+  ALLBOT_NPM_LOGLEVEL=error|warn|notice  Default: error (hide npm deprecation noise)
   SHARP_IGNORE_GLOBAL_LIBVIPS=0|1    Default: 1 (avoid sharp building against global libvips)
 
 Examples:
@@ -1059,7 +1059,7 @@ parse_args() {
                 shift 2
                 ;;
             --version)
-                KAIJIBOT_VERSION="$2"
+                ALLBOT_VERSION="$2"
                 shift 2
                 ;;
             --beta)
@@ -1130,7 +1130,7 @@ choose_install_method_interactive() {
 
     if [[ -n "$GUM" ]] && gum_is_tty; then
         local header selection
-        header="Detected KaijiBot checkout in: ${detected_checkout}
+        header="Detected AllBot checkout in: ${detected_checkout}
 Choose install method"
         selection="$("$GUM" choose \
             --header "$header" \
@@ -1153,7 +1153,7 @@ Choose install method"
 
     local choice=""
     choice="$(prompt_choice "$(cat <<EOF
-${WARN}→${NC} Detected a KaijiBot source checkout in: ${INFO}${detected_checkout}${NC}
+${WARN}→${NC} Detected a AllBot source checkout in: ${INFO}${detected_checkout}${NC}
 Choose install method:
   1) Update this checkout (git) and use it
   2) Install global via npm (migrate away from git)
@@ -1175,7 +1175,7 @@ EOF
     return 1
 }
 
-detect_kaijibot_checkout() {
+detect_allbot_checkout() {
     local dir="$1"
     if [[ ! -f "$dir/package.json" ]]; then
         return 1
@@ -1183,7 +1183,7 @@ detect_kaijibot_checkout() {
     if [[ ! -f "$dir/pnpm-workspace.yaml" ]]; then
         return 1
     fi
-    if ! grep -q '"name"[[:space:]]*:[[:space:]]*"kaijibot"' "$dir/package.json" 2>/dev/null; then
+    if ! grep -q '"name"[[:space:]]*:[[:space:]]*"allbot"' "$dir/package.json" 2>/dev/null; then
         return 1
     fi
     echo "$dir"
@@ -1590,10 +1590,10 @@ fix_npm_permissions() {
     ui_success "npm configured for user installs"
 }
 
-ensure_kaijibot_bin_link() {
+ensure_allbot_bin_link() {
     local npm_root=""
     npm_root="$(npm root -g 2>/dev/null || true)"
-    if [[ -z "$npm_root" || ! -d "$npm_root/kaijibot" ]]; then
+    if [[ -z "$npm_root" || ! -d "$npm_root/allbot" ]]; then
         return 1
     fi
     local npm_bin=""
@@ -1602,17 +1602,17 @@ ensure_kaijibot_bin_link() {
         return 1
     fi
     mkdir -p "$npm_bin"
-    if [[ ! -x "${npm_bin}/kaijibot" ]]; then
-        ln -sf "$npm_root/kaijibot/dist/entry.js" "${npm_bin}/kaijibot"
-        ui_info "Created kaijibot bin link at ${npm_bin}/kaijibot"
+    if [[ ! -x "${npm_bin}/allbot" ]]; then
+        ln -sf "$npm_root/allbot/dist/entry.js" "${npm_bin}/allbot"
+        ui_info "Created allbot bin link at ${npm_bin}/allbot"
     fi
     return 0
 }
 
-# Check for existing KaijiBot installation
-check_existing_kaijibot() {
-    if [[ -n "$(type -P kaijibot 2>/dev/null || true)" ]]; then
-        ui_info "Existing KaijiBot installation detected, upgrading"
+# Check for existing AllBot installation
+check_existing_allbot() {
+    if [[ -n "$(type -P allbot 2>/dev/null || true)" ]]; then
+        ui_info "Existing AllBot installation detected, upgrading"
         return 0
     fi
     return 1
@@ -1797,7 +1797,7 @@ warn_shell_path_missing_dir() {
 
     echo ""
     ui_warn "PATH missing ${label}: ${dir}"
-    echo "  This can make kaijibot show as \"command not found\" in new terminals."
+    echo "  This can make allbot show as \"command not found\" in new terminals."
     echo "  Fix (zsh: ~/.zshrc, bash: ~/.bashrc):"
     echo "    export PATH=\"${dir}:\$PATH\""
 }
@@ -1816,13 +1816,13 @@ maybe_nodenv_rehash() {
     fi
 }
 
-warn_kaijibot_not_found() {
-    ui_warn "Installed, but kaijibot is not discoverable on PATH in this shell"
+warn_allbot_not_found() {
+    ui_warn "Installed, but allbot is not discoverable on PATH in this shell"
     echo "  Try: hash -r (bash) or rehash (zsh), then retry."
     local t=""
-    t="$(type -t kaijibot 2>/dev/null || true)"
+    t="$(type -t allbot 2>/dev/null || true)"
     if [[ "$t" == "alias" || "$t" == "function" ]]; then
-        ui_warn "Found a shell ${t} named kaijibot; it may shadow the real binary"
+        ui_warn "Found a shell ${t} named allbot; it may shadow the real binary"
     fi
     if command -v nodenv &> /dev/null; then
         echo -e "Using nodenv? Run: ${INFO}nodenv rehash${NC}"
@@ -1841,10 +1841,10 @@ warn_kaijibot_not_found() {
     fi
 }
 
-resolve_kaijibot_bin() {
+resolve_allbot_bin() {
     refresh_shell_command_cache
     local resolved=""
-    resolved="$(type -P kaijibot 2>/dev/null || true)"
+    resolved="$(type -P allbot 2>/dev/null || true)"
     if [[ -n "$resolved" && -x "$resolved" ]]; then
         echo "$resolved"
         return 0
@@ -1852,7 +1852,7 @@ resolve_kaijibot_bin() {
 
     ensure_npm_global_bin_on_path
     refresh_shell_command_cache
-    resolved="$(type -P kaijibot 2>/dev/null || true)"
+    resolved="$(type -P allbot 2>/dev/null || true)"
     if [[ -n "$resolved" && -x "$resolved" ]]; then
         echo "$resolved"
         return 0
@@ -1860,21 +1860,21 @@ resolve_kaijibot_bin() {
 
     local npm_bin=""
     npm_bin="$(npm_global_bin_dir || true)"
-    if [[ -n "$npm_bin" && -x "${npm_bin}/kaijibot" ]]; then
-        echo "${npm_bin}/kaijibot"
+    if [[ -n "$npm_bin" && -x "${npm_bin}/allbot" ]]; then
+        echo "${npm_bin}/allbot"
         return 0
     fi
 
     maybe_nodenv_rehash
     refresh_shell_command_cache
-    resolved="$(type -P kaijibot 2>/dev/null || true)"
+    resolved="$(type -P allbot 2>/dev/null || true)"
     if [[ -n "$resolved" && -x "$resolved" ]]; then
         echo "$resolved"
         return 0
     fi
 
-    if [[ -n "$npm_bin" && -x "${npm_bin}/kaijibot" ]]; then
-        echo "${npm_bin}/kaijibot"
+    if [[ -n "$npm_bin" && -x "${npm_bin}/allbot" ]]; then
+        echo "${npm_bin}/allbot"
         return 0
     fi
 
@@ -1882,14 +1882,14 @@ resolve_kaijibot_bin() {
     return 1
 }
 
-install_kaijibot_from_git() {
+install_allbot_from_git() {
     local repo_dir="$1"
     local repo_url="https://gitee.com/kaiji1126/kaijibot.git"
 
     if [[ -d "$repo_dir/.git" ]]; then
-        ui_info "Installing KaijiBot from git checkout: ${repo_dir}"
+        ui_info "Installing AllBot from git checkout: ${repo_dir}"
     else
-        ui_info "Installing KaijiBot from GitHub (${repo_url})"
+        ui_info "Installing AllBot from GitHub (${repo_url})"
     fi
 
     if ! check_git; then
@@ -1900,7 +1900,7 @@ install_kaijibot_from_git() {
     ensure_pnpm_binary_for_scripts
 
     if [[ ! -d "$repo_dir" ]]; then
-        run_quiet_step "Cloning KaijiBot" git clone "$repo_url" "$repo_dir"
+        run_quiet_step "Cloning AllBot" git clone "$repo_url" "$repo_dir"
     fi
 
     if [[ "$GIT_UPDATE" == "1" ]]; then
@@ -1918,24 +1918,24 @@ install_kaijibot_from_git() {
     if ! run_quiet_step "Building UI" run_pnpm -C "$repo_dir" ui:build; then
         ui_warn "UI build failed; continuing (CLI may still work)"
     fi
-    run_quiet_step "Building KaijiBot" run_pnpm -C "$repo_dir" build
+    run_quiet_step "Building AllBot" run_pnpm -C "$repo_dir" build
 
     ensure_user_local_bin_on_path
 
-    cat > "$HOME/.local/bin/kaijibot" <<EOF
+    cat > "$HOME/.local/bin/allbot" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 exec node "${repo_dir}/dist/entry.js" "\$@"
 EOF
-    chmod +x "$HOME/.local/bin/kaijibot"
-    ui_success "KaijiBot wrapper installed to \$HOME/.local/bin/kaijibot"
+    chmod +x "$HOME/.local/bin/allbot"
+    ui_success "AllBot wrapper installed to \$HOME/.local/bin/allbot"
     ui_info "This checkout uses pnpm — run pnpm install (or corepack pnpm install) for deps"
 }
 
-# Install KaijiBot
+# Install AllBot
 resolve_beta_version() {
     local beta=""
-    beta="$(npm view kaijibot dist-tags.beta 2>/dev/null || true)"
+    beta="$(npm view allbot dist-tags.beta 2>/dev/null || true)"
     if [[ -z "$beta" || "$beta" == "undefined" || "$beta" == "null" ]]; then
         return 1
     fi
@@ -1965,7 +1965,7 @@ resolve_package_install_spec() {
     local package_name="$1"
     local value="$2"
     if [[ "${value,,}" == "main" ]]; then
-        echo "github:Kaiji-Z/kaijibot#main"
+        echo "github:Kaiji-Z/allbot#main"
         return 0
     fi
     if is_explicit_package_install_spec "$value"; then
@@ -1979,66 +1979,66 @@ resolve_package_install_spec() {
     echo "${package_name}@${value}"
 }
 
-install_kaijibot() {
-    local package_name="kaijibot"
+install_allbot() {
+    local package_name="allbot"
     if [[ "$USE_BETA" == "1" ]]; then
         local beta_version=""
         beta_version="$(resolve_beta_version || true)"
         if [[ -n "$beta_version" ]]; then
-            KAIJIBOT_VERSION="$beta_version"
+            ALLBOT_VERSION="$beta_version"
             ui_info "Beta tag detected (${beta_version})"
-            package_name="kaijibot"
+            package_name="allbot"
         else
-            KAIJIBOT_VERSION="latest"
+            ALLBOT_VERSION="latest"
             ui_info "No beta tag found; using latest"
         fi
     fi
 
-    if [[ -z "${KAIJIBOT_VERSION}" ]]; then
-        KAIJIBOT_VERSION="latest"
+    if [[ -z "${ALLBOT_VERSION}" ]]; then
+        ALLBOT_VERSION="latest"
     fi
 
     local resolved_version=""
-    if can_resolve_registry_package_version "${KAIJIBOT_VERSION}"; then
-        resolved_version="$(npm view "${package_name}@${KAIJIBOT_VERSION}" version 2>/dev/null || true)"
+    if can_resolve_registry_package_version "${ALLBOT_VERSION}"; then
+        resolved_version="$(npm view "${package_name}@${ALLBOT_VERSION}" version 2>/dev/null || true)"
     fi
     if [[ -n "$resolved_version" ]]; then
-        ui_info "Installing KaijiBot v${resolved_version}"
+        ui_info "Installing AllBot v${resolved_version}"
     else
-        ui_info "Installing KaijiBot (${KAIJIBOT_VERSION})"
+        ui_info "Installing AllBot (${ALLBOT_VERSION})"
     fi
     local install_spec=""
-    install_spec="$(resolve_package_install_spec "${package_name}" "${KAIJIBOT_VERSION}")"
+    install_spec="$(resolve_package_install_spec "${package_name}" "${ALLBOT_VERSION}")"
 
-    if ! install_kaijibot_npm "${install_spec}"; then
+    if ! install_allbot_npm "${install_spec}"; then
         ui_warn "npm install failed; retrying"
-        cleanup_npm_kaijibot_paths
-        install_kaijibot_npm "${install_spec}"
+        cleanup_npm_allbot_paths
+        install_allbot_npm "${install_spec}"
     fi
 
-    if [[ "${KAIJIBOT_VERSION}" == "latest" && "${package_name}" == "kaijibot" ]]; then
-        if ! resolve_kaijibot_bin &> /dev/null; then
-            ui_warn "npm install kaijibot@latest failed; retrying kaijibot@next"
-            cleanup_npm_kaijibot_paths
-            install_kaijibot_npm "kaijibot@next"
+    if [[ "${ALLBOT_VERSION}" == "latest" && "${package_name}" == "allbot" ]]; then
+        if ! resolve_allbot_bin &> /dev/null; then
+            ui_warn "npm install allbot@latest failed; retrying allbot@next"
+            cleanup_npm_allbot_paths
+            install_allbot_npm "allbot@next"
         fi
     fi
 
-    ensure_kaijibot_bin_link || true
+    ensure_allbot_bin_link || true
 
-    ui_success "KaijiBot installed"
+    ui_success "AllBot installed"
 }
 
 # Run doctor for migrations (safe, non-interactive)
 run_doctor() {
     ui_info "Running doctor to migrate settings"
-    local claw="${KAIJIBOT_BIN:-}"
+    local claw="${ALLBOT_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_kaijibot_bin || true)"
+        claw="$(resolve_allbot_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
-        ui_info "Skipping doctor (kaijibot not on PATH yet)"
-        warn_kaijibot_not_found
+        ui_info "Skipping doctor (allbot not on PATH yet)"
+        warn_allbot_not_found
         return 0
     fi
     run_quiet_step "Running doctor" "$claw" doctor --non-interactive || true
@@ -2046,9 +2046,9 @@ run_doctor() {
 }
 
 maybe_open_dashboard() {
-    local claw="${KAIJIBOT_BIN:-}"
+    local claw="${ALLBOT_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_kaijibot_bin || true)"
+        claw="$(resolve_allbot_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
         return 0
@@ -2060,11 +2060,11 @@ maybe_open_dashboard() {
 }
 
 resolve_workspace_dir() {
-    local profile="${KAIJIBOT_PROFILE:-default}"
+    local profile="${ALLBOT_PROFILE:-default}"
     if [[ "${profile}" != "default" ]]; then
-        echo "${HOME}/.kaijibot/workspace-${profile}"
+        echo "${HOME}/.allbot/workspace-${profile}"
     else
-        echo "${HOME}/.kaijibot/workspace"
+        echo "${HOME}/.allbot/workspace"
     fi
 }
 
@@ -2073,7 +2073,7 @@ run_bootstrap_onboarding_if_needed() {
         return
     fi
 
-    local config_path="${KAIJIBOT_CONFIG_PATH:-$HOME/.kaijibot/kaijibot.json}"
+    local config_path="${ALLBOT_CONFIG_PATH:-$HOME/.allbot/allbot.json}"
     if [[ -f "${config_path}" || -f "$HOME/.clawdbot/clawdbot.json" ]]; then
         return
     fi
@@ -2087,23 +2087,23 @@ run_bootstrap_onboarding_if_needed() {
     fi
 
     if [[ ! -r /dev/tty || ! -w /dev/tty ]]; then
-        ui_info "BOOTSTRAP.md found but no TTY; run kaijibot onboard to finish setup"
+        ui_info "BOOTSTRAP.md found but no TTY; run allbot onboard to finish setup"
         return
     fi
 
     ui_info "BOOTSTRAP.md found; starting onboarding"
-    local claw="${KAIJIBOT_BIN:-}"
+    local claw="${ALLBOT_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_kaijibot_bin || true)"
+        claw="$(resolve_allbot_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
-        ui_info "BOOTSTRAP.md found but kaijibot not on PATH; skipping onboarding"
-        warn_kaijibot_not_found
+        ui_info "BOOTSTRAP.md found but allbot not on PATH; skipping onboarding"
+        warn_allbot_not_found
         return
     fi
 
     "$claw" onboard || {
-        ui_error "Onboarding failed; run kaijibot onboard to retry"
+        ui_error "Onboarding failed; run allbot onboard to retry"
         return
     }
 }
@@ -2125,9 +2125,9 @@ load_install_version_helpers() {
 
 load_install_version_helpers
 
-if ! declare -F extract_kaijibot_semver >/dev/null 2>&1; then
+if ! declare -F extract_allbot_semver >/dev/null 2>&1; then
 # Inline fallback when version-parse.sh could not be sourced (for example, stdin install).
-extract_kaijibot_semver() {
+extract_allbot_semver() {
     local raw="${1:-}"
     local parsed=""
     parsed="$(
@@ -2141,16 +2141,16 @@ extract_kaijibot_semver() {
 }
 fi
 
-resolve_kaijibot_version() {
+resolve_allbot_version() {
     local version=""
     local raw_version_output=""
-    local claw="${KAIJIBOT_BIN:-}"
-    if [[ -z "$claw" ]] && command -v kaijibot &> /dev/null; then
-        claw="$(command -v kaijibot)"
+    local claw="${ALLBOT_BIN:-}"
+    if [[ -z "$claw" ]] && command -v allbot &> /dev/null; then
+        claw="$(command -v allbot)"
     fi
     if [[ -n "$claw" ]]; then
         raw_version_output=$("$claw" --version 2>/dev/null | head -n 1 | tr -d '\r')
-        version="$(extract_kaijibot_semver "$raw_version_output")"
+        version="$(extract_allbot_semver "$raw_version_output")"
         if [[ -z "$version" ]]; then
             version="$raw_version_output"
         fi
@@ -2158,8 +2158,8 @@ resolve_kaijibot_version() {
     if [[ -z "$version" ]]; then
         local npm_root=""
         npm_root=$(npm root -g 2>/dev/null || true)
-        if [[ -n "$npm_root" && -f "$npm_root/kaijibot/package.json" ]]; then
-            version=$(node -e "console.log(require('${npm_root}/kaijibot/package.json').version)" 2>/dev/null || true)
+        if [[ -n "$npm_root" && -f "$npm_root/allbot/package.json" ]]; then
+            version=$(node -e "console.log(require('${npm_root}/allbot/package.json').version)" 2>/dev/null || true)
         fi
     fi
     echo "$version"
@@ -2191,9 +2191,9 @@ try {
 }
 
 refresh_gateway_service_if_loaded() {
-    local claw="${KAIJIBOT_BIN:-}"
+    local claw="${ALLBOT_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_kaijibot_bin || true)"
+        claw="$(resolve_allbot_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
         return 0
@@ -2227,22 +2227,22 @@ verify_installation() {
     fi
 
     ui_stage "Verifying installation"
-    local claw="${KAIJIBOT_BIN:-}"
+    local claw="${ALLBOT_BIN:-}"
     if [[ -z "$claw" ]]; then
-        claw="$(resolve_kaijibot_bin || true)"
+        claw="$(resolve_allbot_bin || true)"
     fi
     if [[ -z "$claw" ]]; then
-        ui_error "Install verify failed: kaijibot not on PATH yet"
-        warn_kaijibot_not_found
+        ui_error "Install verify failed: allbot not on PATH yet"
+        warn_allbot_not_found
         return 1
     fi
 
-    run_quiet_step "Checking KaijiBot version" "$claw" --version || return 1
+    run_quiet_step "Checking AllBot version" "$claw" --version || return 1
 
     if is_gateway_daemon_loaded "$claw"; then
         run_quiet_step "Checking gateway service" "$claw" gateway status --deep || {
             ui_error "Install verify failed: gateway service unhealthy"
-            ui_info "Run: kaijibot gateway status --deep"
+            ui_info "Run: allbot gateway status --deep"
             return 1
         }
     else
@@ -2265,11 +2265,11 @@ main() {
     detect_os_or_die
 
     local detected_checkout=""
-    detected_checkout="$(detect_kaijibot_checkout "$PWD" || true)"
+    detected_checkout="$(detect_allbot_checkout "$PWD" || true)"
 
     if [[ -z "$INSTALL_METHOD" && -n "$detected_checkout" ]]; then
         if ! is_promptable; then
-            ui_info "Found KaijiBot checkout but no TTY; defaulting to npm install"
+            ui_info "Found AllBot checkout but no TTY; defaulting to npm install"
             INSTALL_METHOD="npm"
         else
             local selected_method=""
@@ -2280,7 +2280,7 @@ main() {
                     ;;
                 *)
                     ui_error "no install method selected"
-                    echo "Re-run with: --install-method git|npm (or set KAIJIBOT_INSTALL_METHOD)."
+                    echo "Re-run with: --install-method git|npm (or set ALLBOT_INSTALL_METHOD)."
                     exit 2
                     ;;
             esac
@@ -2306,7 +2306,7 @@ main() {
 
     # Check for existing installation
     local is_upgrade=false
-    if check_existing_kaijibot; then
+    if check_existing_allbot; then
         is_upgrade=true
     fi
     local should_open_dashboard=false
@@ -2325,14 +2325,14 @@ main() {
         exit 1
     fi
 
-    ui_stage "Installing KaijiBot"
+    ui_stage "Installing AllBot"
 
     local final_git_dir=""
     if [[ "$INSTALL_METHOD" == "git" ]]; then
         # Clean up npm global install if switching to git
-        if npm list -g kaijibot &>/dev/null; then
+        if npm list -g allbot &>/dev/null; then
             ui_info "Removing npm global install (switching to git)"
-            npm uninstall -g kaijibot 2>/dev/null || true
+            npm uninstall -g allbot 2>/dev/null || true
             ui_success "npm global install removed"
         fi
 
@@ -2341,12 +2341,12 @@ main() {
             repo_dir="$detected_checkout"
         fi
         final_git_dir="$repo_dir"
-        install_kaijibot_from_git "$repo_dir"
+        install_allbot_from_git "$repo_dir"
     else
         # Clean up git wrapper if switching to npm
-        if [[ -x "$HOME/.local/bin/kaijibot" ]]; then
+        if [[ -x "$HOME/.local/bin/allbot" ]]; then
             ui_info "Removing git wrapper (switching to npm)"
-            rm -f "$HOME/.local/bin/kaijibot"
+            rm -f "$HOME/.local/bin/allbot"
             ui_success "git wrapper removed"
         fi
 
@@ -2358,13 +2358,13 @@ main() {
         # Step 4: npm permissions (Linux)
         fix_npm_permissions
 
-        # Step 5: KaijiBot
-        install_kaijibot
+        # Step 5: AllBot
+        install_allbot
     fi
 
     ui_stage "Finalizing setup"
 
-    KAIJIBOT_BIN="$(resolve_kaijibot_bin || true)"
+    ALLBOT_BIN="$(resolve_allbot_bin || true)"
 
     # PATH warning: installs can succeed while the user's login shell still lacks npm's global bin dir.
     local npm_bin=""
@@ -2373,7 +2373,7 @@ main() {
         warn_shell_path_missing_dir "$npm_bin" "npm global bin dir"
     fi
     if [[ "$INSTALL_METHOD" == "git" ]]; then
-        if [[ -x "$HOME/.local/bin/kaijibot" ]]; then
+        if [[ -x "$HOME/.local/bin/allbot" ]]; then
             warn_shell_path_missing_dir "$HOME/.local/bin" "user-local bin dir (~/.local/bin)"
         fi
     fi
@@ -2394,13 +2394,13 @@ main() {
     run_bootstrap_onboarding_if_needed
 
     local installed_version
-    installed_version=$(resolve_kaijibot_version)
+    installed_version=$(resolve_allbot_version)
 
     echo ""
     if [[ -n "$installed_version" ]]; then
-        ui_celebrate "🦞 KaijiBot installed successfully (${installed_version})!"
+        ui_celebrate "🦞 AllBot installed successfully (${installed_version})!"
     else
-        ui_celebrate "🦞 KaijiBot installed successfully!"
+        ui_celebrate "🦞 AllBot installed successfully!"
     fi
     if [[ "$is_upgrade" == "true" ]]; then
         local update_messages=(
@@ -2450,46 +2450,46 @@ main() {
     if [[ "$INSTALL_METHOD" == "git" && -n "$final_git_dir" ]]; then
         ui_section "Source install details"
         ui_kv "Checkout" "$final_git_dir"
-        ui_kv "Wrapper" "$HOME/.local/bin/kaijibot"
-        ui_kv "Update command" "kaijibot update --restart"
+        ui_kv "Wrapper" "$HOME/.local/bin/allbot"
+        ui_kv "Update command" "allbot update --restart"
         ui_kv "Switch to npm" "curl -fsSL --proto '=https' --tlsv1.2 https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.sh | bash -s -- --install-method npm"
     elif [[ "$is_upgrade" == "true" ]]; then
         ui_info "Upgrade complete"
         if [[ -r /dev/tty && -w /dev/tty ]]; then
-            local claw="${KAIJIBOT_BIN:-}"
+            local claw="${ALLBOT_BIN:-}"
             if [[ -z "$claw" ]]; then
-                claw="$(resolve_kaijibot_bin || true)"
+                claw="$(resolve_allbot_bin || true)"
             fi
             if [[ -z "$claw" ]]; then
-                ui_info "Skipping doctor (kaijibot not on PATH yet)"
-                warn_kaijibot_not_found
+                ui_info "Skipping doctor (allbot not on PATH yet)"
+                warn_allbot_not_found
                 return 0
             fi
             local -a doctor_args=()
             if [[ "$NO_ONBOARD" == "1" || "$NO_PROMPT" == "1" ]]; then
                 doctor_args+=("--non-interactive")
             fi
-            ui_info "Running kaijibot doctor"
+            ui_info "Running allbot doctor"
             local doctor_ok=0
             if (( ${#doctor_args[@]} )); then
-                KAIJIBOT_UPDATE_IN_PROGRESS=1 "$claw" doctor "${doctor_args[@]}" </dev/null && doctor_ok=1
+                ALLBOT_UPDATE_IN_PROGRESS=1 "$claw" doctor "${doctor_args[@]}" </dev/null && doctor_ok=1
             else
-                KAIJIBOT_UPDATE_IN_PROGRESS=1 "$claw" doctor </dev/tty && doctor_ok=1
+                ALLBOT_UPDATE_IN_PROGRESS=1 "$claw" doctor </dev/tty && doctor_ok=1
             fi
             if (( doctor_ok )); then
                 ui_info "Updating plugins"
-                KAIJIBOT_UPDATE_IN_PROGRESS=1 "$claw" plugins update --all || true
+                ALLBOT_UPDATE_IN_PROGRESS=1 "$claw" plugins update --all || true
             else
                 ui_warn "Doctor failed; skipping plugin updates"
             fi
         else
-            ui_info "No TTY; run kaijibot doctor and kaijibot plugins update --all manually"
+            ui_info "No TTY; run allbot doctor and allbot plugins update --all manually"
         fi
     else
         if [[ "$NO_ONBOARD" == "1" || "$skip_onboard" == "true" ]]; then
-            ui_info "Skipping onboard (requested); run kaijibot onboard later"
+            ui_info "Skipping onboard (requested); run allbot onboard later"
         else
-            local config_path="${KAIJIBOT_CONFIG_PATH:-$HOME/.kaijibot/kaijibot.json}"
+            local config_path="${ALLBOT_CONFIG_PATH:-$HOME/.allbot/allbot.json}"
             if [[ -f "${config_path}" || -f "$HOME/.clawdbot/clawdbot.json" ]]; then
                 ui_info "Config already present; running doctor"
                 run_doctor
@@ -2500,13 +2500,13 @@ main() {
             ui_info "Starting setup"
             echo ""
             if [[ -r /dev/tty && -w /dev/tty ]]; then
-                local claw="${KAIJIBOT_BIN:-}"
+                local claw="${ALLBOT_BIN:-}"
                 if [[ -z "$claw" ]]; then
-                    claw="$(resolve_kaijibot_bin || true)"
+                    claw="$(resolve_allbot_bin || true)"
                 fi
                 if [[ -z "$claw" ]]; then
-                    ui_info "Skipping onboarding (kaijibot not on PATH yet)"
-                    warn_kaijibot_not_found
+                    ui_info "Skipping onboarding (allbot not on PATH yet)"
+                    warn_allbot_not_found
                     return 0
                 fi
                 echo ""
@@ -2517,25 +2517,25 @@ main() {
                 exec </dev/tty
                 exec "$claw" onboard
             fi
-            ui_info "No TTY; run kaijibot onboard to finish setup"
+            ui_info "No TTY; run allbot onboard to finish setup"
             return 0
         fi
     fi
 
-    if command -v kaijibot &> /dev/null; then
-        local claw="${KAIJIBOT_BIN:-}"
+    if command -v allbot &> /dev/null; then
+        local claw="${ALLBOT_BIN:-}"
         if [[ -z "$claw" ]]; then
-            claw="$(resolve_kaijibot_bin || true)"
+            claw="$(resolve_allbot_bin || true)"
         fi
         if [[ -n "$claw" ]] && is_gateway_daemon_loaded "$claw"; then
             if [[ "$DRY_RUN" == "1" ]]; then
-                ui_info "Gateway daemon detected; would restart (kaijibot daemon restart)"
+                ui_info "Gateway daemon detected; would restart (allbot daemon restart)"
             else
                 ui_info "Gateway daemon detected; restarting"
-                if KAIJIBOT_UPDATE_IN_PROGRESS=1 "$claw" daemon restart >/dev/null 2>&1; then
+                if ALLBOT_UPDATE_IN_PROGRESS=1 "$claw" daemon restart >/dev/null 2>&1; then
                     ui_success "Gateway restarted"
                 else
-                    ui_warn "Gateway restart failed; try: kaijibot daemon restart"
+                    ui_warn "Gateway restart failed; try: allbot daemon restart"
                 fi
             fi
         fi
@@ -2552,7 +2552,7 @@ main() {
     show_footer_links
 }
 
-if [[ "${KAIJIBOT_INSTALL_SH_NO_RUN:-0}" != "1" ]]; then
+if [[ "${ALLBOT_INSTALL_SH_NO_RUN:-0}" != "1" ]]; then
     parse_args "$@"
     configure_verbose
     main

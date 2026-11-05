@@ -4,12 +4,12 @@ description: "Run BOOT.md on gateway startup"
 homepage: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/automation/hooks.md#boot-md
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "🚀",
         "events": ["gateway:startup"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with KaijiBot" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with AllBot" }],
       },
   }
 ---

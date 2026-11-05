@@ -1,5 +1,5 @@
 ---
-summary: "Run multiple KaijiBot Gateways on one host (isolation, ports, and profiles)"
+summary: "Run multiple AllBot Gateways on one host (isolation, ports, and profiles)"
 read_when:
   - Running more than one Gateway on the same machine
   - You need isolated config/state/ports per Gateway
@@ -12,8 +12,8 @@ Most setups should use one Gateway because a single Gateway can handle multiple 
 
 ## Isolation checklist (required)
 
-- `KAIJIBOT_CONFIG_PATH` — per-instance config file
-- `KAIJIBOT_STATE_DIR` — per-instance sessions, creds, caches
+- `ALLBOT_CONFIG_PATH` — per-instance config file
+- `ALLBOT_STATE_DIR` — per-instance sessions, creds, caches
 - `agents.defaults.workspace` — per-instance workspace root
 - `gateway.port` (or `--port`) — unique per instance
 - Derived ports (browser/canvas) must not overlap
@@ -22,23 +22,23 @@ If these are shared, you will hit config races and port conflicts.
 
 ## Recommended: profiles (`--profile`)
 
-Profiles auto-scope `KAIJIBOT_STATE_DIR` + `KAIJIBOT_CONFIG_PATH` and suffix service names.
+Profiles auto-scope `ALLBOT_STATE_DIR` + `ALLBOT_CONFIG_PATH` and suffix service names.
 
 ```bash
 # main
-kaijibot --profile main setup
-kaijibot --profile main gateway --port 18789
+allbot --profile main setup
+allbot --profile main gateway --port 18789
 
 # rescue
-kaijibot --profile rescue setup
-kaijibot --profile rescue gateway --port 19001
+allbot --profile rescue setup
+allbot --profile rescue gateway --port 19001
 ```
 
 Per-profile services:
 
 ```bash
-kaijibot --profile main gateway install
-kaijibot --profile rescue gateway install
+allbot --profile main gateway install
+allbot --profile rescue gateway install
 ```
 
 ## Rescue-bot guide
@@ -59,11 +59,11 @@ Port spacing: leave at least 20 ports between base ports so the derived browser/
 ```bash
 # Main bot (existing or fresh, without --profile param)
 # Runs on port 18789 + Chrome CDC/Canvas/... Ports
-kaijibot onboard
-kaijibot gateway install
+allbot onboard
+allbot gateway install
 
 # Rescue bot (isolated profile + ports)
-kaijibot --profile rescue onboard
+allbot --profile rescue onboard
 # Notes:
 # - workspace name will be postfixed with -rescue per default
 # - Port should be at least 18789 + 20 Ports,
@@ -71,12 +71,12 @@ kaijibot --profile rescue onboard
 # - rest of the onboarding is the same as normal
 
 # To install the service (if not happened automatically during setup)
-kaijibot --profile rescue gateway install
+allbot --profile rescue gateway install
 ```
 
 ## Port mapping (derived)
 
-Base port = `gateway.port` (or `KAIJIBOT_GATEWAY_PORT` / `--port`).
+Base port = `gateway.port` (or `ALLBOT_GATEWAY_PORT` / `--port`).
 
 - browser control service port = base + 2 (loopback only)
 - canvas host is served on the Gateway HTTP server (same port as `gateway.port`)
@@ -94,24 +94,24 @@ If you override any of these in config or env, you must keep them unique per ins
 ## Manual env example
 
 ```bash
-KAIJIBOT_CONFIG_PATH=~/.kaijibot/main.json \
-KAIJIBOT_STATE_DIR=~/.kaijibot-main \
-kaijibot gateway --port 18789
+ALLBOT_CONFIG_PATH=~/.allbot/main.json \
+ALLBOT_STATE_DIR=~/.allbot-main \
+allbot gateway --port 18789
 
-KAIJIBOT_CONFIG_PATH=~/.kaijibot/rescue.json \
-KAIJIBOT_STATE_DIR=~/.kaijibot-rescue \
-kaijibot gateway --port 19001
+ALLBOT_CONFIG_PATH=~/.allbot/rescue.json \
+ALLBOT_STATE_DIR=~/.allbot-rescue \
+allbot gateway --port 19001
 ```
 
 ## Quick checks
 
 ```bash
-kaijibot --profile main gateway status --deep
-kaijibot --profile rescue gateway status --deep
-kaijibot --profile rescue gateway probe
-kaijibot --profile main status
-kaijibot --profile rescue status
-kaijibot --profile rescue browser status
+allbot --profile main gateway status --deep
+allbot --profile rescue gateway status --deep
+allbot --profile rescue gateway probe
+allbot --profile main status
+allbot --profile rescue status
+allbot --profile rescue browser status
 ```
 
 Interpretation:

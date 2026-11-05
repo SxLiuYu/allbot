@@ -52,7 +52,7 @@ function createCommandWithTimeoutResult() {
 
 function createLegacyConfigSnapshot() {
   return {
-    path: "/tmp/kaijibot.json",
+    path: "/tmp/allbot.json",
     exists: false,
     raw: null,
     parsed: {},
@@ -68,7 +68,7 @@ export const confirm = vi.fn().mockResolvedValue(true) as unknown as MockFn;
 export const select = vi.fn().mockResolvedValue("node") as unknown as MockFn;
 export const note = vi.fn() as unknown as MockFn;
 export const writeConfigFile = vi.fn().mockResolvedValue(undefined) as unknown as MockFn;
-export const resolveKaijiBotPackageRoot = vi.fn().mockResolvedValue(null) as unknown as MockFn;
+export const resolveAllBotPackageRoot = vi.fn().mockResolvedValue(null) as unknown as MockFn;
 export const runGatewayUpdate = vi
   .fn()
   .mockResolvedValue(createGatewayUpdateResult()) as unknown as MockFn;
@@ -226,7 +226,7 @@ export const runLegacyStateMigrations = vi.fn().mockResolvedValue({
 }) as unknown as MockFn;
 
 const DEFAULT_CONFIG_SNAPSHOT = {
-  path: "/tmp/kaijibot.json",
+  path: "/tmp/allbot.json",
   exists: true,
   raw: "{}",
   parsed: {},
@@ -249,14 +249,14 @@ vi.mock("../agents/skills-status.js", () => ({
 }));
 
 vi.mock("../plugins/loader.js", () => ({
-  loadKaijiBotPlugins: () => createEmptyPluginRegistry(),
+  loadAllBotPlugins: () => createEmptyPluginRegistry(),
 }));
 
 vi.mock("../config/config.js", async () => {
   const actual = await vi.importActual<typeof import("../config/config.js")>("../config/config.js");
   return {
     ...actual,
-    CONFIG_PATH: "/tmp/kaijibot.json",
+    CONFIG_PATH: "/tmp/allbot.json",
     createConfigIO,
     readConfigFileSnapshot,
     writeConfigFile,
@@ -307,22 +307,22 @@ vi.mock("../process/exec.js", () => ({
   runCommandWithTimeout,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-auth", () => ({
+vi.mock("allbot/plugin-sdk/provider-auth", () => ({
   isNonSecretApiKeyMarker: () => false,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-model-shared", () => ({
+vi.mock("allbot/plugin-sdk/provider-model-shared", () => ({
   DEFAULT_CONTEXT_TOKENS: 32768,
   normalizeProviderId: (value: string) => normalizeLowercaseStringOrEmpty(value),
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-stream-shared", () => ({
+vi.mock("allbot/plugin-sdk/provider-stream-shared", () => ({
   createMoonshotThinkingWrapper: () => undefined,
   resolveMoonshotThinkingType: () => undefined,
   streamWithPayloadPatch: () => undefined,
 }));
 
-vi.mock("kaijibot/plugin-sdk/runtime-env", () => ({
+vi.mock("allbot/plugin-sdk/runtime-env", () => ({
   createSubsystemLogger: () => ({
     debug: () => {},
     info: () => {},
@@ -331,9 +331,9 @@ vi.mock("kaijibot/plugin-sdk/runtime-env", () => ({
   }),
 }));
 
-vi.mock("../infra/kaijibot-root.js", () => ({
-  resolveKaijiBotPackageRoot,
-  resolveKaijiBotPackageRootSync: vi.fn(() => "/tmp/kaijibot"),
+vi.mock("../infra/allbot-root.js", () => ({
+  resolveAllBotPackageRoot,
+  resolveAllBotPackageRootSync: vi.fn(() => "/tmp/allbot"),
 }));
 
 vi.mock("../infra/update-runner.js", () => ({
@@ -501,7 +501,7 @@ beforeEach(() => {
 
   readConfigFileSnapshot.mockReset();
   writeConfigFile.mockReset().mockResolvedValue(undefined);
-  resolveKaijiBotPackageRoot.mockReset().mockResolvedValue(null);
+  resolveAllBotPackageRoot.mockReset().mockResolvedValue(null);
   runGatewayUpdate.mockReset().mockResolvedValue(createGatewayUpdateResult());
   listPluginDoctorLegacyConfigRules.mockReset().mockReturnValue([]);
   runDoctorHealthContributions.mockReset().mockImplementation(defaultRunDoctorHealthContributions);
@@ -544,11 +544,11 @@ beforeEach(() => {
 
   originalIsTTY = process.stdin.isTTY;
   setStdinTty(true);
-  originalStateDir = process.env.KAIJIBOT_STATE_DIR;
-  originalUpdateInProgress = process.env.KAIJIBOT_UPDATE_IN_PROGRESS;
-  process.env.KAIJIBOT_UPDATE_IN_PROGRESS = "1";
-  tempStateDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-doctor-state-"));
-  process.env.KAIJIBOT_STATE_DIR = tempStateDir;
+  originalStateDir = process.env.ALLBOT_STATE_DIR;
+  originalUpdateInProgress = process.env.ALLBOT_UPDATE_IN_PROGRESS;
+  process.env.ALLBOT_UPDATE_IN_PROGRESS = "1";
+  tempStateDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-doctor-state-"));
+  process.env.ALLBOT_STATE_DIR = tempStateDir;
   fs.mkdirSync(path.join(tempStateDir, "agents", "main", "sessions"), {
     recursive: true,
   });
@@ -558,14 +558,14 @@ beforeEach(() => {
 afterEach(() => {
   setStdinTty(originalIsTTY);
   if (originalStateDir === undefined) {
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_STATE_DIR;
   } else {
-    process.env.KAIJIBOT_STATE_DIR = originalStateDir;
+    process.env.ALLBOT_STATE_DIR = originalStateDir;
   }
   if (originalUpdateInProgress === undefined) {
-    delete process.env.KAIJIBOT_UPDATE_IN_PROGRESS;
+    delete process.env.ALLBOT_UPDATE_IN_PROGRESS;
   } else {
-    process.env.KAIJIBOT_UPDATE_IN_PROGRESS = originalUpdateInProgress;
+    process.env.ALLBOT_UPDATE_IN_PROGRESS = originalUpdateInProgress;
   }
   if (tempStateDir) {
     fs.rmSync(tempStateDir, { recursive: true, force: true });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { MissingAgentModelConfigError } from "./defaults.js";
 import { resolveSimpleCompletionSelectionForAgent } from "./simple-completion-runtime.js";
 
@@ -9,7 +9,7 @@ describe("resolveSimpleCompletionSelectionForAgent", () => {
       agents: {
         defaults: { model: "openrouter/anthropic/claude-sonnet-4-6" },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selection = resolveSimpleCompletionSelectionForAgent({ cfg, agentId: "main" });
     expect(selection).toEqual(
@@ -26,7 +26,7 @@ describe("resolveSimpleCompletionSelectionForAgent", () => {
         defaults: { model: "anthropic/claude-opus-4-6" },
         list: [{ id: "ops", model: "openrouter/aurora-alpha" }],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selection = resolveSimpleCompletionSelectionForAgent({ cfg, agentId: "ops" });
     expect(selection).toEqual(
@@ -42,7 +42,7 @@ describe("resolveSimpleCompletionSelectionForAgent", () => {
       agents: {
         defaults: { model: "anthropic/claude-opus-4-6@work" },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selection = resolveSimpleCompletionSelectionForAgent({ cfg, agentId: "main" });
     expect(selection).toEqual(
@@ -64,7 +64,7 @@ describe("resolveSimpleCompletionSelectionForAgent", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selection = resolveSimpleCompletionSelectionForAgent({ cfg, agentId: "main" });
     expect(selection).toEqual(
@@ -77,7 +77,7 @@ describe("resolveSimpleCompletionSelectionForAgent", () => {
   });
 
   it("throws MissingAgentModelConfigError when no explicit model is configured and no providers are available", () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
 
     expect(() => resolveSimpleCompletionSelectionForAgent({ cfg, agentId: "main" })).toThrow(
       MissingAgentModelConfigError,
@@ -109,7 +109,7 @@ describe("resolveSimpleCompletionSelectionForAgent", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const selection = resolveSimpleCompletionSelectionForAgent({ cfg, agentId: "main" });
     expect(selection).toEqual(

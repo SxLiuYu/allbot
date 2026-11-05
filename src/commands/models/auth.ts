@@ -21,7 +21,7 @@ import { normalizeProviderId } from "../../agents/model-selection.js";
 import { resolveDefaultAgentWorkspaceDir } from "../../agents/workspace.js";
 import { formatCliCommand } from "../../cli/command-format.js";
 import { parseDurationMs } from "../../cli/parse-duration.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
 import { applyAuthProfileConfig } from "../../plugins/provider-auth-helpers.js";
 import { resolvePluginProviders } from "../../plugins/providers.runtime.js";
@@ -87,7 +87,7 @@ function resolveDefaultTokenProfileId(provider: string): string {
 }
 
 type ResolvedModelsAuthContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir: string;
   workspaceDir: string;
   providers: ProviderPlugin[];
@@ -149,7 +149,7 @@ function resolveRequestedProviderOrThrow(
     .toSorted((a, b) => a.localeCompare(b));
   const availableText = available.length > 0 ? available.join(", ") : "(none)";
   throw new Error(
-    `Unknown provider "${requested}". Loaded providers: ${availableText}. Verify plugins via \`${formatCliCommand("kaijibot plugins list --json")}\`.`,
+    `Unknown provider "${requested}". Loaded providers: ${availableText}. Verify plugins via \`${formatCliCommand("allbot plugins list --json")}\`.`,
   );
 }
 
@@ -279,7 +279,7 @@ async function persistProviderAuthResult(params: {
 }
 
 async function runProviderAuthMethod(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir: string;
   workspaceDir: string;
   provider: ProviderPlugin;
@@ -330,7 +330,7 @@ export async function modelsAuthSetupTokenCommand(
   const tokenProviders = listProvidersWithTokenMethods(providers);
   if (tokenProviders.length === 0) {
     throw new Error(
-      `No provider token-auth plugins found. Install one via \`${formatCliCommand("kaijibot plugins install")}\`.`,
+      `No provider token-auth plugins found. Install one via \`${formatCliCommand("allbot plugins install")}\`.`,
     );
   }
 
@@ -427,9 +427,9 @@ export async function modelsAuthPasteTokenCommand(
   logConfigUpdated(runtime);
   runtime.log(`Auth profile: ${profileId} (${provider}/token)`);
   if (provider === "anthropic") {
-    runtime.log("Anthropic setup-token auth is supported in KaijiBot.");
-    runtime.log("KaijiBot prefers Claude CLI reuse when it is available on the host.");
-    runtime.log("Anthropic staff told us this KaijiBot path is allowed again.");
+    runtime.log("Anthropic setup-token auth is supported in AllBot.");
+    runtime.log("AllBot prefers Claude CLI reuse when it is available on the host.");
+    runtime.log("Anthropic staff told us this AllBot path is allowed again.");
   }
 }
 
@@ -578,7 +578,7 @@ function maybeLogOpenAICodexNativeSearchTip(runtime: RuntimeEnv, providerId: str
     return;
   }
   runtime.log(
-    "Tip: Codex-capable models can use native Codex web search. Enable it with kaijibot configure --section web (recommended mode: cached). Docs: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/tools/web.md",
+    "Tip: Codex-capable models can use native Codex web search. Enable it with allbot configure --section web (recommended mode: cached). Docs: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/tools/web.md",
   );
 }
 export async function modelsAuthLoginCommand(opts: LoginOptions, runtime: RuntimeEnv) {
@@ -593,7 +593,7 @@ export async function modelsAuthLoginCommand(opts: LoginOptions, runtime: Runtim
   const authProviders = listProvidersWithAuthMethods(providers);
   if (authProviders.length === 0) {
     throw new Error(
-      `No provider plugins found. Install one via \`${formatCliCommand("kaijibot plugins install")}\`.`,
+      `No provider plugins found. Install one via \`${formatCliCommand("allbot plugins install")}\`.`,
     );
   }
 

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "./types.kaijibot.js";
+import type { AllBotConfig } from "./types.allbot.js";
 
 export type OwnerDisplaySecretPersistState = {
   pendingByPath: Map<string, string>;
@@ -7,16 +7,16 @@ export type OwnerDisplaySecretPersistState = {
 };
 
 export function persistGeneratedOwnerDisplaySecret(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   configPath: string;
   generatedSecret?: string;
   logger: Pick<typeof console, "warn">;
   state: OwnerDisplaySecretPersistState;
   persistConfig: (
-    config: KaijiBotConfig,
+    config: AllBotConfig,
     options: { expectedConfigPath: string },
   ) => Promise<unknown>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const { config, configPath, generatedSecret, logger, state, persistConfig } = params;
   if (!generatedSecret) {
     state.pendingByPath.delete(configPath);

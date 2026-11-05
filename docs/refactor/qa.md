@@ -4,7 +4,7 @@ Status: foundational migration landed.
 
 ## Goal
 
-Move KaijiBot QA from a split-definition model to a single source of truth:
+Move AllBot QA from a split-definition model to a single source of truth:
 
 - scenario metadata
 - prompts sent to the model

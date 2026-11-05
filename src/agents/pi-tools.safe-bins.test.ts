@@ -2,17 +2,17 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ExecApprovalsResolved } from "../infra/exec-approvals.js";
 import type { SafeBinProfileFixture } from "../infra/exec-safe-bin-policy.js";
 import { captureEnv } from "../test-utils/env.js";
 
-const bundledPluginsDirSnapshot = captureEnv(["KAIJIBOT_BUNDLED_PLUGINS_DIR"]);
+const bundledPluginsDirSnapshot = captureEnv(["ALLBOT_BUNDLED_PLUGINS_DIR"]);
 
 beforeAll(() => {
-  process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = path.join(
+  process.env.ALLBOT_BUNDLED_PLUGINS_DIR = path.join(
     os.tmpdir(),
-    "kaijibot-test-no-bundled-extensions",
+    "allbot-test-no-bundled-extensions",
   );
 });
 
@@ -77,7 +77,7 @@ vi.mock("../infra/exec-approvals.js", async () => {
   return { ...mod, resolveExecApprovals: () => approvals };
 });
 
-const { createKaijiBotCodingTools } = await import("./pi-tools.js");
+const { createAllBotCodingTools } = await import("./pi-tools.js");
 
 type ExecToolResult = {
   content: Array<{ type: string; text?: string }>;
@@ -106,7 +106,7 @@ async function createSafeBinsExecTool(params: {
     fs.writeFileSync(path.join(tmpDir, file.name), file.contents, "utf8");
   }
 
-  const cfg: KaijiBotConfig = {
+  const cfg: AllBotConfig = {
     tools: {
       exec: {
         host: "gateway",
@@ -118,7 +118,7 @@ async function createSafeBinsExecTool(params: {
     },
   };
 
-  const tools = createKaijiBotCodingTools({
+  const tools = createAllBotCodingTools({
     config: cfg,
     sessionKey: "agent:main:main",
     workspaceDir: tmpDir,
@@ -146,11 +146,11 @@ async function withSafeBinsExecTool(
   }
 }
 
-describe("createKaijiBotCodingTools safeBins", () => {
+describe("createAllBotCodingTools safeBins", () => {
   it("threads tools.exec.safeBins into exec allowlist checks", async () => {
     await withSafeBinsExecTool(
       {
-        tmpPrefix: "kaijibot-safe-bins-",
+        tmpPrefix: "allbot-safe-bins-",
         safeBins: ["echo"],
         safeBinProfiles: {
           echo: { maxPositional: 1 },
@@ -174,7 +174,7 @@ describe("createKaijiBotCodingTools safeBins", () => {
   it("rejects unprofiled custom safe-bin entries", async () => {
     await withSafeBinsExecTool(
       {
-        tmpPrefix: "kaijibot-safe-bins-unprofiled-",
+        tmpPrefix: "allbot-safe-bins-unprofiled-",
         safeBins: ["echo"],
       },
       async ({ tmpDir, execTool }) => {
@@ -191,7 +191,7 @@ describe("createKaijiBotCodingTools safeBins", () => {
   it("does not allow env var expansion to smuggle file args via safeBins", async () => {
     await withSafeBinsExecTool(
       {
-        tmpPrefix: "kaijibot-safe-bins-expand-",
+        tmpPrefix: "allbot-safe-bins-expand-",
         safeBins: ["head", "wc"],
         files: [{ name: "secret.txt", contents: "TOP_SECRET\n" }],
       },
@@ -210,7 +210,7 @@ describe("createKaijiBotCodingTools safeBins", () => {
   it("blocks sort output/compress bypass attempts in safeBins mode", async () => {
     await withSafeBinsExecTool(
       {
-        tmpPrefix: "kaijibot-safe-bins-sort-",
+        tmpPrefix: "allbot-safe-bins-sort-",
         safeBins: ["sort"],
         files: [{ name: "existing.txt", contents: "x\n" }],
       },
@@ -257,7 +257,7 @@ describe("createKaijiBotCodingTools safeBins", () => {
   it("blocks shell redirection metacharacters in safeBins mode", async () => {
     await withSafeBinsExecTool(
       {
-        tmpPrefix: "kaijibot-safe-bins-redirect-",
+        tmpPrefix: "allbot-safe-bins-redirect-",
         safeBins: ["head"],
         files: [{ name: "source.txt", contents: "line1\nline2\n" }],
       },
@@ -276,7 +276,7 @@ describe("createKaijiBotCodingTools safeBins", () => {
   it("blocks grep recursive flags from reading cwd via safeBins", async () => {
     await withSafeBinsExecTool(
       {
-        tmpPrefix: "kaijibot-safe-bins-grep-",
+        tmpPrefix: "allbot-safe-bins-grep-",
         safeBins: ["grep"],
         files: [{ name: "secret.txt", contents: "SAFE_BINS_RECURSIVE_SHOULD_NOT_LEAK\n" }],
       },

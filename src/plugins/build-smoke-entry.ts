@@ -4,4 +4,4 @@ export {
   getPluginCommandSpecs,
   matchPluginCommand,
 } from "./commands.js";
-export { loadKaijiBotPlugins } from "./loader.js";
+export { loadAllBotPlugins } from "./loader.js";

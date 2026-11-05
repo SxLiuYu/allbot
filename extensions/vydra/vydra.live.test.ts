@@ -8,13 +8,13 @@ import plugin from "./index.js";
 
 const LIVE = isLiveTestEnabled();
 const VYDRA_API_KEY = process.env.VYDRA_API_KEY?.trim() ?? "";
-const ENABLE_VYDRA_VIDEO_LIVE = process.env.KAIJIBOT_LIVE_VYDRA_VIDEO === "1";
-const LIVE_IMAGE_MODEL = process.env.KAIJIBOT_LIVE_VYDRA_IMAGE_MODEL?.trim() || "grok-imagine";
-const LIVE_VIDEO_MODEL = process.env.KAIJIBOT_LIVE_VYDRA_VIDEO_MODEL?.trim() || "veo3";
+const ENABLE_VYDRA_VIDEO_LIVE = process.env.ALLBOT_LIVE_VYDRA_VIDEO === "1";
+const LIVE_IMAGE_MODEL = process.env.ALLBOT_LIVE_VYDRA_IMAGE_MODEL?.trim() || "grok-imagine";
+const LIVE_VIDEO_MODEL = process.env.ALLBOT_LIVE_VYDRA_VIDEO_MODEL?.trim() || "veo3";
 const DEFAULT_LIVE_KLING_IMAGE_URL =
-  "https://raw.githubusercontent.com/kaijibot/kaijibot/main/docs/assets/showcase/roof-camera-sky.jpg";
+  "https://raw.githubusercontent.com/allbot/allbot/main/docs/assets/showcase/roof-camera-sky.jpg";
 const LIVE_KLING_IMAGE_URL =
-  process.env.KAIJIBOT_LIVE_VYDRA_KLING_IMAGE_URL?.trim() || DEFAULT_LIVE_KLING_IMAGE_URL;
+  process.env.ALLBOT_LIVE_VYDRA_KLING_IMAGE_URL?.trim() || DEFAULT_LIVE_KLING_IMAGE_URL;
 const VYDRA_KLING_TIMEOUT_MS = 12 * 60_000;
 
 const registerVydraPlugin = () =>
@@ -34,7 +34,7 @@ describe.skipIf(!LIVE || !VYDRA_API_KEY)("vydra live", () => {
       model: LIVE_IMAGE_MODEL,
       prompt: "Create a minimal flat orange square centered on a white background.",
       cfg: { plugins: { enabled: true } } as never,
-      agentDir: "/tmp/kaijibot-live-vydra-image",
+      agentDir: "/tmp/allbot-live-vydra-image",
     });
 
     expect(result.images.length).toBeGreaterThan(0);
@@ -51,7 +51,7 @@ describe.skipIf(!LIVE || !VYDRA_API_KEY)("vydra live", () => {
     );
 
     const result = await provider.synthesize({
-      text: "KaijiBot integration test OK.",
+      text: "AllBot integration test OK.",
       cfg: { plugins: { enabled: true } } as never,
       providerConfig: { apiKey: VYDRA_API_KEY },
       target: "audio-file",
@@ -74,7 +74,7 @@ describe.skipIf(!LIVE || !VYDRA_API_KEY)("vydra live", () => {
         prompt:
           "A tiny paper diorama city at sunrise with slow cinematic camera motion and no text.",
         cfg: { plugins: { enabled: true } } as never,
-        agentDir: "/tmp/kaijibot-live-vydra-video",
+        agentDir: "/tmp/allbot-live-vydra-video",
       });
 
       expect(result.videos.length).toBeGreaterThan(0);
@@ -95,7 +95,7 @@ describe.skipIf(!LIVE || !VYDRA_API_KEY)("vydra live", () => {
         model: "kling",
         prompt: "Animate the scene with subtle camera drift and soft cloud motion.",
         cfg: { plugins: { enabled: true } } as never,
-        agentDir: "/tmp/kaijibot-live-vydra-kling",
+        agentDir: "/tmp/allbot-live-vydra-kling",
         inputImages: [{ url: LIVE_KLING_IMAGE_URL }],
         timeoutMs: VYDRA_KLING_TIMEOUT_MS,
       });

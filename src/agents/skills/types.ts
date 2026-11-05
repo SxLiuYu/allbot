@@ -16,7 +16,7 @@ export type SkillInstallSpec = {
   targetDir?: string;
 };
 
-export type KaijiBotSkillMetadata = {
+export type AllBotSkillMetadata = {
   always?: boolean;
   skillKey?: string;
   primaryEnv?: string;
@@ -76,7 +76,7 @@ export type SkillExposure = {
 export type SkillEntry = {
   skill: Skill;
   frontmatter: ParsedSkillFrontmatter;
-  metadata?: KaijiBotSkillMetadata;
+  metadata?: AllBotSkillMetadata;
   invocation?: SkillInvocationPolicy;
   exposure?: SkillExposure;
 };

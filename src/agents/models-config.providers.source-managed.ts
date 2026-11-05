@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveSecretInputRef } from "../config/types.secrets.js";
 import { isRecord } from "../utils.js";
 import {
@@ -8,7 +8,7 @@ import {
 } from "./model-auth-markers.js";
 import type { ProviderConfig, SecretDefaults } from "./models-config.providers.secrets.js";
 
-type ModelsConfig = NonNullable<KaijiBotConfig["models"]>;
+type ModelsConfig = NonNullable<AllBotConfig["models"]>;
 
 function normalizeSourceProviderLookup(
   providers: ModelsConfig["providers"] | undefined,

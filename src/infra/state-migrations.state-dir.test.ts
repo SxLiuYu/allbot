@@ -9,7 +9,7 @@ import {
 
 async function withStateDirFixture(run: (root: string) => Promise<void>): Promise<void> {
   try {
-    await withTempDir({ prefix: "kaijibot-state-dir-" }, async (root) => {
+    await withTempDir({ prefix: "allbot-state-dir-" }, async (root) => {
       await run(root);
     });
   } finally {
@@ -45,13 +45,13 @@ describe("legacy state dir auto-migration", () => {
     });
   });
 
-  it("skips state-dir migration when KAIJIBOT_STATE_DIR is explicitly set", async () => {
+  it("skips state-dir migration when ALLBOT_STATE_DIR is explicitly set", async () => {
     await withStateDirFixture(async (root) => {
       const legacyDir = path.join(root, ".clawdbot");
       fs.mkdirSync(legacyDir, { recursive: true });
 
       const result = await autoMigrateLegacyStateDir({
-        env: { KAIJIBOT_STATE_DIR: path.join(root, "custom-state") } as NodeJS.ProcessEnv,
+        env: { ALLBOT_STATE_DIR: path.join(root, "custom-state") } as NodeJS.ProcessEnv,
         homedir: () => root,
       });
 

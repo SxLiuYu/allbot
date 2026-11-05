@@ -58,7 +58,7 @@ async function submitOpenAiBatch(params: {
       endpoint: OPENAI_BATCH_ENDPOINT,
       completion_window: OPENAI_BATCH_COMPLETION_WINDOW,
       metadata: {
-        source: "kaijibot-memory",
+        source: "allbot-memory",
         agent: params.agentId,
       },
     },

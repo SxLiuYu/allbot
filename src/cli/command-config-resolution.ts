@@ -1,12 +1,12 @@
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import type { RuntimeEnv } from "../runtime.js";
 import {
   type CommandSecretResolutionMode,
   resolveCommandSecretRefsViaGateway,
 } from "./command-secret-gateway.js";
 
-export async function resolveCommandConfigWithSecrets<TConfig extends KaijiBotConfig>(params: {
+export async function resolveCommandConfigWithSecrets<TConfig extends AllBotConfig>(params: {
   config: TConfig;
   commandName: string;
   targetIds: Set<string>;

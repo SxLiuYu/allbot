@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot nodes` (status, pairing, invoke, camera/canvas/screen)"
+summary: "CLI reference for `allbot nodes` (status, pairing, invoke, camera/canvas/screen)"
 read_when:
   - You’re managing paired nodes (cameras, screen, canvas)
   - You need to approve requests or invoke node commands
 title: "nodes"
 ---
 
-# `kaijibot nodes`
+# `allbot nodes`
 
 Manage paired nodes (devices) and invoke node capabilities.
 
@@ -23,16 +23,16 @@ Common options:
 ## Common commands
 
 ```bash
-kaijibot nodes list
-kaijibot nodes list --connected
-kaijibot nodes list --last-connected 24h
-kaijibot nodes pending
-kaijibot nodes approve <requestId>
-kaijibot nodes reject <requestId>
-kaijibot nodes rename --node <id|name|ip> --name <displayName>
-kaijibot nodes status
-kaijibot nodes status --connected
-kaijibot nodes status --last-connected 24h
+allbot nodes list
+allbot nodes list --connected
+allbot nodes list --last-connected 24h
+allbot nodes pending
+allbot nodes approve <requestId>
+allbot nodes reject <requestId>
+allbot nodes rename --node <id|name|ip> --name <displayName>
+allbot nodes status
+allbot nodes status --connected
+allbot nodes status --last-connected 24h
 ```
 
 `nodes list` prints pending/paired tables. Paired rows include the most recent connect age (Last Connect).
@@ -41,8 +41,8 @@ filter to nodes that connected within a duration (e.g. `24h`, `7d`).
 
 Approval note:
 
-- `kaijibot nodes pending` only needs pairing scope.
-- `kaijibot nodes approve <requestId>` inherits extra scope requirements from the
+- `allbot nodes pending` only needs pairing scope.
+- `allbot nodes approve <requestId>` inherits extra scope requirements from the
   pending request:
   - commandless request: pairing only
   - non-exec node commands: pairing + write
@@ -51,7 +51,7 @@ Approval note:
 ## Invoke
 
 ```bash
-kaijibot nodes invoke --node <id|name|ip> --command <command> --params <json>
+allbot nodes invoke --node <id|name|ip> --command <command> --params <json>
 ```
 
 Invoke flags:
@@ -61,6 +61,6 @@ Invoke flags:
 - `--idempotency-key <key>`: optional idempotency key.
 - `system.run` and `system.run.prepare` are blocked here; use the `exec` tool with `host=node` for shell execution.
 
-For shell execution on a node, use the `exec` tool with `host=node` instead of `kaijibot nodes run`.
+For shell execution on a node, use the `exec` tool with `host=node` instead of `allbot nodes run`.
 The `nodes` CLI is now capability-focused: direct RPC via `nodes invoke`, plus pairing, camera,
 screen, location, canvas, and notifications.

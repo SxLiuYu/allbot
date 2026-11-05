@@ -2,8 +2,8 @@ import {
   applyAgentDefaultModelPrimary,
   applyOnboardAuthAgentModelsAndProviders,
   type ModelProviderConfig,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildMinimaxApiModelDefinition,
   MINIMAX_API_BASE_URL,
@@ -17,9 +17,9 @@ type MinimaxApiProviderConfigParams = {
 };
 
 function applyMinimaxApiProviderConfigWithBaseUrl(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params: MinimaxApiProviderConfigParams,
-): KaijiBotConfig {
+): AllBotConfig {
   const providers = { ...cfg.models?.providers } as Record<string, ModelProviderConfig>;
   const existingProvider = providers[params.providerId];
   const existingModels = existingProvider?.models ?? [];
@@ -52,17 +52,17 @@ function applyMinimaxApiProviderConfigWithBaseUrl(
 }
 
 function applyMinimaxApiConfigWithBaseUrl(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params: MinimaxApiProviderConfigParams,
-): KaijiBotConfig {
+): AllBotConfig {
   const next = applyMinimaxApiProviderConfigWithBaseUrl(cfg, params);
   return applyAgentDefaultModelPrimary(next, `${params.providerId}/${params.modelId}`);
 }
 
 export function applyMinimaxApiProviderConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   modelId: string = "MiniMax-M2.7",
-): KaijiBotConfig {
+): AllBotConfig {
   return applyMinimaxApiProviderConfigWithBaseUrl(cfg, {
     providerId: "minimax",
     modelId,
@@ -71,9 +71,9 @@ export function applyMinimaxApiProviderConfig(
 }
 
 export function applyMinimaxApiConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   modelId: string = "MiniMax-M2.7",
-): KaijiBotConfig {
+): AllBotConfig {
   return applyMinimaxApiConfigWithBaseUrl(cfg, {
     providerId: "minimax",
     modelId,
@@ -82,9 +82,9 @@ export function applyMinimaxApiConfig(
 }
 
 export function applyMinimaxApiProviderConfigCn(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   modelId: string = "MiniMax-M2.7",
-): KaijiBotConfig {
+): AllBotConfig {
   return applyMinimaxApiProviderConfigWithBaseUrl(cfg, {
     providerId: "minimax",
     modelId,
@@ -93,9 +93,9 @@ export function applyMinimaxApiProviderConfigCn(
 }
 
 export function applyMinimaxApiConfigCn(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   modelId: string = "MiniMax-M2.7",
-): KaijiBotConfig {
+): AllBotConfig {
   return applyMinimaxApiConfigWithBaseUrl(cfg, {
     providerId: "minimax",
     modelId,

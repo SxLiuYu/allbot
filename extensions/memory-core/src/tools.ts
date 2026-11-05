@@ -1,15 +1,15 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   jsonResult,
   readNumberParam,
   readStringParam,
   type AnyAgentTool,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-runtime-core";
 import type {
   MemorySearchResult,
   MemorySearchRuntimeDebug,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-files";
+} from "allbot/plugin-sdk/memory-core-host-runtime-files";
 import { recordShortTermRecalls } from "./short-term-promotion.js";
 import {
   clampResultsByInjectedChars,
@@ -83,7 +83,7 @@ function isActiveMemorySessionKey(sessionKey?: string): boolean {
 }
 
 function resolveActiveMemoryQmdSearchModeOverride(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   sessionKey?: string,
 ): "search" | "vsearch" | "query" | undefined {
   if (!isActiveMemorySessionKey(sessionKey)) {
@@ -209,7 +209,7 @@ async function executeMemoryReadResult<T>(params: {
 }
 
 export function createMemorySearchTool(options: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentSessionKey?: string;
 }): AnyAgentTool | null {
   return createMemoryTool({
@@ -347,7 +347,7 @@ export function createMemorySearchTool(options: {
 }
 
 export function createMemoryGetTool(options: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentSessionKey?: string;
 }): AnyAgentTool | null {
   return createMemoryTool({

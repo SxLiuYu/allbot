@@ -1,4 +1,4 @@
-# KaijiBot 👾
+# AllBot 👾
 
 > **Your AI assistant reaches out to you — not the other way around.**
 
@@ -10,13 +10,13 @@ The first open-source AI companion that turns "proactive cognition" into a syste
 
 [English](./README.en.md) | [简体中文](./README.md)
 
-## Why KaijiBot
+## Why AllBot
 
 Every AI assistant you've used follows the same pattern: you ask, it answers. You stop asking, it goes silent.
 
-KaijiBot is different. After a few conversations on Feishu, it starts **reaching out to you** proactively — not with spam or hydration reminders, but with things you'd actually find interesting.
+AllBot is different. After a few conversations on Feishu, it starts **reaching out to you** proactively — not with spam or hydration reminders, but with things you'd actually find interesting.
 
-| Capability              | Typical chatbot                | Typical memory agent (2026) | **KaijiBot**                                                                              |
+| Capability              | Typical chatbot                | Typical memory agent (2026) | **AllBot**                                                                              |
 | ----------------------- | ------------------------------ | --------------------------- | ----------------------------------------------------------------------------------------- |
 | **Interaction**         | Reactive — you ask, it answers | Reactive + long memory      | **Pushes insights proactively** + normal Q&A                                              |
 | **User modeling**       | Stateless                      | Vector DB + rerank          | **TypedInsight 6 categories + category-aware decay half-lives + interest lifecycle**      |
@@ -31,7 +31,7 @@ KaijiBot is different. After a few conversations on Feishu, it starts **reaching
 
 ### 🔮 Cognitive Engine — From Reactive Replies to Proactive Insights
 
-KaijiBot is not a reactive tool — it's a **continuously running cognitive entity that models you and pushes insights when the moment is right**. Its proactive insight pipeline:
+AllBot is not a reactive tool — it's a **continuously running cognitive entity that models you and pushes insights when the moment is right**. Its proactive insight pipeline:
 
 ```mermaid
 flowchart LR
@@ -58,23 +58,23 @@ Five core mechanisms:
 
 Insight content is generated from your profile + LLM knowledge + real-time web search. With a search API key, insights stay current.
 
-**💡 Real insight samples (actual Feishu messages from the operator's own KaijiBot instance)**
+**💡 Real insight samples (actual Feishu messages from the operator's own AllBot instance)**
 
-The two screenshots below are real Feishu messages KaijiBot pushed to the operator during long-term use. **Not fabricated, not GPT examples, actual system output.**
+The two screenshots below are real Feishu messages AllBot pushed to the operator during long-term use. **Not fabricated, not GPT examples, actual system output.**
 
 <table>
 <tr>
 <td width="33%" valign="top">
 <strong>Sample 1: Behavioral pattern insight</strong><br>
-<sub>KaijiBot noticed the operator repeatedly deferring "style judgment" to the review stage, and proactively suggested moving that judgment upstream into the delegation stage (pushed 2026-07-07 22:48)</sub>
+<sub>AllBot noticed the operator repeatedly deferring "style judgment" to the review stage, and proactively suggested moving that judgment upstream into the delegation stage (pushed 2026-07-07 22:48)</sub>
 <br><br>
-<img src="./screenshot/ins1.jpg" width="100%" alt="Writing workflow insight — KaijiBot proactively suggests moving review judgment upstream into delegation">
+<img src="./screenshot/ins1.jpg" width="100%" alt="Writing workflow insight — AllBot proactively suggests moving review judgment upstream into delegation">
 </td>
 <td width="33%" valign="top">
 <strong>Sample 2: Cross-domain connection</strong><br>
-<sub>KaijiBot migrated the operator's prior pattern of "using AI to assist medical consultations" onto "using AI to interpret Apple Watch fitness data", building a bridge between two domains (pushed 2026-07-11 19:26)</sub>
+<sub>AllBot migrated the operator's prior pattern of "using AI to assist medical consultations" onto "using AI to interpret Apple Watch fitness data", building a bridge between two domains (pushed 2026-07-11 19:26)</sub>
 <br><br>
-<img src="./screenshot/ins2.jpg" width="100%" alt="Cross-domain connection — KaijiBot maps the AI-assisted medical visit pattern onto fitness data analysis">
+<img src="./screenshot/ins2.jpg" width="100%" alt="Cross-domain connection — AllBot maps the AI-assisted medical visit pattern onto fitness data analysis">
 </td>
 <td width="33%"></td>
 </tr>
@@ -84,7 +84,7 @@ Note the tone — it doesn't read like a cold "notification" or "suggestion", bu
 
 ### 🧬 Self-Evolution — Agent Decides When to Learn New Skills
 
-You've done several complex Feishu knowledge base operations with KaijiBot — searching meeting records, extracting minutes, creating documents, setting tasks. KaijiBot notices this workflow is repetitive and complex, and tells you:
+You've done several complex Feishu knowledge base operations with AllBot — searching meeting records, extracting minutes, creating documents, setting tasks. AllBot notices this workflow is repetitive and complex, and tells you:
 
 > "I noticed you've been doing similar meeting minute archiving workflows recently. I wrote myself a skill — next time you say 'archive meetings', I'll execute the entire flow automatically."
 
@@ -96,7 +96,7 @@ How it works:
 
 **🧬 Real samples — two opposite outcomes from Agent autonomous decision-making**
 
-The two screenshots below show opposite decisions the Agent made during the operator's real use. **This is living proof of the "code makes no quality judgments" architectural claim** — most "self-evolving agents" will blindly create a skill for every complex task. KaijiBot's Agent judges for itself whether something "deserves to be solidified into a workflow".
+The two screenshots below show opposite decisions the Agent made during the operator's real use. **This is living proof of the "code makes no quality judgments" architectural claim** — most "self-evolving agents" will blindly create a skill for every complex task. AllBot's Agent judges for itself whether something "deserves to be solidified into a workflow".
 
 <table>
 <tr>
@@ -120,7 +120,7 @@ Note evo2 — the Agent's refusal reason is substantive (first draft = structure
 
 ### 🔄 Correction Self-Evolution — Never Makes the Same Mistake Twice
 
-AI assistant making the same mistake every new session? KaijiBot won't. It has a correction memory system that ensures every mistake is made at most once.
+AI assistant making the same mistake every new session? AllBot won't. It has a correction memory system that ensures every mistake is made at most once.
 
 - **Dual-Path Detection** — Agent self-reports errors, or the system automatically extracts corrections from conversations at session end.
 - **Dedup + Reinforcement** — Repeated errors don't create new records; they increase weight, ensuring high-frequency issues get priority.
@@ -130,7 +130,7 @@ Step into a pit once. That's enough.
 
 ### 🔌 Pluggable Architecture
 
-Not locked into any single provider. Switch between domestic and international at will. `kaijibot onboard` wizard auto-discovers configured API keys.
+Not locked into any single provider. Switch between domestic and international at will. `allbot onboard` wizard auto-discovers configured API keys.
 
 | China                                          | International                                   | Aggregator / Self-hosted                           |
 | ---------------------------------------------- | ----------------------------------------------- | -------------------------------------------------- |
@@ -139,8 +139,8 @@ Not locked into any single provider. Switch between domestic and international a
 Switch models with a single command:
 
 ```bash
-kaijibot config set agent.model "deepseek/deepseek-chat"
-kaijibot config set agent.model "anthropic/claude-sonnet-4-20250514"
+allbot config set agent.model "deepseek/deepseek-chat"
+allbot config set agent.model "anthropic/claude-sonnet-4-20250514"
 ```
 
 ### 🌐 Auto Locale Switching (EN / zh)
@@ -155,7 +155,7 @@ CLI output, onboarding wizard, and cognitive layer prompts all switch automatica
 export LANG=en_US.UTF-8   # English
 export LANG=zh_CN.UTF-8   # Chinese
 # Or override explicitly:
-export KAIJIBOT_CLI_LOCALE=en
+export ALLBOT_CLI_LOCALE=en
 ```
 
 ### 🛠️ Full Agent
@@ -172,20 +172,20 @@ export KAIJIBOT_CLI_LOCALE=en
 **Skill Marketplace**: Dozens of built-in skills (github, weather, summarize, coding-agent, notion, obsidian, taskflow, and more). Install additional skills from ClawHub:
 
 ```bash
-kaijibot skills install <skill-name>
+allbot skills install <skill-name>
 ```
 
 ### 📱 Runs Locally on Android — Put Your AI Companion in Your Pocket
 
-Most AI assistants are either cloud SaaS (data leaves your device) or self-hosted projects that require a server. **KaijiBot can be installed directly on an Android phone, running the full agent locally** — not a thin client connecting back to your server, the phone itself is the agent.
+Most AI assistants are either cloud SaaS (data leaves your device) or self-hosted projects that require a server. **AllBot can be installed directly on an Android phone, running the full agent locally** — not a thin client connecting back to your server, the phone itself is the agent.
 
-**Just download one APK — no laptop, no command line, no GitHub account needed.** The [KaijiBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) (~41MB, bundles Termux inside) walks you through every step.
+**Just download one APK — no laptop, no command line, no GitHub account needed.** The [AllBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) (~41MB, bundles Termux inside) walks you through every step.
 
 **Three steps:**
 
-1. **Download `kaijibot-launcher.apk`** — from the [GitHub Release](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) to your phone
+1. **Download `allbot-launcher.apk`** — from the [GitHub Release](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) to your phone
 2. **Install the APK** (allow "unknown sources") — open the Launcher, it auto-installs the bundled Termux
-3. **Tap "复制命令并打开 Termux" (Copy command and open Termux)** — long-press in Termux to paste, hit enter, KaijiBot auto-installs and starts
+3. **Tap "复制命令并打开 Termux" (Copy command and open Termux)** — long-press in Termux to paste, hit enter, AllBot auto-installs and starts
 
 Launcher home screen, control panel, and a real mobile conversation — three screenshots side by side:
 
@@ -193,19 +193,19 @@ Launcher home screen, control panel, and a real mobile conversation — three sc
 <tr>
 <td width="33%" valign="top">
 <strong>Launcher home screen</strong><br>
-<sub>What you see when you open the APK — KaijiBot branding + a one-tap button that installs Termux and guides you through the rest</sub>
+<sub>What you see when you open the APK — AllBot branding + a one-tap button that installs Termux and guides you through the rest</sub>
 <br><br>
-<img src="./screenshot/Android1.jpg" width="100%" alt="KaijiBot Launcher APK home screen">
+<img src="./screenshot/Android1.jpg" width="100%" alt="AllBot Launcher APK home screen">
 </td>
 <td width="33%" valign="top">
 <strong>Control panel (full cognitive system)</strong><br>
-<sub>After launch, KaijiBot Control runs in the phone's browser. Every item in the left nav is a real UI entry for a cognitive subsystem: <strong>聊天 / 代理 / 认知 / 洞察 / 进化 / 纠错 / 技能 / 使用情况 / 历史 / 定时任务 / 设置</strong> (Chat / Agent / Cognition / Insights / Evolution / Corrections / Skills / Usage / History / Scheduled tasks / Settings). The right pane shows the current insight with its source attribution (<code>Source: Web Search --- LEDGER: Scaling Agentic Document Editing...</code>), proving the knowledge-mode web search is actually working</sub>
+<sub>After launch, AllBot Control runs in the phone's browser. Every item in the left nav is a real UI entry for a cognitive subsystem: <strong>聊天 / 代理 / 认知 / 洞察 / 进化 / 纠错 / 技能 / 使用情况 / 历史 / 定时任务 / 设置</strong> (Chat / Agent / Cognition / Insights / Evolution / Corrections / Skills / Usage / History / Scheduled tasks / Settings). The right pane shows the current insight with its source attribution (<code>Source: Web Search --- LEDGER: Scaling Agentic Document Editing...</code>), proving the knowledge-mode web search is actually working</sub>
 <br><br>
-<img src="./screenshot/Android3.jpg" width="100%" alt="KaijiBot Control mobile — full cognitive-systems sidebar visible">
+<img src="./screenshot/Android3.jpg" width="100%" alt="AllBot Control mobile — full cognitive-systems sidebar visible">
 </td>
 <td width="33%" valign="top">
 <strong>Real mobile conversation</strong><br>
-<sub>Substantive content KaijiBot produced on-phone (analogizing Git commits to dependency graphs, discussing how Agent can assist with consistency-checking in philosophical writing). Not a toy demo — this is real output from a live session</sub>
+<sub>Substantive content AllBot produced on-phone (analogizing Git commits to dependency graphs, discussing how Agent can assist with consistency-checking in philosophical writing). Not a toy demo — this is real output from a live session</sub>
 <br><br>
 <img src="./screenshot/Android2.jpg" width="100%" alt="Real mobile conversation — philosophical writing + Agent collaboration">
 </td>
@@ -216,11 +216,11 @@ Launcher home screen, control panel, and a real mobile conversation — three sc
 
 - **Data never leaves the phone** — Conversation history, Persona profile, correction memory, skills — all stored locally on the phone. No third-party server in the middle.
 - **Offline-capable** — As long as the LLM provider is reachable (fully offline via on-device Ollama / LAN vLLM), you have a portable AI companion. Cloud LLMs work too — traffic goes through your own API key.
-- **Proactive insights via system notifications** — PRISM gating + Android notifications. KaijiBot pushes insights during your commute or lunch break, with the same UX as your daily Feishu/WeChat use.
+- **Proactive insights via system notifications** — PRISM gating + Android notifications. AllBot pushes insights during your commute or lunch break, with the same UX as your daily Feishu/WeChat use.
 
 **📱 Full run flow (26-second sped-up replay)**
 
-Launch KaijiBot from phone home screen → open control panel → chat response (video sped up for quick preview; actual timing is longer):
+Launch AllBot from phone home screen → open control panel → chat response (video sped up for quick preview; actual timing is longer):
 
 <a href="./screenshot/Android5.mp4?raw=true" target="_blank" title="Click to play the 26-second sped-up replay in a new tab">
   <img src="./screenshot/Android5-poster.jpg" width="32%" alt="Android launch to chat response - click to play sped-up replay">
@@ -245,7 +245,7 @@ Before you start, you'll need:
 | Requirement           | What for                       | How to get it                                                                                                                                                                                                                                                                          |
 | --------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **LLM API key**       | At least one AI provider's key | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [Qwen](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) — pick one                                                |
-| **Messaging channel** | For sending/receiving messages | [Feishu](https://open.feishu.cn/) (recommended, wizard supports QR-code auto-creation) · [WeChat](./docs/channels/) (first-class channel, run `kaijibot channels login --channel wechat` to connect) · 18 additional bundled channels (Telegram/Discord/Slack etc., not deeply tested) |
+| **Messaging channel** | For sending/receiving messages | [Feishu](https://open.feishu.cn/) (recommended, wizard supports QR-code auto-creation) · [WeChat](./docs/channels/) (first-class channel, run `allbot channels login --channel wechat` to connect) · 18 additional bundled channels (Telegram/Discord/Slack etc., not deeply tested) |
 
 ### Install (recommended)
 
@@ -255,7 +255,7 @@ Before you start, you'll need:
 curl -fsSL https://github.com/Kaiji-Z/kaijibot/raw/main/scripts/install.sh | bash
 ```
 
-The script will: detect your system → install Node.js (if missing) → install KaijiBot → launch the config wizard.
+The script will: detect your system → install Node.js (if missing) → install AllBot → launch the config wizard.
 
 **Windows** — PowerShell:
 
@@ -268,34 +268,34 @@ After install, the wizard walks you through configuring LLM providers, Feishu bo
 ### Start
 
 ```bash
-kaijibot gateway --port 18789 --verbose
+allbot gateway --port 18789 --verbose
 ```
 
-Once started, find your bot in Feishu and send a message. KaijiBot automatically begins building your cognitive profile, and after a few rounds of conversation it'll push its first proactive insight.
+Once started, find your bot in Feishu and send a message. AllBot automatically begins building your cognitive profile, and after a few rounds of conversation it'll push its first proactive insight.
 
 <details>
 <summary><b>📦 Other install methods</b></summary>
 
 #### Android phone
 
-Just download the [KaijiBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) — three steps and you're done. See the [📱 Runs Locally on Android](#-runs-locally-on-android--put-your-ai-companion-in-your-pocket) section above.
+Just download the [AllBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) — three steps and you're done. See the [📱 Runs Locally on Android](#-runs-locally-on-android--put-your-ai-companion-in-your-pocket) section above.
 
 #### npm global install (if you already have Node.js 22+)
 
 ```bash
-npm install -g kaijibot
-kaijibot onboard   # Interactive wizard, auto-configures
+npm install -g allbot
+allbot onboard   # Interactive wizard, auto-configures
 ```
 
-> ⚠️ **postinstall behavior**: `npm install kaijibot` runs a postinstall hook that
+> ⚠️ **postinstall behavior**: `npm install allbot` runs a postinstall hook that
 > (1) fetches bundled-extension runtime deps (e.g. `@larksuiteoapi/node-sdk`) into
 > the package root, and (2) installs ~28 lark-cli skills to `~/.agents/skills/` via
 > `npx -y skills add larksuite/cli -g --all`. Both pull third-party npm packages at
 > install time. To skip:
 >
 > ```bash
-> KAIJIBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1 npm install -g kaijibot   # skip all postinstall
-> KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL=1 npm install -g kaijibot          # skip lark-cli skills only
+> ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1 npm install -g allbot   # skip all postinstall
+> ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1 npm install -g allbot          # skip lark-cli skills only
 > ```
 >
 > See `.env.example` for full details.
@@ -304,7 +304,7 @@ kaijibot onboard   # Interactive wizard, auto-configures
 
 ```bash
 git clone https://github.com/Kaiji-Z/kaijibot.git
-cd kaijibot
+cd allbot
 bash scripts/docker/setup.sh   # One-shot deploy script (recommended)
 ```
 
@@ -312,13 +312,13 @@ Or build manually:
 
 ```bash
 git clone https://github.com/Kaiji-Z/kaijibot.git
-cd kaijibot
-docker build -t kaijibot:local .
+cd allbot
+docker build -t allbot:local .
 # Create .env (see .env.example), at minimum:
 #   ZAI_API_KEY=your-key
-#   KAIJIBOT_GATEWAY_TOKEN=your-token
-#   KAIJIBOT_STATE_DIR=~/.kaijibot
-#   KAIJIBOT_WORKSPACE_DIR=~/.kaijibot/workspace
+#   ALLBOT_GATEWAY_TOKEN=your-token
+#   ALLBOT_STATE_DIR=~/.allbot
+#   ALLBOT_WORKSPACE_DIR=~/.allbot/workspace
 docker compose up -d
 ```
 
@@ -326,12 +326,12 @@ docker compose up -d
 
 ```bash
 git clone https://github.com/Kaiji-Z/kaijibot.git
-cd kaijibot
+cd allbot
 pnpm install
 pnpm build
-kaijibot onboard   # Interactive wizard
+allbot onboard   # Interactive wizard
 # Migrating from OpenClaw? Run:
-kaijibot migrate
+allbot migrate
 ```
 
 </details>
@@ -348,8 +348,8 @@ kaijibot migrate
 # export ZAI_API_KEY="your-key"              # Zhipu GLM
 
 # Feishu channel (also configurable via wizard QR-code)
-kaijibot config set channels.feishu.appId "your-app-id"
-kaijibot config set channels.feishu.appSecret "your-app-secret"
+allbot config set channels.feishu.appId "your-app-id"
+allbot config set channels.feishu.appSecret "your-app-secret"
 ```
 
 **Optional**: Web search to enhance insight timeliness.
@@ -359,11 +359,11 @@ export EXA_API_KEY="your-key"
 export TAVILY_API_KEY="your-key"
 ```
 
-Config file at `~/.kaijibot/kaijibot.json`, supports hot reload. Cognitive system can be disabled via `cognitive.enabled: false`. For detailed configuration, see `AGENTS.md`.
+Config file at `~/.allbot/allbot.json`, supports hot reload. Cognitive system can be disabled via `cognitive.enabled: false`. For detailed configuration, see `AGENTS.md`.
 
 ## Relationship with OpenClaw
 
-KaijiBot was originally forked from [OpenClaw](https://github.com/openclaw/openclaw)'s Gateway architecture and Plugin SDK boundaries. On top of that, we built an independent cognitive layer (proactive insights, self-evolution, correction memory) and rewrote the memory consolidation system. The foundation OpenClaw provides (Gateway, agent loop, tool ecosystem) lets us focus on the differentiated parts.
+AllBot was originally forked from [OpenClaw](https://github.com/openclaw/openclaw)'s Gateway architecture and Plugin SDK boundaries. On top of that, we built an independent cognitive layer (proactive insights, self-evolution, correction memory) and rewrote the memory consolidation system. The foundation OpenClaw provides (Gateway, agent loop, tool ecosystem) lets us focus on the differentiated parts.
 
 Base-layer engineering work (TypeBox type migration, pi-ai SDK upgrades, 1220 lint fixes, Windows/Android bug fixes, Plugin SDK backfill) is essentially invisible to users — see commit history for details.
 
@@ -371,7 +371,7 @@ Base-layer engineering work (TypeBox type migration, pi-ai SDK upgrades, 1220 li
 
 ## Acknowledgments
 
-KaijiBot stands on the shoulders of [OpenClaw](https://github.com/openclaw/openclaw) (built by Peter Steinberger and the community).
+AllBot stands on the shoulders of [OpenClaw](https://github.com/openclaw/openclaw) (built by Peter Steinberger and the community).
 
 ### Academic Research
 

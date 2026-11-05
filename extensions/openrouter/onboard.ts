@@ -1,11 +1,11 @@
 import {
   applyAgentDefaultModelPrimary,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 
 export const OPENROUTER_DEFAULT_MODEL_REF = "openrouter/auto";
 
-export function applyOpenrouterProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpenrouterProviderConfig(cfg: AllBotConfig): AllBotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[OPENROUTER_DEFAULT_MODEL_REF] = {
     ...models[OPENROUTER_DEFAULT_MODEL_REF],
@@ -24,7 +24,7 @@ export function applyOpenrouterProviderConfig(cfg: KaijiBotConfig): KaijiBotConf
   };
 }
 
-export function applyOpenrouterConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpenrouterConfig(cfg: AllBotConfig): AllBotConfig {
   return applyAgentDefaultModelPrimary(
     applyOpenrouterProviderConfig(cfg),
     OPENROUTER_DEFAULT_MODEL_REF,

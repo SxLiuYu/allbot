@@ -6,7 +6,7 @@ const buildSessionContextMock = vi.fn();
 const getLeafEntryMock = vi.fn();
 const branchMock = vi.fn();
 const resetLeafMock = vi.fn();
-const ensureKaijiBotModelsJsonMock = vi.fn();
+const ensureAllBotModelsJsonMock = vi.fn();
 const discoverAuthStorageMock = vi.fn();
 const discoverModelsMock = vi.fn();
 const resolveModelWithRegistryMock = vi.fn();
@@ -37,7 +37,7 @@ vi.mock("@earendil-works/pi-coding-agent", () => ({
 }));
 
 vi.mock("./models-config.js", () => ({
-  ensureKaijiBotModelsJson: (...args: unknown[]) => ensureKaijiBotModelsJsonMock(...args),
+  ensureAllBotModelsJson: (...args: unknown[]) => ensureAllBotModelsJsonMock(...args),
 }));
 
 vi.mock("./pi-model-discovery.js", () => ({
@@ -186,7 +186,7 @@ describe("runBtwSideQuestion", () => {
     getLeafEntryMock.mockReset();
     branchMock.mockReset();
     resetLeafMock.mockReset();
-    ensureKaijiBotModelsJsonMock.mockReset();
+    ensureAllBotModelsJsonMock.mockReset();
     discoverAuthStorageMock.mockReset();
     discoverModelsMock.mockReset();
     resolveModelWithRegistryMock.mockReset();

@@ -18,7 +18,7 @@ describe("buildAgentSystemPrompt", () => {
       {
         name: "plain owner numbers",
         params: {
-          workspaceDir: "/tmp/kaijibot",
+          workspaceDir: "/tmp/allbot",
           ownerNumbers: ["+123", " +456 ", ""],
         },
         expectAuthorizedSection: true,
@@ -30,7 +30,7 @@ describe("buildAgentSystemPrompt", () => {
       {
         name: "hashed owner numbers",
         params: {
-          workspaceDir: "/tmp/kaijibot",
+          workspaceDir: "/tmp/allbot",
           ownerNumbers: ["+123", "+456", ""],
           ownerDisplay: "hash",
         },
@@ -42,7 +42,7 @@ describe("buildAgentSystemPrompt", () => {
       {
         name: "missing owners",
         params: {
-          workspaceDir: "/tmp/kaijibot",
+          workspaceDir: "/tmp/allbot",
         },
         expectAuthorizedSection: false,
         contains: [],
@@ -71,14 +71,14 @@ describe("buildAgentSystemPrompt", () => {
 
   it("uses a stable, keyed HMAC when ownerDisplaySecret is provided", () => {
     const secretA = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       ownerNumbers: ["+123"],
       ownerDisplay: "hash",
       ownerDisplaySecret: "secret-key-A", // pragma: allowlist secret
     });
 
     const secretB = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       ownerNumbers: ["+123"],
       ownerDisplay: "hash",
       ownerDisplaySecret: "secret-key-B", // pragma: allowlist secret
@@ -96,14 +96,14 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits extended sections in minimal prompt mode", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptMode: "minimal",
       ownerNumbers: ["+123"],
       skillsPrompt:
         "<available_skills>\n  <skill>\n    <name>demo</name>\n  </skill>\n</available_skills>",
       heartbeatPrompt: "ping",
       toolNames: ["message", "memory_search", "cron"],
-      docsPath: "/tmp/kaijibot/docs",
+      docsPath: "/tmp/allbot/docs",
       extraSystemPrompt: "Subagent details",
       ttsHint: "Voice (TTS) is enabled.",
     });
@@ -144,14 +144,14 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes Capabilities section in full prompt mode", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptMode: "full",
       toolNames: ["exec", "read", "message"],
     });
 
     expect(prompt).toContain("## Capabilities");
     expect(prompt).toContain("### Core Abilities");
-    expect(prompt).toContain("### Proactive Intelligence (Unique to KaijiBot)");
+    expect(prompt).toContain("### Proactive Intelligence (Unique to AllBot)");
     expect(prompt).toContain("### How to Introduce Yourself");
     expect(prompt).toContain("/help");
     expect(prompt).toContain("/tools");
@@ -165,7 +165,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits Capabilities section in minimal prompt mode", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptMode: "minimal",
       toolNames: ["exec"],
     });
@@ -179,7 +179,7 @@ describe("buildAgentSystemPrompt", () => {
     const skillsPrompt =
       "<available_skills>\n  <skill>\n    <name>demo</name>\n  </skill>\n</available_skills>";
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptMode: "minimal",
       skillsPrompt,
     });
@@ -193,7 +193,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("tells the agent not to execute /approve through exec", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).toContain(
@@ -203,7 +203,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("adds stronger execution-bias guidance for actionable turns", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).toContain("## Execution Bias");
@@ -217,7 +217,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("narrows silent reply guidance to true no-delivery cases", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).toContain(
@@ -230,7 +230,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("keeps manual /approve instructions for non-native approval channels", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: { channel: "signal" },
     });
 
@@ -242,7 +242,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("tells native approval channels not to duplicate plain chat /approve instructions", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: { channel: "telegram", capabilities: ["inlineButtons"] },
     });
 
@@ -259,7 +259,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("treats webchat as a native approval surface", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: { channel: "webchat" },
     });
 
@@ -276,7 +276,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits skills in minimal prompt mode when skillsPrompt is absent", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptMode: "minimal",
     });
 
@@ -285,7 +285,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits the heartbeat section when no heartbeat prompt is provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptMode: "full",
       heartbeatPrompt: undefined,
     });
@@ -297,7 +297,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes safety guardrails in full prompts", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).toContain("## Safety");
@@ -311,7 +311,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes voice hint when provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       ttsHint: "Voice (TTS) is enabled.",
     });
 
@@ -321,7 +321,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("adds reasoning tag hint when enabled", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       reasoningTagHint: true,
     });
 
@@ -332,17 +332,17 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes a CLI quick reference section", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
-    expect(prompt).toContain("## KaijiBot CLI Quick Reference");
-    expect(prompt).toContain("kaijibot gateway restart");
+    expect(prompt).toContain("## AllBot CLI Quick Reference");
+    expect(prompt).toContain("allbot gateway restart");
     expect(prompt).toContain("Do not invent commands");
   });
 
   it("guides runtime completion events without exposing internal metadata", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).toContain("Runtime-generated completion events may ask for a user update.");
@@ -352,7 +352,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("guides subagent workflows to avoid polling loops", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).toContain(
@@ -373,7 +373,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("uses structured tool definitions as the source of truth", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["exec", "sessions_list", "sessions_history", "sessions_send"],
     });
 
@@ -394,7 +394,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("documents ACP sessions_spawn agent targeting requirements", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["sessions_spawn"],
     });
 
@@ -405,7 +405,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("guides harness requests to ACP thread-bound spawns", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["sessions_spawn", "subagents", "agents_list", "exec"],
     });
 
@@ -425,7 +425,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits ACP harness guidance when ACP is disabled", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["sessions_spawn", "subagents", "agents_list", "exec"],
       acpEnabled: false,
     });
@@ -442,7 +442,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits ACP harness spawn guidance for sandboxed sessions and shows ACP block note", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["sessions_spawn", "subagents", "agents_list", "exec"],
       sandboxInfo: {
         enabled: true,
@@ -464,11 +464,11 @@ describe("buildAgentSystemPrompt", () => {
 
   it("preserves tool casing in the prompt", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["Read", "Exec", "process"],
       skillsPrompt:
         "<available_skills>\n  <skill>\n    <name>demo</name>\n  </skill>\n</available_skills>",
-      docsPath: "/tmp/kaijibot/docs",
+      docsPath: "/tmp/allbot/docs",
     });
 
     expect(prompt).toContain(
@@ -480,19 +480,19 @@ describe("buildAgentSystemPrompt", () => {
     expect(prompt).toContain(
       "- If exactly one skill clearly applies: read its SKILL.md at <location> with `Read`, then follow it.",
     );
-    expect(prompt).toContain("KaijiBot docs: /tmp/kaijibot/docs");
+    expect(prompt).toContain("AllBot docs: /tmp/allbot/docs");
     expect(prompt).toContain(
-      "For KaijiBot behavior, commands, config, or architecture: consult local docs first.",
+      "For AllBot behavior, commands, config, or architecture: consult local docs first.",
     );
   });
 
   it("adds update_plan guidance only when the tool is available", () => {
     const promptWithPlan = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["exec", "update_plan"],
     });
     const promptWithoutPlan = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["exec"],
     });
 
@@ -507,20 +507,20 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes docs guidance when docsPath is provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
-      docsPath: "/tmp/kaijibot/docs",
+      workspaceDir: "/tmp/allbot",
+      docsPath: "/tmp/allbot/docs",
     });
 
     expect(prompt).toContain("## Documentation");
-    expect(prompt).toContain("KaijiBot docs: /tmp/kaijibot/docs");
+    expect(prompt).toContain("AllBot docs: /tmp/allbot/docs");
     expect(prompt).toContain(
-      "For KaijiBot behavior, commands, config, or architecture: consult local docs first.",
+      "For AllBot behavior, commands, config, or architecture: consult local docs first.",
     );
   });
 
   it("includes workspace notes when provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       workspaceNotes: ["Reminder: commit your changes in this workspace after edits."],
     });
 
@@ -532,7 +532,7 @@ describe("buildAgentSystemPrompt", () => {
       {
         name: "12-hour",
         params: {
-          workspaceDir: "/tmp/kaijibot",
+          workspaceDir: "/tmp/allbot",
           userTimezone: "America/Chicago",
           userTime: "Monday, January 5th, 2026 - 3:26 PM",
           userTimeFormat: "12" as const,
@@ -541,7 +541,7 @@ describe("buildAgentSystemPrompt", () => {
       {
         name: "24-hour",
         params: {
-          workspaceDir: "/tmp/kaijibot",
+          workspaceDir: "/tmp/allbot",
           userTimezone: "America/Chicago",
           userTime: "Monday, January 5th, 2026 - 15:26",
           userTimeFormat: "24" as const,
@@ -550,7 +550,7 @@ describe("buildAgentSystemPrompt", () => {
       {
         name: "timezone-only",
         params: {
-          workspaceDir: "/tmp/kaijibot",
+          workspaceDir: "/tmp/allbot",
           userTimezone: "America/Chicago",
           userTimeFormat: "24" as const,
         },
@@ -597,7 +597,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes model alias guidance when aliases are provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       modelAliasLines: [
         "- Opus: anthropic/claude-opus-4-6",
         "- Sonnet: anthropic/claude-sonnet-4-6",
@@ -611,11 +611,11 @@ describe("buildAgentSystemPrompt", () => {
 
   it("adds ClaudeBot self-update guidance when gateway tool is available", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["gateway", "exec"],
     });
 
-    expect(prompt).toContain("## KaijiBot Self-Update");
+    expect(prompt).toContain("## AllBot Self-Update");
     expect(prompt).toContain("config.schema.lookup");
     expect(prompt).toContain("config.apply");
     expect(prompt).toContain("config.patch");
@@ -626,7 +626,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes skills guidance when skills prompt is present", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       skillsPrompt:
         "<available_skills>\n  <skill>\n    <name>demo</name>\n  </skill>\n</available_skills>",
     });
@@ -639,7 +639,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("appends available skills when provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       skillsPrompt:
         "<available_skills>\n  <skill>\n    <name>demo</name>\n  </skill>\n</available_skills>",
     });
@@ -650,7 +650,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits skills section when no skills prompt is provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).not.toContain("## Skills");
@@ -659,7 +659,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("renders project context files when provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [
         { path: "AGENTS.md", content: "Alpha" },
         { path: "IDENTITY.md", content: "Bravo" },
@@ -675,7 +675,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("ignores context files with missing or blank paths", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [
         { path: undefined as unknown as string, content: "Missing path" },
         { path: "   ", content: "Blank path" },
@@ -692,7 +692,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("adds SOUL guidance when a soul file is present", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [
         { path: "./SOUL.md", content: "Persona" },
         { path: "dir\\SOUL.md", content: "Persona Windows" },
@@ -706,7 +706,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("omits project context when no context files are injected", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [],
     });
 
@@ -715,7 +715,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("orders stable project context before the cache boundary and moves HEARTBEAT below it", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [
         { path: "HEARTBEAT.md", content: "Check inbox." },
         { path: "MEMORY.md", content: "Long-term notes." },
@@ -747,7 +747,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("keeps heartbeat-only project context below the cache boundary", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [{ path: "HEARTBEAT.md", content: "Check inbox." }],
     });
 
@@ -763,7 +763,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("replaces provider-owned prompt sections without disturbing core ordering", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptContribution: {
         sectionOverrides: {
           interaction_style: "## Interaction Style\n\nCustom interaction guidance.",
@@ -779,7 +779,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("places provider stable prefixes above the cache boundary", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptContribution: {
         stablePrefix: "## Provider Stable Block\n\nStable provider guidance.",
       },
@@ -796,7 +796,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("places provider dynamic suffixes below the cache boundary", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       promptContribution: {
         dynamicSuffix: "## Provider Dynamic Block\n\nPer-turn provider guidance.",
       },
@@ -813,7 +813,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("summarizes the message tool when available", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["message"],
     });
 
@@ -824,7 +824,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes inline button style guidance when runtime supports inline buttons", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       toolNames: ["message"],
       runtimeInfo: {
         channel: "telegram",
@@ -838,7 +838,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes runtime provider capabilities when present", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: {
         channel: "telegram",
         capabilities: ["inlineButtons"],
@@ -851,7 +851,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes agent id in runtime when provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: {
         agentId: "work",
         host: "host",
@@ -867,7 +867,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes reasoning visibility hint", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       reasoningLevel: "off",
     });
 
@@ -920,7 +920,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("keeps semantically equivalent structured prompt inputs byte-stable", () => {
     const clean = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: {
         channel: "telegram",
         capabilities: ["inlinebuttons", "react"],
@@ -933,7 +933,7 @@ describe("buildAgentSystemPrompt", () => {
       modelAliasLines: ["- Sonnet: anthropic/claude-sonnet-4-5"],
     });
     const noisy = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       runtimeInfo: {
         channel: "telegram",
         capabilities: [" react ", "inlineButtons", "react"],
@@ -953,7 +953,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("describes sandboxed runtime and elevated when allowed", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       sandboxInfo: {
         enabled: true,
         workspaceDir: "/tmp/sandbox",
@@ -966,7 +966,7 @@ describe("buildAgentSystemPrompt", () => {
 
     expect(prompt).toContain("Your working directory is: /workspace");
     expect(prompt).toContain(
-      "For read/write/edit/apply_patch, file paths resolve against host workspace: /tmp/kaijibot. For bash/exec commands, use sandbox container paths under /workspace (or relative paths from that workdir), not host paths.",
+      "For read/write/edit/apply_patch, file paths resolve against host workspace: /tmp/allbot. For bash/exec commands, use sandbox container paths under /workspace (or relative paths from that workdir), not host paths.",
     );
     expect(prompt).toContain("Sandbox container workdir: /workspace");
     expect(prompt).toContain(
@@ -980,7 +980,7 @@ describe("buildAgentSystemPrompt", () => {
 
   it("includes reaction guidance when provided", () => {
     const prompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       reactionGuidance: {
         level: "minimal",
         channel: "Telegram",
@@ -1010,8 +1010,8 @@ describe("buildSubagentSystemPrompt", () => {
     expect(prompt).toContain("For ACP harness sessions (codex/claudecode/gemini)");
     expect(prompt).toContain("set `agentId` unless `acp.defaultAgent` is configured");
     expect(prompt).toContain("Do not ask users to run slash commands or CLI");
-    expect(prompt).toContain("Do not use `exec` (`kaijibot ...`, `acpx ...`)");
-    expect(prompt).toContain("Use `subagents` only for KaijiBot subagents");
+    expect(prompt).toContain("Do not use `exec` (`allbot ...`, `acpx ...`)");
+    expect(prompt).toContain("Use `subagents` only for AllBot subagents");
     expect(prompt).toContain("Subagent results auto-announce back to you");
     expect(prompt).toContain(
       "After spawning children, do NOT call sessions_list, sessions_history, exec sleep, or any polling tool.",

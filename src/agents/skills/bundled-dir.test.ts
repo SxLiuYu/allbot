@@ -11,24 +11,24 @@ describe("resolveBundledSkillsDir", () => {
   let envSnapshot: ReturnType<typeof captureEnv>;
 
   beforeEach(() => {
-    envSnapshot = captureEnv(["KAIJIBOT_BUNDLED_SKILLS_DIR"]);
+    envSnapshot = captureEnv(["ALLBOT_BUNDLED_SKILLS_DIR"]);
   });
 
   afterEach(() => {
     envSnapshot.restore();
   });
 
-  it("returns KAIJIBOT_BUNDLED_SKILLS_DIR override when set", async () => {
-    const overrideDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-bundled-override-"));
-    process.env.KAIJIBOT_BUNDLED_SKILLS_DIR = ` ${overrideDir} `;
+  it("returns ALLBOT_BUNDLED_SKILLS_DIR override when set", async () => {
+    const overrideDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-bundled-override-"));
+    process.env.ALLBOT_BUNDLED_SKILLS_DIR = ` ${overrideDir} `;
     expect(resolveBundledSkillsDir()).toBe(overrideDir);
   });
 
   it("resolves bundled skills under a flattened dist layout", async () => {
-    delete process.env.KAIJIBOT_BUNDLED_SKILLS_DIR;
+    delete process.env.ALLBOT_BUNDLED_SKILLS_DIR;
 
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-bundled-"));
-    await fs.writeFile(path.join(root, "package.json"), JSON.stringify({ name: "kaijibot" }));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-bundled-"));
+    await fs.writeFile(path.join(root, "package.json"), JSON.stringify({ name: "allbot" }));
 
     await writeSkill({
       dir: path.join(root, "skills", "peekaboo"),

@@ -76,13 +76,13 @@ describe("saveFileState / loadFileState round-trip", () => {
     expect(entryA?.lastIngestedAt).toBe(original.get("notes/a.md")?.lastIngestedAt);
   });
 
-  it("writes the state file under .kaijibot-wiki/file-state.json", async () => {
+  it("writes the state file under .allbot-wiki/file-state.json", async () => {
     const state = new Map<string, FileStateEntry>();
     updateEntry(state, "x.md", "h", ["p"]);
 
     await saveFileState(vaultRoot, state);
 
-    const stateFile = path.join(vaultRoot, ".kaijibot-wiki", "file-state.json");
+    const stateFile = path.join(vaultRoot, ".allbot-wiki", "file-state.json");
     await expect(fs.access(stateFile)).resolves.toBeUndefined();
   });
 });

@@ -1,5 +1,5 @@
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import { normalizeOptionalString, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import {
   DEFAULT_AI_SNAPSHOT_MAX_CHARS,
   browserAct,

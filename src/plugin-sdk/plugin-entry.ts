@@ -1,20 +1,20 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { emptyPluginConfigSchema } from "../plugins/config-schema.js";
 import type {
   AnyAgentTool,
   MediaUnderstandingProviderPlugin,
-  KaijiBotPluginApi,
-  KaijiBotPluginCommandDefinition,
-  KaijiBotPluginConfigSchema,
-  KaijiBotPluginDefinition,
-  KaijiBotPluginNodeHostCommand,
-  KaijiBotPluginReloadRegistration,
-  KaijiBotPluginSecurityAuditCollector,
-  KaijiBotPluginSecurityAuditContext,
-  KaijiBotPluginService,
-  KaijiBotPluginServiceContext,
-  KaijiBotPluginToolContext,
-  KaijiBotPluginToolFactory,
+  AllBotPluginApi,
+  AllBotPluginCommandDefinition,
+  AllBotPluginConfigSchema,
+  AllBotPluginDefinition,
+  AllBotPluginNodeHostCommand,
+  AllBotPluginReloadRegistration,
+  AllBotPluginSecurityAuditCollector,
+  AllBotPluginSecurityAuditContext,
+  AllBotPluginService,
+  AllBotPluginServiceContext,
+  AllBotPluginToolContext,
+  AllBotPluginToolFactory,
   PluginLogger,
   ProviderAugmentModelCatalogContext,
   ProviderAuthContext,
@@ -74,15 +74,15 @@ import { createCachedLazyValueGetter } from "./lazy-value.js";
 export type {
   AnyAgentTool,
   MediaUnderstandingProviderPlugin,
-  KaijiBotPluginApi,
-  KaijiBotPluginNodeHostCommand,
-  KaijiBotPluginReloadRegistration,
-  KaijiBotPluginSecurityAuditCollector,
-  KaijiBotPluginSecurityAuditContext,
-  KaijiBotPluginToolContext,
-  KaijiBotPluginToolFactory,
+  AllBotPluginApi,
+  AllBotPluginNodeHostCommand,
+  AllBotPluginReloadRegistration,
+  AllBotPluginSecurityAuditCollector,
+  AllBotPluginSecurityAuditContext,
+  AllBotPluginToolContext,
+  AllBotPluginToolFactory,
   PluginCommandContext,
-  KaijiBotPluginConfigSchema,
+  AllBotPluginConfigSchema,
   ProviderDiscoveryContext,
   ProviderCatalogContext,
   ProviderCatalogResult,
@@ -129,18 +129,18 @@ export type {
   ProviderValidateReplayTurnsContext,
   ProviderWebSocketSessionPolicy,
   ProviderWrapStreamFnContext,
-  KaijiBotPluginService,
-  KaijiBotPluginServiceContext,
+  AllBotPluginService,
+  AllBotPluginServiceContext,
   ProviderAuthContext,
   ProviderAuthDoctorHintContext,
   ProviderAuthMethodNonInteractiveContext,
   ProviderAuthMethod,
   ProviderAuthResult,
-  KaijiBotPluginCommandDefinition,
-  KaijiBotPluginDefinition,
+  AllBotPluginCommandDefinition,
+  AllBotPluginDefinition,
   PluginLogger,
 };
-export type { KaijiBotConfig };
+export type { AllBotConfig };
 
 export { buildPluginConfigSchema, emptyPluginConfigSchema } from "../plugins/config-schema.js";
 
@@ -149,23 +149,23 @@ type DefinePluginEntryOptions = {
   id: string;
   name: string;
   description: string;
-  kind?: KaijiBotPluginDefinition["kind"];
-  configSchema?: KaijiBotPluginConfigSchema | (() => KaijiBotPluginConfigSchema);
-  reload?: KaijiBotPluginDefinition["reload"];
-  nodeHostCommands?: KaijiBotPluginDefinition["nodeHostCommands"];
-  securityAuditCollectors?: KaijiBotPluginDefinition["securityAuditCollectors"];
-  register: (api: KaijiBotPluginApi) => void;
+  kind?: AllBotPluginDefinition["kind"];
+  configSchema?: AllBotPluginConfigSchema | (() => AllBotPluginConfigSchema);
+  reload?: AllBotPluginDefinition["reload"];
+  nodeHostCommands?: AllBotPluginDefinition["nodeHostCommands"];
+  securityAuditCollectors?: AllBotPluginDefinition["securityAuditCollectors"];
+  register: (api: AllBotPluginApi) => void;
 };
 
-/** Normalized object shape that KaijiBot loads from a plugin entry module. */
+/** Normalized object shape that AllBot loads from a plugin entry module. */
 type DefinedPluginEntry = {
   id: string;
   name: string;
   description: string;
-  configSchema: KaijiBotPluginConfigSchema;
-  register: NonNullable<KaijiBotPluginDefinition["register"]>;
+  configSchema: AllBotPluginConfigSchema;
+  register: NonNullable<AllBotPluginDefinition["register"]>;
 } & Pick<
-  KaijiBotPluginDefinition,
+  AllBotPluginDefinition,
   "kind" | "reload" | "nodeHostCommands" | "securityAuditCollectors"
 >;
 
@@ -174,7 +174,7 @@ type DefinedPluginEntry = {
  *
  * Use this for provider, tool, command, service, memory, and context-engine
  * plugins. Channel plugins should use `defineChannelPluginEntry(...)` from
- * `kaijibot/plugin-sdk/core` so they inherit the channel capability wiring.
+ * `allbot/plugin-sdk/core` so they inherit the channel capability wiring.
  */
 export function definePluginEntry({
   id,

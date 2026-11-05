@@ -6,7 +6,7 @@ import {
   resolveActiveTalkProviderConfig,
 } from "../../config/talk.js";
 import type { TalkConfigResponse, TalkProviderConfig } from "../../config/types.gateway.js";
-import type { KaijiBotConfig, TtsConfig, TtsProviderConfigMap } from "../../config/types.js";
+import type { AllBotConfig, TtsConfig, TtsProviderConfigMap } from "../../config/types.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -83,9 +83,9 @@ function resolveTalkVoiceId(
 }
 
 function buildTalkTtsConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
 ):
-  | { cfg: KaijiBotConfig; provider: string; providerConfig: TalkProviderConfig }
+  | { cfg: AllBotConfig; provider: string; providerConfig: TalkProviderConfig }
   | { error: string; reason: TalkSpeakReason } {
   const resolved = resolveActiveTalkProviderConfig(config.talk);
   const provider = canonicalizeSpeechProviderId(resolved?.provider, config);
@@ -169,7 +169,7 @@ function resolveTalkSpeed(params: TalkSpeakParams): number | undefined {
 function buildTalkSpeakOverrides(
   provider: string,
   providerConfig: TalkProviderConfig,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   params: TalkSpeakParams,
 ): TtsDirectiveOverrides {
   const speechProvider = getSpeechProvider(provider, config);
@@ -233,8 +233,8 @@ function inferMimeType(
 
 function resolveTalkResponseFromConfig(params: {
   includeSecrets: boolean;
-  sourceConfig: KaijiBotConfig;
-  runtimeConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  runtimeConfig: AllBotConfig;
 }): TalkConfigResponse | undefined {
   const normalizedTalk = normalizeTalkSection(params.sourceConfig.talk);
   if (!normalizedTalk) {

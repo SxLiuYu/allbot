@@ -2,14 +2,14 @@ import {
   assertOkOrThrowHttpError,
   postJsonRequest,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
-import { normalizeResolvedSecretInputString } from "kaijibot/plugin-sdk/secret-input";
+} from "allbot/plugin-sdk/provider-http";
+import { normalizeResolvedSecretInputString } from "allbot/plugin-sdk/secret-input";
 import type {
   SpeechProviderConfig,
   SpeechProviderOverrides,
   SpeechProviderPlugin,
-} from "kaijibot/plugin-sdk/speech-core";
-import { asObject } from "kaijibot/plugin-sdk/speech-core";
+} from "allbot/plugin-sdk/speech-core";
+import { asObject } from "allbot/plugin-sdk/speech-core";
 import {
   DEFAULT_VYDRA_BASE_URL,
   DEFAULT_VYDRA_SPEECH_MODEL,

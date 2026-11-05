@@ -1,15 +1,15 @@
 ---
 title: "ComfyUI"
-summary: "ComfyUI workflow image, video, and music generation setup in KaijiBot"
+summary: "ComfyUI workflow image, video, and music generation setup in AllBot"
 read_when:
-  - You want to use local ComfyUI workflows with KaijiBot
+  - You want to use local ComfyUI workflows with AllBot
   - You want to use Comfy Cloud with image, video, or music workflows
   - You need the bundled comfy plugin config keys
 ---
 
 # ComfyUI
 
-KaijiBot ships a bundled `comfy` plugin for workflow-driven ComfyUI runs.
+AllBot ships a bundled `comfy` plugin for workflow-driven ComfyUI runs.
 
 - Provider: `comfy`
 - Models: `comfy/workflow`
@@ -26,7 +26,7 @@ KaijiBot ships a bundled `comfy` plugin for workflow-driven ComfyUI runs.
 - Music or audio generation through the shared `music_generate` tool
 - Output download from a configured node or all matching output nodes
 
-The bundled plugin is workflow-driven, so KaijiBot does not try to map generic
+The bundled plugin is workflow-driven, so AllBot does not try to map generic
 `size`, `aspectRatio`, `resolution`, `durationSeconds`, or TTS-style controls
 onto your graph.
 
@@ -102,7 +102,7 @@ Existing top-level image config still works:
 }
 ```
 
-KaijiBot treats that legacy shape as the image workflow config.
+AllBot treats that legacy shape as the image workflow config.
 
 ## Image workflows
 
@@ -157,7 +157,7 @@ Set the default video model:
 ```
 
 Comfy video workflows currently support text-to-video and image-to-video through
-the configured graph. KaijiBot does not pass input videos into Comfy workflows.
+the configured graph. AllBot does not pass input videos into Comfy workflows.
 
 ## Music workflows
 
@@ -186,7 +186,7 @@ Cloud mode still uses the same `image`, `video`, and `music` workflow sections.
 Opt-in live coverage exists for the bundled plugin:
 
 ```bash
-KAIJIBOT_LIVE_TEST=1 COMFY_LIVE_TEST=1 pnpm test:live -- extensions/comfy/comfy.live.test.ts
+ALLBOT_LIVE_TEST=1 COMFY_LIVE_TEST=1 pnpm test:live -- extensions/comfy/comfy.live.test.ts
 ```
 
 The live test skips individual image, video, or music cases unless the matching

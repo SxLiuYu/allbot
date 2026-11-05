@@ -1,10 +1,10 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/browser-config-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/browser-config-runtime";
 import {
   normalizePluginsConfig,
   resolveEffectiveEnableState,
-} from "kaijibot/plugin-sdk/browser-config-runtime";
+} from "allbot/plugin-sdk/browser-config-runtime";
 
-export function isDefaultBrowserPluginEnabled(cfg: KaijiBotConfig): boolean {
+export function isDefaultBrowserPluginEnabled(cfg: AllBotConfig): boolean {
   return resolveEffectiveEnableState({
     id: "browser",
     origin: "bundled",

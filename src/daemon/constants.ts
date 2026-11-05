@@ -1,16 +1,16 @@
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 
 // Default service labels (canonical + legacy compatibility)
-export const GATEWAY_LAUNCH_AGENT_LABEL = "ai.kaijibot.gateway";
-export const GATEWAY_SYSTEMD_SERVICE_NAME = "kaijibot-gateway";
-export const GATEWAY_WINDOWS_TASK_NAME = "KaijiBot Gateway";
-export const GATEWAY_WATCHDOG_TASK_NAME = "KaijiBot Gateway Watchdog";
-export const GATEWAY_SERVICE_MARKER = "kaijibot";
+export const GATEWAY_LAUNCH_AGENT_LABEL = "ai.allbot.gateway";
+export const GATEWAY_SYSTEMD_SERVICE_NAME = "allbot-gateway";
+export const GATEWAY_WINDOWS_TASK_NAME = "AllBot Gateway";
+export const GATEWAY_WATCHDOG_TASK_NAME = "AllBot Gateway Watchdog";
+export const GATEWAY_SERVICE_MARKER = "allbot";
 export const GATEWAY_SERVICE_KIND = "gateway";
-export const NODE_LAUNCH_AGENT_LABEL = "ai.kaijibot.node";
-export const NODE_SYSTEMD_SERVICE_NAME = "kaijibot-node";
-export const NODE_WINDOWS_TASK_NAME = "KaijiBot Node";
-export const NODE_SERVICE_MARKER = "kaijibot";
+export const NODE_LAUNCH_AGENT_LABEL = "ai.allbot.node";
+export const NODE_SYSTEMD_SERVICE_NAME = "allbot-node";
+export const NODE_WINDOWS_TASK_NAME = "AllBot Node";
+export const NODE_SERVICE_MARKER = "allbot";
 export const NODE_SERVICE_KIND = "node";
 export const NODE_WINDOWS_TASK_SCRIPT_NAME = "node.cmd";
 export const LEGACY_GATEWAY_LAUNCH_AGENT_LABELS: string[] = [];
@@ -35,7 +35,7 @@ export function resolveGatewayLaunchAgentLabel(profile?: string): string {
   if (!normalized) {
     return GATEWAY_LAUNCH_AGENT_LABEL;
   }
-  return `ai.kaijibot.${normalized}`;
+  return `ai.allbot.${normalized}`;
 }
 
 export function resolveLegacyGatewayLaunchAgentLabels(profile?: string): string[] {
@@ -48,7 +48,7 @@ export function resolveGatewaySystemdServiceName(profile?: string): string {
   if (!suffix) {
     return GATEWAY_SYSTEMD_SERVICE_NAME;
   }
-  return `kaijibot-gateway${suffix}`;
+  return `allbot-gateway${suffix}`;
 }
 
 export function resolveGatewayWindowsTaskName(profile?: string): string {
@@ -56,7 +56,7 @@ export function resolveGatewayWindowsTaskName(profile?: string): string {
   if (!normalized) {
     return GATEWAY_WINDOWS_TASK_NAME;
   }
-  return `KaijiBot Gateway (${normalized})`;
+  return `AllBot Gateway (${normalized})`;
 }
 
 export function resolveGatewayWatchdogTaskName(profile?: string): string {
@@ -64,7 +64,7 @@ export function resolveGatewayWatchdogTaskName(profile?: string): string {
   if (!normalized) {
     return GATEWAY_WATCHDOG_TASK_NAME;
   }
-  return `KaijiBot Gateway Watchdog (${normalized})`;
+  return `AllBot Gateway Watchdog (${normalized})`;
 }
 
 export function formatGatewayServiceDescription(params?: {
@@ -81,9 +81,9 @@ export function formatGatewayServiceDescription(params?: {
     parts.push(`v${version}`);
   }
   if (parts.length === 0) {
-    return "KaijiBot Gateway";
+    return "AllBot Gateway";
   }
-  return `KaijiBot Gateway (${parts.join(", ")})`;
+  return `AllBot Gateway (${parts.join(", ")})`;
 }
 
 export function resolveGatewayServiceDescription(params: {
@@ -94,8 +94,8 @@ export function resolveGatewayServiceDescription(params: {
   return (
     params.description ??
     formatGatewayServiceDescription({
-      profile: params.env.KAIJIBOT_PROFILE,
-      version: params.environment?.KAIJIBOT_SERVICE_VERSION ?? params.env.KAIJIBOT_SERVICE_VERSION,
+      profile: params.env.ALLBOT_PROFILE,
+      version: params.environment?.ALLBOT_SERVICE_VERSION ?? params.env.ALLBOT_SERVICE_VERSION,
     })
   );
 }
@@ -115,7 +115,7 @@ export function resolveNodeWindowsTaskName(): string {
 export function formatNodeServiceDescription(params?: { version?: string }): string {
   const version = params?.version?.trim();
   if (!version) {
-    return "KaijiBot Node Host";
+    return "AllBot Node Host";
   }
-  return `KaijiBot Node Host (v${version})`;
+  return `AllBot Node Host (v${version})`;
 }

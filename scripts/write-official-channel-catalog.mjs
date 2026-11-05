@@ -24,7 +24,7 @@ function buildCatalogEntry(packageJson) {
     return null;
   }
   const packageName = trimString(packageJson.name);
-  const manifest = isRecord(packageJson.kaijibot) ? packageJson.kaijibot : null;
+  const manifest = isRecord(packageJson.allbot) ? packageJson.allbot : null;
   const release = manifest && isRecord(manifest.release) ? manifest.release : null;
   const channel = manifest && isRecord(manifest.channel) ? manifest.channel : null;
   if (!packageName || !channel || release?.publishToNpm !== true) {
@@ -40,7 +40,7 @@ function buildCatalogEntry(packageJson) {
     name: packageName,
     ...(version ? { version } : {}),
     ...(description ? { description } : {}),
-    kaijibot: {
+    allbot: {
       channel,
       install,
     },
@@ -75,8 +75,8 @@ export function buildOfficialChannelCatalog(params = {}) {
   }
 
   entries.sort((left, right) => {
-    const leftId = trimString(left.kaijibot?.channel?.id) || left.name;
-    const rightId = trimString(right.kaijibot?.channel?.id) || right.name;
+    const leftId = trimString(left.allbot?.channel?.id) || left.name;
+    const rightId = trimString(right.allbot?.channel?.id) || right.name;
     return leftId.localeCompare(rightId);
   });
 

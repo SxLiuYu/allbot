@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
 import {
   createWebSearchTestProvider,
@@ -32,7 +32,7 @@ function createCustomSearchTool() {
   };
 }
 
-function getCustomSearchApiKey(config?: KaijiBotConfig): unknown {
+function getCustomSearchApiKey(config?: AllBotConfig): unknown {
   const pluginConfig = config?.plugins?.entries?.["custom-search"]?.config as
     | TestPluginWebSearchConfig
     | undefined;
@@ -53,7 +53,7 @@ function createCustomSearchProvider(
   });
 }
 
-function createCustomSearchConfig(apiKey: unknown): KaijiBotConfig {
+function createCustomSearchConfig(apiKey: unknown): AllBotConfig {
   return {
     plugins: {
       entries: {

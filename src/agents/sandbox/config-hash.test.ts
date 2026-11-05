@@ -5,8 +5,8 @@ import { SANDBOX_MOUNT_FORMAT_VERSION } from "./workspace-mounts.js";
 
 function createDockerConfig(overrides?: Partial<SandboxDockerConfig>): SandboxDockerConfig {
   return {
-    image: "kaijibot-sandbox:test",
-    containerPrefix: "kaijibot-sbx-",
+    image: "allbot-sandbox:test",
+    containerPrefix: "allbot-sbx-",
     workdir: "/workspace",
     readOnlyRoot: true,
     tmpfs: ["/tmp", "/var/tmp", "/run"],

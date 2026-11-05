@@ -137,15 +137,15 @@ export function resolveConfigDir(
   env: NodeJS.ProcessEnv = process.env,
   homedir: () => string = os.homedir,
 ): string {
-  const override = env.KAIJIBOT_STATE_DIR?.trim();
+  const override = env.ALLBOT_STATE_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, homedir);
   }
-  const configPath = env.KAIJIBOT_CONFIG_PATH?.trim();
+  const configPath = env.ALLBOT_CONFIG_PATH?.trim();
   if (configPath) {
     return path.dirname(resolveUserPath(configPath, env, homedir));
   }
-  const newDir = path.join(resolveRequiredHomeDir(env, homedir), ".kaijibot");
+  const newDir = path.join(resolveRequiredHomeDir(env, homedir), ".allbot");
   try {
     const hasNew = fs.existsSync(newDir);
     if (hasNew) {
@@ -166,9 +166,9 @@ function resolveHomeDisplayPrefix(): { home: string; prefix: string } | undefine
   if (!home) {
     return undefined;
   }
-  const explicitHome = process.env.KAIJIBOT_HOME?.trim();
+  const explicitHome = process.env.ALLBOT_HOME?.trim();
   if (explicitHome) {
-    return { home, prefix: "$KAIJIBOT_HOME" };
+    return { home, prefix: "$ALLBOT_HOME" };
   }
   return { home, prefix: "~" };
 }
@@ -210,5 +210,5 @@ export function displayString(input: string): string {
   return shortenHomeInString(input);
 }
 
-// Configuration root; can be overridden via KAIJIBOT_STATE_DIR.
+// Configuration root; can be overridden via ALLBOT_STATE_DIR.
 export const CONFIG_DIR = resolveConfigDir();

@@ -15,15 +15,15 @@ describe("Dockerfile", () => {
   it("uses shared multi-arch base image refs for all root Node stages", async () => {
     const dockerfile = await readFile(dockerfilePath, "utf8");
     expect(dockerfile).toContain(
-      'ARG KAIJIBOT_NODE_BOOKWORM_IMAGE="node:24-bookworm@sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a"',
+      'ARG ALLBOT_NODE_BOOKWORM_IMAGE="node:24-bookworm@sha256:6449e19d8184d84062525b6a7524def03146c2cb04a7f08b076680d0e8e4240a"',
     );
     expect(dockerfile).toContain(
-      'ARG KAIJIBOT_NODE_BOOKWORM_SLIM_IMAGE="node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205"',
+      'ARG ALLBOT_NODE_BOOKWORM_SLIM_IMAGE="node:24-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205"',
     );
-    expect(dockerfile).toContain("FROM ${KAIJIBOT_NODE_BOOKWORM_IMAGE} AS ext-deps");
-    expect(dockerfile).toContain("FROM ${KAIJIBOT_NODE_BOOKWORM_IMAGE} AS build");
-    expect(dockerfile).toContain("FROM ${KAIJIBOT_NODE_BOOKWORM_IMAGE} AS base-default");
-    expect(dockerfile).toContain("FROM ${KAIJIBOT_NODE_BOOKWORM_SLIM_IMAGE} AS base-slim");
+    expect(dockerfile).toContain("FROM ${ALLBOT_NODE_BOOKWORM_IMAGE} AS ext-deps");
+    expect(dockerfile).toContain("FROM ${ALLBOT_NODE_BOOKWORM_IMAGE} AS build");
+    expect(dockerfile).toContain("FROM ${ALLBOT_NODE_BOOKWORM_IMAGE} AS base-default");
+    expect(dockerfile).toContain("FROM ${ALLBOT_NODE_BOOKWORM_SLIM_IMAGE} AS base-slim");
     expect(dockerfile).toContain("current multi-arch manifest list entry");
     expect(dockerfile).not.toContain("current amd64 entry");
   });
@@ -31,7 +31,7 @@ describe("Dockerfile", () => {
   it("installs optional browser dependencies after pnpm install", async () => {
     const dockerfile = await readFile(dockerfilePath, "utf8");
     const installIndex = dockerfile.indexOf("pnpm install --frozen-lockfile");
-    const browserArgIndex = dockerfile.indexOf("ARG KAIJIBOT_INSTALL_BROWSER");
+    const browserArgIndex = dockerfile.indexOf("ARG ALLBOT_INSTALL_BROWSER");
 
     expect(installIndex).toBeGreaterThan(-1);
     expect(browserArgIndex).toBeGreaterThan(-1);
@@ -45,8 +45,8 @@ describe("Dockerfile", () => {
   it("prunes runtime dependencies after the build stage", async () => {
     const dockerfile = await readFile(dockerfilePath, "utf8");
     expect(dockerfile).toContain("FROM build AS runtime-assets");
-    expect(dockerfile).toContain("ARG KAIJIBOT_EXTENSIONS");
-    expect(dockerfile).toContain("ARG KAIJIBOT_BUNDLED_PLUGIN_DIR");
+    expect(dockerfile).toContain("ARG ALLBOT_EXTENSIONS");
+    expect(dockerfile).toContain("ARG ALLBOT_BUNDLED_PLUGIN_DIR");
     expect(dockerfile).toContain("pnpm-workspace.runtime.yaml");
     expect(dockerfile).toContain("  - ui\\n");
     expect(dockerfile).toContain("CI=true NPM_CONFIG_FROZEN_LOCKFILE=false pnpm prune --prod");
@@ -61,20 +61,20 @@ describe("Dockerfile", () => {
 
   it("does not override bundled plugin discovery in runtime images", async () => {
     const dockerfile = collapseDockerContinuations(await readFile(dockerfilePath, "utf8"));
-    expect(dockerfile).toContain(`ARG KAIJIBOT_BUNDLED_PLUGIN_DIR=${BUNDLED_PLUGIN_ROOT_DIR}`);
-    expect(dockerfile).not.toMatch(/^\s*ENV\b[^\n]*\bKAIJIBOT_BUNDLED_PLUGINS_DIR\b/m);
+    expect(dockerfile).toContain(`ARG ALLBOT_BUNDLED_PLUGIN_DIR=${BUNDLED_PLUGIN_ROOT_DIR}`);
+    expect(dockerfile).not.toMatch(/^\s*ENV\b[^\n]*\bALLBOT_BUNDLED_PLUGINS_DIR\b/m);
   });
 
   it("normalizes plugin and agent paths permissions in image layers", async () => {
     const dockerfile = await readFile(dockerfilePath, "utf8");
     expect(dockerfile).toContain(
-      "RUN for dir in /app/${KAIJIBOT_BUNDLED_PLUGIN_DIR} /app/.agent /app/.agents; do \\",
+      "RUN for dir in /app/${ALLBOT_BUNDLED_PLUGIN_DIR} /app/.agent /app/.agents; do \\",
     );
     expect(dockerfile).toContain('find "$dir" -type d -exec chmod 755 {} +');
     expect(dockerfile).toContain('find "$dir" -type f -exec chmod 644 {} +');
   });
 
-  it("Docker GPG fingerprint awk uses correct quoting for KAIJIBOT_SANDBOX=1 build", async () => {
+  it("Docker GPG fingerprint awk uses correct quoting for ALLBOT_SANDBOX=1 build", async () => {
     const dockerfile = await readFile(dockerfilePath, "utf8");
     expect(dockerfile).toContain('== "fpr" {');
     expect(dockerfile).not.toContain('\\"fpr\\"');

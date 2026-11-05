@@ -7,9 +7,9 @@ export function buildPairingReply(params: {
   code: string;
 }): string {
   const { channel, idLine, code } = params;
-  const approveCommand = formatCliCommand(`kaijibot pairing approve ${channel} ${code}`);
+  const approveCommand = formatCliCommand(`allbot pairing approve ${channel} ${code}`);
   return [
-    "KaijiBot: access not configured.",
+    "AllBot: access not configured.",
     "",
     idLine,
     "Pairing code:",
@@ -18,7 +18,7 @@ export function buildPairingReply(params: {
     "```",
     "",
     "Ask the bot owner to approve with:",
-    formatCliCommand(`kaijibot pairing approve ${channel} ${code}`),
+    formatCliCommand(`allbot pairing approve ${channel} ${code}`),
     "```",
     approveCommand,
     "```",

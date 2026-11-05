@@ -110,7 +110,7 @@ const ILINK_APP_CLIENT_VERSION: number = buildClientVersion(pkg.version ?? "0.0.
  * Default `bot_agent` value used when the upstream app does not declare one.
  * Mirrors the role of HTTP `User-Agent`'s implicit "no UA" fallback.
  */
-const DEFAULT_BOT_AGENT = "KaijiBot";
+const DEFAULT_BOT_AGENT = "AllBot";
 
 /** Maximum length (bytes) of the sanitized `bot_agent` string. */
 const BOT_AGENT_MAX_LEN = 256;
@@ -590,7 +590,7 @@ export async function sendTyping(
 /**
  * Notify Weixin that this channel client is stopping (gateway shutdown / channel stop).
  * Uses a standalone timeout (not the gateway abort signal) so the request can finish
- * after KaijiBot has already aborted the long-poll.
+ * after AllBot has already aborted the long-poll.
  */
 export async function notifyStop(params: WeixinApiOptions): Promise<NotifyStopResp> {
   const rawText = await apiPostFetch({

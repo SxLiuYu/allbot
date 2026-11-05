@@ -16,7 +16,7 @@ import {
 import { trackConnectChallengeNonce } from "./test-helpers.js";
 
 export function resolveDeviceIdentityPath(name: string): string {
-  const root = process.env.KAIJIBOT_STATE_DIR ?? process.env.HOME ?? os.tmpdir();
+  const root = process.env.ALLBOT_STATE_DIR ?? process.env.HOME ?? os.tmpdir();
   return path.join(root, "test-device-identities", `${name}.json`);
 }
 

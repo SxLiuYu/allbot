@@ -12,7 +12,7 @@ describe("memory manager atomic reindex", () => {
   let tempIndexPath: string;
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-mem-atomic-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-mem-atomic-"));
   });
 
   beforeEach(async () => {

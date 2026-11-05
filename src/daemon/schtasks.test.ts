@@ -12,7 +12,7 @@ import {
 describe("schtasks runtime parsing", () => {
   it.each(["Ready", "Running"])("parses %s status", (status) => {
     const output = [
-      "TaskName: \\KaijiBot Gateway",
+      "TaskName: \\AllBot Gateway",
       `Status: ${status}`,
       "Last Run Time: 1/8/2026 1:23:45 AM",
       "Last Run Result: 0x0",
@@ -26,7 +26,7 @@ describe("schtasks runtime parsing", () => {
 
   it("parses 'Last Result' key variant (without 'Run') (#47726)", () => {
     const output = [
-      "TaskName: \\KaijiBot Gateway",
+      "TaskName: \\AllBot Gateway",
       "Status: Running",
       "Last Run Time: 2026/3/16 8:34:15",
       "Last Result: 267009",
@@ -126,28 +126,28 @@ describe("scheduled task runtime derivation", () => {
 describe("resolveTaskScriptPath", () => {
   it.each([
     {
-      name: "uses default path when KAIJIBOT_PROFILE is unset",
+      name: "uses default path when ALLBOT_PROFILE is unset",
       env: { USERPROFILE: "C:\\Users\\test" },
-      expected: path.join("C:\\Users\\test", ".kaijibot", "gateway.cmd"),
+      expected: path.join("C:\\Users\\test", ".allbot", "gateway.cmd"),
     },
     {
-      name: "uses profile-specific path when KAIJIBOT_PROFILE is set to a custom value",
-      env: { USERPROFILE: "C:\\Users\\test", KAIJIBOT_PROFILE: "jbphoenix" },
-      expected: path.join("C:\\Users\\test", ".kaijibot-jbphoenix", "gateway.cmd"),
+      name: "uses profile-specific path when ALLBOT_PROFILE is set to a custom value",
+      env: { USERPROFILE: "C:\\Users\\test", ALLBOT_PROFILE: "jbphoenix" },
+      expected: path.join("C:\\Users\\test", ".allbot-jbphoenix", "gateway.cmd"),
     },
     {
-      name: "prefers KAIJIBOT_STATE_DIR over profile-derived defaults",
+      name: "prefers ALLBOT_STATE_DIR over profile-derived defaults",
       env: {
         USERPROFILE: "C:\\Users\\test",
-        KAIJIBOT_PROFILE: "rescue",
-        KAIJIBOT_STATE_DIR: "C:\\State\\kaijibot",
+        ALLBOT_PROFILE: "rescue",
+        ALLBOT_STATE_DIR: "C:\\State\\allbot",
       },
-      expected: path.join("C:\\State\\kaijibot", "gateway.cmd"),
+      expected: path.join("C:\\State\\allbot", "gateway.cmd"),
     },
     {
       name: "falls back to HOME when USERPROFILE is not set",
-      env: { HOME: "/home/test", KAIJIBOT_PROFILE: "default" },
-      expected: path.join("/home/test", ".kaijibot", "gateway.cmd"),
+      env: { HOME: "/home/test", ALLBOT_PROFILE: "default" },
+      expected: path.join("/home/test", ".allbot", "gateway.cmd"),
     },
   ])("$name", ({ env, expected }) => {
     expect(resolveTaskScriptPath(env)).toBe(expected);
@@ -164,12 +164,12 @@ describe("readScheduledTaskCommand", () => {
     },
     run: (env: Record<string, string | undefined>) => Promise<void>,
   ) {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-schtasks-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-schtasks-test-"));
     try {
       const extraEnv = typeof options.env === "function" ? options.env(tmpDir) : options.env;
       const env = {
         USERPROFILE: tmpDir,
-        KAIJIBOT_PROFILE: "default",
+        ALLBOT_PROFILE: "default",
         ...extraEnv,
       };
       if (options.scriptLines) {
@@ -221,10 +221,10 @@ describe("readScheduledTaskCommand", () => {
       {
         scriptLines: [
           "@echo off",
-          "rem KaijiBot Gateway",
-          "cd /d C:\\Projects\\kaijibot",
+          "rem AllBot Gateway",
+          "cd /d C:\\Projects\\allbot",
           "set NODE_ENV=production",
-          "set KAIJIBOT_PORT=18789",
+          "set ALLBOT_PORT=18789",
           "node gateway.js --verbose",
         ],
       },
@@ -232,10 +232,10 @@ describe("readScheduledTaskCommand", () => {
         const result = await readScheduledTaskCommand(env);
         expect(result).toEqual({
           programArguments: ["node", "gateway.js", "--verbose"],
-          workingDirectory: "C:\\Projects\\kaijibot",
+          workingDirectory: "C:\\Projects\\allbot",
           environment: {
             NODE_ENV: "production",
-            KAIJIBOT_PORT: "18789",
+            ALLBOT_PORT: "18789",
           },
           sourcePath: resolveTaskScriptPath(env),
         });
@@ -248,7 +248,7 @@ describe("readScheduledTaskCommand", () => {
       {
         scriptLines: [
           "@echo off",
-          '"C:\\Program Files\\nodejs\\node.exe" C:\\Users\\test\\AppData\\Roaming\\npm\\node_modules\\kaijibot\\dist\\index.js gateway --port 18789',
+          '"C:\\Program Files\\nodejs\\node.exe" C:\\Users\\test\\AppData\\Roaming\\npm\\node_modules\\allbot\\dist\\index.js gateway --port 18789',
         ],
       },
       async (env) => {
@@ -256,7 +256,7 @@ describe("readScheduledTaskCommand", () => {
         expect(result).toEqual({
           programArguments: [
             "C:\\Program Files\\nodejs\\node.exe",
-            "C:\\Users\\test\\AppData\\Roaming\\npm\\node_modules\\kaijibot\\dist\\index.js",
+            "C:\\Users\\test\\AppData\\Roaming\\npm\\node_modules\\allbot\\dist\\index.js",
             "gateway",
             "--port",
             "18789",
@@ -272,15 +272,15 @@ describe("readScheduledTaskCommand", () => {
       {
         scriptLines: [
           "@echo off",
-          '"\\\\fileserver\\KaijiBot Share\\node.exe" "\\\\fileserver\\KaijiBot Share\\dist\\index.js" gateway --port 18789',
+          '"\\\\fileserver\\AllBot Share\\node.exe" "\\\\fileserver\\AllBot Share\\dist\\index.js" gateway --port 18789',
         ],
       },
       async (env) => {
         const result = await readScheduledTaskCommand(env);
         expect(result).toEqual({
           programArguments: [
-            "\\\\fileserver\\KaijiBot Share\\node.exe",
-            "\\\\fileserver\\KaijiBot Share\\dist\\index.js",
+            "\\\\fileserver\\AllBot Share\\node.exe",
+            "\\\\fileserver\\AllBot Share\\dist\\index.js",
             "gateway",
             "--port",
             "18789",
@@ -291,10 +291,10 @@ describe("readScheduledTaskCommand", () => {
     );
   });
 
-  it("reads script from KAIJIBOT_STATE_DIR override", async () => {
+  it("reads script from ALLBOT_STATE_DIR override", async () => {
     await withScheduledTaskScript(
       {
-        env: (tmpDir) => ({ KAIJIBOT_STATE_DIR: path.join(tmpDir, "custom-state") }),
+        env: (tmpDir) => ({ ALLBOT_STATE_DIR: path.join(tmpDir, "custom-state") }),
         scriptLines: ["@echo off", "node gateway.js --from-state-dir"],
       },
       async (env) => {

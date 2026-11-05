@@ -14,16 +14,16 @@ describe("buildDockerExecArgs", () => {
     });
 
     const commandArg = args[args.length - 1];
-    expect(args).toContain("KAIJIBOT_PREPEND_PATH=/custom/bin:/usr/local/bin:/usr/bin");
-    expect(commandArg).toContain('export PATH="${KAIJIBOT_PREPEND_PATH}:$PATH"');
+    expect(args).toContain("ALLBOT_PREPEND_PATH=/custom/bin:/usr/local/bin:/usr/bin");
+    expect(commandArg).toContain('export PATH="${ALLBOT_PREPEND_PATH}:$PATH"');
     expect(commandArg).toContain("echo hello");
     expect(commandArg).toBe(
-      'export PATH="${KAIJIBOT_PREPEND_PATH}:$PATH"; unset KAIJIBOT_PREPEND_PATH; echo hello',
+      'export PATH="${ALLBOT_PREPEND_PATH}:$PATH"; unset ALLBOT_PREPEND_PATH; echo hello',
     );
   });
 
   it("does not interpolate PATH into the shell command", () => {
-    const injectedPath = "$(touch /tmp/kaijibot-path-injection)";
+    const injectedPath = "$(touch /tmp/allbot-path-injection)";
     const args = buildDockerExecArgs({
       containerName: "test-container",
       command: "echo hello",
@@ -35,9 +35,9 @@ describe("buildDockerExecArgs", () => {
     });
 
     const commandArg = args[args.length - 1];
-    expect(args).toContain(`KAIJIBOT_PREPEND_PATH=${injectedPath}`);
+    expect(args).toContain(`ALLBOT_PREPEND_PATH=${injectedPath}`);
     expect(commandArg).not.toContain(injectedPath);
-    expect(commandArg).toContain("KAIJIBOT_PREPEND_PATH");
+    expect(commandArg).toContain("ALLBOT_PREPEND_PATH");
   });
 
   it("does not add PATH export when PATH is not in env", () => {

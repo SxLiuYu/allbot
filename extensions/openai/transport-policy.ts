@@ -3,9 +3,9 @@ import type {
   ProviderResolveWebSocketSessionPolicyContext,
   ProviderTransportTurnState,
   ProviderWebSocketSessionPolicy,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { normalizeProviderId } from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/plugin-entry";
+import { normalizeProviderId } from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { isOpenAIApiBaseUrl, isOpenAICodexBaseUrl } from "./shared.js";
 
 const DEFAULT_OPENAI_WS_DEGRADE_COOLDOWN_MS = 60_000;
@@ -60,7 +60,7 @@ function resolveSessionHeaders(params: {
   }
   return {
     "x-client-request-id": sessionId,
-    "x-kaijibot-session-id": sessionId,
+    "x-allbot-session-id": sessionId,
   };
 }
 
@@ -82,14 +82,14 @@ export function resolveOpenAITransportTurnState(
   return {
     headers: {
       ...sessionHeaders,
-      "x-kaijibot-turn-id": turnId,
-      "x-kaijibot-turn-attempt": attempt,
+      "x-allbot-turn-id": turnId,
+      "x-allbot-turn-attempt": attempt,
     },
     metadata: {
-      kaijibot_session_id: sessionHeaders["x-kaijibot-session-id"] ?? "",
-      kaijibot_turn_id: turnId,
-      kaijibot_turn_attempt: attempt,
-      kaijibot_transport: ctx.transport,
+      allbot_session_id: sessionHeaders["x-allbot-session-id"] ?? "",
+      allbot_turn_id: turnId,
+      allbot_turn_attempt: attempt,
+      allbot_transport: ctx.transport,
     },
   };
 }

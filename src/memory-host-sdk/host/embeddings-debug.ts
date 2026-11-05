@@ -2,7 +2,7 @@ import { isTruthyEnvValue } from "../../infra/env.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 
 const debugEmbeddings = isTruthyEnvValue(
-  process.env.KAIJIBOT_DEBUG_MEMORY_EMBEDDINGS || process.env.OPENCLAW_DEBUG_MEMORY_EMBEDDINGS,
+  process.env.ALLBOT_DEBUG_MEMORY_EMBEDDINGS || process.env.OPENCLAW_DEBUG_MEMORY_EMBEDDINGS,
 );
 const log = createSubsystemLogger("memory/embeddings");
 

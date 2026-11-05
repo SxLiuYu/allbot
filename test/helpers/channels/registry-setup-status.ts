@@ -1,21 +1,21 @@
 import { expect } from "vitest";
 import { requireBundledChannelPlugin } from "../../../src/channels/plugins/bundled.js";
 import type { ChannelPlugin } from "../../../src/channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 
 type SetupContractEntry = {
   id: string;
   plugin: Pick<ChannelPlugin, "id" | "config" | "setup">;
   cases: Array<{
     name: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     input: Record<string, unknown>;
     expectedAccountId?: string;
     expectedValidation?: string | null;
     beforeTest?: () => void;
-    assertPatchedConfig?: (cfg: KaijiBotConfig) => void;
-    assertResolvedAccount?: (account: unknown, cfg: KaijiBotConfig) => void;
+    assertPatchedConfig?: (cfg: AllBotConfig) => void;
+    assertResolvedAccount?: (account: unknown, cfg: AllBotConfig) => void;
   }>;
 };
 
@@ -24,7 +24,7 @@ type StatusContractEntry = {
   plugin: Pick<ChannelPlugin, "id" | "config" | "status">;
   cases: Array<{
     name: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     runtime?: Record<string, unknown>;
     probe?: unknown;
@@ -45,7 +45,7 @@ export function getSetupContractRegistry(): SetupContractEntry[] {
       cases: [
         {
           name: "default account stores tokens and enables the channel",
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           input: {
             botToken: "xoxb-test",
             appToken: "xapp-test",
@@ -59,7 +59,7 @@ export function getSetupContractRegistry(): SetupContractEntry[] {
         },
         {
           name: "non-default env setup is rejected",
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           accountId: "ops",
           input: {
             useEnv: true,
@@ -75,7 +75,7 @@ export function getSetupContractRegistry(): SetupContractEntry[] {
       cases: [
         {
           name: "default account stores token and normalized base URL",
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           input: {
             botToken: "test-token",
             httpUrl: "https://chat.example.com/",
@@ -89,7 +89,7 @@ export function getSetupContractRegistry(): SetupContractEntry[] {
         },
         {
           name: "missing credentials are rejected",
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           input: {
             httpUrl: "",
           },
@@ -104,7 +104,7 @@ export function getSetupContractRegistry(): SetupContractEntry[] {
       cases: [
         {
           name: "default account stores token and secret",
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           input: {
             channelAccessToken: "line-token",
             channelSecret: "line-secret",
@@ -118,7 +118,7 @@ export function getSetupContractRegistry(): SetupContractEntry[] {
         },
         {
           name: "non-default env setup is rejected",
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           accountId: "ops",
           input: {
             useEnv: true,
@@ -147,7 +147,7 @@ export function getStatusContractRegistry(): StatusContractEntry[] {
                 appToken: "xapp-test",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           runtime: {
             accountId: "default",
             connected: true,
@@ -176,7 +176,7 @@ export function getStatusContractRegistry(): StatusContractEntry[] {
                 baseUrl: "https://chat.example.com",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           runtime: {
             accountId: "default",
             connected: true,
@@ -207,7 +207,7 @@ export function getStatusContractRegistry(): StatusContractEntry[] {
                 channelSecret: "line-secret",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           runtime: {
             accountId: "default",
             running: true,

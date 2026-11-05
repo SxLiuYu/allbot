@@ -167,7 +167,7 @@ export function loadShellEnvFallback(opts: ShellEnvFallbackOptions): ShellEnvFal
     exec: opts.exec,
   });
   if (!probe.ok) {
-    logger.warn(`[kaijibot] shell env fallback failed: ${probe.error}`);
+    logger.warn(`[allbot] shell env fallback failed: ${probe.error}`);
     lastAppliedKeys = [];
     return { ok: false, error: probe.error, applied: [] };
   }
@@ -190,15 +190,15 @@ export function loadShellEnvFallback(opts: ShellEnvFallbackOptions): ShellEnvFal
 }
 
 export function shouldEnableShellEnvFallback(env: NodeJS.ProcessEnv): boolean {
-  return isTruthyEnvValue(env.KAIJIBOT_LOAD_SHELL_ENV);
+  return isTruthyEnvValue(env.ALLBOT_LOAD_SHELL_ENV);
 }
 
 export function shouldDeferShellEnvFallback(env: NodeJS.ProcessEnv): boolean {
-  return isTruthyEnvValue(env.KAIJIBOT_DEFER_SHELL_ENV_FALLBACK);
+  return isTruthyEnvValue(env.ALLBOT_DEFER_SHELL_ENV_FALLBACK);
 }
 
 export function resolveShellEnvFallbackTimeoutMs(env: NodeJS.ProcessEnv): number {
-  const raw = env.KAIJIBOT_SHELL_ENV_TIMEOUT_MS?.trim();
+  const raw = env.ALLBOT_SHELL_ENV_TIMEOUT_MS?.trim();
   if (!raw) {
     return DEFAULT_TIMEOUT_MS;
   }

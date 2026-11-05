@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { isRecord } from "../utils.js";
 import { findBundledPluginMetadataById } from "./bundled-plugin-metadata.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
@@ -98,7 +98,7 @@ export function collectPluginConfigContractMatches(params: {
 }
 
 export function resolvePluginConfigContractsById(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   cache?: boolean;

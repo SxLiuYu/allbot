@@ -1,14 +1,14 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/provider-auth";
-import { upsertAuthProfileWithLock } from "kaijibot/plugin-sdk/provider-auth";
-import { applyAgentDefaultModelPrimary } from "kaijibot/plugin-sdk/provider-onboard";
-import type { RuntimeEnv } from "kaijibot/plugin-sdk/runtime";
-import { WizardCancelledError, type WizardPrompter } from "kaijibot/plugin-sdk/setup";
-import { fetchWithSsrFGuard } from "kaijibot/plugin-sdk/ssrf-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/provider-auth";
+import { upsertAuthProfileWithLock } from "allbot/plugin-sdk/provider-auth";
+import { applyAgentDefaultModelPrimary } from "allbot/plugin-sdk/provider-onboard";
+import type { RuntimeEnv } from "allbot/plugin-sdk/runtime";
+import { WizardCancelledError, type WizardPrompter } from "allbot/plugin-sdk/setup";
+import { fetchWithSsrFGuard } from "allbot/plugin-sdk/ssrf-runtime";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import { OLLAMA_DEFAULT_BASE_URL, OLLAMA_DEFAULT_MODEL } from "./defaults.js";
 import {
   buildOllamaBaseUrlSsrFPolicy,
@@ -261,11 +261,11 @@ function buildOllamaModelsConfig(
 }
 
 function applyOllamaProviderConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   baseUrl: string,
   modelNames: string[],
   discoveredModelsByName?: Map<string, OllamaModelWithContext>,
-): KaijiBotConfig {
+): AllBotConfig {
   return {
     ...cfg,
     models: {
@@ -316,11 +316,11 @@ export async function buildOllamaProvider(
 }
 
 export async function promptAndConfigureOllama(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   isRemote: boolean;
   openUrl: (url: string) => Promise<void>;
-}): Promise<{ config: KaijiBotConfig }> {
+}): Promise<{ config: AllBotConfig }> {
   const baseUrlRaw = await params.prompter.text({
     message: "Ollama base URL",
     initialValue: OLLAMA_DEFAULT_BASE_URL,
@@ -414,11 +414,11 @@ export async function promptAndConfigureOllama(params: {
 }
 
 export async function configureOllamaNonInteractive(params: {
-  nextConfig: KaijiBotConfig;
+  nextConfig: AllBotConfig;
   opts: OllamaSetupOptions;
   runtime: RuntimeEnv;
   agentDir?: string;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const baseUrl = resolveOllamaApiBase(
     (params.opts.customBaseUrl?.trim() || OLLAMA_DEFAULT_BASE_URL).replace(/\/+$/, ""),
   );
@@ -507,7 +507,7 @@ export async function configureOllamaNonInteractive(params: {
 }
 
 export async function ensureOllamaModelPulled(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   model: string;
   prompter: WizardPrompter;
 }): Promise<void> {

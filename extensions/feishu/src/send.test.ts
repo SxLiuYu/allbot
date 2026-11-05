@@ -24,12 +24,12 @@ const {
   mockRuntimeResolveMarkdownTableMode: vi.fn(() => "preserve"),
 }));
 
-vi.mock("kaijibot/plugin-sdk/config-runtime", () => ({
+vi.mock("allbot/plugin-sdk/config-runtime", () => ({
   resolveMarkdownTableMode: mockResolveMarkdownTableMode,
 }));
 
-vi.mock("kaijibot/plugin-sdk/text-runtime", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("kaijibot/plugin-sdk/text-runtime")>();
+vi.mock("allbot/plugin-sdk/text-runtime", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("allbot/plugin-sdk/text-runtime")>();
   return {
     ...actual,
     convertMarkdownTables: mockConvertMarkdownTables,

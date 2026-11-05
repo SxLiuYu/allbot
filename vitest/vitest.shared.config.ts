@@ -17,7 +17,7 @@ function parsePositiveInt(value: string | undefined): number | null {
 }
 
 function isSystemThrottleDisabled(env: Record<string, string | undefined>): boolean {
-  const normalized = env.KAIJIBOT_VITEST_DISABLE_SYSTEM_THROTTLE?.trim().toLowerCase();
+  const normalized = env.ALLBOT_VITEST_DISABLE_SYSTEM_THROTTLE?.trim().toLowerCase();
   return normalized === "1" || normalized === "true";
 }
 
@@ -27,7 +27,7 @@ type VitestHostInfo = {
   totalMemoryBytes?: number;
 };
 
-export type KaijiBotVitestPool = "forks" | "threads";
+export type AllBotVitestPool = "forks" | "threads";
 
 export type LocalVitestScheduling = {
   maxWorkers: number;
@@ -56,7 +56,7 @@ function detectVitestHostInfo(): Required<VitestHostInfo> {
 export function resolveLocalVitestMaxWorkers(
   env: Record<string, string | undefined> = process.env,
   system: VitestHostInfo = detectVitestHostInfo(),
-  pool: KaijiBotVitestPool = resolveDefaultVitestPool(env),
+  pool: AllBotVitestPool = resolveDefaultVitestPool(env),
 ): number {
   return resolveLocalVitestScheduling(env, system, pool).maxWorkers;
 }
@@ -64,9 +64,9 @@ export function resolveLocalVitestMaxWorkers(
 export function resolveLocalVitestScheduling(
   env: Record<string, string | undefined> = process.env,
   system: VitestHostInfo = detectVitestHostInfo(),
-  pool: KaijiBotVitestPool = resolveDefaultVitestPool(env),
+  pool: AllBotVitestPool = resolveDefaultVitestPool(env),
 ): LocalVitestScheduling {
-  const override = parsePositiveInt(env.KAIJIBOT_VITEST_MAX_WORKERS ?? env.KAIJIBOT_TEST_WORKERS);
+  const override = parsePositiveInt(env.ALLBOT_VITEST_MAX_WORKERS ?? env.ALLBOT_TEST_WORKERS);
   if (override !== null) {
     const maxWorkers = clamp(override, 1, 16);
     return {
@@ -155,7 +155,7 @@ export function resolveLocalVitestScheduling(
 
 export function resolveDefaultVitestPool(
   _env: Record<string, string | undefined> = process.env,
-): KaijiBotVitestPool {
+): AllBotVitestPool {
   return "threads";
 }
 
@@ -182,19 +182,19 @@ export const sharedVitestConfig = {
   resolve: {
     alias: [
       {
-        find: "kaijibot/extension-api",
+        find: "allbot/extension-api",
         replacement: path.join(repoRoot, "src", "extensionAPI.ts"),
       },
       ...pluginSdkSubpaths.map((subpath) => ({
-        find: `kaijibot/plugin-sdk/${subpath}`,
+        find: `allbot/plugin-sdk/${subpath}`,
         replacement: path.join(repoRoot, "src", "plugin-sdk", `${subpath}.ts`),
       })),
       ...pluginSdkSubpaths.map((subpath) => ({
-        find: `@kaijibot/plugin-sdk/${subpath}`,
+        find: `@allbot/plugin-sdk/${subpath}`,
         replacement: path.join(repoRoot, "packages", "plugin-sdk", "src", `${subpath}.ts`),
       })),
       {
-        find: "kaijibot/plugin-sdk",
+        find: "allbot/plugin-sdk",
         replacement: path.join(repoRoot, "src", "plugin-sdk", "index.ts"),
       },
     ],
@@ -216,7 +216,7 @@ export const sharedVitestConfig = {
       "test/setup.ts",
       "test/setup.shared.ts",
       "test/setup.extensions.ts",
-      "test/setup-kaijibot-runtime.ts",
+      "test/setup-allbot-runtime.ts",
       "vitest/vitest.channel-paths.mjs",
       "vitest/vitest.boundary.config.ts",
       "vitest/vitest.bundled.config.ts",
@@ -263,7 +263,7 @@ export const sharedVitestConfig = {
       "test/fixtures/**",
       "**/node_modules/**",
       "**/vendor/**",
-      "dist/KaijiBot.app/**",
+      "dist/AllBot.app/**",
       "**/*.live.test.ts",
       "**/*.e2e.test.ts",
       ...(isCI ? ["ui/**"] : []),

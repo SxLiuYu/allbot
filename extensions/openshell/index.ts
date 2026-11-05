@@ -1,5 +1,5 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { registerSandboxBackend } from "kaijibot/plugin-sdk/sandbox";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { registerSandboxBackend } from "allbot/plugin-sdk/sandbox";
 import {
   createOpenShellSandboxBackendFactory,
   createOpenShellSandboxBackendManager,

@@ -16,7 +16,7 @@ export type ExtraGatewayService = {
   label: string;
   detail: string;
   scope: "user" | "system";
-  marker?: "kaijibot" | "clawdbot";
+  marker?: "allbot" | "clawdbot";
   legacy?: boolean;
 };
 
@@ -24,12 +24,12 @@ export type FindExtraGatewayServicesOptions = {
   deep?: boolean;
 };
 
-const EXTRA_MARKERS = ["kaijibot", "clawdbot"] as const;
+const EXTRA_MARKERS = ["allbot", "clawdbot"] as const;
 
 export function renderGatewayServiceCleanupHints(
   env: Record<string, string | undefined> = process.env as Record<string, string | undefined>,
 ): string[] {
-  const profile = env.KAIJIBOT_PROFILE;
+  const profile = env.ALLBOT_PROFILE;
   switch (process.platform) {
     case "darwin": {
       const label = resolveGatewayLaunchAgentLabel(profile);
@@ -81,8 +81,8 @@ export function detectMarkerLineWithGateway(contents: string): Marker | null {
 
 function hasGatewayServiceMarker(content: string): boolean {
   const lower = normalizeLowercaseStringOrEmpty(content);
-  const markerKeys = ["kaijibot_service_marker"];
-  const kindKeys = ["kaijibot_service_kind"];
+  const markerKeys = ["allbot_service_marker"];
+  const kindKeys = ["allbot_service_kind"];
   const markerValues = [normalizeLowercaseStringOrEmpty(GATEWAY_SERVICE_MARKER)];
   const hasMarkerKey = markerKeys.some((key) => lower.includes(key));
   const hasKindKey = kindKeys.some((key) => lower.includes(key));
@@ -95,7 +95,7 @@ function hasGatewayServiceMarker(content: string): boolean {
   );
 }
 
-function isKaijiBotGatewayLaunchdService(label: string, contents: string): boolean {
+function isAllBotGatewayLaunchdService(label: string, contents: string): boolean {
   if (hasGatewayServiceMarker(contents)) {
     return true;
   }
@@ -103,26 +103,26 @@ function isKaijiBotGatewayLaunchdService(label: string, contents: string): boole
   if (!lowerContents.includes("gateway")) {
     return false;
   }
-  return label.startsWith("ai.kaijibot.");
+  return label.startsWith("ai.allbot.");
 }
 
-function isKaijiBotGatewaySystemdService(name: string, contents: string): boolean {
+function isAllBotGatewaySystemdService(name: string, contents: string): boolean {
   if (hasGatewayServiceMarker(contents)) {
     return true;
   }
-  if (!name.startsWith("kaijibot-gateway")) {
+  if (!name.startsWith("allbot-gateway")) {
     return false;
   }
   return normalizeLowercaseStringOrEmpty(contents).includes("gateway");
 }
 
-function isKaijiBotGatewayTaskName(name: string): boolean {
+function isAllBotGatewayTaskName(name: string): boolean {
   const normalized = normalizeLowercaseStringOrEmpty(name);
   if (!normalized) {
     return false;
   }
   const defaultName = normalizeLowercaseStringOrEmpty(resolveGatewayWindowsTaskName());
-  return normalized === defaultName || normalized.startsWith("kaijibot gateway");
+  return normalized === defaultName || normalized.startsWith("allbot gateway");
 }
 
 function tryExtractPlistLabel(contents: string): string | null {
@@ -226,7 +226,7 @@ async function scanLaunchdDir(params: {
     if (isIgnoredLaunchdLabel(label)) {
       continue;
     }
-    if (marker === "kaijibot" && isKaijiBotGatewayLaunchdService(label, contents)) {
+    if (marker === "allbot" && isAllBotGatewayLaunchdService(label, contents)) {
       continue;
     }
     results.push({
@@ -235,7 +235,7 @@ async function scanLaunchdDir(params: {
       detail: `plist: ${fullPath}`,
       scope: params.scope,
       marker,
-      legacy: marker !== "kaijibot" || isLegacyLabel(label),
+      legacy: marker !== "allbot" || isLegacyLabel(label),
     });
   }
 
@@ -258,7 +258,7 @@ async function scanSystemdDir(params: {
     if (!marker) {
       continue;
     }
-    if (marker === "kaijibot" && isKaijiBotGatewaySystemdService(name, contents)) {
+    if (marker === "allbot" && isAllBotGatewaySystemdService(name, contents)) {
       continue;
     }
     results.push({
@@ -267,7 +267,7 @@ async function scanSystemdDir(params: {
       detail: `unit: ${fullPath}`,
       scope: params.scope,
       marker,
-      legacy: marker !== "kaijibot",
+      legacy: marker !== "allbot",
     });
   }
 
@@ -411,7 +411,7 @@ export async function findExtraGatewayServices(
       if (!name) {
         continue;
       }
-      if (isKaijiBotGatewayTaskName(name)) {
+      if (isAllBotGatewayTaskName(name)) {
         continue;
       }
       const lowerName = normalizeLowercaseStringOrEmpty(name);
@@ -432,7 +432,7 @@ export async function findExtraGatewayServices(
         detail: task.taskToRun ? `task: ${name}, run: ${task.taskToRun}` : name,
         scope: "system",
         marker,
-        legacy: marker !== "kaijibot",
+        legacy: marker !== "allbot",
       });
     }
     return results;

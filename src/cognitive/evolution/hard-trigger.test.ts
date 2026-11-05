@@ -125,7 +125,7 @@ describe("evaluateHardTrigger", () => {
     const { join } = await import("node:path");
     const { tmpdir } = await import("node:os");
 
-    const tempDir = mkdtempSync(join(tmpdir(), "kaijibot-trigger-skills-test-"));
+    const tempDir = mkdtempSync(join(tmpdir(), "allbot-trigger-skills-test-"));
     try {
       // Skills live under <workspace>/skills/agent, the same root the evolution
       // tools write to; configDir alone is not the workspace root.

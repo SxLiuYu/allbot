@@ -1,7 +1,7 @@
 /**
  * Live pipeline evaluation — full search→identify→resolve with real LLM + web search.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY \
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY \
  *     pnpm test src/cognitive/insight/insight-pipeline-live-eval.test.ts
  */
 
@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, it, expect } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveConfigDir } from "../../utils.js";
 import { ProactiveScheduler, type InsightGeneratorFn } from "../scheduler/proactive-scheduler.js";
 import type { SchedulerConfig, SchedulerEvent } from "../scheduler/types.js";
@@ -26,7 +26,7 @@ import {
 
 // ─── Constants ───
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
@@ -302,10 +302,10 @@ function makeSchedulerConfig(): SchedulerConfig {
   };
 }
 
-function makeMinimalConfig(): KaijiBotConfig {
+function makeMinimalConfig(): AllBotConfig {
   return {
     cognitive: { insight: { sources: { webSearchProvider: "zai" } } },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 // ─── Result types ───

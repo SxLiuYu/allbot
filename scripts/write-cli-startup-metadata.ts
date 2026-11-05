@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import type { RootHelpRenderOptions } from "../src/cli/program/root-help.js";
-import type { KaijiBotConfig } from "../src/config/config.js";
+import type { AllBotConfig } from "../src/config/config.js";
 
 function dedupe(values: string[]): string[] {
   const seen = new Set<string>();
@@ -84,7 +84,7 @@ export function readBundledChannelCatalog(
       const raw = readFileSync(packageJsonPath, "utf8");
       signature.update(`${dirEntry.name}\0${raw}\0`);
       const parsed = JSON.parse(raw) as {
-        kaijibot?: {
+        allbot?: {
           channel?: {
             id?: unknown;
             order?: unknown;
@@ -92,12 +92,12 @@ export function readBundledChannelCatalog(
           };
         };
       };
-      const id = parsed.kaijibot?.channel?.id;
+      const id = parsed.allbot?.channel?.id;
       if (typeof id !== "string" || !id.trim()) {
         continue;
       }
-      const orderRaw = parsed.kaijibot?.channel?.order;
-      const labelRaw = parsed.kaijibot?.channel?.label;
+      const orderRaw = parsed.allbot?.channel?.order;
+      const labelRaw = parsed.allbot?.channel?.label;
       entries.push({
         id: id.trim(),
         order: typeof orderRaw === "number" ? orderRaw : 999,
@@ -126,28 +126,28 @@ export function readBundledChannelCatalogIds(
 function createIsolatedRootHelpRenderContext(
   bundledPluginsDir: string = extensionsDir,
 ): RootHelpRenderContext {
-  const stateDir = path.join(rootDir, ".kaijibot-build-root-help");
+  const stateDir = path.join(rootDir, ".allbot-build-root-help");
   const workspaceDir = path.join(stateDir, "workspace");
   const homeDir = path.join(stateDir, "home");
   const env: NodeJS.ProcessEnv = {
     HOME: homeDir,
-    LOGNAME: process.env.LOGNAME ?? process.env.USER ?? "kaijibot-build",
-    USER: process.env.USER ?? process.env.LOGNAME ?? "kaijibot-build",
+    LOGNAME: process.env.LOGNAME ?? process.env.USER ?? "allbot-build",
+    USER: process.env.USER ?? process.env.LOGNAME ?? "allbot-build",
     PATH: process.env.PATH ?? "",
     TMPDIR: process.env.TMPDIR ?? "/tmp",
     LANG: process.env.LANG ?? "C.UTF-8",
     LC_ALL: process.env.LC_ALL ?? "C.UTF-8",
     TERM: process.env.TERM ?? "dumb",
     NO_COLOR: "1",
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: bundledPluginsDir,
-    KAIJIBOT_DISABLE_BUNDLED_PLUGINS: "",
-    KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-    KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
-    KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS: "0",
-    KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS: "0",
-    KAIJIBOT_STATE_DIR: stateDir,
+    ALLBOT_BUNDLED_PLUGINS_DIR: bundledPluginsDir,
+    ALLBOT_DISABLE_BUNDLED_PLUGINS: "",
+    ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+    ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
+    ALLBOT_PLUGIN_DISCOVERY_CACHE_MS: "0",
+    ALLBOT_PLUGIN_MANIFEST_CACHE_MS: "0",
+    ALLBOT_STATE_DIR: stateDir,
   };
-  const config: KaijiBotConfig = {
+  const config: AllBotConfig = {
     agents: {
       defaults: {
         workspace: workspaceDir,

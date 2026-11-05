@@ -57,8 +57,8 @@ type NodeDaemonStatusOptions = {
 
 function renderNodeServiceStartHints(): string[] {
   return buildPlatformServiceStartHints({
-    installCommand: formatCliCommand("kaijibot node install"),
-    startCommand: formatCliCommand("kaijibot node start"),
+    installCommand: formatCliCommand("allbot node install"),
+    startCommand: formatCliCommand("allbot node start"),
     launchAgentPlistPath: `~/Library/LaunchAgents/${resolveNodeLaunchAgentLabel()}.plist`,
     systemdServiceName: resolveNodeSystemdServiceName(),
     windowsTaskName: resolveNodeWindowsTaskName(),
@@ -127,7 +127,7 @@ export async function runNodeDaemonInstall(opts: NodeDaemonInstallOptions) {
     });
     if (!json) {
       defaultRuntime.log(`Node service already ${service.loadedText}.`);
-      defaultRuntime.log(`Reinstall with: ${formatCliCommand("kaijibot node install --force")}`);
+      defaultRuntime.log(`Reinstall with: ${formatCliCommand("allbot node install --force")}`);
     }
     return;
   }
@@ -288,7 +288,7 @@ export async function runNodeDaemonStatus(opts: NodeDaemonStatusOptions = {}) {
   };
   const hintEnv = {
     ...baseEnv,
-    KAIJIBOT_LOG_PREFIX: baseEnv.KAIJIBOT_LOG_PREFIX ?? "node",
+    ALLBOT_LOG_PREFIX: baseEnv.ALLBOT_LOG_PREFIX ?? "node",
   } as NodeJS.ProcessEnv;
 
   if (runtime?.missingUnit) {

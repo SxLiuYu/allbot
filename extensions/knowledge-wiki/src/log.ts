@@ -12,7 +12,7 @@ export async function appendKnowledgeWikiLog(
   vaultRoot: string,
   entry: KnowledgeWikiLogEntry,
 ): Promise<void> {
-  const logPath = path.join(vaultRoot, ".kaijibot-wiki", "log.jsonl");
+  const logPath = path.join(vaultRoot, ".allbot-wiki", "log.jsonl");
   await fs.mkdir(path.dirname(logPath), { recursive: true });
   await fs.appendFile(logPath, `${JSON.stringify(entry)}\n`, "utf8");
 }

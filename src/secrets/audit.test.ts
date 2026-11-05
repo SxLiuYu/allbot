@@ -98,9 +98,9 @@ function hasFinding(
 }
 
 async function createAuditFixture(): Promise<AuditFixture> {
-  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-secrets-audit-"));
-  const stateDir = path.join(rootDir, ".kaijibot");
-  const configPath = path.join(stateDir, "kaijibot.json");
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-secrets-audit-"));
+  const stateDir = path.join(rootDir, ".allbot");
+  const configPath = path.join(stateDir, "allbot.json");
   const authStorePath = path.join(stateDir, "agents", "main", "agent", "auth-profiles.json");
   const authJsonPath = path.join(stateDir, "agents", "main", "agent", "auth.json");
   const modelsPath = path.join(stateDir, "agents", "main", "agent", "models.json");
@@ -118,8 +118,8 @@ async function createAuditFixture(): Promise<AuditFixture> {
     modelsPath,
     envPath,
     env: {
-      KAIJIBOT_STATE_DIR: stateDir,
-      KAIJIBOT_CONFIG_PATH: configPath,
+      ALLBOT_STATE_DIR: stateDir,
+      ALLBOT_CONFIG_PATH: configPath,
       OPENAI_API_KEY: "env-openai-key", // pragma: allowlist secret
       PATH: resolveRuntimePathEnv(),
     },
@@ -539,7 +539,7 @@ describe("secrets audit", () => {
     const report = await runSecretsAudit({
       env: {
         ...fixture.env,
-        KAIJIBOT_AGENT_DIR: externalAgentDir,
+        ALLBOT_AGENT_DIR: externalAgentDir,
       },
     });
     expect(
@@ -554,7 +554,7 @@ describe("secrets audit", () => {
     expect(report.filesScanned).toContain(externalModelsPath);
   });
 
-  it("does not flag non-sensitive routing headers in kaijibot config", async () => {
+  it("does not flag non-sensitive routing headers in allbot config", async () => {
     await writeJsonFile(fixture.configPath, {
       models: {
         providers: {

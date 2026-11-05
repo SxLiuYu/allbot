@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import type {
   ContextEnginePromptCacheInfo,
   ContextEngineRuntimeContext,
@@ -96,7 +96,7 @@ export function resolvePromptModeForSession(sessionKey?: string): "minimal" | "f
 }
 
 export function shouldInjectHeartbeatPrompt(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   defaultAgentId?: string;
   isDefaultAgent: boolean;
@@ -122,7 +122,7 @@ export function shouldWarnOnOrphanedUserRepair(
 }
 
 export function resolveAttemptFsWorkspaceOnly(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionAgentId: string;
 }): boolean {
   return resolveEffectiveToolFsWorkspaceOnly({

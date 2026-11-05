@@ -1,7 +1,7 @@
 import { complete, type Api, type Model } from "@earendil-works/pi-ai";
 import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { detectCognitiveLocale } from "../cognitive-locale.js";
 import type { PersonaTree } from "../types.js";
@@ -18,7 +18,7 @@ const log = createSubsystemLogger("cognitive/interest-inference");
 export type InterestInferenceDeps = {
   complete: typeof complete;
   prepareModel: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     modelRef?: string,
   ) => Promise<{ model: Model<Api>; auth: ResolvedProviderAuth } | { error: string }>;
 };
@@ -27,7 +27,7 @@ export type InterestInferenceDeps = {
 // Model resolution
 // ---------------------------------------------------------------------------
 
-function resolveInferenceModel(config: KaijiBotConfig): string {
+function resolveInferenceModel(config: AllBotConfig): string {
   const explicit =
     config.cognitive?.insight?.inferenceModel ?? config.cognitive?.persona?.extractionModel;
   if (explicit) {
@@ -255,7 +255,7 @@ Respond with ONLY a JSON object (no markdown, no code fences):
 export async function inferSearchStrategy(
   persona: PersonaTree,
   input: InsightEngineInput,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: InterestInferenceDeps,
   mode: "surprise" | "extend" = "surprise",
 ): Promise<InferenceResult> {

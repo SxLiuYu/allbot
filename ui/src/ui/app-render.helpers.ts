@@ -4,7 +4,7 @@ import { t } from "../i18n/index.ts";
 import { refreshChatAvatar } from "./app-chat.ts";
 import { syncUrlWithSessionKey } from "./app-settings.ts";
 import type { AppViewState } from "./app-view-state.ts";
-import { KaijiBotApp } from "./app.ts";
+import { AllBotApp } from "./app.ts";
 import { createChatModelOverride } from "./chat-model-ref.ts";
 import {
   resolveChatModelOverrideValue,
@@ -59,10 +59,10 @@ export function resetChatStateForSessionSwitch(state: AppViewState, sessionKey: 
   state.fallbackStatus = null;
   state.chatAvatarUrl = null;
   state.chatQueue = [];
-  (state as unknown as KaijiBotApp).chatStreamStartedAt = null;
+  (state as unknown as AllBotApp).chatStreamStartedAt = null;
   state.chatRunId = null;
-  (state as unknown as KaijiBotApp).resetToolStream();
-  (state as unknown as KaijiBotApp).resetChatScroll();
+  (state as unknown as AllBotApp).resetToolStream();
+  (state as unknown as AllBotApp).resetChatScroll();
   state.applySettings({
     ...state.settings,
     sessionKey,

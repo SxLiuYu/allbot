@@ -3,7 +3,7 @@ import { resolveCorrectionUserId } from "../../cognitive/correction/userid.js";
 import { createTaskSafely } from "../../cognitive/tasks/service.js";
 import { reportStepOutcome } from "../../cognitive/tasks/step-driver.js";
 import { TaskStore } from "../../cognitive/tasks/store.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
@@ -117,7 +117,7 @@ function summarizeTask(task: {
  * cognitive.tasks.enabled is true (flag default on).
  */
 export function createTaskTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   deliveryTo?: string;
   agentId?: string;
@@ -203,7 +203,7 @@ export function createTaskTool(deps: {
 }
 
 export function createTaskStatusTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   deliveryTo?: string;
   agentId?: string;

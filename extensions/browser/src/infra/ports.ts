@@ -1,1 +1,1 @@
-export { ensurePortAvailable } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { ensurePortAvailable } from "allbot/plugin-sdk/browser-security-runtime";

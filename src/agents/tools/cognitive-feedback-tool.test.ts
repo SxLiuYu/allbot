@@ -61,7 +61,7 @@ vi.mock("../../utils.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../utils.js")>();
   return {
     ...actual,
-    resolveConfigDir: vi.fn().mockReturnValue("/home/test/.kaijibot"),
+    resolveConfigDir: vi.fn().mockReturnValue("/home/test/.allbot"),
   };
 });
 

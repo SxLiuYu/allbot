@@ -1,7 +1,7 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/plugin-entry";
-import { CUSTOM_LOCAL_AUTH_MARKER } from "kaijibot/plugin-sdk/provider-auth";
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { capturePluginRegistration } from "kaijibot/plugin-sdk/testing";
+import type { AllBotConfig } from "allbot/plugin-sdk/plugin-entry";
+import { CUSTOM_LOCAL_AUTH_MARKER } from "allbot/plugin-sdk/provider-auth";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { capturePluginRegistration } from "allbot/plugin-sdk/testing";
 import { describe, expect, it } from "vitest";
 import plugin from "./index.js";
 import { LMSTUDIO_LOCAL_API_KEY_PLACEHOLDER } from "./src/defaults.js";
@@ -159,12 +159,12 @@ describe("lmstudio plugin", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     expect(
       provider?.augmentModelCatalog?.({
         config,
-        agentDir: "/tmp/kaijibot",
+        agentDir: "/tmp/allbot",
         env: {},
         entries: [],
       }),

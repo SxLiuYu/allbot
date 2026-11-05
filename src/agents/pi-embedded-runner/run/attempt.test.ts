@@ -1,6 +1,6 @@
 import { streamSimple } from "@earendil-works/pi-ai";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { appendBootstrapPromptWarning } from "../../bootstrap-budget.js";
 import { SYSTEM_PROMPT_CACHE_BOUNDARY } from "../../system-prompt-cache-boundary.js";
 import { buildAgentSystemPrompt } from "../../system-prompt.js";
@@ -165,7 +165,7 @@ describe("composeSystemPromptWithHookContext", () => {
 
   it("keeps hook-composed system prompt stable when bootstrap warnings only change the user prompt", () => {
     const baseSystemPrompt = buildAgentSystemPrompt({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       contextFiles: [{ path: "AGENTS.md", content: "Follow AGENTS guidance." }],
       toolNames: ["read"],
     });
@@ -333,7 +333,7 @@ describe("resolveEmbeddedAgentStreamFn", () => {
 
 describe("resolveAttemptFsWorkspaceOnly", () => {
   it("uses global tools.fs.workspaceOnly when agent has no override", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       tools: {
         fs: { workspaceOnly: true },
       },
@@ -348,7 +348,7 @@ describe("resolveAttemptFsWorkspaceOnly", () => {
   });
 
   it("prefers agent-specific tools.fs.workspaceOnly override", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       tools: {
         fs: { workspaceOnly: true },
       },
@@ -1902,7 +1902,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         messageProvider: "slack",
         agentAccountId: "acct-1",
         authProfileId: "openai:p1",
-        config: {} as KaijiBotConfig,
+        config: {} as AllBotConfig,
         skillsSnapshot: undefined,
         senderIsOwner: true,
         provider: "openai-codex",
@@ -1938,7 +1938,7 @@ describe("buildAfterTurnRuntimeContext", () => {
               },
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         skillsSnapshot: undefined,
         senderIsOwner: true,
         provider: "openai-codex",
@@ -1970,7 +1970,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         messageProvider: "slack",
         agentAccountId: "acct-1",
         authProfileId: "openai:p1",
-        config: { plugins: { slots: { contextEngine: "lossless-claw" } } } as KaijiBotConfig,
+        config: { plugins: { slots: { contextEngine: "lossless-claw" } } } as AllBotConfig,
         skillsSnapshot: undefined,
         senderIsOwner: true,
         provider: "openai-codex",
@@ -2004,7 +2004,7 @@ describe("buildAfterTurnRuntimeContext", () => {
         currentThreadTs: "thread-9",
         currentMessageId: "msg-42",
         authProfileId: "openai:p1",
-        config: {} as KaijiBotConfig,
+        config: {} as AllBotConfig,
         skillsSnapshot: undefined,
         senderIsOwner: true,
         senderId: "user-123",
@@ -2040,7 +2040,7 @@ describe("resolveCognitiveWritePathFlags", () => {
     expect(
       resolveCognitiveWritePathFlags({
         cognitive: { enabled: false },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
     ).toEqual({
       cognitiveEnabled: false,
       personaAutoExtract: true,
@@ -2051,7 +2051,7 @@ describe("resolveCognitiveWritePathFlags", () => {
     expect(
       resolveCognitiveWritePathFlags({
         cognitive: { persona: { autoExtract: false } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
     ).toEqual({
       cognitiveEnabled: true,
       personaAutoExtract: false,

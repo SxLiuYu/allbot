@@ -31,7 +31,7 @@ const ANTHROPIC_OVERLOADED_PAYLOAD =
 // OpenRouter 402 billing example: https://openrouter.ai/docs/api-reference/errors
 const OPENROUTER_CREDITS_MESSAGE = "Payment Required: insufficient credits";
 // Issue-backed Anthropic/OpenAI-compatible insufficient_quota payload under HTTP 400:
-// https://github.com/kaijibot/kaijibot/issues/23440
+// https://github.com/allbot/allbot/issues/23440
 const INSUFFICIENT_QUOTA_PAYLOAD =
   '{"type":"error","error":{"type":"insufficient_quota","message":"Your account has insufficient quota balance to run this request."}}'; // pragma: allowlist secret
 // Together AI error code examples: https://docs.together.ai/docs/error-codes
@@ -911,7 +911,7 @@ describe("classifyFailoverReason", () => {
     expect(classifyFailoverReason("no api key found")).toBe("auth");
     expect(
       classifyFailoverReason(
-        'No API key found for provider "openai". Auth store: /tmp/kaijibot-agent-abc/auth-profiles.json (agentDir: /tmp/kaijibot-agent-abc).',
+        'No API key found for provider "openai". Auth store: /tmp/allbot-agent-abc/auth-profiles.json (agentDir: /tmp/allbot-agent-abc).',
       ),
     ).toBe("auth");
     expect(classifyFailoverReason("You have insufficient permissions for this operation.")).toBe(

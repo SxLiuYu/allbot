@@ -1,1 +1,1 @@
-export { ensureGatewayStartupAuth } from "kaijibot/plugin-sdk/browser-node-runtime";
+export { ensureGatewayStartupAuth } from "allbot/plugin-sdk/browser-node-runtime";

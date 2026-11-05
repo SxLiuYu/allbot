@@ -52,7 +52,7 @@ export async function connectGatewayClient(params: {
   const role = params.role ?? "operator";
   const scopes = params.scopes ?? (role === "node" ? [] : undefined);
   const platform = params.platform ?? process.platform;
-  const identityRoot = process.env.KAIJIBOT_STATE_DIR ?? os.tmpdir();
+  const identityRoot = process.env.ALLBOT_STATE_DIR ?? os.tmpdir();
   const deviceIdentity =
     params.deviceIdentity ??
     loadOrCreateDeviceIdentity(
@@ -240,7 +240,7 @@ export async function startGatewayWithClient(params: {
   clientDisplayName?: string;
 }) {
   await writeFile(params.configPath, `${JSON.stringify(params.cfg, null, 2)}\n`);
-  process.env.KAIJIBOT_CONFIG_PATH = params.configPath;
+  process.env.ALLBOT_CONFIG_PATH = params.configPath;
   clearRuntimeConfigSnapshot();
   clearConfigCache();
   clearSessionStoreCacheForTest();

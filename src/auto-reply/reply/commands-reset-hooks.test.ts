@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import { maybeHandleResetCommand } from "./commands-reset.js";
 import type { HandleCommandsParams } from "./commands-types.js";
@@ -51,7 +51,7 @@ vi.mock("./commands-handlers.runtime.js", () => ({
 
 function buildResetParams(
   commandBody: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   ctxOverrides?: Partial<MsgContext>,
 ): HandleCommandsParams {
   const ctx = {
@@ -85,7 +85,7 @@ function buildResetParams(
     directives: parseInlineDirectives(""),
     elevated: { enabled: true, allowed: true, failures: [] },
     sessionKey: "agent:main:main",
-    workspaceDir: "/tmp/kaijibot-commands",
+    workspaceDir: "/tmp/allbot-commands",
     defaultGroupActivation: () => "mention",
     resolvedVerboseLevel: "off",
     resolvedReasoningLevel: "off",
@@ -111,7 +111,7 @@ describe("handleCommands reset hooks", () => {
         params: buildResetParams("/new take notes", {
           commands: { text: true },
           channels: { whatsapp: { allowFrom: ["*"] } },
-        } as KaijiBotConfig),
+        } as AllBotConfig),
         expectedCall: expect.objectContaining({ type: "command", action: "new" }),
       },
       {
@@ -122,7 +122,7 @@ describe("handleCommands reset hooks", () => {
             {
               commands: { text: true },
               channels: { telegram: { allowFrom: ["*"] } },
-            } as KaijiBotConfig,
+            } as AllBotConfig,
             {
               Provider: "telegram",
               Surface: "telegram",
@@ -143,7 +143,7 @@ describe("handleCommands reset hooks", () => {
           action: "new",
           sessionKey: "agent:main:telegram:direct:123",
           context: expect.objectContaining({
-            workspaceDir: "/tmp/kaijibot-commands",
+            workspaceDir: "/tmp/allbot-commands",
           }),
         }),
       },
@@ -165,7 +165,7 @@ describe("handleCommands reset hooks", () => {
       {
         commands: { text: true },
         channels: { discord: { allowFrom: ["*"] } },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "discord",
         Surface: "discord",
@@ -198,7 +198,7 @@ describe("handleCommands reset hooks", () => {
       {
         commands: { text: true },
         channels: { discord: { allowFrom: ["*"] } },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "discord",
         Surface: "discord",

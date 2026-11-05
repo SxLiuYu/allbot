@@ -131,15 +131,15 @@ export function attachGatewayWsConnectionHandler(params: AttachGatewayWsConnecti
       ?.remoteAddress;
     const preauthBudgetKey = (
       socket as WebSocket & {
-        __kaijibotPreauthBudgetClaimed?: boolean;
-        __kaijibotPreauthBudgetKey?: string;
+        __allbotPreauthBudgetClaimed?: boolean;
+        __allbotPreauthBudgetKey?: string;
       }
-    ).__kaijibotPreauthBudgetKey;
+    ).__allbotPreauthBudgetKey;
     (
       socket as WebSocket & {
-        __kaijibotPreauthBudgetClaimed?: boolean;
+        __allbotPreauthBudgetClaimed?: boolean;
       }
-    ).__kaijibotPreauthBudgetClaimed = true;
+    ).__allbotPreauthBudgetClaimed = true;
     const headerValue = (value: string | string[] | undefined) =>
       Array.isArray(value) ? value[0] : value;
     const requestHost = headerValue(upgradeReq.headers.host);

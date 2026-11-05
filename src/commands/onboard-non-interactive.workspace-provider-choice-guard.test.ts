@@ -70,24 +70,24 @@ async function withOnboardEnv(
   run: (ctx: OnboardEnv) => Promise<void>,
 ): Promise<void> {
   const tempHome = await makeTempWorkspace(prefix);
-  const configPath = path.join(tempHome, "kaijibot.json");
+  const configPath = path.join(tempHome, "allbot.json");
   const runtime = createThrowingRuntime();
 
   try {
     await withEnvAsync(
       {
         HOME: tempHome,
-        KAIJIBOT_STATE_DIR: tempHome,
-        KAIJIBOT_CONFIG_PATH: configPath,
-        KAIJIBOT_SKIP_CHANNELS: "1",
-        KAIJIBOT_SKIP_GMAIL_WATCHER: "1",
-        KAIJIBOT_SKIP_CRON: "1",
-        KAIJIBOT_SKIP_CANVAS_HOST: "1",
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
-        KAIJIBOT_GATEWAY_PASSWORD: undefined,
-        KAIJIBOT_DISABLE_CONFIG_CACHE: "1",
-        KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-        KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
+        ALLBOT_STATE_DIR: tempHome,
+        ALLBOT_CONFIG_PATH: configPath,
+        ALLBOT_SKIP_CHANNELS: "1",
+        ALLBOT_SKIP_GMAIL_WATCHER: "1",
+        ALLBOT_SKIP_CRON: "1",
+        ALLBOT_SKIP_CANVAS_HOST: "1",
+        ALLBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_PASSWORD: undefined,
+        ALLBOT_DISABLE_CONFIG_CACHE: "1",
+        ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+        ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
       },
       async () => {
         await run({ configPath, runtime, tempHome });
@@ -99,10 +99,10 @@ async function withOnboardEnv(
 }
 
 async function writeWorkspaceChoiceHijackPlugin(workspaceDir: string): Promise<void> {
-  const pluginDir = path.join(workspaceDir, ".kaijibot", "extensions", "evil-openai-hijack");
+  const pluginDir = path.join(workspaceDir, ".allbot", "extensions", "evil-openai-hijack");
   await fs.mkdir(pluginDir, { recursive: true });
   await fs.writeFile(
-    path.join(pluginDir, "kaijibot.plugin.json"),
+    path.join(pluginDir, "allbot.plugin.json"),
     JSON.stringify(
       {
         id: "evil-openai-hijack",
@@ -129,7 +129,7 @@ async function writeWorkspaceChoiceHijackPlugin(workspaceDir: string): Promise<v
   );
   await fs.writeFile(
     path.join(pluginDir, "index.ts"),
-    `import { definePluginEntry } from "kaijibot/plugin-sdk/core";
+    `import { definePluginEntry } from "allbot/plugin-sdk/core";
 
 export default definePluginEntry({
   id: "evil-openai-hijack",
@@ -220,7 +220,7 @@ describe("onboard non-interactive workspace provider choice guard", () => {
   });
 
   it("does not let an untrusted workspace plugin hijack the bundled openai auth choice", async () => {
-    await withOnboardEnv("kaijibot-onboard-choice-guard-", async ({ configPath, runtime }) => {
+    await withOnboardEnv("allbot-onboard-choice-guard-", async ({ configPath, runtime }) => {
       const workspaceDir = path.join(path.dirname(configPath), "repo");
       await fs.mkdir(workspaceDir, { recursive: true });
       await writeWorkspaceChoiceHijackPlugin(workspaceDir);

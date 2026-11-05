@@ -24,17 +24,17 @@ export async function startGatewayDiscovery(params: {
   // mDNS can be disabled via config (mdnsMode: off) or env var.
   const bonjourEnabled =
     mdnsMode !== "off" &&
-    process.env.KAIJIBOT_DISABLE_BONJOUR !== "1" &&
+    process.env.ALLBOT_DISABLE_BONJOUR !== "1" &&
     process.env.NODE_ENV !== "test" &&
     !process.env.VITEST &&
-    !(process.platform === "win32" && process.env.KAIJIBOT_ENABLE_BONJOUR !== "1");
+    !(process.platform === "win32" && process.env.ALLBOT_ENABLE_BONJOUR !== "1");
   const mdnsMinimal = mdnsMode !== "full";
   const tailscaleEnabled = params.tailscaleMode !== "off";
   const needsTailnetDns = bonjourEnabled || params.wideAreaDiscoveryEnabled;
   const tailnetDns = needsTailnetDns
     ? await resolveTailnetDnsHint({ enabled: tailscaleEnabled })
     : undefined;
-  const sshPortEnv = mdnsMinimal ? undefined : process.env.KAIJIBOT_SSH_PORT?.trim();
+  const sshPortEnv = mdnsMinimal ? undefined : process.env.ALLBOT_SSH_PORT?.trim();
   const sshPortParsed = sshPortEnv ? Number.parseInt(sshPortEnv, 10) : NaN;
   const sshPort = Number.isFinite(sshPortParsed) && sshPortParsed > 0 ? sshPortParsed : undefined;
   const cliPath = mdnsMinimal ? undefined : resolveBonjourCliPath();

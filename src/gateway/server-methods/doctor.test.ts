@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
-const loadConfig = vi.hoisted(() => vi.fn(() => ({}) as KaijiBotConfig));
+const loadConfig = vi.hoisted(() => vi.fn(() => ({}) as AllBotConfig));
 const resolveDefaultAgentId = vi.hoisted(() => vi.fn(() => "main"));
 const resolveAgentWorkspaceDir = vi.hoisted(() =>
-  vi.fn((_cfg: KaijiBotConfig, _agentId: string) => "/tmp/kaijibot"),
+  vi.fn((_cfg: AllBotConfig, _agentId: string) => "/tmp/allbot"),
 );
 const resolveMemorySearchConfig = vi.hoisted(() =>
-  vi.fn<(_cfg: KaijiBotConfig, _agentId: string) => { enabled: boolean } | null>(() => ({
+  vi.fn<(_cfg: AllBotConfig, _agentId: string) => { enabled: boolean } | null>(() => ({
     enabled: true,
   })),
 );
@@ -89,7 +89,7 @@ describe("doctor.memory.status", () => {
   beforeEach(() => {
     loadConfig.mockClear();
     resolveDefaultAgentId.mockClear();
-    resolveAgentWorkspaceDir.mockReset().mockReturnValue("/tmp/kaijibot");
+    resolveAgentWorkspaceDir.mockReset().mockReturnValue("/tmp/allbot");
     resolveMemorySearchConfig.mockReset().mockReturnValue({ enabled: true });
     getMemorySearchManager.mockReset();
     removeGroundedShortTermCandidates.mockReset();
@@ -159,22 +159,22 @@ describe("doctor.memory resetGroundedShortTerm", () => {
   beforeEach(() => {
     loadConfig.mockClear();
     resolveDefaultAgentId.mockClear();
-    resolveAgentWorkspaceDir.mockReset().mockReturnValue("/tmp/kaijibot");
+    resolveAgentWorkspaceDir.mockReset().mockReturnValue("/tmp/allbot");
     removeGroundedShortTermCandidates.mockReset();
   });
 
   it("clears grounded-only staged short-term entries", async () => {
-    resolveAgentWorkspaceDir.mockReturnValue("/tmp/kaijibot");
+    resolveAgentWorkspaceDir.mockReturnValue("/tmp/allbot");
     removeGroundedShortTermCandidates.mockResolvedValue({
       removed: 3,
-      storePath: "/tmp/kaijibot/memory/.dreams/short-term-recall.json",
+      storePath: "/tmp/allbot/memory/.dreams/short-term-recall.json",
     });
     const respond = vi.fn();
 
     await invokeDoctorMemoryResetGroundedShortTerm(respond);
 
     expect(removeGroundedShortTermCandidates).toHaveBeenCalledWith({
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
     expect(respond).toHaveBeenCalledWith(
       true,

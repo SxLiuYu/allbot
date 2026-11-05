@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { DmPolicy, GroupPolicy } from "../../config/types.js";
 import type { SecretInput } from "../../config/types.secrets.js";
 import { resolveSecretInputModeForEnvSelection } from "../../plugins/provider-auth-mode.js";
@@ -170,7 +170,7 @@ export function createStandardChannelSetupStatus(params: {
   includeStatusLine?: boolean;
   resolveConfigured: ChannelSetupWizardStatus["resolveConfigured"];
   resolveExtraStatusLines?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId?: string;
     configured: boolean;
   }) => string[] | Promise<string[]>;
@@ -213,12 +213,12 @@ export function resolveSetupAccountId(params: {
 }
 
 export async function resolveAccountIdForConfigure(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   label: string;
   accountOverride?: string;
   shouldPromptAccountIds: boolean;
-  listAccountIds: (cfg: KaijiBotConfig) => string[];
+  listAccountIds: (cfg: AllBotConfig) => string[];
   defaultAccountId: string;
 }): Promise<string> {
   const override = params.accountOverride?.trim();
@@ -237,11 +237,11 @@ export async function resolveAccountIdForConfigure(params: {
 }
 
 export function setAccountAllowFromForChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId: string;
   allowFrom: string[];
-}): KaijiBotConfig {
+}): AllBotConfig {
   const { cfg, channel, accountId, allowFrom } = params;
   return patchConfigForScopedAccount({
     cfg,
@@ -253,12 +253,12 @@ export function setAccountAllowFromForChannel(params: {
 }
 
 export function patchTopLevelChannelConfigSection(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   enabled?: boolean;
   clearFields?: string[];
   patch: Record<string, unknown>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const channelConfig = {
     ...(params.cfg.channels?.[params.channel] as Record<string, unknown> | undefined),
   };
@@ -279,13 +279,13 @@ export function patchTopLevelChannelConfigSection(params: {
 }
 
 export function patchNestedChannelConfigSection(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   section: string;
   enabled?: boolean;
   clearFields?: string[];
   patch: Record<string, unknown>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const channelConfig = {
     ...(params.cfg.channels?.[params.channel] as Record<string, unknown> | undefined),
   };
@@ -312,11 +312,11 @@ export function patchNestedChannelConfigSection(params: {
 }
 
 export function setTopLevelChannelAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   allowFrom: string[];
   enabled?: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchTopLevelChannelConfigSection({
     cfg: params.cfg,
     channel: params.channel,
@@ -326,12 +326,12 @@ export function setTopLevelChannelAllowFrom(params: {
 }
 
 export function setNestedChannelAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   section: string;
   allowFrom: string[];
   enabled?: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchNestedChannelConfigSection({
     cfg: params.cfg,
     channel: params.channel,
@@ -342,11 +342,11 @@ export function setNestedChannelAllowFrom(params: {
 }
 
 export function setTopLevelChannelDmPolicyWithAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   dmPolicy: DmPolicy;
-  getAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number> | undefined;
-}): KaijiBotConfig {
+  getAllowFrom?: (cfg: AllBotConfig) => Array<string | number> | undefined;
+}): AllBotConfig {
   const channelConfig =
     (params.cfg.channels?.[params.channel] as Record<string, unknown> | undefined) ?? {};
   const existingAllowFrom =
@@ -366,13 +366,13 @@ export function setTopLevelChannelDmPolicyWithAllowFrom(params: {
 }
 
 export function setNestedChannelDmPolicyWithAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   section: string;
   dmPolicy: DmPolicy;
-  getAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number> | undefined;
+  getAllowFrom?: (cfg: AllBotConfig) => Array<string | number> | undefined;
   enabled?: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const channelConfig =
     (params.cfg.channels?.[params.channel] as Record<string, unknown> | undefined) ?? {};
   const sectionConfig =
@@ -396,11 +396,11 @@ export function setNestedChannelDmPolicyWithAllowFrom(params: {
 }
 
 export function setTopLevelChannelGroupPolicy(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   groupPolicy: GroupPolicy;
   enabled?: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchTopLevelChannelConfigSection({
     cfg: params.cfg,
     channel: params.channel,
@@ -414,9 +414,9 @@ export function createTopLevelChannelDmPolicy(params: {
   channel: string;
   policyKey: string;
   allowFromKey: string;
-  getCurrent: (cfg: KaijiBotConfig) => DmPolicy;
+  getCurrent: (cfg: AllBotConfig) => DmPolicy;
   promptAllowFrom?: ChannelSetupDmPolicy["promptAllowFrom"];
-  getAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number> | undefined;
+  getAllowFrom?: (cfg: AllBotConfig) => Array<string | number> | undefined;
 }): ChannelSetupDmPolicy {
   const setPolicy = createTopLevelChannelDmPolicySetter({
     channel: params.channel,
@@ -439,9 +439,9 @@ export function createNestedChannelDmPolicy(params: {
   section: string;
   policyKey: string;
   allowFromKey: string;
-  getCurrent: (cfg: KaijiBotConfig) => DmPolicy;
+  getCurrent: (cfg: AllBotConfig) => DmPolicy;
   promptAllowFrom?: ChannelSetupDmPolicy["promptAllowFrom"];
-  getAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number> | undefined;
+  getAllowFrom?: (cfg: AllBotConfig) => Array<string | number> | undefined;
   enabled?: boolean;
 }): ChannelSetupDmPolicy {
   const setPolicy = createNestedChannelDmPolicySetter({
@@ -463,8 +463,8 @@ export function createNestedChannelDmPolicy(params: {
 
 export function createTopLevelChannelDmPolicySetter(params: {
   channel: string;
-  getAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number> | undefined;
-}): (cfg: KaijiBotConfig, dmPolicy: DmPolicy) => KaijiBotConfig {
+  getAllowFrom?: (cfg: AllBotConfig) => Array<string | number> | undefined;
+}): (cfg: AllBotConfig, dmPolicy: DmPolicy) => AllBotConfig {
   return (cfg, dmPolicy) =>
     setTopLevelChannelDmPolicyWithAllowFrom({
       cfg,
@@ -477,9 +477,9 @@ export function createTopLevelChannelDmPolicySetter(params: {
 export function createNestedChannelDmPolicySetter(params: {
   channel: string;
   section: string;
-  getAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number> | undefined;
+  getAllowFrom?: (cfg: AllBotConfig) => Array<string | number> | undefined;
   enabled?: boolean;
-}): (cfg: KaijiBotConfig, dmPolicy: DmPolicy) => KaijiBotConfig {
+}): (cfg: AllBotConfig, dmPolicy: DmPolicy) => AllBotConfig {
   return (cfg, dmPolicy) =>
     setNestedChannelDmPolicyWithAllowFrom({
       cfg,
@@ -494,7 +494,7 @@ export function createNestedChannelDmPolicySetter(params: {
 export function createTopLevelChannelAllowFromSetter(params: {
   channel: string;
   enabled?: boolean;
-}): (cfg: KaijiBotConfig, allowFrom: string[]) => KaijiBotConfig {
+}): (cfg: AllBotConfig, allowFrom: string[]) => AllBotConfig {
   return (cfg, allowFrom) =>
     setTopLevelChannelAllowFrom({
       cfg,
@@ -508,7 +508,7 @@ export function createNestedChannelAllowFromSetter(params: {
   channel: string;
   section: string;
   enabled?: boolean;
-}): (cfg: KaijiBotConfig, allowFrom: string[]) => KaijiBotConfig {
+}): (cfg: AllBotConfig, allowFrom: string[]) => AllBotConfig {
   return (cfg, allowFrom) =>
     setNestedChannelAllowFrom({
       cfg,
@@ -522,7 +522,7 @@ export function createNestedChannelAllowFromSetter(params: {
 export function createTopLevelChannelGroupPolicySetter(params: {
   channel: string;
   enabled?: boolean;
-}): (cfg: KaijiBotConfig, groupPolicy: "open" | "allowlist" | "disabled") => KaijiBotConfig {
+}): (cfg: AllBotConfig, groupPolicy: "open" | "allowlist" | "disabled") => AllBotConfig {
   return (cfg, groupPolicy) =>
     setTopLevelChannelGroupPolicy({
       cfg,
@@ -533,10 +533,10 @@ export function createTopLevelChannelGroupPolicySetter(params: {
 }
 
 export function setChannelDmPolicyWithAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   dmPolicy: DmPolicy;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const { cfg, channel, dmPolicy } = params;
   const allowFrom =
     dmPolicy === "open" ? addWildcardAllowFrom(cfg.channels?.[channel]?.allowFrom) : undefined;
@@ -554,10 +554,10 @@ export function setChannelDmPolicyWithAllowFrom(params: {
 }
 
 export function setCompatChannelDmPolicyWithAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   dmPolicy: DmPolicy;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const channelConfig = (params.cfg.channels?.[params.channel] as
     | {
         allowFrom?: Array<string | number>;
@@ -581,10 +581,10 @@ export function setCompatChannelDmPolicyWithAllowFrom(params: {
 }
 
 export function setCompatChannelAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   allowFrom: string[];
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchCompatDmChannelConfig({
     cfg: params.cfg,
     channel: params.channel,
@@ -593,11 +593,11 @@ export function setCompatChannelAllowFrom(params: {
 }
 
 export function setAccountGroupPolicyForChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId: string;
   groupPolicy: GroupPolicy;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchChannelConfigForAccount({
     cfg: params.cfg,
     channel: params.channel,
@@ -607,11 +607,11 @@ export function setAccountGroupPolicyForChannel(params: {
 }
 
 export function setAccountDmAllowFromForChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId: string;
   allowFrom: string[];
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchChannelConfigForAccount({
     cfg: params.cfg,
     channel: params.channel,
@@ -794,10 +794,10 @@ export function createAccountScopedGroupAccessSection<TResolved>(params: {
   >;
   fallbackResolved: (entries: string[]) => TResolved;
   applyAllowlist: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
     resolved: TResolved;
-  }) => KaijiBotConfig;
+  }) => AllBotConfig;
 }): NonNullable<ChannelSetupWizard["groupAccess"]> {
   return {
     label: params.label,
@@ -847,10 +847,10 @@ type AccountScopedChannel = string;
 type CompatDmChannel = string;
 
 export function patchCompatDmChannelConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   patch: Record<string, unknown>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const { cfg, channel, patch } = params;
   const channelConfig = (cfg.channels?.[channel] as Record<string, unknown> | undefined) ?? {};
   const dmConfig = (channelConfig.dm as Record<string, unknown> | undefined) ?? {};
@@ -871,10 +871,10 @@ export function patchCompatDmChannelConfig(params: {
 }
 
 export function setSetupChannelEnabled(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel: string,
   enabled: boolean,
-): KaijiBotConfig {
+): AllBotConfig {
   const channelConfig = (cfg.channels?.[channel] as Record<string, unknown> | undefined) ?? {};
   return {
     ...cfg,
@@ -889,12 +889,12 @@ export function setSetupChannelEnabled(
 }
 
 function patchConfigForScopedAccount(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: AccountScopedChannel;
   accountId: string;
   patch: Record<string, unknown>;
   ensureEnabled: boolean;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const { cfg, channel, accountId, patch, ensureEnabled } = params;
   const channelConfig = cfg.channels?.[channel] as
     | { accounts?: Record<string, unknown> }
@@ -920,11 +920,11 @@ function patchConfigForScopedAccount(params: {
 }
 
 export function patchChannelConfigForAccount(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: AccountScopedChannel;
   accountId: string;
   patch: Record<string, unknown>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return patchConfigForScopedAccount({
     ...params,
     ensureEnabled: true,
@@ -932,7 +932,7 @@ export function patchChannelConfigForAccount(params: {
 }
 
 export function applySingleTokenPromptResult(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId: string;
   tokenPatchKey: string;
@@ -940,7 +940,7 @@ export function applySingleTokenPromptResult(params: {
     useEnv: boolean;
     token: SecretInput | null;
   };
-}): KaijiBotConfig {
+}): AllBotConfig {
   let next = params.cfg;
   if (params.tokenResult.useEnv) {
     next = patchChannelConfigForAccount({
@@ -1025,7 +1025,7 @@ export type SingleChannelSecretInputPromptResult =
   | { action: "set"; value: SecretInput; resolvedValue: string };
 
 export async function runSingleChannelSecretStep(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: Pick<WizardPrompter, "confirm" | "text" | "select" | "note">;
   providerHint: string;
   credentialLabel: string;
@@ -1039,14 +1039,14 @@ export async function runSingleChannelSecretStep(params: {
   inputPrompt: string;
   preferredEnvVar?: string;
   onMissingConfigured?: () => Promise<void>;
-  applyUseEnv?: (cfg: KaijiBotConfig) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  applyUseEnv?: (cfg: AllBotConfig) => AllBotConfig | Promise<AllBotConfig>;
   applySet?: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     value: SecretInput,
     resolvedValue: string,
-  ) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  ) => AllBotConfig | Promise<AllBotConfig>;
 }): Promise<{
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   action: SingleChannelSecretInputPromptResult["action"];
   resolvedValue?: string;
 }> {
@@ -1101,7 +1101,7 @@ export async function runSingleChannelSecretStep(params: {
 }
 
 export async function promptSingleChannelSecretInput(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: Pick<WizardPrompter, "confirm" | "text" | "select" | "note">;
   providerHint: string;
   credentialLabel: string;
@@ -1120,7 +1120,7 @@ export async function promptSingleChannelSecretInput(params: {
     copy: {
       modeMessage: `How do you want to provide this ${params.credentialLabel}?`,
       plaintextLabel: `Enter ${params.credentialLabel}`,
-      plaintextHint: "Stores the credential directly in KaijiBot config",
+      plaintextHint: "Stores the credential directly in AllBot config",
       refLabel: "Use external secret provider",
       refHint: "Stores a reference to env or configured external secret providers",
     },
@@ -1163,9 +1163,9 @@ export async function promptSingleChannelSecretInput(params: {
     preferredEnvVar: params.preferredEnvVar,
     copy: {
       sourceMessage: `Where is this ${params.credentialLabel} stored?`,
-      envVarPlaceholder: params.preferredEnvVar ?? "KAIJIBOT_SECRET",
+      envVarPlaceholder: params.preferredEnvVar ?? "ALLBOT_SECRET",
       envVarFormatError:
-        'Use an env var name like "KAIJIBOT_SECRET" (uppercase letters, numbers, underscores).',
+        'Use an env var name like "ALLBOT_SECRET" (uppercase letters, numbers, underscores).',
       noProvidersMessage:
         "No file/exec secret providers are configured yet. Add one under secrets.providers, or select Environment variable.",
     },
@@ -1179,7 +1179,7 @@ export async function promptSingleChannelSecretInput(params: {
 
 type ParsedAllowFromResult = { entries: string[]; error?: string };
 
-export async function promptParsedAllowFromForAccount<TConfig extends KaijiBotConfig>(params: {
+export async function promptParsedAllowFromForAccount<TConfig extends AllBotConfig>(params: {
   cfg: TConfig;
   accountId?: string;
   defaultAccountId: string;
@@ -1233,7 +1233,7 @@ export async function promptParsedAllowFromForAccount<TConfig extends KaijiBotCo
   });
 }
 
-export function createPromptParsedAllowFromForAccount<TConfig extends KaijiBotConfig>(params: {
+export function createPromptParsedAllowFromForAccount<TConfig extends AllBotConfig>(params: {
   defaultAccountId: string | ((cfg: TConfig) => string);
   noteTitle?: string;
   noteLines?: string[];
@@ -1269,7 +1269,7 @@ export function createPromptParsedAllowFromForAccount<TConfig extends KaijiBotCo
 }
 
 export async function promptParsedAllowFromForScopedChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId?: string;
   defaultAccountId: string;
@@ -1280,10 +1280,10 @@ export async function promptParsedAllowFromForScopedChannel(params: {
   placeholder: string;
   parseEntries: (raw: string) => ParsedAllowFromResult;
   getExistingAllowFrom: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     accountId: string;
   }) => Array<string | number>;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   return await promptParsedAllowFromForAccount({
     cfg: params.cfg,
     accountId: params.accountId,
@@ -1307,14 +1307,14 @@ export async function promptParsedAllowFromForScopedChannel(params: {
 
 export function createTopLevelChannelParsedAllowFromPrompt(params: {
   channel: string;
-  defaultAccountId: string | ((cfg: KaijiBotConfig) => string);
+  defaultAccountId: string | ((cfg: AllBotConfig) => string);
   enabled?: boolean;
   noteTitle?: string;
   noteLines?: string[];
   message: string;
   placeholder: string;
   parseEntries: (raw: string) => ParsedAllowFromResult;
-  getExistingAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number>;
+  getExistingAllowFrom?: (cfg: AllBotConfig) => Array<string | number>;
   mergeEntries?: (params: { existing: Array<string | number>; parsed: string[] }) => string[];
 }): NonNullable<ChannelSetupDmPolicy["promptAllowFrom"]> {
   const setAllowFrom = createTopLevelChannelAllowFromSetter({
@@ -1327,13 +1327,13 @@ export function createTopLevelChannelParsedAllowFromPrompt(params: {
     message: params.message,
     placeholder: params.placeholder,
     parseEntries: params.parseEntries,
-    getExistingAllowFrom: ({ cfg }: { cfg: KaijiBotConfig }) =>
+    getExistingAllowFrom: ({ cfg }: { cfg: AllBotConfig }) =>
       params.getExistingAllowFrom?.(cfg) ??
       (cfg.channels?.[params.channel] as { allowFrom?: Array<string | number> } | undefined)
         ?.allowFrom ??
       [],
     ...(params.mergeEntries ? { mergeEntries: params.mergeEntries } : {}),
-    applyAllowFrom: ({ cfg, allowFrom }: { cfg: KaijiBotConfig; allowFrom: string[] }) =>
+    applyAllowFrom: ({ cfg, allowFrom }: { cfg: AllBotConfig; allowFrom: string[] }) =>
       setAllowFrom(cfg, allowFrom),
   };
 
@@ -1354,14 +1354,14 @@ export function createTopLevelChannelParsedAllowFromPrompt(params: {
 export function createNestedChannelParsedAllowFromPrompt(params: {
   channel: string;
   section: string;
-  defaultAccountId: string | ((cfg: KaijiBotConfig) => string);
+  defaultAccountId: string | ((cfg: AllBotConfig) => string);
   enabled?: boolean;
   noteTitle?: string;
   noteLines?: string[];
   message: string;
   placeholder: string;
   parseEntries: (raw: string) => ParsedAllowFromResult;
-  getExistingAllowFrom?: (cfg: KaijiBotConfig) => Array<string | number>;
+  getExistingAllowFrom?: (cfg: AllBotConfig) => Array<string | number>;
   mergeEntries?: (params: { existing: Array<string | number>; parsed: string[] }) => string[];
 }): NonNullable<ChannelSetupDmPolicy["promptAllowFrom"]> {
   const setAllowFrom = createNestedChannelAllowFromSetter({
@@ -1376,7 +1376,7 @@ export function createNestedChannelParsedAllowFromPrompt(params: {
     message: params.message,
     placeholder: params.placeholder,
     parseEntries: params.parseEntries,
-    getExistingAllowFrom: ({ cfg }: { cfg: KaijiBotConfig }) =>
+    getExistingAllowFrom: ({ cfg }: { cfg: AllBotConfig }) =>
       params.getExistingAllowFrom?.(cfg) ??
       (
         (cfg.channels?.[params.channel] as Record<string, unknown> | undefined)?.[params.section] as
@@ -1385,7 +1385,7 @@ export function createNestedChannelParsedAllowFromPrompt(params: {
       )?.allowFrom ??
       [],
     ...(params.mergeEntries ? { mergeEntries: params.mergeEntries } : {}),
-    applyAllowFrom: ({ cfg, allowFrom }: { cfg: KaijiBotConfig; allowFrom: string[] }) =>
+    applyAllowFrom: ({ cfg, allowFrom }: { cfg: AllBotConfig; allowFrom: string[] }) =>
       setAllowFrom(cfg, allowFrom),
   };
 
@@ -1551,7 +1551,7 @@ export async function promptResolvedAllowFrom(params: {
 }
 
 export async function promptLegacyChannelAllowFrom(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: CompatDmChannel;
   prompter: WizardPrompter;
   existing: Array<string | number>;
@@ -1563,7 +1563,7 @@ export async function promptLegacyChannelAllowFrom(params: {
   parseId: (value: string) => string | null;
   invalidWithoutTokenNote: string;
   resolveEntries: (params: { token: string; entries: string[] }) => Promise<AllowFromResolution[]>;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   await params.prompter.note(params.noteLines.join("\n"), params.noteTitle);
   const unique = await promptResolvedAllowFrom({
     prompter: params.prompter,
@@ -1585,13 +1585,13 @@ export async function promptLegacyChannelAllowFrom(params: {
 }
 
 export async function promptLegacyChannelAllowFromForAccount<TAccount>(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: CompatDmChannel;
   prompter: WizardPrompter;
   accountId?: string;
   defaultAccountId: string;
-  resolveAccount: (cfg: KaijiBotConfig, accountId: string) => TAccount;
-  resolveExisting: (account: TAccount, cfg: KaijiBotConfig) => Array<string | number>;
+  resolveAccount: (cfg: AllBotConfig, accountId: string) => TAccount;
+  resolveExisting: (account: TAccount, cfg: AllBotConfig) => Array<string | number>;
   resolveToken: (account: TAccount) => string | null | undefined;
   noteTitle: string;
   noteLines: string[];
@@ -1600,7 +1600,7 @@ export async function promptLegacyChannelAllowFromForAccount<TAccount>(params: {
   parseId: (value: string) => string | null;
   invalidWithoutTokenNote: string;
   resolveEntries: (params: { token: string; entries: string[] }) => Promise<AllowFromResolution[]>;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   const accountId = resolveSetupAccountId({
     accountId: params.accountId,
     defaultAccountId: params.defaultAccountId,

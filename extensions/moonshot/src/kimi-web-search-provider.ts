@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/provider-onboard";
+import type { AllBotConfig } from "allbot/plugin-sdk/provider-onboard";
 import {
   buildSearchCacheKey,
   buildUnsupportedSearchFilterResponse,
@@ -24,8 +24,8 @@ import {
   withTrustedWebSearchEndpoint,
   wrapWebContent,
   writeCachedSearchPayload,
-} from "kaijibot/plugin-sdk/provider-web-search";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-web-search";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { Type } from "typebox";
 import {
   isNativeMoonshotBaseUrl,
@@ -101,7 +101,7 @@ function trimTrailingSlashes(url: string): string {
   return url.replace(/\/+$/, "");
 }
 
-function resolveKimiBaseUrl(kimi?: KimiConfig, openClawConfig?: KaijiBotConfig): string {
+function resolveKimiBaseUrl(kimi?: KimiConfig, openClawConfig?: AllBotConfig): string {
   const explicitBaseUrl = normalizeOptionalString(kimi?.baseUrl) ?? "";
   if (explicitBaseUrl) {
     return trimTrailingSlashes(explicitBaseUrl) || DEFAULT_KIMI_BASE_URL;
@@ -280,7 +280,7 @@ function createKimiSchema() {
 
 function createKimiToolDefinition(
   searchConfig: SearchConfigRecord | undefined,
-  openClawConfig: KaijiBotConfig | undefined,
+  openClawConfig: AllBotConfig | undefined,
 ): WebSearchProviderToolDefinition {
   return {
     description:

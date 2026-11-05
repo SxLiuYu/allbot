@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `kaijibot skills` (search/install/update/list/info/check)"
+summary: "CLI reference for `allbot skills` (search/install/update/list/info/check)"
 read_when:
   - You want to see which skills are available and ready to run
   - You want to search, install, or update skills from ClawHub
@@ -7,7 +7,7 @@ read_when:
 title: "skills"
 ---
 
-# `kaijibot skills`
+# `allbot skills`
 
 Inspect local skills and install/update skills from ClawHub.
 
@@ -20,21 +20,21 @@ Related:
 ## Commands
 
 ```bash
-kaijibot skills search "calendar"
-kaijibot skills search --limit 20 --json
-kaijibot skills install <slug>
-kaijibot skills install <slug> --version <version>
-kaijibot skills install <slug> --force
-kaijibot skills update <slug>
-kaijibot skills update --all
-kaijibot skills list
-kaijibot skills list --eligible
-kaijibot skills list --json
-kaijibot skills list --verbose
-kaijibot skills info <name>
-kaijibot skills info <name> --json
-kaijibot skills check
-kaijibot skills check --json
+allbot skills search "calendar"
+allbot skills search --limit 20 --json
+allbot skills install <slug>
+allbot skills install <slug> --version <version>
+allbot skills install <slug> --force
+allbot skills update <slug>
+allbot skills update --all
+allbot skills list
+allbot skills list --eligible
+allbot skills list --json
+allbot skills list --verbose
+allbot skills info <name>
+allbot skills info <name> --json
+allbot skills check
+allbot skills check --json
 ```
 
 `search`/`install`/`update` use ClawHub directly and install into the active

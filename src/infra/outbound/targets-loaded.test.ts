@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { tryResolveLoadedOutboundTarget } from "./targets-loaded.js";
 
 const mocks = vi.hoisted(() => ({
@@ -10,7 +10,7 @@ vi.mock("../../channels/plugins/index.js", () => ({
   getLoadedChannelPlugin: mocks.getLoadedChannelPlugin,
 }));
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("tryResolveLoadedOutboundTarget", () => {
   beforeEach(() => {
     mocks.getLoadedChannelPlugin.mockReset();
@@ -23,7 +23,7 @@ describe.skipIf(process.env.CI)("tryResolveLoadedOutboundTarget", () => {
   });
 
   it("uses loaded plugin config defaultTo fallback", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: { telegram: { defaultTo: "123456789" } },
     };
     mocks.getLoadedChannelPlugin.mockReturnValue({
@@ -31,7 +31,7 @@ describe.skipIf(process.env.CI)("tryResolveLoadedOutboundTarget", () => {
       meta: { label: "Telegram" },
       capabilities: {},
       config: {
-        resolveDefaultTo: ({ cfg }: { cfg: KaijiBotConfig }) => cfg.channels?.telegram?.defaultTo,
+        resolveDefaultTo: ({ cfg }: { cfg: AllBotConfig }) => cfg.channels?.telegram?.defaultTo,
       },
       outbound: {},
       messaging: {},

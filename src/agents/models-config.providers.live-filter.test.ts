@@ -6,8 +6,8 @@ describe("resolveProviderDiscoveryFilterForTest", () => {
     expect(
       resolveProviderDiscoveryFilterForTest({
         env: {
-          KAIJIBOT_LIVE_TEST: "1",
-          KAIJIBOT_LIVE_PROVIDERS: "claude-cli",
+          ALLBOT_LIVE_TEST: "1",
+          ALLBOT_LIVE_PROVIDERS: "claude-cli",
           VITEST: "1",
         } as NodeJS.ProcessEnv,
       }),
@@ -18,8 +18,8 @@ describe("resolveProviderDiscoveryFilterForTest", () => {
     expect(
       resolveProviderDiscoveryFilterForTest({
         env: {
-          KAIJIBOT_LIVE_TEST: "1",
-          KAIJIBOT_LIVE_GATEWAY_PROVIDERS: "claude-cli",
+          ALLBOT_LIVE_TEST: "1",
+          ALLBOT_LIVE_GATEWAY_PROVIDERS: "claude-cli",
           VITEST: "1",
         } as NodeJS.ProcessEnv,
       }),
@@ -30,8 +30,8 @@ describe("resolveProviderDiscoveryFilterForTest", () => {
     expect(
       resolveProviderDiscoveryFilterForTest({
         env: {
-          KAIJIBOT_LIVE_TEST: "1",
-          KAIJIBOT_LIVE_PROVIDERS: "openrouter",
+          ALLBOT_LIVE_TEST: "1",
+          ALLBOT_LIVE_PROVIDERS: "openrouter",
           VITEST: "1",
         } as NodeJS.ProcessEnv,
       }),

@@ -1,6 +1,6 @@
-# @kaijibot/knowledge-wiki
+# @allbot/knowledge-wiki
 
-LLM-compiled knowledge wiki for **KaijiBot** — based on the [Karpathy LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+LLM-compiled knowledge wiki for **AllBot** — based on the [Karpathy LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
 The LLM reads your workspace files, extracts knowledge, and compiles a structured, interlinked wiki of markdown pages. You read it; the LLM writes it. The wiki is a persistent, compounding artifact — every source you ingest makes it smarter.
 
@@ -51,11 +51,11 @@ Default: `enabled: false`. Opt-in via config.
 ## CLI
 
 ```bash
-kaijibot wiki status          # Wiki vault stats
-kaijibot wiki init            # Initialize wiki directory structure
-kaijibot wiki ingest          # Ingest all changed workspace files
-kaijibot wiki query "rust"    # Search the compiled wiki
-kaijibot wiki lint            # Health-check (contradictions, stale claims, orphans)
+allbot wiki status          # Wiki vault stats
+allbot wiki init            # Initialize wiki directory structure
+allbot wiki ingest          # Ingest all changed workspace files
+allbot wiki query "rust"    # Search the compiled wiki
+allbot wiki lint            # Health-check (contradictions, stale claims, orphans)
 ```
 
 ## Agent Tools
@@ -75,7 +75,7 @@ workspace/wiki/
 ├── summaries/             # One page per ingested source
 ├── entities/              # LLM-extracted entity pages
 ├── concepts/              # LLM-extracted concept pages
-└── .kaijibot-wiki/        # Internal state (file hashes, JSONL log)
+└── .allbot-wiki/        # Internal state (file hashes, JSONL log)
 ```
 
 All pages use YAML frontmatter (`pageType`, `title`, `sourceIds`, `claims`, `updatedAt`) and `[[wikilinks]]` for cross-references.

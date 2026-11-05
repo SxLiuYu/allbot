@@ -119,7 +119,7 @@ describe("parseLegacyMemoryFiles", () => {
         "Regular session with useful info about the deployment pipeline.",
         "",
         "## Diagnostic Output",
-        "kaijibot:metadata: confidence: 0.85 evidence: recall-store",
+        "allbot:metadata: confidence: 0.85 evidence: recall-store",
       ].join("\n"),
     );
 

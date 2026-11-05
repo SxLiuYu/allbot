@@ -1,25 +1,25 @@
 {
-  "name": "@kaijibot/feishu",
+  "name": "@allbot/feishu",
   "version": "2026.4.10",
-  "description": "KaijiBot Feishu/Lark channel plugin (community maintained by @m1heng)",
+  "description": "AllBot Feishu/Lark channel plugin (community maintained by @m1heng)",
   "type": "module",
   "dependencies": {
     "@larksuiteoapi/node-sdk": "^1.64.0",
     "typebox": "^1.1"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*",
-    "kaijibot": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*",
+    "allbot": "workspace:*"
   },
   "peerDependencies": {
-    "kaijibot": ">=2026.4.10"
+    "allbot": ">=2026.4.10"
   },
   "peerDependenciesMeta": {
-    "kaijibot": {
+    "allbot": {
       "optional": true
     }
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -38,7 +38,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@kaijibot/feishu",
+      "npmSpec": "@allbot/feishu",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.4.10"
     },
@@ -46,7 +46,7 @@
       "pluginApi": ">=2026.4.10"
     },
     "build": {
-      "kaijibotVersion": "2026.4.17"
+      "allbotVersion": "2026.4.17"
     },
     "bundle": {
       "stageRuntimeDependencies": true

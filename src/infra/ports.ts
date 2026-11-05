@@ -56,10 +56,10 @@ export async function handlePortError(
     if (details) {
       runtime.error(info("Port listener details:"));
       runtime.error(details);
-      if (/kaijibot|src\/index\.ts|dist\/index\.js/.test(details)) {
+      if (/allbot|src\/index\.ts|dist\/index\.js/.test(details)) {
         runtime.error(
           warn(
-            "It looks like another KaijiBot instance is already running. Stop it or pick a different port.",
+            "It looks like another AllBot instance is already running. Stop it or pick a different port.",
           ),
         );
       }

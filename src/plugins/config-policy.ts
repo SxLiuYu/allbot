@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveMemorySlotDecisionShared,
   resolveEnableStateShared,
@@ -27,7 +27,7 @@ export type PluginActivationState = {
 export type NormalizedPluginsConfig = SharedNormalizedPluginsConfig;
 
 export function normalizePluginsConfigWithResolver(
-  config?: KaijiBotConfig["plugins"],
+  config?: AllBotConfig["plugins"],
   normalizePluginId: NormalizePluginId = identityNormalizePluginId,
 ): NormalizedPluginsConfig {
   return normalizePluginsConfigWithResolverShared(config, normalizePluginId);
@@ -37,7 +37,7 @@ function resolveExplicitPluginSelection(params: {
   id: string;
   origin: PluginOrigin;
   config: NormalizedPluginsConfig;
-  rootConfig?: KaijiBotConfig;
+  rootConfig?: AllBotConfig;
 }): { explicitlyEnabled: boolean; reason?: string } {
   if (params.config.entries[params.id]?.enabled === true) {
     return { explicitlyEnabled: true, reason: "enabled in config" };
@@ -61,10 +61,10 @@ export function resolvePluginActivationState(params: {
   id: string;
   origin: PluginOrigin;
   config: NormalizedPluginsConfig;
-  rootConfig?: KaijiBotConfig;
+  rootConfig?: AllBotConfig;
   enabledByDefault?: boolean;
   sourceConfig?: NormalizedPluginsConfig;
-  sourceRootConfig?: KaijiBotConfig;
+  sourceRootConfig?: AllBotConfig;
   autoEnabledReason?: string;
 }): PluginActivationState {
   const explicitSelection = resolveExplicitPluginSelection({
@@ -194,7 +194,7 @@ export function resolvePluginActivationState(params: {
     source: "default",
   };
 }
-export function hasExplicitPluginConfig(plugins?: KaijiBotConfig["plugins"]): boolean {
+export function hasExplicitPluginConfig(plugins?: AllBotConfig["plugins"]): boolean {
   return hasExplicitPluginConfigShared(plugins);
 }
 export function resolveEnableState(
@@ -210,7 +210,7 @@ export function resolveEnableState(
 }
 
 export function isBundledChannelEnabledByChannelConfig(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   pluginId: string,
 ): boolean {
   return isBundledChannelEnabledByChannelConfigShared(cfg, pluginId);
@@ -220,10 +220,10 @@ export function resolveEffectiveEnableState(params: {
   id: string;
   origin: PluginOrigin;
   config: NormalizedPluginsConfig;
-  rootConfig?: KaijiBotConfig;
+  rootConfig?: AllBotConfig;
   enabledByDefault?: boolean;
   sourceConfig?: NormalizedPluginsConfig;
-  sourceRootConfig?: KaijiBotConfig;
+  sourceRootConfig?: AllBotConfig;
   autoEnabledReason?: string;
 }): { enabled: boolean; reason?: string } {
   return resolveEnableStateResult(params, resolveEffectivePluginActivationState);
@@ -233,10 +233,10 @@ export function resolveEffectivePluginActivationState(params: {
   id: string;
   origin: PluginOrigin;
   config: NormalizedPluginsConfig;
-  rootConfig?: KaijiBotConfig;
+  rootConfig?: AllBotConfig;
   enabledByDefault?: boolean;
   sourceConfig?: NormalizedPluginsConfig;
-  sourceRootConfig?: KaijiBotConfig;
+  sourceRootConfig?: AllBotConfig;
   autoEnabledReason?: string;
 }): PluginActivationState {
   return resolvePluginActivationState(params);

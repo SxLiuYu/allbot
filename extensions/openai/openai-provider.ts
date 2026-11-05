@@ -1,16 +1,16 @@
 import {
   type ProviderResolveDynamicModelContext,
   type ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
+} from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
 import {
   DEFAULT_CONTEXT_TOKENS,
   normalizeModelCompat,
   normalizeProviderId,
   type ProviderPlugin,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { applyOpenAIConfig, OPENAI_DEFAULT_MODEL } from "./default-models.js";
 import { buildOpenAIReplayPolicy } from "./replay-policy.js";
 import {

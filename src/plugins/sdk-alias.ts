@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveKaijiBotPackageRootSync } from "../infra/kaijibot-root.js";
+import { resolveAllBotPackageRootSync } from "../infra/allbot-root.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 
 type PluginSdkAliasCandidateKind = "dist" | "src";
@@ -51,7 +51,7 @@ function listPluginSdkSubpathsFromPackageJson(pkg: PluginSdkPackageJson): string
     .toSorted();
 }
 
-function hasTrustedKaijiBotRootIndicator(params: {
+function hasTrustedAllBotRootIndicator(params: {
   packageRoot: string;
   packageJson: PluginSdkPackageJson;
 }): boolean {
@@ -64,14 +64,14 @@ function hasTrustedKaijiBotRootIndicator(params: {
     return false;
   }
   const hasCliEntryExport = Object.prototype.hasOwnProperty.call(packageExports, "./cli-entry");
-  const hasKaijiBotBin =
+  const hasAllBotBin =
     (typeof params.packageJson.bin === "string" &&
-      normalizeLowercaseStringOrEmpty(params.packageJson.bin).includes("kaijibot")) ||
+      normalizeLowercaseStringOrEmpty(params.packageJson.bin).includes("allbot")) ||
     (typeof params.packageJson.bin === "object" &&
       params.packageJson.bin !== null &&
-      typeof params.packageJson.bin.kaijibot === "string");
-  const hasKaijiBotEntrypoint = fs.existsSync(path.join(params.packageRoot, "kaijibot.mjs"));
-  return hasCliEntryExport || hasKaijiBotBin || hasKaijiBotEntrypoint;
+      typeof params.packageJson.bin.allbot === "string");
+  const hasAllBotEntrypoint = fs.existsSync(path.join(params.packageRoot, "allbot.mjs"));
+  return hasCliEntryExport || hasAllBotBin || hasAllBotEntrypoint;
 }
 
 function readPluginSdkSubpathsFromPackageRoot(packageRoot: string): string[] | null {
@@ -79,21 +79,21 @@ function readPluginSdkSubpathsFromPackageRoot(packageRoot: string): string[] | n
   if (!pkg) {
     return null;
   }
-  if (!hasTrustedKaijiBotRootIndicator({ packageRoot, packageJson: pkg })) {
+  if (!hasTrustedAllBotRootIndicator({ packageRoot, packageJson: pkg })) {
     return null;
   }
   const subpaths = listPluginSdkSubpathsFromPackageJson(pkg);
   return subpaths.length > 0 ? subpaths : null;
 }
 
-function resolveTrustedKaijiBotRootFromArgvHint(params: {
+function resolveTrustedAllBotRootFromArgvHint(params: {
   argv1?: string;
   cwd: string;
 }): string | null {
   if (!params.argv1) {
     return null;
   }
-  const packageRoot = resolveKaijiBotPackageRootSync({
+  const packageRoot = resolveAllBotPackageRootSync({
     cwd: params.cwd,
     argv1: params.argv1,
   });
@@ -104,7 +104,7 @@ function resolveTrustedKaijiBotRootFromArgvHint(params: {
   if (!packageJson) {
     return null;
   }
-  return hasTrustedKaijiBotRootIndicator({ packageRoot, packageJson }) ? packageRoot : null;
+  return hasTrustedAllBotRootIndicator({ packageRoot, packageJson }) ? packageRoot : null;
 }
 
 function findNearestPluginSdkPackageRoot(startDir: string, maxDepth = 12): string | null {
@@ -127,13 +127,13 @@ export function resolveLoaderPackageRoot(
   params: LoaderModuleResolveParams & { modulePath: string },
 ): string | null {
   const cwd = params.cwd ?? path.dirname(params.modulePath);
-  const fromModulePath = resolveKaijiBotPackageRootSync({ cwd });
+  const fromModulePath = resolveAllBotPackageRootSync({ cwd });
   if (fromModulePath) {
     return fromModulePath;
   }
   const argv1 = params.argv1 ?? process.argv[1];
   const moduleUrl = params.moduleUrl ?? (params.modulePath ? undefined : import.meta.url);
-  return resolveKaijiBotPackageRootSync({
+  return resolveAllBotPackageRootSync({
     cwd,
     ...(argv1 ? { argv1 } : {}),
     ...(moduleUrl ? { moduleUrl } : {}),
@@ -144,11 +144,11 @@ function resolveLoaderPluginSdkPackageRoot(
   params: LoaderModuleResolveParams & { modulePath: string },
 ): string | null {
   const cwd = params.cwd ?? path.dirname(params.modulePath);
-  const fromCwd = resolveKaijiBotPackageRootSync({ cwd });
+  const fromCwd = resolveAllBotPackageRootSync({ cwd });
   const fromExplicitHints =
-    resolveTrustedKaijiBotRootFromArgvHint({ cwd, argv1: params.argv1 }) ??
+    resolveTrustedAllBotRootFromArgvHint({ cwd, argv1: params.argv1 }) ??
     (params.moduleUrl
-      ? resolveKaijiBotPackageRootSync({
+      ? resolveAllBotPackageRootSync({
           cwd,
           moduleUrl: params.moduleUrl,
         })
@@ -251,7 +251,7 @@ export function resolvePluginSdkAliasFile(params: {
 
 const cachedPluginSdkExportedSubpaths = new Map<string, string[]>();
 const cachedPluginSdkScopedAliasMaps = new Map<string, Record<string, string>>();
-const PLUGIN_SDK_PACKAGE_NAMES = ["kaijibot/plugin-sdk", "@kaijibot/plugin-sdk"] as const;
+const PLUGIN_SDK_PACKAGE_NAMES = ["allbot/plugin-sdk", "@allbot/plugin-sdk"] as const;
 
 export function listPluginSdkExportedSubpaths(
   params: {
@@ -377,7 +377,7 @@ export function buildPluginLoaderAliasMap(
   const extensionApiAlias = resolveExtensionApiAlias({ modulePath, pluginSdkResolution });
   return {
     ...(extensionApiAlias
-      ? { "kaijibot/extension-api": normalizeJitiAliasTargetPath(extensionApiAlias) }
+      ? { "allbot/extension-api": normalizeJitiAliasTargetPath(extensionApiAlias) }
       : {}),
     ...(pluginSdkAlias
       ? Object.fromEntries(
@@ -515,15 +515,15 @@ export function resolvePluginLoaderJitiConfig(params: {
 
 export function isBundledPluginExtensionPath(params: {
   modulePath: string;
-  kaijiBotPackageRoot: string;
+  allBotPackageRoot: string;
   bundledPluginsDir?: string;
 }): boolean {
   const normalizedModulePath = path.resolve(params.modulePath);
   const roots = [
     params.bundledPluginsDir ? path.resolve(params.bundledPluginsDir) : null,
-    path.join(params.kaijiBotPackageRoot, "extensions"),
-    path.join(params.kaijiBotPackageRoot, "dist", "extensions"),
-    path.join(params.kaijiBotPackageRoot, "dist-runtime", "extensions"),
+    path.join(params.allBotPackageRoot, "extensions"),
+    path.join(params.allBotPackageRoot, "dist", "extensions"),
+    path.join(params.allBotPackageRoot, "dist-runtime", "extensions"),
   ].filter((root): root is string => typeof root === "string");
   return roots.some(
     (root) =>

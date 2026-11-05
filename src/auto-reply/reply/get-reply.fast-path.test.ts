@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import {
   initFastReplySessionState,
@@ -76,7 +76,7 @@ function buildCtx(overrides: Partial<MsgContext> = {}): MsgContext {
 describe("getReplyFromConfig fast test bootstrap", () => {
   beforeEach(async () => {
     await loadGetReplyRuntimeForTest();
-    vi.stubEnv("KAIJIBOT_TEST_FAST", "1");
+    vi.stubEnv("ALLBOT_TEST_FAST", "1");
     mocks.ensureAgentWorkspace.mockReset();
     mocks.initSessionState.mockReset();
     mocks.resolveReplyDirectives.mockReset();
@@ -110,24 +110,24 @@ describe("getReplyFromConfig fast test bootstrap", () => {
   });
 
   it("fails fast on unmarked config overrides in strict fast-test mode", async () => {
-    await expect(getReplyFromConfig(buildCtx(), undefined, {} as KaijiBotConfig)).rejects.toThrow(
+    await expect(getReplyFromConfig(buildCtx(), undefined, {} as AllBotConfig)).rejects.toThrow(
       /withFastReplyConfig\(\)\/markCompleteReplyConfig\(\)/,
     );
     expect(vi.mocked(loadConfigMock)).not.toHaveBeenCalled();
   });
 
   it("skips loadConfig, workspace bootstrap, and session bootstrap for marked test configs", async () => {
-    const home = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-fast-reply-"));
+    const home = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-fast-reply-"));
     const cfg = markCompleteReplyConfig({
       agents: {
         defaults: {
           model: "anthropic/claude-opus-4-6",
-          workspace: path.join(home, "kaijibot"),
+          workspace: path.join(home, "allbot"),
         },
       },
       channels: { telegram: { allowFrom: ["*"] } },
       session: { store: path.join(home, "sessions.json") },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     await expect(getReplyFromConfig(buildCtx(), undefined, cfg)).resolves.toEqual({ text: "ok" });
     expect(vi.mocked(loadConfigMock)).not.toHaveBeenCalled();
@@ -142,14 +142,14 @@ describe("getReplyFromConfig fast test bootstrap", () => {
   });
 
   it("still merges partial config overrides against loadConfig()", async () => {
-    vi.stubEnv("KAIJIBOT_ALLOW_SLOW_REPLY_TESTS", "1");
+    vi.stubEnv("ALLBOT_ALLOW_SLOW_REPLY_TESTS", "1");
     vi.mocked(loadConfigMock).mockReturnValue({
       channels: {
         telegram: {
           botToken: "resolved-telegram-token",
         },
       },
-    } satisfies KaijiBotConfig);
+    } satisfies AllBotConfig);
 
     await getReplyFromConfig(buildCtx(), undefined, {
       agents: {
@@ -157,7 +157,7 @@ describe("getReplyFromConfig fast test bootstrap", () => {
           userTimezone: "America/New_York",
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(vi.mocked(loadConfigMock)).toHaveBeenCalledOnce();
     expect(mocks.initSessionState).toHaveBeenCalledOnce();
@@ -180,7 +180,7 @@ describe("getReplyFromConfig fast test bootstrap", () => {
   });
 
   it("marks configs through withFastReplyConfig()", async () => {
-    const cfg = withFastReplyConfig({ session: { store: "/tmp/sessions.json" } } as KaijiBotConfig);
+    const cfg = withFastReplyConfig({ session: { store: "/tmp/sessions.json" } } as AllBotConfig);
 
     await expect(getReplyFromConfig(buildCtx(), undefined, cfg)).resolves.toEqual({ text: "ok" });
     expect(vi.mocked(loadConfigMock)).not.toHaveBeenCalled();
@@ -195,7 +195,7 @@ describe("getReplyFromConfig fast test bootstrap", () => {
         CommandSource: "native",
         CommandTargetSessionKey: "agent:main:main",
       }),
-      cfg: { session: { store: "/tmp/sessions.json" } } as KaijiBotConfig,
+      cfg: { session: { store: "/tmp/sessions.json" } } as AllBotConfig,
       agentId: "main",
       commandAuthorized: true,
       workspaceDir: "/tmp/workspace",

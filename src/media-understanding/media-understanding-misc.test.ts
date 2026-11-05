@@ -45,7 +45,7 @@ describe("media understanding attachments SSRF", () => {
   });
 
   it("reads local attachments inside configured roots", async () => {
-    await withTempDir({ prefix: "kaijibot-media-cache-allowed-" }, async (base) => {
+    await withTempDir({ prefix: "allbot-media-cache-allowed-" }, async (base) => {
       const allowedRoot = path.join(base, "allowed");
       const attachmentPath = path.join(allowedRoot, "voice-note.m4a");
       await fs.mkdir(allowedRoot, { recursive: true });
@@ -74,7 +74,7 @@ describe("media understanding attachments SSRF", () => {
   });
 
   it("blocks directory attachments even inside configured roots", async () => {
-    await withTempDir({ prefix: "kaijibot-media-cache-dir-" }, async (base) => {
+    await withTempDir({ prefix: "allbot-media-cache-dir-" }, async (base) => {
       const allowedRoot = path.join(base, "allowed");
       const attachmentPath = path.join(allowedRoot, "nested");
       await fs.mkdir(attachmentPath, { recursive: true });
@@ -93,7 +93,7 @@ describe("media understanding attachments SSRF", () => {
     if (process.platform === "win32") {
       return;
     }
-    await withTempDir({ prefix: "kaijibot-media-cache-symlink-" }, async (base) => {
+    await withTempDir({ prefix: "allbot-media-cache-symlink-" }, async (base) => {
       const allowedRoot = path.join(base, "allowed");
       const outsidePath = "/etc/passwd";
       const symlinkPath = path.join(allowedRoot, "note.txt");
@@ -111,7 +111,7 @@ describe("media understanding attachments SSRF", () => {
   });
 
   it("enforces maxBytes after reading local attachments", async () => {
-    await withTempDir({ prefix: "kaijibot-media-cache-max-bytes-" }, async (base) => {
+    await withTempDir({ prefix: "allbot-media-cache-max-bytes-" }, async (base) => {
       const allowedRoot = path.join(base, "allowed");
       const attachmentPath = path.join(allowedRoot, "voice-note.m4a");
       await fs.mkdir(allowedRoot, { recursive: true });
@@ -147,7 +147,7 @@ describe("media understanding attachments SSRF", () => {
     if (process.platform === "win32") {
       return;
     }
-    await withTempDir({ prefix: "kaijibot-media-cache-flags-" }, async (base) => {
+    await withTempDir({ prefix: "allbot-media-cache-flags-" }, async (base) => {
       const allowedRoot = path.join(base, "allowed");
       const attachmentPath = path.join(allowedRoot, "voice-note.m4a");
       await fs.mkdir(allowedRoot, { recursive: true });

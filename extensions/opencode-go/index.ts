@@ -1,6 +1,6 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
 import { applyOpencodeGoConfig, OPENCODE_GO_DEFAULT_MODEL_REF } from "./api.js";
 
 const PROVIDER_ID = "opencode-go";

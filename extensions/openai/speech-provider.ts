@@ -1,14 +1,14 @@
-import { normalizeResolvedSecretInputString } from "kaijibot/plugin-sdk/secret-input";
+import { normalizeResolvedSecretInputString } from "allbot/plugin-sdk/secret-input";
 import type {
   SpeechDirectiveTokenParseContext,
   SpeechProviderConfig,
   SpeechProviderOverrides,
   SpeechProviderPlugin,
-} from "kaijibot/plugin-sdk/speech";
+} from "allbot/plugin-sdk/speech";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import {
   asFiniteNumber,
   asObjectRecord,

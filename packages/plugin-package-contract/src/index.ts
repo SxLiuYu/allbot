@@ -5,7 +5,7 @@ export type JsonObject = Record<string, unknown>;
 
 export type ExternalPluginCompatibility = {
   pluginApiRange?: string;
-  builtWithKaijiBotVersion?: string;
+  builtWithAllBotVersion?: string;
   pluginSdkVersion?: string;
   minGatewayVersion?: string;
 };
@@ -21,23 +21,23 @@ export type ExternalCodePluginValidationResult = {
 };
 
 export const EXTERNAL_CODE_PLUGIN_REQUIRED_FIELD_PATHS = [
-  "kaijibot.compat.pluginApi",
-  "kaijibot.build.kaijibotVersion",
+  "allbot.compat.pluginApi",
+  "allbot.build.allbotVersion",
 ] as const;
 
-function readKaijiBotBlock(packageJson: unknown) {
+function readAllBotBlock(packageJson: unknown) {
   const root = isRecord(packageJson) ? packageJson : undefined;
-  const kaijibot = isRecord(root?.kaijibot) ? root.kaijibot : undefined;
-  const compat = isRecord(kaijibot?.compat) ? kaijibot.compat : undefined;
-  const build = isRecord(kaijibot?.build) ? kaijibot.build : undefined;
-  const install = isRecord(kaijibot?.install) ? kaijibot.install : undefined;
-  return { root, kaijibot, compat, build, install };
+  const allbot = isRecord(root?.allbot) ? root.allbot : undefined;
+  const compat = isRecord(allbot?.compat) ? allbot.compat : undefined;
+  const build = isRecord(allbot?.build) ? allbot.build : undefined;
+  const install = isRecord(allbot?.install) ? allbot.install : undefined;
+  return { root, allbot, compat, build, install };
 }
 
 export function normalizeExternalPluginCompatibility(
   packageJson: unknown,
 ): ExternalPluginCompatibility | undefined {
-  const { root, compat, build, install } = readKaijiBotBlock(packageJson);
+  const { root, compat, build, install } = readAllBotBlock(packageJson);
   const version = normalizeOptionalString(root?.version);
   const minHostVersion = normalizeOptionalString(install?.minHostVersion);
   const compatibility: ExternalPluginCompatibility = {};
@@ -52,9 +52,9 @@ export function normalizeExternalPluginCompatibility(
     compatibility.minGatewayVersion = minGatewayVersion;
   }
 
-  const builtWithKaijiBotVersion = normalizeOptionalString(build?.kaijibotVersion) ?? version;
-  if (builtWithKaijiBotVersion) {
-    compatibility.builtWithKaijiBotVersion = builtWithKaijiBotVersion;
+  const builtWithAllBotVersion = normalizeOptionalString(build?.allbotVersion) ?? version;
+  if (builtWithAllBotVersion) {
+    compatibility.builtWithAllBotVersion = builtWithAllBotVersion;
   }
 
   const pluginSdkVersion = normalizeOptionalString(build?.pluginSdkVersion);
@@ -66,13 +66,13 @@ export function normalizeExternalPluginCompatibility(
 }
 
 export function listMissingExternalCodePluginFieldPaths(packageJson: unknown): string[] {
-  const { compat, build } = readKaijiBotBlock(packageJson);
+  const { compat, build } = readAllBotBlock(packageJson);
   const missing: string[] = [];
   if (!normalizeOptionalString(compat?.pluginApi)) {
-    missing.push("kaijibot.compat.pluginApi");
+    missing.push("allbot.compat.pluginApi");
   }
-  if (!normalizeOptionalString(build?.kaijibotVersion)) {
-    missing.push("kaijibot.build.kaijibotVersion");
+  if (!normalizeOptionalString(build?.allbotVersion)) {
+    missing.push("allbot.build.allbotVersion");
   }
   return missing;
 }

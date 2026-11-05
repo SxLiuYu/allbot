@@ -1,6 +1,6 @@
 import type { Command } from "commander";
 import JSON5 from "json5";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { readConfigFileSnapshot, replaceConfigFile } from "../config/config.js";
 import { formatConfigIssueLines, normalizeConfigIssues } from "../config/issue-format.js";
 import { CONFIG_PATH } from "../config/paths.js";
@@ -76,16 +76,16 @@ type ConfigSetOperation = {
 const GATEWAY_AUTH_MODE_PATH: PathSegment[] = ["gateway", "auth", "mode"];
 const SECRET_PROVIDER_PATH_PREFIX: PathSegment[] = ["secrets", "providers"];
 const CONFIG_SET_EXAMPLE_VALUE = formatCliCommand(
-  "kaijibot config set gateway.port 19001 --strict-json",
+  "allbot config set gateway.port 19001 --strict-json",
 );
 const CONFIG_SET_EXAMPLE_REF = formatCliCommand(
-  "kaijibot config set channels.feishu.appId --ref-provider default --ref-source env --ref-id FEISHU_APP_ID",
+  "allbot config set channels.feishu.appId --ref-provider default --ref-source env --ref-id FEISHU_APP_ID",
 );
 const CONFIG_SET_EXAMPLE_PROVIDER = formatCliCommand(
-  "kaijibot config set secrets.providers.vault --provider-source file --provider-path /etc/kaijibot/secrets.json --provider-mode json",
+  "allbot config set secrets.providers.vault --provider-source file --provider-path /etc/allbot/secrets.json --provider-mode json",
 );
 const CONFIG_SET_EXAMPLE_BATCH = formatCliCommand(
-  "kaijibot config set --batch-file ./config-set.batch.json --dry-run",
+  "allbot config set --batch-file ./config-set.batch.json --dry-run",
 );
 const CONFIG_SET_DESCRIPTION = [
   "Set config values by path (value mode, ref/provider builder mode, or batch JSON mode).",
@@ -182,7 +182,7 @@ function hasOwnPathKey(value: Record<string, unknown>, key: string): boolean {
 }
 
 function formatDoctorHint(message: string): string {
-  return `Run \`${formatCliCommand("kaijibot doctor")}\` ${message}`;
+  return `Run \`${formatCliCommand("allbot doctor")}\` ${message}`;
 }
 
 function formatUnsupportedSecretRefPolicyFailureMessage(issues: string[]): string {
@@ -795,7 +795,7 @@ function buildSingleSetOperations(params: {
 }
 
 function collectDryRunRefs(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   operations: ConfigSetOperation[];
 }): SecretRef[] {
   const refsByKey = new Map<string, SecretRef>();
@@ -837,7 +837,7 @@ function collectDryRunRefs(params: {
 
 async function collectDryRunResolvabilityErrors(params: {
   refs: SecretRef[];
-  config: KaijiBotConfig;
+  config: AllBotConfig;
 }): Promise<ConfigSetDryRunError[]> {
   const failures: ConfigSetDryRunError[] = [];
   for (const ref of params.refs) {
@@ -859,7 +859,7 @@ async function collectDryRunResolvabilityErrors(params: {
 
 function collectDryRunStaticErrorsForSkippedExecRefs(params: {
   refs: SecretRef[];
-  config: KaijiBotConfig;
+  config: AllBotConfig;
 }): ConfigSetDryRunError[] {
   const failures: ConfigSetDryRunError[] = [];
   for (const ref of params.refs) {
@@ -917,7 +917,7 @@ function selectDryRunRefsForResolution(params: { refs: SecretRef[]; allowExecInD
   return { refsToResolve, skippedExecRefs };
 }
 
-function collectDryRunSchemaErrors(config: KaijiBotConfig): ConfigSetDryRunError[] {
+function collectDryRunSchemaErrors(config: AllBotConfig): ConfigSetDryRunError[] {
   const validated = validateConfigObjectRaw(config);
   if (validated.ok) {
     return [];
@@ -1025,7 +1025,7 @@ export async function runConfigSet(opts: {
       root: next,
       operations,
     });
-    const nextConfig = next as KaijiBotConfig;
+    const nextConfig = next as AllBotConfig;
     const policyIssues = collectUnsupportedSecretRefPolicyIssues(nextConfig);
     const policyIssueLines = formatConfigIssueLines(policyIssues, "", { normalizeRoot: true }).map(
       (line) => line.trim(),
@@ -1255,7 +1255,7 @@ export async function runConfigSchema(opts: { runtime?: RuntimeEnv } = {}) {
 
 export async function runConfigValidate(opts: { json?: boolean; runtime?: RuntimeEnv } = {}) {
   const runtime = opts.runtime ?? defaultRuntime;
-  let outputPath = CONFIG_PATH ?? "kaijibot.json";
+  let outputPath = CONFIG_PATH ?? "allbot.json";
 
   try {
     const snapshot = await readConfigFileSnapshot();
@@ -1343,7 +1343,7 @@ export function registerConfigCli(program: Command) {
     .option("--json", "Legacy alias for --strict-json", false)
     .option(
       "--dry-run",
-      "Validate changes without writing kaijibot.json (checks run in builder/json/batch modes; exec SecretRefs are skipped unless --allow-exec is set)",
+      "Validate changes without writing allbot.json (checks run in builder/json/batch modes; exec SecretRefs are skipped unless --allow-exec is set)",
       false,
     )
     .option(
@@ -1430,7 +1430,7 @@ export function registerConfigCli(program: Command) {
 
   cmd
     .command("schema")
-    .description("Print the JSON schema for kaijibot.json")
+    .description("Print the JSON schema for allbot.json")
     .action(async () => {
       await runConfigSchema({});
     });

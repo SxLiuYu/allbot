@@ -1,6 +1,6 @@
 import { normalizeProviderId } from "../agents/model-selection.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolvePluginProviders } from "../plugins/providers.runtime.js";
 
 function matchesProviderId(
@@ -19,7 +19,7 @@ function matchesProviderId(
 
 export function resolveProviderAuthLoginCommand(params: {
   provider: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): string | undefined {
@@ -32,12 +32,12 @@ export function resolveProviderAuthLoginCommand(params: {
   if (!provider || provider.auth.length === 0) {
     return undefined;
   }
-  return formatCliCommand(`kaijibot models auth login --provider ${provider.id}`);
+  return formatCliCommand(`allbot models auth login --provider ${provider.id}`);
 }
 
 export function buildProviderAuthRecoveryHint(params: {
   provider: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeConfigure?: boolean;
@@ -49,13 +49,13 @@ export function buildProviderAuthRecoveryHint(params: {
     parts.push(`Run \`${loginCommand}\``);
   }
   if (params.includeConfigure !== false) {
-    parts.push(`\`${formatCliCommand("kaijibot configure")}\``);
+    parts.push(`\`${formatCliCommand("allbot configure")}\``);
   }
   if (params.includeEnvVar) {
     parts.push("set an API key env var");
   }
   if (parts.length === 0) {
-    return `Run \`${formatCliCommand("kaijibot configure")}\`.`;
+    return `Run \`${formatCliCommand("allbot configure")}\`.`;
   }
   if (parts.length === 1) {
     return `${parts[0]}.`;

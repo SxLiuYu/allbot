@@ -9,7 +9,7 @@ import {
   loadConfig,
   readConfigFileSnapshot,
   replaceConfigFile,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { setVerbose } from "../globals.js";
@@ -31,7 +31,7 @@ function supportsChannelAuthMode(plugin: ChannelPlugin, mode: ChannelAuthMode): 
   return mode === "login" ? Boolean(plugin.auth?.login) : Boolean(plugin.gateway?.logoutAccount);
 }
 
-function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: KaijiBotConfig): boolean {
+function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: AllBotConfig): boolean {
   const key = plugin.id;
   if (isBlockedObjectKey(key)) {
     return false;
@@ -65,7 +65,7 @@ function isConfiguredAuthPlugin(plugin: ChannelPlugin, cfg: KaijiBotConfig): boo
   return false;
 }
 
-function resolveConfiguredAuthChannelInput(cfg: KaijiBotConfig, mode: ChannelAuthMode): string {
+function resolveConfiguredAuthChannelInput(cfg: AllBotConfig, mode: ChannelAuthMode): string {
   const configured = listChannelPlugins()
     .filter((plugin): plugin is ChannelPlugin => supportsChannelAuthMode(plugin, mode))
     .filter((plugin) => isConfiguredAuthPlugin(plugin, cfg))
@@ -86,10 +86,10 @@ function resolveConfiguredAuthChannelInput(cfg: KaijiBotConfig, mode: ChannelAut
 async function resolveChannelPluginForMode(
   opts: ChannelAuthOptions,
   mode: ChannelAuthMode,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   runtime: RuntimeEnv,
 ): Promise<{
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   configChanged: boolean;
   channelInput: string;
   channelId: string;
@@ -127,7 +127,7 @@ async function resolveChannelPluginForMode(
 function resolveAccountContext(
   plugin: ChannelPlugin,
   opts: ChannelAuthOptions,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ) {
   const accountId =
     normalizeOptionalString(opts.account) || resolveChannelDefaultAccountId({ plugin, cfg });

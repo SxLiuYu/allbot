@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
 } from "./constants.js";
 
 function decoratedMarkerPath(userDataDir: string) {
-  return path.join(userDataDir, ".kaijibot-profile-decorated");
+  return path.join(userDataDir, ".allbot-profile-decorated");
 }
 
 function safeReadJson(filePath: string): Record<string, unknown> | null {
@@ -126,12 +126,12 @@ export function isProfileDecorated(
  * Best-effort profile decoration (name + lobster-orange). Chrome preference keys
  * vary by version; we keep this conservative and idempotent.
  */
-export function decorateKaijiBotProfile(
+export function decorateAllBotProfile(
   userDataDir: string,
   opts?: { name?: string; color?: string },
 ) {
-  const desiredName = opts?.name ?? DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME;
-  const desiredColor = (opts?.color ?? DEFAULT_KAIJIBOT_BROWSER_COLOR).toUpperCase();
+  const desiredName = opts?.name ?? DEFAULT_ALLBOT_BROWSER_PROFILE_NAME;
+  const desiredColor = (opts?.color ?? DEFAULT_ALLBOT_BROWSER_COLOR).toUpperCase();
   const desiredColorInt = parseHexRgbToSignedArgbInt(desiredColor);
 
   const localStatePath = path.join(userDataDir, "Local State");

@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 /** Resolve the config path prefix for a channel account, falling back to the root channel section. */
 export function resolveChannelAccountConfigBasePath(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channelKey: string;
   accountId: string;
 }): string {

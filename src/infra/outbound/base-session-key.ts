@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { buildAgentSessionKey, type RoutePeer } from "../../routing/resolve-route.js";
 import { resolveEffectiveDmScope } from "../../routing/session-key.js";
 
 export function buildOutboundBaseSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   channel: string;
   accountId?: string | null;

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import type { OAuthCredentials } from "@earendil-works/pi-ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveAgentDir } from "../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
 import type { ModelProviderConfig } from "../config/types.models.js";
 import { createProviderApiKeyAuthMethod } from "../plugins/provider-api-key-auth.js";
@@ -17,7 +17,7 @@ import {
   createExitThrowingRuntime,
   createWizardPrompter,
   readAuthProfilesForAgent,
-  requireKaijiBotAgentDir,
+  requireAllBotAgentDir,
   setupAuthTestEnv,
 } from "./test-wizard-helpers.js";
 
@@ -72,7 +72,7 @@ function normalizeText(value: unknown): string {
 function providerConfigPatch(
   providerId: string,
   patch: Record<string, unknown>,
-): Partial<KaijiBotConfig> {
+): Partial<AllBotConfig> {
   const providers: Record<string, ModelProviderConfig> = {
     [providerId]: patch as ModelProviderConfig,
   };
@@ -97,7 +97,7 @@ function createApiKeyProvider(params: {
   expectedProviders?: string[];
   noteMessage?: string;
   noteTitle?: string;
-  applyConfig?: Partial<KaijiBotConfig>;
+  applyConfig?: Partial<AllBotConfig>;
 }): ProviderPlugin {
   return {
     id: params.providerId,
@@ -117,7 +117,7 @@ function createApiKeyProvider(params: {
         ...(params.expectedProviders ? { expectedProviders: params.expectedProviders } : {}),
         ...(params.noteMessage ? { noteMessage: params.noteMessage } : {}),
         ...(params.noteTitle ? { noteTitle: params.noteTitle } : {}),
-        ...(params.applyConfig ? { applyConfig: () => params.applyConfig as KaijiBotConfig } : {}),
+        ...(params.applyConfig ? { applyConfig: () => params.applyConfig as AllBotConfig } : {}),
         wizard: {
           choiceId: params.choiceId,
           choiceLabel: params.label,
@@ -202,7 +202,7 @@ function createDefaultProviderPlugins() {
             credential: buildApiKeyCredential("zai", token),
           },
         ],
-        configPatch: providerConfigPatch("zai", { baseUrl }) as KaijiBotConfig,
+        configPatch: providerConfigPatch("zai", { baseUrl }) as AllBotConfig,
         defaultModel: `zai/${modelId}`,
       };
     },
@@ -575,8 +575,8 @@ function createDefaultProviderPlugins() {
 
 describe("applyAuthChoice", () => {
   const lifecycle = createAuthTestLifecycle([
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_AGENT_DIR",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
     "ANTHROPIC_API_KEY",
     "OPENROUTER_API_KEY",
@@ -603,7 +603,7 @@ describe("applyAuthChoice", () => {
     if (activeStateDir) {
       await fs.rm(activeStateDir, { recursive: true, force: true });
     }
-    const env = await setupAuthTestEnv("kaijibot-auth-");
+    const env = await setupAuthTestEnv("allbot-auth-");
     activeStateDir = env.stateDir;
     lifecycle.setStateDir(env.stateDir);
   }
@@ -636,7 +636,7 @@ describe("applyAuthChoice", () => {
   async function readAuthProfiles() {
     return await readAuthProfilesForAgent<{
       profiles?: Record<string, StoredAuthProfile>;
-    }>(requireKaijiBotAgentDir());
+    }>(requireAllBotAgentDir());
   }
   async function readAuthProfile(profileId: string) {
     return (await readAuthProfiles()).profiles?.[profileId];
@@ -690,7 +690,7 @@ describe("applyAuthChoice", () => {
 
     const result = await applyAuthChoice({
       authChoice: "token",
-      config: {} as KaijiBotConfig,
+      config: {} as AllBotConfig,
       prompter: createPrompter({}),
       runtime: createExitThrowingRuntime(),
       setDefaultModel: true,
@@ -1391,7 +1391,7 @@ describe("applyAuthChoice", () => {
           providers: {
             filemain: {
               source: "file",
-              path: "/tmp/kaijibot-missing-secrets.json",
+              path: "/tmp/allbot-missing-secrets.json",
               mode: "json",
             },
           },
@@ -1658,7 +1658,7 @@ describe("applyAuthChoice", () => {
     await setupTempState();
     process.env.LITELLM_API_KEY = "sk-litellm-test"; // pragma: allowlist secret
 
-    const authProfilePath = authProfilePathForAgent(requireKaijiBotAgentDir());
+    const authProfilePath = authProfilePathForAgent(requireAllBotAgentDir());
     await fs.writeFile(
       authProfilePath,
       JSON.stringify(

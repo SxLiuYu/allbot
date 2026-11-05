@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ReplyPayload } from "../auto-reply/types.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createChannelTestPluginBase, createTestRegistry } from "../test-utils/channel-plugins.js";
 import { createExecApprovalForwarder } from "./exec-approval-forwarder.js";
@@ -35,7 +35,7 @@ async function flushPendingDelivery(): Promise<void> {
 }
 
 function isDiscordExecApprovalClientEnabledForTest(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): boolean {
   const accountId = params.accountId?.trim();
@@ -53,7 +53,7 @@ function isDiscordExecApprovalClientEnabledForTest(params: {
 }
 
 function isTelegramExecApprovalClientEnabledForTest(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): boolean {
   const accountId = params.accountId?.trim();
@@ -71,7 +71,7 @@ function isTelegramExecApprovalClientEnabledForTest(params: {
 }
 
 function shouldSuppressTelegramExecApprovalForwardingFallbackForTest(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   target: { channel: string; accountId?: string | null };
   request: { request: { turnSourceChannel?: string | null; turnSourceAccountId?: string | null } };
 }): boolean {
@@ -140,7 +140,7 @@ const telegramApprovalPlugin: Pick<
   approvalCapability: {
     delivery: {
       shouldSuppressForwardingFallback: (params: {
-        cfg: KaijiBotConfig;
+        cfg: AllBotConfig;
         target: { channel: string; accountId?: string | null };
         request: {
           request: { turnSourceChannel?: string | null; turnSourceAccountId?: string | null };
@@ -166,7 +166,7 @@ const discordApprovalPlugin: Pick<
         cfg,
         target,
       }: {
-        cfg: KaijiBotConfig;
+        cfg: AllBotConfig;
         target: { channel: string; accountId?: string | null };
       }) =>
         target.channel === "discord" &&
@@ -194,7 +194,7 @@ function getFirstDeliveryText(deliver: ReturnType<typeof vi.fn>): string {
   return firstCall?.payloads?.[0]?.text ?? "";
 }
 
-function makeTargetsCfg(targets: Array<{ channel: string; to: string }>): KaijiBotConfig {
+function makeTargetsCfg(targets: Array<{ channel: string; to: string }>): AllBotConfig {
   return {
     approvals: {
       exec: {
@@ -203,13 +203,13 @@ function makeTargetsCfg(targets: Array<{ channel: string; to: string }>): KaijiB
         targets,
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 const TARGETS_CFG = makeTargetsCfg([{ channel: "slack", to: "U123" }]);
 
 function createForwarder(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   deliver?: ReturnType<typeof vi.fn>;
   resolveSessionTarget?: () => { channel: string; to: string } | null;
 }) {
@@ -229,7 +229,7 @@ function createForwarder(params: {
   return { deliver, forwarder };
 }
 
-function makeSessionCfg(options: { discordExecApprovalsEnabled?: boolean } = {}): KaijiBotConfig {
+function makeSessionCfg(options: { discordExecApprovalsEnabled?: boolean } = {}): AllBotConfig {
   return {
     ...(options.discordExecApprovalsEnabled
       ? {
@@ -244,11 +244,11 @@ function makeSessionCfg(options: { discordExecApprovalsEnabled?: boolean } = {})
         }
       : {}),
     approvals: { exec: { enabled: true, mode: "session" } },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 async function expectDiscordSessionTargetRequest(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   expectedAccepted: boolean;
   expectedDeliveryCount: number;
 }) {
@@ -280,7 +280,7 @@ async function expectSessionFilterRequestResult(params: {
         sessionFilter: params.sessionFilter,
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 
   const { deliver, forwarder } = createForwarder({
     cfg,
@@ -315,7 +315,7 @@ async function expectForwardedApprovalText(params: { command?: string; expectedT
   expect(getFirstDeliveryText(deliver)).toContain(params.expectedText);
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("exec approval forwarder", () => {
   beforeEach(() => {
     setActivePluginRegistry(defaultRegistry);
@@ -329,7 +329,7 @@ describe.skipIf(process.env.CI)("exec approval forwarder", () => {
     vi.useFakeTimers();
     const cfg = {
       approvals: { exec: { enabled: true, mode: "session" } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { deliver, forwarder } = createForwarder({
       cfg,
@@ -421,7 +421,7 @@ describe.skipIf(process.env.CI)("exec approval forwarder", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const { deliver, forwarder } = createForwarder({
       cfg,
@@ -578,7 +578,7 @@ describe.skipIf(process.env.CI)("exec approval forwarder", () => {
 
   it("returns false when forwarding is disabled", async () => {
     const { deliver, forwarder } = createForwarder({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
     });
     await expect(forwarder.handleRequested(baseRequest)).resolves.toBe(false);
     expect(deliver).not.toHaveBeenCalled();

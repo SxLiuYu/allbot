@@ -1,16 +1,16 @@
 ---
-summary: "KaijiBot on DigitalOcean (simple paid VPS option)"
+summary: "AllBot on DigitalOcean (simple paid VPS option)"
 read_when:
-  - Setting up KaijiBot on DigitalOcean
-  - Looking for cheap VPS hosting for KaijiBot
+  - Setting up AllBot on DigitalOcean
+  - Looking for cheap VPS hosting for AllBot
 title: "DigitalOcean (Platform)"
 ---
 
-# KaijiBot on DigitalOcean
+# AllBot on DigitalOcean
 
 ## Goal
 
-Run a persistent KaijiBot Gateway on DigitalOcean for **$6/month** (or $4/mo with reserved pricing).
+Run a persistent AllBot Gateway on DigitalOcean for **$6/month** (or $4/mo with reserved pricing).
 
 If you want a $0/month option and don’t mind ARM + provider-specific setup, see the [Oracle Cloud guide](/platforms/oracle).
 
@@ -60,7 +60,7 @@ Use a clean base image (Ubuntu 24.04 LTS). Avoid third-party Marketplace 1-click
 ssh root@YOUR_DROPLET_IP
 ```
 
-## 3) Install KaijiBot
+## 3) Install AllBot
 
 ```bash
 # Update system
@@ -70,19 +70,19 @@ apt update && apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 apt install -y nodejs
 
-# Install KaijiBot
+# Install AllBot
 git clone https://gitee.com/kaiji1126/kaijibot
-cd kaijibot
+cd allbot
 pnpm install && pnpm build
 
 # Verify
-kaijibot --version
+allbot --version
 ```
 
 ## 4) Run Onboarding
 
 ```bash
-kaijibot onboard --install-daemon
+allbot onboard --install-daemon
 ```
 
 The wizard will walk you through:
@@ -96,13 +96,13 @@ The wizard will walk you through:
 
 ```bash
 # Check status
-kaijibot status
+allbot status
 
 # Check service
-systemctl --user status kaijibot-gateway.service
+systemctl --user status allbot-gateway.service
 
 # View logs
-journalctl --user -u kaijibot-gateway.service -f
+journalctl --user -u allbot-gateway.service -f
 ```
 
 ## 6) Access the Dashboard
@@ -126,8 +126,8 @@ curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
 
 # Configure Gateway to use Tailscale Serve
-kaijibot config set gateway.tailscale.mode serve
-kaijibot gateway restart
+allbot config set gateway.tailscale.mode serve
+allbot gateway restart
 ```
 
 Open: `https://<magicdns>/`
@@ -140,8 +140,8 @@ Notes:
 **Option C: Tailnet bind (no Serve)**
 
 ```bash
-kaijibot config set gateway.bind tailnet
-kaijibot gateway restart
+allbot config set gateway.bind tailnet
+allbot gateway restart
 ```
 
 Open: `http://<tailscale-ip>:18789` (token required).
@@ -151,14 +151,14 @@ Open: `http://<tailscale-ip>:18789` (token required).
 ### Telegram
 
 ```bash
-kaijibot pairing list telegram
-kaijibot pairing approve telegram <CODE>
+allbot pairing list telegram
+allbot pairing approve telegram <CODE>
 ```
 
 ### WhatsApp
 
 ```bash
-kaijibot channels login whatsapp
+allbot channels login whatsapp
 # Scan QR code
 ```
 
@@ -200,13 +200,13 @@ htop
 
 All state lives in:
 
-- `~/.kaijibot/` — `kaijibot.json`, per-agent `auth-profiles.json`, channel/provider state, and session data
-- `~/.kaijibot/workspace/` — workspace (SOUL.md, memory, etc.)
+- `~/.allbot/` — `allbot.json`, per-agent `auth-profiles.json`, channel/provider state, and session data
+- `~/.allbot/workspace/` — workspace (SOUL.md, memory, etc.)
 
 These survive reboots. Back them up periodically:
 
 ```bash
-kaijibot backup create
+allbot backup create
 ```
 
 ---
@@ -236,9 +236,9 @@ For the full setup guide, see [Oracle Cloud](/platforms/oracle). For signup tips
 ### Gateway will not start
 
 ```bash
-kaijibot gateway status
-kaijibot doctor --non-interactive
-journalctl --user -u kaijibot-gateway.service --no-pager -n 50
+allbot gateway status
+allbot doctor --non-interactive
+journalctl --user -u allbot-gateway.service --no-pager -n 50
 ```
 
 ### Port already in use

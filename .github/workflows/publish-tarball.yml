@@ -81,5 +81,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=${GITHUB_REF#refs/tags/}
-          TARBALL=$(ls kaijibot-*.tgz | head -1)
+          TARBALL=$(ls allbot-*.tgz | head -1)
           gh release create "$TAG" "$TARBALL" --title "$TAG" --generate-notes || gh release upload "$TAG" "$TARBALL" --clobber

@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { fetchOk, normalizeCdpHttpBaseForJsonEndpoints } from "./cdp.helpers.js";
 import { appendCdpPath } from "./cdp.js";
 import { closeChromeMcpTab, focusChromeMcpTab } from "./chrome-mcp.js";

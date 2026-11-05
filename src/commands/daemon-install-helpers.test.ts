@@ -43,11 +43,11 @@ afterEach(() => {
 
 describe("resolveGatewayDevMode", () => {
   it("detects dev mode for src ts entrypoints", () => {
-    expect(resolveGatewayDevMode(["node", "/Users/me/kaijibot/src/cli/index.ts"])).toBe(true);
-    expect(resolveGatewayDevMode(["node", "C:\\Users\\me\\kaijibot\\src\\cli\\index.ts"])).toBe(
+    expect(resolveGatewayDevMode(["node", "/Users/me/allbot/src/cli/index.ts"])).toBe(true);
+    expect(resolveGatewayDevMode(["node", "C:\\Users\\me\\allbot\\src\\cli\\index.ts"])).toBe(
       true,
     );
-    expect(resolveGatewayDevMode(["node", "/Users/me/kaijibot/dist/cli/index.js"])).toBe(false);
+    expect(resolveGatewayDevMode(["node", "/Users/me/allbot/dist/cli/index.js"])).toBe(false);
   });
 });
 
@@ -65,7 +65,7 @@ function mockNodeGatewayPlanFixture(
     version = "22.0.0",
     supported = true,
     warning,
-    serviceEnvironment = { KAIJIBOT_PORT: "3000" },
+    serviceEnvironment = { ALLBOT_PORT: "3000" },
   } = params;
   mocks.resolvePreferredNodePath.mockResolvedValue("/opt/node");
   mocks.resolveGatewayProgramArguments.mockResolvedValue({
@@ -86,7 +86,7 @@ function mockNodeGatewayPlanFixture(
 }
 
 describe("buildGatewayInstallPlan", () => {
-  // Prevent tests from reading the developer's real ~/.kaijibot/.env when
+  // Prevent tests from reading the developer's real ~/.allbot/.env when
   // passing `env: {}` (which falls back to os.homedir for state-dir resolution).
   let isolatedHome: string;
   beforeEach(() => {
@@ -108,7 +108,7 @@ describe("buildGatewayInstallPlan", () => {
 
     expect(plan.programArguments).toEqual(["node", "gateway"]);
     expect(plan.workingDirectory).toBe("/Users/me");
-    expect(plan.environment).toEqual({ KAIJIBOT_PORT: "3000" });
+    expect(plan.environment).toEqual({ ALLBOT_PORT: "3000" });
     expect(mocks.resolvePreferredNodePath).not.toHaveBeenCalled();
     expect(mocks.buildServiceEnvironment).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -160,7 +160,7 @@ describe("buildGatewayInstallPlan", () => {
   it("merges config env vars into the environment", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
         HOME: "/Users/me",
       },
     });
@@ -182,16 +182,16 @@ describe("buildGatewayInstallPlan", () => {
     // Config env vars should be present
     expect(plan.environment.GOOGLE_API_KEY).toBe("test-key");
     expect(plan.environment.CUSTOM_VAR).toBe("custom-value");
-    expect(plan.environment.KAIJIBOT_SERVICE_MANAGED_ENV_KEYS).toBe("CUSTOM_VAR,GOOGLE_API_KEY");
+    expect(plan.environment.ALLBOT_SERVICE_MANAGED_ENV_KEYS).toBe("CUSTOM_VAR,GOOGLE_API_KEY");
     // Service environment vars should take precedence
-    expect(plan.environment.KAIJIBOT_PORT).toBe("3000");
+    expect(plan.environment.ALLBOT_PORT).toBe("3000");
     expect(plan.environment.HOME).toBe("/Users/me");
   });
 
   it("drops dangerous config env vars before service merge", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
       },
     });
 
@@ -259,7 +259,7 @@ describe("buildGatewayInstallPlan", () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
         HOME: "/Users/service",
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
       },
     });
 
@@ -271,20 +271,20 @@ describe("buildGatewayInstallPlan", () => {
         env: {
           HOME: "/Users/config",
           vars: {
-            KAIJIBOT_PORT: "9999",
+            ALLBOT_PORT: "9999",
           },
         },
       },
     });
 
     expect(plan.environment.HOME).toBe("/Users/service");
-    expect(plan.environment.KAIJIBOT_PORT).toBe("3000");
+    expect(plan.environment.ALLBOT_PORT).toBe("3000");
   });
 
   it("merges env-backed auth-profile refs into the service environment", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
       },
     });
     mocks.loadAuthProfileStoreForSecretsRuntime.mockReturnValue({
@@ -320,7 +320,7 @@ describe("buildGatewayInstallPlan", () => {
   it("blocks dangerous auth-profile env refs from the service environment", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
       },
     });
     mocks.loadAuthProfileStoreForSecretsRuntime.mockReturnValue({
@@ -367,7 +367,7 @@ describe("buildGatewayInstallPlan", () => {
   it("skips non-portable auth-profile env ref keys", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
       },
     });
     mocks.loadAuthProfileStoreForSecretsRuntime.mockReturnValue({
@@ -396,7 +396,7 @@ describe("buildGatewayInstallPlan", () => {
   it("skips unresolved auth-profile env refs", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
       },
     });
     mocks.loadAuthProfileStoreForSecretsRuntime.mockReturnValue({
@@ -433,9 +433,9 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
 
   it("merges .env file vars into the install plan", async () => {
     await writeStateDirDotEnv("BRAVE_API_KEY=BSA-from-env\nOPENROUTER_API_KEY=or-key\n", {
-      stateDir: path.join(tmpDir, ".kaijibot"),
+      stateDir: path.join(tmpDir, ".allbot"),
     });
-    mockNodeGatewayPlanFixture({ serviceEnvironment: { KAIJIBOT_PORT: "3000" } });
+    mockNodeGatewayPlanFixture({ serviceEnvironment: { ALLBOT_PORT: "3000" } });
 
     const plan = await buildGatewayInstallPlan({
       env: { HOME: tmpDir },
@@ -445,12 +445,12 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
 
     expect(plan.environment.BRAVE_API_KEY).toBe("BSA-from-env");
     expect(plan.environment.OPENROUTER_API_KEY).toBe("or-key");
-    expect(plan.environment.KAIJIBOT_PORT).toBe("3000");
+    expect(plan.environment.ALLBOT_PORT).toBe("3000");
   });
 
   it("config env vars override .env file vars", async () => {
     await writeStateDirDotEnv("MY_KEY=from-dotenv\n", {
-      stateDir: path.join(tmpDir, ".kaijibot"),
+      stateDir: path.join(tmpDir, ".allbot"),
     });
     mockNodeGatewayPlanFixture({ serviceEnvironment: {} });
 
@@ -472,7 +472,7 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
 
   it("service env overrides .env file vars", async () => {
     await writeStateDirDotEnv("HOME=/from-dotenv\n", {
-      stateDir: path.join(tmpDir, ".kaijibot"),
+      stateDir: path.join(tmpDir, ".allbot"),
     });
     mockNodeGatewayPlanFixture({
       serviceEnvironment: { HOME: "/from-service" },
@@ -491,7 +491,7 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
         HOME: "/from-service",
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
         PATH: "/managed/bin:/usr/bin",
       },
     });
@@ -506,7 +506,7 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
         BLOGWATCHER_HOME: "/Users/test/.blogwatcher",
         NODE_OPTIONS: "--require /tmp/evil.js",
         GOPATH: "/Users/test/.local/gopath",
-        KAIJIBOT_SERVICE_MARKER: "kaijibot",
+        ALLBOT_SERVICE_MARKER: "allbot",
       },
     });
 
@@ -515,14 +515,14 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
     expect(plan.environment.BLOGWATCHER_HOME).toBe("/Users/test/.blogwatcher");
     expect(plan.environment.NODE_OPTIONS).toBeUndefined();
     expect(plan.environment.GOPATH).toBeUndefined();
-    expect(plan.environment.KAIJIBOT_SERVICE_MARKER).toBeUndefined();
+    expect(plan.environment.ALLBOT_SERVICE_MARKER).toBeUndefined();
   });
 
   it("drops non-absolute and temp PATH entries from an existing service env", async () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
         HOME: "/from-service",
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
         PATH: "/managed/bin:/usr/bin",
         TMPDIR: "/tmp",
       },
@@ -544,7 +544,7 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
     mockNodeGatewayPlanFixture({
       serviceEnvironment: {
         HOME: "/from-service",
-        KAIJIBOT_PORT: "3000",
+        ALLBOT_PORT: "3000",
         PATH: "/managed/bin:/usr/bin",
       },
     });
@@ -558,7 +558,7 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
         GOBIN: "/Users/test/.local/gopath/bin",
         BLOGWATCHER_HOME: "/Users/test/.blogwatcher",
         GOPATH: "/Users/test/.local/gopath",
-        KAIJIBOT_SERVICE_MANAGED_ENV_KEYS: "GOBIN,GOPATH",
+        ALLBOT_SERVICE_MANAGED_ENV_KEYS: "GOBIN,GOPATH",
       },
     });
 
@@ -566,11 +566,11 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
     expect(plan.environment.GOBIN).toBeUndefined();
     expect(plan.environment.BLOGWATCHER_HOME).toBe("/Users/test/.blogwatcher");
     expect(plan.environment.GOPATH).toBeUndefined();
-    expect(plan.environment.KAIJIBOT_SERVICE_MANAGED_ENV_KEYS).toBeUndefined();
+    expect(plan.environment.ALLBOT_SERVICE_MANAGED_ENV_KEYS).toBeUndefined();
   });
 
   it("works when .env file does not exist", async () => {
-    mockNodeGatewayPlanFixture({ serviceEnvironment: { KAIJIBOT_PORT: "3000" } });
+    mockNodeGatewayPlanFixture({ serviceEnvironment: { ALLBOT_PORT: "3000" } });
 
     const plan = await buildGatewayInstallPlan({
       env: { HOME: tmpDir },
@@ -578,7 +578,7 @@ describe("buildGatewayInstallPlan — dotenv merge", () => {
       runtime: "node",
     });
 
-    expect(plan.environment.KAIJIBOT_PORT).toBe("3000");
+    expect(plan.environment.ALLBOT_PORT).toBe("3000");
   });
 });
 
@@ -587,7 +587,7 @@ describe("gatewayInstallErrorHint", () => {
     expect(gatewayInstallErrorHint("win32")).toContain("Startup-folder login item");
     expect(gatewayInstallErrorHint("win32")).toContain("elevated PowerShell");
     expect(gatewayInstallErrorHint("linux")).toMatch(
-      /(?:kaijibot|kaijibot)( --profile isolated)? gateway install/,
+      /(?:allbot|allbot)( --profile isolated)? gateway install/,
     );
   });
 });

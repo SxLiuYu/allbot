@@ -1,16 +1,16 @@
 ---
-summary: "Run KaijiBot with vLLM (OpenAI-compatible local server)"
+summary: "Run AllBot with vLLM (OpenAI-compatible local server)"
 read_when:
-  - You want to run KaijiBot against a local vLLM server
+  - You want to run AllBot against a local vLLM server
   - You want OpenAI-compatible /v1 endpoints with your own models
 title: "vLLM"
 ---
 
 # vLLM
 
-vLLM can serve open-source (and some custom) models via an **OpenAI-compatible** HTTP API. KaijiBot can connect to vLLM using the `openai-completions` API.
+vLLM can serve open-source (and some custom) models via an **OpenAI-compatible** HTTP API. AllBot can connect to vLLM using the `openai-completions` API.
 
-KaijiBot can also **auto-discover** available models from vLLM when you opt in with `VLLM_API_KEY` (any value works if your server doesn’t enforce auth) and you do not define an explicit `models.providers.vllm` entry.
+AllBot can also **auto-discover** available models from vLLM when you opt in with `VLLM_API_KEY` (any value works if your server doesn’t enforce auth) and you do not define an explicit `models.providers.vllm` entry.
 
 ## Quick start
 
@@ -40,7 +40,7 @@ export VLLM_API_KEY="vllm-local"
 
 ## Model discovery (implicit provider)
 
-When `VLLM_API_KEY` is set (or an auth profile exists) and you **do not** define `models.providers.vllm`, KaijiBot will query:
+When `VLLM_API_KEY` is set (or an auth profile exists) and you **do not** define `models.providers.vllm`, AllBot will query:
 
 - `GET http://127.0.0.1:8000/v1/models`
 
@@ -99,5 +99,5 @@ OpenAI endpoint.
 - native OpenAI-only request shaping does not apply here
 - no `service_tier`, no Responses `store`, no prompt-cache hints, and no
   OpenAI reasoning-compat payload shaping
-- hidden KaijiBot attribution headers (`originator`, `version`, `User-Agent`)
+- hidden AllBot attribution headers (`originator`, `version`, `User-Agent`)
   are not injected on custom vLLM base URLs

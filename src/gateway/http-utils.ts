@@ -24,8 +24,8 @@ import { sendGatewayAuthFailure } from "./http-common.js";
 import { ADMIN_SCOPE, CLI_DEFAULT_OPERATOR_SCOPES } from "./method-scopes.js";
 import { loadGatewayModelCatalog } from "./server-model-catalog.js";
 
-export const KAIJIBOT_MODEL_ID = "kaijibot";
-export const KAIJIBOT_DEFAULT_MODEL_ID = "kaijibot/default";
+export const ALLBOT_MODEL_ID = "allbot";
+export const ALLBOT_DEFAULT_MODEL_ID = "allbot/default";
 
 export function getHeader(req: IncomingMessage, name: string): string | undefined {
   const raw = req.headers[normalizeLowercaseStringOrEmpty(name)];
@@ -138,7 +138,7 @@ export function resolveTrustedHttpOperatorScopes(
     return [];
   }
 
-  const headerValue = getHeader(req, "x-kaijibot-scopes");
+  const headerValue = getHeader(req, "x-allbot-scopes");
   if (headerValue === undefined) {
     // No scope header present — trusted clients without an explicit header
     // get the default operator scopes (matching pre-#57783 behavior).
@@ -193,8 +193,8 @@ export function resolveOpenAiCompatibleHttpSenderIsOwner(
 
 export function resolveAgentIdFromHeader(req: IncomingMessage): string | undefined {
   const raw =
-    normalizeOptionalString(getHeader(req, "x-kaijibot-agent-id")) ||
-    normalizeOptionalString(getHeader(req, "x-kaijibot-agent")) ||
+    normalizeOptionalString(getHeader(req, "x-allbot-agent-id")) ||
+    normalizeOptionalString(getHeader(req, "x-allbot-agent")) ||
     "";
   if (!raw) {
     return undefined;
@@ -211,12 +211,12 @@ export function resolveAgentIdFromModel(
     return undefined;
   }
   const lowered = normalizeLowercaseStringOrEmpty(raw);
-  if (lowered === KAIJIBOT_MODEL_ID || lowered === KAIJIBOT_DEFAULT_MODEL_ID) {
+  if (lowered === ALLBOT_MODEL_ID || lowered === ALLBOT_DEFAULT_MODEL_ID) {
     return resolveDefaultAgentId(cfg);
   }
 
   const m =
-    raw.match(/^kaijibot[:/](?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i) ??
+    raw.match(/^allbot[:/](?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i) ??
     raw.match(/^agent:(?<agentId>[a-z0-9][a-z0-9_-]{0,63})$/i);
   const agentId = m?.groups?.agentId;
   if (!agentId) {
@@ -233,11 +233,11 @@ export async function resolveOpenAiCompatModelOverride(params: {
   const requestModel = params.model?.trim();
   if (requestModel && !resolveAgentIdFromModel(requestModel)) {
     return {
-      errorMessage: "Invalid `model`. Use `kaijibot` or `kaijibot/<agentId>`.",
+      errorMessage: "Invalid `model`. Use `allbot` or `allbot/<agentId>`.",
     };
   }
 
-  const raw = getHeader(params.req, "x-kaijibot-model")?.trim();
+  const raw = getHeader(params.req, "x-allbot-model")?.trim();
   if (!raw) {
     return {};
   }
@@ -247,7 +247,7 @@ export async function resolveOpenAiCompatModelOverride(params: {
   const defaultProvider = defaultModelRef.provider;
   const parsed = parseModelRef(raw, defaultProvider);
   if (!parsed) {
-    return { errorMessage: "Invalid `x-kaijibot-model`." };
+    return { errorMessage: "Invalid `x-allbot-model`." };
   }
 
   const catalog = await loadGatewayModelCatalog();
@@ -287,7 +287,7 @@ export function resolveSessionKey(params: {
   user?: string | undefined;
   prefix: string;
 }): string {
-  const explicit = getHeader(params.req, "x-kaijibot-session-key")?.trim();
+  const explicit = getHeader(params.req, "x-allbot-session-key")?.trim();
   if (explicit) {
     return explicit;
   }
@@ -314,7 +314,7 @@ export function resolveGatewayRequestContext(params: {
   });
 
   const messageChannel = params.useMessageChannelHeader
-    ? (normalizeMessageChannel(getHeader(params.req, "x-kaijibot-message-channel")) ??
+    ? (normalizeMessageChannel(getHeader(params.req, "x-allbot-message-channel")) ??
       params.defaultMessageChannel)
     : params.defaultMessageChannel;
 

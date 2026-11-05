@@ -1,26 +1,26 @@
-import { formatCliCommand, parseDurationMs } from "kaijibot/plugin-sdk/cli-runtime";
+import { formatCliCommand, parseDurationMs } from "allbot/plugin-sdk/cli-runtime";
 import type {
-  KaijiBotPluginApi,
+  AllBotPluginApi,
   ProviderAuthContext,
   ProviderAuthMethodNonInteractiveContext,
   ProviderResolveDynamicModelContext,
   ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   applyAuthProfileConfig,
   type AuthProfileStore,
   buildTokenProfileId,
   createProviderApiKeyAuthMethod,
   listProfilesForProvider,
-  type KaijiBotConfig as ProviderAuthConfig,
+  type AllBotConfig as ProviderAuthConfig,
   type ProviderAuthResult,
   suggestOAuthProfileIdForLegacyDefault,
   upsertAuthProfile,
   validateAnthropicSetupToken,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { cloneFirstTemplateModel } from "kaijibot/plugin-sdk/provider-model-shared";
-import { fetchClaudeUsage } from "kaijibot/plugin-sdk/provider-usage";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { cloneFirstTemplateModel } from "allbot/plugin-sdk/provider-model-shared";
+import { fetchClaudeUsage } from "allbot/plugin-sdk/provider-usage";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import * as claudeCliAuth from "./cli-auth-seam.js";
 import { buildAnthropicCliBackend } from "./cli-backend.js";
 import { buildAnthropicCliMigrationResult } from "./cli-migration.js";
@@ -60,10 +60,10 @@ const _ANTHROPIC_OAUTH_ALLOWLIST = [
   "anthropic/claude-haiku-4-5",
 ] as const;
 const ANTHROPIC_SETUP_TOKEN_NOTE_LINES = [
-  "Anthropic setup-token auth is supported in KaijiBot.",
-  "KaijiBot prefers Claude CLI reuse when it is available on the host.",
-  "Anthropic staff told us this KaijiBot path is allowed again.",
-  `If you want a direct API billing path instead, use ${formatCliCommand("kaijibot models auth login --provider anthropic --method api-key --set-default")} or ${formatCliCommand("kaijibot models auth login --provider anthropic --method cli --set-default")}.`,
+  "Anthropic setup-token auth is supported in AllBot.",
+  "AllBot prefers Claude CLI reuse when it is available on the host.",
+  "Anthropic staff told us this AllBot path is allowed again.",
+  `If you want a direct API billing path instead, use ${formatCliCommand("allbot models auth login --provider anthropic --method api-key --set-default")} or ${formatCliCommand("allbot models auth login --provider anthropic --method cli --set-default")}.`,
 ] as const;
 
 function normalizeAnthropicSetupTokenInput(value: string): string {
@@ -293,7 +293,7 @@ function buildAnthropicAuthDoctorHint(params: {
     }`,
     `- auth store oauth profiles: ${storeOauthProfiles || "(none)"}`,
     `- suggested profile: ${suggested}`,
-    `Fix: run "${formatCliCommand("kaijibot doctor --yes")}"`,
+    `Fix: run "${formatCliCommand("allbot doctor --yes")}"`,
   ].join("\n");
 }
 
@@ -377,7 +377,7 @@ async function runAnthropicCliMigrationNonInteractive(ctx: {
   };
 }
 
-export function registerAnthropicPlugin(api: KaijiBotPluginApi): void {
+export function registerAnthropicPlugin(api: AllBotPluginApi): void {
   const providerId = "anthropic";
   const defaultAnthropicModel = "anthropic/claude-sonnet-4-6";
   const _anthropicOauthAllowlist = [

@@ -82,7 +82,7 @@ function createHost() {
     toolsCatalogError: null,
     toolsCatalogResult: null,
     debugHealth: null,
-    assistantName: "KaijiBot",
+    assistantName: "AllBot",
     assistantAvatar: null,
     assistantAgentId: null,
     serverVersion: null,

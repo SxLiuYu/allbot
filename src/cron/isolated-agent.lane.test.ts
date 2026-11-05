@@ -47,8 +47,8 @@ const envSnapshot = {
   USERPROFILE: process.env.USERPROFILE,
   HOMEDRIVE: process.env.HOMEDRIVE,
   HOMEPATH: process.env.HOMEPATH,
-  KAIJIBOT_HOME: process.env.KAIJIBOT_HOME,
-  KAIJIBOT_STATE_DIR: process.env.KAIJIBOT_STATE_DIR,
+  ALLBOT_HOME: process.env.ALLBOT_HOME,
+  ALLBOT_STATE_DIR: process.env.ALLBOT_STATE_DIR,
 } as const;
 
 function restoreSnapshotEnv() {

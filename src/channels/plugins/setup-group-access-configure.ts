@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { WizardPrompter } from "../../wizard/prompts.js";
 import { promptChannelAccessConfig, type ChannelAccessPolicy } from "./setup-group-access.js";
 
 export async function configureChannelAccessWithAllowlist<TResolved>(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   label: string;
   currentPolicy: ChannelAccessPolicy;
@@ -11,10 +11,10 @@ export async function configureChannelAccessWithAllowlist<TResolved>(params: {
   placeholder: string;
   updatePrompt: boolean;
   skipAllowlistEntries?: boolean;
-  setPolicy: (cfg: KaijiBotConfig, policy: ChannelAccessPolicy) => KaijiBotConfig;
-  resolveAllowlist?: (params: { cfg: KaijiBotConfig; entries: string[] }) => Promise<TResolved>;
-  applyAllowlist?: (params: { cfg: KaijiBotConfig; resolved: TResolved }) => KaijiBotConfig;
-}): Promise<KaijiBotConfig> {
+  setPolicy: (cfg: AllBotConfig, policy: ChannelAccessPolicy) => AllBotConfig;
+  resolveAllowlist?: (params: { cfg: AllBotConfig; entries: string[] }) => Promise<TResolved>;
+  applyAllowlist?: (params: { cfg: AllBotConfig; resolved: TResolved }) => AllBotConfig;
+}): Promise<AllBotConfig> {
   let next = params.cfg;
   const accessConfig = await promptChannelAccessConfig({
     prompter: params.prompter,

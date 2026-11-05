@@ -10,7 +10,7 @@ const require = createRequire(import.meta.url);
 const tsdownModuleUrl = pathToFileURL(require.resolve("tsdown")).href;
 const bundledRepresentativeEntrypoints = ["core"] as const;
 const bundleTempRootTracker = createSuiteTempRootTracker(
-  "kaijibot-plugin-sdk-build",
+  "allbot-plugin-sdk-build",
   path.join(process.cwd(), "node_modules", ".cache"),
 );
 

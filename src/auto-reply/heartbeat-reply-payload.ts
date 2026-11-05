@@ -1,4 +1,4 @@
-import { hasOutboundReplyContent } from "kaijibot/plugin-sdk/reply-payload";
+import { hasOutboundReplyContent } from "allbot/plugin-sdk/reply-payload";
 import type { ReplyPayload } from "./types.js";
 
 export function resolveHeartbeatReplyPayload(

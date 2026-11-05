@@ -1,6 +1,6 @@
 import type { MsgContext } from "../auto-reply/templating.js";
 import { getBootstrapChannelPlugin } from "../channels/plugins/bootstrap-registry.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 
 function findChannelMessagingAdapter(channelId?: string | null) {
@@ -12,7 +12,7 @@ function findChannelMessagingAdapter(channelId?: string | null) {
 }
 
 export function resolveChannelInboundAttachmentRoots(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
 }): readonly string[] | undefined {
   const messaging = findChannelMessagingAdapter(params.ctx.Surface ?? params.ctx.Provider);
@@ -23,7 +23,7 @@ export function resolveChannelInboundAttachmentRoots(params: {
 }
 
 export function resolveChannelRemoteInboundAttachmentRoots(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
 }): readonly string[] | undefined {
   const messaging = findChannelMessagingAdapter(params.ctx.Surface ?? params.ctx.Provider);

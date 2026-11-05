@@ -64,9 +64,9 @@ vi.mock("./control-ui-assets.fs.runtime.js", async () => {
   return wrapped;
 });
 
-vi.mock("./kaijibot-root.js", () => ({
-  resolveKaijiBotPackageRoot: vi.fn(async () => null),
-  resolveKaijiBotPackageRootSync: vi.fn(() => null),
+vi.mock("./allbot-root.js", () => ({
+  resolveAllBotPackageRoot: vi.fn(async () => null),
+  resolveAllBotPackageRootSync: vi.fn(() => null),
 }));
 
 let resolveControlUiRepoRoot: typeof import("./control-ui-assets.js").resolveControlUiRepoRoot;
@@ -75,7 +75,7 @@ let resolveControlUiDistIndexHealth: typeof import("./control-ui-assets.js").res
 let isPackageProvenControlUiRootSync: typeof import("./control-ui-assets.js").isPackageProvenControlUiRootSync;
 let resolveControlUiRootOverrideSync: typeof import("./control-ui-assets.js").resolveControlUiRootOverrideSync;
 let resolveControlUiRootSync: typeof import("./control-ui-assets.js").resolveControlUiRootSync;
-let kaijibotRoot: typeof import("./kaijibot-root.js");
+let allbotRoot: typeof import("./allbot-root.js");
 
 describe("control UI assets helpers (fs-mocked)", () => {
   beforeAll(async () => {
@@ -87,7 +87,7 @@ describe("control UI assets helpers (fs-mocked)", () => {
       resolveControlUiRootOverrideSync,
       resolveControlUiRootSync,
     } = await import("./control-ui-assets.js"));
-    kaijibotRoot = await import("./kaijibot-root.js");
+    allbotRoot = await import("./allbot-root.js");
   });
 
   beforeEach(() => {
@@ -122,8 +122,8 @@ describe("control UI assets helpers (fs-mocked)", () => {
   });
 
   it("resolves dist control-ui index path for symlinked argv1 via realpath", async () => {
-    const pkgRoot = abs("fixtures/bun-global/kaijibot");
-    const wrapperArgv1 = abs("fixtures/bin/kaijibot");
+    const pkgRoot = abs("fixtures/bun-global/allbot");
+    const wrapperArgv1 = abs("fixtures/bin/allbot");
     const realEntrypoint = path.join(pkgRoot, "dist", "index.js");
 
     state.realpaths.set(wrapperArgv1, realEntrypoint);
@@ -133,29 +133,29 @@ describe("control UI assets helpers (fs-mocked)", () => {
     );
   });
 
-  it("uses resolveKaijiBotPackageRoot when available", async () => {
-    const pkgRoot = abs("fixtures/kaijibot");
+  it("uses resolveAllBotPackageRoot when available", async () => {
+    const pkgRoot = abs("fixtures/allbot");
     (
-      kaijibotRoot.resolveKaijiBotPackageRoot as unknown as ReturnType<typeof vi.fn>
+      allbotRoot.resolveAllBotPackageRoot as unknown as ReturnType<typeof vi.fn>
     ).mockResolvedValueOnce(pkgRoot);
 
-    await expect(resolveControlUiDistIndexPath(abs("fixtures/bin/kaijibot"))).resolves.toBe(
+    await expect(resolveControlUiDistIndexPath(abs("fixtures/bin/allbot"))).resolves.toBe(
       path.join(pkgRoot, "dist", "control-ui", "index.html"),
     );
   });
 
   it("falls back to package.json name matching when root resolution fails", async () => {
     const root = abs("fixtures/fallback");
-    setFile(path.join(root, "package.json"), JSON.stringify({ name: "kaijibot" }));
+    setFile(path.join(root, "package.json"), JSON.stringify({ name: "allbot" }));
     setFile(path.join(root, "dist", "control-ui", "index.html"), "<html></html>\n");
 
-    await expect(resolveControlUiDistIndexPath(path.join(root, "kaijibot.mjs"))).resolves.toBe(
+    await expect(resolveControlUiDistIndexPath(path.join(root, "allbot.mjs"))).resolves.toBe(
       path.join(root, "dist", "control-ui", "index.html"),
     );
   });
 
   it("returns null when fallback package name does not match", async () => {
-    const root = abs("fixtures/not-kaijibot");
+    const root = abs("fixtures/not-allbot");
     setFile(path.join(root, "package.json"), JSON.stringify({ name: "malicious-pkg" }));
     setFile(path.join(root, "dist", "control-ui", "index.html"), "<html></html>\n");
 
@@ -192,9 +192,9 @@ describe("control UI assets helpers (fs-mocked)", () => {
   });
 
   it("resolves control-ui root for dist bundle argv1 and moduleUrl candidates", async () => {
-    const pkgRoot = abs("fixtures/kaijibot-bundle");
+    const pkgRoot = abs("fixtures/allbot-bundle");
     (
-      kaijibotRoot.resolveKaijiBotPackageRootSync as unknown as ReturnType<typeof vi.fn>
+      allbotRoot.resolveAllBotPackageRootSync as unknown as ReturnType<typeof vi.fn>
     ).mockReturnValueOnce(pkgRoot);
 
     const uiDir = path.join(pkgRoot, "dist", "control-ui");
@@ -211,8 +211,8 @@ describe("control UI assets helpers (fs-mocked)", () => {
   });
 
   it("prefers packaged app Control UI assets in Contents/Resources", () => {
-    const execPath = abs("fixtures/KaijiBot.app/Contents/MacOS/KaijiBot");
-    const bundledUiDir = abs("fixtures/KaijiBot.app/Contents/Resources/control-ui");
+    const execPath = abs("fixtures/AllBot.app/Contents/MacOS/AllBot");
+    const bundledUiDir = abs("fixtures/AllBot.app/Contents/Resources/control-ui");
     setFile(path.join(bundledUiDir, "index.html"), "<html></html>\n");
 
     state.realpaths.set(execPath, execPath);
@@ -221,8 +221,8 @@ describe("control UI assets helpers (fs-mocked)", () => {
   });
 
   it("resolves control-ui root for symlinked argv1 via realpath", () => {
-    const pkgRoot = abs("fixtures/bun-global/kaijibot");
-    const wrapperArgv1 = abs("fixtures/bin/kaijibot");
+    const pkgRoot = abs("fixtures/bun-global/allbot");
+    const wrapperArgv1 = abs("fixtures/bin/allbot");
     const realEntrypoint = path.join(pkgRoot, "dist", "index.js");
     const uiDir = path.join(pkgRoot, "dist", "control-ui");
 
@@ -233,12 +233,12 @@ describe("control UI assets helpers (fs-mocked)", () => {
   });
 
   it("detects package-proven control-ui roots", () => {
-    const pkgRoot = abs("fixtures/kaijibot-package-root");
+    const pkgRoot = abs("fixtures/allbot-package-root");
     const uiDir = path.join(pkgRoot, "dist", "control-ui");
     setDir(uiDir);
     setFile(path.join(uiDir, "index.html"), "<html></html>\n");
     (
-      kaijibotRoot.resolveKaijiBotPackageRootSync as unknown as ReturnType<typeof vi.fn>
+      allbotRoot.resolveAllBotPackageRootSync as unknown as ReturnType<typeof vi.fn>
     ).mockReturnValueOnce(pkgRoot);
 
     expect(
@@ -249,12 +249,12 @@ describe("control UI assets helpers (fs-mocked)", () => {
   });
 
   it("does not treat fallback roots as package-proven", () => {
-    const pkgRoot = abs("fixtures/kaijibot-package-root");
+    const pkgRoot = abs("fixtures/allbot-package-root");
     const fallbackRoot = abs("fixtures/fallback-root/dist/control-ui");
     setDir(fallbackRoot);
     setFile(path.join(fallbackRoot, "index.html"), "<html></html>\n");
     (
-      kaijibotRoot.resolveKaijiBotPackageRootSync as unknown as ReturnType<typeof vi.fn>
+      allbotRoot.resolveAllBotPackageRootSync as unknown as ReturnType<typeof vi.fn>
     ).mockReturnValueOnce(pkgRoot);
 
     expect(

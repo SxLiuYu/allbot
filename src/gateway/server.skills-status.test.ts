@@ -6,11 +6,11 @@ import { withServer } from "./test-with-server.js";
 
 installGatewayTestHooks({ scope: "suite" });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway skills.status", () => {
   it("does not expose raw config values to operator.read clients", async () => {
     await withEnvAsync(
-      { KAIJIBOT_BUNDLED_SKILLS_DIR: path.join(process.cwd(), "skills") },
+      { ALLBOT_BUNDLED_SKILLS_DIR: path.join(process.cwd(), "skills") },
       async () => {
         const secret = "discord-token-secret-abc"; // pragma: allowlist secret
         const { writeConfigFile } = await import("../config/config.js");

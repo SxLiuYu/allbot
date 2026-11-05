@@ -3,21 +3,21 @@ import os from "node:os";
 import path from "node:path";
 import type {
   CreateSandboxBackendParams,
-  KaijiBotConfig,
+  AllBotConfig,
   SandboxBackendCommandParams,
   SandboxBackendCommandResult,
   SandboxBackendFactory,
   SandboxBackendManager,
   SshSandboxSession,
-} from "kaijibot/plugin-sdk/sandbox";
+} from "allbot/plugin-sdk/sandbox";
 import {
   createRemoteShellSandboxFsBridge,
   disposeSshSandboxSession,
-  resolvePreferredKaijiBotTmpDir,
+  resolvePreferredAllBotTmpDir,
   runSshSandboxCommand,
   sanitizeEnvVars,
-} from "kaijibot/plugin-sdk/sandbox";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/sandbox";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import type { OpenShellSandboxBackend } from "./backend.types.js";
 import {
   buildExecRemoteCommand,
@@ -273,7 +273,7 @@ class OpenShellSandboxBackendImpl {
           "/bin/sh",
           "-c",
           params.script,
-          "kaijibot-openshell-fs",
+          "allbot-openshell-fs",
           ...(params.args ?? []),
         ]),
         stdin: params.stdin,
@@ -413,7 +413,7 @@ class OpenShellSandboxBackendImpl {
 
   private async syncWorkspaceFromRemote(): Promise<void> {
     const tmpDir = await fs.mkdtemp(
-      path.join(resolveOpenShellTmpRoot(), "kaijibot-openshell-sync-"),
+      path.join(resolveOpenShellTmpRoot(), "allbot-openshell-sync-"),
     );
     try {
       const result = await runOpenShellCli({
@@ -444,7 +444,7 @@ class OpenShellSandboxBackendImpl {
 
   private async uploadPathToRemote(localPath: string, remotePath: string): Promise<void> {
     const tmpDir = await fs.mkdtemp(
-      path.join(resolveOpenShellTmpRoot(), "kaijibot-openshell-upload-"),
+      path.join(resolveOpenShellTmpRoot(), "allbot-openshell-upload-"),
     );
     try {
       // Stage a symlink-free snapshot so upload never dereferences host paths
@@ -488,7 +488,7 @@ class OpenShellSandboxBackendImpl {
 }
 
 function resolveOpenShellPluginConfigFromConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   fallback: ResolvedOpenShellPluginConfig,
 ): ResolvedOpenShellPluginConfig {
   const pluginConfig = config.plugins?.entries?.openshell?.config;
@@ -508,9 +508,9 @@ function buildOpenShellSandboxName(scopeKey: string): string {
     (acc, char) => ((acc * 33) ^ char.charCodeAt(0)) >>> 0,
     5381,
   );
-  return `kaijibot-${safe || "session"}-${hash.toString(16).slice(0, 8)}`;
+  return `allbot-${safe || "session"}-${hash.toString(16).slice(0, 8)}`;
 }
 
 function resolveOpenShellTmpRoot(): string {
-  return path.resolve(resolvePreferredKaijiBotTmpDir() ?? os.tmpdir());
+  return path.resolve(resolvePreferredAllBotTmpDir() ?? os.tmpdir());
 }

@@ -1,4 +1,4 @@
-import { adaptScopedAccountAccessor } from "kaijibot/plugin-sdk/channel-config-helpers";
+import { adaptScopedAccountAccessor } from "allbot/plugin-sdk/channel-config-helpers";
 import { describe, expect, it, vi } from "vitest";
 import { createNonExitingTypedRuntimeEnv } from "../../../test/helpers/plugins/runtime-env.js";
 import {

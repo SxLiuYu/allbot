@@ -1,9 +1,9 @@
 import {
   CLAUDE_CLI_PROFILE_ID,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type ProviderAuthResult,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import {
   readClaudeCliCredentialsForSetup,
   readClaudeCliCredentialsForSetupNonInteractive,
@@ -14,8 +14,8 @@ import {
   CLAUDE_CLI_DEFAULT_MODEL_REF,
 } from "./cli-shared.js";
 
-type AgentDefaultsModel = NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>["model"];
-type AgentDefaultsModels = NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>["models"];
+type AgentDefaultsModel = NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>["model"];
+type AgentDefaultsModels = NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>["models"];
 type ClaudeCliCredential = NonNullable<ReturnType<typeof readClaudeCliCredentialsForSetup>>;
 
 function toClaudeCliModelRef(raw: string): string | null {
@@ -158,7 +158,7 @@ function buildClaudeCliAuthProfiles(
 }
 
 export function buildAnthropicCliMigrationResult(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   credential?: ClaudeCliCredential | null,
 ): ProviderAuthResult {
   const defaults = config.agents?.defaults;

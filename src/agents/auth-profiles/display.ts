@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveAuthProfileMetadata } from "./identity.js";
 import type { AuthProfileStore } from "./types.js";
 
 export function resolveAuthProfileDisplayLabel(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store: AuthProfileStore;
   profileId: string;
 }): string {

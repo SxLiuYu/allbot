@@ -29,7 +29,7 @@ describe("isolated cron resolveSessionAuthProfileOverride isNewSession (#62783)"
 
     await withTempCronHome(async (home) => {
       const storePath = await writeSessionStore(home, { lastProvider: "webchat", lastTo: "" });
-      const agentDir = path.join(home, ".kaijibot", "agents", "main", "agent");
+      const agentDir = path.join(home, ".allbot", "agents", "main", "agent");
       await fs.mkdir(agentDir, { recursive: true });
       await fs.writeFile(
         path.join(agentDir, "auth-profiles.json"),
@@ -59,7 +59,7 @@ describe("isolated cron resolveSessionAuthProfileOverride isNewSession (#62783)"
         agents: {
           defaults: {
             model: { primary: "openrouter/moonshotai/kimi-k2.5" },
-            workspace: path.join(home, "kaijibot"),
+            workspace: path.join(home, "allbot"),
           },
         },
       });

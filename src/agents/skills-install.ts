@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveBrewExecutable } from "../infra/brew.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import {
@@ -28,7 +28,7 @@ export type SkillInstallRequest = InstallSafetyOverrides & {
   skillName: string;
   installId: string;
   timeoutMs?: number;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 };
 export type { SkillInstallResult } from "./skills-install.types.js";
 
@@ -443,7 +443,7 @@ export async function installSkill(params: SkillInstallRequest): Promise<SkillIn
   }
   // Warn when install is triggered from a non-bundled source.
   // Workspace/project/personal agent skills can contain attacker-controlled metadata.
-  const trustedInstallSources = new Set(["kaijibot-bundled", "kaijibot-managed", "kaijibot-extra"]);
+  const trustedInstallSources = new Set(["allbot-bundled", "allbot-managed", "allbot-extra"]);
   if (!trustedInstallSources.has(skillSource)) {
     warnings.push(
       `WARNING: Skill "${params.skillName}" install triggered from non-bundled source "${skillSource}". Verify the install recipe is trusted.`,

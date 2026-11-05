@@ -17,10 +17,10 @@ import { ProactiveScheduler } from "../scheduler/proactive-scheduler.js";
 import type { PersonaTree } from "../types.js";
 import { FragmentStore } from "./fragment-store.js";
 
-// Isolated FragmentStore so tests don't read/write the real ~/.kaijibot and
+// Isolated FragmentStore so tests don't read/write the real ~/.allbot and
 // don't pollute each other across files in the same suite.
 const isolatedFragmentStore = new FragmentStore(
-  join(tmpdir(), `kaijibot-test-fragments-${Date.now()}`),
+  join(tmpdir(), `allbot-test-fragments-${Date.now()}`),
 );
 import { buildInsightPrompt, generateInsightCandidatesLLM } from "./llm-engine.js";
 import type { LlmInsightDeps, WebSearchResult } from "./llm-engine.js";
@@ -251,7 +251,7 @@ function makeMockDeps(options?: {
 // TEST SUITE 2: Semantic Dedup via Domain Overlap
 // ═════════════════════════════════════════════════════════════════════════
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("Improvement #2: Semantic dedup via domain overlap", () => {
   const config = {
     minIntervalHours: 4,

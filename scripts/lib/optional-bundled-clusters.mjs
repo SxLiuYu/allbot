@@ -27,7 +27,7 @@ export const optionalBundledClusters = [
 
 export const optionalBundledClusterSet = new Set(optionalBundledClusters);
 
-export const OPTIONAL_BUNDLED_BUILD_ENV = "KAIJIBOT_INCLUDE_OPTIONAL_BUNDLED";
+export const OPTIONAL_BUNDLED_BUILD_ENV = "ALLBOT_INCLUDE_OPTIONAL_BUNDLED";
 
 export function isOptionalBundledCluster(cluster) {
   return optionalBundledClusterSet.has(cluster);
@@ -41,8 +41,8 @@ export function shouldIncludeOptionalBundledClusters(env = process.env) {
 
 export function hasReleasedBundledInstall(packageJson) {
   return (
-    typeof packageJson?.kaijibot?.install?.npmSpec === "string" &&
-    packageJson.kaijibot.install.npmSpec.trim().length > 0
+    typeof packageJson?.allbot?.install?.npmSpec === "string" &&
+    packageJson.allbot.install.npmSpec.trim().length > 0
   );
 }
 

@@ -9,14 +9,14 @@ export async function withTempConfig(params: {
   run: () => Promise<void>;
   prefix?: string;
 }): Promise<void> {
-  const prevConfigPath = process.env.KAIJIBOT_CONFIG_PATH;
-  const prevStateDir = process.env.KAIJIBOT_STATE_DIR;
+  const prevConfigPath = process.env.ALLBOT_CONFIG_PATH;
+  const prevStateDir = process.env.ALLBOT_STATE_DIR;
 
-  const dir = await mkdtemp(path.join(os.tmpdir(), params.prefix ?? "kaijibot-test-config-"));
-  const configPath = path.join(dir, "kaijibot.json");
+  const dir = await mkdtemp(path.join(os.tmpdir(), params.prefix ?? "allbot-test-config-"));
+  const configPath = path.join(dir, "allbot.json");
 
-  process.env.KAIJIBOT_CONFIG_PATH = configPath;
-  process.env.KAIJIBOT_STATE_DIR = path.join(dir, ".kaijibot");
+  process.env.ALLBOT_CONFIG_PATH = configPath;
+  process.env.ALLBOT_STATE_DIR = path.join(dir, ".allbot");
 
   try {
     await writeFile(configPath, JSON.stringify(params.cfg, null, 2), "utf-8");
@@ -26,14 +26,14 @@ export async function withTempConfig(params: {
     await params.run();
   } finally {
     if (prevConfigPath === undefined) {
-      delete process.env.KAIJIBOT_CONFIG_PATH;
+      delete process.env.ALLBOT_CONFIG_PATH;
     } else {
-      process.env.KAIJIBOT_CONFIG_PATH = prevConfigPath;
+      process.env.ALLBOT_CONFIG_PATH = prevConfigPath;
     }
     if (prevStateDir === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = prevStateDir;
+      process.env.ALLBOT_STATE_DIR = prevStateDir;
     }
     clearConfigCache();
     resetConfigRuntimeState();

@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestPluginApi } from "../../../test/helpers/plugins/plugin-api.js";
-import type { KaijiBotPluginApi, PluginRuntime } from "../runtime-api.js";
+import type { AllBotPluginApi, PluginRuntime } from "../runtime-api.js";
 
 const createFeishuClientMock = vi.hoisted(() => vi.fn());
 const chatGetMock = vi.hoisted(() => vi.fn());
@@ -19,9 +19,9 @@ function createFeishuToolRuntime(): PluginRuntime {
 
 describe("registerFeishuChatTools", () => {
   function createChatToolApi(params: {
-    config: KaijiBotPluginApi["config"];
-    registerTool: KaijiBotPluginApi["registerTool"];
-  }): KaijiBotPluginApi {
+    config: AllBotPluginApi["config"];
+    registerTool: AllBotPluginApi["registerTool"];
+  }): AllBotPluginApi {
     return createTestPluginApi({
       id: "feishu-test",
       name: "Feishu Test",

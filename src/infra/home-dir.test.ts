@@ -12,14 +12,14 @@ import {
 describe("resolveEffectiveHomeDir", () => {
   it.each([
     {
-      name: "prefers KAIJIBOT_HOME over HOME and USERPROFILE",
+      name: "prefers ALLBOT_HOME over HOME and USERPROFILE",
       env: {
-        KAIJIBOT_HOME: " /srv/kaijibot-home ",
+        ALLBOT_HOME: " /srv/allbot-home ",
         HOME: "/home/other",
         USERPROFILE: "C:/Users/other",
       } as NodeJS.ProcessEnv,
       homedir: () => "/fallback",
-      expected: "/srv/kaijibot-home",
+      expected: "/srv/allbot-home",
     },
     {
       name: "falls back to HOME",
@@ -37,7 +37,7 @@ describe("resolveEffectiveHomeDir", () => {
     {
       name: "falls back to homedir when env values are blank",
       env: {
-        KAIJIBOT_HOME: " ",
+        ALLBOT_HOME: " ",
         HOME: " ",
         USERPROFILE: "\t",
       } as NodeJS.ProcessEnv,
@@ -47,7 +47,7 @@ describe("resolveEffectiveHomeDir", () => {
     {
       name: "treats literal undefined env values as unset",
       env: {
-        KAIJIBOT_HOME: "undefined",
+        ALLBOT_HOME: "undefined",
         HOME: "undefined",
         USERPROFILE: "null",
       } as NodeJS.ProcessEnv,
@@ -62,7 +62,7 @@ describe("resolveEffectiveHomeDir", () => {
     {
       name: "expands ~/ using HOME",
       env: {
-        KAIJIBOT_HOME: "~/svc",
+        ALLBOT_HOME: "~/svc",
         HOME: "/home/alice",
       } as NodeJS.ProcessEnv,
       expected: "/home/alice/svc",
@@ -70,7 +70,7 @@ describe("resolveEffectiveHomeDir", () => {
     {
       name: "expands ~\\\\ using USERPROFILE",
       env: {
-        KAIJIBOT_HOME: "~\\svc",
+        ALLBOT_HOME: "~\\svc",
         HOME: " ",
         USERPROFILE: "C:/Users/alice",
       } as NodeJS.ProcessEnv,
@@ -92,14 +92,14 @@ describe("resolveRequiredHomeDir", () => {
       expected: process.cwd(),
     },
     {
-      name: "returns a fully resolved path for KAIJIBOT_HOME",
-      env: { KAIJIBOT_HOME: "/custom/home" } as NodeJS.ProcessEnv,
+      name: "returns a fully resolved path for ALLBOT_HOME",
+      env: { ALLBOT_HOME: "/custom/home" } as NodeJS.ProcessEnv,
       homedir: () => "/fallback",
       expected: path.resolve("/custom/home"),
     },
     {
-      name: "returns cwd when KAIJIBOT_HOME is tilde-only and no fallback home exists",
-      env: { KAIJIBOT_HOME: "~" } as NodeJS.ProcessEnv,
+      name: "returns cwd when ALLBOT_HOME is tilde-only and no fallback home exists",
+      env: { ALLBOT_HOME: "~" } as NodeJS.ProcessEnv,
       homedir: () => {
         throw new Error("no home");
       },
@@ -111,11 +111,11 @@ describe("resolveRequiredHomeDir", () => {
 });
 
 describe("resolveOsHomeDir", () => {
-  it("ignores KAIJIBOT_HOME and uses HOME", () => {
+  it("ignores ALLBOT_HOME and uses HOME", () => {
     expect(
       resolveOsHomeDir(
         {
-          KAIJIBOT_HOME: "/srv/kaijibot-home",
+          ALLBOT_HOME: "/srv/allbot-home",
           HOME: "/home/alice",
           USERPROFILE: "C:/Users/alice",
         } as NodeJS.ProcessEnv,
@@ -131,15 +131,15 @@ describe("expandHomePrefix", () => {
       name: "expands ~/ using effective home",
       input: "~/x",
       opts: {
-        env: { KAIJIBOT_HOME: "/srv/kaijibot-home" } as NodeJS.ProcessEnv,
+        env: { ALLBOT_HOME: "/srv/allbot-home" } as NodeJS.ProcessEnv,
       },
-      expected: `${path.resolve("/srv/kaijibot-home")}/x`,
+      expected: `${path.resolve("/srv/allbot-home")}/x`,
     },
     {
       name: "expands exact ~ using explicit home",
       input: "~",
-      opts: { home: " /srv/kaijibot-home " },
-      expected: "/srv/kaijibot-home",
+      opts: { home: " /srv/allbot-home " },
+      expected: "/srv/allbot-home",
     },
     {
       name: "expands ~\\\\ using resolved env home",
@@ -180,9 +180,9 @@ describe("resolveHomeRelativePath", () => {
       name: "expands tilde paths using the resolved home directory",
       input: "~/docs",
       opts: {
-        env: { KAIJIBOT_HOME: "/srv/kaijibot-home" } as NodeJS.ProcessEnv,
+        env: { ALLBOT_HOME: "/srv/allbot-home" } as NodeJS.ProcessEnv,
       },
-      expected: path.resolve("/srv/kaijibot-home/docs"),
+      expected: path.resolve("/srv/allbot-home/docs"),
     },
     {
       name: "falls back to cwd when tilde paths have no home source",
@@ -201,11 +201,11 @@ describe("resolveHomeRelativePath", () => {
 });
 
 describe("resolveOsHomeRelativePath", () => {
-  it("expands tilde paths using the OS home instead of KAIJIBOT_HOME", () => {
+  it("expands tilde paths using the OS home instead of ALLBOT_HOME", () => {
     expect(
       resolveOsHomeRelativePath("~/docs", {
         env: {
-          KAIJIBOT_HOME: "/srv/kaijibot-home",
+          ALLBOT_HOME: "/srv/allbot-home",
           HOME: "/home/alice",
         } as NodeJS.ProcessEnv,
       }),

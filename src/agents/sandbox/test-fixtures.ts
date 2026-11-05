@@ -7,8 +7,8 @@ export function createSandboxTestContext(params?: {
   const overrides = params?.overrides ?? {};
   const { docker: _unusedDockerOverrides, ...sandboxOverrides } = overrides;
   const docker = {
-    image: "kaijibot-sandbox:bookworm-slim",
-    containerPrefix: "kaijibot-sbx-",
+    image: "allbot-sandbox:bookworm-slim",
+    containerPrefix: "allbot-sbx-",
     network: "none",
     user: "1000:1000",
     workdir: "/workspace",
@@ -33,9 +33,9 @@ export function createSandboxTestContext(params?: {
     workspaceDir: "/tmp/workspace",
     agentWorkspaceDir: "/tmp/workspace",
     workspaceAccess: "rw",
-    runtimeId: "kaijibot-sbx-test",
-    runtimeLabel: "kaijibot-sbx-test",
-    containerName: "kaijibot-sbx-test",
+    runtimeId: "allbot-sbx-test",
+    runtimeLabel: "allbot-sbx-test",
+    containerName: "allbot-sbx-test",
     containerWorkdir: "/workspace",
     tools: { allow: ["*"], deny: [] },
     browserAllowHostControl: false,

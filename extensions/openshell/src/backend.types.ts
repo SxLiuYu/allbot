@@ -1,4 +1,4 @@
-import type { RemoteShellSandboxHandle, SandboxBackendHandle } from "kaijibot/plugin-sdk/sandbox";
+import type { RemoteShellSandboxHandle, SandboxBackendHandle } from "allbot/plugin-sdk/sandbox";
 
 export type OpenShellFsBridgeContext = Parameters<
   NonNullable<SandboxBackendHandle["createFsBridge"]>

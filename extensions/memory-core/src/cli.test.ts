@@ -23,9 +23,9 @@ const resolveCommandSecretRefsViaGateway = vi.hoisted(() =>
 
 vi.mock("./cli.host.runtime.js", async () => {
   const [runtimeCli, runtimeCore, runtimeFiles] = await Promise.all([
-    import("kaijibot/plugin-sdk/memory-core-host-runtime-cli"),
-    import("kaijibot/plugin-sdk/memory-core-host-runtime-core"),
-    import("kaijibot/plugin-sdk/memory-core-host-runtime-files"),
+    import("allbot/plugin-sdk/memory-core-host-runtime-cli"),
+    import("allbot/plugin-sdk/memory-core-host-runtime-core"),
+    import("allbot/plugin-sdk/memory-core-host-runtime-files"),
   ]);
   return {
     colorize: runtimeCli.colorize,
@@ -51,9 +51,9 @@ vi.mock("./cli.host.runtime.js", async () => {
 });
 
 let registerMemoryCli: typeof import("./cli.js").registerMemoryCli;
-let defaultRuntime: typeof import("kaijibot/plugin-sdk/memory-core-host-runtime-cli").defaultRuntime;
-let isVerbose: typeof import("kaijibot/plugin-sdk/memory-core-host-runtime-cli").isVerbose;
-let setVerbose: typeof import("kaijibot/plugin-sdk/memory-core-host-runtime-cli").setVerbose;
+let defaultRuntime: typeof import("allbot/plugin-sdk/memory-core-host-runtime-cli").defaultRuntime;
+let isVerbose: typeof import("allbot/plugin-sdk/memory-core-host-runtime-cli").isVerbose;
+let setVerbose: typeof import("allbot/plugin-sdk/memory-core-host-runtime-cli").setVerbose;
 let fixtureRoot = "";
 let workspaceFixtureRoot = "";
 let qmdFixtureRoot = "";
@@ -63,7 +63,7 @@ let qmdCaseId = 0;
 beforeAll(async () => {
   ({ registerMemoryCli } = await import("./cli.js"));
   ({ defaultRuntime, isVerbose, setVerbose } =
-    await import("kaijibot/plugin-sdk/memory-core-host-runtime-cli"));
+    await import("allbot/plugin-sdk/memory-core-host-runtime-cli"));
   fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "memory-cli-fixtures-"));
   workspaceFixtureRoot = path.join(fixtureRoot, "workspace");
   qmdFixtureRoot = path.join(fixtureRoot, "qmd");
@@ -108,7 +108,7 @@ describe("memory cli", () => {
       files: 0,
       chunks: 0,
       dirty: false,
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       dbPath: "/tmp/memory.sqlite",
       provider: "openai",
       model: "text-embedding-3-small",
@@ -291,19 +291,19 @@ describe("memory cli", () => {
   it("documents memory help examples", () => {
     const helpText = getMemoryHelpText();
 
-    expect(helpText).toContain("kaijibot memory status --fix");
+    expect(helpText).toContain("allbot memory status --fix");
     expect(helpText).toContain("Repair stale recall locks and normalize promotion metadata.");
-    expect(helpText).toContain("kaijibot memory status --deep");
+    expect(helpText).toContain("allbot memory status --deep");
     expect(helpText).toContain("Probe embedding provider readiness.");
-    expect(helpText).toContain('kaijibot memory search "meeting notes"');
+    expect(helpText).toContain('allbot memory search "meeting notes"');
     expect(helpText).toContain("Quick search using positional query.");
-    expect(helpText).toContain('kaijibot memory search --query "deployment" --max-results 20');
+    expect(helpText).toContain('allbot memory search --query "deployment" --max-results 20');
     expect(helpText).toContain("Limit results for focused troubleshooting.");
-    expect(helpText).toContain("kaijibot memory promote --apply");
+    expect(helpText).toContain("allbot memory promote --apply");
     expect(helpText).toContain("Append top-ranked short-term candidates into MEMORY.md.");
-    expect(helpText).toContain('kaijibot memory promote-explain "router vlan"');
+    expect(helpText).toContain('allbot memory promote-explain "router vlan"');
     expect(helpText).toContain("Explain why a specific candidate would or would not promote.");
-    expect(helpText).toContain("kaijibot memory status --json");
+    expect(helpText).toContain("allbot memory status --json");
     expect(helpText).toContain("Output machine-readable JSON (good for scripts).");
   });
 
@@ -456,7 +456,7 @@ describe("memory cli", () => {
       const log = spyRuntimeLogs(defaultRuntime);
       await runMemoryCli(["status"]);
       expect(log).toHaveBeenCalledWith(
-        expect.stringContaining("Fix: kaijibot memory status --fix --agent main"),
+        expect.stringContaining("Fix: allbot memory status --fix --agent main"),
       );
 
       log.mockClear();
@@ -467,7 +467,7 @@ describe("memory cli", () => {
       });
       await runMemoryCli(["status", "--fix"]);
       expect(log).not.toHaveBeenCalledWith(
-        expect.stringContaining("Fix: kaijibot memory status --fix --agent main"),
+        expect.stringContaining("Fix: allbot memory status --fix --agent main"),
       );
     });
   });
@@ -963,7 +963,7 @@ describe("memory cli", () => {
       const memoryPath = path.join(workspaceDir, "MEMORY.md");
       const memoryText = await fs.readFile(memoryPath, "utf-8");
       expect(memoryText).toContain("Promoted From Short-Term Memory");
-      expect(memoryText).toContain("kaijibot-memory-promotion:");
+      expect(memoryText).toContain("allbot-memory-promotion:");
       expect(memoryText).toContain("memory/2026-04-01.md:10-10");
       expect(log).toHaveBeenCalledWith(expect.stringContaining("Processed 1 candidate(s) for"));
       expect(log).toHaveBeenCalledWith(expect.stringContaining("appended=1 reconciledExisting=0"));

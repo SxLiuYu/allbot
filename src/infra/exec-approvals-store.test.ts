@@ -27,7 +27,7 @@ let resolveExecApprovalsPath: ExecApprovalsModule["resolveExecApprovalsPath"];
 let resolveExecApprovalsSocketPath: ExecApprovalsModule["resolveExecApprovalsSocketPath"];
 
 const tempDirs: string[] = [];
-const originalKaijiBotHome = process.env.KAIJIBOT_HOME;
+const originalAllBotHome = process.env.ALLBOT_HOME;
 
 beforeAll(async () => {
   ({
@@ -52,10 +52,10 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
-  if (originalKaijiBotHome === undefined) {
-    delete process.env.KAIJIBOT_HOME;
+  if (originalAllBotHome === undefined) {
+    delete process.env.ALLBOT_HOME;
   } else {
-    process.env.KAIJIBOT_HOME = originalKaijiBotHome;
+    process.env.ALLBOT_HOME = originalAllBotHome;
   }
   for (const dir of tempDirs.splice(0)) {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -65,12 +65,12 @@ afterEach(() => {
 function createHomeDir(): string {
   const dir = makeTempDir();
   tempDirs.push(dir);
-  process.env.KAIJIBOT_HOME = dir;
+  process.env.ALLBOT_HOME = dir;
   return dir;
 }
 
 function approvalsFilePath(homeDir: string): string {
-  return path.join(homeDir, ".kaijibot", "exec-approvals.json");
+  return path.join(homeDir, ".allbot", "exec-approvals.json");
 }
 
 function readApprovalsFile(homeDir: string): ExecApprovalsFile {
@@ -82,10 +82,10 @@ describe("exec approvals store helpers", () => {
     const dir = createHomeDir();
 
     expect(path.normalize(resolveExecApprovalsPath())).toBe(
-      path.normalize(path.join(dir, ".kaijibot", "exec-approvals.json")),
+      path.normalize(path.join(dir, ".allbot", "exec-approvals.json")),
     );
     expect(path.normalize(resolveExecApprovalsSocketPath())).toBe(
-      path.normalize(path.join(dir, ".kaijibot", "exec-approvals.sock")),
+      path.normalize(path.join(dir, ".allbot", "exec-approvals.sock")),
     );
   });
 

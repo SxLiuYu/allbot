@@ -26,11 +26,11 @@ describe("host env security policy parity", () => {
       const policyPath = path.join(repoRoot, "src/infra/host-env-security-policy.json");
       const generatedSwiftPath = path.join(
         repoRoot,
-        "apps/macos/Sources/KaijiBot/HostEnvSecurityPolicy.generated.swift",
+        "apps/macos/Sources/AllBot/HostEnvSecurityPolicy.generated.swift",
       );
       const sanitizerSwiftPath = path.join(
         repoRoot,
-        "apps/macos/Sources/KaijiBot/HostEnvSanitizer.swift",
+        "apps/macos/Sources/AllBot/HostEnvSanitizer.swift",
       );
 
       const rawPolicy = JSON.parse(fs.readFileSync(policyPath, "utf8"));

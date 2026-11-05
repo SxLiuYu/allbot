@@ -17,7 +17,7 @@ export type HardTriggerParams = {
   started: number;
   configDir?: string;
   /** Full config, so a custom agent workspace is honored when listing skills. */
-  config?: import("../../config/config.js").KaijiBotConfig;
+  config?: import("../../config/config.js").AllBotConfig;
   /** Agent whose workspace owns the skills; parsed from the session key when absent. */
   agentId?: string;
   /** Locale for the generated signal text. Defaults to zh (legacy behavior). */

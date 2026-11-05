@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { callGateway } from "../../gateway/call.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { normalizeAgentId, resolveAgentIdFromSessionKey } from "../../routing/session-key.js";
@@ -78,7 +78,7 @@ export function createSessionsSendTool(opts?: {
   agentSessionKey?: string;
   agentChannel?: GatewayMessageChannel;
   sandboxed?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   callGateway?: GatewayCaller;
 }): AnyAgentTool {
   return {

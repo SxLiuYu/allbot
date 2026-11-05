@@ -1,8 +1,8 @@
 import path from "node:path";
 import { resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import { resolveConfigDir } from "../utils.js";
 
@@ -14,7 +14,7 @@ let cachedPreferredTmpDir: string | undefined;
 
 function resolveCachedPreferredTmpDir(): string {
   if (!cachedPreferredTmpDir) {
-    cachedPreferredTmpDir = resolvePreferredKaijiBotTmpDir();
+    cachedPreferredTmpDir = resolvePreferredAllBotTmpDir();
   }
   return cachedPreferredTmpDir;
 }
@@ -34,7 +34,7 @@ export function buildMediaLocalRoots(
       path.join(resolvedStateDir, "workspace"),
       path.join(resolvedStateDir, "sandboxes"),
       // Upgraded installs can still resolve the active state dir to the legacy
-      // ~/.clawdbot tree while new media writes already go under ~/.kaijibot/media.
+      // ~/.clawdbot tree while new media writes already go under ~/.allbot/media.
       // Keep inbound media readable across that split without widening roots beyond
       // the managed media cache.
       path.join(resolvedConfigDir, "media"),
@@ -47,7 +47,7 @@ export function getDefaultMediaLocalRoots(): readonly string[] {
 }
 
 export function getAgentScopedMediaLocalRoots(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   agentId?: string,
 ): readonly string[] {
   const roots = buildMediaLocalRoots(resolveStateDir(), resolveConfigDir());
@@ -81,7 +81,7 @@ export function getAgentScopedMediaLocalRootsForSources({
   agentId,
   mediaSources: _mediaSources,
 }: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId?: string;
   mediaSources?: readonly string[];
 }): readonly string[] {

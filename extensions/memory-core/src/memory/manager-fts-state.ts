@@ -1,5 +1,5 @@
 import type { DatabaseSync } from "node:sqlite";
-import type { MemorySource } from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+import type { MemorySource } from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 export function deleteMemoryFtsRows(params: {
   db: DatabaseSync;

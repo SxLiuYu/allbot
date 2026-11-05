@@ -16,22 +16,22 @@ function parseSpecOrThrow(spec: string) {
 
 describe("npm registry spec validation", () => {
   it.each([
-    "@kaijibot/voice-call",
-    "@kaijibot/voice-call@1.2.3",
-    "@kaijibot/voice-call@1.2.3-beta.4",
-    "@kaijibot/voice-call@latest",
-    "@kaijibot/voice-call@beta",
+    "@allbot/voice-call",
+    "@allbot/voice-call@1.2.3",
+    "@allbot/voice-call@1.2.3-beta.4",
+    "@allbot/voice-call@latest",
+    "@allbot/voice-call@beta",
   ])("accepts %s", (spec) => {
     expect(validateRegistryNpmSpec(spec)).toBeNull();
   });
 
   it.each([
     {
-      spec: "@kaijibot/voice-call@^1.2.3",
+      spec: "@allbot/voice-call@^1.2.3",
       expected: "exact version or dist-tag",
     },
     {
-      spec: "@kaijibot/voice-call@~1.2.3",
+      spec: "@allbot/voice-call@~1.2.3",
       expected: "exact version or dist-tag",
     },
     {
@@ -39,15 +39,15 @@ describe("npm registry spec validation", () => {
       expected: "URLs are not allowed",
     },
     {
-      spec: "git+ssh://github.com/kaijibot/kaijibot",
+      spec: "git+ssh://github.com/allbot/allbot",
       expected: "URLs are not allowed",
     },
     {
-      spec: "@kaijibot/voice-call@",
+      spec: "@allbot/voice-call@",
       expected: "missing version/tag after @",
     },
     {
-      spec: "@kaijibot/voice-call@../beta",
+      spec: "@allbot/voice-call@../beta",
       expected: "invalid version/tag",
     },
   ])("rejects %s", ({ spec, expected }) => {
@@ -58,29 +58,29 @@ describe("npm registry spec validation", () => {
 describe("npm registry spec parsing helpers", () => {
   it.each([
     {
-      spec: "@kaijibot/voice-call",
+      spec: "@allbot/voice-call",
       expected: {
-        name: "@kaijibot/voice-call",
-        raw: "@kaijibot/voice-call",
+        name: "@allbot/voice-call",
+        raw: "@allbot/voice-call",
         selectorKind: "none",
         selectorIsPrerelease: false,
       },
     },
     {
-      spec: "@kaijibot/voice-call@beta",
+      spec: "@allbot/voice-call@beta",
       expected: {
-        name: "@kaijibot/voice-call",
-        raw: "@kaijibot/voice-call@beta",
+        name: "@allbot/voice-call",
+        raw: "@allbot/voice-call@beta",
         selector: "beta",
         selectorKind: "tag",
         selectorIsPrerelease: false,
       },
     },
     {
-      spec: "@kaijibot/voice-call@1.2.3-beta.1",
+      spec: "@allbot/voice-call@1.2.3-beta.1",
       expected: {
-        name: "@kaijibot/voice-call",
-        raw: "@kaijibot/voice-call@1.2.3-beta.1",
+        name: "@allbot/voice-call",
+        raw: "@allbot/voice-call@1.2.3-beta.1",
         selector: "1.2.3-beta.1",
         selectorKind: "exact-version",
         selectorIsPrerelease: true,
@@ -108,32 +108,32 @@ describe("npm registry spec parsing helpers", () => {
 describe("npm prerelease resolution policy", () => {
   it.each([
     {
-      spec: "@kaijibot/voice-call",
+      spec: "@allbot/voice-call",
       resolvedVersion: "1.2.3-beta.1",
       expected: false,
     },
     {
-      spec: "@kaijibot/voice-call@latest",
+      spec: "@allbot/voice-call@latest",
       resolvedVersion: "1.2.3-rc.1",
       expected: false,
     },
     {
-      spec: "@kaijibot/voice-call@beta",
+      spec: "@allbot/voice-call@beta",
       resolvedVersion: "1.2.3-beta.4",
       expected: true,
     },
     {
-      spec: "@kaijibot/voice-call@1.2.3-beta.1",
+      spec: "@allbot/voice-call@1.2.3-beta.1",
       resolvedVersion: "1.2.3-beta.1",
       expected: true,
     },
     {
-      spec: "@kaijibot/voice-call",
+      spec: "@allbot/voice-call",
       resolvedVersion: "1.2.3",
       expected: true,
     },
     {
-      spec: "@kaijibot/voice-call@latest",
+      spec: "@allbot/voice-call@latest",
       resolvedVersion: undefined,
       expected: true,
     },
@@ -148,12 +148,12 @@ describe("npm prerelease resolution policy", () => {
 
   it.each([
     {
-      spec: "@kaijibot/voice-call",
+      spec: "@allbot/voice-call",
       resolvedVersion: "1.2.3-beta.1",
-      expected: `Use "@kaijibot/voice-call@beta"`,
+      expected: `Use "@allbot/voice-call@beta"`,
     },
     {
-      spec: "@kaijibot/voice-call@beta",
+      spec: "@allbot/voice-call@beta",
       resolvedVersion: "1.2.3-rc.1",
       expected: "Use an explicit prerelease tag or exact prerelease version",
     },

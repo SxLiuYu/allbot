@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import { Type } from "typebox";
 import { isRestartEnabled } from "../../config/commands.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { parseConfigJson5, resolveConfigSnapshotHash } from "../../config/io.js";
 import { applyMergePatch } from "../../config/merge-patch.js";
 import { extractDeliveryInfo } from "../../config/sessions.js";
@@ -16,7 +16,7 @@ import { normalizeOptionalString, readStringValue } from "../../shared/string-co
 import { stringEnum } from "../schema/typebox.js";
 import { type AnyAgentTool, jsonResult, readStringParam } from "./common.js";
 import { callGatewayTool, readGatewayCallOptions } from "./gateway.js";
-import { isKaijiBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
+import { isAllBotOwnerOnlyCoreToolName } from "./owner-only-tools.js";
 
 const log = createSubsystemLogger("gateway-tool");
 
@@ -159,12 +159,12 @@ const GatewayToolSchema = Type.Object({
 
 export function createGatewayTool(opts?: {
   agentSessionKey?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }): AnyAgentTool {
   return {
     label: "Gateway",
     name: "gateway",
-    ownerOnly: isKaijiBotOwnerOnlyCoreToolName("gateway"),
+    ownerOnly: isAllBotOwnerOnlyCoreToolName("gateway"),
     description:
       "Restart, inspect a specific config schema path, apply config, or update the gateway in-place (SIGUSR1). Use config.schema.lookup with a targeted dot path before config edits. Use config.patch for safe partial config updates (merges with existing). Use config.apply only when replacing entire config. Config writes hot-reload when possible and restart when required. Always pass a human-readable completion message via the `note` parameter so the system can deliver it to the user after restart.",
     parameters: GatewayToolSchema,

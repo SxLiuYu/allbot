@@ -9,13 +9,13 @@ function writeStderrLine(message: string): void {
 }
 
 const { get: getArg } = createArgReader();
-const urlRaw = getArg("--url") ?? process.env.KAIJIBOT_GATEWAY_URL;
-const token = getArg("--token") ?? process.env.KAIJIBOT_GATEWAY_TOKEN;
+const urlRaw = getArg("--url") ?? process.env.ALLBOT_GATEWAY_URL;
+const token = getArg("--token") ?? process.env.ALLBOT_GATEWAY_TOKEN;
 
 if (!urlRaw || !token) {
   writeStderrLine(
     "Usage: bun scripts/dev/gateway-smoke.ts --url <wss://host[:port]> --token <gateway.auth.token>\n" +
-      "Or set env: KAIJIBOT_GATEWAY_URL / KAIJIBOT_GATEWAY_TOKEN",
+      "Or set env: ALLBOT_GATEWAY_URL / ALLBOT_GATEWAY_TOKEN",
   );
   process.exit(1);
 }
@@ -39,12 +39,12 @@ async function main() {
     minProtocol: 3,
     maxProtocol: 3,
     client: {
-      id: "kaijibot-ios",
-      displayName: "kaijibot gateway smoke test",
+      id: "allbot-ios",
+      displayName: "allbot gateway smoke test",
       version: "dev",
       platform: "dev",
       mode: "ui",
-      instanceId: "kaijibot-dev-smoke",
+      instanceId: "allbot-dev-smoke",
     },
     locale: "en-US",
     userAgent: "gateway-smoke",

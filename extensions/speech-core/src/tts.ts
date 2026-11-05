@@ -9,21 +9,21 @@ import {
   unlinkSync,
 } from "node:fs";
 import path from "node:path";
-import { normalizeChannelId, type ChannelId } from "kaijibot/plugin-sdk/channel-targets";
+import { normalizeChannelId, type ChannelId } from "allbot/plugin-sdk/channel-targets";
 import type {
-  KaijiBotConfig,
+  AllBotConfig,
   TtsAutoMode,
   TtsConfig,
   TtsMode,
   TtsModelOverrideConfig,
   TtsProvider,
-} from "kaijibot/plugin-sdk/config-runtime";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import { redactSensitiveText } from "kaijibot/plugin-sdk/logging-core";
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
-import type { ReplyPayload } from "kaijibot/plugin-sdk/reply-runtime";
-import { isVerbose, logVerbose } from "kaijibot/plugin-sdk/runtime-env";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/sandbox";
+} from "allbot/plugin-sdk/config-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import { redactSensitiveText } from "allbot/plugin-sdk/logging-core";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
+import type { ReplyPayload } from "allbot/plugin-sdk/reply-runtime";
+import { isVerbose, logVerbose } from "allbot/plugin-sdk/runtime-env";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/sandbox";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -31,7 +31,7 @@ import {
   resolveConfigDir,
   resolveUserPath,
   stripMarkdown,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import {
   canonicalizeSpeechProviderId,
   getSpeechProvider,
@@ -68,7 +68,7 @@ export type ResolvedTtsConfig = {
   maxTextLength: number;
   timeoutMs: number;
   rawConfig?: TtsConfig;
-  sourceConfig?: KaijiBotConfig;
+  sourceConfig?: AllBotConfig;
 };
 
 type TtsUserPrefs = {
@@ -172,7 +172,7 @@ function resolveTtsPrefsPathValue(prefsPath: string | undefined): string {
   if (prefsPath?.trim()) {
     return resolveUserPath(prefsPath.trim());
   }
-  const envPath = process.env.KAIJIBOT_TTS_PREFS?.trim();
+  const envPath = process.env.ALLBOT_TTS_PREFS?.trim();
   if (envPath) {
     return resolveUserPath(envPath);
   }
@@ -208,7 +208,7 @@ function resolveModelOverridePolicy(
   };
 }
 
-function sortSpeechProvidersForAutoSelection(cfg?: KaijiBotConfig) {
+function sortSpeechProvidersForAutoSelection(cfg?: AllBotConfig) {
   return listSpeechProviders(cfg).toSorted((left, right) => {
     const leftOrder = left.autoSelectOrder ?? Number.MAX_SAFE_INTEGER;
     const rightOrder = right.autoSelectOrder ?? Number.MAX_SAFE_INTEGER;
@@ -219,7 +219,7 @@ function sortSpeechProvidersForAutoSelection(cfg?: KaijiBotConfig) {
   });
 }
 
-function _resolveRegistryDefaultSpeechProviderId(cfg?: KaijiBotConfig): TtsProvider {
+function _resolveRegistryDefaultSpeechProviderId(cfg?: AllBotConfig): TtsProvider {
   return sortSpeechProvidersForAutoSelection(cfg)[0]?.id ?? "";
 }
 
@@ -250,7 +250,7 @@ function resolveRawProviderConfig(
 function resolveLazyProviderConfig(
   config: ResolvedTtsConfig,
   providerId: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): SpeechProviderConfig {
   const canonical =
     normalizeConfiguredSpeechProviderId(providerId) ?? normalizeLowercaseStringOrEmpty(providerId);
@@ -311,7 +311,7 @@ function collectDirectProviderConfigEntries(raw: TtsConfig): Record<string, Spee
 export function getResolvedSpeechProviderConfig(
   config: ResolvedTtsConfig,
   providerId: string,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): SpeechProviderConfig {
   const canonical =
     canonicalizeSpeechProviderId(providerId, cfg) ??
@@ -320,7 +320,7 @@ export function getResolvedSpeechProviderConfig(
   return resolveLazyProviderConfig(config, canonical, cfg);
 }
 
-export function resolveTtsConfig(cfg: KaijiBotConfig): ResolvedTtsConfig {
+export function resolveTtsConfig(cfg: AllBotConfig): ResolvedTtsConfig {
   const raw: TtsConfig = cfg.messages?.tts ?? {};
   const providerSource = raw.provider ? "config" : "default";
   const timeoutMs = raw.timeoutMs ?? DEFAULT_TIMEOUT_MS;
@@ -374,7 +374,7 @@ export function resolveTtsAutoMode(params: {
   return params.config.auto;
 }
 
-function resolveEffectiveTtsAutoState(params: { cfg: KaijiBotConfig; sessionAuto?: string }): {
+function resolveEffectiveTtsAutoState(params: { cfg: AllBotConfig; sessionAuto?: string }): {
   autoMode: TtsAutoMode;
   prefsPath: string;
 } {
@@ -394,7 +394,7 @@ function resolveEffectiveTtsAutoState(params: { cfg: KaijiBotConfig; sessionAuto
   };
 }
 
-export function buildTtsSystemPromptHint(cfg: KaijiBotConfig): string | undefined {
+export function buildTtsSystemPromptHint(cfg: AllBotConfig): string | undefined {
   const { autoMode, prefsPath } = resolveEffectiveTtsAutoState({ cfg });
   if (autoMode === "off") {
     return undefined;
@@ -504,7 +504,7 @@ export function setTtsProvider(prefsPath: string, provider: TtsProvider): void {
 }
 
 export function resolveExplicitTtsOverrides(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prefsPath?: string;
   provider?: string;
   modelId?: string;
@@ -599,7 +599,7 @@ function resolveChannelId(channel: string | undefined): ChannelId | null {
   return channel ? normalizeChannelId(channel) : null;
 }
 
-export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: KaijiBotConfig): TtsProvider[] {
+export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: AllBotConfig): TtsProvider[] {
   const normalizedPrimary = canonicalizeSpeechProviderId(primary, cfg) ?? primary;
   const ordered = new Set<TtsProvider>([normalizedPrimary]);
   for (const provider of sortSpeechProvidersForAutoSelection(cfg)) {
@@ -614,7 +614,7 @@ export function resolveTtsProviderOrder(primary: TtsProvider, cfg?: KaijiBotConf
 export function isTtsProviderConfigured(
   config: ResolvedTtsConfig,
   provider: TtsProvider,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): boolean {
   const resolvedProvider = getSpeechProvider(provider, cfg);
   if (!resolvedProvider) {
@@ -674,7 +674,7 @@ type TtsProviderReadyResolution =
 
 function resolveReadySpeechProvider(params: {
   provider: TtsProvider;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   config: ResolvedTtsConfig;
   requireTelephony?: boolean;
 }): TtsProviderReadyResolution {
@@ -720,7 +720,7 @@ function resolveReadySpeechProvider(params: {
 
 function resolveTtsRequestSetup(params: {
   text: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prefsPath?: string;
   providerOverride?: TtsProvider;
   disableFallback?: boolean;
@@ -751,7 +751,7 @@ function resolveTtsRequestSetup(params: {
 
 export async function textToSpeech(params: {
   text: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -767,7 +767,7 @@ export async function textToSpeech(params: {
     };
   }
 
-  const tempRoot = resolvePreferredKaijiBotTmpDir();
+  const tempRoot = resolvePreferredAllBotTmpDir();
   mkdirSync(tempRoot, { recursive: true, mode: 0o700 });
   const tempDir = mkdtempSync(path.join(tempRoot, "tts-"));
   const audioPath = path.join(tempDir, `voice-${Date.now()}${synthesis.fileExtension}`);
@@ -789,7 +789,7 @@ export async function textToSpeech(params: {
 
 export async function synthesizeSpeech(params: {
   text: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prefsPath?: string;
   channel?: string;
   overrides?: TtsDirectiveOverrides;
@@ -894,7 +894,7 @@ export async function synthesizeSpeech(params: {
 
 export async function textToSpeechTelephony(params: {
   text: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prefsPath?: string;
 }): Promise<TtsTelephonyResult> {
   const setup = resolveTtsRequestSetup({
@@ -993,7 +993,7 @@ export async function textToSpeechTelephony(params: {
 
 export async function listSpeechVoices(params: {
   provider: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   config?: ResolvedTtsConfig;
   apiKey?: string;
   baseUrl?: string;
@@ -1023,7 +1023,7 @@ export async function listSpeechVoices(params: {
 
 export async function maybeApplyTtsToPayload(params: {
   payload: ReplyPayload;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
   kind?: "tool" | "block" | "final";
   inboundAudio?: boolean;

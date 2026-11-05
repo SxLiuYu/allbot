@@ -11,7 +11,7 @@ describe("security audit config symlink findings", () => {
   let caseId = 0;
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-security-audit-config-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-security-audit-config-"));
   });
 
   afterAll(async () => {
@@ -36,11 +36,11 @@ describe("security audit config symlink findings", () => {
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(stateDir, { recursive: true, mode: 0o700 });
 
-    const targetConfigPath = path.join(tmp, "managed-kaijibot.json");
+    const targetConfigPath = path.join(tmp, "managed-allbot.json");
     await fs.writeFile(targetConfigPath, "{}\n", "utf-8");
     await fs.chmod(targetConfigPath, 0o444);
 
-    const configPath = path.join(stateDir, "kaijibot.json");
+    const configPath = path.join(stateDir, "allbot.json");
     await fs.symlink(targetConfigPath, configPath);
 
     const findings = await collectFilesystemFindings({

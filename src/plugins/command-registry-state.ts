@@ -1,9 +1,9 @@
 import { getChannelPlugin } from "../channels/plugins/index.js";
 import { resolveGlobalSingleton } from "../shared/global-singleton.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
-import type { KaijiBotPluginCommandDefinition } from "./types.js";
+import type { AllBotPluginCommandDefinition } from "./types.js";
 
-export type RegisteredPluginCommand = KaijiBotPluginCommandDefinition & {
+export type RegisteredPluginCommand = AllBotPluginCommandDefinition & {
   pluginId: string;
   pluginName?: string;
   pluginRoot?: string;
@@ -14,7 +14,7 @@ type PluginCommandState = {
   registryLocked: boolean;
 };
 
-const PLUGIN_COMMAND_STATE_KEY = Symbol.for("kaijibot.pluginCommandsState");
+const PLUGIN_COMMAND_STATE_KEY = Symbol.for("allbot.pluginCommandsState");
 
 const getState = () =>
   resolveGlobalSingleton<PluginCommandState>(PLUGIN_COMMAND_STATE_KEY, () => ({
@@ -52,7 +52,7 @@ export function clearPluginCommandsForPlugin(pluginId: string): void {
 }
 
 function resolvePluginNativeName(
-  command: KaijiBotPluginCommandDefinition,
+  command: AllBotPluginCommandDefinition,
   provider?: string,
 ): string {
   const providerName = normalizeOptionalLowercaseString(provider);

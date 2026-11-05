@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { installedPluginRoot } from "../../test/helpers/bundled-plugin-paths.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   applyExclusiveSlotSelection,
   buildPluginDiagnosticsReport,
@@ -27,13 +27,13 @@ import {
   writeConfigFile,
 } from "./plugins-cli-test-helpers.js";
 
-const CLI_STATE_ROOT = "/tmp/kaijibot-state";
+const CLI_STATE_ROOT = "/tmp/allbot-state";
 
 function cliInstallPath(pluginId: string): string {
   return installedPluginRoot(CLI_STATE_ROOT, pluginId);
 }
 
-function createEnabledPluginConfig(pluginId: string): KaijiBotConfig {
+function createEnabledPluginConfig(pluginId: string): AllBotConfig {
   return {
     plugins: {
       entries: {
@@ -42,21 +42,21 @@ function createEnabledPluginConfig(pluginId: string): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
-function createEmptyPluginConfig(): KaijiBotConfig {
+function createEmptyPluginConfig(): AllBotConfig {
   return {
     plugins: {
       entries: {},
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createClawHubInstalledConfig(params: {
   pluginId: string;
   install: Record<string, unknown>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const enabledCfg = createEnabledPluginConfig(params.pluginId);
   return {
     ...enabledCfg,
@@ -66,7 +66,7 @@ function createClawHubInstalledConfig(params: {
         [params.pluginId]: params.install,
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createClawHubInstallResult(params: {
@@ -135,7 +135,7 @@ function primeNpmPluginFallback(pluginId = "demo") {
   return { cfg, enabledCfg };
 }
 
-function createPathHookPackInstalledConfig(tmpRoot: string): KaijiBotConfig {
+function createPathHookPackInstalledConfig(tmpRoot: string): AllBotConfig {
   return {
     hooks: {
       internal: {
@@ -148,10 +148,10 @@ function createPathHookPackInstalledConfig(tmpRoot: string): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
-function createNpmHookPackInstalledConfig(): KaijiBotConfig {
+function createNpmHookPackInstalledConfig(): AllBotConfig {
   return {
     hooks: {
       internal: {
@@ -163,7 +163,7 @@ function createNpmHookPackInstalledConfig(): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createHookPackInstallResult(targetDir: string): {
@@ -183,14 +183,14 @@ function createHookPackInstallResult(targetDir: string): {
 }
 
 function primeHookPackNpmFallback() {
-  const cfg = {} as KaijiBotConfig;
+  const cfg = {} as AllBotConfig;
   const installedCfg = createNpmHookPackInstalledConfig();
 
   loadConfig.mockReturnValue(cfg);
   mockClawHubPackageNotFound("@acme/demo-hooks");
   installPluginFromNpmSpec.mockResolvedValue({
     ok: false,
-    error: "package.json missing kaijibot.plugin.json",
+    error: "package.json missing allbot.plugin.json",
   });
   installHooksFromNpmSpec.mockResolvedValue({
     ...createHookPackInstallResult("/tmp/hooks/demo-hooks"),
@@ -208,10 +208,10 @@ function primeHookPackNpmFallback() {
 function primeHookPackPathFallback(params: {
   tmpRoot: string;
   pluginInstallError: string;
-}): KaijiBotConfig {
+}): AllBotConfig {
   const installedCfg = createPathHookPackInstalledConfig(params.tmpRoot);
 
-  loadConfig.mockReturnValue({} as KaijiBotConfig);
+  loadConfig.mockReturnValue({} as AllBotConfig);
   installPluginFromPath.mockResolvedValueOnce({
     ok: false,
     error: params.pluginInstallError,
@@ -282,7 +282,7 @@ describe("plugins cli install", () => {
       throw invalidConfigErr;
     });
     readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/kaijibot-config.json5",
+      path: "/tmp/allbot-config.json5",
       exists: true,
       raw: '{ "models": { "default": 123 } }',
       parsed: { models: { default: 123 } },
@@ -298,7 +298,7 @@ describe("plugins cli install", () => {
     await expect(runPluginsCommand(["plugins", "install", "alpha"])).rejects.toThrow("__exit__:1");
 
     expect(runtimeErrors.at(-1)).toContain(
-      "Config invalid; run `kaijibot doctor --fix` before installing plugins.",
+      "Config invalid; run `allbot doctor --fix` before installing plugins.",
     );
     expect(installPluginFromMarketplace).not.toHaveBeenCalled();
     expect(installPluginFromNpmSpec).not.toHaveBeenCalled();
@@ -310,7 +310,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const enabledCfg = {
       plugins: {
         entries: {
@@ -319,7 +319,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const installedCfg = {
       ...enabledCfg,
       plugins: {
@@ -331,7 +331,7 @@ describe("plugins cli install", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     loadConfig.mockReturnValue(cfg);
     installPluginFromMarketplace.mockResolvedValue({
@@ -382,7 +382,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const enabledCfg = createEnabledPluginConfig("demo");
     const installedCfg = createClawHubInstalledConfig({
       pluginId: "demo",
@@ -441,7 +441,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const enabledCfg = createEnabledPluginConfig("demo");
 
     loadConfig.mockReturnValue(cfg);
@@ -476,7 +476,7 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const enabledCfg = createEnabledPluginConfig("demo");
     const installedCfg = createClawHubInstalledConfig({
       pluginId: "demo",
@@ -571,9 +571,9 @@ describe("plugins cli install", () => {
       plugins: {
         entries: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const enabledCfg = createEnabledPluginConfig("demo");
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-plugin-link-"));
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-plugin-link-"));
 
     loadConfig.mockReturnValue(cfg);
     installPluginFromPath.mockResolvedValueOnce({
@@ -612,7 +612,7 @@ describe("plugins cli install", () => {
   });
 
   it("passes dangerous force unsafe install to linked hook-pack probe fallback", async () => {
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-hook-link-"));
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-hook-link-"));
     primeHookPackPathFallback({
       tmpRoot,
       pluginInstallError: "plugin install probe failed",
@@ -640,7 +640,7 @@ describe("plugins cli install", () => {
   });
 
   it("passes dangerous force unsafe install to local hook-pack fallback installs", async () => {
-    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-hook-install-"));
+    const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-hook-install-"));
     primeHookPackPathFallback({
       tmpRoot,
       pluginInstallError: "plugin install failed",
@@ -681,14 +681,14 @@ describe("plugins cli install", () => {
   it("does not fall back to npm when ClawHub rejects a real package", async () => {
     installPluginFromClawHub.mockResolvedValue({
       ok: false,
-      error: 'Use "kaijibot skills install demo" instead.',
+      error: 'Use "allbot skills install demo" instead.',
       code: "skill_package",
     });
 
     await expect(runPluginsCommand(["plugins", "install", "demo"])).rejects.toThrow("__exit__:1");
 
     expect(installPluginFromNpmSpec).not.toHaveBeenCalled();
-    expect(runtimeErrors.at(-1)).toContain('Use "kaijibot skills install demo" instead.');
+    expect(runtimeErrors.at(-1)).toContain('Use "allbot skills install demo" instead.');
   });
 
   it("falls back to installing hook packs from npm specs", async () => {

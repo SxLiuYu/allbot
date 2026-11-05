@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { handlePluginCommand } from "./commands-plugin.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 
@@ -13,7 +13,7 @@ vi.mock("../../plugins/commands.js", () => ({
 
 function buildPluginParams(
   commandBodyNormalized: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): HandleCommandsParams {
   return {
     cfg,
@@ -57,7 +57,7 @@ describe("handlePluginCommand", () => {
       buildPluginParams("/card", {
         commands: { text: true },
         channels: { whatsapp: { allowFrom: ["*"] } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
       true,
     );
 

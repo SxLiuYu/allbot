@@ -97,9 +97,9 @@ describe("runCronIsolatedAgentTurn — LiveSessionModelSwitchError retry (#57206
 
   afterEach(() => {
     if (previousFastTestEnv !== undefined) {
-      process.env.KAIJIBOT_TEST_FAST = previousFastTestEnv;
+      process.env.ALLBOT_TEST_FAST = previousFastTestEnv;
     } else {
-      delete process.env.KAIJIBOT_TEST_FAST;
+      delete process.env.ALLBOT_TEST_FAST;
     }
   });
 

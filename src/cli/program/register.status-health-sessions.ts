@@ -65,15 +65,15 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.statusHealth.examples"))}\n${formatHelpExamples([
-          ["kaijibot status", "Show channel health + session summary."],
-          ["kaijibot status --all", "Full diagnosis (read-only)."],
-          ["kaijibot status --json", "Machine-readable output."],
-          ["kaijibot status --usage", "Show model provider usage/quota snapshots."],
+          ["allbot status", "Show channel health + session summary."],
+          ["allbot status --all", "Full diagnosis (read-only)."],
+          ["allbot status --json", "Machine-readable output."],
+          ["allbot status --usage", "Show model provider usage/quota snapshots."],
           [
-            "kaijibot status --deep",
+            "allbot status --deep",
             "Run channel probes (WA + Telegram + Discord + Slack + Signal).",
           ],
-          ["kaijibot status --deep --timeout 5000", "Tighten probe timeout."],
+          ["allbot status --deep --timeout 5000", "Tighten probe timeout."],
         ])}`,
     )
     .addHelpText(
@@ -135,12 +135,12 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.statusHealth.examples"))}\n${formatHelpExamples([
-          ["kaijibot sessions", "List all sessions."],
-          ["kaijibot sessions --agent work", "List sessions for one agent."],
-          ["kaijibot sessions --all-agents", "Aggregate sessions across agents."],
-          ["kaijibot sessions --active 120", "Only last 2 hours."],
-          ["kaijibot sessions --json", "Machine-readable output."],
-          ["kaijibot sessions --store ./tmp/sessions.json", "Use a specific session store."],
+          ["allbot sessions", "List all sessions."],
+          ["allbot sessions --agent work", "List sessions for one agent."],
+          ["allbot sessions --all-agents", "Aggregate sessions across agents."],
+          ["allbot sessions --active 120", "Only last 2 hours."],
+          ["allbot sessions --json", "Machine-readable output."],
+          ["allbot sessions --store ./tmp/sessions.json", "Use a specific session store."],
         ])}\n\n${theme.muted(t("cli.statusHealth.sessionsHint"))}`,
     )
     .addHelpText(
@@ -182,16 +182,16 @@ export function registerStatusHealthSessionsCommands(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.statusHealth.examples"))}\n${formatHelpExamples([
-          ["kaijibot sessions cleanup --dry-run", "Preview stale/cap cleanup."],
+          ["allbot sessions cleanup --dry-run", "Preview stale/cap cleanup."],
           [
-            "kaijibot sessions cleanup --dry-run --fix-missing",
+            "allbot sessions cleanup --dry-run --fix-missing",
             "Also preview pruning entries with missing transcript files.",
           ],
-          ["kaijibot sessions cleanup --enforce", "Apply maintenance now."],
-          ["kaijibot sessions cleanup --agent work --dry-run", "Preview one agent store."],
-          ["kaijibot sessions cleanup --all-agents --dry-run", "Preview all agent stores."],
+          ["allbot sessions cleanup --enforce", "Apply maintenance now."],
+          ["allbot sessions cleanup --agent work --dry-run", "Preview one agent store."],
+          ["allbot sessions cleanup --all-agents --dry-run", "Preview all agent stores."],
           [
-            "kaijibot sessions cleanup --enforce --store ./tmp/sessions.json",
+            "allbot sessions cleanup --enforce --store ./tmp/sessions.json",
             "Use a specific store.",
           ],
         ])}`,

@@ -29,16 +29,16 @@ type NodeListNode = NonNullable<NodeListPayload["nodes"]>[number];
 
 const { get: getArg, has: hasFlag } = createArgReader();
 
-const urlRaw = getArg("--url") ?? process.env.KAIJIBOT_GATEWAY_URL;
-const token = getArg("--token") ?? process.env.KAIJIBOT_GATEWAY_TOKEN;
+const urlRaw = getArg("--url") ?? process.env.ALLBOT_GATEWAY_URL;
+const token = getArg("--token") ?? process.env.ALLBOT_GATEWAY_TOKEN;
 const nodeHint = getArg("--node");
-const dangerous = hasFlag("--dangerous") || process.env.KAIJIBOT_RUN_DANGEROUS === "1";
+const dangerous = hasFlag("--dangerous") || process.env.ALLBOT_RUN_DANGEROUS === "1";
 const jsonOut = hasFlag("--json");
 
 if (!urlRaw || !token) {
   writeStderrLine(
     "Usage: bun scripts/dev/ios-node-e2e.ts --url <wss://host[:port]> --token <gateway.auth.token> [--node <id|name-substring>] [--dangerous] [--json]\n" +
-      "Or set env: KAIJIBOT_GATEWAY_URL / KAIJIBOT_GATEWAY_TOKEN",
+      "Or set env: ALLBOT_GATEWAY_URL / ALLBOT_GATEWAY_TOKEN",
   );
   process.exit(1);
 }
@@ -101,11 +101,11 @@ async function main() {
     maxProtocol: 3,
     client: {
       id: "cli",
-      displayName: "kaijibot ios node e2e",
+      displayName: "allbot ios node e2e",
       version: "dev",
       platform: "dev",
       mode: "cli",
-      instanceId: "kaijibot-dev-ios-node-e2e",
+      instanceId: "allbot-dev-ios-node-e2e",
     },
     locale: "en-US",
     userAgent: "ios-node-e2e",
@@ -161,7 +161,7 @@ async function main() {
     {
       id: "system.notify",
       command: "system.notify",
-      params: { title: "KaijiBot E2E", body: `ios-node-e2e @ ${isoNow()}`, delivery: "system" },
+      params: { title: "AllBot E2E", body: `ios-node-e2e @ ${isoNow()}`, delivery: "system" },
     },
     {
       id: "contacts.search",

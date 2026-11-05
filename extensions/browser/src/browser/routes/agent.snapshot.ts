@@ -40,7 +40,7 @@ import {
 import type { BrowserResponse, BrowserRouteRegistrar } from "./types.js";
 import { jsonError, toBoolean, toStringOrEmpty } from "./utils.js";
 
-const CHROME_MCP_OVERLAY_ATTR = "data-kaijibot-mcp-overlay";
+const CHROME_MCP_OVERLAY_ATTR = "data-allbot-mcp-overlay";
 
 async function clearChromeMcpOverlay(params: {
   profileName: string;

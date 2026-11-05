@@ -6,7 +6,7 @@ import {
 } from "./exec-approvals-test-helpers.js";
 import { analyzeShellCommand, resolveCommandResolutionFromArgv } from "./exec-approvals.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("exec approvals shell parser parity fixture", () => {
   const fixtures = process.env.CI ? [] : loadShellParserParityFixtureCases();
 

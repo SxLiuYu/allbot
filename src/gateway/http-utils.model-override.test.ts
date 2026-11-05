@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const loadConfigMock = vi.fn();
 const loadGatewayModelCatalogMock = vi.fn();
@@ -30,7 +30,7 @@ describe("resolveOpenAiCompatModelOverride", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig);
+    } satisfies AllBotConfig);
     loadGatewayModelCatalogMock
       .mockReset()
       .mockResolvedValue([{ id: "gpt-5.4", name: "GPT 5.4", provider: "openai" }]);
@@ -39,9 +39,9 @@ describe("resolveOpenAiCompatModelOverride", () => {
   it("rejects CLI model overrides outside the configured allowlist", async () => {
     await expect(
       resolveOpenAiCompatModelOverride({
-        req: createReq({ "x-kaijibot-model": "claude-cli/opus" }),
+        req: createReq({ "x-allbot-model": "claude-cli/opus" }),
         agentId: "main",
-        model: "kaijibot",
+        model: "allbot",
       }),
     ).resolves.toEqual({
       errorMessage: "Model 'claude-cli/opus' is not allowed for agent 'main'.",

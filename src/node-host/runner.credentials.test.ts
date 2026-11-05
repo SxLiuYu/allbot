@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { resolveNodeHostGatewayCredentials } from "./runner.js";
 
-function createRemoteGatewayTokenRefConfig(tokenId: string): KaijiBotConfig {
+function createRemoteGatewayTokenRefConfig(tokenId: string): AllBotConfig {
   return {
     secrets: {
       providers: {
@@ -16,11 +16,11 @@ function createRemoteGatewayTokenRefConfig(tokenId: string): KaijiBotConfig {
         token: { source: "env", provider: "default", id: tokenId },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 async function expectNoGatewayCredentials(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   env: Record<string, string | undefined>,
 ) {
   await withEnvAsync(env, async () => {
@@ -37,11 +37,11 @@ describe("resolveNodeHostGatewayCredentials", () => {
         mode: "local",
         remote: { token: "remote-only-token" },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await expectNoGatewayCredentials(config, {
-      KAIJIBOT_GATEWAY_TOKEN: undefined,
-      KAIJIBOT_GATEWAY_PASSWORD: undefined,
+      ALLBOT_GATEWAY_TOKEN: undefined,
+      ALLBOT_GATEWAY_PASSWORD: undefined,
     });
   });
 
@@ -58,11 +58,11 @@ describe("resolveNodeHostGatewayCredentials", () => {
           token: { source: "env", provider: "default", id: "MISSING_REMOTE_GATEWAY_TOKEN" },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await expectNoGatewayCredentials(config, {
-      KAIJIBOT_GATEWAY_TOKEN: undefined,
-      KAIJIBOT_GATEWAY_PASSWORD: undefined,
+      ALLBOT_GATEWAY_TOKEN: undefined,
+      ALLBOT_GATEWAY_PASSWORD: undefined,
       MISSING_REMOTE_GATEWAY_TOKEN: undefined,
     });
   });
@@ -72,8 +72,8 @@ describe("resolveNodeHostGatewayCredentials", () => {
 
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
-        KAIJIBOT_GATEWAY_PASSWORD: undefined,
+        ALLBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_PASSWORD: undefined,
         REMOTE_GATEWAY_TOKEN: "token-from-ref",
       },
       async () => {
@@ -83,13 +83,13 @@ describe("resolveNodeHostGatewayCredentials", () => {
     );
   });
 
-  it("prefers KAIJIBOT_GATEWAY_TOKEN over configured refs", async () => {
+  it("prefers ALLBOT_GATEWAY_TOKEN over configured refs", async () => {
     const config = createRemoteGatewayTokenRefConfig("REMOTE_GATEWAY_TOKEN");
 
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: "token-from-env",
-        KAIJIBOT_GATEWAY_PASSWORD: undefined,
+        ALLBOT_GATEWAY_TOKEN: "token-from-env",
+        ALLBOT_GATEWAY_PASSWORD: undefined,
         REMOTE_GATEWAY_TOKEN: "token-from-ref",
       },
       async () => {
@@ -104,8 +104,8 @@ describe("resolveNodeHostGatewayCredentials", () => {
 
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
-        KAIJIBOT_GATEWAY_PASSWORD: undefined,
+        ALLBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_PASSWORD: undefined,
         MISSING_REMOTE_GATEWAY_TOKEN: undefined,
       },
       async () => {
@@ -130,12 +130,12 @@ describe("resolveNodeHostGatewayCredentials", () => {
           password: { source: "env", provider: "default", id: "MISSING_REMOTE_GATEWAY_PASSWORD" },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await withEnvAsync(
       {
-        KAIJIBOT_GATEWAY_TOKEN: undefined,
-        KAIJIBOT_GATEWAY_PASSWORD: undefined,
+        ALLBOT_GATEWAY_TOKEN: undefined,
+        ALLBOT_GATEWAY_PASSWORD: undefined,
         REMOTE_GATEWAY_TOKEN: "token-from-ref",
         MISSING_REMOTE_GATEWAY_PASSWORD: undefined,
       },

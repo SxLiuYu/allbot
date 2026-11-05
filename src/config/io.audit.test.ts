@@ -13,7 +13,7 @@ import {
 function createRenameAuditRecord(home: string) {
   return finalizeConfigWriteAuditRecord({
     base: createConfigWriteAuditRecordBase({
-      configPath: path.join(home, ".kaijibot", "kaijibot.json"),
+      configPath: path.join(home, ".allbot", "allbot.json"),
       env: {} as NodeJS.ProcessEnv,
       existsBefore: true,
       previousHash: "prev-hash",
@@ -49,7 +49,7 @@ function createRenameAuditRecord(home: string) {
 }
 
 function readAuditLog(home: string): unknown[] {
-  const auditPath = path.join(home, ".kaijibot", "logs", "config-audit.jsonl");
+  const auditPath = path.join(home, ".allbot", "logs", "config-audit.jsonl");
   return fs
     .readFileSync(auditPath, "utf-8")
     .trim()
@@ -58,7 +58,7 @@ function readAuditLog(home: string): unknown[] {
 }
 
 describe("config io audit helpers", () => {
-  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-config-audit-" });
+  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-config-audit-" });
 
   beforeAll(async () => {
     await suiteRootTracker.setup();
@@ -74,34 +74,34 @@ describe("config io audit helpers", () => {
       {
         HOME: "undefined",
         USERPROFILE: "null",
-        KAIJIBOT_HOME: "undefined",
+        ALLBOT_HOME: "undefined",
       } as NodeJS.ProcessEnv,
       () => home,
     );
-    expect(auditPath).toBe(path.join(home, ".kaijibot", "logs", "config-audit.jsonl"));
+    expect(auditPath).toBe(path.join(home, ".allbot", "logs", "config-audit.jsonl"));
     expect(auditPath.startsWith(path.resolve("undefined"))).toBe(false);
   });
 
   it("formats overwrite warnings with hash transition and backup path", () => {
     expect(
       formatConfigOverwriteLogMessage({
-        configPath: "/tmp/kaijibot.json",
+        configPath: "/tmp/allbot.json",
         previousHash: "prev-hash",
         nextHash: "next-hash",
         changedPathCount: 3,
       }),
     ).toBe(
-      "Config overwrite: /tmp/kaijibot.json (sha256 prev-hash -> next-hash, backup=/tmp/kaijibot.json.bak, changedPaths=3)",
+      "Config overwrite: /tmp/allbot.json (sha256 prev-hash -> next-hash, backup=/tmp/allbot.json.bak, changedPaths=3)",
     );
   });
 
   it("captures watch markers and next stat metadata for successful writes", () => {
     const base = createConfigWriteAuditRecordBase({
-      configPath: "/tmp/kaijibot.json",
+      configPath: "/tmp/allbot.json",
       env: {
-        KAIJIBOT_WATCH_MODE: "1",
-        KAIJIBOT_WATCH_SESSION: "watch-session-1",
-        KAIJIBOT_WATCH_COMMAND: "gateway --force",
+        ALLBOT_WATCH_MODE: "1",
+        ALLBOT_WATCH_SESSION: "watch-session-1",
+        ALLBOT_WATCH_COMMAND: "gateway --force",
       } as NodeJS.ProcessEnv,
       existsBefore: true,
       previousHash: "prev-hash",
@@ -127,7 +127,7 @@ describe("config io audit helpers", () => {
         pid: 101,
         ppid: 99,
         cwd: "/work",
-        argv: ["node", "kaijibot"],
+        argv: ["node", "allbot"],
         execArgv: ["--loader"],
       },
     });
@@ -156,7 +156,7 @@ describe("config io audit helpers", () => {
 
   it("drops next-file metadata and preserves error details for failed writes", () => {
     const base = createConfigWriteAuditRecordBase({
-      configPath: "/tmp/kaijibot.json",
+      configPath: "/tmp/allbot.json",
       env: {} as NodeJS.ProcessEnv,
       existsBefore: true,
       previousHash: "prev-hash",

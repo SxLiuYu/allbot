@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
 
@@ -18,7 +18,7 @@ export const EvolutionPatchSchema = Type.Object({
 });
 
 export function createEvolutionPatchTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
 }): AnyAgentTool | null {
   if (deps.config?.cognitive?.enabled === false) {

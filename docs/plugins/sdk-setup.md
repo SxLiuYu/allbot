@@ -5,13 +5,13 @@ summary: "Setup wizards, setup-entry.ts, config schemas, and package.json metada
 read_when:
   - You are adding a setup wizard to a plugin
   - You need to understand setup-entry.ts vs index.ts
-  - You are defining plugin config schemas or package.json kaijibot metadata
+  - You are defining plugin config schemas or package.json allbot metadata
 ---
 
 # Plugin Setup and Config
 
 Reference for plugin packaging (`package.json` metadata), manifests
-(`kaijibot.plugin.json`), setup entries, and config schemas.
+(`allbot.plugin.json`), setup entries, and config schemas.
 
 <Tip>
   **Looking for a walkthrough?** The how-to guides cover packaging in context:
@@ -21,17 +21,17 @@ Reference for plugin packaging (`package.json` metadata), manifests
 
 ## Package metadata
 
-Your `package.json` needs an `kaijibot` field that tells the plugin system what
+Your `package.json` needs an `allbot` field that tells the plugin system what
 your plugin provides:
 
 **Channel plugin:**
 
 ```json
 {
-  "name": "@myorg/kaijibot-my-channel",
+  "name": "@myorg/allbot-my-channel",
   "version": "1.0.0",
   "type": "module",
-  "kaijibot": {
+  "allbot": {
     "extensions": ["./index.ts"],
     "setupEntry": "./setup-entry.ts",
     "channel": {
@@ -45,19 +45,19 @@ your plugin provides:
 
 **Provider plugin / ClawHub publish baseline:**
 
-```json kaijibot-clawhub-package.json
+```json allbot-clawhub-package.json
 {
-  "name": "@myorg/kaijibot-my-plugin",
+  "name": "@myorg/allbot-my-plugin",
   "version": "1.0.0",
   "type": "module",
-  "kaijibot": {
+  "allbot": {
     "extensions": ["./index.ts"],
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
       "minGatewayVersion": "2026.3.24-beta.2"
     },
     "build": {
-      "kaijibotVersion": "2026.3.24-beta.2",
+      "allbotVersion": "2026.3.24-beta.2",
       "pluginSdkVersion": "2026.3.24-beta.2"
     }
   }
@@ -68,7 +68,7 @@ If you publish the plugin externally on ClawHub, those `compat` and `build`
 fields are required. The canonical publish snippets live in
 `docs/snippets/plugin-publish/`.
 
-### `kaijibot` fields
+### `allbot` fields
 
 | Field        | Type       | Description                                                                                            |
 | ------------ | ---------- | ------------------------------------------------------------------------------------------------------ |
@@ -79,9 +79,9 @@ fields are required. The canonical publish snippets live in
 | `install`    | `object`   | Install hints: `npmSpec`, `localPath`, `defaultChoice`, `minHostVersion`, `allowInvalidConfigRecovery` |
 | `startup`    | `object`   | Startup behavior flags                                                                                 |
 
-### `kaijibot.channel`
+### `allbot.channel`
 
-`kaijibot.channel` is cheap package metadata for channel discovery and setup
+`allbot.channel` is cheap package metadata for channel discovery and setup
 surfaces before runtime loads.
 
 | Field                                  | Type       | What it means                                                                 |
@@ -110,7 +110,7 @@ Example:
 
 ```json
 {
-  "kaijibot": {
+  "allbot": {
     "channel": {
       "id": "my-channel",
       "label": "My Channel",
@@ -145,16 +145,16 @@ Example:
 `showConfigured` and `showInSetup` remain supported as legacy aliases. Prefer
 `exposure`.
 
-### `kaijibot.install`
+### `allbot.install`
 
-`kaijibot.install` is package metadata, not manifest metadata.
+`allbot.install` is package metadata, not manifest metadata.
 
 | Field                        | Type                 | What it means                                                                    |
 | ---------------------------- | -------------------- | -------------------------------------------------------------------------------- |
 | `npmSpec`                    | `string`             | Canonical npm spec for install/update flows.                                     |
 | `localPath`                  | `string`             | Local development or bundled install path.                                       |
 | `defaultChoice`              | `"npm"` \| `"local"` | Preferred install source when both are available.                                |
-| `minHostVersion`             | `string`             | Minimum supported KaijiBot version in the form `>=x.y.z`.                        |
+| `minHostVersion`             | `string`             | Minimum supported AllBot version in the form `>=x.y.z`.                        |
 | `allowInvalidConfigRecovery` | `boolean`            | Lets bundled-plugin reinstall flows recover from specific stale-config failures. |
 
 If `minHostVersion` is set, install and manifest-registry loading both enforce
@@ -164,7 +164,7 @@ it. Older hosts skip the plugin; invalid version strings are rejected.
 for narrow bundled-plugin recovery only, so reinstall/setup can repair known
 upgrade leftovers like a missing bundled plugin path or stale `channels.<id>`
 entry for that same plugin. If config is broken for unrelated reasons, install
-still fails closed and tells the operator to run `kaijibot doctor --fix`.
+still fails closed and tells the operator to run `allbot doctor --fix`.
 
 ### Deferred full load
 
@@ -172,7 +172,7 @@ Channel plugins can opt into deferred loading with:
 
 ```json
 {
-  "kaijibot": {
+  "allbot": {
     "extensions": ["./index.ts"],
     "setupEntry": "./setup-entry.ts",
     "startup": {
@@ -182,7 +182,7 @@ Channel plugins can opt into deferred loading with:
 }
 ```
 
-When enabled, KaijiBot loads only `setupEntry` during the pre-listen startup
+When enabled, AllBot loads only `setupEntry` during the pre-listen startup
 phase, even for already-configured channels. The full entry loads after the
 gateway starts listening.
 
@@ -200,14 +200,14 @@ to `operator.admin`.
 
 ## Plugin manifest
 
-Every native plugin must ship an `kaijibot.plugin.json` in the package root.
-KaijiBot uses this to validate config without executing plugin code.
+Every native plugin must ship an `allbot.plugin.json` in the package root.
+AllBot uses this to validate config without executing plugin code.
 
 ```json
 {
   "id": "my-plugin",
   "name": "My Plugin",
-  "description": "Adds My Plugin capabilities to KaijiBot",
+  "description": "Adds My Plugin capabilities to AllBot",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -265,12 +265,12 @@ always use `clawhub package publish`.
 ## Setup entry
 
 The `setup-entry.ts` file is a lightweight alternative to `index.ts` that
-KaijiBot loads when it only needs setup surfaces (onboarding, config repair,
+AllBot loads when it only needs setup surfaces (onboarding, config repair,
 disabled channel inspection).
 
 ```typescript
 // setup-entry.ts
-import { defineSetupPluginEntry } from "kaijibot/plugin-sdk/channel-core";
+import { defineSetupPluginEntry } from "allbot/plugin-sdk/channel-core";
 import { myChannelPlugin } from "./src/channel.js";
 
 export default defineSetupPluginEntry(myChannelPlugin);
@@ -279,7 +279,7 @@ export default defineSetupPluginEntry(myChannelPlugin);
 This avoids loading heavy runtime code (crypto libraries, CLI registrations,
 background services) during setup flows.
 
-**When KaijiBot uses `setupEntry` instead of the full entry:**
+**When AllBot uses `setupEntry` instead of the full entry:**
 
 - The channel is disabled but needs setup/onboarding surfaces
 - The channel is enabled but unconfigured
@@ -379,12 +379,12 @@ For channel-specific config, use the channel config section instead:
 
 ### Building channel config schemas
 
-Use `buildChannelConfigSchema` from `kaijibot/plugin-sdk/core` to convert a
-Zod schema into the `ChannelConfigSchema` wrapper that KaijiBot validates:
+Use `buildChannelConfigSchema` from `allbot/plugin-sdk/core` to convert a
+Zod schema into the `ChannelConfigSchema` wrapper that AllBot validates:
 
 ```typescript
 import { z } from "zod";
-import { buildChannelConfigSchema } from "kaijibot/plugin-sdk/core";
+import { buildChannelConfigSchema } from "allbot/plugin-sdk/core";
 
 const accountSchema = z.object({
   token: z.string().optional(),
@@ -398,11 +398,11 @@ const configSchema = buildChannelConfigSchema(accountSchema);
 
 ## Setup wizards
 
-Channel plugins can provide interactive setup wizards for `kaijibot onboard`.
+Channel plugins can provide interactive setup wizards for `allbot onboard`.
 The wizard is a `ChannelSetupWizard` object on the `ChannelPlugin`:
 
 ```typescript
-import type { ChannelSetupWizard } from "kaijibot/plugin-sdk/channel-setup";
+import type { ChannelSetupWizard } from "allbot/plugin-sdk/channel-setup";
 
 const setupWizard: ChannelSetupWizard = {
   channel: "my-channel",
@@ -439,25 +439,25 @@ full examples.
 
 For DM allowlist prompts that only need the standard
 `note -> prompt -> parse -> merge -> patch` flow, prefer the shared setup
-helpers from `kaijibot/plugin-sdk/setup`: `createPromptParsedAllowFromForAccount(...)`,
+helpers from `allbot/plugin-sdk/setup`: `createPromptParsedAllowFromForAccount(...)`,
 `createTopLevelChannelParsedAllowFromPrompt(...)`, and
 `createNestedChannelParsedAllowFromPrompt(...)`.
 
 For channel setup status blocks that only vary by labels, scores, and optional
 extra lines, prefer `createStandardChannelSetupStatus(...)` from
-`kaijibot/plugin-sdk/setup` instead of hand-rolling the same `status` object in
+`allbot/plugin-sdk/setup` instead of hand-rolling the same `status` object in
 each plugin.
 
 For optional setup surfaces that should only appear in certain contexts, use
-`createOptionalChannelSetupSurface` from `kaijibot/plugin-sdk/channel-setup`:
+`createOptionalChannelSetupSurface` from `allbot/plugin-sdk/channel-setup`:
 
 ```typescript
-import { createOptionalChannelSetupSurface } from "kaijibot/plugin-sdk/channel-setup";
+import { createOptionalChannelSetupSurface } from "allbot/plugin-sdk/channel-setup";
 
 const setupSurface = createOptionalChannelSetupSurface({
   channel: "my-channel",
   label: "My Channel",
-  npmSpec: "@myorg/kaijibot-my-channel",
+  npmSpec: "@myorg/allbot-my-channel",
   docsPath: "/channels/my-channel",
 });
 // Returns { setupAdapter, setupWizard }
@@ -491,21 +491,21 @@ copying the same binary/status glue into every channel:
 **External plugins:** publish to [ClawHub](/tools/clawhub) or npm, then install:
 
 ```bash
-kaijibot plugins install @myorg/kaijibot-my-plugin
+allbot plugins install @myorg/allbot-my-plugin
 ```
 
-KaijiBot tries ClawHub first and falls back to npm automatically. You can also
+AllBot tries ClawHub first and falls back to npm automatically. You can also
 force ClawHub explicitly:
 
 ```bash
-kaijibot plugins install clawhub:@myorg/kaijibot-my-plugin   # ClawHub only
+allbot plugins install clawhub:@myorg/allbot-my-plugin   # ClawHub only
 ```
 
 There is no matching `npm:` override. Use the normal npm package spec when you
 want the npm path after ClawHub fallback:
 
 ```bash
-kaijibot plugins install @myorg/kaijibot-my-plugin
+allbot plugins install @myorg/allbot-my-plugin
 ```
 
 **In-repo plugins:** place under the bundled plugin workspace tree and they are automatically
@@ -514,11 +514,11 @@ discovered during build.
 **Users can install:**
 
 ```bash
-kaijibot plugins install <package-name>
+allbot plugins install <package-name>
 ```
 
 <Info>
-  For npm-sourced installs, `kaijibot plugins install` runs
+  For npm-sourced installs, `allbot plugins install` runs
   `npm install --ignore-scripts` (no lifecycle scripts). Keep plugin dependency
   trees pure JS/TS and avoid packages that require `postinstall` builds.
 </Info>

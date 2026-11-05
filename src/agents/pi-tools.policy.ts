@@ -4,7 +4,7 @@ import {
   resolveSessionParentSessionKey,
 } from "../channels/plugins/session-conversation.js";
 import { DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH } from "../config/agent-limits.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveChannelGroupToolsPolicy } from "../config/group-policy.js";
 import type { AgentToolsConfig } from "../config/types.tools.js";
 import { normalizeAgentId } from "../routing/session-key.js";
@@ -75,7 +75,7 @@ function resolveSubagentDenyListForRole(role: SubagentSessionRole): string[] {
   return [...SUBAGENT_TOOL_DENY_ALWAYS];
 }
 
-export function resolveSubagentToolPolicy(cfg?: KaijiBotConfig, depth?: number): SandboxToolPolicy {
+export function resolveSubagentToolPolicy(cfg?: AllBotConfig, depth?: number): SandboxToolPolicy {
   const configured = cfg?.tools?.subagents?.tools;
   const maxSpawnDepth =
     cfg?.agents?.defaults?.subagents?.maxSpawnDepth ?? DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH;
@@ -95,7 +95,7 @@ export function resolveSubagentToolPolicy(cfg?: KaijiBotConfig, depth?: number):
 }
 
 export function resolveSubagentToolPolicyForSession(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   sessionKey: string,
 ): SandboxToolPolicy {
   const configured = cfg?.tools?.subagents?.tools;
@@ -212,7 +212,7 @@ function resolveProviderToolPolicy(params: {
   return undefined;
 }
 
-function resolveExplicitProfileAlsoAllow(tools?: KaijiBotConfig["tools"]): string[] | undefined {
+function resolveExplicitProfileAlsoAllow(tools?: AllBotConfig["tools"]): string[] | undefined {
   return Array.isArray(tools?.alsoAllow) ? tools.alsoAllow : undefined;
 }
 
@@ -221,7 +221,7 @@ function hasExplicitToolSection(section: unknown): boolean {
 }
 
 function resolveImplicitProfileAlsoAllow(params: {
-  globalTools?: KaijiBotConfig["tools"];
+  globalTools?: AllBotConfig["tools"];
   agentTools?: AgentToolsConfig;
 }): string[] | undefined {
   const implicit = new Set<string>();
@@ -244,7 +244,7 @@ function resolveImplicitProfileAlsoAllow(params: {
 }
 
 export function resolveEffectiveToolPolicy(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   agentId?: string;
   modelProvider?: string;
@@ -301,7 +301,7 @@ export function resolveEffectiveToolPolicy(params: {
 }
 
 export function resolveGroupToolPolicy(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   spawnedBy?: string | null;
   messageProvider?: string;

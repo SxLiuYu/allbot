@@ -52,7 +52,7 @@ function expectResolvedCommandCase(entry: ContractCase): void {
   expect(result.commandText).toBe(entry.expected.displayCommand);
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("system-run command contract fixtures", () => {
   test.each(fixture.cases)("$name", (entry) => {
     expectResolvedCommandCase(entry);

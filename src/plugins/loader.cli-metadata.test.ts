@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { afterAll, afterEach, describe, expect, it } from "vitest";
-import { loadKaijiBotPluginCliRegistry, loadKaijiBotPlugins } from "./loader.js";
+import { loadAllBotPluginCliRegistry, loadAllBotPlugins } from "./loader.js";
 import {
   cleanupPluginLoaderFixturesForTest,
   EMPTY_PLUGIN_SCHEMA,
@@ -47,8 +47,8 @@ describe("plugin loader CLI metadata", () => {
     });
 
     const warnings: string[] = [];
-    const registry = await loadKaijiBotPluginCliRegistry({
-      env: { ...process.env, KAIJIBOT_STATE_DIR: stateDir },
+    const registry = await loadAllBotPluginCliRegistry({
+      env: { ...process.env, ALLBOT_STATE_DIR: stateDir },
       logger: {
         info: () => {},
         warn: (msg: string) => warnings.push(msg),
@@ -90,7 +90,7 @@ describe("plugin loader CLI metadata", () => {
 };`,
     });
     fs.writeFileSync(
-      path.join(plugin.dir, "kaijibot.plugin.json"),
+      path.join(plugin.dir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "config-cli",
@@ -109,7 +109,7 @@ describe("plugin loader CLI metadata", () => {
       "utf-8",
     );
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           load: { paths: [plugin.file] },
@@ -140,8 +140,8 @@ describe("plugin loader CLI metadata", () => {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@kaijibot/cli-metadata-channel",
-          kaijibot: { extensions: ["./index.cjs"], setupEntry: "./setup-entry.cjs" },
+          name: "@allbot/cli-metadata-channel",
+          allbot: { extensions: ["./index.cjs"], setupEntry: "./setup-entry.cjs" },
         },
         null,
         2,
@@ -149,7 +149,7 @@ describe("plugin loader CLI metadata", () => {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "kaijibot.plugin.json"),
+      path.join(pluginDir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "cli-metadata-channel",
@@ -218,7 +218,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           load: { paths: [pluginDir] },
@@ -241,14 +241,14 @@ module.exports = {
     const fullMarker = path.join(pluginDir, "full-loaded.txt");
 
     fs.mkdirSync(pluginDir, { recursive: true });
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledRoot;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledRoot;
 
     fs.writeFileSync(
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@kaijibot/bundled-skip-channel",
-          kaijibot: { extensions: ["./index.cjs"] },
+          name: "@allbot/bundled-skip-channel",
+          allbot: { extensions: ["./index.cjs"] },
         },
         null,
         2,
@@ -256,7 +256,7 @@ module.exports = {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "kaijibot.plugin.json"),
+      path.join(pluginDir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "bundled-skip-channel",
@@ -280,7 +280,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           allow: ["bundled-skip-channel"],
@@ -309,14 +309,14 @@ module.exports = {
     const cliMarker = path.join(pluginDir, "cli-loaded.txt");
 
     fs.mkdirSync(pluginDir, { recursive: true });
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledRoot;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledRoot;
 
     fs.writeFileSync(
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@kaijibot/bundled-cli-channel",
-          kaijibot: { extensions: ["./index.cjs"] },
+          name: "@allbot/bundled-cli-channel",
+          allbot: { extensions: ["./index.cjs"] },
         },
         null,
         2,
@@ -324,7 +324,7 @@ module.exports = {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "kaijibot.plugin.json"),
+      path.join(pluginDir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "bundled-cli-channel",
@@ -367,7 +367,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           allow: ["bundled-cli-channel"],
@@ -393,14 +393,14 @@ module.exports = {
     const fullMarker = path.join(pluginDir, "full-loaded.txt");
 
     fs.mkdirSync(pluginDir, { recursive: true });
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledRoot;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledRoot;
 
     fs.writeFileSync(
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@kaijibot/bundled-skip-provider",
-          kaijibot: { extensions: ["./index.cjs"] },
+          name: "@allbot/bundled-skip-provider",
+          allbot: { extensions: ["./index.cjs"] },
         },
         null,
         2,
@@ -408,7 +408,7 @@ module.exports = {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "kaijibot.plugin.json"),
+      path.join(pluginDir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "bundled-skip-provider",
@@ -431,7 +431,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           allow: ["bundled-skip-provider"],
@@ -463,8 +463,8 @@ module.exports = {
       path.join(pluginDir, "package.json"),
       JSON.stringify(
         {
-          name: "@kaijibot/full-cli-metadata-channel",
-          kaijibot: { extensions: ["./index.cjs"] },
+          name: "@allbot/full-cli-metadata-channel",
+          allbot: { extensions: ["./index.cjs"] },
         },
         null,
         2,
@@ -472,7 +472,7 @@ module.exports = {
       "utf-8",
     );
     fs.writeFileSync(
-      path.join(pluginDir, "kaijibot.plugin.json"),
+      path.join(pluginDir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "full-cli-metadata-channel",
@@ -532,7 +532,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       cache: false,
       config: {
         plugins: {
@@ -571,7 +571,7 @@ module.exports = {
 };`,
     });
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           load: { paths: [plugin.file] },
@@ -608,7 +608,7 @@ module.exports = {
 };`,
     });
     fs.writeFileSync(
-      path.join(plugin.dir, "kaijibot.plugin.json"),
+      path.join(plugin.dir, "allbot.plugin.json"),
       JSON.stringify(
         {
           id: "memory-external",
@@ -621,7 +621,7 @@ module.exports = {
       "utf-8",
     );
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           load: { paths: [plugin.file] },
@@ -661,7 +661,7 @@ module.exports = {
 };`,
     });
 
-    const registry = await loadKaijiBotPluginCliRegistry({
+    const registry = await loadAllBotPluginCliRegistry({
       config: {
         plugins: {
           load: { paths: [plugin.file] },

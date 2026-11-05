@@ -1,5 +1,5 @@
 [
-  { "source": "KaijiBot", "target": "KaijiBot" },
+  { "source": "AllBot", "target": "AllBot" },
   { "source": "Gateway", "target": "Gateway" },
   { "source": "Pi", "target": "Pi" },
   { "source": "Skills", "target": "Skills" },

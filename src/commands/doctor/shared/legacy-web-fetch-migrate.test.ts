@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import {
   listLegacyWebFetchConfigPaths,
   migrateLegacyWebFetchConfig,
@@ -21,7 +21,7 @@ describe("legacy web fetch config", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(res.config.tools?.web?.fetch).toEqual({
       provider: "firecrawl",
@@ -55,7 +55,7 @@ describe("legacy web fetch config", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(res.config.plugins?.entries?.firecrawl).toEqual({
       enabled: true,

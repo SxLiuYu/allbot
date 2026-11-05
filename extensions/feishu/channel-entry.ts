@@ -1,4 +1,4 @@
-import { defineBundledChannelEntry } from "kaijibot/plugin-sdk/channel-entry-contract";
+import { defineBundledChannelEntry } from "allbot/plugin-sdk/channel-entry-contract";
 
 export default defineBundledChannelEntry({
   id: "feishu",

@@ -12,12 +12,12 @@ import type { DoctorPrompter } from "./doctor-prompter.js";
 const tempDirs: string[] = [];
 
 function makeTempDir() {
-  return makeTrackedTempDir("kaijibot-doctor-plugin-manifests", tempDirs);
+  return makeTrackedTempDir("allbot-doctor-plugin-manifests", tempDirs);
 }
 
 function writeManifest(dir: string, manifest: Record<string, unknown>) {
   fs.writeFileSync(
-    path.join(dir, "kaijibot.plugin.json"),
+    path.join(dir, "allbot.plugin.json"),
     `${JSON.stringify(manifest, null, 2)}\n`,
     "utf-8",
   );
@@ -28,9 +28,9 @@ function writePackageJson(dir: string) {
     path.join(dir, "package.json"),
     `${JSON.stringify(
       {
-        name: "@kaijibot/test-plugin",
+        name: "@allbot/test-plugin",
         version: "1.0.0",
-        kaijibot: {
+        allbot: {
           extensions: ["./index.ts"],
         },
       },
@@ -90,7 +90,7 @@ describe("doctor plugin manifest legacy contract repair", () => {
     const migrations = collectLegacyPluginManifestContractMigrations({
       env: {
         ...process.env,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: pluginsRoot,
+        ALLBOT_BUNDLED_PLUGINS_DIR: pluginsRoot,
       },
     });
 
@@ -119,13 +119,13 @@ describe("doctor plugin manifest legacy contract repair", () => {
     await maybeRepairLegacyPluginManifestContracts({
       env: {
         ...process.env,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: pluginsRoot,
+        ALLBOT_BUNDLED_PLUGINS_DIR: pluginsRoot,
       },
       runtime: createRuntime(),
       prompter: createPrompter(),
     });
 
-    const next = JSON.parse(fs.readFileSync(path.join(root, "kaijibot.plugin.json"), "utf-8")) as {
+    const next = JSON.parse(fs.readFileSync(path.join(root, "allbot.plugin.json"), "utf-8")) as {
       speechProviders?: string[];
       mediaUnderstandingProviders?: string[];
       contracts?: Record<string, string[]>;
@@ -155,7 +155,7 @@ describe("doctor plugin manifest legacy contract repair", () => {
     const migrations = collectLegacyPluginManifestContractMigrations({
       env: {
         ...process.env,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: pluginsRoot,
+        ALLBOT_BUNDLED_PLUGINS_DIR: pluginsRoot,
       },
     });
 

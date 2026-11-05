@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { collectChannelDoctorStaleConfigMutations } from "../commands/doctor/shared/channel-doctor.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig, readConfigFileSnapshot } from "../config/config.js";
 import { installHooksFromNpmSpec, installHooksFromPath } from "../hooks/install.js";
 import { resolveArchiveKind } from "../infra/archive.js";
@@ -50,7 +50,7 @@ function resolveInstallSafetyOverrides(overrides: InstallSafetyOverrides): Insta
 }
 
 async function installBundledPluginSource(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   rawSpec: string;
   bundledSource: BundledPluginSource;
   warning: string;
@@ -80,7 +80,7 @@ async function installBundledPluginSource(params: {
 }
 
 async function tryInstallHookPackFromLocalPath(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   resolvedPath: string;
   installMode: "install" | "update";
   safetyOverrides?: InstallSafetyOverrides;
@@ -162,7 +162,7 @@ async function tryInstallHookPackFromLocalPath(params: {
 }
 
 async function tryInstallHookPackFromNpmSpec(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   installMode: "install" | "update";
   spec: string;
   pin?: boolean;
@@ -219,7 +219,7 @@ function buildInvalidPluginInstallConfigError(message: string): Error {
 
 async function loadConfigFromSnapshotForInstall(
   request: PluginInstallRequestContext,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   if (resolvePluginInstallInvalidConfigPolicy(request) !== "allow-bundled-recovery") {
     throw buildInvalidPluginInstallConfigError(t("cli.plugins.install.configInvalid"));
   }
@@ -247,7 +247,7 @@ async function loadConfigFromSnapshotForInstall(
 
 export async function loadConfigForInstall(
   request: PluginInstallRequestContext,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   try {
     return loadConfig();
   } catch (err) {

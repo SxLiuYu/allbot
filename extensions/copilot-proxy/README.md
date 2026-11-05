@@ -1,4 +1,4 @@
-# Copilot Proxy (KaijiBot plugin)
+# Copilot Proxy (AllBot plugin)
 
 Provider plugin for the **Copilot Proxy** VS Code extension.
 
@@ -7,7 +7,7 @@ Provider plugin for the **Copilot Proxy** VS Code extension.
 Bundled plugins are disabled by default. Enable this one:
 
 ```bash
-kaijibot plugins enable copilot-proxy
+allbot plugins enable copilot-proxy
 ```
 
 Restart the Gateway after enabling.
@@ -15,7 +15,7 @@ Restart the Gateway after enabling.
 ## Authenticate
 
 ```bash
-kaijibot models auth login --provider copilot-proxy --set-default
+allbot models auth login --provider copilot-proxy --set-default
 ```
 
 ## Notes

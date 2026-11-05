@@ -2,11 +2,11 @@
 // Keep this list additive and scoped to the bundled LLM task surface.
 
 export { definePluginEntry } from "./plugin-entry.js";
-export { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+export { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 export {
   formatThinkingLevels,
   formatXHighModelHint,
   normalizeThinkLevel,
   supportsXHighThinking,
 } from "../auto-reply/thinking.js";
-export type { AnyAgentTool, KaijiBotPluginApi } from "../plugins/types.js";
+export type { AnyAgentTool, AllBotPluginApi } from "../plugins/types.js";

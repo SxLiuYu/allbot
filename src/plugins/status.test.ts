@@ -10,7 +10,7 @@ import {
 } from "./status.test-helpers.js";
 
 const loadConfigMock = vi.fn();
-const loadKaijiBotPluginsMock = vi.fn();
+const loadAllBotPluginsMock = vi.fn();
 const loadPluginMetadataRegistrySnapshotMock = vi.fn();
 const applyPluginAutoEnableMock = vi.fn();
 const resolveBundledProviderCompatPluginIdsMock = vi.fn();
@@ -36,7 +36,7 @@ vi.mock("../config/plugin-auto-enable.js", () => ({
 }));
 
 vi.mock("./loader.js", () => ({
-  loadKaijiBotPlugins: (...args: unknown[]) => loadKaijiBotPluginsMock(...args),
+  loadAllBotPlugins: (...args: unknown[]) => loadAllBotPluginsMock(...args),
 }));
 
 vi.mock("./runtime/metadata-registry-loader.js", () => ({
@@ -80,7 +80,7 @@ function setPluginLoadResult(overrides: Partial<ReturnType<typeof createPluginLo
     plugins: [],
     ...overrides,
   });
-  loadKaijiBotPluginsMock.mockReturnValue(result);
+  loadAllBotPluginsMock.mockReturnValue(result);
   loadPluginMetadataRegistrySnapshotMock.mockReturnValue(result);
 }
 
@@ -113,7 +113,7 @@ function expectPluginLoaderCall(params: {
   env?: NodeJS.ProcessEnv;
   loadModules?: boolean;
 }) {
-  expect(loadKaijiBotPluginsMock).toHaveBeenCalledWith(
+  expect(loadAllBotPluginsMock).toHaveBeenCalledWith(
     expect.objectContaining({
       ...(params.config !== undefined ? { config: params.config } : {}),
       ...(params.activationSourceConfig !== undefined
@@ -324,7 +324,7 @@ describe("plugin status reports", () => {
 
   beforeEach(() => {
     loadConfigMock.mockReset();
-    loadKaijiBotPluginsMock.mockReset();
+    loadAllBotPluginsMock.mockReset();
     loadPluginMetadataRegistrySnapshotMock.mockReset();
     applyPluginAutoEnableMock.mockReset();
     resolveBundledProviderCompatPluginIdsMock.mockReset();
@@ -351,7 +351,7 @@ describe("plugin status reports", () => {
   });
 
   it("forwards an explicit env to plugin loading", () => {
-    const env = { HOME: "/tmp/kaijibot-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/allbot-home" } as NodeJS.ProcessEnv;
 
     buildPluginSnapshotReport({
       config: {},
@@ -375,7 +375,7 @@ describe("plugin status reports", () => {
         loadModules: false,
       }),
     );
-    expect(loadKaijiBotPluginsMock).not.toHaveBeenCalled();
+    expect(loadAllBotPluginsMock).not.toHaveBeenCalled();
   });
 
   it("loads plugin status from the auto-enabled config snapshot", () => {
@@ -489,7 +489,7 @@ describe("plugin status reports", () => {
     const report = buildPluginDiagnosticsReport({
       config: {},
       env: {
-        KAIJIBOT_VERSION: "2026.3.23-1",
+        ALLBOT_VERSION: "2026.3.23-1",
       } as NodeJS.ProcessEnv,
     });
 

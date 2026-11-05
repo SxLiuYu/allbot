@@ -1,5 +1,5 @@
-import * as ssrf from "kaijibot/plugin-sdk/ssrf-runtime";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import * as ssrf from "allbot/plugin-sdk/ssrf-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { vi } from "vitest";
 
 export function mockPublicPinnedHostname() {

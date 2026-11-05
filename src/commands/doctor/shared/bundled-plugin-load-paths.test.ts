@@ -16,13 +16,13 @@ function bundled(pluginId: string, localPath: string): BundledPluginSource {
   return {
     pluginId,
     localPath,
-    npmSpec: `@kaijibot/${pluginId}`,
+    npmSpec: `@allbot/${pluginId}`,
   };
 }
 
 describe("bundled plugin load path repair", () => {
   beforeEach(() => {
-    const packageRoot = "/app/node_modules/kaijibot";
+    const packageRoot = "/app/node_modules/allbot";
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
       new Map([["feishu", bundled("feishu", bundledDistPluginRootAt(packageRoot, "feishu"))]]),
     );
@@ -33,7 +33,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("detects legacy bundled plugin paths that still point at source extensions", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = bundledPluginRootAt(packageRoot, "feishu");
     const bundledPath = bundledDistPluginRootAt(packageRoot, "feishu");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
@@ -59,7 +59,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("rewrites legacy bundled paths during doctor repair", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = bundledPluginRootAt(packageRoot, "feishu");
     const bundledPath = bundledDistPluginRootAt(packageRoot, "feishu");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
@@ -81,7 +81,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("derives legacy paths from the bundled directory name instead of plugin id", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = bundledPluginRootAt(packageRoot, "kimi-coding");
     const bundledPath = bundledDistPluginRootAt(packageRoot, "kimi-coding");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
@@ -107,7 +107,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("matches legacy bundled paths with a trailing slash", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = `${bundledPluginRootAt(packageRoot, "feishu")}${path.sep}`;
     const bundledPath = bundledDistPluginRootAt(packageRoot, "feishu");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
@@ -126,7 +126,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("rewrites dist-runtime bundled paths back to their legacy source path", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = path.join(packageRoot, "extensions", "feishu");
     const bundledPath = path.join(packageRoot, "dist-runtime", "extensions", "feishu");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
@@ -145,7 +145,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("preserves non-string path entries when repairing legacy bundled paths", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = path.join(packageRoot, "extensions", "feishu");
     const bundledPath = path.join(packageRoot, "dist", "extensions", "feishu");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
@@ -166,7 +166,7 @@ describe("bundled plugin load path repair", () => {
   });
 
   it("formats a doctor hint for legacy bundled plugin paths", () => {
-    const packageRoot = path.resolve("app-node-modules", "kaijibot");
+    const packageRoot = path.resolve("app-node-modules", "allbot");
     const legacyPath = path.join(packageRoot, "extensions", "feishu");
     const bundledPath = path.join(packageRoot, "dist", "extensions", "feishu");
 
@@ -179,17 +179,17 @@ describe("bundled plugin load path repair", () => {
           pathLabel: "plugins.load.paths",
         },
       ],
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     expect(warnings).toEqual([
       expect.stringContaining(`plugins.load.paths: legacy bundled plugin path "${legacyPath}"`),
-      expect.stringContaining('Run "kaijibot doctor --fix"'),
+      expect.stringContaining('Run "allbot doctor --fix"'),
     ]);
   });
 
   it("ignores bundled plugins that already resolve to source extensions", () => {
-    const sourcePath = path.resolve("repo", "kaijibot", "extensions", "feishu");
+    const sourcePath = path.resolve("repo", "allbot", "extensions", "feishu");
     vi.spyOn(bundledSources, "resolveBundledPluginSources").mockReturnValue(
       new Map([["feishu", bundled("feishu", sourcePath)]]),
     );

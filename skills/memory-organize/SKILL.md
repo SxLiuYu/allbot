@@ -1,7 +1,7 @@
 ---
 name: memory-organize
 description: "整理记忆：历遍所有会话记录，提取并整理记忆到结构化的主题文件中。当用户说'整理记忆'、'整理一下记忆'、'记忆太乱了'、'重新组织记忆'时使用。也用于系统触发时自动整理 MEMORY.md。"
-metadata: { "kaijibot": { "emoji": "🗃️", "requires": { "bins": [] }, "install": [] } }
+metadata: { "allbot": { "emoji": "🗃️", "requires": { "bins": [] }, "install": [] } }
 ---
 
 # Memory Organize
@@ -104,7 +104,7 @@ MEMORY.md 是长期记忆的入口，**8KB 预算**。任何不符合结构的�
 
 **LLM 分析全篇内容**，识别以下问题并逐一修复：
 
-1. **未归档的 Promoted 条目**：`## Promoted From Short-Term Memory (YYYY-MM-DD)` 下的条目（格式为 `<!-- kaijibot-memory-promotion:key -->` + `- snippet [score=...]`）应该被提取到主题文件中。逐条判断 subject，调用 `memory_save` 写入对应主题文件。
+1. **未归档的 Promoted 条目**：`## Promoted From Short-Term Memory (YYYY-MM-DD)` 下的条目（格式为 `<!-- allbot-memory-promotion:key -->` + `- snippet [score=...]`）应该被提取到主题文件中。逐条判断 subject，调用 `memory_save` 写入对应主题文件。
 
 2. **重复内容**：同一信息出现多次（不同格式、不同 section）。保留最完整的版本，删除重复。inline 与 topic 之间的交叉重复由 Step 3 的 `memory_tidy` 自动处理。
 
@@ -139,7 +139,7 @@ MEMORY.md 是长期记忆的入口，**8KB 预算**。任何不符合结构的�
 - product → memory/topics/product.md
 
 ## Promoted From Short-Term Memory (YYYY-MM-DD)
-<!-- kaijibot-memory-promotion:key -->
+<!-- allbot-memory-promotion:key -->
 - snippet [score=0.XXX recalls=N avg=0.XXX source=...]
 （这些条目在下次整理时会被归档到主题文件并从此 section 移除）
 ```

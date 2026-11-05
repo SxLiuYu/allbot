@@ -19,7 +19,7 @@ const fsState = vi.hoisted(() => ({
 }));
 
 const abs = (p: string) => path.resolve(p);
-const fixturesRoot = abs(path.join("__kaijibot_vitest__", "cron", "runs-one-shot"));
+const fixturesRoot = abs(path.join("__allbot_vitest__", "cron", "runs-one-shot"));
 const isFixturePath = (p: string) => {
   const resolved = abs(p);
   const rootPrefix = `${fixturesRoot}${path.sep}`;

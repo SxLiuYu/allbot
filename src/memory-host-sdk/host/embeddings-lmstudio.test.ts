@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 const ensureLmstudioModelLoadedMock = vi.hoisted(() => vi.fn());
 const resolveLmstudioRuntimeApiKeyMock = vi.hoisted(() => vi.fn());
@@ -63,7 +63,7 @@ describe("embeddings-lmstudio", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       provider: "lmstudio",
       model: "lmstudio/text-embedding-nomic-embed-text-v1.5",
       fallback: "none",
@@ -114,7 +114,7 @@ describe("embeddings-lmstudio", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       provider: "lmstudio",
       model: "",
       fallback: "none",
@@ -175,7 +175,7 @@ describe("embeddings-lmstudio", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       provider: "lmstudio",
       model: "",
       fallback: "none",
@@ -235,7 +235,7 @@ describe("embeddings-lmstudio", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       provider: "openai",
       model: "",
       fallback: "lmstudio",
@@ -296,7 +296,7 @@ describe("embeddings-lmstudio", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       provider: "openai",
       model: "",
       fallback: "lmstudio",
@@ -342,7 +342,7 @@ describe("embeddings-lmstudio", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       provider: "lmstudio",
       model: "text-embedding-nomic-embed-text-v1.5",
       fallback: "none",

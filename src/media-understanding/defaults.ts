@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import {
   bundledProviderSupportsNativePdfDocument,
@@ -54,12 +54,12 @@ function providerSupportsCapability(
   return Boolean(provider.describeVideo);
 }
 
-function resolveDefaultRegistry(cfg?: KaijiBotConfig) {
-  return buildMediaUnderstandingRegistry(undefined, cfg ?? ({} as KaijiBotConfig));
+function resolveDefaultRegistry(cfg?: AllBotConfig) {
+  return buildMediaUnderstandingRegistry(undefined, cfg ?? ({} as AllBotConfig));
 }
 
 function resolveConfiguredImageProviderModel(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerId: string;
 }): string | undefined {
   const providers = params.cfg?.models?.providers;
@@ -86,7 +86,7 @@ function resolveConfiguredImageProviderModel(params: {
 export function resolveDefaultMediaModel(params: {
   providerId: string;
   capability: MediaUnderstandingCapability;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerRegistry?: Map<string, MediaUnderstandingProvider>;
 }): string | undefined {
   if (!params.providerRegistry) {
@@ -115,7 +115,7 @@ export function resolveDefaultMediaModel(params: {
 
 export function resolveAutoMediaKeyProviders(params: {
   capability: MediaUnderstandingCapability;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerRegistry?: Map<string, MediaUnderstandingProvider>;
 }): string[] {
   if (!params.providerRegistry) {
@@ -166,7 +166,7 @@ export function resolveAutoMediaKeyProviders(params: {
 
 export function providerSupportsNativePdfDocument(params: {
   providerId: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   providerRegistry?: Map<string, MediaUnderstandingProvider>;
 }): boolean {
   if (!params.providerRegistry && bundledProviderSupportsNativePdfDocument(params.providerId)) {

@@ -37,8 +37,8 @@ function expectVersionMetadataToBeMissing(moduleUrl: string) {
 
 describe("version resolution", () => {
   it("resolves package version from nested dist/plugin-sdk module URL", async () => {
-    await withTempDir({ prefix: "kaijibot-version-" }, async (root) => {
-      await writeJsonFixture(root, "package.json", { name: "kaijibot", version: "1.2.3" });
+    await withTempDir({ prefix: "allbot-version-" }, async (root) => {
+      await writeJsonFixture(root, "package.json", { name: "allbot", version: "1.2.3" });
       const moduleUrl = await ensureModuleFixture(root);
       expect(readVersionFromPackageJsonForModuleUrl(moduleUrl)).toBe("1.2.3");
       expect(resolveVersionFromModuleUrl(moduleUrl)).toBe("1.2.3");
@@ -46,8 +46,8 @@ describe("version resolution", () => {
   });
 
   it("ignores unrelated nearby package.json files", async () => {
-    await withTempDir({ prefix: "kaijibot-version-" }, async (root) => {
-      await writeJsonFixture(root, "package.json", { name: "kaijibot", version: "2.3.4" });
+    await withTempDir({ prefix: "allbot-version-" }, async (root) => {
+      await writeJsonFixture(root, "package.json", { name: "allbot", version: "2.3.4" });
       await writeJsonFixture(root, "dist/package.json", {
         name: "other-package",
         version: "9.9.9",
@@ -58,7 +58,7 @@ describe("version resolution", () => {
   });
 
   it("falls back to build-info when package metadata is unavailable", async () => {
-    await withTempDir({ prefix: "kaijibot-version-" }, async (root) => {
+    await withTempDir({ prefix: "allbot-version-" }, async (root) => {
       await writeJsonFixture(root, "build-info.json", { version: "4.5.6" });
       const moduleUrl = await ensureModuleFixture(root);
       expect(readVersionFromPackageJsonForModuleUrl(moduleUrl)).toBeNull();
@@ -68,14 +68,14 @@ describe("version resolution", () => {
   });
 
   it("returns null when no version metadata exists", async () => {
-    await withTempDir({ prefix: "kaijibot-version-" }, async (root) => {
+    await withTempDir({ prefix: "allbot-version-" }, async (root) => {
       const moduleUrl = await ensureModuleFixture(root);
       expectVersionMetadataToBeMissing(moduleUrl);
     });
   });
 
-  it("ignores non-kaijibot package and blank build-info versions", async () => {
-    await withTempDir({ prefix: "kaijibot-version-" }, async (root) => {
+  it("ignores non-allbot package and blank build-info versions", async () => {
+    await withTempDir({ prefix: "allbot-version-" }, async (root) => {
       await writeJsonFixture(root, "package.json", { name: "other-package", version: "9.9.9" });
       await writeJsonFixture(root, "build-info.json", { version: "  " });
       const moduleUrl = await ensureModuleFixture(root);
@@ -90,8 +90,8 @@ describe("version resolution", () => {
   });
 
   it("resolves binary version with explicit precedence", async () => {
-    await withTempDir({ prefix: "kaijibot-version-" }, async (root) => {
-      await writeJsonFixture(root, "package.json", { name: "kaijibot", version: "2.3.4" });
+    await withTempDir({ prefix: "allbot-version-" }, async (root) => {
+      await writeJsonFixture(root, "package.json", { name: "allbot", version: "2.3.4" });
       const moduleUrl = await ensureModuleFixture(root);
       expect(
         resolveBinaryVersion({
@@ -125,28 +125,28 @@ describe("version resolution", () => {
     });
   });
 
-  it("prefers KAIJIBOT_VERSION over service and package versions", () => {
+  it("prefers ALLBOT_VERSION over service and package versions", () => {
     expect(
       resolveRuntimeServiceVersion({
-        KAIJIBOT_VERSION: "9.9.9",
-        KAIJIBOT_SERVICE_VERSION: "2.2.2",
+        ALLBOT_VERSION: "9.9.9",
+        ALLBOT_SERVICE_VERSION: "2.2.2",
         npm_package_version: "1.1.1",
       }),
     ).toBe("9.9.9");
   });
 
-  it("prefers runtime VERSION over stale KAIJIBOT_VERSION for compatibility checks", () => {
-    const previous = process.env.KAIJIBOT_VERSION;
-    const previousService = process.env.KAIJIBOT_SERVICE_VERSION;
+  it("prefers runtime VERSION over stale ALLBOT_VERSION for compatibility checks", () => {
+    const previous = process.env.ALLBOT_VERSION;
+    const previousService = process.env.ALLBOT_SERVICE_VERSION;
     const previousPackage = process.env.npm_package_version;
     try {
-      process.env.KAIJIBOT_VERSION = "2026.3.25";
-      process.env.KAIJIBOT_SERVICE_VERSION = "2026.3.25-service";
+      process.env.ALLBOT_VERSION = "2026.3.25";
+      process.env.ALLBOT_SERVICE_VERSION = "2026.3.25-service";
       process.env.npm_package_version = "2026.3.25-package";
       expect(resolveCompatibilityHostVersion()).toBe(VERSION);
     } finally {
-      process.env.KAIJIBOT_VERSION = previous;
-      process.env.KAIJIBOT_SERVICE_VERSION = previousService;
+      process.env.ALLBOT_VERSION = previous;
+      process.env.ALLBOT_SERVICE_VERSION = previousService;
       process.env.npm_package_version = previousPackage;
     }
   });
@@ -154,8 +154,8 @@ describe("version resolution", () => {
   it("keeps explicit env-object overrides for compatibility checks in tests", () => {
     expect(
       resolveCompatibilityHostVersion({
-        KAIJIBOT_VERSION: "2026.3.99",
-        KAIJIBOT_SERVICE_VERSION: "2026.3.98",
+        ALLBOT_VERSION: "2026.3.99",
+        ALLBOT_SERVICE_VERSION: "2026.3.98",
         npm_package_version: "2026.3.97",
       }),
     ).toBe("2026.3.99");
@@ -164,9 +164,9 @@ describe("version resolution", () => {
   it("prefers explicit compatibility host overrides over runtime and stale env versions", () => {
     expect(
       resolveCompatibilityHostVersion({
-        KAIJIBOT_COMPATIBILITY_HOST_VERSION: "2026.4.8",
-        KAIJIBOT_VERSION: "2026.3.99",
-        KAIJIBOT_SERVICE_VERSION: "2026.3.98",
+        ALLBOT_COMPATIBILITY_HOST_VERSION: "2026.4.8",
+        ALLBOT_VERSION: "2026.3.99",
+        ALLBOT_SERVICE_VERSION: "2026.3.98",
         npm_package_version: "2026.3.97",
       }),
     ).toBe("2026.4.8");
@@ -185,16 +185,16 @@ describe("version resolution", () => {
   it("prefers runtime VERSION over service/package markers and ignores blank env values", () => {
     expect(
       resolveRuntimeServiceVersion({
-        KAIJIBOT_VERSION: "   ",
-        KAIJIBOT_SERVICE_VERSION: "  2.0.0  ",
+        ALLBOT_VERSION: "   ",
+        ALLBOT_SERVICE_VERSION: "  2.0.0  ",
         npm_package_version: "1.0.0",
       }),
     ).toBe(VERSION);
 
     expect(
       resolveRuntimeServiceVersion({
-        KAIJIBOT_VERSION: " ",
-        KAIJIBOT_SERVICE_VERSION: "\t",
+        ALLBOT_VERSION: " ",
+        ALLBOT_SERVICE_VERSION: "\t",
         npm_package_version: " 1.0.0-package ",
       }),
     ).toBe(VERSION);
@@ -202,8 +202,8 @@ describe("version resolution", () => {
     expect(
       resolveRuntimeServiceVersion(
         {
-          KAIJIBOT_VERSION: "",
-          KAIJIBOT_SERVICE_VERSION: " ",
+          ALLBOT_VERSION: "",
+          ALLBOT_SERVICE_VERSION: " ",
           npm_package_version: "",
         },
         "fallback",

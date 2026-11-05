@@ -1,7 +1,7 @@
 ---
-summary: "Use Qwen Cloud via KaijiBot's bundled qwen provider"
+summary: "Use Qwen Cloud via AllBot's bundled qwen provider"
 read_when:
-  - You want to use Qwen with KaijiBot
+  - You want to use Qwen with AllBot
   - You previously used Qwen OAuth
 title: "Qwen"
 ---
@@ -12,14 +12,14 @@ title: "Qwen"
 
 **Qwen OAuth has been removed.** The free-tier OAuth integration
 (`qwen-portal`) that used `portal.qwen.ai` endpoints is no longer available.
-See [Issue #49557](https://github.com/kaijibot/kaijibot/issues/49557) for
+See [Issue #49557](https://github.com/allbot/allbot/issues/49557) for
 background.
 
 </Warning>
 
 ## Recommended: Qwen Cloud
 
-KaijiBot now treats Qwen as a first-class bundled provider with canonical id
+AllBot now treats Qwen as a first-class bundled provider with canonical id
 `qwen`. The bundled provider targets the Qwen Cloud / Alibaba DashScope and
 Coding Plan endpoints and keeps legacy `modelstudio` ids working as a
 compatibility alias.
@@ -34,16 +34,16 @@ Coding Plan support can lag behind the public catalog.
 
 ```bash
 # Global Coding Plan endpoint
-kaijibot onboard --auth-choice qwen-api-key
+allbot onboard --auth-choice qwen-api-key
 
 # China Coding Plan endpoint
-kaijibot onboard --auth-choice qwen-api-key-cn
+allbot onboard --auth-choice qwen-api-key-cn
 
 # Global Standard (pay-as-you-go) endpoint
-kaijibot onboard --auth-choice qwen-standard-api-key
+allbot onboard --auth-choice qwen-standard-api-key
 
 # China Standard (pay-as-you-go) endpoint
-kaijibot onboard --auth-choice qwen-standard-api-key-cn
+allbot onboard --auth-choice qwen-standard-api-key-cn
 ```
 
 Legacy `modelstudio-*` auth-choice ids and `modelstudio/...` model refs still
@@ -76,7 +76,7 @@ choices use the `qwen-*` family; `modelstudio-*` remains compatibility-only.
 You can override with a custom `baseUrl` in config.
 
 Native Model Studio endpoints advertise streaming usage compatibility on the
-shared `openai-completions` transport. KaijiBot keys that off endpoint
+shared `openai-completions` transport. AllBot keys that off endpoint
 capabilities now, so DashScope-compatible custom provider ids targeting the
 same native hosts inherit the same streaming-usage behavior instead of
 requiring the built-in `qwen` provider id specifically.
@@ -88,7 +88,7 @@ requiring the built-in `qwen` provider id specifically.
 
 ## Built-in catalog
 
-KaijiBot currently ships this bundled Qwen catalog. The configured catalog is
+AllBot currently ships this bundled Qwen catalog. The configured catalog is
 endpoint-aware: Coding Plan configs omit models that are only known to work on
 the Standard endpoint.
 
@@ -158,7 +158,7 @@ Coding Plan endpoints.
 - Global/Intl Standard base URL: `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`
 - China Standard base URL: `https://dashscope.aliyuncs.com/compatible-mode/v1`
 
-For video generation, KaijiBot maps the configured Qwen region to the matching
+For video generation, AllBot maps the configured Qwen region to the matching
 DashScope AIGC host before submitting the job:
 
 - Global/Intl: `https://dashscope-intl.aliyuncs.com`
@@ -197,5 +197,5 @@ parameters, provider selection, and failover behavior.
 ## Environment note
 
 If the Gateway runs as a daemon (launchd/systemd), make sure `QWEN_API_KEY` is
-available to that process (for example, in `~/.kaijibot/.env` or via
+available to that process (for example, in `~/.allbot/.env` or via
 `env.shellEnv`).

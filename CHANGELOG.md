@@ -1,10 +1,10 @@
 # Changelog
 
-> KaijiBot forked from [OpenClaw](https://github.com/openclaw/openclaw) in April 2026 and is
-> developed as an independent project. The changelog below records only KaijiBot's own work.
+> AllBot forked from [OpenClaw](https://github.com/openclaw/openclaw) in April 2026 and is
+> developed as an independent project. The changelog below records only AllBot's own work.
 > Upstream OpenClaw history is available in the [upstream repository](https://github.com/openclaw/openclaw).
 
-All notable KaijiBot changes, grouped by milestone. KaijiBot uses CalVer `YYYY.M.DD`;
+All notable AllBot changes, grouped by milestone. AllBot uses CalVer `YYYY.M.DD`;
 multiple releases on the same date append `-1`, `-2`, etc.
 
 Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126/kaijibot
@@ -24,21 +24,21 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
 - **`/v1/*` and `/api/*` unmatched routes return JSON error body** instead of bare `Not Found` text. SDK clients now get
   `{ error: { message, type: "not_found", code } }` with actionable hints (e.g. `chat_completions_endpoint_disabled`).
 - **Docker `.env` file mode changed from 0644 to 0600.** `scripts/docker/setup.sh` now sets `umask 077` and `chmod 600`
-  after every `update_env_var`. Existing deployments: run `chmod 600 ~/.kaijibot/.env` once.
+  after every `update_env_var`. Existing deployments: run `chmod 600 ~/.allbot/.env` once.
 - **`install.sh` no longer forces npmmirror.com for non-China users.** Detection now uses `TZ=Asia/Shanghai` or
   `LANG=zh_CN*`; everywhere else gets the upstream npm registry. Users who previously relied on the forced mirror should
   `npm config set registry https://registry.npmmirror.com` explicitly.
 
 ### Highlights — Distribution blockers (B-1..B-5)
 
-- **Config clobber protection (B-1).** New `ConfigClobberProtectionError` refuses writes that would shrink `kaijibot.json`
+- **Config clobber protection (B-1).** New `ConfigClobberProtectionError` refuses writes that would shrink `allbot.json`
   by >50% vs the last-known-good snapshot when the prior config had `gateway.mode` set. Eliminates the silent-overwrite
-  pattern caused by env-var typos (e.g. `KAIJIBOT_CONFIG_DIR` is not honored — the correct name is `KAIJIBOT_STATE_DIR`;
+  pattern caused by env-var typos (e.g. `ALLBOT_CONFIG_DIR` is not honored — the correct name is `ALLBOT_STATE_DIR`;
   docs now consistent across `.env.example` / `README.en.md` / `DOCKER.md`). Bypass via
-  `KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` env or `allowConfigClobberShrink: true` write option. 5 unit tests.
+  `ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` env or `allowConfigClobberShrink: true` write option. 5 unit tests.
 - **Postinstall transparency (B-2).** Two kill switches documented in README + `.env.example`:
-  `KAIJIBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1` (skip all postinstall) and
-  `KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL=1` (skip lark-cli skills only).
+  `ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1` (skip all postinstall) and
+  `ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1` (skip lark-cli skills only).
 - **`install.sh` locale-aware mirror (B-3).** See breaking section above.
 - **Channel docs reconciliation (B-4).** `README.md` / `docs/index.md` / `docs/channels/index.md` now agree: Feishu + WeChat
   first-class, 16 upstream-inherited (was inconsistently 18/20). New `docs/channels/wechat.md` (was missing despite README
@@ -79,16 +79,16 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
 
 ### New environment variables
 
-- `KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` — bypass config clobber protection (B-1).
-- `KAIJIBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1` — skip all npm postinstall hooks (B-2).
-- `KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL=1` — skip only the lark-cli skills install step (B-2).
+- `ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` — bypass config clobber protection (B-1).
+- `ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1` — skip all npm postinstall hooks (B-2).
+- `ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1` — skip only the lark-cli skills install step (B-2).
 
 ### Migration notes
 
 - If you have a Feishu bot running: no action needed. Tool schemas changed but execute behavior is identical for valid calls.
-- If you maintain a third-party KaijiBot plugin: use `stringEnum` from `kaijibot/plugin-sdk/core` for tool action fields;
+- If you maintain a third-party AllBot plugin: use `stringEnum` from `allbot/plugin-sdk/core` for tool action fields;
   avoid `Type.Union([Type.Literal(...)])`. See `docs/plugins/building-plugins.md` for the updated guidance.
-- If you deploy via Docker: run `chmod 600 ~/.kaijibot/.env` once on existing deployments to pick up the new default.
+- If you deploy via Docker: run `chmod 600 ~/.allbot/.env` once on existing deployments to pick up the new default.
 
 ---
 
@@ -100,7 +100,7 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
   full transcript at `compaction:after` (was capped at 500 messages), giving it complete
   pre-compaction context and making the parallel Memory Flush pipeline largely redundant.
   To re-enable agent-curated pre-compaction memory extraction, set
-  `agents.defaults.compaction.memoryFlush.enabled: true` in `~/.kaijibot/kaijiBot.json`
+  `agents.defaults.compaction.memoryFlush.enabled: true` in `~/.allbot/allBot.json`
   or toggle it on in **Settings → Quick Settings → 压缩前记忆冲刷**.
   Most users do not need to re-enable it — the hook covers the same ground.
 
@@ -144,8 +144,8 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
 ### Changes
 
 - i18n: locale-aware CLI, cognitive prompts, wizard, and agent tools — auto-detects `LANG` /
-  `LC_ALL` / `KAIJIBOT_CLI_LOCALE`, switches between Chinese and English.
-- Gateway: `X-KaijiBot-Session-Reset` HTTP header triggers the session-memory hook via the API,
+  `LC_ALL` / `ALLBOT_CLI_LOCALE`, switches between Chinese and English.
+- Gateway: `X-AllBot-Session-Reset` HTTP header triggers the session-memory hook via the API,
   so non-message reset paths still capture summaries and corrections.
 - Memory: chunk dialogue files at turn boundaries and default to Porter stemming for better
   full-text search recall.
@@ -155,9 +155,9 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
   section header and target file to disagree at certain timezones.
 - Cognitive: new `cognitive.correction.enabled` config key (default `true`) gates the
   correction pipeline in three locations: `get-reply-run.ts` (CorrectionStore load),
-  `session-memory` hook (post-session extraction), and `kaijibot-tools.ts`
+  `session-memory` hook (post-session extraction), and `allbot-tools.ts`
   (`record_correction` agent tool registration). Surfaces as the "纠错记忆" sub-toggle.
-- Branding: replaced inherited OpenClaw lobster icons with the KaijiBot K logo; filter evolution
+- Branding: replaced inherited OpenClaw lobster icons with the AllBot K logo; filter evolution
   signals out of chat history.
 
 ### Fixes
@@ -175,14 +175,14 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
 
 - **pi-ai 0.65.2 → 0.79.4 + TypeBox migration**: AJV/JSON Schema validators replaced with
   TypeBox across the runtime, unifying compile-time and run-time types. Also renamed upstream
-  packages to `kaijibot` and resolved all resulting type errors.
+  packages to `allbot` and resolved all resulting type errors.
 - **Android / Termux**: full Termux compatibility with `sharp` WASM32 fallback, Chromium path
-  detection, zero-interaction install + `.bashrc` autostart, and a **KaijiBot Launcher APK** that
+  detection, zero-interaction install + `.bashrc` autostart, and a **AllBot Launcher APK** that
   bundles Termux for one-tap install (no download needed).
 - **Knowledge Wiki** (refactored from `memory-wiki`): Karpathy-style LLM Wiki with per-agent
   vault isolation, relationship rendering as wikilinks, claim/evidence fields, and
   freshness-weighted search. Enabled by default.
-- **Feishu QR-scan auto-create bot**: `kaijibot onboard` supports scanning a QR code to create
+- **Feishu QR-scan auto-create bot**: `allbot onboard` supports scanning a QR code to create
   the feishu bot in ~10 seconds via `lark.registerApp` (SDK 1.60 → 1.66), no manual open-platform
   work needed. Wizard now validates LLM provider keys (ZAI/DeepSeek/Qwen/Anthropic/Google) with a
   non-blocking warning.
@@ -227,7 +227,7 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
   (`cognitive/{subsystem}/{agentId}/{userId}.json`).
 - **Self-evolution hard-trigger**: post-turn hook detects ≥3 tool calls (noise filter only),
   enqueues an evolution signal for the agent to evaluate — no code-level complexity gating.
-- **OpenClaw → KaijiBot migration** (`kaijibot migrate`): auto-detect OpenClaw install, import
+- **OpenClaw → AllBot migration** (`allbot migrate`): auto-detect OpenClaw install, import
   agents/workspace/skills/config with dry-run support, workspace `.md` content rewriting, onboard
   wizard integration.
 
@@ -262,7 +262,7 @@ Repo: https://github.com/Kaiji-Z/kaijibot · Backup: https://gitee.com/kaiji1126
 
 ## 2026.4.x — Fork origin: cognitive layer foundation
 
-KaijiBot forked from OpenClaw and immediately began adding the cognitive layer — the project's
+AllBot forked from OpenClaw and immediately began adding the cognitive layer — the project's
 core differentiator. This milestone established persona, proactive insight generation,
 self-evolution, and the memory overhaul.
 
@@ -280,7 +280,7 @@ self-evolution, and the memory overhaul.
 - **Self-evolution** (`src/cognitive/evolution/`): agent-driven skill generation with embedded
   skill-creator spec, `SKILL.md` output, skill patch/delete/archive lifecycle, dedup
   (Levenshtein + Jaccard), 30-day expiry, effectiveness tracking.
-- **Brand identity**: KaijiBot palette, banner, wizard, Control UI. 🦞 → 🧠.
+- **Brand identity**: AllBot palette, banner, wizard, Control UI. 🦞 → 🧠.
 
 ### Changes
 

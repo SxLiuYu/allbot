@@ -1,5 +1,5 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-types";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-types";
 import { DEEPSEEK_MODEL_CATALOG } from "./models.js";
 import { resolveDeepSeekV4ThinkingProfile } from "./thinking.js";
 

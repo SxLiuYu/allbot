@@ -1,7 +1,7 @@
 import { isAtLeast, parseSemver } from "../infra/runtime-guard.js";
 
 export const MIN_HOST_VERSION_FORMAT =
-  'kaijibot.install.minHostVersion must use a semver floor in the form ">=x.y.z"';
+  'allbot.install.minHostVersion must use a semver floor in the form ">=x.y.z"';
 const MIN_HOST_VERSION_RE = /^>=(\d+)\.(\d+)\.(\d+)$/;
 
 export type MinHostVersionRequirement = {

@@ -11,7 +11,7 @@ Manage sandbox runtimes for isolated agent execution.
 
 ## Overview
 
-KaijiBot can run agents in isolated sandbox runtimes for security. The `sandbox` commands help you inspect and recreate those runtimes after updates or configuration changes.
+AllBot can run agents in isolated sandbox runtimes for security. The `sandbox` commands help you inspect and recreate those runtimes after updates or configuration changes.
 
 Today that usually means:
 
@@ -22,30 +22,30 @@ Today that usually means:
 For `ssh` and OpenShell `remote`, recreate matters more than with Docker:
 
 - the remote workspace is canonical after the initial seed
-- `kaijibot sandbox recreate` deletes that canonical remote workspace for the selected scope
+- `allbot sandbox recreate` deletes that canonical remote workspace for the selected scope
 - next use seeds it again from the current local workspace
 
 ## Commands
 
-### `kaijibot sandbox explain`
+### `allbot sandbox explain`
 
 Inspect the **effective** sandbox mode/scope/workspace access, sandbox tool policy, and elevated gates (with fix-it config key paths).
 
 ```bash
-kaijibot sandbox explain
-kaijibot sandbox explain --session agent:main:main
-kaijibot sandbox explain --agent work
-kaijibot sandbox explain --json
+allbot sandbox explain
+allbot sandbox explain --session agent:main:main
+allbot sandbox explain --agent work
+allbot sandbox explain --json
 ```
 
-### `kaijibot sandbox list`
+### `allbot sandbox list`
 
 List all sandbox runtimes with their status and configuration.
 
 ```bash
-kaijibot sandbox list
-kaijibot sandbox list --browser  # List only browser containers
-kaijibot sandbox list --json     # JSON output
+allbot sandbox list
+allbot sandbox list --browser  # List only browser containers
+allbot sandbox list --json     # JSON output
 ```
 
 **Output includes:**
@@ -57,16 +57,16 @@ kaijibot sandbox list --json     # JSON output
 - Idle time (time since last use)
 - Associated session/agent
 
-### `kaijibot sandbox recreate`
+### `allbot sandbox recreate`
 
 Remove sandbox runtimes to force recreation with updated config.
 
 ```bash
-kaijibot sandbox recreate --all                # Recreate all containers
-kaijibot sandbox recreate --session main       # Specific session
-kaijibot sandbox recreate --agent mybot        # Specific agent
-kaijibot sandbox recreate --browser            # Only browser containers
-kaijibot sandbox recreate --all --force        # Skip confirmation
+allbot sandbox recreate --all                # Recreate all containers
+allbot sandbox recreate --session main       # Specific session
+allbot sandbox recreate --agent mybot        # Specific agent
+allbot sandbox recreate --browser            # Only browser containers
+allbot sandbox recreate --all --force        # Skip confirmation
 ```
 
 **Options:**
@@ -85,14 +85,14 @@ kaijibot sandbox recreate --all --force        # Skip confirmation
 
 ```bash
 # Pull new image
-docker pull kaijibot-sandbox:latest
-docker tag kaijibot-sandbox:latest kaijibot-sandbox:bookworm-slim
+docker pull allbot-sandbox:latest
+docker tag allbot-sandbox:latest allbot-sandbox:bookworm-slim
 
 # Update config to use new image
 # Edit config: agents.defaults.sandbox.docker.image (or agents.list[].sandbox.docker.image)
 
 # Recreate containers
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 ```
 
 ### After changing sandbox configuration
@@ -101,7 +101,7 @@ kaijibot sandbox recreate --all
 # Edit config: agents.defaults.sandbox.* (or agents.list[].sandbox.*)
 
 # Recreate to apply new config
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 ```
 
 ### After changing SSH target or SSH auth material
@@ -114,7 +114,7 @@ kaijibot sandbox recreate --all
 # - agents.defaults.sandbox.ssh.identityFile / certificateFile / knownHostsFile
 # - agents.defaults.sandbox.ssh.identityData / certificateData / knownHostsData
 
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 ```
 
 For the core `ssh` backend, recreate deletes the per-scope remote workspace root
@@ -129,7 +129,7 @@ on the SSH target. The next run seeds it again from the local workspace.
 # - plugins.entries.openshell.config.mode
 # - plugins.entries.openshell.config.policy
 
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 ```
 
 For OpenShell `remote` mode, recreate deletes the canonical remote workspace
@@ -138,16 +138,16 @@ for that scope. The next run seeds it again from the local workspace.
 ### After changing setupCommand
 
 ```bash
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 # or just one agent:
-kaijibot sandbox recreate --agent family
+allbot sandbox recreate --agent family
 ```
 
 ### For a specific agent only
 
 ```bash
 # Update only one agent's containers
-kaijibot sandbox recreate --agent alfred
+allbot sandbox recreate --agent alfred
 ```
 
 ## Why is this needed?
@@ -158,14 +158,14 @@ kaijibot sandbox recreate --agent alfred
 - Runtimes are only pruned after 24h of inactivity
 - Regularly-used agents keep old runtimes alive indefinitely
 
-**Solution:** Use `kaijibot sandbox recreate` to force removal of old runtimes. They'll be recreated automatically with current settings when next needed.
+**Solution:** Use `allbot sandbox recreate` to force removal of old runtimes. They'll be recreated automatically with current settings when next needed.
 
-Tip: prefer `kaijibot sandbox recreate` over manual backend-specific cleanup.
+Tip: prefer `allbot sandbox recreate` over manual backend-specific cleanup.
 It uses the Gateway’s runtime registry and avoids mismatches when scope/session keys change.
 
 ## Configuration
 
-Sandbox settings live in `~/.kaijibot/kaijibot.json` under `agents.defaults.sandbox` (per-agent overrides go in `agents.list[].sandbox`):
+Sandbox settings live in `~/.allbot/allbot.json` under `agents.defaults.sandbox` (per-agent overrides go in `agents.list[].sandbox`):
 
 ```jsonc
 {
@@ -176,8 +176,8 @@ Sandbox settings live in `~/.kaijibot/kaijibot.json` under `agents.defaults.sand
         "backend": "docker", // docker, ssh, openshell
         "scope": "agent", // session, agent, shared
         "docker": {
-          "image": "kaijibot-sandbox:bookworm-slim",
-          "containerPrefix": "kaijibot-sbx-",
+          "image": "allbot-sandbox:bookworm-slim",
+          "containerPrefix": "allbot-sbx-",
           // ... more Docker options
         },
         "prune": {

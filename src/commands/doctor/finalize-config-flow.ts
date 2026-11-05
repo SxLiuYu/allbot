@@ -1,14 +1,14 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 export async function finalizeDoctorConfigFlow(params: {
-  cfg: KaijiBotConfig;
-  candidate: KaijiBotConfig;
+  cfg: AllBotConfig;
+  candidate: AllBotConfig;
   pendingChanges: boolean;
   shouldRepair: boolean;
   fixHints: string[];
   confirm: (p: { message: string; initialValue: boolean }) => Promise<boolean>;
   note: (message: string, title?: string) => void;
-}): Promise<{ cfg: KaijiBotConfig; shouldWriteConfig: boolean }> {
+}): Promise<{ cfg: AllBotConfig; shouldWriteConfig: boolean }> {
   if (!params.shouldRepair && params.pendingChanges) {
     const shouldApply = await params.confirm({
       message: "Apply recommended config repairs now?",

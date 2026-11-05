@@ -6,7 +6,7 @@ import { createConfigIO } from "./io.js";
 import { normalizeExecSafeBinProfilesInConfig } from "./normalize-exec-safe-bin.js";
 
 async function withTempHome(run: (home: string) => Promise<void>): Promise<void> {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-config-"));
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-config-"));
   try {
     await run(home);
   } finally {
@@ -16,9 +16,9 @@ async function withTempHome(run: (home: string) => Promise<void>): Promise<void>
 
 async function writeConfig(
   home: string,
-  dirname: ".kaijibot",
+  dirname: ".allbot",
   port: number,
-  filename: string = "kaijibot.json",
+  filename: string = "allbot.json",
 ) {
   const dir = path.join(home, dirname);
   await fs.mkdir(dir, { recursive: true });
@@ -35,35 +35,35 @@ function createIoForHome(home: string, env: NodeJS.ProcessEnv = {} as NodeJS.Pro
 }
 
 describe("config io paths", () => {
-  it("uses ~/.kaijibot/kaijibot.json when config exists", async () => {
+  it("uses ~/.allbot/allbot.json when config exists", async () => {
     await withTempHome(async (home) => {
-      const configPath = await writeConfig(home, ".kaijibot", 19001);
+      const configPath = await writeConfig(home, ".allbot", 19001);
       const io = createIoForHome(home);
       expect(io.configPath).toBe(configPath);
     });
   });
 
-  it("defaults to ~/.kaijibot/kaijibot.json when config is missing", async () => {
+  it("defaults to ~/.allbot/allbot.json when config is missing", async () => {
     await withTempHome(async (home) => {
       const io = createIoForHome(home);
-      expect(io.configPath).toBe(path.join(home, ".kaijibot", "kaijibot.json"));
+      expect(io.configPath).toBe(path.join(home, ".allbot", "allbot.json"));
     });
   });
 
-  it("uses KAIJIBOT_HOME for default config path", async () => {
+  it("uses ALLBOT_HOME for default config path", async () => {
     await withTempHome(async (home) => {
       const io = createConfigIO({
-        env: { KAIJIBOT_HOME: path.join(home, "svc-home") } as NodeJS.ProcessEnv,
+        env: { ALLBOT_HOME: path.join(home, "svc-home") } as NodeJS.ProcessEnv,
         homedir: () => path.join(home, "ignored-home"),
       });
-      expect(io.configPath).toBe(path.join(home, "svc-home", ".kaijibot", "kaijibot.json"));
+      expect(io.configPath).toBe(path.join(home, "svc-home", ".allbot", "allbot.json"));
     });
   });
 
-  it("honors explicit KAIJIBOT_CONFIG_PATH override", async () => {
+  it("honors explicit ALLBOT_CONFIG_PATH override", async () => {
     await withTempHome(async (home) => {
-      const customPath = await writeConfig(home, ".kaijibot", 20002, "custom.json");
-      const io = createIoForHome(home, { KAIJIBOT_CONFIG_PATH: customPath } as NodeJS.ProcessEnv);
+      const customPath = await writeConfig(home, ".allbot", 20002, "custom.json");
+      const io = createIoForHome(home, { ALLBOT_CONFIG_PATH: customPath } as NodeJS.ProcessEnv);
       expect(io.configPath).toBe(customPath);
     });
   });

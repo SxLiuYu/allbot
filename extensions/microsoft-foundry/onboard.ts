@@ -1,9 +1,9 @@
-import type { ProviderAuthContext } from "kaijibot/plugin-sdk/core";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import type { ProviderAuthContext } from "allbot/plugin-sdk/core";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   normalizeOptionalString,
   normalizeStringifiedOptionalString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import {
   azLoginDeviceCode,
   azLoginDeviceCodeWithOptions,

@@ -4,7 +4,7 @@ import path from "node:path";
 import type { AssistantMessage, Message, Tool } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   buildAssistantHistoryTurn as buildTypedAssistantHistoryTurn,
   buildStableCachePrefix,
@@ -230,7 +230,7 @@ function buildEmbeddedRunnerConfig(
     cacheRetention: "none" | "short" | "long";
     transport?: "sse" | "websocket";
   },
-): KaijiBotConfig {
+): AllBotConfig {
   const provider = params.model.provider;
   const modelKey = `${provider}/${params.model.id}`;
   const providerBaseUrl =
@@ -749,32 +749,32 @@ async function runAnthropicImageCacheProbe(params: {
 
 describeCacheLive("pi embedded runner prompt caching (live)", () => {
   beforeAll(async () => {
-    liveRunnerRootDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-live-cache-"));
+    liveRunnerRootDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-live-cache-"));
     liveCacheTraceFile = path.join(liveRunnerRootDir, "cache-trace.jsonl");
     liveTestPngBase64 = (await fs.readFile(LIVE_TEST_PNG_URL)).toString("base64");
     previousCacheTraceEnv = {
-      enabled: process.env.KAIJIBOT_CACHE_TRACE,
-      file: process.env.KAIJIBOT_CACHE_TRACE_FILE,
-      messages: process.env.KAIJIBOT_CACHE_TRACE_MESSAGES,
-      prompt: process.env.KAIJIBOT_CACHE_TRACE_PROMPT,
-      system: process.env.KAIJIBOT_CACHE_TRACE_SYSTEM,
+      enabled: process.env.ALLBOT_CACHE_TRACE,
+      file: process.env.ALLBOT_CACHE_TRACE_FILE,
+      messages: process.env.ALLBOT_CACHE_TRACE_MESSAGES,
+      prompt: process.env.ALLBOT_CACHE_TRACE_PROMPT,
+      system: process.env.ALLBOT_CACHE_TRACE_SYSTEM,
     };
-    process.env.KAIJIBOT_CACHE_TRACE = "1";
-    process.env.KAIJIBOT_CACHE_TRACE_FILE = liveCacheTraceFile;
-    process.env.KAIJIBOT_CACHE_TRACE_MESSAGES = "0";
-    process.env.KAIJIBOT_CACHE_TRACE_PROMPT = "0";
-    process.env.KAIJIBOT_CACHE_TRACE_SYSTEM = "0";
+    process.env.ALLBOT_CACHE_TRACE = "1";
+    process.env.ALLBOT_CACHE_TRACE_FILE = liveCacheTraceFile;
+    process.env.ALLBOT_CACHE_TRACE_MESSAGES = "0";
+    process.env.ALLBOT_CACHE_TRACE_PROMPT = "0";
+    process.env.ALLBOT_CACHE_TRACE_SYSTEM = "0";
   }, 120_000);
 
   afterAll(async () => {
     if (previousCacheTraceEnv) {
       const restore = (
         key:
-          | "KAIJIBOT_CACHE_TRACE"
-          | "KAIJIBOT_CACHE_TRACE_FILE"
-          | "KAIJIBOT_CACHE_TRACE_MESSAGES"
-          | "KAIJIBOT_CACHE_TRACE_PROMPT"
-          | "KAIJIBOT_CACHE_TRACE_SYSTEM",
+          | "ALLBOT_CACHE_TRACE"
+          | "ALLBOT_CACHE_TRACE_FILE"
+          | "ALLBOT_CACHE_TRACE_MESSAGES"
+          | "ALLBOT_CACHE_TRACE_PROMPT"
+          | "ALLBOT_CACHE_TRACE_SYSTEM",
         value: string | undefined,
       ) => {
         if (value === undefined) {
@@ -783,11 +783,11 @@ describeCacheLive("pi embedded runner prompt caching (live)", () => {
           process.env[key] = value;
         }
       };
-      restore("KAIJIBOT_CACHE_TRACE", previousCacheTraceEnv.enabled);
-      restore("KAIJIBOT_CACHE_TRACE_FILE", previousCacheTraceEnv.file);
-      restore("KAIJIBOT_CACHE_TRACE_MESSAGES", previousCacheTraceEnv.messages);
-      restore("KAIJIBOT_CACHE_TRACE_PROMPT", previousCacheTraceEnv.prompt);
-      restore("KAIJIBOT_CACHE_TRACE_SYSTEM", previousCacheTraceEnv.system);
+      restore("ALLBOT_CACHE_TRACE", previousCacheTraceEnv.enabled);
+      restore("ALLBOT_CACHE_TRACE_FILE", previousCacheTraceEnv.file);
+      restore("ALLBOT_CACHE_TRACE_MESSAGES", previousCacheTraceEnv.messages);
+      restore("ALLBOT_CACHE_TRACE_PROMPT", previousCacheTraceEnv.prompt);
+      restore("ALLBOT_CACHE_TRACE_SYSTEM", previousCacheTraceEnv.system);
     }
     previousCacheTraceEnv = null;
     liveCacheTraceFile = undefined;
@@ -804,7 +804,7 @@ describeCacheLive("pi embedded runner prompt caching (live)", () => {
       fixture = await resolveLiveDirectModel({
         provider: "openai",
         api: "openai-responses",
-        envVar: "KAIJIBOT_LIVE_OPENAI_CACHE_MODEL",
+        envVar: "ALLBOT_LIVE_OPENAI_CACHE_MODEL",
         preferredModelIds: ["gpt-5.4-mini", "gpt-5.4", "gpt-5.4"],
       });
       logLiveCache(`openai model=${fixture.model.provider}/${fixture.model.id}`);
@@ -1060,7 +1060,7 @@ describeCacheLive("pi embedded runner prompt caching (live)", () => {
       fixture = await resolveLiveDirectModel({
         provider: "anthropic",
         api: "anthropic-messages",
-        envVar: "KAIJIBOT_LIVE_ANTHROPIC_CACHE_MODEL",
+        envVar: "ALLBOT_LIVE_ANTHROPIC_CACHE_MODEL",
         preferredModelIds: ["claude-sonnet-4-6", "claude-sonnet-4-6", "claude-haiku-3-5"],
       });
       logLiveCache(`anthropic model=${fixture.model.provider}/${fixture.model.id}`);

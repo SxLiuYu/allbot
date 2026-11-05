@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { GroupKeyResolution } from "../config/sessions.js";
 import { resetPluginRuntimeStateForTest } from "../plugins/runtime.js";
 import { createInboundDebouncer } from "./inbound-debounce.js";
@@ -684,9 +684,9 @@ describe("createInboundDebouncer", () => {
 
 describe("initSessionState BodyStripped", () => {
   it("prefers BodyForAgent over Body for group chats", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-sender-meta-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-sender-meta-"));
     const storePath = path.join(root, "sessions.json");
-    const cfg = { session: { store: storePath } } as KaijiBotConfig;
+    const cfg = { session: { store: storePath } } as AllBotConfig;
 
     const result = await initSessionState({
       ctx: {
@@ -706,9 +706,9 @@ describe("initSessionState BodyStripped", () => {
   });
 
   it("prefers BodyForAgent over Body for direct chats", async () => {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-sender-meta-direct-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-sender-meta-direct-"));
     const storePath = path.join(root, "sessions.json");
-    const cfg = { session: { store: storePath } } as KaijiBotConfig;
+    const cfg = { session: { store: storePath } } as AllBotConfig;
 
     const result = await initSessionState({
       ctx: {
@@ -731,22 +731,22 @@ describe("mention helpers", () => {
   it("builds regexes and skips invalid or unsafe patterns", () => {
     const regexes = buildMentionRegexes({
       messages: {
-        groupChat: { mentionPatterns: ["\\bkaijibot\\b", "(invalid", "(a+)+$"] },
+        groupChat: { mentionPatterns: ["\\ballbot\\b", "(invalid", "(a+)+$"] },
       },
     });
     expect(regexes).toHaveLength(1);
-    expect(regexes[0]?.test("kaijibot")).toBe(true);
+    expect(regexes[0]?.test("allbot")).toBe(true);
   });
 
   it("normalizes zero-width characters", () => {
-    expect(normalizeMentionText("open\u200bclaw")).toBe("kaijibot");
+    expect(normalizeMentionText("open\u200bclaw")).toBe("allbot");
   });
 
   it("matches patterns case-insensitively", () => {
     const regexes = buildMentionRegexes({
-      messages: { groupChat: { mentionPatterns: ["\\bkaijibot\\b"] } },
+      messages: { groupChat: { mentionPatterns: ["\\ballbot\\b"] } },
     });
-    expect(matchesMentionPatterns("KAIJIBOT: hi", regexes)).toBe(true);
+    expect(matchesMentionPatterns("ALLBOT: hi", regexes)).toBe(true);
   });
 
   it("uses per-agent mention patterns when configured", () => {
@@ -771,9 +771,9 @@ describe("mention helpers", () => {
   });
 
   it("strips safe mention patterns and ignores unsafe ones", () => {
-    const stripped = stripMentions("kaijibot " + "a".repeat(28) + "!", {} as MsgContext, {
+    const stripped = stripMentions("allbot " + "a".repeat(28) + "!", {} as MsgContext, {
       messages: {
-        groupChat: { mentionPatterns: ["\\bkaijibot\\b", "(a+)+$"] },
+        groupChat: { mentionPatterns: ["\\ballbot\\b", "(a+)+$"] },
       },
     });
     expect(stripped).toBe(`${"a".repeat(28)}!`);
@@ -788,7 +788,7 @@ describe("mention helpers", () => {
 describe("resolveGroupRequireMention", () => {
   it("respects Discord guild/channel requireMention settings", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         discord: {
           guilds: {
@@ -819,7 +819,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("respects Slack channel requireMention settings", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         slack: {
           channels: {
@@ -845,7 +845,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("uses Slack fallback resolver semantics for default-account wildcard channels", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         slack: {
           defaultAccount: "work",
@@ -876,7 +876,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("keeps core reply-stage resolution aligned for Slack default-account wildcard fallbacks", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         slack: {
           defaultAccount: "work",
@@ -907,7 +907,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("uses Discord fallback resolver semantics for guild slug matches", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         discord: {
           guilds: {
@@ -937,7 +937,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("keeps core reply-stage resolution aligned for Discord slug + wildcard guild fallbacks", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         discord: {
           guilds: {
@@ -969,7 +969,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("respects LINE prefixed group keys in reply-stage requireMention resolution", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         line: {
           groups: {
@@ -994,7 +994,7 @@ describe("resolveGroupRequireMention", () => {
 
   it("preserves plugin-backed channel requireMention resolution", async () => {
     resetPluginRuntimeStateForTest();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         bluebubbles: {
           groups: {

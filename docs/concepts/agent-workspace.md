@@ -11,7 +11,7 @@ title: "Agent Workspace"
 The workspace is the agent's home. It is the only working directory used for
 file tools and for workspace context. Keep it private and treat it as memory.
 
-This is separate from `~/.kaijibot/`, which stores config, credentials, and
+This is separate from `~/.allbot/`, which stores config, credentials, and
 sessions.
 
 **Important:** the workspace is the **default cwd**, not a hard sandbox. Tools
@@ -19,24 +19,24 @@ resolve relative paths against the workspace, but absolute paths can still reach
 elsewhere on the host unless sandboxing is enabled. If you need isolation, use
 [`agents.defaults.sandbox`](/gateway/sandboxing) (and/or per‑agent sandbox config).
 When sandboxing is enabled and `workspaceAccess` is not `"rw"`, tools operate
-inside a sandbox workspace under `~/.kaijibot/sandboxes`, not your host workspace.
+inside a sandbox workspace under `~/.allbot/sandboxes`, not your host workspace.
 
 ## Default location
 
-- Default: `~/.kaijibot/workspace`
-- If `KAIJIBOT_PROFILE` is set and not `"default"`, the default becomes
-  `~/.kaijibot/workspace-<profile>`.
-- Override in `~/.kaijibot/kaijibot.json`:
+- Default: `~/.allbot/workspace`
+- If `ALLBOT_PROFILE` is set and not `"default"`, the default becomes
+  `~/.allbot/workspace-<profile>`.
+- Override in `~/.allbot/allbot.json`:
 
 ```json5
 {
   agent: {
-    workspace: "~/.kaijibot/workspace",
+    workspace: "~/.allbot/workspace",
   },
 }
 ```
 
-`kaijibot onboard`, `kaijibot configure`, or `kaijibot setup` will create the
+`allbot onboard`, `allbot configure`, or `allbot setup` will create the
 workspace and seed the bootstrap files if they are missing.
 Sandbox seed copies only accept regular in-workspace files; symlink/hardlink
 aliases that resolve outside the source workspace are ignored.
@@ -50,20 +50,20 @@ file creation:
 
 ## Extra workspace folders
 
-Older installs may have created `~/kaijibot`. Keeping multiple workspace
+Older installs may have created `~/allbot`. Keeping multiple workspace
 directories around can cause confusing auth or state drift, because only one
 workspace is active at a time.
 
 **Recommendation:** keep a single active workspace. If you no longer use the
-extra folders, archive or move them to Trash (for example `trash ~/kaijibot`).
+extra folders, archive or move them to Trash (for example `trash ~/allbot`).
 If you intentionally keep multiple workspaces, make sure
 `agents.defaults.workspace` points to the active one.
 
-`kaijibot doctor` warns when it detects extra workspace directories.
+`allbot doctor` warns when it detects extra workspace directories.
 
 ## Workspace file map (what each file means)
 
-These are the standard files KaijiBot expects inside the workspace:
+These are the standard files AllBot expects inside the workspace:
 
 - `AGENTS.md`
   - Operating instructions for the agent and how it should use memory.
@@ -118,22 +118,22 @@ See [Memory](/concepts/memory) for the workflow and automatic memory flush.
 - `canvas/` (optional)
   - Canvas UI files for node displays (for example `canvas/index.html`).
 
-If any bootstrap file is missing, KaijiBot injects a "missing file" marker into
+If any bootstrap file is missing, AllBot injects a "missing file" marker into
 the session and continues. Large bootstrap files are truncated when injected;
 adjust limits with `agents.defaults.bootstrapMaxChars` (default: 20000) and
 `agents.defaults.bootstrapTotalMaxChars` (default: 150000).
-`kaijibot setup` can recreate missing defaults without overwriting existing
+`allbot setup` can recreate missing defaults without overwriting existing
 files.
 
 ## What is NOT in the workspace
 
-These live under `~/.kaijibot/` and should NOT be committed to the workspace repo:
+These live under `~/.allbot/` and should NOT be committed to the workspace repo:
 
-- `~/.kaijibot/kaijibot.json` (config)
-- `~/.kaijibot/agents/<agentId>/agent/auth-profiles.json` (model auth profiles: OAuth + API keys)
-- `~/.kaijibot/credentials/` (channel/provider state plus legacy OAuth import data)
-- `~/.kaijibot/agents/<agentId>/sessions/` (session transcripts + metadata)
-- `~/.kaijibot/skills/` (managed skills)
+- `~/.allbot/allbot.json` (config)
+- `~/.allbot/agents/<agentId>/agent/auth-profiles.json` (model auth profiles: OAuth + API keys)
+- `~/.allbot/credentials/` (channel/provider state plus legacy OAuth import data)
+- `~/.allbot/agents/<agentId>/sessions/` (session transcripts + metadata)
+- `~/.allbot/skills/` (managed skills)
 
 If you need to migrate sessions or config, copy them separately and keep them
 out of version control.
@@ -152,7 +152,7 @@ If git is installed, brand-new workspaces are initialized automatically. If this
 workspace is not already a repo, run:
 
 ```bash
-cd ~/.kaijibot/workspace
+cd ~/.allbot/workspace
 git init
 git add AGENTS.md SOUL.md TOOLS.md IDENTITY.md USER.md HEARTBEAT.md memory/
 git commit -m "Add agent workspace"
@@ -177,7 +177,7 @@ Option B: GitHub CLI (`gh`)
 
 ```bash
 gh auth login
-gh repo create kaijibot-workspace --private --source . --remote origin --push
+gh repo create allbot-workspace --private --source . --remote origin --push
 ```
 
 Option C: GitLab web UI
@@ -207,11 +207,11 @@ git push
 Even in a private repo, avoid storing secrets in the workspace:
 
 - API keys, OAuth tokens, passwords, or private credentials.
-- Anything under `~/.kaijibot/`.
+- Anything under `~/.allbot/`.
 - Raw dumps of chats or sensitive attachments.
 
 If you must store sensitive references, use placeholders and keep the real
-secret elsewhere (password manager, environment variables, or `~/.kaijibot/`).
+secret elsewhere (password manager, environment variables, or `~/.allbot/`).
 
 Suggested `.gitignore` starter:
 
@@ -225,10 +225,10 @@ Suggested `.gitignore` starter:
 
 ## Moving the workspace to a new machine
 
-1. Clone the repo to the desired path (default `~/.kaijibot/workspace`).
-2. Set `agents.defaults.workspace` to that path in `~/.kaijibot/kaijibot.json`.
-3. Run `kaijibot setup --workspace <path>` to seed any missing files.
-4. If you need sessions, copy `~/.kaijibot/agents/<agentId>/sessions/` from the
+1. Clone the repo to the desired path (default `~/.allbot/workspace`).
+2. Set `agents.defaults.workspace` to that path in `~/.allbot/allbot.json`.
+3. Run `allbot setup --workspace <path>` to seed any missing files.
+4. If you need sessions, copy `~/.allbot/agents/<agentId>/sessions/` from the
    old machine separately.
 
 ## Advanced notes

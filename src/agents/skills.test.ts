@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   clearRuntimeConfigSnapshot,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import { createFixtureSuite } from "../test-utils/fixture-suite.js";
 import { createTempHomeEnv, type TempHomeEnv } from "../test-utils/temp-home.js";
@@ -19,7 +19,7 @@ import {
 } from "./skills.js";
 import { getActiveSkillEnvKeys } from "./skills/env-overrides.js";
 
-const fixtureSuite = createFixtureSuite("kaijibot-skills-suite-");
+const fixtureSuite = createFixtureSuite("allbot-skills-suite-");
 let tempHome: TempHomeEnv | null = null;
 
 const resolveTestSkillDirs = (workspaceDir: string) => ({
@@ -60,14 +60,14 @@ async function writeEnvSkill(workspaceDir: string) {
     dir: skillDir,
     name: "env-skill",
     description: "Needs env",
-    metadata: '{"kaijibot":{"requires":{"env":["ENV_KEY"]},"primaryEnv":"ENV_KEY"}}',
+    metadata: '{"allbot":{"requires":{"env":["ENV_KEY"]},"primaryEnv":"ENV_KEY"}}',
   });
 }
 
 beforeAll(async () => {
   await fixtureSuite.setup();
-  tempHome = await createTempHomeEnv("kaijibot-skills-home-");
-  await fs.mkdir(path.join(tempHome.home, ".kaijibot", "agents", "main", "sessions"), {
+  tempHome = await createTempHomeEnv("allbot-skills-home-");
+  await fs.mkdir(path.join(tempHome.home, ".allbot", "agents", "main", "sessions"), {
     recursive: true,
   });
 });
@@ -193,9 +193,9 @@ describe("buildWorkspaceSkillCommandSpecs", () => {
     expect(commands.map((entry) => entry.skillName)).toEqual(["alpha-skill"]);
   });
 
-  it("includes enabled Claude bundle markdown commands as native KaijiBot slash commands", async () => {
+  it("includes enabled Claude bundle markdown commands as native AllBot slash commands", async () => {
     const workspaceDir = await makeWorkspace();
-    const pluginRoot = path.join(tempHome!.home, ".kaijibot", "extensions", "compound-bundle");
+    const pluginRoot = path.join(tempHome!.home, ".allbot", "extensions", "compound-bundle");
     await fs.mkdir(path.join(pluginRoot, ".claude-plugin"), { recursive: true });
     await fs.mkdir(path.join(pluginRoot, "commands"), { recursive: true });
     await fs.writeFile(
@@ -431,7 +431,7 @@ describe("applySkillEnvOverrides", () => {
     await writeEnvSkill(workspaceDir);
 
     const entries = loadWorkspaceSkillEntries(workspaceDir, resolveTestSkillDirs(workspaceDir));
-    const sourceConfig: KaijiBotConfig = {
+    const sourceConfig: AllBotConfig = {
       skills: {
         entries: {
           "env-skill": {
@@ -444,7 +444,7 @@ describe("applySkillEnvOverrides", () => {
         },
       },
     };
-    const runtimeConfig: KaijiBotConfig = {
+    const runtimeConfig: AllBotConfig = {
       skills: {
         entries: {
           "env-skill": {
@@ -478,7 +478,7 @@ describe("applySkillEnvOverrides", () => {
       name: "unsafe-env-skill",
       description: "Needs env",
       metadata:
-        '{"kaijibot":{"requires":{"env":["OPENAI_API_KEY","NODE_OPTIONS"]},"primaryEnv":"OPENAI_API_KEY"}}',
+        '{"allbot":{"requires":{"env":["OPENAI_API_KEY","NODE_OPTIONS"]},"primaryEnv":"OPENAI_API_KEY"}}',
     });
 
     const entries = loadWorkspaceSkillEntries(workspaceDir, resolveTestSkillDirs(workspaceDir));
@@ -518,7 +518,7 @@ describe("applySkillEnvOverrides", () => {
       dir: skillDir,
       name: "dangerous-env-skill",
       description: "Needs env",
-      metadata: '{"kaijibot":{"requires":{"env":["BASH_ENV","SHELL"]}}}',
+      metadata: '{"allbot":{"requires":{"env":["BASH_ENV","SHELL"]}}}',
     });
 
     const entries = loadWorkspaceSkillEntries(workspaceDir, resolveTestSkillDirs(workspaceDir));
@@ -559,7 +559,7 @@ describe("applySkillEnvOverrides", () => {
       name: "override-env-skill",
       description: "Needs env",
       metadata:
-        '{"kaijibot":{"requires":{"env":["HTTPS_PROXY","NODE_TLS_REJECT_UNAUTHORIZED","DOCKER_HOST"]}}}',
+        '{"allbot":{"requires":{"env":["HTTPS_PROXY","NODE_TLS_REJECT_UNAUTHORIZED","DOCKER_HOST"]}}}',
     });
 
     const entries = loadWorkspaceSkillEntries(workspaceDir, resolveTestSkillDirs(workspaceDir));
@@ -602,7 +602,7 @@ describe("applySkillEnvOverrides", () => {
       dir: skillDir,
       name: "snapshot-env-skill",
       description: "Needs env",
-      metadata: '{"kaijibot":{"requires":{"env":["OPENAI_API_KEY"]}}}',
+      metadata: '{"allbot":{"requires":{"env":["OPENAI_API_KEY"]}}}',
     });
 
     const config = {

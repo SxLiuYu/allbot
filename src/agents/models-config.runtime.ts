@@ -1,1 +1,1 @@
-export { ensureKaijiBotModelsJson } from "./models-config.js";
+export { ensureAllBotModelsJson } from "./models-config.js";

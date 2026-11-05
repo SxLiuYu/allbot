@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { KeyedAsyncQueue } from "../../plugin-sdk/keyed-async-queue.js";
@@ -265,7 +265,7 @@ export class ProactiveScheduler {
   private readonly generateInsights: InsightGeneratorFn;
   private readonly fragmentStore: FragmentStore;
   private readonly llmDeps: LlmInsightDeps | undefined;
-  private readonly botConfig: KaijiBotConfig | undefined;
+  private readonly botConfig: AllBotConfig | undefined;
   private readonly ledger: DecisionLedger | undefined;
   private readonly processEventQueue = new KeyedAsyncQueue();
   private readonly lastProcessEventAt = new Map<string, number>();
@@ -310,12 +310,12 @@ export class ProactiveScheduler {
       insightGenerator?: InsightGeneratorFn;
       fragmentStore?: FragmentStore;
       llmDeps?: LlmInsightDeps;
-      botConfig?: KaijiBotConfig;
+      botConfig?: AllBotConfig;
       ledger?: DecisionLedger;
     },
   ) {
     this.generateInsights = deps?.insightGenerator ?? defaultInsightGenerator;
-    this.fragmentStore = deps?.fragmentStore ?? new FragmentStore(join(homedir(), ".kaijibot"));
+    this.fragmentStore = deps?.fragmentStore ?? new FragmentStore(join(homedir(), ".allbot"));
     this.llmDeps = deps?.llmDeps;
     this.botConfig = deps?.botConfig;
     this.ledger = deps?.ledger;

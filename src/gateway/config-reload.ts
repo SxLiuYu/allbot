@@ -1,7 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 import chokidar from "chokidar";
 import type {
-  KaijiBotConfig,
+  AllBotConfig,
   ConfigFileSnapshot,
   ConfigWriteNotification,
   GatewayReloadMode,
@@ -56,7 +56,7 @@ export function diffConfigPaths(prev: unknown, next: unknown, prefix = ""): stri
   return [prefix || "<root>"];
 }
 
-export function resolveGatewayReloadSettings(cfg: KaijiBotConfig): GatewayReloadSettings {
+export function resolveGatewayReloadSettings(cfg: AllBotConfig): GatewayReloadSettings {
   const rawMode = cfg.gateway?.reload?.mode;
   const mode =
     rawMode === "off" || rawMode === "restart" || rawMode === "hot" || rawMode === "hybrid"
@@ -75,11 +75,11 @@ export type GatewayConfigReloader = {
 };
 
 export function startGatewayConfigReloader(opts: {
-  initialConfig: KaijiBotConfig;
+  initialConfig: AllBotConfig;
   initialInternalWriteHash?: string | null;
   readSnapshot: () => Promise<ConfigFileSnapshot>;
-  onHotReload: (plan: GatewayReloadPlan, nextConfig: KaijiBotConfig) => Promise<void>;
-  onRestart: (plan: GatewayReloadPlan, nextConfig: KaijiBotConfig) => void | Promise<void>;
+  onHotReload: (plan: GatewayReloadPlan, nextConfig: AllBotConfig) => Promise<void>;
+  onRestart: (plan: GatewayReloadPlan, nextConfig: AllBotConfig) => void | Promise<void>;
   subscribeToWrites?: (listener: (event: ConfigWriteNotification) => void) => () => void;
   log: {
     info: (msg: string) => void;
@@ -96,7 +96,7 @@ export function startGatewayConfigReloader(opts: {
   let stopped = false;
   let restartQueued = false;
   let missingConfigRetries = 0;
-  let pendingInProcessConfig: KaijiBotConfig | null = null;
+  let pendingInProcessConfig: AllBotConfig | null = null;
   let lastAppliedWriteHash = opts.initialInternalWriteHash ?? null;
 
   const scheduleAfter = (wait: number) => {
@@ -113,7 +113,7 @@ export function startGatewayConfigReloader(opts: {
   const schedule = () => {
     scheduleAfter(settings.debounceMs);
   };
-  const queueRestart = (plan: GatewayReloadPlan, nextConfig: KaijiBotConfig) => {
+  const queueRestart = (plan: GatewayReloadPlan, nextConfig: AllBotConfig) => {
     if (restartQueued) {
       return;
     }
@@ -156,7 +156,7 @@ export function startGatewayConfigReloader(opts: {
     return true;
   };
 
-  const applySnapshot = async (nextConfig: KaijiBotConfig) => {
+  const applySnapshot = async (nextConfig: AllBotConfig) => {
     const changedPaths = diffConfigPaths(currentConfig, nextConfig);
     currentConfig = nextConfig;
     settings = resolveGatewayReloadSettings(nextConfig);

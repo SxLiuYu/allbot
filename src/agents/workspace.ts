@@ -17,11 +17,11 @@ export function resolveDefaultAgentWorkspaceDir(
   homedir: () => string = os.homedir,
 ): string {
   const home = resolveRequiredHomeDir(env, homedir);
-  const profile = env.KAIJIBOT_PROFILE?.trim();
+  const profile = env.ALLBOT_PROFILE?.trim();
   if (profile && normalizeOptionalLowercaseString(profile) !== "default") {
-    return path.join(home, ".kaijibot", `workspace-${profile}`);
+    return path.join(home, ".allbot", `workspace-${profile}`);
   }
-  return path.join(home, ".kaijibot", "workspace");
+  return path.join(home, ".allbot", "workspace");
 }
 
 export const DEFAULT_AGENT_WORKSPACE_DIR = resolveDefaultAgentWorkspaceDir();
@@ -34,8 +34,8 @@ export const DEFAULT_HEARTBEAT_FILENAME = "HEARTBEAT.md";
 export const DEFAULT_BOOTSTRAP_FILENAME = "BOOTSTRAP.md";
 export const DEFAULT_MEMORY_FILENAME = "MEMORY.md";
 export const DEFAULT_MEMORY_ALT_FILENAME = "memory.md";
-export const DEFAULT_GUIDE_FILENAME = "KAIJIBOT-GUIDE.md";
-const WORKSPACE_STATE_DIRNAME = ".kaijibot";
+export const DEFAULT_GUIDE_FILENAME = "ALLBOT-GUIDE.md";
+const WORKSPACE_STATE_DIRNAME = ".allbot";
 const WORKSPACE_STATE_FILENAME = "workspace-state.json";
 const WORKSPACE_STATE_VERSION = 1;
 

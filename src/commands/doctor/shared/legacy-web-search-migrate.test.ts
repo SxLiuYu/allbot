@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { findLegacyConfigIssues } from "../../../config/legacy.js";
 import { migrateLegacyConfig } from "./legacy-config-migrate.js";
 import {
@@ -9,7 +9,7 @@ import {
 
 describe("legacy web search config", () => {
   it("migrates legacy provider config through bundled web search ownership metadata", () => {
-    const res = migrateLegacyWebSearchConfig<KaijiBotConfig>({
+    const res = migrateLegacyWebSearchConfig<AllBotConfig>({
       tools: {
         web: {
           search: {
@@ -102,13 +102,13 @@ describe("legacy web search config", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
 
     expect(findLegacyConfigIssues(rawConfig)).toEqual([
       {
         path: "tools.web.search",
         message:
-          'tools.web.search provider-owned config moved to plugins.entries.<plugin>.config.webSearch. Run "kaijibot doctor --fix".',
+          'tools.web.search provider-owned config moved to plugins.entries.<plugin>.config.webSearch. Run "allbot doctor --fix".',
       },
     ]);
 

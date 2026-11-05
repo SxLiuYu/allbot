@@ -1,7 +1,7 @@
 /**
  * Read all registered agents from config + session status from session store.
  *
- * Walks `~/.kaijibot/kaijibot.json` → `agents.list` to enumerate every
+ * Walks `~/.allbot/allbot.json` → `agents.list` to enumerate every
  * configured agent (e.g. "main", "testagent"), then reads each agent's
  * `sessions/sessions.json` to count sessions and find the most recent
  * `updatedAt` timestamp.
@@ -66,7 +66,7 @@ async function readJson(file: string): Promise<unknown> {
 }
 
 /**
- * Extract the `agents.list` array from a parsed kaijibot.json config object.
+ * Extract the `agents.list` array from a parsed allbot.json config object.
  * Returns `[]` if the structure is missing or malformed.
  */
 function extractAgentList(configRoot: unknown): readonly ConfigAgentEntry[] {
@@ -128,7 +128,7 @@ async function readAgentSessionStats(
 /**
  * Read all registered agents from config, enriched with session counts.
  *
- * @param stateDir   Root state directory (e.g. `~/.kaijibot`).
+ * @param stateDir   Root state directory (e.g. `~/.allbot`).
  * @param _loadStore Session store loader (reserved for future active-state
  *                    enrichment; currently unused — agents default to "idle"
  *                    and the HTTP layer merges in fleet active state).
@@ -139,7 +139,7 @@ export async function readAllAgents(
   _loadStore?: LoadSessionStore,
 ): Promise<AgentInfo[]> {
   try {
-    const configFile = join(stateDir, "kaijibot.json");
+    const configFile = join(stateDir, "allbot.json");
     const configRoot = await readJson(configFile);
     const list = extractAgentList(configRoot);
 

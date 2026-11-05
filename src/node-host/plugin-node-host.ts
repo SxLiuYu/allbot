@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { getActivePluginRegistry } from "../plugins/runtime.js";
 
 let pluginRegistryLoaderModulePromise:
@@ -11,7 +11,7 @@ async function loadPluginRegistryLoaderModule() {
 }
 
 export async function ensureNodeHostPluginRegistry(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env?: NodeJS.ProcessEnv;
 }): Promise<void> {
   (await loadPluginRegistryLoaderModule()).ensurePluginRegistryLoaded({

@@ -1,6 +1,6 @@
 import { resolveDefaultAgentWorkspaceDir } from "../agents/workspace.js";
 import { loadConfig } from "../config/config.js";
-import { normalizeKaijiBotVersionBase } from "../config/version.js";
+import { normalizeAllBotVersionBase } from "../config/version.js";
 import { listImportedBundledPluginFacadeIds } from "../plugin-sdk/facade-runtime.js";
 import { resolveCompatibilityHostVersion } from "../version.js";
 import { inspectBundleLspRuntimeSupport } from "./bundle-lsp.js";
@@ -10,7 +10,7 @@ import {
   withBundledPluginEnablementCompat,
 } from "./bundled-compat.js";
 import { normalizePluginsConfig } from "./config-state.js";
-import { loadKaijiBotPlugins } from "./loader.js";
+import { loadAllBotPlugins } from "./loader.js";
 import { resolveBundledProviderCompatPluginIds } from "./providers.js";
 import type { PluginRegistry } from "./registry.js";
 import { listImportedRuntimePluginIds } from "./runtime.js";
@@ -134,8 +134,8 @@ function resolveReportedPluginVersion(
     return plugin.version;
   }
   return (
-    normalizeKaijiBotVersionBase(resolveCompatibilityHostVersion(env)) ??
-    normalizeKaijiBotVersionBase(plugin.version) ??
+    normalizeAllBotVersionBase(resolveCompatibilityHostVersion(env)) ??
+    normalizeAllBotVersionBase(plugin.version) ??
     plugin.version
   );
 }
@@ -188,7 +188,7 @@ function buildPluginReport(
   });
 
   const registry = loadModules
-    ? loadKaijiBotPlugins(
+    ? loadAllBotPlugins(
         buildPluginRuntimeLoadOptions(context, {
           config: runtimeCompatConfig,
           activationSourceConfig: rawConfig,

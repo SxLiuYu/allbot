@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withActivatedPluginIds } from "./activation-context.js";
 import {
   buildPluginSnapshotCacheEnvKey,
@@ -7,7 +7,7 @@ import {
 } from "./cache-controls.js";
 import {
   isPluginRegistryLoadInFlight,
-  loadKaijiBotPlugins,
+  loadAllBotPlugins,
   resolveCompatibleRuntimePluginRegistry,
   resolveRuntimePluginRegistry,
 } from "./loader.js";
@@ -27,7 +27,7 @@ type WebProviderSnapshotCacheEntry<TEntry> = {
 };
 
 export type WebProviderSnapshotCache<TEntry> = WeakMap<
-  KaijiBotConfig,
+  AllBotConfig,
   WeakMap<NodeJS.ProcessEnv, Map<string, WebProviderSnapshotCacheEntry<TEntry>>>
 >;
 
@@ -70,7 +70,7 @@ type ResolveWebProviderRuntimeDeps<TEntry> = {
 
 export function createWebProviderSnapshotCache<TEntry>(): WebProviderSnapshotCache<TEntry> {
   return new WeakMap<
-    KaijiBotConfig,
+    AllBotConfig,
     WeakMap<NodeJS.ProcessEnv, Map<string, WebProviderSnapshotCacheEntry<TEntry>>>
   >();
 }
@@ -129,7 +129,7 @@ export function resolvePluginWebProviders<TEntry>(
     if (pluginIds.length === 0) {
       return [];
     }
-    const registry = loadKaijiBotPlugins(
+    const registry = loadAllBotPlugins(
       buildPluginRuntimeLoadOptionsFromValues(
         {
           config: withActivatedPluginIds({
@@ -209,7 +209,7 @@ export function resolvePluginWebProviders<TEntry>(
     return [];
   }
   const resolved = deps.mapRegistryProviders({
-    registry: loadKaijiBotPlugins(loadOptions),
+    registry: loadAllBotPlugins(loadOptions),
     onlyPluginIds: params.onlyPluginIds,
   });
   memoizeSnapshot(resolved);

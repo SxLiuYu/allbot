@@ -3,7 +3,7 @@
  * prompt makes the Agent reliably call evaluate_skill_evolution and respond
  * to the user (not HEARTBEAT_OK).
  *
- * Run: KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/evolution/evolution-heartbeat-live.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/evolution/evolution-heartbeat-live.test.ts
  *
  * What this tests:
  *   1. Dedicated evolution prompt → Agent calls evaluate_skill_evolution tool
@@ -15,7 +15,7 @@
 import { describe, expect, it } from "vitest";
 import { buildEvolutionEventPrompt } from "../../infra/heartbeat-events-filter.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5-turbo";
@@ -66,7 +66,7 @@ const EVOLUTION_TOOL = {
 };
 
 const SYSTEM_PROMPT =
-  "You are KaijiBot, a proactive AI assistant for Chinese users via Feishu. " +
+  "You are AllBot, a proactive AI assistant for Chinese users via Feishu. " +
   "Follow instructions precisely. You have access to tools.";
 
 const EVOLUTION_SIGNAL =

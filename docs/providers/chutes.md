@@ -2,7 +2,7 @@
 title: "Chutes"
 summary: "Chutes setup (OAuth or API key, model discovery, aliases)"
 read_when:
-  - You want to use Chutes with KaijiBot
+  - You want to use Chutes with AllBot
   - You need the OAuth or API key setup path
   - You want the default model, aliases, or discovery behavior
 ---
@@ -10,15 +10,15 @@ read_when:
 # Chutes
 
 [Chutes](https://chutes.ai) exposes open-source model catalogs through an
-OpenAI-compatible API. KaijiBot supports both browser OAuth and direct API-key
+OpenAI-compatible API. AllBot supports both browser OAuth and direct API-key
 auth for the bundled `chutes` provider.
 
 - Provider: `chutes`
 - API: OpenAI-compatible
 - Base URL: `https://llm.chutes.ai/v1`
 - Auth:
-  - OAuth via `kaijibot onboard --auth-choice chutes`
-  - API key via `kaijibot onboard --auth-choice chutes-api-key`
+  - OAuth via `allbot onboard --auth-choice chutes`
+  - API key via `allbot onboard --auth-choice chutes-api-key`
   - Runtime env vars: `CHUTES_API_KEY`, `CHUTES_OAUTH_TOKEN`
 
 ## Quick start
@@ -26,11 +26,11 @@ auth for the bundled `chutes` provider.
 ### OAuth
 
 ```bash
-kaijibot onboard --auth-choice chutes
+allbot onboard --auth-choice chutes
 ```
 
-KaijiBot launches the browser flow locally, or shows a URL + redirect-paste
-flow on remote/headless hosts. OAuth tokens auto-refresh through KaijiBot auth
+AllBot launches the browser flow locally, or shows a URL + redirect-paste
+flow on remote/headless hosts. OAuth tokens auto-refresh through AllBot auth
 profiles.
 
 Optional OAuth overrides:
@@ -43,7 +43,7 @@ Optional OAuth overrides:
 ### API key
 
 ```bash
-kaijibot onboard --auth-choice chutes-api-key
+allbot onboard --auth-choice chutes-api-key
 ```
 
 Get your key at
@@ -54,13 +54,13 @@ to `chutes/zai-org/GLM-4.7-TEE`.
 
 ## Discovery behavior
 
-When Chutes auth is available, KaijiBot queries the Chutes catalog with that
-credential and uses the discovered models. If discovery fails, KaijiBot falls
+When Chutes auth is available, AllBot queries the Chutes catalog with that
+credential and uses the discovered models. If discovery fails, AllBot falls
 back to a bundled static catalog so onboarding and startup still work.
 
 ## Default aliases
 
-KaijiBot also registers three convenience aliases for the bundled Chutes
+AllBot also registers three convenience aliases for the bundled Chutes
 catalog:
 
 - `chutes-fast` -> `chutes/zai-org/GLM-4.7-FP8`

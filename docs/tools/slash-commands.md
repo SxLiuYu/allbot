@@ -63,8 +63,8 @@ They run immediately, are stripped before the model sees the message, and the re
   - Set `channels.discord.commands.nativeSkills`, `channels.telegram.commands.nativeSkills`, or `channels.slack.commands.nativeSkills` to override per provider (bool or `"auto"`).
 - `commands.bash` (default `false`) enables `! <cmd>` to run host shell commands (`/bash <cmd>` is an alias; requires `tools.elevated` allowlists).
 - `commands.bashForegroundMs` (default `2000`) controls how long bash waits before switching to background mode (`0` backgrounds immediately).
-- `commands.config` (default `false`) enables `/config` (reads/writes `kaijibot.json`).
-- `commands.mcp` (default `false`) enables `/mcp` (reads/writes KaijiBot-managed MCP config under `mcp.servers`).
+- `commands.config` (default `false`) enables `/config` (reads/writes `allbot.json`).
+- `commands.mcp` (default `false`) enables `/mcp` (reads/writes AllBot-managed MCP config under `mcp.servers`).
 - `commands.plugins` (default `false`) enables `/plugins` (plugin discovery/status plus install + enable/disable controls).
 - `commands.debug` (default `false`) enables `/debug` (runtime-only overrides).
 - `commands.restart` (default `true`) enables `/restart` plus gateway restart tool actions.
@@ -121,13 +121,13 @@ Built-in commands available today:
 - `/agents` lists thread-bound agents for the current session.
 - `/kill <id|#|all>` aborts one or all running sub-agents.
 - `/steer <id|#> <message>` sends steering to a running sub-agent. Alias: `/tell`.
-- `/config show|get|set|unset` reads or writes `kaijibot.json`. Owner-only. Requires `commands.config: true`.
-- `/mcp show|get|set|unset` reads or writes KaijiBot-managed MCP server config under `mcp.servers`. Owner-only. Requires `commands.mcp: true`.
+- `/config show|get|set|unset` reads or writes `allbot.json`. Owner-only. Requires `commands.config: true`.
+- `/mcp show|get|set|unset` reads or writes AllBot-managed MCP server config under `mcp.servers`. Owner-only. Requires `commands.mcp: true`.
 - `/plugins list|inspect|show|get|install|enable|disable` inspects or mutates plugin state. `/plugin` is an alias. Owner-only for writes. Requires `commands.plugins: true`.
 - `/debug show|set|unset|reset` manages runtime-only config overrides. Owner-only. Requires `commands.debug: true`.
 - `/usage off|tokens|full|cost` controls the per-response usage footer or prints a local cost summary.
 - `/tts on|off|status|provider|limit|summary|audio|help` controls TTS. See [/tools/tts](/tools/tts).
-- `/restart` restarts KaijiBot when enabled. Default: enabled; set `commands.restart: false` to disable it.
+- `/restart` restarts AllBot when enabled. Default: enabled; set `commands.restart: false` to disable it.
 - `/activation mention|always` sets group activation mode.
 - `/send on|off|inherit` sets send policy. Owner-only.
 - `/bash <command>` runs a host shell command. Text-only. Alias: `! <command>`. Requires `commands.bash: true` plus `tools.elevated` allowlists.
@@ -171,12 +171,12 @@ Notes:
 
 - Commands accept an optional `:` between the command and args (e.g. `/think: high`, `/send: on`, `/help:`).
 - `/new <model>` accepts a model alias, `provider/model`, or a provider name (fuzzy match); if no match, the text is treated as the message body.
-- For full provider usage breakdown, use `kaijibot status --usage`.
+- For full provider usage breakdown, use `allbot status --usage`.
 - `/allowlist add|remove` requires `commands.config=true` and honors channel `configWrites`.
 - In multi-account channels, config-targeted `/allowlist --account <id>` and `/config set channels.<provider>.accounts.<id>...` also honor the target account's `configWrites`.
-- `/usage` controls the per-response usage footer; `/usage cost` prints a local cost summary from KaijiBot session logs.
+- `/usage` controls the per-response usage footer; `/usage cost` prints a local cost summary from AllBot session logs.
 - `/restart` is enabled by default; set `commands.restart: false` to disable it.
-- `/plugins install <spec>` accepts the same plugin specs as `kaijibot plugins install`: local path/archive, npm package, or `clawhub:<pkg>`.
+- `/plugins install <spec>` accepts the same plugin specs as `allbot plugins install`: local path/archive, npm package, or `clawhub:<pkg>`.
 - `/plugins enable|disable` updates plugin config and may prompt for a restart.
 - Discord-only native command: `/vc join|leave|status` controls voice channels (requires `channels.discord.voice` and native commands; not available as text).
 - Discord thread-binding commands (`/focus`, `/unfocus`, `/agents`, `/session idle`, `/session max-age`) require effective thread bindings to be enabled (`session.threadBindings.enabled` and/or `channels.discord.threadBindings.enabled`).
@@ -188,7 +188,7 @@ Notes:
 - `/reasoning` (and `/verbose`) are risky in group settings: they may reveal internal reasoning or tool output you did not intend to expose. Prefer leaving them off, especially in group chats.
 - `/model` persists the new session model immediately.
 - If the agent is idle, the next run uses it right away.
-- If a run is already active, KaijiBot marks a live switch as pending and only restarts into the new model at a clean retry point.
+- If a run is already active, AllBot marks a live switch as pending and only restarts into the new model at a clean retry point.
 - If tool activity or reply output has already started, the pending switch can stay queued until a later retry opportunity or the next user turn.
 - **Fast path:** command-only messages from allowlisted senders are handled immediately (bypass queue + model).
 - **Group mention gating:** command-only messages from allowlisted senders bypass mention requirements.
@@ -221,7 +221,7 @@ of treating `/tools` as a static catalog.
 
 ## Usage surfaces (what shows where)
 
-- **Provider usage/quota** (example: “Claude 80% left”) shows up in `/status` for the current model provider when usage tracking is enabled. KaijiBot normalizes provider windows to `% left`; for MiniMax, remaining-only percent fields are inverted before display, and `model_remains` responses prefer the chat-model entry plus a model-tagged plan label.
+- **Provider usage/quota** (example: “Claude 80% left”) shows up in `/status` for the current model provider when usage tracking is enabled. AllBot normalizes provider windows to `% left`; for MiniMax, remaining-only percent fields are inverted before display, and `model_remains` responses prefer the chat-model entry plus a model-tagged plan label.
 - **Token/cache lines** in `/status` can fall back to the latest transcript usage entry when the live session snapshot is sparse. Existing nonzero live values still win, and transcript fallback can also recover the active runtime model label plus a larger prompt-oriented total when stored totals are missing or smaller.
 - **Per-response tokens/cost** is controlled by `/usage off|tokens|full` (appended to normal replies).
 - `/model status` is about **models/auth/endpoints**, not usage.
@@ -256,7 +256,7 @@ Examples:
 
 ```
 /debug show
-/debug set messages.responsePrefix="[kaijibot]"
+/debug set messages.responsePrefix="[allbot]"
 /debug set channels.whatsapp.allowFrom=["+1555","+4477"]
 /debug unset messages.responsePrefix
 /debug reset
@@ -264,12 +264,12 @@ Examples:
 
 Notes:
 
-- Overrides apply immediately to new config reads, but do **not** write to `kaijibot.json`.
+- Overrides apply immediately to new config reads, but do **not** write to `allbot.json`.
 - Use `/debug reset` to clear all overrides and return to the on-disk config.
 
 ## Config updates
 
-`/config` writes to your on-disk config (`kaijibot.json`). Owner-only. Disabled by default; enable with `commands.config: true`.
+`/config` writes to your on-disk config (`allbot.json`). Owner-only. Disabled by default; enable with `commands.config: true`.
 
 Examples:
 
@@ -277,7 +277,7 @@ Examples:
 /config show
 /config show messages.responsePrefix
 /config get messages.responsePrefix
-/config set messages.responsePrefix="[kaijibot]"
+/config set messages.responsePrefix="[allbot]"
 /config unset messages.responsePrefix
 ```
 
@@ -288,7 +288,7 @@ Notes:
 
 ## MCP updates
 
-`/mcp` writes KaijiBot-managed MCP server definitions under `mcp.servers`. Owner-only. Disabled by default; enable with `commands.mcp: true`.
+`/mcp` writes AllBot-managed MCP server definitions under `mcp.servers`. Owner-only. Disabled by default; enable with `commands.mcp: true`.
 
 Examples:
 
@@ -301,7 +301,7 @@ Examples:
 
 Notes:
 
-- `/mcp` stores config in KaijiBot config, not Pi-owned project settings.
+- `/mcp` stores config in AllBot config, not Pi-owned project settings.
 - Runtime adapters decide which transports are actually executable.
 
 ## Plugin updates
@@ -332,7 +332,7 @@ Notes:
   - Slack: `agent:<agentId>:slack:slash:<userId>` (prefix configurable via `channels.slack.slashCommand.sessionPrefix`)
   - Telegram: `telegram:slash:<userId>` (targets the chat session via `CommandTargetSessionKey`)
 - **`/stop`** targets the active chat session so it can abort the current run.
-- **Slack:** `channels.slack.slashCommand` is still supported for a single `/kaijibot`-style command. If you enable `commands.native`, you must create one Slack slash command per built-in command (same names as `/help`). Command argument menus for Slack are delivered as ephemeral Block Kit buttons.
+- **Slack:** `channels.slack.slashCommand` is still supported for a single `/allbot`-style command. If you enable `commands.native`, you must create one Slack slash command per built-in command (same names as `/help`). Command argument menus for Slack are delivered as ephemeral Block Kit buttons.
   - Slack native exception: register `/agentstatus` (not `/status`) because Slack reserves `/status`. Text `/status` still works in Slack messages.
 
 ## BTW side questions

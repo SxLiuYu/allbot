@@ -26,7 +26,7 @@ import {
 } from "../channels/thread-bindings-policy.js";
 import { parseDurationMs } from "../cli/parse-duration.js";
 import { loadConfig } from "../config/config.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { loadSessionStore } from "../config/sessions/store.js";
 import { resolveSessionTranscriptFile } from "../config/sessions/transcript.js";
@@ -145,7 +145,7 @@ export const ACP_SPAWN_SESSION_ACCEPTED_NOTE =
   "thread-bound ACP session stays active after this task; continue in-thread for follow-ups.";
 
 export function resolveAcpSpawnRuntimePolicyError(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   requesterSessionKey?: string;
   requesterSandboxed?: boolean;
   sandbox?: SpawnAcpSandboxMode;
@@ -277,7 +277,7 @@ function resolveAcpSessionMode(mode: SpawnAcpMode): AcpRuntimeSessionMode {
 }
 
 function isHeartbeatEnabledForSessionAgent(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey?: string;
 }): boolean {
   if (!areHeartbeatsEnabled()) {
@@ -315,9 +315,9 @@ function isHeartbeatEnabledForSessionAgent(params: {
 }
 
 function resolveHeartbeatConfigForAgent(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
-}): NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>["heartbeat"] {
+}): NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>["heartbeat"] {
   const defaults = params.cfg.agents?.defaults?.heartbeat;
   const overrides = resolveAgentConfig(params.cfg, params.agentId)?.heartbeat;
   if (!defaults && !overrides) {
@@ -330,7 +330,7 @@ function resolveHeartbeatConfigForAgent(params: {
 }
 
 function hasSessionLocalHeartbeatRelayRoute(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   parentSessionKey: string;
   requesterAgentId: string;
 }): boolean {
@@ -367,7 +367,7 @@ function hasSessionLocalHeartbeatRelayRoute(params: {
 
 function resolveTargetAcpAgentId(params: {
   requestedAgentId?: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): { ok: true; agentId: string } | { ok: false; error: string } {
   const requested = normalizeOptionalAgentId(params.requestedAgentId);
   if (requested) {
@@ -445,7 +445,7 @@ async function resolveRuntimeCwdForAcpSpawn(params: {
 }
 
 function resolveRequesterInternalSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   requesterSessionKey?: string;
 }): string {
   const { mainKey, alias } = resolveMainSessionAlias(params.cfg);
@@ -531,7 +531,7 @@ function resolveConversationIdForThreadBinding(params: {
 }
 
 function resolveAcpSpawnChannelAccountId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
   accountId?: string;
 }): string | undefined {
@@ -549,7 +549,7 @@ function resolveAcpSpawnChannelAccountId(params: {
 }
 
 function prepareAcpThreadBinding(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
   accountId?: string;
   to?: string;
@@ -645,7 +645,7 @@ function prepareAcpThreadBinding(params: {
 }
 
 function resolveAcpSpawnRequesterState(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   parentSessionKey?: string;
   ctx: SpawnAcpContext;
 }): AcpSpawnRequesterState {
@@ -721,7 +721,7 @@ function resolveAcpSpawnStreamPlan(params: {
 }
 
 async function initializeAcpSpawnRuntime(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   targetAgentId: string;
   runtimeMode: AcpRuntimeSessionMode;
@@ -768,7 +768,7 @@ async function initializeAcpSpawnRuntime(params: {
 }
 
 async function bindPreparedAcpThread(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   targetAgentId: string;
   label?: string;
@@ -845,7 +845,7 @@ async function bindPreparedAcpThread(params: {
 }
 
 function resolveAcpSpawnBootstrapDeliveryPlan(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   spawnMode: SpawnAcpMode;
   requestThreadBinding: boolean;
   effectiveStreamToParent: boolean;

@@ -144,7 +144,7 @@ describeLive("xai live", () => {
 
     expect(tool).toBeTruthy();
     const result = await tool!.execute("web-search:grok-live", {
-      query: "KaijiBot GitHub",
+      query: "AllBot GitHub",
       count: 3,
     });
 

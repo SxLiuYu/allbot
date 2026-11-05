@@ -1,6 +1,6 @@
 import { hasNonEmptyString } from "../infra/outbound/channel-target.js";
 import { isRecord } from "../utils.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 
 const STATIC_ENV_RULES: Record<string, string[] | ((env: NodeJS.ProcessEnv) => boolean)> = {
   discord: ["DISCORD_BOT_TOKEN"],
@@ -10,7 +10,7 @@ const STATIC_ENV_RULES: Record<string, string[] | ((env: NodeJS.ProcessEnv) => b
 };
 
 export function resolveChannelConfigRecord(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channelId: string,
 ): Record<string, unknown> | null {
   const channels = cfg.channels as Record<string, unknown> | undefined;
@@ -26,7 +26,7 @@ export function hasMeaningfulChannelConfigShallow(value: unknown): boolean {
 }
 
 export function isStaticallyChannelConfigured(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channelId: string,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {

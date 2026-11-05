@@ -38,7 +38,7 @@ const defaultProgramArguments = ["node", "-e", "process.exit(0)"];
 
 function expectLaunchctlEnableBootstrapOrder(env: Record<string, string | undefined>) {
   const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-  const label = "ai.kaijibot.gateway";
+  const label = "ai.allbot.gateway";
   const plistPath = resolveLaunchAgentPlistPath(env);
   const serviceId = `${domain}/${label}`;
   const enableIndex = state.launchctlCalls.findIndex(
@@ -230,9 +230,9 @@ describe("launchd runtime parsing", () => {
 
 describe("launchctl list detection", () => {
   it("detects the resolved label in launchctl list", async () => {
-    state.listOutput = "123 0 ai.kaijibot.gateway\n";
+    state.listOutput = "123 0 ai.allbot.gateway\n";
     const listed = await isLaunchAgentListed({
-      env: { HOME: "/Users/test", KAIJIBOT_PROFILE: "default" },
+      env: { HOME: "/Users/test", ALLBOT_PROFILE: "default" },
     });
     expect(listed).toBe(true);
   });
@@ -240,7 +240,7 @@ describe("launchctl list detection", () => {
   it("returns false when the label is missing", async () => {
     state.listOutput = "123 0 com.other.service\n";
     const listed = await isLaunchAgentListed({
-      env: { HOME: "/Users/test", KAIJIBOT_PROFILE: "default" },
+      env: { HOME: "/Users/test", ALLBOT_PROFILE: "default" },
     });
     expect(listed).toBe(false);
   });
@@ -250,7 +250,7 @@ describe("launchd bootstrap repair", () => {
   it("enables, bootstraps, and kickstarts the resolved label", async () => {
     const env: Record<string, string | undefined> = {
       HOME: "/Users/test",
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
     const repair = await repairLaunchAgentBootstrap({ env });
     expect(repair).toEqual({ ok: true, status: "repaired" });
@@ -269,7 +269,7 @@ describe("launchd bootstrap repair", () => {
     state.bootstrapCode = 130;
     const env: Record<string, string | undefined> = {
       HOME: "/Users/test",
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
 
     const repair = await repairLaunchAgentBootstrap({ env });
@@ -283,7 +283,7 @@ describe("launchd bootstrap repair", () => {
       "Could not bootstrap service: 5: Input/output error: already exists in domain for gui/501";
     const env: Record<string, string | undefined> = {
       HOME: "/Users/test",
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
 
     const repair = await repairLaunchAgentBootstrap({ env });
@@ -296,7 +296,7 @@ describe("launchd bootstrap repair", () => {
     state.bootstrapError = "Could not find specified service";
     const env: Record<string, string | undefined> = {
       HOME: "/Users/test",
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
 
     const repair = await repairLaunchAgentBootstrap({ env });
@@ -314,7 +314,7 @@ describe("launchd bootstrap repair", () => {
     state.kickstartFailuresRemaining = 1;
     const env: Record<string, string | undefined> = {
       HOME: "/Users/test",
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
 
     const repair = await repairLaunchAgentBootstrap({ env });
@@ -331,7 +331,7 @@ describe("launchd install", () => {
   function createDefaultLaunchdEnv(): Record<string, string | undefined> {
     return {
       HOME: "/Users/test",
-      KAIJIBOT_PROFILE: "default",
+      ALLBOT_PROFILE: "default",
     };
   }
 
@@ -409,7 +409,7 @@ describe("launchd install", () => {
   it("restarts LaunchAgent with kickstart and no bootout", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      KAIJIBOT_GATEWAY_PORT: "18789",
+      ALLBOT_GATEWAY_PORT: "18789",
     };
     const result = await restartLaunchAgent({
       env,
@@ -417,7 +417,7 @@ describe("launchd install", () => {
     });
 
     const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
-    const label = "ai.kaijibot.gateway";
+    const label = "ai.allbot.gateway";
     const serviceId = `${domain}/${label}`;
     expect(result).toEqual({ outcome: "completed" });
     expect(cleanStaleGatewayProcessesSync).toHaveBeenCalledWith(18789);
@@ -429,7 +429,7 @@ describe("launchd install", () => {
   it("uses the configured gateway port for stale cleanup", async () => {
     const env = {
       ...createDefaultLaunchdEnv(),
-      KAIJIBOT_GATEWAY_PORT: "19001",
+      ALLBOT_GATEWAY_PORT: "19001",
     };
 
     await restartLaunchAgent({
@@ -574,40 +574,40 @@ describe("launchd install", () => {
 describe("resolveLaunchAgentPlistPath", () => {
   it.each([
     {
-      name: "uses default label when KAIJIBOT_PROFILE is unset",
+      name: "uses default label when ALLBOT_PROFILE is unset",
       env: { HOME: "/Users/test" },
-      expected: "/Users/test/Library/LaunchAgents/ai.kaijibot.gateway.plist",
+      expected: "/Users/test/Library/LaunchAgents/ai.allbot.gateway.plist",
     },
     {
-      name: "uses profile-specific label when KAIJIBOT_PROFILE is set to a custom value",
-      env: { HOME: "/Users/test", KAIJIBOT_PROFILE: "jbphoenix" },
-      expected: "/Users/test/Library/LaunchAgents/ai.kaijibot.jbphoenix.plist",
+      name: "uses profile-specific label when ALLBOT_PROFILE is set to a custom value",
+      env: { HOME: "/Users/test", ALLBOT_PROFILE: "jbphoenix" },
+      expected: "/Users/test/Library/LaunchAgents/ai.allbot.jbphoenix.plist",
     },
     {
-      name: "prefers KAIJIBOT_LAUNCHD_LABEL over KAIJIBOT_PROFILE",
+      name: "prefers ALLBOT_LAUNCHD_LABEL over ALLBOT_PROFILE",
       env: {
         HOME: "/Users/test",
-        KAIJIBOT_PROFILE: "jbphoenix",
-        KAIJIBOT_LAUNCHD_LABEL: "com.custom.label",
+        ALLBOT_PROFILE: "jbphoenix",
+        ALLBOT_LAUNCHD_LABEL: "com.custom.label",
       },
       expected: "/Users/test/Library/LaunchAgents/com.custom.label.plist",
     },
     {
-      name: "trims whitespace from KAIJIBOT_LAUNCHD_LABEL",
+      name: "trims whitespace from ALLBOT_LAUNCHD_LABEL",
       env: {
         HOME: "/Users/test",
-        KAIJIBOT_LAUNCHD_LABEL: "  com.custom.label  ",
+        ALLBOT_LAUNCHD_LABEL: "  com.custom.label  ",
       },
       expected: "/Users/test/Library/LaunchAgents/com.custom.label.plist",
     },
     {
-      name: "ignores empty KAIJIBOT_LAUNCHD_LABEL and falls back to profile",
+      name: "ignores empty ALLBOT_LAUNCHD_LABEL and falls back to profile",
       env: {
         HOME: "/Users/test",
-        KAIJIBOT_PROFILE: "myprofile",
-        KAIJIBOT_LAUNCHD_LABEL: "   ",
+        ALLBOT_PROFILE: "myprofile",
+        ALLBOT_LAUNCHD_LABEL: "   ",
       },
-      expected: "/Users/test/Library/LaunchAgents/ai.kaijibot.myprofile.plist",
+      expected: "/Users/test/Library/LaunchAgents/ai.allbot.myprofile.plist",
     },
   ])("$name", ({ env, expected }) => {
     expect(resolveLaunchAgentPlistPath(env)).toBe(expected);

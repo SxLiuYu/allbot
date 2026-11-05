@@ -43,7 +43,7 @@ vi.mock("./backup-rotation.js", async (importOriginal) => {
 });
 
 describe("config io write", () => {
-  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-config-io-" });
+  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-config-io-" });
   const silentLogger = {
     warn: () => {},
     error: () => {},
@@ -84,7 +84,7 @@ describe("config io write", () => {
     "tightens world-writable state dir when writing the default config",
     async () => {
       await withSuiteHome(async (home) => {
-        const stateDir = path.join(home, ".kaijibot");
+        const stateDir = path.join(home, ".allbot");
         await fs.mkdir(stateDir, { recursive: true, mode: 0o777 });
         await fs.chmod(stateDir, 0o777);
 
@@ -102,9 +102,9 @@ describe("config io write", () => {
     },
   );
 
-  it("keeps writes inside an KAIJIBOT_STATE_DIR override even when the real home config exists", async () => {
+  it("keeps writes inside an ALLBOT_STATE_DIR override even when the real home config exists", async () => {
     await withSuiteHome(async (home) => {
-      const liveConfigPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const liveConfigPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(liveConfigPath), { recursive: true });
       await fs.writeFile(
         liveConfigPath,
@@ -113,14 +113,14 @@ describe("config io write", () => {
       );
 
       const overrideDir = path.join(home, "isolated-state");
-      const env = { KAIJIBOT_STATE_DIR: overrideDir } as NodeJS.ProcessEnv;
+      const env = { ALLBOT_STATE_DIR: overrideDir } as NodeJS.ProcessEnv;
       const io = createConfigIO({
         env,
         homedir: () => home,
         logger: silentLogger,
       });
 
-      expect(io.configPath).toBe(path.join(overrideDir, "kaijibot.json"));
+      expect(io.configPath).toBe(path.join(overrideDir, "allbot.json"));
 
       await io.writeConfigFile({
         agents: { list: [{ id: "main", default: true }] },
@@ -134,7 +134,7 @@ describe("config io write", () => {
       expect(livePersisted.gateway).toEqual({ mode: "local", port: 18789 });
 
       const overridePersisted = JSON.parse(
-        await fs.readFile(path.join(overrideDir, "kaijibot.json"), "utf-8"),
+        await fs.readFile(path.join(overrideDir, "allbot.json"), "utf-8"),
       ) as {
         session?: { store?: unknown };
       };
@@ -144,7 +144,7 @@ describe("config io write", () => {
 
   it("does not mutate caller config when unsetPaths is applied on first write", async () => {
     await withSuiteHome(async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       const io = createConfigIO({
         env: {} as NodeJS.ProcessEnv,
         homedir: () => home,
@@ -202,9 +202,9 @@ describe("config io write", () => {
           cliBackends: [],
           skills: [],
           hooks: [],
-          rootDir: "/tmp/kaijibot-test-required-plugin",
-          source: "/tmp/kaijibot-test-required-plugin/index.ts",
-          manifestPath: "/tmp/kaijibot-test-required-plugin/kaijibot.plugin.json",
+          rootDir: "/tmp/allbot-test-required-plugin",
+          source: "/tmp/allbot-test-required-plugin/index.ts",
+          manifestPath: "/tmp/allbot-test-required-plugin/allbot.plugin.json",
           configSchema: {
             type: "object",
             properties: {

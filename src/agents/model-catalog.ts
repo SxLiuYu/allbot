@@ -1,12 +1,12 @@
-import { type KaijiBotConfig, loadConfig } from "../config/config.js";
+import { type AllBotConfig, loadConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { augmentModelCatalogWithProviderPlugins } from "../plugins/provider-runtime.runtime.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
 } from "../shared/string-coerce.js";
-import { resolveKaijiBotAgentDir } from "./agent-paths.js";
-import { ensureKaijiBotModelsJson } from "./models-config.js";
+import { resolveAllBotAgentDir } from "./agent-paths.js";
+import { ensureAllBotModelsJson } from "./models-config.js";
 import { normalizeProviderId } from "./provider-id.js";
 
 const log = createSubsystemLogger("model-catalog");
@@ -56,7 +56,7 @@ const defaultImportLiveDiscovery = () => import("./model-discovery-live.runtime.
 let importLiveDiscovery = defaultImportLiveDiscovery;
 
 function shouldLogModelCatalogTiming(): boolean {
-  return process.env.KAIJIBOT_DEBUG_INGRESS_TIMING === "1";
+  return process.env.ALLBOT_DEBUG_INGRESS_TIMING === "1";
 }
 
 function loadModelSuppression() {
@@ -103,7 +103,7 @@ function instantiatePiModelRegistry(
 }
 
 export async function loadModelCatalog(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   useCache?: boolean;
 }): Promise<ModelCatalogEntry[]> {
   if (params?.useCache === false) {
@@ -134,7 +134,7 @@ export async function loadModelCatalog(params?: {
       });
     try {
       const cfg = params?.config ?? loadConfig();
-      await ensureKaijiBotModelsJson(cfg);
+      await ensureAllBotModelsJson(cfg);
       logStage("models-json-ready");
       // IMPORTANT: keep the dynamic import *inside* the try/catch.
       // If this fails once (e.g. during a pnpm install that temporarily swaps node_modules),
@@ -142,7 +142,7 @@ export async function loadModelCatalog(params?: {
       // will keep failing until restart).
       const piSdk = await importPiSdk();
       logStage("pi-sdk-imported");
-      const agentDir = resolveKaijiBotAgentDir();
+      const agentDir = resolveAllBotAgentDir();
       const { shouldSuppressBuiltInModel } = await loadModelSuppression();
       logStage("catalog-deps-ready");
       const { join } = await import("node:path");

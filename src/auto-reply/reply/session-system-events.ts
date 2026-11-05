@@ -1,5 +1,5 @@
 import { resolveUserTimezone } from "../../agents/date-time.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { buildChannelSummary } from "../../infra/channel-summary.js";
 import {
   formatUtcTimestamp,
@@ -17,7 +17,7 @@ import {
 
 /** Drain queued system events, format as `System:` lines, return the block (or undefined). */
 export async function drainFormattedSystemEvents(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionKey: string;
   isMainSession: boolean;
   isNewSession: boolean;
@@ -45,7 +45,7 @@ export async function drainFormattedSystemEvents(params: {
     return trimmed;
   };
 
-  const resolveSystemEventTimezone = (cfg: KaijiBotConfig) => {
+  const resolveSystemEventTimezone = (cfg: AllBotConfig) => {
     const raw = normalizeOptionalString(cfg.agents?.defaults?.envelopeTimezone);
     if (!raw) {
       return { mode: "local" as const };
@@ -67,7 +67,7 @@ export async function drainFormattedSystemEvents(params: {
     return explicit ? { mode: "iana" as const, timeZone: explicit } : { mode: "local" as const };
   };
 
-  const formatSystemEventTimestamp = (ts: number, cfg: KaijiBotConfig) => {
+  const formatSystemEventTimestamp = (ts: number, cfg: AllBotConfig) => {
     const date = new Date(ts);
     if (Number.isNaN(date.getTime())) {
       return "unknown-time";

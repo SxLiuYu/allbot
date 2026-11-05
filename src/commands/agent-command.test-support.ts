@@ -1,10 +1,10 @@
 import path from "node:path";
 import { withTempHome as withTempHomeBase } from "../../test/helpers/temp-home.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
-type AgentDefaultConfig = NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>;
+type AgentDefaultConfig = NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>;
 type LoadConfigMock = {
-  mockReturnValue(value: KaijiBotConfig): unknown;
+  mockReturnValue(value: AllBotConfig): unknown;
 };
 
 export async function withAgentCommandTempHome<T>(
@@ -19,18 +19,18 @@ export function mockAgentCommandConfig(
   home: string,
   storePath: string,
   agentOverrides?: Partial<AgentDefaultConfig>,
-): KaijiBotConfig {
+): AllBotConfig {
   const cfg = {
     agents: {
       defaults: {
         model: { primary: "anthropic/claude-opus-4-6" },
         models: { "anthropic/claude-opus-4-6": {} },
-        workspace: path.join(home, "kaijibot"),
+        workspace: path.join(home, "allbot"),
         ...agentOverrides,
       },
     },
     session: { store: storePath, mainKey: "main" },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
   configSpy.mockReturnValue(cfg);
   return cfg;
 }

@@ -2,7 +2,7 @@
 import {
   isMissingEmbeddingApiKeyError,
   type MemoryEmbeddingProviderAdapter,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
 import {
   createDeepInfraEmbeddingProvider,
   DEFAULT_DEEPINFRA_EMBEDDING_MODEL,

@@ -50,7 +50,7 @@ const mocks = vi.hoisted(() => {
     sourceConfig,
     resolvedConfig,
     loadModelsConfigWithSource: vi.fn(),
-    ensureKaijiBotModelsJson: vi.fn(),
+    ensureAllBotModelsJson: vi.fn(),
     ensureAuthProfileStore: vi.fn(),
     loadModelRegistry: vi.fn(),
     loadModelCatalog: vi.fn(),
@@ -67,7 +67,7 @@ function resetMocks() {
     resolvedConfig: mocks.resolvedConfig,
     diagnostics: [],
   });
-  mocks.ensureKaijiBotModelsJson.mockResolvedValue({ wrote: false });
+  mocks.ensureAllBotModelsJson.mockResolvedValue({ wrote: false });
   mocks.ensureAuthProfileStore.mockReturnValue({ version: 1, profiles: {}, order: {} });
   mocks.loadModelRegistry.mockResolvedValue({
     models: [],
@@ -130,7 +130,7 @@ function installModelsListCommandForwardCompatMocks() {
   }));
 
   vi.doMock("./list.runtime.js", () => ({
-    ensureKaijiBotModelsJson: mocks.ensureKaijiBotModelsJson,
+    ensureAllBotModelsJson: mocks.ensureAllBotModelsJson,
     ensureAuthProfileStore: mocks.ensureAuthProfileStore,
     listProfilesForProvider: mocks.listProfilesForProvider,
     loadModelCatalog: mocks.loadModelCatalog,

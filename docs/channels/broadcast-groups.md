@@ -7,7 +7,7 @@ status: experimental
 title: "Broadcast Groups"
 ---
 
-> ⚠️ **Channel scope notice**: This document describes broadcast groups for **WhatsApp**, which is **not shipped** with KaijiBot. Only **Feishu** and **WeChat** have source code in this repository. The broadcast pattern may apply if you implement a custom channel plugin. See `docs/archive/channels/whatsapp.md` for the archived WhatsApp reference.
+> ⚠️ **Channel scope notice**: This document describes broadcast groups for **WhatsApp**, which is **not shipped** with AllBot. Only **Feishu** and **WeChat** have source code in this repository. The broadcast pattern may apply if you implement a custom channel plugin. See `docs/archive/channels/whatsapp.md` for the archived WhatsApp reference.
 
 # Broadcast Groups
 
@@ -20,7 +20,7 @@ Broadcast Groups enable multiple agents to process and respond to the same messa
 
 Current scope: **WhatsApp only** (web channel).
 
-Broadcast groups are evaluated after channel allowlists and group activation rules. In WhatsApp groups, this means broadcasts happen when KaijiBot would normally reply (for example: on mention, depending on your group settings).
+Broadcast groups are evaluated after channel allowlists and group activation rules. In WhatsApp groups, this means broadcasts happen when AllBot would normally reply (for example: on mention, depending on your group settings).
 
 ## Use Cases
 
@@ -85,7 +85,7 @@ Add a top-level `broadcast` section (next to `bindings`). Keys are WhatsApp peer
 }
 ```
 
-**Result:** When KaijiBot would reply in this chat, it will run all three agents.
+**Result:** When AllBot would reply in this chat, it will run all three agents.
 
 ### Processing Strategy
 
@@ -194,7 +194,7 @@ In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
 ```
 Session: agent:alfred:whatsapp:group:120363403215116621@g.us
 History: [user message, alfred's previous responses]
-Workspace: /Users/user/kaijibot-alfred/
+Workspace: /Users/user/allbot-alfred/
 Tools: read, write, exec
 ```
 
@@ -203,7 +203,7 @@ Tools: read, write, exec
 ```
 Session: agent:baerbel:whatsapp:group:120363403215116621@g.us
 History: [user message, baerbel's previous responses]
-Workspace: /Users/user/kaijibot-baerbel/
+Workspace: /Users/user/allbot-baerbel/
 Tools: read only
 ```
 
@@ -319,7 +319,7 @@ Broadcast groups work alongside existing routing:
 **Debug:**
 
 ```bash
-tail -f ~/.kaijibot/logs/gateway.log | grep broadcast
+tail -f ~/.allbot/logs/gateway.log | grep broadcast
 ```
 
 ### Only One Agent Responding
@@ -405,7 +405,7 @@ tail -f ~/.kaijibot/logs/gateway.log | grep broadcast
 ### Config Schema
 
 ```typescript
-interface KaijiBotConfig {
+interface AllBotConfig {
   broadcast?: {
     strategy?: "parallel" | "sequential";
     [peerId: string]: string[];

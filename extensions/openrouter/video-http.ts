@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fetchWithTimeoutGuarded } from "kaijibot/plugin-sdk/provider-http";
+import { fetchWithTimeoutGuarded } from "allbot/plugin-sdk/provider-http";
 
 type GuardedFetchResult = Awaited<ReturnType<typeof fetchWithTimeoutGuarded>>;
 type FetchGuardOptions = NonNullable<Parameters<typeof fetchWithTimeoutGuarded>[4]>;

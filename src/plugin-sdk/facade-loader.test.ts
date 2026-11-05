@@ -11,8 +11,8 @@ import { listImportedBundledPluginFacadeIds as listImportedFacadeRuntimeIds } fr
 import { createPluginSdkTestHarness } from "./test-helpers.js";
 
 const { createTempDirSync } = createPluginSdkTestHarness();
-const originalBundledPluginsDir = process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-const FACADE_LOADER_GLOBAL = "__kaijibotTestLoadBundledPluginPublicSurfaceModuleSync";
+const originalBundledPluginsDir = process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
+const FACADE_LOADER_GLOBAL = "__allbotTestLoadBundledPluginPublicSurfaceModuleSync";
 type FacadeLoaderJitiFactory = NonNullable<Parameters<typeof setFacadeLoaderJitiFactoryForTest>[0]>;
 
 function createBundledPluginDir(prefix: string, marker: string): string {
@@ -73,25 +73,25 @@ afterEach(() => {
   setFacadeLoaderJitiFactoryForTest(undefined);
   delete (globalThis as typeof globalThis & Record<string, unknown>)[FACADE_LOADER_GLOBAL];
   if (originalBundledPluginsDir === undefined) {
-    delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+    delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = originalBundledPluginsDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = originalBundledPluginsDir;
   }
 });
 
 describe("plugin-sdk facade loader", () => {
   it("honors bundled plugin dir overrides outside the package root", () => {
-    const overrideA = createBundledPluginDir("kaijibot-facade-loader-a-", "override-a");
-    const overrideB = createBundledPluginDir("kaijibot-facade-loader-b-", "override-b");
+    const overrideA = createBundledPluginDir("allbot-facade-loader-a-", "override-a");
+    const overrideB = createBundledPluginDir("allbot-facade-loader-b-", "override-b");
 
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = overrideA;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = overrideA;
     const fromA = loadBundledPluginPublicSurfaceModuleSync<{ marker: string }>({
       dirName: "demo",
       artifactBasename: "api.js",
     });
     expect(fromA.marker).toBe("override-a");
 
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = overrideB;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = overrideB;
     const fromB = loadBundledPluginPublicSurfaceModuleSync<{ marker: string }>({
       dirName: "demo",
       artifactBasename: "api.js",
@@ -100,8 +100,8 @@ describe("plugin-sdk facade loader", () => {
   });
 
   it("shares loaded facade ids with facade-runtime", () => {
-    const dir = createBundledPluginDir("kaijibot-facade-loader-ids-", "identity-check");
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = dir;
+    const dir = createBundledPluginDir("allbot-facade-loader-ids-", "identity-check");
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = dir;
 
     const first = loadBundledPluginPublicSurfaceModuleSync<{ marker: string }>({
       dirName: "demo",
@@ -119,7 +119,7 @@ describe("plugin-sdk facade loader", () => {
   });
 
   it("keeps Windows dist facade loads off Jiti native import", () => {
-    const dir = createTempDirSync("kaijibot-facade-loader-windows-dist-");
+    const dir = createTempDirSync("allbot-facade-loader-windows-dist-");
     const bundledPluginsDir = path.join(dir, "dist");
     fs.mkdirSync(path.join(bundledPluginsDir, "demo"), { recursive: true });
     fs.writeFileSync(
@@ -127,7 +127,7 @@ describe("plugin-sdk facade loader", () => {
       'export const marker = "windows-dist-ok";\n',
       "utf8",
     );
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
 
     const createJitiCalls: Parameters<FacadeLoaderJitiFactory>[] = [];
     setFacadeLoaderJitiFactoryForTest(((...args) => {
@@ -158,8 +158,8 @@ describe("plugin-sdk facade loader", () => {
   });
 
   it("breaks circular facade re-entry during module evaluation", () => {
-    const dir = createCircularPluginDir("kaijibot-facade-loader-circular-");
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = dir;
+    const dir = createCircularPluginDir("allbot-facade-loader-circular-");
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = dir;
     (globalThis as typeof globalThis & Record<string, unknown>)[FACADE_LOADER_GLOBAL] =
       loadBundledPluginPublicSurfaceModuleSync;
 
@@ -172,8 +172,8 @@ describe("plugin-sdk facade loader", () => {
   });
 
   it("clears the cache on load failure so retries re-execute", () => {
-    const dir = createThrowingPluginDir("kaijibot-facade-loader-throw-");
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = dir;
+    const dir = createThrowingPluginDir("allbot-facade-loader-throw-");
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = dir;
 
     expect(() =>
       loadBundledPluginPublicSurfaceModuleSync<{ marker: string }>({

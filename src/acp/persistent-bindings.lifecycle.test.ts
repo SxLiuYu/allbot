@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { buildConfiguredAcpSessionKey } from "./persistent-bindings.types.js";
 
 const managerMocks = vi.hoisted(() => ({
@@ -39,7 +39,7 @@ const baseCfg = {
   agents: {
     list: [{ id: "codex" }, { id: "claude" }],
   },
-} satisfies KaijiBotConfig;
+} satisfies AllBotConfig;
 
 let resetAcpSessionInPlace: typeof import("./persistent-bindings.lifecycle.js").resetAcpSessionInPlace;
 

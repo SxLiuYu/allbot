@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { callBrowserRequest, type BrowserParentOpts } from "../browser-cli-shared.js";
 import {
   danger,
@@ -88,7 +88,7 @@ export function registerBrowserFilesAndDownloadsCommands(
     .description("Arm file upload for the next file chooser")
     .argument(
       "<paths...>",
-      "File paths to upload (must be within KaijiBot temp uploads dir, e.g. /tmp/kaijibot/uploads/file.pdf)",
+      "File paths to upload (must be within AllBot temp uploads dir, e.g. /tmp/allbot/uploads/file.pdf)",
     )
     .option("--ref <ref>", "Ref id from snapshot to click after arming")
     .option("--input-ref <ref>", "Ref id for <input type=file> to set directly")
@@ -125,7 +125,7 @@ export function registerBrowserFilesAndDownloadsCommands(
     .description("Wait for the next download (and save it)")
     .argument(
       "[path]",
-      "Save path within kaijibot temp downloads dir (default: /tmp/kaijibot/downloads/...; fallback: os.tmpdir()/kaijibot/downloads/...)",
+      "Save path within allbot temp downloads dir (default: /tmp/allbot/downloads/...; fallback: os.tmpdir()/allbot/downloads/...)",
     )
     .option("--target-id <id>", "CDP target id (or unique prefix)")
     .option(
@@ -148,7 +148,7 @@ export function registerBrowserFilesAndDownloadsCommands(
     .argument("<ref>", "Ref id from snapshot to click")
     .argument(
       "<path>",
-      "Save path within kaijibot temp downloads dir (e.g. report.pdf or /tmp/kaijibot/downloads/report.pdf)",
+      "Save path within allbot temp downloads dir (e.g. report.pdf or /tmp/allbot/downloads/report.pdf)",
     )
     .option("--target-id <id>", "CDP target id (or unique prefix)")
     .option(

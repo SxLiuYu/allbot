@@ -1,28 +1,28 @@
 ---
 title: "Building Channel Plugins"
 sidebarTitle: "Channel Plugins"
-summary: "Step-by-step guide to building a messaging channel plugin for KaijiBot"
+summary: "Step-by-step guide to building a messaging channel plugin for AllBot"
 read_when:
   - You are building a new messaging channel plugin
-  - You want to connect KaijiBot to a messaging platform
+  - You want to connect AllBot to a messaging platform
   - You need to understand the ChannelPlugin adapter surface
 ---
 
 # Building Channel Plugins
 
-This guide walks through building a channel plugin that connects KaijiBot to a
+This guide walks through building a channel plugin that connects AllBot to a
 messaging platform. By the end you will have a working channel with DM security,
 pairing, reply threading, and outbound messaging.
 
 <Info>
-  If you have not built any KaijiBot plugin before, read
+  If you have not built any AllBot plugin before, read
   [Getting Started](/plugins/building-plugins) first for the basic package
   structure and manifest setup.
 </Info>
 
 ## How channel plugins work
 
-Channel plugins do not need their own send/edit/react tools. KaijiBot keeps one
+Channel plugins do not need their own send/edit/react tools. AllBot keeps one
 shared `message` tool in core. Your plugin owns:
 
 - **Config** — account resolution and setup wizard
@@ -70,14 +70,14 @@ Most channel plugins do not need approval-specific code.
 - Use `approvalCapability.nativeRuntime` for channel-owned native approval facts. Keep it lazy on hot channel entrypoints with `createLazyChannelApprovalNativeRuntimeAdapter(...)`, which can import your runtime module on demand while still letting core assemble the approval lifecycle.
 - Use `approvalCapability.render` only when a channel truly needs custom approval payloads instead of the shared renderer.
 - Use `approvalCapability.describeExecApprovalSetup` when the channel wants the disabled-path reply to explain the exact config knobs needed to enable native exec approvals. The hook receives `{ channel, channelLabel, accountId }`; named-account channels should render account-scoped paths such as `channels.<channel>.accounts.<id>.execApprovals.*` instead of top-level defaults.
-- If a channel can infer stable owner-like DM identities from existing config, use `createResolvedApproverActionAuthAdapter` from `kaijibot/plugin-sdk/approval-runtime` to restrict same-chat `/approve` without adding approval-specific core logic.
-- If a channel needs native approval delivery, keep channel code focused on target normalization plus transport/presentation facts. Use `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver`, and `createApproverRestrictedNativeApprovalCapability` from `kaijibot/plugin-sdk/approval-runtime`. Put the channel-specific facts behind `approvalCapability.nativeRuntime`, ideally via `createChannelApprovalNativeRuntimeAdapter(...)` or `createLazyChannelApprovalNativeRuntimeAdapter(...)`, so core can assemble the handler and own request filtering, routing, dedupe, expiry, gateway subscription, and routed-elsewhere notices. `nativeRuntime` is split into a few smaller seams:
+- If a channel can infer stable owner-like DM identities from existing config, use `createResolvedApproverActionAuthAdapter` from `allbot/plugin-sdk/approval-runtime` to restrict same-chat `/approve` without adding approval-specific core logic.
+- If a channel needs native approval delivery, keep channel code focused on target normalization plus transport/presentation facts. Use `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver`, and `createApproverRestrictedNativeApprovalCapability` from `allbot/plugin-sdk/approval-runtime`. Put the channel-specific facts behind `approvalCapability.nativeRuntime`, ideally via `createChannelApprovalNativeRuntimeAdapter(...)` or `createLazyChannelApprovalNativeRuntimeAdapter(...)`, so core can assemble the handler and own request filtering, routing, dedupe, expiry, gateway subscription, and routed-elsewhere notices. `nativeRuntime` is split into a few smaller seams:
 - `availability` — whether the account is configured and whether a request should be handled
 - `presentation` — map the shared approval view model into pending/resolved/expired native payloads or final actions
 - `transport` — prepare targets plus send/update/delete native approval messages
 - `interactions` — optional bind/unbind/clear-action hooks for native buttons or reactions
 - `observe` — optional delivery diagnostics hooks
-- If the channel needs runtime-owned objects such as a client, token, Bolt app, or webhook receiver, register them through `kaijibot/plugin-sdk/channel-runtime-context`. The generic runtime-context registry lets core bootstrap capability-driven handlers from channel startup state without adding approval-specific wrapper glue.
+- If the channel needs runtime-owned objects such as a client, token, Bolt app, or webhook receiver, register them through `allbot/plugin-sdk/channel-runtime-context`. The generic runtime-context registry lets core bootstrap capability-driven handlers from channel startup state without adding approval-specific wrapper glue.
 - Reach for the lower-level `createChannelApprovalHandler` or `createChannelNativeApprovalRuntime` only when the capability-driven seam is not expressive enough yet.
 - Native approval channels must route both `accountId` and `approvalKind` through those helpers. `accountId` keeps multi-account approval policy scoped to the right bot account, and `approvalKind` keeps exec vs plugin approval behavior available to the channel without hardcoded branches in core.
 - Core now owns approval reroute notices too. Channel plugins should not send their own "approval went to DMs / another channel" follow-up messages from `createChannelNativeApprovalRuntime`; instead, expose accurate origin + approver-DM routing through the shared approval capability helpers and let core aggregate actual deliveries before posting any notice back to the initiating chat.
@@ -93,35 +93,35 @@ Most channel plugins do not need approval-specific code.
 For hot channel entrypoints, prefer the narrower runtime subpaths when you only
 need one part of that family:
 
-- `kaijibot/plugin-sdk/approval-auth-runtime`
-- `kaijibot/plugin-sdk/approval-client-runtime`
-- `kaijibot/plugin-sdk/approval-delivery-runtime`
-- `kaijibot/plugin-sdk/approval-gateway-runtime`
-- `kaijibot/plugin-sdk/approval-handler-adapter-runtime`
-- `kaijibot/plugin-sdk/approval-handler-runtime`
-- `kaijibot/plugin-sdk/approval-native-runtime`
-- `kaijibot/plugin-sdk/approval-reply-runtime`
-- `kaijibot/plugin-sdk/channel-runtime-context`
+- `allbot/plugin-sdk/approval-auth-runtime`
+- `allbot/plugin-sdk/approval-client-runtime`
+- `allbot/plugin-sdk/approval-delivery-runtime`
+- `allbot/plugin-sdk/approval-gateway-runtime`
+- `allbot/plugin-sdk/approval-handler-adapter-runtime`
+- `allbot/plugin-sdk/approval-handler-runtime`
+- `allbot/plugin-sdk/approval-native-runtime`
+- `allbot/plugin-sdk/approval-reply-runtime`
+- `allbot/plugin-sdk/channel-runtime-context`
 
-Likewise, prefer `kaijibot/plugin-sdk/setup-runtime`,
-`kaijibot/plugin-sdk/setup-adapter-runtime`,
-`kaijibot/plugin-sdk/reply-runtime`,
-`kaijibot/plugin-sdk/reply-dispatch-runtime`,
-`kaijibot/plugin-sdk/reply-reference`, and
-`kaijibot/plugin-sdk/reply-chunking` when you do not need the broader umbrella
+Likewise, prefer `allbot/plugin-sdk/setup-runtime`,
+`allbot/plugin-sdk/setup-adapter-runtime`,
+`allbot/plugin-sdk/reply-runtime`,
+`allbot/plugin-sdk/reply-dispatch-runtime`,
+`allbot/plugin-sdk/reply-reference`, and
+`allbot/plugin-sdk/reply-chunking` when you do not need the broader umbrella
 surface.
 
 For setup specifically:
 
-- `kaijibot/plugin-sdk/setup-runtime` covers the runtime-safe setup helpers:
+- `allbot/plugin-sdk/setup-runtime` covers the runtime-safe setup helpers:
   import-safe setup patch adapters (`createPatchedAccountSetupAdapter`,
   `createEnvPatchedAccountSetupAdapter`,
   `createSetupInputPresenceValidator`), lookup-note output,
   `promptResolvedAllowFrom`, `splitSetupEntries`, and the delegated
   setup-proxy builders
-- `kaijibot/plugin-sdk/setup-adapter-runtime` is the narrow env-aware adapter
+- `allbot/plugin-sdk/setup-adapter-runtime` is the narrow env-aware adapter
   seam for `createEnvPatchedAccountSetupAdapter`
-- `kaijibot/plugin-sdk/channel-setup` covers the optional-install setup
+- `allbot/plugin-sdk/channel-setup` covers the optional-install setup
   builders plus a few setup-safe primitives:
   `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`,
 
@@ -133,7 +133,7 @@ constants for operator-facing copy only.
 `createTopLevelChannelDmPolicy`, `setSetupChannelEnabled`, and
 `splitSetupEntries`
 
-- use the broader `kaijibot/plugin-sdk/setup` seam only when you also need the
+- use the broader `allbot/plugin-sdk/setup` seam only when you also need the
   heavier shared setup/config helpers such as
   `moveSingleAccountChannelSectionToDefaultAccount(...)`
 
@@ -146,23 +146,23 @@ copy.
 For other hot channel paths, prefer the narrow helpers over broader legacy
 surfaces:
 
-- `kaijibot/plugin-sdk/account-core`,
-  `kaijibot/plugin-sdk/account-id`,
-  `kaijibot/plugin-sdk/account-resolution`, and
-  `kaijibot/plugin-sdk/account-helpers` for multi-account config and
+- `allbot/plugin-sdk/account-core`,
+  `allbot/plugin-sdk/account-id`,
+  `allbot/plugin-sdk/account-resolution`, and
+  `allbot/plugin-sdk/account-helpers` for multi-account config and
   default-account fallback
-- `kaijibot/plugin-sdk/inbound-envelope` and
-  `kaijibot/plugin-sdk/inbound-reply-dispatch` for inbound route/envelope and
+- `allbot/plugin-sdk/inbound-envelope` and
+  `allbot/plugin-sdk/inbound-reply-dispatch` for inbound route/envelope and
   record-and-dispatch wiring
-- `kaijibot/plugin-sdk/messaging-targets` for target parsing/matching
-- `kaijibot/plugin-sdk/outbound-media` and
-  `kaijibot/plugin-sdk/outbound-runtime` for media loading plus outbound
+- `allbot/plugin-sdk/messaging-targets` for target parsing/matching
+- `allbot/plugin-sdk/outbound-media` and
+  `allbot/plugin-sdk/outbound-runtime` for media loading plus outbound
   identity/send delegates
-- `kaijibot/plugin-sdk/thread-bindings-runtime` for thread-binding lifecycle
+- `allbot/plugin-sdk/thread-bindings-runtime` for thread-binding lifecycle
   and adapter registration
-- `kaijibot/plugin-sdk/agent-media-payload` only when a legacy agent/media
+- `allbot/plugin-sdk/agent-media-payload` only when a legacy agent/media
   payload field layout is still required
-- `kaijibot/plugin-sdk/telegram-command-config` for Telegram custom-command
+- `allbot/plugin-sdk/telegram-command-config` for Telegram custom-command
   normalization, duplicate/conflict validation, and a fallback-stable command
   config contract
 
@@ -175,7 +175,7 @@ Keep inbound mention handling split in two layers:
 - plugin-owned evidence gathering
 - shared policy evaluation
 
-Use `kaijibot/plugin-sdk/channel-inbound` for the shared layer.
+Use `allbot/plugin-sdk/channel-inbound` for the shared layer.
 
 Good fit for plugin-local logic:
 
@@ -204,7 +204,7 @@ import {
   implicitMentionKindWhen,
   matchesMentionWithExplicit,
   resolveInboundMentionDecision,
-} from "kaijibot/plugin-sdk/channel-inbound";
+} from "allbot/plugin-sdk/channel-inbound";
 
 const mentionMatch = matchesMentionWithExplicit(text, {
   mentionRegexes,
@@ -246,7 +246,7 @@ bundled channel plugins that already depend on runtime injection:
 - `resolveInboundMentionDecision`
 
 The older `resolveMentionGating*` helpers remain on
-`kaijibot/plugin-sdk/channel-inbound` as compatibility exports only. New code
+`allbot/plugin-sdk/channel-inbound` as compatibility exports only. New code
 should use `resolveInboundMentionDecision({ facts, policy })`.
 
 ## Walkthrough
@@ -256,27 +256,27 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
   <Step title="Package and manifest">
     Create the standard plugin files. The `channel` field in `package.json` is
     what makes this a channel plugin. For the full package-metadata surface,
-    see [Plugin Setup and Config](/plugins/sdk-setup#kaijibotchannel):
+    see [Plugin Setup and Config](/plugins/sdk-setup#allbotchannel):
 
     <CodeGroup>
     ```json package.json
     {
-      "name": "@myorg/kaijibot-acme-chat",
+      "name": "@myorg/allbot-acme-chat",
       "version": "1.0.0",
       "type": "module",
-      "kaijibot": {
+      "allbot": {
         "extensions": ["./index.ts"],
         "setupEntry": "./setup-entry.ts",
         "channel": {
           "id": "acme-chat",
           "label": "Acme Chat",
-          "blurb": "Connect KaijiBot to Acme Chat."
+          "blurb": "Connect AllBot to Acme Chat."
         }
       }
     }
     ```
 
-    ```json kaijibot.plugin.json
+    ```json allbot.plugin.json
     {
       "id": "acme-chat",
       "kind": "channel",
@@ -315,8 +315,8 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     import {
       createChatChannelPlugin,
       createChannelPluginBase,
-    } from "kaijibot/plugin-sdk/channel-core";
-    import type { KaijiBotConfig } from "kaijibot/plugin-sdk/channel-core";
+    } from "allbot/plugin-sdk/channel-core";
+    import type { AllBotConfig } from "allbot/plugin-sdk/channel-core";
     import { acmeChatApi } from "./client.js"; // your platform API client
 
     type ResolvedAccount = {
@@ -327,7 +327,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     };
 
     function resolveAccount(
-      cfg: KaijiBotConfig,
+      cfg: AllBotConfig,
       accountId?: string | null,
     ): ResolvedAccount {
       const section = (cfg.channels as Record<string, any>)?.["acme-chat"];
@@ -423,7 +423,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     Create `index.ts`:
 
     ```typescript index.ts
-    import { defineChannelPluginEntry } from "kaijibot/plugin-sdk/channel-core";
+    import { defineChannelPluginEntry } from "allbot/plugin-sdk/channel-core";
     import { acmeChatPlugin } from "./src/channel.js";
 
     export default defineChannelPluginEntry({
@@ -455,7 +455,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     });
     ```
 
-    Put channel-owned CLI descriptors in `registerCliMetadata(...)` so KaijiBot
+    Put channel-owned CLI descriptors in `registerCliMetadata(...)` so AllBot
     can show them in root help without activating the full channel runtime,
     while normal full loads still pick up the same descriptors for real command
     registration. Keep `registerFull(...)` for runtime-only work.
@@ -473,13 +473,13 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
     Create `setup-entry.ts` for lightweight loading during onboarding:
 
     ```typescript setup-entry.ts
-    import { defineSetupPluginEntry } from "kaijibot/plugin-sdk/channel-core";
+    import { defineSetupPluginEntry } from "allbot/plugin-sdk/channel-core";
     import { acmeChatPlugin } from "./src/channel.js";
 
     export default defineSetupPluginEntry(acmeChatPlugin);
     ```
 
-    KaijiBot loads this instead of the full entry when the channel is disabled
+    AllBot loads this instead of the full entry when the channel is disabled
     or unconfigured. It avoids pulling in heavy runtime code during setup flows.
     See [Setup and Config](/plugins/sdk-setup#setup-entry) for details.
 
@@ -487,7 +487,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
 
   <Step title="Handle inbound messages">
     Your plugin needs to receive messages from the platform and forward them to
-    KaijiBot. The typical pattern is a webhook that verifies the request and
+    AllBot. The typical pattern is a webhook that verifies the request and
     dispatches it through your channel's inbound handler:
 
     ```typescript
@@ -498,7 +498,7 @@ should use `resolveInboundMentionDecision({ facts, policy })`.
         handler: async (req, res) => {
           const event = parseWebhookPayload(req);
 
-          // Your inbound handler dispatches the message to KaijiBot.
+          // Your inbound handler dispatches the message to AllBot.
           // The exact wiring depends on your platform SDK —
           // see a real example in the bundled Microsoft Teams or Google Chat plugin package.
           await handleAcmeChatInbound(api, event);
@@ -568,8 +568,8 @@ Write colocated tests in `src/channel.test.ts`:
 
 ```
 <bundled-plugin-root>/acme-chat/
-├── package.json              # kaijibot.channel metadata
-├── kaijibot.plugin.json      # Manifest with config schema
+├── package.json              # allbot.channel metadata
+├── allbot.plugin.json      # Manifest with config schema
 ├── index.ts                  # defineChannelPluginEntry
 ├── setup-entry.ts            # defineSetupPluginEntry
 ├── api.ts                    # Public exports (optional)

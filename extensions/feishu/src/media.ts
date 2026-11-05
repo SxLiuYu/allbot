@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { mediaKindFromMime } from "kaijibot/plugin-sdk/media-runtime";
-import { withTempDownloadPath } from "kaijibot/plugin-sdk/temp-path";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { mediaKindFromMime } from "allbot/plugin-sdk/media-runtime";
+import { withTempDownloadPath } from "allbot/plugin-sdk/temp-path";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import type { ClawdbotConfig } from "../runtime-api.js";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { createFeishuClient } from "./client.js";
@@ -262,7 +262,7 @@ export async function downloadImageFeishu(params: {
 
   const buffer = await readFeishuResponseBuffer({
     response,
-    tmpDirPrefix: "kaijibot-feishu-img-",
+    tmpDirPrefix: "allbot-feishu-img-",
     errorPrefix: "Feishu image download failed",
   });
   const meta = extractFeishuDownloadMetadata(response);
@@ -294,7 +294,7 @@ export async function downloadMessageResourceFeishu(params: {
 
   const buffer = await readFeishuResponseBuffer({
     response,
-    tmpDirPrefix: "kaijibot-feishu-resource-",
+    tmpDirPrefix: "allbot-feishu-resource-",
     errorPrefix: "Feishu message resource download failed",
   });
   return { buffer, ...extractFeishuDownloadMetadata(response) };

@@ -11,7 +11,7 @@ const RUNTIME_ENTRY_HELPER_RE = /(^|\/)plugin-entry\.runtime\.[cm]?[jt]s$/;
 const SOURCE_MODULE_EXTENSIONS = [".ts", ".mts", ".cts", ".js", ".mjs", ".cjs"] as const;
 const FORBIDDEN_CONTRACT_MODULE_SPECIFIER_PATTERNS = [
   /^vitest$/u,
-  /^kaijibot\/plugin-sdk\/testing$/u,
+  /^allbot\/plugin-sdk\/testing$/u,
   /(^|\/)test-api(?:\.[cm]?[jt]s)?$/u,
   /(^|\/)__tests__(\/|$)/u,
   /(^|\/)test-support(\/|$)/u,
@@ -108,7 +108,7 @@ function analyzeSourceModule(params: { filePath: string; source: string }): {
       }
 
       if (
-        specifier === "kaijibot/plugin-sdk/core" &&
+        specifier === "allbot/plugin-sdk/core" &&
         statement.importClause?.namedBindings &&
         ts.isNamedImports(statement.importClause.namedBindings) &&
         statement.importClause.namedBindings.elements.some(
@@ -244,9 +244,9 @@ describe("plugin entry guardrails", () => {
       const packageJsonPath = resolve(plugin.rootDir, "package.json");
       try {
         const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
-          kaijibot?: { extensions?: unknown };
+          allbot?: { extensions?: unknown };
         };
-        const extensions = Array.isArray(pkg.kaijibot?.extensions) ? pkg.kaijibot.extensions : [];
+        const extensions = Array.isArray(pkg.allbot?.extensions) ? pkg.allbot.extensions : [];
         if (
           extensions.some(
             (candidate) => typeof candidate === "string" && RUNTIME_ENTRY_HELPER_RE.test(candidate),
@@ -283,7 +283,7 @@ describe("plugin entry guardrails", () => {
         import "./setup.js";
         export { x };
         export * from "./barrel.js";
-        import { y } from "kaijibot/plugin-sdk/testing";
+        import { y } from "allbot/plugin-sdk/testing";
       `,
       }).relativeSpecifiers.toSorted(),
     ).toEqual(["./barrel.js", "./safe.js", "./setup.js"]);
@@ -313,8 +313,8 @@ describe("plugin entry guardrails", () => {
       analyzeSourceModule({
         filePath: "aliased-plugin-entry.ts",
         source: `
-          import { definePluginEntry as dpe } from "kaijibot/plugin-sdk/core";
-          import { somethingElse } from "kaijibot/plugin-sdk/core";
+          import { definePluginEntry as dpe } from "allbot/plugin-sdk/core";
+          import { somethingElse } from "allbot/plugin-sdk/core";
         `,
       }).importsDefinePluginEntryFromCore,
     ).toBe(true);

@@ -1,9 +1,9 @@
-import type { KaijiBotPluginApi } from "kaijibot/plugin-sdk/plugin-runtime";
+import type { AllBotPluginApi } from "allbot/plugin-sdk/plugin-runtime";
 import {
   jsonResult,
   readNumberParam,
   readStringParam,
-} from "kaijibot/plugin-sdk/provider-web-search";
+} from "allbot/plugin-sdk/provider-web-search";
 import { Type } from "typebox";
 import { runTavilySearch } from "./tavily-client.js";
 
@@ -58,7 +58,7 @@ const TavilySearchToolSchema = Type.Object(
   { additionalProperties: false },
 );
 
-export function createTavilySearchTool(api: KaijiBotPluginApi) {
+export function createTavilySearchTool(api: AllBotPluginApi) {
   return {
     name: "tavily_search",
     label: "Tavily Search",

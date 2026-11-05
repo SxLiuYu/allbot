@@ -14,30 +14,30 @@ type CommandOptions = Record<string, unknown>;
 
 const SANDBOX_EXAMPLES = {
   main: [
-    ["kaijibot sandbox list", "List all sandbox containers."],
-    ["kaijibot sandbox list --browser", "List only browser containers."],
-    ["kaijibot sandbox recreate --all", "Recreate all containers."],
-    ["kaijibot sandbox recreate --session main", "Recreate a specific session."],
-    ["kaijibot sandbox recreate --agent mybot", "Recreate agent containers."],
-    ["kaijibot sandbox explain", "Explain effective sandbox config."],
+    ["allbot sandbox list", "List all sandbox containers."],
+    ["allbot sandbox list --browser", "List only browser containers."],
+    ["allbot sandbox recreate --all", "Recreate all containers."],
+    ["allbot sandbox recreate --session main", "Recreate a specific session."],
+    ["allbot sandbox recreate --agent mybot", "Recreate agent containers."],
+    ["allbot sandbox explain", "Explain effective sandbox config."],
   ],
   list: [
-    ["kaijibot sandbox list", "List all sandbox containers."],
-    ["kaijibot sandbox list --browser", "List only browser containers."],
-    ["kaijibot sandbox list --json", "JSON output."],
+    ["allbot sandbox list", "List all sandbox containers."],
+    ["allbot sandbox list --browser", "List only browser containers."],
+    ["allbot sandbox list --json", "JSON output."],
   ],
   recreate: [
-    ["kaijibot sandbox recreate --all", "Recreate all containers."],
-    ["kaijibot sandbox recreate --session main", "Recreate a specific session."],
-    ["kaijibot sandbox recreate --agent mybot", "Recreate a specific agent (includes sub-agents)."],
-    ["kaijibot sandbox recreate --browser --all", "Recreate only browser containers."],
-    ["kaijibot sandbox recreate --all --force", "Skip confirmation."],
+    ["allbot sandbox recreate --all", "Recreate all containers."],
+    ["allbot sandbox recreate --session main", "Recreate a specific session."],
+    ["allbot sandbox recreate --agent mybot", "Recreate a specific agent (includes sub-agents)."],
+    ["allbot sandbox recreate --browser --all", "Recreate only browser containers."],
+    ["allbot sandbox recreate --all --force", "Skip confirmation."],
   ],
   explain: [
-    ["kaijibot sandbox explain", "Show effective sandbox config."],
-    ["kaijibot sandbox explain --session agent:main:main", "Explain a specific session."],
-    ["kaijibot sandbox explain --agent work", "Explain an agent sandbox."],
-    ["kaijibot sandbox explain --json", "JSON output."],
+    ["allbot sandbox explain", "Show effective sandbox config."],
+    ["allbot sandbox explain --session agent:main:main", "Explain a specific session."],
+    ["allbot sandbox explain --agent work", "Explain an agent sandbox."],
+    ["allbot sandbox explain --json", "JSON output."],
   ],
 } as const;
 

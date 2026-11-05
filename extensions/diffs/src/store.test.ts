@@ -17,7 +17,7 @@ describe("DiffArtifactStore", () => {
       rootDir,
       store,
       cleanup: cleanupRootDir,
-    } = await createDiffStoreHarness("kaijibot-diffs-store-"));
+    } = await createDiffStoreHarness("allbot-diffs-store-"));
   });
 
   afterEach(async () => {
@@ -233,7 +233,7 @@ describe("createDiffsHttpHandler", () => {
   }
 
   beforeEach(async () => {
-    ({ store, cleanup: cleanupRootDir } = await createDiffStoreHarness("kaijibot-diffs-http-"));
+    ({ store, cleanup: cleanupRootDir } = await createDiffStoreHarness("allbot-diffs-http-"));
   });
 
   afterEach(async () => {
@@ -304,7 +304,7 @@ describe("createDiffsHttpHandler", () => {
 
     expect(handled).toBe(true);
     expect(res.statusCode).toBe(200);
-    expect(String(res.body)).toContain("kaijibotDiffsReady");
+    expect(String(res.body)).toContain("allbotDiffsReady");
   });
 
   it.each([

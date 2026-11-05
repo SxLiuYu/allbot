@@ -165,7 +165,7 @@ export function buildStatusAllOverviewRows(params: {
       { Item: "Config", Value: params.configPath },
     ],
     middleRows: [
-      { Item: "Security", Value: `Run: ${formatCliCommand("kaijibot security audit --deep")}` },
+      { Item: "Security", Value: `Run: ${formatCliCommand("allbot security audit --deep")}` },
     ],
     agentsValue: buildStatusAllAgentsValue({
       agentStatus: params.agentStatus,

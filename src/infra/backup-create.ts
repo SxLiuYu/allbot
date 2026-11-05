@@ -287,8 +287,8 @@ export async function createBackupArchive(
   if (plan.included.length === 0) {
     throw new Error(
       onlyConfig
-        ? "No KaijiBot config file was found to back up."
-        : "No local KaijiBot state was found to back up.",
+        ? "No AllBot config file was found to back up."
+        : "No local AllBot state was found to back up.",
     );
   }
 
@@ -324,7 +324,7 @@ export async function createBackupArchive(
   }
 
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-"));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-"));
   const manifestPath = path.join(tempDir, "manifest.json");
   const tempArchivePath = buildTempArchivePath(outputPath);
   try {

@@ -3,7 +3,7 @@ import { SENSITIVE_URL_HINT_TAG } from "../shared/net/redact-sensitive-url.js";
 import { computeBaseConfigSchemaResponse } from "./schema-base.js";
 import { GENERATED_BASE_CONFIG_SCHEMA } from "./schema.base.generated.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("generated base config schema", () => {
   it("matches the computed base config schema payload", () => {
     expect(

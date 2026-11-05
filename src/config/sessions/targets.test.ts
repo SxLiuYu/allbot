@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { withTempHome } from "../../../test/helpers/temp-home.js";
-import type { KaijiBotConfig } from "../config.js";
+import type { AllBotConfig } from "../config.js";
 import { resolveStorePath } from "./paths.js";
 import {
   resolveAllAgentSessionStoreTargets,
@@ -30,7 +30,7 @@ async function createAgentSessionStores(
   return storePaths;
 }
 
-function createCustomRootCfg(customRoot: string, defaultAgentId = "ops"): KaijiBotConfig {
+function createCustomRootCfg(customRoot: string, defaultAgentId = "ops"): AllBotConfig {
   return {
     session: {
       store: path.join(customRoot, "agents", "{agentId}", "sessions", "sessions.json"),
@@ -66,12 +66,12 @@ function expectTargetsToContainStores(
 const discoveryResolvers = [
   {
     label: "async",
-    resolve: async (cfg: KaijiBotConfig, env: NodeJS.ProcessEnv) =>
+    resolve: async (cfg: AllBotConfig, env: NodeJS.ProcessEnv) =>
       await resolveAllAgentSessionStoreTargets(cfg, { env }),
   },
   {
     label: "sync",
-    resolve: async (cfg: KaijiBotConfig, env: NodeJS.ProcessEnv) =>
+    resolve: async (cfg: AllBotConfig, env: NodeJS.ProcessEnv) =>
       resolveAllAgentSessionStoreTargetsSync(cfg, { env }),
   },
 ] as const;
@@ -79,9 +79,9 @@ const discoveryResolvers = [
 describe("resolveSessionStoreTargets", () => {
   it("resolves all configured agent stores", async () => {
     await withTempHome(async () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         session: {
-          store: "~/.kaijibot/agents/{agentId}/sessions/sessions.json",
+          store: "~/.allbot/agents/{agentId}/sessions/sessions.json",
         },
         agents: {
           list: [{ id: "main", default: true }, { id: "work" }],
@@ -104,7 +104,7 @@ describe("resolveSessionStoreTargets", () => {
   });
 
   it("dedupes shared store paths for --all-agents", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       session: {
         store: "/tmp/shared-sessions.json",
       },
@@ -119,7 +119,7 @@ describe("resolveSessionStoreTargets", () => {
   });
 
   it("rejects unknown agent ids", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [{ id: "main", default: true }, { id: "work" }],
       },
@@ -141,10 +141,10 @@ describe("resolveSessionStoreTargets", () => {
 describe("resolveAllAgentSessionStoreTargets", () => {
   it("includes discovered on-disk agent stores alongside configured targets", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".kaijibot");
+      const stateDir = path.join(home, ".allbot");
       const storePaths = await createAgentSessionStores(stateDir, ["ops", "retired"]);
 
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           list: [{ id: "ops", default: true }],
         },
@@ -196,9 +196,9 @@ describe("resolveAllAgentSessionStoreTargets", () => {
 
       const env = {
         ...process.env,
-        KAIJIBOT_STATE_DIR: envStateDir,
+        ALLBOT_STATE_DIR: envStateDir,
       };
-      const cfg: KaijiBotConfig = {};
+      const cfg: AllBotConfig = {};
       const mainStorePath = await resolveRealStorePath(mainSessionsDir);
       const retiredStorePath = await resolveRealStorePath(retiredSessionsDir);
 
@@ -231,7 +231,7 @@ describe("resolveAllAgentSessionStoreTargets", () => {
         const cfg = createCustomRootCfg(customRoot, "main");
         const env = {
           ...process.env,
-          KAIJIBOT_STATE_DIR: envStateDir,
+          ALLBOT_STATE_DIR: envStateDir,
         };
 
         await expect(resolver.resolve(cfg, env)).resolves.toEqual(
@@ -268,7 +268,7 @@ describe("resolveAllAgentSessionStoreTargets", () => {
 
   it("skips discovered directories that only normalize into the default main agent", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".kaijibot");
+      const stateDir = path.join(home, ".allbot");
       const mainSessionsDir = path.join(stateDir, "agents", "main", "sessions");
       const junkSessionsDir = path.join(stateDir, "agents", "###", "sessions");
       await fs.mkdir(mainSessionsDir, { recursive: true });
@@ -276,7 +276,7 @@ describe("resolveAllAgentSessionStoreTargets", () => {
       await fs.writeFile(path.join(mainSessionsDir, "sessions.json"), "{}", "utf8");
       await fs.writeFile(path.join(junkSessionsDir, "sessions.json"), "{}", "utf8");
 
-      const cfg: KaijiBotConfig = {};
+      const cfg: AllBotConfig = {};
       const mainStorePath = await resolveRealStorePath(mainSessionsDir);
       const targets = await resolveAllAgentSessionStoreTargets(cfg, { env: process.env });
 

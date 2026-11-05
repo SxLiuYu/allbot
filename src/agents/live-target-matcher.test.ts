@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 describe("createLiveTargetMatcher", () => {
   const env = {
-    KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
+    ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE: "1",
   } as NodeJS.ProcessEnv;
 
   it("matches Anthropic-owned models for the claude-cli provider filter", () => {

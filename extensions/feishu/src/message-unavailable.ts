@@ -1,5 +1,5 @@
 /**
- * Message unavailability detection and guard for the KaijiBot feishu extension.
+ * Message unavailability detection and guard for the AllBot feishu extension.
  *
  * When the Lark API returns terminal error codes (230011 = message recalled,
  * 231003 = message deleted), we mark the message_id as unavailable so that

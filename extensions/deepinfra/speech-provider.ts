@@ -3,7 +3,7 @@ import {
   asObject,
   createOpenAiCompatibleSpeechProvider,
   type SpeechProviderPlugin,
-} from "kaijibot/plugin-sdk/speech";
+} from "allbot/plugin-sdk/speech";
 import {
   DEEPINFRA_BASE_URL,
   DEEPINFRA_TTS_MODELS,

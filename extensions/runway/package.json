@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/runway-provider",
+  "name": "@allbot/runway-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Runway video provider plugin",
+  "description": "AllBot Runway video provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

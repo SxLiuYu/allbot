@@ -29,7 +29,7 @@ function buildConfig(): TestConfig {
       enabled: true,
       color: "#FF4500",
       headless: true,
-      defaultProfile: "kaijibot",
+      defaultProfile: "allbot",
       profiles: { ...mockState.cfgProfiles },
     },
   };
@@ -70,13 +70,13 @@ describe("server-context hot-reload profiles", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockState.cfgProfiles = {
-      kaijibot: { cdpPort: 18800, color: "#FF4500" },
+      allbot: { cdpPort: 18800, color: "#FF4500" },
     };
     mockState.cachedConfig = null; // Clear simulated cache
   });
 
   it("forProfile hot-reloads newly added profiles from config", async () => {
-    // Start with only kaijibot profile
+    // Start with only allbot profile
     // 1. Prime the cache by calling loadConfig() first
     const cfg = loadConfig();
     const resolved = resolveBrowserConfig(cfg.browser, cfg);
@@ -99,7 +99,7 @@ describe("server-context hot-reload profiles", () => {
       }),
     ).toBeNull();
 
-    // 2. Simulate adding a new profile to config (like user editing kaijibot.json)
+    // 2. Simulate adding a new profile to config (like user editing allbot.json)
     mockState.cfgProfiles.desktop = { cdpUrl: "http://127.0.0.1:9222", color: "#0066CC" };
 
     // 3. Verify without clearConfigCache, loadConfig() still returns stale cached value
@@ -155,16 +155,16 @@ describe("server-context hot-reload profiles", () => {
       profiles: new Map(),
     };
 
-    mockState.cfgProfiles.kaijibot = { cdpPort: 19999, color: "#FF4500" };
+    mockState.cfgProfiles.allbot = { cdpPort: 19999, color: "#FF4500" };
     mockState.cachedConfig = null;
 
     const after = resolveBrowserProfileWithHotReload({
       current: state,
       refreshConfigFromDisk: true,
-      name: "kaijibot",
+      name: "allbot",
     });
     expect(after?.cdpPort).toBe(19999);
-    expect(state.resolved.profiles.kaijibot?.cdpPort).toBe(19999);
+    expect(state.resolved.profiles.allbot?.cdpPort).toBe(19999);
   });
 
   it("listProfiles refreshes config before enumerating profiles", async () => {
@@ -191,17 +191,17 @@ describe("server-context hot-reload profiles", () => {
   it("marks existing runtime state for reconcile when profile invariants change", async () => {
     const cfg = loadConfig();
     const resolved = resolveBrowserConfig(cfg.browser, cfg);
-    const kaijibotProfile = resolveProfile(resolved, "kaijibot");
-    expect(kaijibotProfile).toBeTruthy();
+    const allbotProfile = resolveProfile(resolved, "allbot");
+    expect(allbotProfile).toBeTruthy();
     const state: BrowserServerState = {
       server: null,
       port: 18791,
       resolved,
       profiles: new Map([
         [
-          "kaijibot",
+          "allbot",
           {
-            profile: kaijibotProfile!,
+            profile: allbotProfile!,
             running: { pid: 123 } as never,
             lastTargetId: "tab-1",
             reconcile: null,
@@ -210,7 +210,7 @@ describe("server-context hot-reload profiles", () => {
       ]),
     };
 
-    mockState.cfgProfiles.kaijibot = { cdpPort: 19999, color: "#FF4500" };
+    mockState.cfgProfiles.allbot = { cdpPort: 19999, color: "#FF4500" };
     mockState.cachedConfig = null;
 
     refreshResolvedBrowserConfigFromDisk({
@@ -219,7 +219,7 @@ describe("server-context hot-reload profiles", () => {
       mode: "cached",
     });
 
-    const runtime = state.profiles.get("kaijibot");
+    const runtime = state.profiles.get("allbot");
     expect(runtime).toBeTruthy();
     expect(runtime?.profile.cdpPort).toBe(19999);
     expect(runtime?.lastTargetId).toBeNull();

@@ -7,10 +7,10 @@ import {
   runPluginCommandWithTimeout,
   shellEscape,
   type SshSandboxSession,
-} from "kaijibot/plugin-sdk/sandbox";
+} from "allbot/plugin-sdk/sandbox";
 import type { ResolvedOpenShellPluginConfig } from "./config.js";
 
-export { buildExecRemoteCommand, shellEscape } from "kaijibot/plugin-sdk/sandbox";
+export { buildExecRemoteCommand, shellEscape } from "allbot/plugin-sdk/sandbox";
 
 const require = createRequire(import.meta.url);
 

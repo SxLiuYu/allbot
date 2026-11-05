@@ -21,7 +21,7 @@ describe("config observe recovery", () => {
   }
 
   beforeAll(async () => {
-    fixtureRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "kaijibot-config-observe-recovery-"));
+    fixtureRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "allbot-config-observe-recovery-"));
   });
 
   afterAll(async () => {
@@ -42,7 +42,7 @@ describe("config observe recovery", () => {
     auditPath: string;
     warn: ReturnType<typeof vi.fn>;
   } {
-    const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+    const configPath = path.join(home, ".allbot", "allbot.json");
     return {
       deps: {
         fs,
@@ -52,7 +52,7 @@ describe("config observe recovery", () => {
         logger: { warn },
       },
       configPath,
-      auditPath: path.join(home, ".kaijibot", "logs", "config-audit.jsonl"),
+      auditPath: path.join(home, ".allbot", "logs", "config-audit.jsonl"),
       warn,
     };
   }

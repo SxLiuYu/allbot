@@ -1,25 +1,25 @@
 {
-  "name": "@kaijibot/knowledge-wiki",
+  "name": "@allbot/knowledge-wiki",
   "version": "2026.4.12",
   "private": true,
-  "description": "KaijiBot persistent wiki plugin",
+  "description": "AllBot persistent wiki plugin",
   "type": "module",
   "dependencies": {
     "yaml": "^2.8.3"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*",
-    "kaijibot": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*",
+    "allbot": "workspace:*"
   },
   "peerDependencies": {
-    "kaijibot": ">=2026.4.12"
+    "allbot": ">=2026.4.12"
   },
   "peerDependenciesMeta": {
-    "kaijibot": {
+    "allbot": {
       "optional": true
     }
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

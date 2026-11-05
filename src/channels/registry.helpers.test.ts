@@ -44,8 +44,8 @@ describe("channel registry helpers", () => {
     const startupRegistry = createEmptyPluginRegistry();
     startupRegistry.channels = [
       {
-        pluginId: "kaijibot-weixin",
-        plugin: { id: "kaijibot-weixin", meta: { aliases: ["weixin"] } },
+        pluginId: "allbot-weixin",
+        plugin: { id: "allbot-weixin", meta: { aliases: ["weixin"] } },
         source: "test",
       },
     ] as never;
@@ -62,8 +62,8 @@ describe("channel registry helpers", () => {
     ] as never;
     setActivePluginRegistry(replacementRegistry);
 
-    expect(listRegisteredChannelPluginIds()).toEqual(["kaijibot-weixin"]);
-    expect(normalizeAnyChannelId("weixin")).toBe("kaijibot-weixin");
+    expect(listRegisteredChannelPluginIds()).toEqual(["allbot-weixin"]);
+    expect(normalizeAnyChannelId("weixin")).toBe("allbot-weixin");
   });
 
   it("falls back to the active registry when the pinned channel registry has no channels", () => {

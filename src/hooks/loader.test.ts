@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setLoggerOverride } from "../logging/logger.js";
 import { loggingState } from "../logging/state.js";
 import { stripAnsi } from "../terminal/ansi.js";
@@ -22,7 +22,7 @@ describe("loader", () => {
   let envSnapshot: ReturnType<typeof captureEnv>;
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-hooks-loader-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-hooks-loader-"));
   });
 
   beforeEach(async () => {
@@ -32,8 +32,8 @@ describe("loader", () => {
     await fs.mkdir(tmpDir, { recursive: true });
 
     // Disable bundled hooks during tests by setting env var to non-existent directory
-    envSnapshot = captureEnv(["KAIJIBOT_BUNDLED_HOOKS_DIR"]);
-    process.env.KAIJIBOT_BUNDLED_HOOKS_DIR = "/nonexistent/bundled/hooks";
+    envSnapshot = captureEnv(["ALLBOT_BUNDLED_HOOKS_DIR"]);
+    process.env.ALLBOT_BUNDLED_HOOKS_DIR = "/nonexistent/bundled/hooks";
     setLoggerOverride({ level: "silent", consoleLevel: "error" });
     loggingState.rawConsole = {
       log: vi.fn(),
@@ -57,7 +57,7 @@ describe("loader", () => {
         "---",
         `name: ${params.hookName}`,
         `description: ${params.hookName} test hook`,
-        'metadata: {"kaijibot":{"events":["command:new"]}}',
+        'metadata: {"allbot":{"events":["command:new"]}}',
         "---",
         "",
         `# ${params.hookName}`,
@@ -83,9 +83,9 @@ describe("loader", () => {
   }
 
   function withLegacyInternalHookHandlers(
-    config: KaijiBotConfig,
+    config: AllBotConfig,
     handlers?: Array<{ event: string; module: string; export?: string }>,
-  ): KaijiBotConfig {
+  ): AllBotConfig {
     if (!handlers) {
       return config;
     }
@@ -98,12 +98,12 @@ describe("loader", () => {
           handlers,
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   function createEnabledHooksConfig(
     handlers?: Array<{ event: string; module: string; export?: string }>,
-  ): KaijiBotConfig {
+  ): AllBotConfig {
     return withLegacyInternalHookHandlers(
       {
         hooks: {
@@ -137,7 +137,7 @@ describe("loader", () => {
         },
       ]);
 
-    const expectNoCommandHookRegistration = async (cfg: KaijiBotConfig) => {
+    const expectNoCommandHookRegistration = async (cfg: AllBotConfig) => {
       const count = await loadInternalHooks(cfg, tmpDir);
       expect(count).toBe(0);
       expect(getRegisteredEventKeys()).not.toContain("command:new");
@@ -151,7 +151,7 @@ describe("loader", () => {
               enabled: false,
             },
           },
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         withLegacyInternalHookHandlers(
           {
             hooks: {
@@ -159,7 +159,7 @@ describe("loader", () => {
                 enabled: false,
               },
             },
-          } satisfies KaijiBotConfig,
+          } satisfies AllBotConfig,
           [],
         ),
       ]) {
@@ -173,9 +173,9 @@ describe("loader", () => {
       // With no discoverable hooks in the temp dir (bundled dir is overridden
       // to /nonexistent), this returns 0 but does NOT bail at the guard.
       for (const cfg of [
-        {} satisfies KaijiBotConfig,
-        { hooks: {} } satisfies KaijiBotConfig,
-        { hooks: { internal: {} } } satisfies KaijiBotConfig,
+        {} satisfies AllBotConfig,
+        { hooks: {} } satisfies AllBotConfig,
+        { hooks: { internal: {} } } satisfies AllBotConfig,
       ]) {
         const count = await loadInternalHooks(cfg, tmpDir);
         expect(count).toBe(0);
@@ -359,7 +359,7 @@ describe("loader", () => {
           "---",
           "name: symlink-hook",
           "description: symlink test",
-          'metadata: {"kaijibot":{"events":["command:new"]}}',
+          'metadata: {"allbot":{"events":["command:new"]}}',
           "---",
           "",
           "# Symlink Hook",
@@ -404,7 +404,7 @@ describe("loader", () => {
           "---",
           "name: hardlink-hook",
           "description: hardlink test",
-          'metadata: {"kaijibot":{"events":["command:new"]}}',
+          'metadata: {"allbot":{"events":["command:new"]}}',
           "---",
           "",
           "# Hardlink Hook",

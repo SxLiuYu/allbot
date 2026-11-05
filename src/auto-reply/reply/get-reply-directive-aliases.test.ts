@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { parseInlineDirectives } from "./directive-handling.parse.js";
 import {
   reserveSkillCommandNames,
   resolveConfiguredDirectiveAliases,
 } from "./get-reply-directive-aliases.js";
 
-function configWithModelAlias(alias: string): KaijiBotConfig {
+function configWithModelAlias(alias: string): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -15,7 +15,7 @@ function configWithModelAlias(alias: string): KaijiBotConfig {
         },
       },
     },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 describe("reply directive aliases", () => {

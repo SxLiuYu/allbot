@@ -6,13 +6,13 @@ describe("xai responses tool helpers", () => {
     expect(
       __testing.buildXaiResponsesToolBody({
         model: "grok-4-1-fast",
-        inputText: "search for kaijibot",
+        inputText: "search for allbot",
         tools: [{ type: "x_search" }],
         maxTurns: 2,
       }),
     ).toEqual({
       model: "grok-4-1-fast",
-      input: [{ role: "user", content: "search for kaijibot" }],
+      input: [{ role: "user", content: "search for allbot" }],
       tools: [{ type: "x_search" }],
       max_turns: 2,
     });

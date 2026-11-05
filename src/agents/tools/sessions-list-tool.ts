@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { Type } from "typebox";
-import { type KaijiBotConfig, loadConfig } from "../../config/config.js";
+import { type AllBotConfig, loadConfig } from "../../config/config.js";
 import {
   resolveSessionFilePath,
   resolveSessionFilePathOptions,
@@ -60,7 +60,7 @@ function readSessionRunStatus(value: unknown): SessionRunStatus | undefined {
 export function createSessionsListTool(opts?: {
   agentSessionKey?: string;
   sandboxed?: boolean;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   callGateway?: GatewayCaller;
 }): AnyAgentTool {
   return {

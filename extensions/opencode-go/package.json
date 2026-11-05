@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/opencode-go-provider",
+  "name": "@allbot/opencode-go-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot OpenCode Go provider plugin",
+  "description": "AllBot OpenCode Go provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

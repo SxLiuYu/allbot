@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveOwningPluginIdsForProvider } from "../plugins/providers.js";
 import {
   normalizeLowercaseStringOrEmpty,
@@ -55,7 +55,7 @@ function hasSharedOwner(
   left: string,
   right: string,
   params: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
     ownerCache: Map<string, readonly string[]>;
@@ -86,7 +86,7 @@ function hasSharedOwner(
 export function createLiveTargetMatcher(params: {
   providerFilter: Set<string> | null;
   modelFilter: Set<string> | null;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }) {

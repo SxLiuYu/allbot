@@ -1,12 +1,12 @@
 import {
   DEFAULT_ACCOUNT_ID,
-  type KaijiBotConfig as ClawdbotConfig,
+  type AllBotConfig as ClawdbotConfig,
   createAccountListHelpers,
   normalizeAccountId,
   normalizeOptionalAccountId,
   resolveMergedAccountConfig,
-} from "kaijibot/plugin-sdk/account-resolution";
-import { coerceSecretRef } from "kaijibot/plugin-sdk/provider-auth";
+} from "allbot/plugin-sdk/account-resolution";
+import { coerceSecretRef } from "allbot/plugin-sdk/provider-auth";
 import { normalizeString } from "./comment-shared.js";
 import type {
   FeishuConfig,

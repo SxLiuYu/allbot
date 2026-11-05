@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SpawnSubagentResult } from "../../agents/subagent-spawn.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import { handleSubagentsSpawnAction } from "./commands-subagents/action-spawn.js";
 import type { HandleCommandsParams } from "./commands-types.js";
@@ -31,10 +31,10 @@ function forbiddenResult(error: string): SpawnSubagentResult {
 
 const baseCfg = {
   session: { mainKey: "main", scope: "per-sender" },
-} satisfies KaijiBotConfig;
+} satisfies AllBotConfig;
 
 function buildContext(params?: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   requesterKey?: string;
   restTokens?: string[];
   commandTo?: string | undefined;
@@ -84,7 +84,7 @@ function buildContext(params?: {
       directives,
       elevated: { enabled: false, allowed: false, failures: [] },
       sessionKey: "agent:main:main",
-      workspaceDir: "/tmp/kaijibot-subagents-spawn",
+      workspaceDir: "/tmp/allbot-subagents-spawn",
       defaultGroupActivation: () => "mention",
       resolvedVerboseLevel: "off",
       resolvedReasoningLevel: "off",

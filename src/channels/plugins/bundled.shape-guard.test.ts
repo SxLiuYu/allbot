@@ -129,9 +129,9 @@ describe("bundled channel entry shape guards", () => {
           continue;
         }
         if (
-          !source.includes('from "kaijibot/plugin-sdk/channel-entry-contract"') ||
-          source.includes('from "kaijibot/plugin-sdk/core"') ||
-          source.includes('from "kaijibot/plugin-sdk/channel-core"')
+          !source.includes('from "allbot/plugin-sdk/channel-entry-contract"') ||
+          source.includes('from "allbot/plugin-sdk/core"') ||
+          source.includes('from "allbot/plugin-sdk/channel-core"')
         ) {
           offenders.push(path.relative(process.cwd(), filePath));
         }
@@ -179,7 +179,7 @@ describe("bundled channel entry shape guards", () => {
         if (!source.includes("createChatChannelPlugin")) {
           continue;
         }
-        if (source.includes('from "kaijibot/plugin-sdk/core"')) {
+        if (source.includes('from "allbot/plugin-sdk/core"')) {
           offenders.push(path.relative(process.cwd(), filePath));
         }
       }
@@ -215,7 +215,7 @@ describe("bundled channel entry shape guards", () => {
   });
 
   it("breaks reentrant bundled channel discovery cycles with an empty fallback", async () => {
-    const pluginDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-bundled-reentrant-"));
+    const pluginDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-bundled-reentrant-"));
     const modulePath = path.join(pluginDir, "index.js");
     fs.writeFileSync(modulePath, "export {};\n", "utf8");
 

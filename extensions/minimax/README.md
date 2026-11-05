@@ -1,4 +1,4 @@
-# MiniMax (KaijiBot plugin)
+# MiniMax (AllBot plugin)
 
 Bundled MiniMax plugin for both:
 
@@ -8,13 +8,13 @@ Bundled MiniMax plugin for both:
 ## Enable
 
 ```bash
-kaijibot plugins enable minimax
+allbot plugins enable minimax
 ```
 
 Restart the Gateway after enabling.
 
 ```bash
-kaijibot gateway restart
+allbot gateway restart
 ```
 
 ## Authenticate
@@ -22,13 +22,13 @@ kaijibot gateway restart
 OAuth:
 
 ```bash
-kaijibot models auth login --provider minimax-portal --set-default
+allbot models auth login --provider minimax-portal --set-default
 ```
 
 API key:
 
 ```bash
-kaijibot setup --wizard --auth-choice minimax-global-api
+allbot setup --wizard --auth-choice minimax-global-api
 ```
 
 ## Notes

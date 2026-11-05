@@ -1,7 +1,7 @@
-import { readConfiguredProviderCatalogEntries } from "kaijibot/plugin-sdk/provider-catalog-shared";
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
+import { readConfiguredProviderCatalogEntries } from "allbot/plugin-sdk/provider-catalog-shared";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
 import { applyKilocodeConfig, KILOCODE_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildKilocodeProviderWithDiscovery } from "./provider-catalog.js";
 

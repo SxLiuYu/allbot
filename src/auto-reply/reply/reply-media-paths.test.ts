@@ -74,7 +74,7 @@ describe("createReplyMediaPathNormalizer", () => {
     });
 
     const result = await normalize({
-      mediaUrls: ["/Users/peter/.kaijibot/media/inbound/photo.png"],
+      mediaUrls: ["/Users/peter/.allbot/media/inbound/photo.png"],
     });
 
     expect(result).toMatchObject({
@@ -107,7 +107,7 @@ describe("createReplyMediaPathNormalizer", () => {
   });
 
   it("keeps managed generated media under the shared media root", async () => {
-    vi.stubEnv("KAIJIBOT_STATE_DIR", "/Users/peter/.kaijibot");
+    vi.stubEnv("ALLBOT_STATE_DIR", "/Users/peter/.allbot");
     ensureSandboxWorkspaceForSession.mockResolvedValue({
       workspaceDir: "/tmp/sandboxes/session-1",
       containerWorkdir: "/workspace",
@@ -119,12 +119,12 @@ describe("createReplyMediaPathNormalizer", () => {
     });
 
     const result = await normalize({
-      mediaUrls: ["/Users/peter/.kaijibot/media/tool-image-generation/generated.png"],
+      mediaUrls: ["/Users/peter/.allbot/media/tool-image-generation/generated.png"],
     });
 
     expect(result).toMatchObject({
-      mediaUrl: "/Users/peter/.kaijibot/media/tool-image-generation/generated.png",
-      mediaUrls: ["/Users/peter/.kaijibot/media/tool-image-generation/generated.png"],
+      mediaUrl: "/Users/peter/.allbot/media/tool-image-generation/generated.png",
+      mediaUrls: ["/Users/peter/.allbot/media/tool-image-generation/generated.png"],
     });
     expect(saveMediaSource).not.toHaveBeenCalled();
   });
@@ -141,7 +141,7 @@ describe("createReplyMediaPathNormalizer", () => {
     });
 
     const result = await normalize({
-      mediaUrls: ["file:///Users/peter/.kaijibot/media/inbound/photo.png"],
+      mediaUrls: ["file:///Users/peter/.allbot/media/inbound/photo.png"],
     });
 
     expect(result).toMatchObject({
@@ -152,28 +152,28 @@ describe("createReplyMediaPathNormalizer", () => {
 
   it("persists volatile agent-state media from the workspace into host outbound media", async () => {
     saveMediaSource.mockResolvedValue({
-      path: "/Users/peter/.kaijibot/media/outbound/persisted.png",
+      path: "/Users/peter/.allbot/media/outbound/persisted.png",
     });
     const normalize = createReplyMediaPathNormalizer({
       cfg: {},
       sessionKey: "session-key",
-      workspaceDir: "/Users/peter/.kaijibot/workspace",
+      workspaceDir: "/Users/peter/.allbot/workspace",
     });
 
     const result = await normalize({
       mediaUrls: [
-        "/Users/peter/.kaijibot/workspace/.kaijibot/media/tool-image-generation/generated.png",
+        "/Users/peter/.allbot/workspace/.allbot/media/tool-image-generation/generated.png",
       ],
     });
 
     expect(saveMediaSource).toHaveBeenCalledWith(
-      "/Users/peter/.kaijibot/workspace/.kaijibot/media/tool-image-generation/generated.png",
+      "/Users/peter/.allbot/workspace/.allbot/media/tool-image-generation/generated.png",
       undefined,
       "outbound",
     );
     expect(result).toMatchObject({
-      mediaUrl: "/Users/peter/.kaijibot/media/outbound/persisted.png",
-      mediaUrls: ["/Users/peter/.kaijibot/media/outbound/persisted.png"],
+      mediaUrl: "/Users/peter/.allbot/media/outbound/persisted.png",
+      mediaUrls: ["/Users/peter/.allbot/media/outbound/persisted.png"],
     });
   });
 });

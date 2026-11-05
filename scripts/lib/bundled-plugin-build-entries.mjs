@@ -23,22 +23,22 @@ function readBundledPluginPackageJson(packageJsonPath) {
 
 function isManifestlessBundledRuntimeSupportPackage(params) {
   const packageName = typeof params.packageJson?.name === "string" ? params.packageJson.name : "";
-  if (packageName !== `@kaijibot/${params.dirName}`) {
+  if (packageName !== `@allbot/${params.dirName}`) {
     return false;
   }
   return params.topLevelPublicSurfaceEntries.length > 0;
 }
 
 function collectPluginSourceEntries(packageJson) {
-  let packageEntries = Array.isArray(packageJson?.kaijibot?.extensions)
-    ? packageJson.kaijibot.extensions.filter(
+  let packageEntries = Array.isArray(packageJson?.allbot?.extensions)
+    ? packageJson.allbot.extensions.filter(
         (entry) => typeof entry === "string" && entry.trim().length > 0,
       )
     : [];
   const setupEntry =
-    typeof packageJson?.kaijibot?.setupEntry === "string" &&
-    packageJson.kaijibot.setupEntry.trim().length > 0
-      ? packageJson.kaijibot.setupEntry
+    typeof packageJson?.allbot?.setupEntry === "string" &&
+    packageJson.allbot.setupEntry.trim().length > 0
+      ? packageJson.allbot.setupEntry
       : undefined;
   if (setupEntry) {
     packageEntries = Array.from(new Set([...packageEntries, setupEntry]));
@@ -47,7 +47,7 @@ function collectPluginSourceEntries(packageJson) {
 }
 
 function shouldStageBundledPluginRuntimeDependencies(packageJson) {
-  return packageJson?.kaijibot?.bundle?.stageRuntimeDependencies === true;
+  return packageJson?.allbot?.bundle?.stageRuntimeDependencies === true;
 }
 
 function collectTopLevelPublicSurfaceEntries(pluginDir) {
@@ -96,7 +96,7 @@ export function collectBundledPluginBuildEntries(params = {}) {
     }
 
     const pluginDir = path.join(extensionsRoot, dirent.name);
-    const manifestPath = path.join(pluginDir, "kaijibot.plugin.json");
+    const manifestPath = path.join(pluginDir, "allbot.plugin.json");
     const hasManifest = fs.existsSync(manifestPath);
     const packageJsonPath = path.join(pluginDir, "package.json");
     const packageJson = readBundledPluginPackageJson(packageJsonPath);
@@ -150,7 +150,7 @@ export function listBundledPluginPackArtifacts(params = {}) {
 
   for (const { id, hasManifest, hasPackageJson, sourceEntries } of entries) {
     if (hasManifest) {
-      artifacts.add(bundledDistPluginFile(id, "kaijibot.plugin.json"));
+      artifacts.add(bundledDistPluginFile(id, "allbot.plugin.json"));
     }
     if (hasPackageJson) {
       artifacts.add(bundledDistPluginFile(id, "package.json"));

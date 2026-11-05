@@ -25,7 +25,7 @@ export type CompactionSafeguardRuntimeValue = {
   provider?: string;
   /**
    * Pending human-readable cancel reason from the current safeguard compaction
-   * attempt. KaijiBot consumes this to replace the upstream generic
+   * attempt. AllBot consumes this to replace the upstream generic
    * "Compaction cancelled" message.
    */
   cancelReason?: string;

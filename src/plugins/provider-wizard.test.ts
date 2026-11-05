@@ -63,7 +63,7 @@ function createSglangConfig() {
 
 function createHomeEnv(suffix = "", overrides?: Partial<NodeJS.ProcessEnv>) {
   return {
-    KAIJIBOT_HOME: `/tmp/kaijibot-home${suffix}`,
+    ALLBOT_HOME: `/tmp/allbot-home${suffix}`,
     ...overrides,
   } as NodeJS.ProcessEnv;
 }

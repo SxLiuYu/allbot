@@ -2,7 +2,7 @@ import type { ChildProcess } from "node:child_process";
 import { EventEmitter } from "node:events";
 import process from "node:process";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { KAIJIBOT_CLI_ENV_VALUE } from "../infra/kaijibot-exec-env.js";
+import { ALLBOT_CLI_ENV_VALUE } from "../infra/allbot-exec-env.js";
 
 const spawnMock = vi.hoisted(() => vi.fn());
 
@@ -104,18 +104,18 @@ describe("runCommandWithTimeout", () => {
     const resolved = resolveCommandEnv({
       argv: ["node", "script.js"],
       baseEnv: {
-        KAIJIBOT_BASE_ENV: "base",
-        KAIJIBOT_TO_REMOVE: undefined,
+        ALLBOT_BASE_ENV: "base",
+        ALLBOT_TO_REMOVE: undefined,
       },
       env: {
-        KAIJIBOT_TEST_ENV: "ok",
+        ALLBOT_TEST_ENV: "ok",
       },
     });
 
-    expect(resolved.KAIJIBOT_BASE_ENV).toBe("base");
-    expect(resolved.KAIJIBOT_TEST_ENV).toBe("ok");
-    expect(resolved.KAIJIBOT_TO_REMOVE).toBeUndefined();
-    expect(resolved.KAIJIBOT_CLI).toBe(KAIJIBOT_CLI_ENV_VALUE);
+    expect(resolved.ALLBOT_BASE_ENV).toBe("base");
+    expect(resolved.ALLBOT_TEST_ENV).toBe("ok");
+    expect(resolved.ALLBOT_TO_REMOVE).toBeUndefined();
+    expect(resolved.ALLBOT_CLI).toBe(ALLBOT_CLI_ENV_VALUE);
   });
 
   it("suppresses npm fund prompts for npm argv", async () => {

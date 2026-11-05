@@ -5,12 +5,12 @@ const sdkExports = vi.hoisted(() => ({
   listRuntimeImageGenerationProviders: vi.fn(),
 }));
 
-vi.mock("kaijibot/plugin-sdk/image-generation-runtime", () => sdkExports);
+vi.mock("allbot/plugin-sdk/image-generation-runtime", () => sdkExports);
 
 import {
   generateImage as sdkGenerateImage,
   listRuntimeImageGenerationProviders as sdkListRuntimeImageGenerationProviders,
-} from "kaijibot/plugin-sdk/image-generation-runtime";
+} from "allbot/plugin-sdk/image-generation-runtime";
 import { generateImage, listRuntimeImageGenerationProviders } from "./runtime.js";
 
 describe("image-generation-core runtime", () => {

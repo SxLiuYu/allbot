@@ -1,7 +1,7 @@
 import {
   getProviderHttpMocks,
   installProviderHttpMockCleanup,
-} from "kaijibot/plugin-sdk/provider-http-test-mocks";
+} from "allbot/plugin-sdk/provider-http-test-mocks";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 const { postJsonRequestMock, fetchWithTimeoutMock } = getProviderHttpMocks();

@@ -39,7 +39,7 @@ function createContext(params: {
       customModelId: params.modelId,
     },
     runtime: createRuntime() as never,
-    agentDir: "/tmp/kaijibot-self-hosted-test-agent",
+    agentDir: "/tmp/allbot-self-hosted-test-agent",
     resolveApiKey: vi.fn<ProviderAuthMethodNonInteractiveContext["resolveApiKey"]>(
       async () => resolved,
     ),

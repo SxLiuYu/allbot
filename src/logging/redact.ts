@@ -1,5 +1,5 @@
 import fsSync from "node:fs";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveConfigPath } from "../config/paths.js";
 import { compileConfigRegex } from "../security/config-regex.js";
 import { resolveNodeRequireFromMeta } from "./node-require.js";
@@ -164,11 +164,11 @@ function resolveConfigRedaction(): RedactOptions {
       patterns: fast.redactPatterns,
     };
   }
-  let cfg: KaijiBotConfig["logging"] | undefined;
+  let cfg: AllBotConfig["logging"] | undefined;
   try {
     const loaded = requireConfig?.("../config/config.js") as
       | {
-          loadConfig?: () => KaijiBotConfig;
+          loadConfig?: () => AllBotConfig;
         }
       | undefined;
     cfg = loaded?.loadConfig?.().logging;

@@ -6,7 +6,7 @@ import {
   type StreamOptions,
 } from "@earendil-works/pi-ai";
 
-const CUSTOM_API_SOURCE_PREFIX = "kaijibot-custom-api:";
+const CUSTOM_API_SOURCE_PREFIX = "allbot-custom-api:";
 
 export function getCustomApiRegistrySourceId(api: Api): string {
   return `${CUSTOM_API_SOURCE_PREFIX}${api}`;

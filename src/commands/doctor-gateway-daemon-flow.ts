@@ -1,5 +1,5 @@
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveGatewayPort } from "../config/config.js";
 import {
   resolveGatewayLaunchAgentLabel,
@@ -87,7 +87,7 @@ async function maybeRepairLaunchAgentBootstrap(params: {
 }
 
 export async function maybeRepairGatewayDaemon(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runtime: RuntimeEnv;
   prompter: DoctorPrompter;
   options: DoctorOptions;
@@ -124,7 +124,7 @@ export async function maybeRepairGatewayDaemon(params: {
     await maybeRepairLaunchAgentBootstrap({
       env: {
         ...process.env,
-        KAIJIBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+        ALLBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
       },
       title: "Node",
       runtime: params.runtime,
@@ -255,9 +255,9 @@ export async function maybeRepairGatewayDaemon(params: {
   }
 
   if (process.platform === "darwin") {
-    const label = resolveGatewayLaunchAgentLabel(process.env.KAIJIBOT_PROFILE);
+    const label = resolveGatewayLaunchAgentLabel(process.env.ALLBOT_PROFILE);
     note(
-      `LaunchAgent loaded; stopping requires "${formatCliCommand("kaijibot gateway stop")}" or launchctl bootout gui/$UID/${label}.`,
+      `LaunchAgent loaded; stopping requires "${formatCliCommand("allbot gateway stop")}" or launchctl bootout gui/$UID/${label}.`,
       "Gateway",
     );
   }

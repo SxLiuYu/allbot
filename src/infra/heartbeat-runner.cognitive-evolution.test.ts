@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { heartbeatRunnerTelegramPlugin } from "../../test/helpers/infra/heartbeat-runner-channel-plugins.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../test-utils/channel-plugins.js";
 import { buildEvolutionEventPrompt } from "./heartbeat-events-filter.js";
@@ -33,8 +33,8 @@ describe("cognitive-evolution system event delivery through base session (no iso
   const createConfig = async (
     tmpDir: string,
     storePath: string,
-  ): Promise<{ cfg: KaijiBotConfig; sessionKey: string }> => {
-    const cfg: KaijiBotConfig = {
+  ): Promise<{ cfg: AllBotConfig; sessionKey: string }> => {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           workspace: tmpDir,
@@ -87,7 +87,7 @@ describe("cognitive-evolution system event delivery through base session (no iso
         expect(calledSessionKey).not.toContain(":heartbeat");
         expect(sendTelegram).toHaveBeenCalled();
       },
-      { prefix: "kaijibot-evo-1-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-evo-1-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 
@@ -119,7 +119,7 @@ describe("cognitive-evolution system event delivery through base session (no iso
         expect(result.status).toBe("ran");
         expect(peekSystemEventEntries(sessionKey)).toHaveLength(0);
       },
-      { prefix: "kaijibot-evo-2-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-evo-2-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 
@@ -155,7 +155,7 @@ describe("cognitive-evolution system event delivery through base session (no iso
         expect(peekSystemEventEntries(sessionKey)).toHaveLength(0);
         expect(replySpy).toHaveBeenCalledTimes(1);
       },
-      { prefix: "kaijibot-evo-3-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-evo-3-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 
@@ -192,7 +192,7 @@ describe("cognitive-evolution system event delivery through base session (no iso
         expect(calledBody).not.toContain("HEARTBEAT_OK");
         expect(calledBody).not.toContain("Read HEARTBEAT.md");
       },
-      { prefix: "kaijibot-evo-4-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-evo-4-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 
@@ -225,7 +225,7 @@ describe("cognitive-evolution system event delivery through base session (no iso
         expect(result.status).toBe("ran");
         expect(peekSystemEventEntries(sessionKey)).toHaveLength(0);
       },
-      { prefix: "kaijibot-evo-5-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-evo-5-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 });

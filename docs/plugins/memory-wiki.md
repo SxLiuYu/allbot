@@ -39,7 +39,7 @@ Think of the split like this:
 | Active memory plugin (`memory-core`, QMD, Honcho, etc.) | Recall, semantic search, promotion, dreaming, memory runtime                               |
 | `memory-wiki`                                           | Compiled wiki pages, provenance-rich syntheses, dashboards, wiki-specific search/get/apply |
 
-If the active memory plugin exposes shared recall artifacts, KaijiBot can search
+If the active memory plugin exposes shared recall artifacts, AllBot can search
 both layers in one pass with `memory_search corpus=all`.
 
 When you need wiki-specific ranking, provenance, or direct page access, use the
@@ -96,7 +96,7 @@ The plugin initializes a vault like this:
   reports/
   _attachments/
   _views/
-  .kaijibot-wiki/
+  .allbot-wiki/
 ```
 
 Managed content stays inside generated blocks. Human note blocks are preserved.
@@ -139,8 +139,8 @@ dump. Claims can be tracked, scored, contested, and resolved back to sources.
 The compile step reads wiki pages, normalizes summaries, and emits stable
 machine-facing artifacts under:
 
-- `.kaijibot-wiki/cache/agent-digest.json`
-- `.kaijibot-wiki/cache/claims.jsonl`
+- `.allbot-wiki/cache/agent-digest.json`
+- `.allbot-wiki/cache/claims.jsonl`
 
 These digests exist so agents and runtime code do not have to scrape Markdown
 pages.
@@ -251,13 +251,13 @@ Put config under `plugins.entries.memory-wiki.config`:
         config: {
           vaultMode: "isolated",
           vault: {
-            path: "~/.kaijibot/wiki/main",
+            path: "~/.allbot/wiki/main",
             renderMode: "obsidian",
           },
           obsidian: {
             enabled: true,
             useOfficialCli: true,
-            vaultName: "KaijiBot Wiki",
+            vaultName: "AllBot Wiki",
             openAfterWrites: false,
           },
           bridge: {
@@ -309,17 +309,17 @@ Key toggles:
 `memory-wiki` also exposes a top-level CLI surface:
 
 ```bash
-kaijibot wiki status
-kaijibot wiki doctor
-kaijibot wiki init
-kaijibot wiki ingest ./notes/alpha.md
-kaijibot wiki compile
-kaijibot wiki lint
-kaijibot wiki search "alpha"
-kaijibot wiki get entity.alpha
-kaijibot wiki apply synthesis "Alpha Summary" --body "..." --source-id source.alpha
-kaijibot wiki bridge import
-kaijibot wiki obsidian status
+allbot wiki status
+allbot wiki doctor
+allbot wiki init
+allbot wiki ingest ./notes/alpha.md
+allbot wiki compile
+allbot wiki lint
+allbot wiki search "alpha"
+allbot wiki get entity.alpha
+allbot wiki apply synthesis "Alpha Summary" --body "..." --source-id source.alpha
+allbot wiki bridge import
+allbot wiki obsidian status
 ```
 
 See [CLI: wiki](/cli/wiki) for the full command reference.

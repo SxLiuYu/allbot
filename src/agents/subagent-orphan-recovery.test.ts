@@ -364,7 +364,7 @@ describe("subagent-orphan-recovery", () => {
 
     vi.mocked(sessionUtils.readSessionMessages).mockReturnValue([
       { role: "user", content: "Update the config" },
-      { role: "assistant", content: "I've modified kaijibot.json to add the new setting." },
+      { role: "assistant", content: "I've modified allbot.json to add the new setting." },
     ]);
 
     const activeRuns = new Map<string, SubagentRunRecord>();

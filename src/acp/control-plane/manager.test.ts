@@ -1,7 +1,7 @@
 import { setTimeout as scheduleNativeTimeout } from "node:timers";
 import { setTimeout as sleep } from "node:timers/promises";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { AcpSessionRuntimeOptions, SessionAcpMeta } from "../../config/sessions/types.js";
 import { resetHeartbeatWakeStateForTests } from "../../infra/heartbeat-wake.js";
 import { resetSystemEventsForTest } from "../../infra/system-events.js";
@@ -56,11 +56,11 @@ const baseCfg = {
     dispatch: { enabled: true },
   },
 } as const;
-const ORIGINAL_STATE_DIR = process.env.KAIJIBOT_STATE_DIR;
+const ORIGINAL_STATE_DIR = process.env.ALLBOT_STATE_DIR;
 
 async function withAcpManagerTaskStateDir(run: (root: string) => Promise<void>): Promise<void> {
-  await withTempDir({ prefix: "kaijibot-acp-manager-task-" }, async (root) => {
-    process.env.KAIJIBOT_STATE_DIR = root;
+  await withTempDir({ prefix: "allbot-acp-manager-task-" }, async (root) => {
+    process.env.ALLBOT_STATE_DIR = root;
     resetTaskRegistryForTests({ persist: false });
     resetTaskFlowRegistryForTests({ persist: false });
     installInMemoryTaskRegistryRuntime();
@@ -231,9 +231,9 @@ describe("AcpSessionManager", () => {
 
   afterEach(() => {
     if (ORIGINAL_STATE_DIR === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = ORIGINAL_STATE_DIR;
+      process.env.ALLBOT_STATE_DIR = ORIGINAL_STATE_DIR;
     }
     resetSystemEventsForTest();
     resetHeartbeatWakeStateForTests();
@@ -285,7 +285,7 @@ describe("AcpSessionManager", () => {
       ...baseCfg,
       session: { mainKey: "main" },
       agents: { list: [{ id: "main", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await manager.runTurn({
       cfg,
@@ -529,7 +529,7 @@ describe("AcpSessionManager", () => {
             timeoutSeconds: 1,
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const first = manager.runTurn({
         cfg,
@@ -629,7 +629,7 @@ describe("AcpSessionManager", () => {
             timeoutSeconds: 1,
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const first = manager.runTurn({
         cfg,
@@ -1197,7 +1197,7 @@ describe("AcpSessionManager", () => {
         ...baseCfg.acp,
         maxConcurrentSessions: 1,
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const manager = new AcpSessionManager();
     await manager.runTurn({
@@ -1239,7 +1239,7 @@ describe("AcpSessionManager", () => {
         ...baseCfg.acp,
         maxConcurrentSessions: 1,
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const manager = new AcpSessionManager();
     await manager.initializeSession({
@@ -1288,7 +1288,7 @@ describe("AcpSessionManager", () => {
         ...baseCfg.acp,
         maxConcurrentSessions: 1,
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const manager = new AcpSessionManager();
     await manager.runTurn({
@@ -1343,7 +1343,7 @@ describe("AcpSessionManager", () => {
         ...baseCfg.acp,
         maxConcurrentSessions: 1,
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const manager = new AcpSessionManager();
     await manager.runTurn({
@@ -1638,7 +1638,7 @@ describe("AcpSessionManager", () => {
             ttlMinutes: 0.01,
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const manager = new AcpSessionManager();
       await manager.runTurn({

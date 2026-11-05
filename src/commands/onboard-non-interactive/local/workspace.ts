@@ -1,10 +1,10 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { resolveUserPath } from "../../../utils.js";
 import type { OnboardOptions } from "../../onboard-types.js";
 
 export function resolveNonInteractiveWorkspaceDir(params: {
   opts: OnboardOptions;
-  baseConfig: KaijiBotConfig;
+  baseConfig: AllBotConfig;
   defaultWorkspaceDir: string;
 }) {
   const raw = (

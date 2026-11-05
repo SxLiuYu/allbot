@@ -1,6 +1,6 @@
 import { normalizeChatChannelId } from "../../../channels/ids.js";
 import { listRouteBindings } from "../../../config/bindings.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import {
   formatChannelAccountsDefaultPath,
   formatSetExplicitDefaultInstruction,
@@ -32,7 +32,7 @@ function normalizeBindingChannelKey(raw?: string | null): string {
 }
 
 function collectChannelsMissingDefaultAccount(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): ChannelMissingDefaultAccountContext[] {
   const channels = asObjectRecord(cfg.channels);
   if (!channels) {
@@ -65,7 +65,7 @@ function collectChannelsMissingDefaultAccount(
   return contexts;
 }
 
-export function collectMissingDefaultAccountBindingWarnings(cfg: KaijiBotConfig): string[] {
+export function collectMissingDefaultAccountBindingWarnings(cfg: AllBotConfig): string[] {
   const bindings = listRouteBindings(cfg);
   const warnings: string[] = [];
 
@@ -130,7 +130,7 @@ export function collectMissingDefaultAccountBindingWarnings(cfg: KaijiBotConfig)
   return warnings;
 }
 
-export function collectMissingExplicitDefaultAccountWarnings(cfg: KaijiBotConfig): string[] {
+export function collectMissingExplicitDefaultAccountWarnings(cfg: AllBotConfig): string[] {
   const warnings: string[] = [];
   for (const { channelKey, channel, normalizedAccountIds } of collectChannelsMissingDefaultAccount(
     cfg,

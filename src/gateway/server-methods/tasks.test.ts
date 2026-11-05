@@ -47,7 +47,7 @@ describe("tasks.list / tasks.get RPC contract (T11)", () => {
   let storeDir: string;
 
   beforeEach(async () => {
-    storeDir = mkdtempSync(join(tmpdir(), "kaijibot-tasks-rpc-"));
+    storeDir = mkdtempSync(join(tmpdir(), "allbot-tasks-rpc-"));
     mocks.resolveConfigDir.mockReturnValue(storeDir);
     const { TaskStore } = await import("../../cognitive/tasks/store.js");
     const store = new TaskStore(storeDir);

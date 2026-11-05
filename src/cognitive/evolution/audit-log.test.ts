@@ -8,7 +8,7 @@ let tempDir: string;
 let log: AuditLog;
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-audit-test-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-audit-test-"));
   log = new AuditLog(tempDir);
 });
 

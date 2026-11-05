@@ -1,4 +1,4 @@
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import type { WikiClaim, WikiPageSummary } from "./markdown.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;

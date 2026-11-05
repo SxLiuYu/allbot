@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/together-provider",
+  "name": "@allbot/together-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "KaijiBot Together provider plugin",
+  "description": "AllBot Together provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

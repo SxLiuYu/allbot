@@ -5,7 +5,7 @@ import { upsertAuthProfile } from "../../agents/auth-profiles/profiles.js";
 import { loadAuthProfileStoreForSecretsRuntime } from "../../agents/auth-profiles/store.js";
 import { invalidateModelCatalog } from "../../agents/model-catalog.js";
 import { loadConfig } from "../../config/config.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { writeConfigFile } from "../../config/io.js";
 import type { ModelApi } from "../../config/types.models.js";
 import { resolveBundledPluginsDir } from "../../plugins/bundled-dir.js";
@@ -28,7 +28,7 @@ type ProviderRegistrationEntry = {
 
 export function createAuthHandlers(deps: {
   agentDir?: string;
-  getConfig?: () => KaijiBotConfig;
+  getConfig?: () => AllBotConfig;
   getProviderRegistrations?: () => ProviderRegistrationEntry[];
   getManifestRegistry?: () => PluginManifestRegistry;
 }): GatewayRequestHandlers {
@@ -230,7 +230,7 @@ function resolveProviderModelCatalog(
       if (!entry.isDirectory()) {
         continue;
       }
-      const manifestPath = joinPath(bundledDir, entry.name, "kaijibot.plugin.json");
+      const manifestPath = joinPath(bundledDir, entry.name, "allbot.plugin.json");
       if (!existsSync(manifestPath)) {
         continue;
       }

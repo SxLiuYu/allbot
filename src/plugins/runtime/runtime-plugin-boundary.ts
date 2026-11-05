@@ -136,8 +136,8 @@ export function getPluginBoundaryJiti(
   const aliasMap = {
     ...(pluginSdkAlias
       ? {
-          "kaijibot/plugin-sdk": pluginSdkAlias,
-          "@kaijibot/plugin-sdk": pluginSdkAlias,
+          "allbot/plugin-sdk": pluginSdkAlias,
+          "@allbot/plugin-sdk": pluginSdkAlias,
         }
       : {}),
     ...resolvePluginSdkScopedAliasMap({ modulePath }),

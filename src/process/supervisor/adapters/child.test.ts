@@ -52,7 +52,7 @@ async function createAdapterHarness(params?: {
 }
 
 describe("createChildAdapter", () => {
-  const originalServiceMarker = process.env.KAIJIBOT_SERVICE_MARKER;
+  const originalServiceMarker = process.env.ALLBOT_SERVICE_MARKER;
 
   beforeAll(async () => {
     ({ createChildAdapter } = await import("./child.js"));
@@ -61,15 +61,15 @@ describe("createChildAdapter", () => {
   beforeEach(() => {
     spawnWithFallbackMock.mockClear();
     killProcessTreeMock.mockClear();
-    delete process.env.KAIJIBOT_SERVICE_MARKER;
+    delete process.env.ALLBOT_SERVICE_MARKER;
     vi.useRealTimers();
   });
 
   afterAll(() => {
     if (originalServiceMarker === undefined) {
-      delete process.env.KAIJIBOT_SERVICE_MARKER;
+      delete process.env.ALLBOT_SERVICE_MARKER;
     } else {
-      process.env.KAIJIBOT_SERVICE_MARKER = originalServiceMarker;
+      process.env.ALLBOT_SERVICE_MARKER = originalServiceMarker;
     }
   });
 
@@ -156,7 +156,7 @@ describe("createChildAdapter", () => {
   });
 
   it("disables detached mode in service-managed runtime", async () => {
-    process.env.KAIJIBOT_SERVICE_MARKER = "kaijibot";
+    process.env.ALLBOT_SERVICE_MARKER = "allbot";
 
     await createAdapterHarness({ pid: 7777 });
 

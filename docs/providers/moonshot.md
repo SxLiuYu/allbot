@@ -25,15 +25,15 @@ Current Kimi K2 model IDs:
 [//]: # "moonshot-kimi-k2-ids:end"
 
 ```bash
-kaijibot onboard --auth-choice moonshot-api-key
+allbot onboard --auth-choice moonshot-api-key
 # or
-kaijibot onboard --auth-choice moonshot-api-key-cn
+allbot onboard --auth-choice moonshot-api-key-cn
 ```
 
 Kimi Coding:
 
 ```bash
-kaijibot onboard --auth-choice kimi-code-api-key
+allbot onboard --auth-choice kimi-code-api-key
 ```
 
 Note: Moonshot and Kimi Coding are separate providers. Keys are not interchangeable, endpoints differ, and model refs differ (Moonshot uses `moonshot/...`, Kimi Coding uses `kimi/...`).
@@ -41,7 +41,7 @@ Note: Moonshot and Kimi Coding are separate providers. Keys are not interchangea
 Kimi web search uses the Moonshot plugin too:
 
 ```bash
-kaijibot configure --section web
+allbot configure --section web
 ```
 
 Choose **Kimi** in the web-search section to store
@@ -136,7 +136,7 @@ Choose **Kimi** in the web-search section to store
 
 ## Kimi web search
 
-KaijiBot also ships **Kimi** as a `web_search` provider, backed by Moonshot web
+AllBot also ships **Kimi** as a `web_search` provider, backed by Moonshot web
 search.
 
 Interactive setup can prompt for:
@@ -180,7 +180,7 @@ Config lives under `plugins.entries.moonshot.config.webSearch`:
 - Kimi web search uses `KIMI_API_KEY` or `MOONSHOT_API_KEY`, and defaults to `https://api.moonshot.ai/v1` with model `kimi-k2.5`.
 - Native Moonshot endpoints (`https://api.moonshot.ai/v1` and
   `https://api.moonshot.cn/v1`) advertise streaming usage compatibility on the
-  shared `openai-completions` transport. KaijiBot now keys that off endpoint
+  shared `openai-completions` transport. AllBot now keys that off endpoint
   capabilities, so compatible custom provider ids targeting the same native
   Moonshot hosts inherit the same streaming-usage behavior.
 - Override pricing and context metadata in `models.providers` if needed.
@@ -216,9 +216,9 @@ Configure it per model via `agents.defaults.models.<provider/model>.params`:
 }
 ```
 
-KaijiBot also maps runtime `/think` levels for Moonshot:
+AllBot also maps runtime `/think` levels for Moonshot:
 
 - `/think off` -> `thinking.type=disabled`
 - any non-off thinking level -> `thinking.type=enabled`
 
-When Moonshot thinking is enabled, `tool_choice` must be `auto` or `none`. KaijiBot normalizes incompatible `tool_choice` values to `auto` for compatibility.
+When Moonshot thinking is enabled, `tool_choice` must be `auto` or `none`. AllBot normalizes incompatible `tool_choice` values to `auto` for compatibility.

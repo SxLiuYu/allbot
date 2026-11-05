@@ -7,7 +7,7 @@
  */
 
 import path from "node:path";
-import { resolveStateDir } from "kaijibot/plugin-sdk/state-paths";
+import { resolveStateDir } from "allbot/plugin-sdk/state-paths";
 
 export const SHERPA_ONNX_VERSION = "v1.13.6";
 

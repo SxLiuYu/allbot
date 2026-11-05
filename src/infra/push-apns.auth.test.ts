@@ -12,7 +12,7 @@ import {
 const tempDirs = createTrackedTempDirs();
 
 async function makeTempDir(): Promise<string> {
-  return await tempDirs.make("kaijibot-push-apns-auth-test-");
+  return await tempDirs.make("allbot-push-apns-auth-test-");
 }
 
 afterEach(async () => {
@@ -29,11 +29,11 @@ describe("push APNs auth and helper coverage", () => {
 
   it("prefers inline APNs private key values and unescapes newlines", async () => {
     const resolved = await resolveApnsAuthConfigFromEnv({
-      KAIJIBOT_APNS_TEAM_ID: "TEAM123",
-      KAIJIBOT_APNS_KEY_ID: "KEY123",
-      KAIJIBOT_APNS_PRIVATE_KEY_P8:
+      ALLBOT_APNS_TEAM_ID: "TEAM123",
+      ALLBOT_APNS_KEY_ID: "KEY123",
+      ALLBOT_APNS_PRIVATE_KEY_P8:
         "-----BEGIN PRIVATE KEY-----\\nline-a\\nline-b\\n-----END PRIVATE KEY-----", // pragma: allowlist secret
-      KAIJIBOT_APNS_PRIVATE_KEY: "ignored",
+      ALLBOT_APNS_PRIVATE_KEY: "ignored",
     } as NodeJS.ProcessEnv);
 
     expect(resolved).toMatchObject({
@@ -49,12 +49,12 @@ describe("push APNs auth and helper coverage", () => {
     }
   });
 
-  it("falls back to KAIJIBOT_APNS_PRIVATE_KEY when KAIJIBOT_APNS_PRIVATE_KEY_P8 is blank", async () => {
+  it("falls back to ALLBOT_APNS_PRIVATE_KEY when ALLBOT_APNS_PRIVATE_KEY_P8 is blank", async () => {
     const resolved = await resolveApnsAuthConfigFromEnv({
-      KAIJIBOT_APNS_TEAM_ID: "TEAM123",
-      KAIJIBOT_APNS_KEY_ID: "KEY123",
-      KAIJIBOT_APNS_PRIVATE_KEY_P8: "   ",
-      KAIJIBOT_APNS_PRIVATE_KEY:
+      ALLBOT_APNS_TEAM_ID: "TEAM123",
+      ALLBOT_APNS_KEY_ID: "KEY123",
+      ALLBOT_APNS_PRIVATE_KEY_P8: "   ",
+      ALLBOT_APNS_PRIVATE_KEY:
         "-----BEGIN PRIVATE KEY-----\\nline-c\\nline-d\\n-----END PRIVATE KEY-----", // pragma: allowlist secret
     } as NodeJS.ProcessEnv);
 
@@ -68,7 +68,7 @@ describe("push APNs auth and helper coverage", () => {
     });
   });
 
-  it("reads APNs private keys from KAIJIBOT_APNS_PRIVATE_KEY_PATH", async () => {
+  it("reads APNs private keys from ALLBOT_APNS_PRIVATE_KEY_PATH", async () => {
     const dir = await makeTempDir();
     const keyPath = path.join(dir, "apns-key.p8");
     await fs.writeFile(
@@ -78,9 +78,9 @@ describe("push APNs auth and helper coverage", () => {
     );
 
     const resolved = await resolveApnsAuthConfigFromEnv({
-      KAIJIBOT_APNS_TEAM_ID: "TEAM123",
-      KAIJIBOT_APNS_KEY_ID: "KEY123",
-      KAIJIBOT_APNS_PRIVATE_KEY_PATH: keyPath,
+      ALLBOT_APNS_TEAM_ID: "TEAM123",
+      ALLBOT_APNS_KEY_ID: "KEY123",
+      ALLBOT_APNS_PRIVATE_KEY_PATH: keyPath,
     } as NodeJS.ProcessEnv);
 
     expect(resolved).toMatchObject({
@@ -99,19 +99,19 @@ describe("push APNs auth and helper coverage", () => {
 
     await expect(resolveApnsAuthConfigFromEnv({} as NodeJS.ProcessEnv)).resolves.toEqual({
       ok: false,
-      error: "APNs auth missing: set KAIJIBOT_APNS_TEAM_ID and KAIJIBOT_APNS_KEY_ID",
+      error: "APNs auth missing: set ALLBOT_APNS_TEAM_ID and ALLBOT_APNS_KEY_ID",
     });
 
     const missingKey = await resolveApnsAuthConfigFromEnv({
-      KAIJIBOT_APNS_TEAM_ID: "TEAM123",
-      KAIJIBOT_APNS_KEY_ID: "KEY123",
-      KAIJIBOT_APNS_PRIVATE_KEY_PATH: missingPath,
+      ALLBOT_APNS_TEAM_ID: "TEAM123",
+      ALLBOT_APNS_KEY_ID: "KEY123",
+      ALLBOT_APNS_PRIVATE_KEY_PATH: missingPath,
     } as NodeJS.ProcessEnv);
 
     expect(missingKey.ok).toBe(false);
     if (!missingKey.ok) {
       expect(missingKey.error).toContain(
-        `failed reading KAIJIBOT_APNS_PRIVATE_KEY_PATH (${missingPath})`,
+        `failed reading ALLBOT_APNS_PRIVATE_KEY_PATH (${missingPath})`,
       );
     }
   });
@@ -132,7 +132,7 @@ describe("push APNs auth and helper coverage", () => {
           nodeId: "ios-node-direct",
           transport: "direct",
           token: "ABCD1234ABCD1234ABCD1234ABCD1234",
-          topic: "ai.kaijibot.ios",
+          topic: "ai.allbot.ios",
           environment: "sandbox",
           updatedAtMs: 1,
         },
@@ -148,7 +148,7 @@ describe("push APNs auth and helper coverage", () => {
           relayHandle: "relay-handle-123",
           sendGrant: "send-grant-123",
           installationId: "install-123",
-          topic: "ai.kaijibot.ios",
+          topic: "ai.allbot.ios",
           environment: "production",
           distribution: "official",
           updatedAtMs: 1,
@@ -163,7 +163,7 @@ describe("push APNs auth and helper coverage", () => {
           nodeId: "ios-node-direct",
           transport: "direct",
           token: "ABCD1234ABCD1234ABCD1234ABCD1234",
-          topic: "ai.kaijibot.ios",
+          topic: "ai.allbot.ios",
           environment: "sandbox",
           updatedAtMs: 1,
         },

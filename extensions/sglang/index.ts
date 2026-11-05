@@ -1,8 +1,8 @@
 import {
   definePluginEntry,
-  type KaijiBotPluginApi,
+  type AllBotPluginApi,
   type ProviderAuthMethodNonInteractiveContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   SGLANG_DEFAULT_API_KEY_ENV_VAR,
   SGLANG_DEFAULT_BASE_URL,
@@ -14,14 +14,14 @@ import {
 const PROVIDER_ID = "sglang";
 
 async function loadProviderSetup() {
-  return await import("kaijibot/plugin-sdk/provider-setup");
+  return await import("allbot/plugin-sdk/provider-setup");
 }
 
 export default definePluginEntry({
   id: "sglang",
   name: "SGLang Provider",
   description: "Bundled SGLang provider plugin",
-  register(api: KaijiBotPluginApi) {
+  register(api: AllBotPluginApi) {
     api.registerProvider({
       id: PROVIDER_ID,
       label: "SGLang",

@@ -1,17 +1,17 @@
 ---
-summary: "CLI reference for `kaijibot approvals` (exec approvals for gateway or node hosts)"
+summary: "CLI reference for `allbot approvals` (exec approvals for gateway or node hosts)"
 read_when:
   - You want to edit exec approvals from the CLI
   - You need to manage allowlists on gateway or node hosts
 title: "approvals"
 ---
 
-# `kaijibot approvals`
+# `allbot approvals`
 
 Manage exec approvals for the **local host**, **gateway host**, or a **node host**.
 By default, commands target the local approvals file on disk. Use `--gateway` to target the gateway, or `--node` to target a specific node.
 
-Alias: `kaijibot exec-approvals`
+Alias: `allbot exec-approvals`
 
 Related:
 
@@ -21,12 +21,12 @@ Related:
 ## Common commands
 
 ```bash
-kaijibot approvals get
-kaijibot approvals get --node <id|name|ip>
-kaijibot approvals get --gateway
+allbot approvals get
+allbot approvals get --node <id|name|ip>
+allbot approvals get --gateway
 ```
 
-`kaijibot approvals get` now shows the effective exec policy for local, gateway, and node targets:
+`allbot approvals get` now shows the effective exec policy for local, gateway, and node targets:
 
 - requested `tools.exec` policy
 - host approvals-file policy
@@ -42,12 +42,12 @@ Precedence is intentional:
 ## Replace approvals from a file
 
 ```bash
-kaijibot approvals set --file ./exec-approvals.json
-kaijibot approvals set --stdin <<'EOF'
+allbot approvals set --file ./exec-approvals.json
+allbot approvals set --stdin <<'EOF'
 { version: 1, defaults: { security: "full", ask: "off" } }
 EOF
-kaijibot approvals set --node <id|name|ip> --file ./exec-approvals.json
-kaijibot approvals set --gateway --file ./exec-approvals.json
+allbot approvals set --node <id|name|ip> --file ./exec-approvals.json
+allbot approvals set --gateway --file ./exec-approvals.json
 ```
 
 `set` accepts JSON5, not only strict JSON. Use either `--file` or `--stdin`, not both.
@@ -57,7 +57,7 @@ kaijibot approvals set --gateway --file ./exec-approvals.json
 For a host that should never stop on exec approvals, set the host approvals defaults to `full` + `off`:
 
 ```bash
-kaijibot approvals set --stdin <<'EOF'
+allbot approvals set --stdin <<'EOF'
 {
   version: 1,
   defaults: {
@@ -72,7 +72,7 @@ EOF
 Node variant:
 
 ```bash
-kaijibot approvals set --node <id|name|ip> --stdin <<'EOF'
+allbot approvals set --node <id|name|ip> --stdin <<'EOF'
 {
   version: 1,
   defaults: {
@@ -84,12 +84,12 @@ kaijibot approvals set --node <id|name|ip> --stdin <<'EOF'
 EOF
 ```
 
-This changes the **host approvals file** only. To keep the requested KaijiBot policy aligned, also set:
+This changes the **host approvals file** only. To keep the requested AllBot policy aligned, also set:
 
 ```bash
-kaijibot config set tools.exec.host gateway
-kaijibot config set tools.exec.security full
-kaijibot config set tools.exec.ask off
+allbot config set tools.exec.host gateway
+allbot config set tools.exec.security full
+allbot config set tools.exec.ask off
 ```
 
 Why `tools.exec.host=gateway` in this example:
@@ -103,11 +103,11 @@ This matches the current host-default YOLO behavior. Tighten it if you want appr
 ## Allowlist helpers
 
 ```bash
-kaijibot approvals allowlist add "~/Projects/**/bin/rg"
-kaijibot approvals allowlist add --agent main --node <id|name|ip> "/usr/bin/uptime"
-kaijibot approvals allowlist add --agent "*" "/usr/bin/uname"
+allbot approvals allowlist add "~/Projects/**/bin/rg"
+allbot approvals allowlist add --agent main --node <id|name|ip> "/usr/bin/uptime"
+allbot approvals allowlist add --agent "*" "/usr/bin/uname"
 
-kaijibot approvals allowlist remove "~/Projects/**/bin/rg"
+allbot approvals allowlist remove "~/Projects/**/bin/rg"
 ```
 
 ## Common options
@@ -130,7 +130,7 @@ Targeting notes:
 
 ## Notes
 
-- `--node` uses the same resolver as `kaijibot nodes` (id, name, ip, or id prefix).
+- `--node` uses the same resolver as `allbot nodes` (id, name, ip, or id prefix).
 - `--agent` defaults to `"*"`, which applies to all agents.
 - The node host must advertise `system.execApprovals.get/set` (macOS app or headless node host).
-- Approvals files are stored per host at `~/.kaijibot/exec-approvals.json`.
+- Approvals files are stored per host at `~/.allbot/exec-approvals.json`.

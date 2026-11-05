@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot models` (status/list/set/scan, aliases, fallbacks, auth)"
+summary: "CLI reference for `allbot models` (status/list/set/scan, aliases, fallbacks, auth)"
 read_when:
   - You want to change default models or view provider auth status
   - You want to scan available models/providers and debug auth profiles
 title: "models"
 ---
 
-# `kaijibot models`
+# `allbot models`
 
 Model discovery, scanning, and configuration (default model, fallbacks, auth profiles).
 
@@ -18,25 +18,25 @@ Related:
 ## Common commands
 
 ```bash
-kaijibot models status
-kaijibot models list
-kaijibot models set <model-or-alias>
-kaijibot models scan
+allbot models status
+allbot models list
+allbot models set <model-or-alias>
+allbot models scan
 ```
 
-`kaijibot models status` shows the resolved default/fallbacks plus an auth overview.
+`allbot models status` shows the resolved default/fallbacks plus an auth overview.
 When provider usage snapshots are available, the OAuth/API-key status section includes
 provider usage windows and quota snapshots.
 Current usage-window providers: Anthropic, GitHub Copilot, Gemini CLI, OpenAI
 Codex, MiniMax, Xiaomi, and z.ai. Usage auth comes from provider-specific hooks
-when available; otherwise KaijiBot falls back to matching OAuth/API-key
+when available; otherwise AllBot falls back to matching OAuth/API-key
 credentials from auth profiles, env, or config.
 In `--json` output, `auth.providers` is the env/config/store-aware provider
 overview, while `auth.oauth` is auth-store profile health only.
 Add `--probe` to run live auth probes against each configured provider profile.
 Probes are real requests (may consume tokens and trigger rate limits).
 Use `--agent <id>` to inspect a configured agent’s model/auth state. When omitted,
-the command uses `KAIJIBOT_AGENT_DIR`/`PI_CODING_AGENT_DIR` if set, otherwise the
+the command uses `ALLBOT_AGENT_DIR`/`PI_CODING_AGENT_DIR` if set, otherwise the
 configured default agent.
 Probe rows can come from auth profiles, env credentials, or `models.json`.
 
@@ -44,10 +44,10 @@ Notes:
 
 - `models set <model-or-alias>` accepts `provider/model` or an alias.
 - Model refs are parsed by splitting on the **first** `/`. If the model ID includes `/` (OpenRouter-style), include the provider prefix (example: `openrouter/moonshotai/kimi-k2`).
-- If you omit the provider, KaijiBot resolves the input as an alias first, then
+- If you omit the provider, AllBot resolves the input as an alias first, then
   as a unique configured-provider match for that exact model id, and only then
   falls back to the configured default provider with a deprecation warning.
-  If that provider no longer exposes the configured default model, KaijiBot
+  If that provider no longer exposes the configured default model, AllBot
   falls back to the first configured provider/model instead of surfacing a
   stale removed-provider default.
 - `models status` may show `marker(<value>)` in auth output for non-secret placeholders (for example `OPENAI_API_KEY`, `secretref-managed`, `minimax-oauth`, `oauth:chutes`, `ollama-local`) instead of masking them as secrets.
@@ -65,7 +65,7 @@ Options:
 - `--probe-timeout <ms>`
 - `--probe-concurrency <n>`
 - `--probe-max-tokens <n>`
-- `--agent <id>` (configured agent id; overrides `KAIJIBOT_AGENT_DIR`/`PI_CODING_AGENT_DIR`)
+- `--agent <id>` (configured agent id; overrides `ALLBOT_AGENT_DIR`/`PI_CODING_AGENT_DIR`)
 
 Probe status buckets:
 
@@ -85,23 +85,23 @@ Probe detail/reason-code cases to expect:
   trying it.
 - `missing_credential`, `invalid_expires`, `expired`, `unresolved_ref`:
   profile is present but not eligible/resolvable.
-- `no_model`: provider auth exists, but KaijiBot could not resolve a probeable
+- `no_model`: provider auth exists, but AllBot could not resolve a probeable
   model candidate for that provider.
 
 ## Aliases + fallbacks
 
 ```bash
-kaijibot models aliases list
-kaijibot models fallbacks list
+allbot models aliases list
+allbot models fallbacks list
 ```
 
 ## Auth profiles
 
 ```bash
-kaijibot models auth add
-kaijibot models auth login --provider <id>
-kaijibot models auth setup-token --provider <id>
-kaijibot models auth paste-token
+allbot models auth add
+allbot models auth login --provider <id>
+allbot models auth setup-token --provider <id>
+allbot models auth paste-token
 ```
 
 `models auth add` is the interactive auth helper. It can launch a provider auth
@@ -109,12 +109,12 @@ flow (OAuth/API key) or guide you into manual token paste, depending on the
 provider you choose.
 
 `models auth login` runs a provider plugin’s auth flow (OAuth/API key). Use
-`kaijibot plugins list` to see which providers are installed.
+`allbot plugins list` to see which providers are installed.
 
 Examples:
 
 ```bash
-kaijibot models auth login --provider openai-codex --set-default
+allbot models auth login --provider openai-codex --set-default
 ```
 
 Notes:
@@ -130,5 +130,5 @@ Notes:
   `--profile-id`.
 - `paste-token --expires-in <duration>` stores an absolute token expiry from a
   relative duration such as `365d` or `12h`.
-- Anthropic note: Anthropic staff told us KaijiBot-style Claude CLI usage is allowed again, so KaijiBot treats Claude CLI reuse and `claude -p` usage as sanctioned for this integration unless Anthropic publishes a new policy.
-- Anthropic `setup-token` / `paste-token` remain available as a supported KaijiBot token path, but KaijiBot now prefers Claude CLI reuse and `claude -p` when available.
+- Anthropic note: Anthropic staff told us AllBot-style Claude CLI usage is allowed again, so AllBot treats Claude CLI reuse and `claude -p` usage as sanctioned for this integration unless Anthropic publishes a new policy.
+- Anthropic `setup-token` / `paste-token` remain available as a supported AllBot token path, but AllBot now prefers Claude CLI reuse and `claude -p` when available.

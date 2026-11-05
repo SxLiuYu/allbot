@@ -98,7 +98,7 @@ function normalizeShellName(value: string): string {
 }
 
 export function detectRuntimeShell(): string | undefined {
-  const overrideShell = process.env.KAIJIBOT_SHELL?.trim();
+  const overrideShell = process.env.ALLBOT_SHELL?.trim();
   if (overrideShell) {
     const name = normalizeShellName(overrideShell);
     if (name) {

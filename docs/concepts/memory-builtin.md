@@ -56,14 +56,14 @@ order shown. Set `memorySearch.provider` to override.
 
 ## How indexing works
 
-KaijiBot indexes `MEMORY.md` and `memory/*.md` into chunks (~400 tokens with
+AllBot indexes `MEMORY.md` and `memory/*.md` into chunks (~400 tokens with
 80-token overlap) and stores them in a per-agent SQLite database.
 
-- **Index location:** `~/.kaijibot/memory/<agentId>.sqlite`
+- **Index location:** `~/.allbot/memory/<agentId>.sqlite`
 - **File watching:** changes to memory files trigger a debounced reindex (1.5s).
 - **Auto-reindex:** when the embedding provider, model, or chunking config
   changes, the entire index is rebuilt automatically.
-- **Reindex on demand:** `kaijibot memory index --force`
+- **Reindex on demand:** `allbot memory index --force`
 
 <Info>
 You can also index Markdown files outside the workspace with
@@ -88,13 +88,13 @@ automatic user modeling.
 
 ## Troubleshooting
 
-**Memory search disabled?** Check `kaijibot memory status`. If no provider is
+**Memory search disabled?** Check `allbot memory status`. If no provider is
 detected, set one explicitly or add an API key.
 
-**Stale results?** Run `kaijibot memory index --force` to rebuild. The watcher
+**Stale results?** Run `allbot memory index --force` to rebuild. The watcher
 may miss changes in rare edge cases.
 
-**sqlite-vec not loading?** KaijiBot falls back to in-process cosine similarity
+**sqlite-vec not loading?** AllBot falls back to in-process cosine similarity
 automatically. Check logs for the specific load error.
 
 ## Configuration

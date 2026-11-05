@@ -3,12 +3,12 @@ import {
   buildApiKeyCredential,
   type ProviderAuthResult,
   type SecretInput,
-} from "kaijibot/plugin-sdk/provider-auth";
-import type { ModelApi, ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/provider-auth";
+import type { ModelApi, ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 
 export const PROVIDER_ID = "microsoft-foundry";
 export const DEFAULT_API = "openai-completions";

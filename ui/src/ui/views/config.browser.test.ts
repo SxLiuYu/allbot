@@ -44,7 +44,7 @@ describe("config view", () => {
     setTheme: vi.fn(),
     setThemeMode: vi.fn(),
     gatewayUrl: "",
-    assistantName: "KaijiBot",
+    assistantName: "AllBot",
   });
 
   function findActionButtons(container: HTMLElement): {
@@ -416,7 +416,7 @@ describe("config view", () => {
       formValue: {
         channels: {
           discord: {
-            token: { source: "env", provider: "default", id: "__KAIJIBOT_REDACTED__" },
+            token: { source: "env", provider: "default", id: "__ALLBOT_REDACTED__" },
           },
         },
       },
@@ -472,7 +472,7 @@ describe("config view", () => {
       formValue: {
         channels: {
           discord: {
-            token: { source: "env", provider: "default", id: "__KAIJIBOT_REDACTED__" },
+            token: { source: "env", provider: "default", id: "__ALLBOT_REDACTED__" },
           },
         },
       },

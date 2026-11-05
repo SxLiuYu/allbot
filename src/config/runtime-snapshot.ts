@@ -1,7 +1,7 @@
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
 export type RuntimeConfigSnapshotRefreshParams = {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
 };
 
 export type RuntimeConfigSnapshotRefreshHandler = {
@@ -11,20 +11,20 @@ export type RuntimeConfigSnapshotRefreshHandler = {
 
 export type RuntimeConfigWriteNotification = {
   configPath: string;
-  sourceConfig: KaijiBotConfig;
-  runtimeConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  runtimeConfig: AllBotConfig;
   persistedHash: string;
   writtenAtMs: number;
 };
 
-let runtimeConfigSnapshot: KaijiBotConfig | null = null;
-let runtimeConfigSourceSnapshot: KaijiBotConfig | null = null;
+let runtimeConfigSnapshot: AllBotConfig | null = null;
+let runtimeConfigSourceSnapshot: AllBotConfig | null = null;
 let runtimeConfigSnapshotRefreshHandler: RuntimeConfigSnapshotRefreshHandler | null = null;
 const runtimeConfigWriteListeners = new Set<(event: RuntimeConfigWriteNotification) => void>();
 
 export function setRuntimeConfigSnapshot(
-  config: KaijiBotConfig,
-  sourceConfig?: KaijiBotConfig,
+  config: AllBotConfig,
+  sourceConfig?: AllBotConfig,
 ): void {
   runtimeConfigSnapshot = config;
   runtimeConfigSourceSnapshot = sourceConfig ?? null;
@@ -39,11 +39,11 @@ export function clearRuntimeConfigSnapshot(): void {
   resetConfigRuntimeState();
 }
 
-export function getRuntimeConfigSnapshot(): KaijiBotConfig | null {
+export function getRuntimeConfigSnapshot(): AllBotConfig | null {
   return runtimeConfigSnapshot;
 }
 
-export function getRuntimeConfigSourceSnapshot(): KaijiBotConfig | null {
+export function getRuntimeConfigSourceSnapshot(): AllBotConfig | null {
   return runtimeConfigSourceSnapshot;
 }
 
@@ -76,7 +76,7 @@ export function notifyRuntimeConfigWriteListeners(event: RuntimeConfigWriteNotif
   }
 }
 
-export function loadPinnedRuntimeConfig(loadFresh: () => KaijiBotConfig): KaijiBotConfig {
+export function loadPinnedRuntimeConfig(loadFresh: () => AllBotConfig): AllBotConfig {
   if (runtimeConfigSnapshot) {
     return runtimeConfigSnapshot;
   }
@@ -86,10 +86,10 @@ export function loadPinnedRuntimeConfig(loadFresh: () => KaijiBotConfig): KaijiB
 }
 
 export async function finalizeRuntimeSnapshotWrite(params: {
-  nextSourceConfig: KaijiBotConfig;
+  nextSourceConfig: AllBotConfig;
   hadRuntimeSnapshot: boolean;
   hadBothSnapshots: boolean;
-  loadFreshConfig: () => KaijiBotConfig;
+  loadFreshConfig: () => AllBotConfig;
   notifyCommittedWrite: () => void;
   createRefreshError: (detail: string, cause: unknown) => Error;
   formatRefreshError: (error: unknown) => string;

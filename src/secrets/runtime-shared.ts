@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { coerceSecretRef, type SecretRef } from "../config/types.secrets.js";
 import { secretRefKey } from "./ref-contract.js";
 import type { SecretRefResolveCache } from "./resolve.js";
@@ -31,7 +31,7 @@ export type SecretAssignment = {
 };
 
 export type ResolverContext = {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   env: NodeJS.ProcessEnv;
   cache: SecretRefResolveCache;
   warnings: SecretResolverWarning[];
@@ -39,10 +39,10 @@ export type ResolverContext = {
   assignments: SecretAssignment[];
 };
 
-export type SecretDefaults = NonNullable<KaijiBotConfig["secrets"]>["defaults"];
+export type SecretDefaults = NonNullable<AllBotConfig["secrets"]>["defaults"];
 
 export function createResolverContext(params: {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   env: NodeJS.ProcessEnv;
 }): ResolverContext {
   return {

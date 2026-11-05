@@ -1,7 +1,7 @@
 import type { SkillCommandSpec } from "../agents/skills.js";
 import { getChannelPlugin } from "../channels/plugins/index.js";
 import { isCommandFlagEnabled } from "../config/commands.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { listPluginCommands } from "../plugins/commands.js";
 import {
   normalizeLowercaseStringOrEmpty,
@@ -51,7 +51,7 @@ function groupCommandsByCategory(
   return grouped;
 }
 
-export function buildHelpMessage(cfg?: KaijiBotConfig): string {
+export function buildHelpMessage(cfg?: AllBotConfig): string {
   const lines = ["ℹ️ Help", ""];
 
   lines.push("Session");
@@ -176,7 +176,7 @@ function formatCommandList(items: CommandsListItem[]): string {
 }
 
 export function buildCommandsMessage(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   skillCommands?: SkillCommandSpec[],
   options?: CommandsMessageOptions,
 ): string {
@@ -185,7 +185,7 @@ export function buildCommandsMessage(
 }
 
 export function buildCommandsMessagePaginated(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   skillCommands?: SkillCommandSpec[],
   options?: CommandsMessageOptions,
 ): CommandsMessageResult {

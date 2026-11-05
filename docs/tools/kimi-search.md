@@ -8,7 +8,7 @@ title: "Kimi Search"
 
 # Kimi Search
 
-KaijiBot supports Kimi as a `web_search` provider, using Moonshot web search
+AllBot supports Kimi as a `web_search` provider, using Moonshot web search
 to produce AI-synthesized answers with citations.
 
 ## Get an API key
@@ -22,14 +22,14 @@ to produce AI-synthesized answers with citations.
     configure via:
 
     ```bash
-    kaijibot configure --section web
+    allbot configure --section web
     ```
 
   </Step>
 </Steps>
 
-When you choose **Kimi** during `kaijibot onboard` or
-`kaijibot configure --section web`, KaijiBot can also ask for:
+When you choose **Kimi** during `allbot onboard` or
+`allbot configure --section web`, AllBot can also ask for:
 
 - the Moonshot API region:
   - `https://api.moonshot.ai/v1`
@@ -64,17 +64,17 @@ When you choose **Kimi** during `kaijibot onboard` or
 ```
 
 If you use the China API host for chat (`models.providers.moonshot.baseUrl`:
-`https://api.moonshot.cn/v1`), KaijiBot reuses that same host for Kimi
+`https://api.moonshot.cn/v1`), AllBot reuses that same host for Kimi
 `web_search` when `tools.web.search.kimi.baseUrl` is omitted, so keys from
 [platform.moonshot.cn](https://platform.moonshot.cn/) do not hit the
 international endpoint by mistake (which often returns HTTP 401). Override
 with `tools.web.search.kimi.baseUrl` when you need a different search base URL.
 
 **Environment alternative:** set `KIMI_API_KEY` or `MOONSHOT_API_KEY` in the
-Gateway environment. For a gateway install, put it in `~/.kaijibot/.env`.
+Gateway environment. For a gateway install, put it in `~/.allbot/.env`.
 
-If you omit `baseUrl`, KaijiBot defaults to `https://api.moonshot.ai/v1`.
-If you omit `model`, KaijiBot defaults to `kimi-k2.5`.
+If you omit `baseUrl`, AllBot defaults to `https://api.moonshot.ai/v1`.
+If you omit `model`, AllBot defaults to `kimi-k2.5`.
 
 ## How it works
 

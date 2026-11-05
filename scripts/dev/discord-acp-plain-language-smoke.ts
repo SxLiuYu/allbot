@@ -55,7 +55,7 @@ type DiscordUser = {
 
 const execFileAsync = promisify(execFile);
 
-type DriverMode = "token" | "webhook" | "kaijibot";
+type DriverMode = "token" | "webhook" | "allbot";
 
 type Args = {
   channelId: string;
@@ -70,7 +70,7 @@ type Args = {
   mentionUserId?: string;
   instruction?: string;
   threadBindingsPath: string;
-  kaijibotBin: string;
+  allbotBin: string;
   json: boolean;
 };
 
@@ -134,14 +134,14 @@ function parseNumber(value: string | undefined, fallback: number): number {
 }
 
 function resolveStateDir(): string {
-  const override = process.env.KAIJIBOT_STATE_DIR?.trim();
+  const override = process.env.ALLBOT_STATE_DIR?.trim();
   if (override) {
     return override.startsWith("~")
       ? path.resolve(process.env.HOME || "", override.slice(1))
       : path.resolve(override);
   }
-  const home = process.env.KAIJIBOT_HOME?.trim() || process.env.HOME || "";
-  return path.join(home, ".kaijibot");
+  const home = process.env.ALLBOT_HOME?.trim() || process.env.HOME || "";
+  return path.join(home, ".allbot");
 }
 
 function resolveArg(flag: string): string | undefined {
@@ -164,13 +164,13 @@ function hasFlag(flag: string): boolean {
 function usage(): string {
   return (
     "Usage: bun scripts/dev/discord-acp-plain-language-smoke.ts " +
-    "--channel <discord-channel-id> [--token <driver-token> | --driver webhook --bot-token <bot-token> | --driver kaijibot] [options]\n\n" +
+    "--channel <discord-channel-id> [--token <driver-token> | --driver webhook --bot-token <bot-token> | --driver allbot] [options]\n\n" +
     "Manual live smoke only (not CI). Sends a plain-language instruction in Discord and verifies:\n" +
-    "1) KaijiBot spawned an ACP thread binding\n" +
+    "1) AllBot spawned an ACP thread binding\n" +
     "2) agent replied in that bound thread with the expected ACK token\n\n" +
     "Options:\n" +
     "  --channel <id>               Parent Discord channel id (required)\n" +
-    "  --driver <token|webhook|kaijibot> Driver transport mode (default: token)\n" +
+    "  --driver <token|webhook|allbot> Driver transport mode (default: token)\n" +
     "  --token <token>              Driver Discord token (required for driver=token)\n" +
     "  --token-prefix <prefix>      Auth prefix for --token (default: Bot)\n" +
     "  --bot-token <token>          Bot token for webhook driver mode\n" +
@@ -181,71 +181,71 @@ function usage(): string {
     "  --timeout-ms <n>             Total timeout in ms (default: 240000)\n" +
     "  --poll-ms <n>                Poll interval in ms (default: 1500)\n" +
     "  --thread-bindings-path <p>   Override thread-bindings json path\n" +
-    "  --kaijibot-bin <path>        KaijiBot CLI binary for driver=kaijibot (default: kaijibot)\n" +
+    "  --allbot-bin <path>        AllBot CLI binary for driver=allbot (default: allbot)\n" +
     "  --json                       Emit JSON output\n" +
     "\n" +
     "Environment fallbacks:\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_CHANNEL_ID\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_DRIVER\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_DRIVER_TOKEN\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_BOT_TOKEN\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_BOT_TOKEN_PREFIX\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_AGENT\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_MENTION_USER_ID\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_TIMEOUT_MS\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_POLL_MS\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_THREAD_BINDINGS_PATH\n" +
-    "  KAIJIBOT_DISCORD_SMOKE_KAIJIBOT_BIN"
+    "  ALLBOT_DISCORD_SMOKE_CHANNEL_ID\n" +
+    "  ALLBOT_DISCORD_SMOKE_DRIVER\n" +
+    "  ALLBOT_DISCORD_SMOKE_DRIVER_TOKEN\n" +
+    "  ALLBOT_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX\n" +
+    "  ALLBOT_DISCORD_SMOKE_BOT_TOKEN\n" +
+    "  ALLBOT_DISCORD_SMOKE_BOT_TOKEN_PREFIX\n" +
+    "  ALLBOT_DISCORD_SMOKE_AGENT\n" +
+    "  ALLBOT_DISCORD_SMOKE_MENTION_USER_ID\n" +
+    "  ALLBOT_DISCORD_SMOKE_TIMEOUT_MS\n" +
+    "  ALLBOT_DISCORD_SMOKE_POLL_MS\n" +
+    "  ALLBOT_DISCORD_SMOKE_THREAD_BINDINGS_PATH\n" +
+    "  ALLBOT_DISCORD_SMOKE_ALLBOT_BIN"
   );
 }
 
 function parseArgs(): Args {
-  const channelId = resolveArg("--channel") || process.env.KAIJIBOT_DISCORD_SMOKE_CHANNEL_ID || "";
+  const channelId = resolveArg("--channel") || process.env.ALLBOT_DISCORD_SMOKE_CHANNEL_ID || "";
   const driverModeRaw =
-    resolveArg("--driver") || process.env.KAIJIBOT_DISCORD_SMOKE_DRIVER || "token";
+    resolveArg("--driver") || process.env.ALLBOT_DISCORD_SMOKE_DRIVER || "token";
   const normalizedDriverMode = driverModeRaw.trim().toLowerCase();
   const driverMode: DriverMode =
     normalizedDriverMode === "webhook"
       ? "webhook"
-      : normalizedDriverMode === "kaijibot"
-        ? "kaijibot"
+      : normalizedDriverMode === "allbot"
+        ? "allbot"
         : normalizedDriverMode === "token"
           ? "token"
           : "token";
   const driverToken =
-    resolveArg("--token") || process.env.KAIJIBOT_DISCORD_SMOKE_DRIVER_TOKEN || "";
+    resolveArg("--token") || process.env.ALLBOT_DISCORD_SMOKE_DRIVER_TOKEN || "";
   const driverTokenPrefix =
-    resolveArg("--token-prefix") || process.env.KAIJIBOT_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX || "Bot";
+    resolveArg("--token-prefix") || process.env.ALLBOT_DISCORD_SMOKE_DRIVER_TOKEN_PREFIX || "Bot";
   const botToken =
     resolveArg("--bot-token") ||
-    process.env.KAIJIBOT_DISCORD_SMOKE_BOT_TOKEN ||
+    process.env.ALLBOT_DISCORD_SMOKE_BOT_TOKEN ||
     process.env.DISCORD_BOT_TOKEN ||
     "";
   const botTokenPrefix =
     resolveArg("--bot-token-prefix") ||
-    process.env.KAIJIBOT_DISCORD_SMOKE_BOT_TOKEN_PREFIX ||
+    process.env.ALLBOT_DISCORD_SMOKE_BOT_TOKEN_PREFIX ||
     "Bot";
-  const targetAgent = resolveArg("--agent") || process.env.KAIJIBOT_DISCORD_SMOKE_AGENT || "codex";
+  const targetAgent = resolveArg("--agent") || process.env.ALLBOT_DISCORD_SMOKE_AGENT || "codex";
   const mentionUserId =
-    resolveArg("--mention") || process.env.KAIJIBOT_DISCORD_SMOKE_MENTION_USER_ID || undefined;
+    resolveArg("--mention") || process.env.ALLBOT_DISCORD_SMOKE_MENTION_USER_ID || undefined;
   const instruction =
-    resolveArg("--instruction") || process.env.KAIJIBOT_DISCORD_SMOKE_INSTRUCTION || undefined;
+    resolveArg("--instruction") || process.env.ALLBOT_DISCORD_SMOKE_INSTRUCTION || undefined;
   const timeoutMs = parseNumber(
-    resolveArg("--timeout-ms") || process.env.KAIJIBOT_DISCORD_SMOKE_TIMEOUT_MS,
+    resolveArg("--timeout-ms") || process.env.ALLBOT_DISCORD_SMOKE_TIMEOUT_MS,
     240_000,
   );
   const pollMs = parseNumber(
-    resolveArg("--poll-ms") || process.env.KAIJIBOT_DISCORD_SMOKE_POLL_MS,
+    resolveArg("--poll-ms") || process.env.ALLBOT_DISCORD_SMOKE_POLL_MS,
     1_500,
   );
   const defaultBindingsPath = path.join(resolveStateDir(), "discord", "thread-bindings.json");
   const threadBindingsPath =
     resolveArg("--thread-bindings-path") ||
-    process.env.KAIJIBOT_DISCORD_SMOKE_THREAD_BINDINGS_PATH ||
+    process.env.ALLBOT_DISCORD_SMOKE_THREAD_BINDINGS_PATH ||
     defaultBindingsPath;
-  const kaijibotBin =
-    resolveArg("--kaijibot-bin") || process.env.KAIJIBOT_DISCORD_SMOKE_KAIJIBOT_BIN || "kaijibot";
+  const allbotBin =
+    resolveArg("--allbot-bin") || process.env.ALLBOT_DISCORD_SMOKE_ALLBOT_BIN || "allbot";
   const json = hasFlag("--json");
 
   if (!channelId) {
@@ -271,34 +271,34 @@ function parseArgs(): Args {
     mentionUserId,
     instruction,
     threadBindingsPath,
-    kaijibotBin,
+    allbotBin,
     json,
   };
 }
 
-async function kaijibotCliJson<T>(params: { kaijibotBin: string; args: string[] }): Promise<T> {
-  const result = await execFileAsync(params.kaijibotBin, params.args, {
+async function allbotCliJson<T>(params: { allbotBin: string; args: string[] }): Promise<T> {
+  const result = await execFileAsync(params.allbotBin, params.args, {
     maxBuffer: 8 * 1024 * 1024,
     env: process.env,
   });
   const stdout = (result.stdout || "").trim();
   if (!stdout) {
-    throw new Error(`kaijibot ${params.args.join(" ")} returned empty stdout`);
+    throw new Error(`allbot ${params.args.join(" ")} returned empty stdout`);
   }
   return JSON.parse(stdout) as T;
 }
 
-async function readMessagesWithKaijibot(params: {
-  kaijibotBin: string;
+async function readMessagesWithAllbot(params: {
+  allbotBin: string;
   target: string;
   limit: number;
 }): Promise<DiscordMessage[]> {
-  const response = await kaijibotCliJson<{
+  const response = await allbotCliJson<{
     payload?: {
       messages?: DiscordMessage[];
     };
   }>({
-    kaijibotBin: params.kaijibotBin,
+    allbotBin: params.allbotBin,
     args: [
       "message",
       "read",
@@ -479,9 +479,9 @@ async function loadParentRecentMessages(params: {
   args: Args;
   readAuthHeader: string;
 }): Promise<DiscordMessage[]> {
-  if (params.args.driverMode === "kaijibot") {
-    return await readMessagesWithKaijibot({
-      kaijibotBin: params.args.kaijibotBin,
+  if (params.args.driverMode === "allbot") {
+    return await readMessagesWithAllbot({
+      allbotBin: params.args.allbotBin,
       target: params.args.channelId,
       limit: 20,
     });
@@ -613,7 +613,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
         path: `/channels/${encodeURIComponent(args.channelId)}/webhooks`,
         authHeader: botAuthHeader,
         body: {
-          name: `kaijibot-acp-smoke-${smokeId.slice(-8)}`,
+          name: `allbot-acp-smoke-${smokeId.slice(-8)}`,
         },
       });
       if (!webhook.id || !webhook.token) {
@@ -643,14 +643,14 @@ async function run(): Promise<SuccessResult | FailureResult> {
       senderAuthorId = sent.author?.id;
     } else {
       setupStage = "send-message";
-      const sent = await kaijibotCliJson<{
+      const sent = await allbotCliJson<{
         payload?: {
           result?: {
             messageId?: string;
           };
         };
       }>({
-        kaijibotBin: args.kaijibotBin,
+        allbotBin: args.allbotBin,
         args: [
           "message",
           "send",
@@ -665,7 +665,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
       });
       sentMessageId = String(sent.payload?.result?.messageId || "");
       if (!sentMessageId) {
-        throw new Error("kaijibot message send did not return payload.result.messageId");
+        throw new Error("allbot message send did not return payload.result.messageId");
       }
     }
   } catch (err) {
@@ -731,9 +731,9 @@ async function run(): Promise<SuccessResult | FailureResult> {
     while (Date.now() < deadline && !ackMessage) {
       try {
         const threadMessages =
-          args.driverMode === "kaijibot"
-            ? await readMessagesWithKaijibot({
-                kaijibotBin: args.kaijibotBin,
+          args.driverMode === "allbot"
+            ? await readMessagesWithAllbot({
+                allbotBin: args.allbotBin,
                 target: threadId,
                 limit: 50,
               })
@@ -770,7 +770,7 @@ async function run(): Promise<SuccessResult | FailureResult> {
         ok: false,
         stage: "wait-ack",
         smokeId,
-        error: `Thread bound (${threadId}) but timed out waiting for ACK token "${ackToken}" from KaijiBot.`,
+        error: `Thread bound (${threadId}) but timed out waiting for ACK token "${ackToken}" from AllBot.`,
         diagnostics: {
           bindingCandidates: [
             {

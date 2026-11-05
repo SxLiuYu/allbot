@@ -22,12 +22,12 @@ const {
   })),
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("allbot/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: resolveApiKeyForProviderMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", async (importOriginal) => {
-  const original = await importOriginal<typeof import("kaijibot/plugin-sdk/provider-http")>();
+vi.mock("allbot/plugin-sdk/provider-http", async (importOriginal) => {
+  const original = await importOriginal<typeof import("allbot/plugin-sdk/provider-http")>();
   return {
     ...original,
     assertOkOrThrowHttpError: assertOkOrThrowHttpErrorMock,

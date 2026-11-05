@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveApprovalApprovers } from "../../plugin-sdk/approval-approvers.js";
 import {
   createApproverRestrictedNativeApprovalAdapter,
@@ -34,7 +34,7 @@ function normalizeDiscordDirectApproverId(value: string | number): string | unde
   return normalized || undefined;
 }
 
-function getDiscordExecApprovalApproversForTests(params: { cfg: KaijiBotConfig }): string[] {
+function getDiscordExecApprovalApproversForTests(params: { cfg: AllBotConfig }): string[] {
   const discord = params.cfg.channels?.discord;
   return resolveApprovalApprovers({
     explicit: discord?.execApprovals?.approvers,
@@ -140,7 +140,7 @@ type TelegramTestSectionConfig = TelegramTestAccountConfig & {
   accounts?: Record<string, TelegramTestAccountConfig>;
 };
 
-function listConfiguredTelegramAccountIds(cfg: KaijiBotConfig): string[] {
+function listConfiguredTelegramAccountIds(cfg: AllBotConfig): string[] {
   const channel = cfg.channels?.telegram as TelegramTestSectionConfig | undefined;
   const accountIds = Object.keys(channel?.accounts ?? {});
   if (accountIds.length > 0) {
@@ -154,7 +154,7 @@ function listConfiguredTelegramAccountIds(cfg: KaijiBotConfig): string[] {
 }
 
 function resolveTelegramTestAccount(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId?: string | null,
 ): TelegramTestAccountConfig {
   const resolvedAccountId = normalizeAccountId(accountId);
@@ -203,7 +203,7 @@ function normalizeTelegramDirectApproverId(value: string | number): string | und
 }
 
 function getTelegramExecApprovalApprovers(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): string[] {
   const account = resolveTelegramTestAccount(params.cfg, params.accountId);
@@ -215,7 +215,7 @@ function getTelegramExecApprovalApprovers(params: {
 }
 
 function isTelegramExecApprovalTargetRecipient(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   senderId?: string | null;
   accountId?: string | null;
 }): boolean {
@@ -242,7 +242,7 @@ function isTelegramExecApprovalTargetRecipient(params: {
 }
 
 function isTelegramExecApprovalAuthorizedSender(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   senderId?: string | null;
 }): boolean {
@@ -257,7 +257,7 @@ function isTelegramExecApprovalAuthorizedSender(params: {
 }
 
 function isTelegramExecApprovalClientEnabled(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): boolean {
   const config = resolveTelegramTestAccount(params.cfg, params.accountId).execApprovals;
@@ -265,7 +265,7 @@ function isTelegramExecApprovalClientEnabled(params: {
 }
 
 function resolveTelegramExecApprovalTarget(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
 }): "dm" | "channel" | "both" {
   return resolveTelegramTestAccount(params.cfg, params.accountId).execApprovals?.target ?? "dm";
@@ -352,7 +352,7 @@ function setApprovePluginRegistry(): void {
 
 function buildApproveParams(
   commandBodyNormalized: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   ctxOverrides?: {
     Provider?: string;
     Surface?: string;
@@ -394,7 +394,7 @@ describe("handleApproveCommand", () => {
       approvers: string[];
       target: "dm";
     } | null = { enabled: true, approvers: ["123"], target: "dm" },
-  ): KaijiBotConfig {
+  ): AllBotConfig {
     return {
       commands: { text: true },
       channels: {
@@ -403,7 +403,7 @@ describe("handleApproveCommand", () => {
           ...(execApprovals ? { execApprovals } : {}),
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   function createDiscordApproveCfg(
@@ -412,7 +412,7 @@ describe("handleApproveCommand", () => {
       approvers: string[];
       target: "dm" | "channel" | "both";
     } | null = { enabled: true, approvers: ["123"], target: "channel" },
-  ): KaijiBotConfig {
+  ): AllBotConfig {
     return {
       commands: { text: true },
       channels: {
@@ -421,7 +421,7 @@ describe("handleApproveCommand", () => {
           ...(execApprovals ? { execApprovals } : {}),
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
   it("rejects invalid usage", async () => {
@@ -429,7 +429,7 @@ describe("handleApproveCommand", () => {
       buildApproveParams("/approve", {
         commands: { text: true },
         channels: { whatsapp: { allowFrom: ["*"] } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
       true,
     );
     expect(result?.shouldContinue).toBe(false);
@@ -444,7 +444,7 @@ describe("handleApproveCommand", () => {
         {
           commands: { text: true },
           channels: { whatsapp: { allowFrom: ["*"] } },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         { SenderId: "123" },
       ),
       true,
@@ -468,7 +468,7 @@ describe("handleApproveCommand", () => {
         {
           commands: { text: true },
           channels: { slack: { allowFrom: ["*"] } },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         {
           Provider: "slack",
           Surface: "slack",
@@ -534,7 +534,7 @@ describe("handleApproveCommand", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "telegram",
         Surface: "telegram",
@@ -565,7 +565,7 @@ describe("handleApproveCommand", () => {
             allowFrom: ["+15551230000"],
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "signal",
         Surface: "signal",
@@ -591,7 +591,7 @@ describe("handleApproveCommand", () => {
       "/approve abc12345 allow-once",
       {
         commands: { text: true },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "webchat",
         Surface: "webchat",
@@ -627,7 +627,7 @@ describe("handleApproveCommand", () => {
       {
         commands: { text: true },
         channels: { slack: { allowFrom: ["*"] } },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "slack",
         Surface: "slack",
@@ -659,7 +659,7 @@ describe("handleApproveCommand", () => {
             allowFrom: ["*"],
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       {
         Provider: "telegram",
         Surface: "telegram",
@@ -825,7 +825,7 @@ describe("handleApproveCommand", () => {
         {
           commands: { text: true },
           channels: { matrix: { allowFrom: ["*"] } },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         {
           Provider: "matrix",
           Surface: "matrix",
@@ -957,7 +957,7 @@ describe("handleApproveCommand", () => {
   it("enforces gateway approval scopes", async () => {
     const cfg = {
       commands: { text: true },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     for (const testCase of [
       {
         scopes: ["operator.write"],

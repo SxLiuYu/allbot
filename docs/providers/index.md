@@ -1,5 +1,5 @@
 ---
-summary: "Model providers (LLMs) supported by KaijiBot"
+summary: "Model providers (LLMs) supported by AllBot"
 read_when:
   - You want to choose a model provider
   - You need a quick overview of supported LLM backends
@@ -8,15 +8,15 @@ title: "Provider Directory"
 
 # Model Providers
 
-KaijiBot 支持 35+ 个国内外 LLM 提供商，开箱即用。选择一个提供商，完成认证，然后设置默认模型为 `provider/model` 即可。
+AllBot 支持 35+ 个国内外 LLM 提供商，开箱即用。选择一个提供商，完成认证，然后设置默认模型为 `provider/model` 即可。
 
-> 💡 **KaijiBot 默认使用 Z.AI (智谱 GLM) 作为主要 LLM 提供商。** 国内用户推荐：Z.AI、DeepSeek、通义千问、Kimi。所有提供商均通过插件系统自动发现，无需手动安装。
+> 💡 **AllBot 默认使用 Z.AI (智谱 GLM) 作为主要 LLM 提供商。** 国内用户推荐：Z.AI、DeepSeek、通义千问、Kimi。所有提供商均通过插件系统自动发现，无需手动安装。
 
 Looking for chat channel docs? See [Channels](/channels).
 
 ## Quick start
 
-1. Authenticate with the provider (usually via `kaijibot onboard`).
+1. Authenticate with the provider (usually via `allbot onboard`).
 2. Set the default model:
 
 ```json5

@@ -196,7 +196,7 @@ describe("formatAssistantErrorText", () => {
     (errorMessage) => {
       const msg = makeAssistantError(errorMessage);
       expect(formatAssistantErrorText(msg)).toBe(
-        "KaijiBot could not write local session data because the disk is full. Free some disk space and try again.",
+        "AllBot could not write local session data because the disk is full. Free some disk space and try again.",
       );
     },
   );

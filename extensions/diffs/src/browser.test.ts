@@ -4,8 +4,8 @@ import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockServerResponse } from "../../../test/helpers/plugins/mock-http-response.js";
 import { createTestPluginApi } from "../../../test/helpers/plugins/plugin-api.js";
-import type { KaijiBotConfig } from "../api.js";
-import type { KaijiBotPluginApi, KaijiBotPluginToolContext } from "../api.js";
+import type { AllBotConfig } from "../api.js";
+import type { AllBotPluginApi, AllBotPluginToolContext } from "../api.js";
 import { registerDiffsPlugin } from "./plugin.js";
 import { createTempDiffRoot } from "./test-helpers.js";
 
@@ -34,7 +34,7 @@ describe("PlaywrightDiffScreenshotter", () => {
 
   beforeEach(async () => {
     vi.useFakeTimers();
-    ({ rootDir, cleanup: cleanupRootDir } = await createTempDiffRoot("kaijibot-diffs-browser-"));
+    ({ rootDir, cleanup: cleanupRootDir } = await createTempDiffRoot("allbot-diffs-browser-"));
     outputPath = path.join(rootDir, "preview.png");
     launchMock.mockReset();
     await resetSharedBrowserStateForTests();
@@ -196,10 +196,10 @@ describe("diffs plugin registration", () => {
     type RegisteredTool = {
       execute?: (toolCallId: string, params: Record<string, unknown>) => Promise<unknown>;
     };
-    type RegisteredHttpRouteParams = Parameters<KaijiBotPluginApi["registerHttpRoute"]>[0];
+    type RegisteredHttpRouteParams = Parameters<AllBotPluginApi["registerHttpRoute"]>[0];
 
     let registeredToolFactory:
-      | ((ctx: KaijiBotPluginToolContext) => RegisteredTool | RegisteredTool[] | null | undefined)
+      | ((ctx: AllBotPluginToolContext) => RegisteredTool | RegisteredTool[] | null | undefined)
       | undefined;
     let registeredHttpRouteHandler: RegisteredHttpRouteParams["handler"] | undefined;
     const on = vi.fn();
@@ -230,7 +230,7 @@ describe("diffs plugin registration", () => {
         },
       },
       runtime: {} as never,
-      registerTool(tool: Parameters<KaijiBotPluginApi["registerTool"]>[0]) {
+      registerTool(tool: Parameters<AllBotPluginApi["registerTool"]>[0]) {
         registeredToolFactory = typeof tool === "function" ? tool : () => tool;
       },
       registerHttpRoute(params: RegisteredHttpRouteParams) {
@@ -239,7 +239,7 @@ describe("diffs plugin registration", () => {
       on,
     });
 
-    registerDiffsPlugin(api as unknown as KaijiBotPluginApi);
+    registerDiffsPlugin(api as unknown as AllBotPluginApi);
 
     expect(on).toHaveBeenCalledTimes(1);
     expect(on.mock.calls[0]?.[0]).toBe("before_prompt_build");
@@ -306,12 +306,12 @@ describe("diffs plugin registration", () => {
   });
 });
 
-function createConfig(): KaijiBotConfig {
+function createConfig(): AllBotConfig {
   return {
     browser: {
       executablePath: process.execPath,
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function localReq(input: {

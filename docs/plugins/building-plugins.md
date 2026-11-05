@@ -1,23 +1,23 @@
 ---
 title: "Building Plugins"
 sidebarTitle: "Getting Started"
-summary: "Create your first KaijiBot plugin in minutes"
+summary: "Create your first AllBot plugin in minutes"
 read_when:
-  - You want to create a new KaijiBot plugin
+  - You want to create a new AllBot plugin
   - You need a quick-start for plugin development
-  - You are adding a new channel, provider, tool, or other capability to KaijiBot
+  - You are adding a new channel, provider, tool, or other capability to AllBot
 ---
 
 # Building Plugins
 
-Plugins extend KaijiBot with new capabilities: channels, model providers,
+Plugins extend AllBot with new capabilities: channels, model providers,
 speech, realtime transcription, realtime voice, media understanding, image
 generation, video generation, web fetch, web search, agent tools, or any
 combination.
 
-You do not need to add your plugin to the KaijiBot repository. Publish to
+You do not need to add your plugin to the AllBot repository. Publish to
 [ClawHub](/tools/clawhub) or npm and users install with
-`kaijibot plugins install <package-name>`. KaijiBot tries ClawHub first and
+`allbot plugins install <package-name>`. AllBot tries ClawHub first and
 falls back to npm automatically.
 
 ## Prerequisites
@@ -30,7 +30,7 @@ falls back to npm automatically.
 
 <CardGroup cols={3}>
   <Card title="Channel plugin" icon="messages-square" href="/plugins/sdk-channel-plugins">
-    Connect KaijiBot to a messaging platform (Discord, IRC, etc.)
+    Connect AllBot to a messaging platform (Discord, IRC, etc.)
   </Card>
   <Card title="Provider plugin" icon="cpu" href="/plugins/sdk-provider-plugins">
     Add a model provider (LLM, proxy, or custom endpoint)
@@ -42,7 +42,7 @@ falls back to npm automatically.
 
 If a channel plugin is optional and may not be installed when onboarding/setup
 runs, use `createOptionalChannelSetupSurface(...)` from
-`kaijibot/plugin-sdk/channel-setup`. It produces a setup adapter + wizard pair
+`allbot/plugin-sdk/channel-setup`. It produces a setup adapter + wizard pair
 that advertises the install requirement and fails closed on real config writes
 until the plugin is installed.
 
@@ -56,28 +56,28 @@ and provider plugins have dedicated guides linked above.
     <CodeGroup>
     ```json package.json
     {
-      "name": "@myorg/kaijibot-my-plugin",
+      "name": "@myorg/allbot-my-plugin",
       "version": "1.0.0",
       "type": "module",
-      "kaijibot": {
+      "allbot": {
         "extensions": ["./index.ts"],
         "compat": {
           "pluginApi": ">=2026.3.24-beta.2",
           "minGatewayVersion": "2026.3.24-beta.2"
         },
         "build": {
-          "kaijibotVersion": "2026.3.24-beta.2",
+          "allbotVersion": "2026.3.24-beta.2",
           "pluginSdkVersion": "2026.3.24-beta.2"
         }
       }
     }
     ```
 
-    ```json kaijibot.plugin.json
+    ```json allbot.plugin.json
     {
       "id": "my-plugin",
       "name": "My Plugin",
-      "description": "Adds a custom tool to KaijiBot",
+      "description": "Adds a custom tool to AllBot",
       "configSchema": {
         "type": "object",
         "additionalProperties": false
@@ -96,13 +96,13 @@ and provider plugins have dedicated guides linked above.
 
     ```typescript
     // index.ts
-    import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+    import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
     import { Type } from "@sinclair/typebox";
 
     export default definePluginEntry({
       id: "my-plugin",
       name: "My Plugin",
-      description: "Adds a custom tool to KaijiBot",
+      description: "Adds a custom tool to AllBot",
       register(api) {
         api.registerTool({
           name: "my_tool",
@@ -126,7 +126,7 @@ and provider plugins have dedicated guides linked above.
       fail to parse top-level `anyOf` reliably.
 
       ```typescript
-      import { stringEnum } from "kaijibot/plugin-sdk/core";
+      import { stringEnum } from "allbot/plugin-sdk/core";
       import { Type } from "@sinclair/typebox";
 
       // ✅ Do this — flat schema, all fields optional
@@ -156,11 +156,11 @@ and provider plugins have dedicated guides linked above.
     ```bash
     clawhub package publish your-org/your-plugin --dry-run
     clawhub package publish your-org/your-plugin
-    kaijibot plugins install clawhub:@myorg/kaijibot-my-plugin
+    allbot plugins install clawhub:@myorg/allbot-my-plugin
     ```
 
-    KaijiBot also checks ClawHub before npm for bare package specs like
-    `@myorg/kaijibot-my-plugin`.
+    AllBot also checks ClawHub before npm for bare package specs like
+    `@myorg/allbot-my-plugin`.
 
     **In-repo plugins:** place under the bundled plugin workspace tree — automatically discovered.
 
@@ -212,10 +212,10 @@ Hook guard semantics to keep in mind:
 - `message_sending`: `{ cancel: true }` is terminal and stops lower-priority handlers.
 - `message_sending`: `{ cancel: false }` is treated as no decision.
 
-The `/approve` command handles both exec and plugin approvals with bounded fallback: when an exec approval id is not found, KaijiBot retries the same id through plugin approvals. Plugin approval forwarding can be configured independently via `approvals.plugin` in config.
+The `/approve` command handles both exec and plugin approvals with bounded fallback: when an exec approval id is not found, AllBot retries the same id through plugin approvals. Plugin approval forwarding can be configured independently via `approvals.plugin` in config.
 
 If custom approval plumbing needs to detect that same bounded fallback case,
-prefer `isApprovalNotFoundError` from `kaijibot/plugin-sdk/error-runtime`
+prefer `isApprovalNotFoundError` from `allbot/plugin-sdk/error-runtime`
 instead of matching approval-expiry strings manually.
 
 See [SDK Overview hook decision semantics](/plugins/sdk-overview#hook-decision-semantics) for details.
@@ -266,14 +266,14 @@ Users enable optional tools in config:
 
 ## Import conventions
 
-Always import from focused `kaijibot/plugin-sdk/<subpath>` paths:
+Always import from focused `allbot/plugin-sdk/<subpath>` paths:
 
 ```typescript
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { createPluginRuntimeStore } from "kaijibot/plugin-sdk/runtime-store";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { createPluginRuntimeStore } from "allbot/plugin-sdk/runtime-store";
 
 // Wrong: monolithic root (deprecated, will be removed)
-import { ... } from "kaijibot/plugin-sdk";
+import { ... } from "allbot/plugin-sdk";
 ```
 
 For the full subpath reference, see [SDK Overview](/plugins/sdk-overview).
@@ -289,17 +289,17 @@ barrels unless the seam is truly generic. Current bundled examples:
 - OpenRouter: provider builder plus onboarding/config helpers
 
 If a helper is only useful inside one bundled provider package, keep it on that
-package-root seam instead of promoting it into `kaijibot/plugin-sdk/*`.
+package-root seam instead of promoting it into `allbot/plugin-sdk/*`.
 
-Some generated `kaijibot/plugin-sdk/<bundled-id>` helper seams still exist for
+Some generated `allbot/plugin-sdk/<bundled-id>` helper seams still exist for
 bundled-plugin maintenance and compatibility, for example
 `plugin-sdk/feishu-setup` or `plugin-sdk/zalo-setup`. Treat those as reserved
 surfaces, not as the default pattern for new third-party plugins.
 
 ## Pre-submission checklist
 
-<Check>**package.json** has correct `kaijibot` metadata</Check>
-<Check>**kaijibot.plugin.json** manifest is present and valid</Check>
+<Check>**package.json** has correct `allbot` metadata</Check>
+<Check>**allbot.plugin.json** manifest is present and valid</Check>
 <Check>Entry point uses `defineChannelPluginEntry` or `definePluginEntry`</Check>
 <Check>All imports use focused `plugin-sdk/<subpath>` paths</Check>
 <Check>Internal imports use local modules, not SDK self-imports</Check>
@@ -308,7 +308,7 @@ surfaces, not as the default pattern for new third-party plugins.
 
 ## Beta Release Testing
 
-1. Watch for GitHub release tags on [kaijibot/kaijibot](https://github.com/kaijibot/kaijibot/releases) and subscribe via `Watch` > `Releases`. Beta tags look like `v2026.3.N-beta.1`. You can also turn on notifications for the official KaijiBot X account [@kaijibot](https://x.com/kaijibot) for release announcements.
+1. Watch for GitHub release tags on [allbot/allbot](https://github.com/allbot/allbot/releases) and subscribe via `Watch` > `Releases`. Beta tags look like `v2026.3.N-beta.1`. You can also turn on notifications for the official AllBot X account [@allbot](https://x.com/allbot) for release announcements.
 2. Test your plugin against the beta tag as soon as it appears. The window before stable is typically only a few hours.
 3. Post in your plugin's thread in the `plugin-forum` Discord channel after testing with either `all good` or what broke. If you do not have a thread yet, create one.
 4. If something breaks, open or update an issue titled `Beta blocker: <plugin-name> - <summary>` and apply the `beta-blocker` label. Put the issue link in your thread.

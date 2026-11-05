@@ -1,1 +1,1 @@
-export { createSubsystemLogger } from "kaijibot/plugin-sdk/logging-core";
+export { createSubsystemLogger } from "allbot/plugin-sdk/logging-core";

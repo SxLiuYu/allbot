@@ -56,7 +56,7 @@ const browserConfigMocks = vi.hoisted(() => ({
     controlPort: 18791,
     proxyEnabled: false,
     profiles: {},
-    defaultProfile: "kaijibot",
+    defaultProfile: "allbot",
   })),
   resolveProfile: vi.fn((resolved: Record<string, unknown>, name: string) => {
     const profile = (resolved.profiles as Record<string, Record<string, unknown>> | undefined)?.[
@@ -65,7 +65,7 @@ const browserConfigMocks = vi.hoisted(() => ({
     if (!profile) {
       return null;
     }
-    const driver = profile.driver === "existing-session" ? "existing-session" : "kaijibot";
+    const driver = profile.driver === "existing-session" ? "existing-session" : "allbot";
     if (driver === "existing-session") {
       return {
         name,
@@ -116,9 +116,9 @@ vi.mock("../../../src/agents/tools/gateway.js", () => gatewayMocks);
 const configMocks = vi.hoisted(() => ({
   loadConfig: vi.fn(() => ({ browser: {} })),
 }));
-vi.mock("kaijibot/plugin-sdk/config-runtime", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/config-runtime")>(
-    "kaijibot/plugin-sdk/config-runtime",
+vi.mock("allbot/plugin-sdk/config-runtime", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/config-runtime")>(
+    "allbot/plugin-sdk/config-runtime",
   );
   return {
     ...actual,
@@ -169,7 +169,7 @@ function resetBrowserToolMocks() {
     controlPort: 18791,
     proxyEnabled: false,
     profiles: {},
-    defaultProfile: "kaijibot",
+    defaultProfile: "allbot",
   });
   nodesUtilsMocks.listNodes.mockResolvedValue([]);
   browserToolTesting.setDepsForTest({
@@ -205,7 +205,7 @@ function resetBrowserToolMocks() {
 
 function setResolvedBrowserProfiles(
   profiles: Record<string, Record<string, unknown>>,
-  defaultProfile = "kaijibot",
+  defaultProfile = "allbot",
 ) {
   browserConfigMocks.resolveBrowserConfig.mockReturnValue({
     enabled: true,
@@ -845,7 +845,7 @@ describe("browser tool agent profile auto-routing (browser.proxy.enabled)", () =
       controlPort: 18791,
       proxyEnabled: true,
       profiles: {},
-      defaultProfile: "kaijibot",
+      defaultProfile: "allbot",
     });
   }
 
@@ -869,7 +869,7 @@ describe("browser tool agent profile auto-routing (browser.proxy.enabled)", () =
       controlPort: 18791,
       proxyEnabled: false,
       profiles: {},
-      defaultProfile: "kaijibot",
+      defaultProfile: "allbot",
     });
     const tool = createBrowserTool({ agentId: "main" });
     await tool.execute?.("call-1", { action: "status" });
@@ -894,11 +894,11 @@ describe("browser tool agent profile auto-routing (browser.proxy.enabled)", () =
   it("an explicit profile param wins over the agent profile", async () => {
     enableLoginProxy({ cdpPort: 18805, color: "#0066CC" });
     const tool = createBrowserTool({ agentId: "main" });
-    await tool.execute?.("call-1", { action: "status", profile: "kaijibot" });
+    await tool.execute?.("call-1", { action: "status", profile: "allbot" });
 
     expect(browserClientMocks.browserStatus).toHaveBeenCalledWith(
       undefined,
-      expect.objectContaining({ profile: "kaijibot" }),
+      expect.objectContaining({ profile: "allbot" }),
     );
   });
 
@@ -931,7 +931,7 @@ describe("browser tool login action (browser.proxy.enabled)", () => {
       controlPort: 18791,
       proxyEnabled: true,
       profiles: {},
-      defaultProfile: "kaijibot",
+      defaultProfile: "allbot",
     });
     const ensureMock = vi.fn(async () => ({ profile: "agent-main", created: true }));
     browserToolTesting.setDepsForTest({ ensureAgentBrowserProfile: ensureMock });
@@ -991,7 +991,7 @@ describe("browser tool login action (browser.proxy.enabled)", () => {
       controlPort: 18791,
       proxyEnabled: false,
       profiles: {},
-      defaultProfile: "kaijibot",
+      defaultProfile: "allbot",
     });
     const tool = createBrowserTool({ agentId: "main" });
     const result = await tool.execute?.("call-1", { action: "login" });

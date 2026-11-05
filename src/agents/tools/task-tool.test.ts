@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { createProductionStepDriver, pendingStepCount } from "../../cognitive/tasks/step-driver.js";
 import { TaskStore } from "../../cognitive/tasks/store.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createTempHomeEnv } from "../../test-utils/temp-home.js";
 import { createTaskStatusTool, createTaskStepReportTool, createTaskTool } from "./task-tool.js";
 
-function cfg(tasks?: { enabled?: boolean }): KaijiBotConfig {
-  return { cognitive: { enabled: true, tasks } } as unknown as KaijiBotConfig;
+function cfg(tasks?: { enabled?: boolean }): AllBotConfig {
+  return { cognitive: { enabled: true, tasks } } as unknown as AllBotConfig;
 }
 
 function parsePayload(result: unknown): Record<string, unknown> {
@@ -19,7 +19,7 @@ describe("task tools", () => {
   let tempHome: Awaited<ReturnType<typeof createTempHomeEnv>>;
 
   beforeAll(async () => {
-    tempHome = await createTempHomeEnv("kaijibot-task-tool-");
+    tempHome = await createTempHomeEnv("allbot-task-tool-");
   });
 
   afterAll(async () => {

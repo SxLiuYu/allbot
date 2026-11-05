@@ -1,5 +1,5 @@
 import { resolveProviderAuthAliasMap } from "../agents/provider-auth-aliases.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadPluginManifestRegistry } from "../plugins/manifest-registry.js";
 
 const CORE_PROVIDER_AUTH_ENV_VAR_CANDIDATES = {
@@ -14,7 +14,7 @@ const CORE_PROVIDER_SETUP_ENV_VAR_OVERRIDES = {
 } as const;
 
 export type ProviderEnvVarLookupParams = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeUntrustedWorkspacePlugins?: boolean;
@@ -127,7 +127,7 @@ export function getProviderEnvVars(
 
 const EXTRA_PROVIDER_AUTH_ENV_VARS = ["MINIMAX_CODE_PLAN_KEY", "MINIMAX_CODING_API_KEY"] as const;
 
-// KAIJIBOT_API_KEY authenticates the local KaijiBot bridge itself and must
+// ALLBOT_API_KEY authenticates the local AllBot bridge itself and must
 // remain available to child bridge/runtime processes.
 export function listKnownProviderAuthEnvVarNames(params?: ProviderEnvVarLookupParams): string[] {
   return [

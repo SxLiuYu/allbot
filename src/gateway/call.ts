@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   loadConfig,
   resolveConfigPath,
@@ -61,7 +61,7 @@ type CallGatewayBaseOptions = {
   token?: string;
   password?: string;
   tlsFingerprint?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   method: string;
   params?: unknown;
   expectFinal?: boolean;
@@ -108,7 +108,7 @@ const gatewayCallDeps = {
   ...defaultGatewayCallDeps,
 };
 
-function loadGatewayConfig(): KaijiBotConfig {
+function loadGatewayConfig(): AllBotConfig {
   const loadConfigFn =
     typeof gatewayCallDeps.loadConfig === "function"
       ? gatewayCallDeps.loadConfig
@@ -134,7 +134,7 @@ function resolveGatewayConfigPath(env: NodeJS.ProcessEnv): string {
   return resolveConfigPathFn(env, resolveGatewayStateDir(env));
 }
 
-function resolveGatewayPortValue(config?: KaijiBotConfig, env?: NodeJS.ProcessEnv): number {
+function resolveGatewayPortValue(config?: AllBotConfig, env?: NodeJS.ProcessEnv): number {
   const resolveGatewayPortFn =
     typeof gatewayCallDeps.resolveGatewayPort === "function"
       ? gatewayCallDeps.resolveGatewayPort
@@ -144,7 +144,7 @@ function resolveGatewayPortValue(config?: KaijiBotConfig, env?: NodeJS.ProcessEn
 
 export function buildGatewayConnectionDetails(
   options: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     url?: string;
     configPath?: string;
     urlSource?: "cli" | "env";
@@ -261,7 +261,7 @@ type GatewayRemoteSettings = {
 };
 
 type ResolvedGatewayCallContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   configPath: string;
   isRemoteMode: boolean;
   remote?: GatewayRemoteSettings;
@@ -293,7 +293,7 @@ function resolveGatewayCallContext(opts: CallGatewayBaseOptions): ResolvedGatewa
   const explicitAuth = resolveExplicitGatewayAuth({ token: opts.token, password: opts.password });
   const envUrlOverride = cliUrlOverride
     ? undefined
-    : trimToUndefined(process.env.KAIJIBOT_GATEWAY_URL);
+    : trimToUndefined(process.env.ALLBOT_GATEWAY_URL);
   const urlOverride = cliUrlOverride ?? envUrlOverride;
   const urlOverrideSource = cliUrlOverride ? "cli" : envUrlOverride ? "env" : undefined;
   const canSkipConfigLoad = canSkipGatewayConfigLoad({
@@ -301,7 +301,7 @@ function resolveGatewayCallContext(opts: CallGatewayBaseOptions): ResolvedGatewa
     urlOverride,
     explicitAuth,
   });
-  const config = opts.config ?? (canSkipConfigLoad ? ({} as KaijiBotConfig) : loadGatewayConfig());
+  const config = opts.config ?? (canSkipConfigLoad ? ({} as AllBotConfig) : loadGatewayConfig());
   const configPath = opts.configPath ?? resolveGatewayConfigPath(process.env);
   const isRemoteMode = config.gateway?.mode === "remote";
   const remote = isRemoteMode
@@ -334,7 +334,7 @@ function ensureRemoteModeUrlConfigured(context: ResolvedGatewayCallContext): voi
 }
 
 async function resolveGatewaySecretInputString(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   value: unknown;
   path: string;
   env: NodeJS.ProcessEnv;
@@ -378,7 +378,7 @@ async function resolveGatewayCredentialsWithEnv(
 }
 
 function hasConfiguredGatewaySecretRef(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   path: SupportedGatewaySecretInputPath,
 ): boolean {
   return Boolean(
@@ -392,7 +392,7 @@ function hasConfiguredGatewaySecretRef(
 function resolveGatewayCredentialsFromConfigOptions(params: {
   context: ResolvedGatewayCallContext;
   env: NodeJS.ProcessEnv;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }) {
   const { context, env, cfg } = params;
   return {
@@ -431,7 +431,7 @@ function localAuthModeAllowsGatewaySecretInputPath(params: {
 function gatewaySecretInputPathCanWin(params: {
   context: ResolvedGatewayCallContext;
   env: NodeJS.ProcessEnv;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   path: SupportedGatewaySecretInputPath;
 }): boolean {
   if (!hasConfiguredGatewaySecretRef(params.config, params.path)) {
@@ -448,7 +448,7 @@ function gatewaySecretInputPathCanWin(params: {
   ) {
     return false;
   }
-  const sentinel = `__KAIJIBOT_GATEWAY_SECRET_REF_PROBE_${params.path.replaceAll(".", "_")}__`;
+  const sentinel = `__ALLBOT_GATEWAY_SECRET_REF_PROBE_${params.path.replaceAll(".", "_")}__`;
   const probeConfig = structuredClone(params.config);
   for (const candidatePath of ALL_GATEWAY_SECRET_INPUT_PATHS) {
     if (!hasConfiguredGatewaySecretRef(probeConfig, candidatePath)) {
@@ -482,7 +482,7 @@ function gatewaySecretInputPathCanWin(params: {
 }
 
 async function resolveConfiguredGatewaySecretInput(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   path: SupportedGatewaySecretInputPath;
   env: NodeJS.ProcessEnv;
 }): Promise<string | undefined> {
@@ -497,8 +497,8 @@ async function resolveConfiguredGatewaySecretInput(params: {
 async function resolvePreferredGatewaySecretInputs(params: {
   context: ResolvedGatewayCallContext;
   env: NodeJS.ProcessEnv;
-  config: KaijiBotConfig;
-}): Promise<KaijiBotConfig> {
+  config: AllBotConfig;
+}): Promise<AllBotConfig> {
   let nextConfig = params.config;
   for (const path of ALL_GATEWAY_SECRET_INPUT_PATHS) {
     if (
@@ -580,7 +580,7 @@ async function resolveGatewayCredentialsFromConfigWithSecretInputs(params: {
 }
 
 export async function resolveGatewayCredentialsWithSecretInputs(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   explicitAuth?: ExplicitGatewayAuth;
   urlOverride?: string;
   urlOverrideSource?: "cli" | "env";
@@ -672,7 +672,7 @@ function formatGatewayCloseError(
       "\n- Gateway not yet ready to accept connections (retry after a moment)" +
       "\n- TLS mismatch (connecting with ws:// to a wss:// gateway, or vice versa)" +
       "\n- Gateway crashed or was terminated unexpectedly" +
-      "\nRun `kaijibot doctor` for diagnostics.";
+      "\nRun `allbot doctor` for diagnostics.";
   }
   return message;
 }

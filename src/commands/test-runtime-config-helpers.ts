@@ -3,7 +3,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import type { MockFn } from "../test-utils/vitest-mock-fn.js";
 
 export const baseConfigSnapshot = {
-  path: "/tmp/kaijibot.json",
+  path: "/tmp/allbot.json",
   exists: true,
   raw: "{}",
   parsed: {},

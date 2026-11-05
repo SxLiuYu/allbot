@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import type {
   Browser,
   BrowserContext,

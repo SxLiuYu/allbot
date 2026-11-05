@@ -1,4 +1,4 @@
-import { isRecord } from "kaijibot/plugin-sdk/text-runtime";
+import { isRecord } from "allbot/plugin-sdk/text-runtime";
 import { DIFF_INDICATORS, DIFF_LAYOUTS, DIFF_THEMES } from "./types.js";
 import type { DiffViewerPayload } from "./types.js";
 

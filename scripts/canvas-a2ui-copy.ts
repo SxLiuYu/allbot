@@ -5,13 +5,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export function getA2uiPaths(env = process.env) {
-  const srcDir = env.KAIJIBOT_A2UI_SRC_DIR ?? path.join(repoRoot, "src", "canvas-host", "a2ui");
-  const outDir = env.KAIJIBOT_A2UI_OUT_DIR ?? path.join(repoRoot, "dist", "canvas-host", "a2ui");
+  const srcDir = env.ALLBOT_A2UI_SRC_DIR ?? path.join(repoRoot, "src", "canvas-host", "a2ui");
+  const outDir = env.ALLBOT_A2UI_OUT_DIR ?? path.join(repoRoot, "dist", "canvas-host", "a2ui");
   return { srcDir, outDir };
 }
 
 export function shouldSkipMissingA2uiAssets(env = process.env): boolean {
-  return env.KAIJIBOT_A2UI_SKIP_MISSING === "1" || Boolean(env.KAIJIBOT_SPARSE_PROFILE);
+  return env.ALLBOT_A2UI_SKIP_MISSING === "1" || Boolean(env.ALLBOT_SPARSE_PROFILE);
 }
 
 export async function copyA2uiAssets({ srcDir, outDir }: { srcDir: string; outDir: string }) {
@@ -23,7 +23,7 @@ export async function copyA2uiAssets({ srcDir, outDir }: { srcDir: string; outDi
     const message = 'Missing A2UI bundle assets. Run "pnpm canvas:a2ui:bundle" and retry.';
     if (skipMissing) {
       console.warn(
-        `${message} Skipping copy because KAIJIBOT_A2UI_SKIP_MISSING=1 or KAIJIBOT_SPARSE_PROFILE is set.`,
+        `${message} Skipping copy because ALLBOT_A2UI_SKIP_MISSING=1 or ALLBOT_SPARSE_PROFILE is set.`,
       );
       return;
     }

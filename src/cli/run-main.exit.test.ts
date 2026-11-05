@@ -43,7 +43,7 @@ vi.mock("../infra/env.js", () => ({
 }));
 
 vi.mock("../infra/path-env.js", () => ({
-  ensureKaijiBotCliOnPath: ensurePathMock,
+  ensureAllBotCliOnPath: ensurePathMock,
 }));
 
 vi.mock("../infra/runtime-guard.js", () => ({
@@ -108,10 +108,10 @@ describe("runCli exit behavior", () => {
       throw new Error(`unexpected process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "kaijibot", "status"]);
+    await runCli(["node", "allbot", "status"]);
 
-    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "kaijibot", "status"]);
-    expect(tryRouteCliMock).toHaveBeenCalledWith(["node", "kaijibot", "status"]);
+    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "allbot", "status"]);
+    expect(tryRouteCliMock).toHaveBeenCalledWith(["node", "allbot", "status"]);
     expect(closeActiveMemorySearchManagersMock).not.toHaveBeenCalled();
     expect(ensureTaskRegistryReadyMock).not.toHaveBeenCalled();
     expect(startTaskRegistryMaintenanceMock).not.toHaveBeenCalled();
@@ -124,9 +124,9 @@ describe("runCli exit behavior", () => {
       throw new Error(`unexpected process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "kaijibot", "--help"]);
+    await runCli(["node", "allbot", "--help"]);
 
-    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "kaijibot", "--help"]);
+    expect(maybeRunCliInContainerMock).toHaveBeenCalledWith(["node", "allbot", "--help"]);
     expect(tryRouteCliMock).not.toHaveBeenCalled();
     expect(outputPrecomputedRootHelpTextMock).toHaveBeenCalledTimes(1);
     expect(outputRootHelpMock).toHaveBeenCalledTimes(1);
@@ -140,7 +140,7 @@ describe("runCli exit behavior", () => {
     tryRouteCliMock.mockResolvedValueOnce(true);
     hasMemoryRuntimeMock.mockReturnValue(true);
 
-    await runCli(["node", "kaijibot", "status"]);
+    await runCli(["node", "allbot", "status"]);
 
     expect(closeActiveMemorySearchManagersMock).toHaveBeenCalledTimes(1);
   });
@@ -148,11 +148,11 @@ describe("runCli exit behavior", () => {
   it("returns after a handled container-target invocation", async () => {
     maybeRunCliInContainerMock.mockReturnValueOnce({ handled: true, exitCode: 0 });
 
-    await runCli(["node", "kaijibot", "--container", "demo", "status"]);
+    await runCli(["node", "allbot", "--container", "demo", "status"]);
 
     expect(maybeRunCliInContainerMock).toHaveBeenCalledWith([
       "node",
-      "kaijibot",
+      "allbot",
       "--container",
       "demo",
       "status",
@@ -166,7 +166,7 @@ describe("runCli exit behavior", () => {
     const exitCode = process.exitCode;
     maybeRunCliInContainerMock.mockReturnValueOnce({ handled: true, exitCode: 7 });
 
-    await runCli(["node", "kaijibot", "--container", "demo", "status"]);
+    await runCli(["node", "allbot", "--container", "demo", "status"]);
 
     expect(process.exitCode).toBe(7);
     process.exitCode = exitCode;
@@ -183,7 +183,7 @@ describe("runCli exit behavior", () => {
         ),
     });
 
-    await expect(runCli(["node", "kaijibot", "status"])).resolves.toBeUndefined();
+    await expect(runCli(["node", "allbot", "status"])).resolves.toBeUndefined();
 
     expect(registerSubCliByNameMock).toHaveBeenCalledWith(expect.anything(), "status");
     expect(process.exitCode).toBe(1);
@@ -198,11 +198,11 @@ describe("runCli exit behavior", () => {
     const ctx = { programVersion: "0.0.0-test" };
     getProgramContextMock.mockReturnValueOnce(ctx as never);
 
-    await runCli(["node", "kaijibot", "doctor", "--help"]);
+    await runCli(["node", "allbot", "doctor", "--help"]);
 
     expect(registerCoreCliByNameMock).toHaveBeenCalledWith(expect.anything(), ctx, "doctor", [
       "node",
-      "kaijibot",
+      "allbot",
       "doctor",
       "--help",
     ]);
@@ -221,7 +221,7 @@ describe("runCli exit behavior", () => {
       throw new Error(`process.exit(${String(code)})`);
     }) as typeof process.exit);
 
-    await runCli(["node", "kaijibot", "status"]);
+    await runCli(["node", "allbot", "status"]);
 
     const handler = processOnSpy.mock.calls.find(([event]) => event === "uncaughtException")?.[1];
     expect(typeof handler).toBe("function");
@@ -231,7 +231,7 @@ describe("runCli exit behavior", () => {
         "process.exit(1)",
       );
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "[kaijibot] Uncaught exception:",
+        "[allbot] Uncaught exception:",
         expect.stringContaining("boom"),
       );
       expect(restoreTerminalStateMock).toHaveBeenCalledWith("uncaught exception", {

@@ -35,7 +35,7 @@ describe("acp prompt cwd prefix", () => {
     sessionStore.createSession({
       sessionId: TEST_SESSION_ID,
       sessionKey: TEST_SESSION_KEY,
-      cwd: options.cwd ?? path.join(os.homedir(), "kaijibot-test"),
+      cwd: options.cwd ?? path.join(os.homedir(), "allbot-test"),
     });
 
     const requestSpy = createStopAfterSendSpy();
@@ -55,18 +55,18 @@ describe("acp prompt cwd prefix", () => {
 
   async function runPromptWithCwd(cwd: string) {
     const pinnedHome = os.homedir();
-    const previousKaijiBotHome = process.env.KAIJIBOT_HOME;
+    const previousAllBotHome = process.env.ALLBOT_HOME;
     const previousHome = process.env.HOME;
-    delete process.env.KAIJIBOT_HOME;
+    delete process.env.ALLBOT_HOME;
     process.env.HOME = pinnedHome;
 
     try {
       return await runPromptAndCaptureRequest({ cwd, prefixCwd: true });
     } finally {
-      if (previousKaijiBotHome === undefined) {
-        delete process.env.KAIJIBOT_HOME;
+      if (previousAllBotHome === undefined) {
+        delete process.env.ALLBOT_HOME;
       } else {
-        process.env.KAIJIBOT_HOME = previousKaijiBotHome;
+        process.env.ALLBOT_HOME = previousAllBotHome;
       }
       if (previousHome === undefined) {
         delete process.env.HOME;
@@ -77,22 +77,22 @@ describe("acp prompt cwd prefix", () => {
   }
 
   it("redacts home directory in prompt prefix", async () => {
-    const requestSpy = await runPromptWithCwd(path.join(os.homedir(), "kaijibot-test"));
+    const requestSpy = await runPromptWithCwd(path.join(os.homedir(), "allbot-test"));
     expect(requestSpy).toHaveBeenCalledWith(
       "chat.send",
       expect.objectContaining({
-        message: expect.stringMatching(/\[Working directory: ~[\\/]kaijibot-test\]/),
+        message: expect.stringMatching(/\[Working directory: ~[\\/]allbot-test\]/),
       }),
       { timeoutMs: null },
     );
   });
 
   it("keeps backslash separators when cwd uses them", async () => {
-    const requestSpy = await runPromptWithCwd(`${os.homedir()}\\kaijibot-test`);
+    const requestSpy = await runPromptWithCwd(`${os.homedir()}\\allbot-test`);
     expect(requestSpy).toHaveBeenCalledWith(
       "chat.send",
       expect.objectContaining({
-        message: expect.stringContaining("[Working directory: ~\\kaijibot-test]"),
+        message: expect.stringContaining("[Working directory: ~\\allbot-test]"),
       }),
       { timeoutMs: null },
     );
@@ -107,7 +107,7 @@ describe("acp prompt cwd prefix", () => {
           kind: "external_user",
           originSessionId: TEST_SESSION_ID,
           sourceChannel: "acp",
-          sourceTool: "kaijibot_acp",
+          sourceTool: "allbot_acp",
         },
         systemProvenanceReceipt: undefined,
       }),
@@ -124,7 +124,7 @@ describe("acp prompt cwd prefix", () => {
           kind: "external_user",
           originSessionId: TEST_SESSION_ID,
           sourceChannel: "acp",
-          sourceTool: "kaijibot_acp",
+          sourceTool: "allbot_acp",
         },
         systemProvenanceReceipt: expect.stringContaining("[Source Receipt]"),
       }),
@@ -133,7 +133,7 @@ describe("acp prompt cwd prefix", () => {
     expect(requestSpy).toHaveBeenCalledWith(
       "chat.send",
       expect.objectContaining({
-        systemProvenanceReceipt: expect.stringContaining("bridge=kaijibot-acp"),
+        systemProvenanceReceipt: expect.stringContaining("bridge=allbot-acp"),
       }),
       { timeoutMs: null },
     );
@@ -167,7 +167,7 @@ describe("acp prompt cwd prefix", () => {
     sessionStore.createSession({
       sessionId: TEST_SESSION_ID,
       sessionKey: TEST_SESSION_KEY,
-      cwd: path.join(os.homedir(), "kaijibot-test"),
+      cwd: path.join(os.homedir(), "allbot-test"),
     });
     const agent = new AcpGatewayAgent(
       createAcpConnection(),
@@ -188,7 +188,7 @@ describe("acp prompt cwd prefix", () => {
           kind: "external_user",
           originSessionId: TEST_SESSION_ID,
           sourceChannel: "acp",
-          sourceTool: "kaijibot_acp",
+          sourceTool: "allbot_acp",
         },
         systemProvenanceReceipt: expect.stringContaining("[Source Receipt]"),
       }),

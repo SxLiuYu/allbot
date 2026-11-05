@@ -1,5 +1,5 @@
 import type { AcpSessionUpdateTag } from "../../acp/runtime/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { clampPositiveInteger, resolveEffectiveBlockStreamingConfig } from "./block-streaming.js";
 
 const DEFAULT_ACP_STREAM_COALESCE_IDLE_MS = 350;
@@ -57,7 +57,7 @@ function resolveAcpHiddenBoundarySeparator(
   return fallback;
 }
 
-function resolveAcpStreamCoalesceIdleMs(cfg: KaijiBotConfig): number {
+function resolveAcpStreamCoalesceIdleMs(cfg: AllBotConfig): number {
   return clampPositiveInteger(
     cfg.acp?.stream?.coalesceIdleMs,
     DEFAULT_ACP_STREAM_COALESCE_IDLE_MS,
@@ -68,14 +68,14 @@ function resolveAcpStreamCoalesceIdleMs(cfg: KaijiBotConfig): number {
   );
 }
 
-function resolveAcpStreamMaxChunkChars(cfg: KaijiBotConfig): number {
+function resolveAcpStreamMaxChunkChars(cfg: AllBotConfig): number {
   return clampPositiveInteger(cfg.acp?.stream?.maxChunkChars, DEFAULT_ACP_STREAM_MAX_CHUNK_CHARS, {
     min: 50,
     max: 4_000,
   });
 }
 
-export function resolveAcpProjectionSettings(cfg: KaijiBotConfig): AcpProjectionSettings {
+export function resolveAcpProjectionSettings(cfg: AllBotConfig): AcpProjectionSettings {
   const stream = cfg.acp?.stream;
   const deliveryMode = resolveAcpDeliveryMode(stream?.deliveryMode);
   const hiddenBoundaryFallback: AcpHiddenBoundarySeparator =
@@ -106,7 +106,7 @@ export function resolveAcpProjectionSettings(cfg: KaijiBotConfig): AcpProjection
 }
 
 export function resolveAcpStreamingConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   provider?: string;
   accountId?: string;
   deliveryMode?: AcpDeliveryMode;

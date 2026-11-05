@@ -1,7 +1,7 @@
 import path from "node:path";
-import { normalizeAccountId } from "kaijibot/plugin-sdk/account-id";
-import type { ChannelPlugin, KaijiBotConfig, PluginRuntime } from "kaijibot/plugin-sdk/core";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/infra-runtime";
+import { normalizeAccountId } from "allbot/plugin-sdk/account-id";
+import type { ChannelPlugin, AllBotConfig, PluginRuntime } from "allbot/plugin-sdk/core";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/infra-runtime";
 import { notifyStop, notifyStart } from "./api/api.js";
 import { assertSessionActive } from "./api/session-guard.js";
 import {
@@ -52,7 +52,7 @@ function isRemoteUrl(mediaUrl: string): boolean {
 }
 
 const MEDIA_OUTBOUND_TEMP_DIR = path.join(
-  resolvePreferredKaijiBotTmpDir(),
+  resolvePreferredAllBotTmpDir(),
   "weixin/media/outbound-temp",
 );
 
@@ -61,7 +61,7 @@ function resolveLocalPath(mediaUrl: string): string {
   if (mediaUrl.startsWith("file://")) {
     return new URL(mediaUrl).pathname;
   }
-  // Resolve any relative path (./foo, ../foo, .kaijibot/foo, foo/bar) against cwd
+  // Resolve any relative path (./foo, ../foo, .allbot/foo, foo/bar) against cwd
   if (!path.isAbsolute(mediaUrl)) {
     return path.resolve(mediaUrl);
   }
@@ -77,12 +77,12 @@ function resolveLocalPath(mediaUrl: string): string {
  *   2. Single account → use it directly
  *   3. No match → throw a descriptive error
  */
-function resolveOutboundAccountId(cfg: KaijiBotConfig, to: string): string {
+function resolveOutboundAccountId(cfg: AllBotConfig, to: string): string {
   const allIds = listWeixinAccountIds(cfg);
 
   if (allIds.length === 0) {
     throw new Error(
-      `weixin: no accounts registered — run \`kaijibot channels login --channel wechat\``,
+      `weixin: no accounts registered — run \`allbot channels login --channel wechat\``,
     );
   }
 
@@ -118,7 +118,7 @@ function resolveOutboundAccountId(cfg: KaijiBotConfig, to: string): string {
 }
 
 async function sendWeixinOutbound(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   to: string;
   text: string;
   accountId?: string | null;
@@ -129,7 +129,7 @@ async function sendWeixinOutbound(params: {
   assertSessionActive(account.accountId);
   if (!account.configured) {
     aLog.error(`sendWeixinOutbound: account not configured`);
-    throw new Error("weixin not configured: please run `kaijibot channels login --channel wechat`");
+    throw new Error("weixin not configured: please run `allbot channels login --channel wechat`");
   }
   if (!params.contextToken) {
     aLog.warn(
@@ -309,7 +309,7 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
           );
         }
         void triggerWeixinChannelReload();
-        process.stdout.write(`\n✅ 已将此 KaijiBot 连接到微信（账号：${normalizedId}）。\n`);
+        process.stdout.write(`\n✅ 已将此 AllBot 连接到微信（账号：${normalizedId}）。\n`);
         return { cfg, accountId: normalizedId };
       } else if (waitResult.alreadyConnected) {
         process.stdout.write(`\n✅ 微信账号已连接（${accountId ?? "default"}），无需重新扫码。\n`);
@@ -340,7 +340,7 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
       if (!account.configured) {
         aLog.error(`sendMedia: account not configured`);
         throw new Error(
-          "weixin not configured: please run `kaijibot channels login --channel wechat`",
+          "weixin not configured: please run `allbot channels login --channel wechat`",
         );
       }
 
@@ -509,7 +509,7 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
             );
           }
           void triggerWeixinChannelReload();
-          log(`\n已将此 KaijiBot 连接到微信。`);
+          log(`\n已将此 AllBot 连接到微信。`);
         } catch (err) {
           logger.error(
             `auth.login: failed to save account data accountId=${waitResult.accountId} err=${String(err)}`,
@@ -517,13 +517,13 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
           log(`⚠️  保存账号数据失败: ${String(err)}`);
         }
       } else if (waitResult.alreadyConnected) {
-        // Server confirmed this KaijiBot is already bound to the scanned bot;
+        // Server confirmed this AllBot is already bound to the scanned bot;
         // local credentials are intact, nothing to persist. Exit successfully
         // so that automated installers don't treat re-runs as login failures.
         // The QR poller already wrote the user-facing message to stdout, so
         // we deliberately do NOT echo it again via `log(...)`.
         logger.info(
-          `auth.login: bot already connected to this KaijiBot accountId=${account.accountId}`,
+          `auth.login: bot already connected to this AllBot accountId=${account.accountId}`,
         );
       } else {
         logger.warn(
@@ -557,7 +557,7 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
       if (!account.configured) {
         aLog.error(`account not configured`);
         ctx.log?.error?.(
-          `[${account.accountId}] weixin not logged in — run: kaijibot channels login --channel wechat`,
+          `[${account.accountId}] weixin not logged in — run: allbot channels login --channel wechat`,
         );
         ctx.setStatus?.({ accountId: account.accountId, running: false });
         throw new Error("weixin not configured: missing token");

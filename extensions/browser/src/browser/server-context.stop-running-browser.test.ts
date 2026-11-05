@@ -10,11 +10,11 @@ vi.mock("./pw-ai.js", () => pwAiMocks);
 vi.mock("./chrome.js", () => ({
   isChromeCdpReady: vi.fn(async () => true),
   isChromeReachable: vi.fn(async () => true),
-  launchKaijiBotChrome: vi.fn(async () => {
+  launchAllBotChrome: vi.fn(async () => {
     throw new Error("unexpected launch");
   }),
-  resolveKaijiBotUserDataDir: vi.fn(() => "/tmp/kaijibot-test"),
-  stopKaijiBotChrome: vi.fn(async () => {}),
+  resolveAllBotUserDataDir: vi.fn(() => "/tmp/allbot-test"),
+  stopAllBotChrome: vi.fn(async () => {}),
 }));
 vi.mock("./chrome-mcp.js", () => ({
   closeChromeMcpSession: vi.fn(async () => false),

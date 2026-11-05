@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import type { ModelApi } from "../../../src/config/types.models.js";
 
 export const EXPECTED_FALLBACKS = ["anthropic/claude-opus-4-5"] as const;
@@ -10,7 +10,7 @@ export function createLegacyProviderConfig(params: {
   modelName?: string;
   baseUrl?: string;
   apiKey?: string;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     models: {
       providers: {
@@ -32,10 +32,10 @@ export function createLegacyProviderConfig(params: {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
-export function createConfigWithFallbacks(): KaijiBotConfig {
+export function createConfigWithFallbacks(): AllBotConfig {
   return {
     agents: {
       defaults: {

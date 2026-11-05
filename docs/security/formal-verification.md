@@ -1,6 +1,6 @@
 ---
 title: Formal Verification (Security Models)
-summary: Machine-checked security models for KaijiBot’s highest-risk paths.
+summary: Machine-checked security models for AllBot’s highest-risk paths.
 read_when:
   - Reviewing formal security model guarantees or limits
   - Reproducing or updating TLA+/TLC security model checks
@@ -9,11 +9,11 @@ permalink: /security/formal-verification/
 
 # Formal Verification (Security Models)
 
-This page tracks KaijiBot’s **formal security models** (TLA+/TLC today; more as needed).
+This page tracks AllBot’s **formal security models** (TLA+/TLC today; more as needed).
 
 > Note: some older links may refer to the previous project name.
 
-**Goal (north star):** provide a machine-checked argument that KaijiBot enforces its
+**Goal (north star):** provide a machine-checked argument that AllBot enforces its
 intended security policy (authorization, session isolation, tool gating, and
 misconfiguration safety), under explicit assumptions.
 
@@ -22,11 +22,11 @@ misconfiguration safety), under explicit assumptions.
 - Each claim has a runnable model-check over a finite state space.
 - Many claims have a paired **negative model** that produces a counterexample trace for a realistic bug class.
 
-**What this is not (yet):** a proof that “KaijiBot is secure in all respects” or that the full TypeScript implementation is correct.
+**What this is not (yet):** a proof that “AllBot is secure in all respects” or that the full TypeScript implementation is correct.
 
 ## Where the models live
 
-Models are maintained in a separate repo: [vignesh07/kaijibot-formal-models](https://github.com/vignesh07/kaijibot-formal-models).
+Models are maintained in a separate repo: [vignesh07/allbot-formal-models](https://github.com/vignesh07/allbot-formal-models).
 
 ## Important caveats
 
@@ -44,8 +44,8 @@ Today, results are reproduced by cloning the models repo locally and running TLC
 Getting started:
 
 ```bash
-git clone https://github.com/vignesh07/kaijibot-formal-models
-cd kaijibot-formal-models
+git clone https://github.com/vignesh07/allbot-formal-models
+cd allbot-formal-models
 
 # Java 11+ required (TLC runs on the JVM).
 # The repo vendors a pinned `tla2tools.jar` (TLA+ tools) and provides `bin/tlc` + Make targets.

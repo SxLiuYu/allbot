@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { enablePluginInConfig } from "./enable.js";
 
 function expectEnableResult(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   pluginId: string,
   params: {
     enabled: boolean;
@@ -42,7 +42,7 @@ describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
   it.each([
     {
       name: "enables a plugin entry",
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       pluginId: "google",
       expectedEnabled: true,
       assert: (result: ReturnType<typeof enablePluginInConfig>) => {
@@ -55,7 +55,7 @@ describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
         plugins: {
           allow: ["memory-core"],
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       pluginId: "google",
       expectedEnabled: true,
       assert: (result: ReturnType<typeof enablePluginInConfig>) => {
@@ -68,7 +68,7 @@ describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
         plugins: {
           deny: ["google"],
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       pluginId: "google",
       expectedEnabled: false,
       assert: (result: ReturnType<typeof enablePluginInConfig>) => {
@@ -77,7 +77,7 @@ describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
     },
     {
       name: "writes built-in channels to channels.<id>.enabled and plugins.entries",
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       pluginId: "feishu",
       expectedEnabled: true,
       assert: expectBuiltInChannelEnabled,
@@ -88,7 +88,7 @@ describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
         plugins: {
           allow: ["memory-core"],
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       pluginId: "feishu",
       expectedEnabled: true,
       assert: (result: ReturnType<typeof enablePluginInConfig>) => {
@@ -110,7 +110,7 @@ describe.skipIf(process.env.CI)("enablePluginInConfig", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       pluginId: "feishu",
       expectedEnabled: true,
       assert: expectBuiltInChannelEnabledWithAllowlist,

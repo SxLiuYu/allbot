@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { InsightStore } from "../cognitive/insight/store.js";
 import type { InsightRecord } from "../cognitive/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveMainSessionKey } from "../config/sessions.js";
 import { runHeartbeatOnce } from "./heartbeat-runner.js";
 import { installHeartbeatRunnerTestRuntime } from "./heartbeat-runner.test-harness.js";
@@ -53,7 +53,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           telegram: { token: "test" },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = resolveMainSessionKey(cfg);
       await seedMainSessionStore(storePath, cfg, {
@@ -140,7 +140,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           telegram: { token: "test" },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = resolveMainSessionKey(cfg);
       await seedMainSessionStore(storePath, cfg, {
@@ -183,8 +183,8 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
   it("writes deliveryMessageId to the exact insight referenced by contextKey, not the first undelivered record", async () => {
     await withTempHeartbeatSandbox(
       async ({ tmpDir, storePath, replySpy }) => {
-        const prevStateDir = process.env.KAIJIBOT_STATE_DIR;
-        process.env.KAIJIBOT_STATE_DIR = tmpDir;
+        const prevStateDir = process.env.ALLBOT_STATE_DIR;
+        process.env.ALLBOT_STATE_DIR = tmpDir;
         try {
           const cfg = {
             agents: {
@@ -196,7 +196,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
             },
             channels: { telegram: { allowFrom: ["*"] } },
             session: { store: storePath },
-          } as unknown as KaijiBotConfig;
+          } as unknown as AllBotConfig;
 
           const sessionKey = await seedMainSessionStore(storePath, cfg, {
             sessionId: "sid_wb",
@@ -272,13 +272,13 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           expect(decoyAfter?.deliveryMessageId).toBeUndefined();
         } finally {
           if (prevStateDir === undefined) {
-            delete process.env.KAIJIBOT_STATE_DIR;
+            delete process.env.ALLBOT_STATE_DIR;
           } else {
-            process.env.KAIJIBOT_STATE_DIR = prevStateDir;
+            process.env.ALLBOT_STATE_DIR = prevStateDir;
           }
         }
       },
-      { prefix: "kaijibot-insight-wb-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-insight-wb-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 
@@ -296,7 +296,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           telegram: { token: "test" },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = await seedMainSessionStore(storePath, cfg, {
         sessionId: "sid_outcome",
@@ -348,8 +348,8 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
   it("fires onInsightDeliveryOutcome with delivered=true on successful delivery", async () => {
     await withTempHeartbeatSandbox(
       async ({ tmpDir, storePath, replySpy }) => {
-        const prevStateDir = process.env.KAIJIBOT_STATE_DIR;
-        process.env.KAIJIBOT_STATE_DIR = tmpDir;
+        const prevStateDir = process.env.ALLBOT_STATE_DIR;
+        process.env.ALLBOT_STATE_DIR = tmpDir;
         try {
           const cfg = {
             agents: {
@@ -361,7 +361,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
             },
             channels: { telegram: { allowFrom: ["*"] } },
             session: { store: storePath },
-          } as unknown as KaijiBotConfig;
+          } as unknown as AllBotConfig;
 
           const sessionKey = await seedMainSessionStore(storePath, cfg, {
             sessionId: "sid_outcome_ok",
@@ -409,13 +409,13 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           expect(outcomes[0]?.insightId).toBe("insight-ok-test");
         } finally {
           if (prevStateDir === undefined) {
-            delete process.env.KAIJIBOT_STATE_DIR;
+            delete process.env.ALLBOT_STATE_DIR;
           } else {
-            process.env.KAIJIBOT_STATE_DIR = prevStateDir;
+            process.env.ALLBOT_STATE_DIR = prevStateDir;
           }
         }
       },
-      { prefix: "kaijibot-insight-ok-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
+      { prefix: "allbot-insight-ok-", unsetEnvVars: ["TELEGRAM_BOT_TOKEN"] },
     );
   });
 
@@ -433,7 +433,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           telegram: { token: "test" },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = await seedMainSessionStore(storePath, cfg, {
         sessionId: "sid_no_insight",
@@ -484,7 +484,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
           telegram: { token: "test", heartbeat: { showAlerts: false } },
         },
         session: { store: storePath },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const sessionKey = await seedMainSessionStore(storePath, cfg, {
         sessionId: "sid_alerts_off",
@@ -532,8 +532,8 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
 
   it("reports delivered=true (not false) for an already-delivered insight on a redundant empty wake", async () => {
     await withTempHeartbeatSandbox(async ({ tmpDir, storePath }) => {
-      const prevStateDir = process.env.KAIJIBOT_STATE_DIR;
-      process.env.KAIJIBOT_STATE_DIR = tmpDir;
+      const prevStateDir = process.env.ALLBOT_STATE_DIR;
+      process.env.ALLBOT_STATE_DIR = tmpDir;
       try {
         const cfg = {
           agents: {
@@ -547,7 +547,7 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
             telegram: { token: "test" },
           },
           session: { store: storePath },
-        } as unknown as KaijiBotConfig;
+        } as unknown as AllBotConfig;
 
         const sessionKey = await seedMainSessionStore(storePath, cfg, {
           sessionId: "sid_armed",
@@ -609,9 +609,9 @@ describe("runHeartbeatOnce insight event → prompt → reply → drain", () => 
         expect(outcomes[0]?.insightId).toBe("insight-armed-test");
       } finally {
         if (prevStateDir === undefined) {
-          delete process.env.KAIJIBOT_STATE_DIR;
+          delete process.env.ALLBOT_STATE_DIR;
         } else {
-          process.env.KAIJIBOT_STATE_DIR = prevStateDir;
+          process.env.ALLBOT_STATE_DIR = prevStateDir;
         }
       }
     });

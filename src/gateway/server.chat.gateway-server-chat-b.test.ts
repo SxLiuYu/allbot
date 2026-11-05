@@ -53,7 +53,7 @@ async function withGatewayChatHarness(
   const tempDirs: string[] = [];
   const ws = await harness.openWs();
   const createSessionDir = async () => {
-    const sessionDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-gw-"));
+    const sessionDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-gw-"));
     tempDirs.push(sessionDir);
     testState.sessionStorePath = path.join(sessionDir, "sessions.json");
     return sessionDir;
@@ -79,9 +79,9 @@ async function writeMainSessionStore() {
 }
 
 async function writeGatewayConfig(config: Record<string, unknown>) {
-  const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+  const configPath = process.env.ALLBOT_CONFIG_PATH;
   if (!configPath) {
-    throw new Error("KAIJIBOT_CONFIG_PATH missing in gateway test environment");
+    throw new Error("ALLBOT_CONFIG_PATH missing in gateway test environment");
   }
   await fs.mkdir(path.dirname(configPath), { recursive: true });
   await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
@@ -149,7 +149,7 @@ describe("gateway server chat", () => {
             message: {
               role: "user",
               content:
-                'Sender (untrusted metadata):\n```json\n{"label":"kaijibot-control-ui"}\n```\n\n[Thu 2026-03-26 16:29 GMT] hi',
+                'Sender (untrusted metadata):\n```json\n{"label":"allbot-control-ui"}\n```\n\n[Thu 2026-03-26 16:29 GMT] hi',
             },
           }),
           JSON.stringify({

@@ -8,7 +8,7 @@ title: "Tools Invoke API"
 
 # Tools Invoke (HTTP)
 
-KaijiBot’s Gateway exposes a simple HTTP endpoint for invoking a single tool directly. It is always enabled and uses Gateway auth plus tool policy. Like the OpenAI-compatible `/v1/*` surface, shared-secret bearer auth is treated as trusted operator access for the whole gateway.
+AllBot’s Gateway exposes a simple HTTP endpoint for invoking a single tool directly. It is always enabled and uses Gateway auth plus tool policy. Like the OpenAI-compatible `/v1/*` surface, shared-secret bearer auth is treated as trusted operator access for the whole gateway.
 
 - `POST /tools/invoke`
 - Same port as the Gateway (WS + HTTP multiplex): `http://<gateway-host>:<port>/tools/invoke`
@@ -31,8 +31,8 @@ Common HTTP auth paths:
 
 Notes:
 
-- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `KAIJIBOT_GATEWAY_TOKEN`).
-- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `KAIJIBOT_GATEWAY_PASSWORD`).
+- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `ALLBOT_GATEWAY_TOKEN`).
+- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `ALLBOT_GATEWAY_PASSWORD`).
 - When `gateway.auth.mode="trusted-proxy"`, the HTTP request must come from a
   configured non-loopback trusted proxy source; same-host loopback proxies do
   not satisfy this mode.
@@ -44,23 +44,23 @@ Treat this endpoint as a **full operator-access** surface for the gateway instan
 
 - HTTP bearer auth here is not a narrow per-user scope model.
 - A valid Gateway token/password for this endpoint should be treated like an owner/operator credential.
-- For shared-secret auth modes (`token` and `password`), the endpoint restores the normal full operator defaults even if the caller sends a narrower `x-kaijibot-scopes` header.
+- For shared-secret auth modes (`token` and `password`), the endpoint restores the normal full operator defaults even if the caller sends a narrower `x-allbot-scopes` header.
 - Shared-secret auth also treats direct tool invokes on this endpoint as owner-sender turns.
-- Trusted identity-bearing HTTP modes (for example trusted proxy auth or `gateway.auth.mode="none"` on a private ingress) honor `x-kaijibot-scopes` when present and otherwise fall back to the normal operator default scope set.
+- Trusted identity-bearing HTTP modes (for example trusted proxy auth or `gateway.auth.mode="none"` on a private ingress) honor `x-allbot-scopes` when present and otherwise fall back to the normal operator default scope set.
 - Keep this endpoint on loopback/tailnet/private ingress only; do not expose it directly to the public internet.
 
 Auth matrix:
 
 - `gateway.auth.mode="token"` or `"password"` + `Authorization: Bearer ...`
   - proves possession of the shared gateway operator secret
-  - ignores narrower `x-kaijibot-scopes`
+  - ignores narrower `x-allbot-scopes`
   - restores the full default operator scope set:
     `operator.admin`, `operator.approvals`, `operator.pairing`,
     `operator.read`, `operator.talk.secrets`, `operator.write`
   - treats direct tool invokes on this endpoint as owner-sender turns
 - trusted identity-bearing HTTP modes (for example trusted proxy auth, or `gateway.auth.mode="none"` on private ingress)
   - authenticate some outer trusted identity or deployment boundary
-  - honor `x-kaijibot-scopes` when the header is present
+  - honor `x-allbot-scopes` when the header is present
   - fall back to the normal operator default scope set when the header is absent
   - only lose owner semantics when the caller explicitly narrows scopes and omits `operator.admin`
 
@@ -134,8 +134,8 @@ You can customize this deny list via `gateway.tools`:
 
 To help group policies resolve context, you can optionally set:
 
-- `x-kaijibot-message-channel: <channel>` (example: `slack`, `telegram`)
-- `x-kaijibot-account-id: <accountId>` (when multiple accounts exist)
+- `x-allbot-message-channel: <channel>` (example: `slack`, `telegram`)
+- `x-allbot-account-id: <accountId>` (when multiple accounts exist)
 
 ## Responses
 

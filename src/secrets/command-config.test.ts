@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   buildTalkTestProviderConfig,
   TALK_TEST_PROVIDER_API_KEY_PATH,
@@ -61,7 +61,7 @@ describe("collectCommandSecretAssignmentsFromSnapshot", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const resolvedConfig = {
       agents: {
         defaults: {
@@ -72,7 +72,7 @@ describe("collectCommandSecretAssignmentsFromSnapshot", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = collectCommandSecretAssignmentsFromSnapshot({
       sourceConfig,

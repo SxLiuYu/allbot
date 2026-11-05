@@ -11,7 +11,7 @@ import { isGooglePromptCacheEligible } from "./prompt-cache-retention.js";
 
 type CustomEntryLike = { type?: unknown; customType?: unknown; data?: unknown };
 
-export const CACHE_TTL_CUSTOM_TYPE = "kaijibot.cache-ttl";
+export const CACHE_TTL_CUSTOM_TYPE = "allbot.cache-ttl";
 
 export type CacheTtlEntryData = {
   timestamp: number;

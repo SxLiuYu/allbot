@@ -26,7 +26,7 @@ import {
   replaceRuntimeAuthProfileStoreSnapshots,
 } from "../../agents/auth-profiles.js";
 import type { ModelAliasIndex } from "../../agents/model-selection.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import type { ElevatedLevel } from "../thinking.js";
 import { handleDirectiveOnly } from "./directive-handling.impl.js";
@@ -82,11 +82,11 @@ function baseAliasIndex(): ModelAliasIndex {
   return { byAlias: new Map(), byKey: new Map() };
 }
 
-function baseConfig(): KaijiBotConfig {
+function baseConfig(): AllBotConfig {
   return {
     commands: { text: true },
     agents: { defaults: {} },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 function createSessionEntry(overrides?: Partial<SessionEntry>): SessionEntry {
@@ -146,7 +146,7 @@ function resolveModelSelectionForCommand(params: {
 }) {
   return resolveModelSelectionFromDirective({
     directives: parseInlineDirectives(params.command),
-    cfg: { commands: { text: true } } as unknown as KaijiBotConfig,
+    cfg: { commands: { text: true } } as unknown as AllBotConfig,
     agentDir: TEST_AGENT_DIR,
     defaultProvider: "anthropic",
     defaultModel: "claude-opus-4-6",
@@ -280,7 +280,7 @@ describe("/model chat UX", () => {
 
   it("auto-applies closest match for typos", () => {
     const directives = parseInlineDirectives("/model anthropic/claud-opus-4-5");
-    const cfg = { commands: { text: true } } as unknown as KaijiBotConfig;
+    const cfg = { commands: { text: true } } as unknown as AllBotConfig;
 
     const resolved = resolveModelSelectionFromDirective({
       directives,
@@ -382,7 +382,7 @@ describe("/model chat UX", () => {
 
     const resolved = resolveModelSelectionFromDirective({
       directives: parseInlineDirectives(`/model gpt@${OPENAI_DATE_PROFILE_ID}`),
-      cfg: { commands: { text: true } } as unknown as KaijiBotConfig,
+      cfg: { commands: { text: true } } as unknown as AllBotConfig,
       agentDir: TEST_AGENT_DIR,
       defaultProvider: "anthropic",
       defaultModel: "claude-opus-4-6",

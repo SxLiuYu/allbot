@@ -2,7 +2,7 @@ import "./reply.directive.directive-behavior.e2e-mocks.js";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadSessionStore } from "../config/sessions.js";
 import type { ModelDefinitionConfig } from "../config/types.models.js";
 import { drainSystemEvents } from "../infra/system-events.js";
@@ -46,7 +46,7 @@ function makeMoonshotConfig(home: string, storePath: string) {
     agents: {
       defaults: {
         model: { primary: "anthropic/claude-opus-4-6" },
-        workspace: path.join(home, "kaijibot"),
+        workspace: path.join(home, "allbot"),
         models: {
           "anthropic/claude-opus-4-6": {},
           "moonshot/kimi-k2-0905-preview": {},
@@ -65,7 +65,7 @@ function makeMoonshotConfig(home: string, storePath: string) {
       },
     },
     session: { store: storePath },
-  } as unknown as KaijiBotConfig);
+  } as unknown as AllBotConfig);
 }
 
 describe("directive behavior", () => {
@@ -122,7 +122,7 @@ describe("directive behavior", () => {
             agents: {
               defaults: {
                 model: { primary: "minimax/MiniMax-M2.7" },
-                workspace: path.join(home, "kaijibot"),
+                workspace: path.join(home, "allbot"),
                 models: {
                   "minimax/MiniMax-M2.7": {},
                   "minimax/MiniMax-M2.7-highspeed": {},
@@ -163,7 +163,7 @@ describe("directive behavior", () => {
             agents: {
               defaults: {
                 model: { primary: "minimax/MiniMax-M2.7" },
-                workspace: path.join(home, "kaijibot"),
+                workspace: path.join(home, "allbot"),
                 models: {
                   "minimax/MiniMax-M2.7": {},
                   "minimax/MiniMax-M2.7-highspeed": {},
@@ -193,7 +193,7 @@ describe("directive behavior", () => {
           withFullRuntimeReplyConfig({
             ...testCase.config,
             session: { store: testCase.storePath },
-          } as unknown as KaijiBotConfig),
+          } as unknown as AllBotConfig),
         );
         assertModelSelection(testCase.storePath, testCase.expectedSelection);
       }
@@ -211,7 +211,7 @@ describe("directive behavior", () => {
           agents: {
             defaults: {
               model: { primary: "anthropic/claude-opus-4-6" },
-              workspace: path.join(home, "kaijibot"),
+              workspace: path.join(home, "allbot"),
               models: {
                 "anthropic/claude-opus-4-6": {},
                 "moonshot/kimi-k2-0905-preview": { alias: "Kimi" },
@@ -237,7 +237,7 @@ describe("directive behavior", () => {
             },
           },
           session: { store: storePath },
-        } as KaijiBotConfig),
+        } as AllBotConfig),
       );
 
       const text = replyText(res);
@@ -252,7 +252,7 @@ describe("directive behavior", () => {
   it("stores auth profile overrides on /model directive", async () => {
     await withTempHome(async (home) => {
       const storePath = sessionStorePath(home);
-      const authDir = path.join(home, ".kaijibot", "agents", "main", "agent");
+      const authDir = path.join(home, ".allbot", "agents", "main", "agent");
       await fs.mkdir(authDir, { recursive: true, mode: 0o700 });
       await fs.writeFile(
         path.join(authDir, "auth-profiles.json"),

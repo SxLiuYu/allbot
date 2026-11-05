@@ -16,7 +16,7 @@ function getSkillCreatorSpec(): string {
   }
   const candidates = [
     join(process.cwd(), "skills", "skill-creator", "SKILL.md"),
-    join(process.env.HOME ?? "", ".kaijibot", "skills", "skill-creator", "SKILL.md"),
+    join(process.env.HOME ?? "", ".allbot", "skills", "skill-creator", "SKILL.md"),
   ];
   for (const p of candidates) {
     if (existsSync(p)) {

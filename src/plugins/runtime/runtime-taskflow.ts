@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   cancelFlowByIdForOwner,
   getFlowTaskSummary,
@@ -29,7 +29,7 @@ import type {
   TaskRuntime,
 } from "../../tasks/task-registry.types.js";
 import { normalizeDeliveryContext } from "../../utils/delivery-context.js";
-import type { KaijiBotPluginToolContext } from "../types.js";
+import type { AllBotPluginToolContext } from "../types.js";
 
 export type ManagedTaskFlowRecord = TaskFlowRecord & {
   syncMode: "managed";
@@ -124,7 +124,7 @@ export type BoundTaskFlowRuntime = {
     expectedRevision: number;
     cancelRequestedAt?: number;
   }) => ManagedTaskFlowMutationResult;
-  cancel: (params: { flowId: string; cfg: KaijiBotConfig }) => Promise<BoundTaskFlowCancelResult>;
+  cancel: (params: { flowId: string; cfg: AllBotConfig }) => Promise<BoundTaskFlowCancelResult>;
   runTask: (params: {
     flowId: string;
     runtime: TaskRuntime;
@@ -151,7 +151,7 @@ export type PluginRuntimeTaskFlow = {
     requesterOrigin?: TaskDeliveryState["requesterOrigin"];
   }) => BoundTaskFlowRuntime;
   fromToolContext: (
-    ctx: Pick<KaijiBotPluginToolContext, "sessionKey" | "deliveryContext">,
+    ctx: Pick<AllBotPluginToolContext, "sessionKey" | "deliveryContext">,
   ) => BoundTaskFlowRuntime;
 };
 

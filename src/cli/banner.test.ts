@@ -27,7 +27,7 @@ describe("formatCliBannerLine", () => {
       richTty: false,
     });
 
-    expect(line).toBe("👾 KaijiBot 2026.3.7 (abc1234)");
+    expect(line).toBe("👾 AllBot 2026.3.7 (abc1234)");
   });
 
   it("uses default English tagline under en locale", () => {
@@ -38,7 +38,7 @@ describe("formatCliBannerLine", () => {
       richTty: false,
     });
 
-    expect(line).toBe("👾 KaijiBot 2026.3.7 (abc1234) — Cognition-driven, proactive thinking.");
+    expect(line).toBe("👾 AllBot 2026.3.7 (abc1234) — Cognition-driven, proactive thinking.");
   });
 
   it("uses default Chinese tagline under zh-CN locale", () => {
@@ -50,7 +50,7 @@ describe("formatCliBannerLine", () => {
       richTty: false,
     });
 
-    expect(line).toBe("👾 KaijiBot 2026.3.7 (abc1234) — 认知驱动，主动思考。");
+    expect(line).toBe("👾 AllBot 2026.3.7 (abc1234) — 认知驱动，主动思考。");
   });
 
   it("prefers explicit tagline mode over config", () => {
@@ -62,6 +62,6 @@ describe("formatCliBannerLine", () => {
       mode: "default",
     });
 
-    expect(line).toBe("👾 KaijiBot 2026.3.7 (abc1234) — Cognition-driven, proactive thinking.");
+    expect(line).toBe("👾 AllBot 2026.3.7 (abc1234) — Cognition-driven, proactive thinking.");
   });
 });

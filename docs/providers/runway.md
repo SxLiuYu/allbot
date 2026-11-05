@@ -1,15 +1,15 @@
 ---
 title: "Runway"
-summary: "Runway video generation setup in KaijiBot"
+summary: "Runway video generation setup in AllBot"
 read_when:
-  - You want to use Runway video generation in KaijiBot
+  - You want to use Runway video generation in AllBot
   - You need the Runway API key/env setup
   - You want to make Runway the default video provider
 ---
 
 # Runway
 
-KaijiBot ships a bundled `runway` provider for hosted video generation.
+AllBot ships a bundled `runway` provider for hosted video generation.
 
 - Provider id: `runway`
 - Auth: `RUNWAYML_API_SECRET` (canonical) or `RUNWAY_API_KEY`
@@ -20,13 +20,13 @@ KaijiBot ships a bundled `runway` provider for hosted video generation.
 1. Set the API key:
 
 ```bash
-kaijibot onboard --auth-choice runway-api-key
+allbot onboard --auth-choice runway-api-key
 ```
 
 2. Set Runway as the default video provider:
 
 ```bash
-kaijibot config set agents.defaults.videoGenerationModel.primary "runway/gen4.5"
+allbot config set agents.defaults.videoGenerationModel.primary "runway/gen4.5"
 ```
 
 3. Ask the agent to generate a video. Runway will be used automatically.

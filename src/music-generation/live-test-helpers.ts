@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   parseLiveCsvFilter,
   parseProviderModelMap,
@@ -18,7 +18,7 @@ export function parseCsvFilter(raw?: string): Set<string> | null {
   return parseLiveCsvFilter(raw);
 }
 
-export function resolveConfiguredLiveMusicModels(cfg: KaijiBotConfig): Map<string, string> {
+export function resolveConfiguredLiveMusicModels(cfg: AllBotConfig): Map<string, string> {
   return resolveConfiguredLiveProviderModels(cfg.agents?.defaults?.musicGenerationModel);
 }
 

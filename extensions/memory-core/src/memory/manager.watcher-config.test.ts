@@ -3,8 +3,8 @@ import os from "node:os";
 import path from "node:path";
 import type {
   MemorySearchConfig,
-  KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+  AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MemoryIndexManager } from "./index.js";
 import { registerBuiltInMemoryEmbeddingProviders } from "./provider-adapters.js";
@@ -88,15 +88,15 @@ describe("memory watcher config", () => {
   });
 
   async function setupWatcherWorkspace(seedFile: { name: string; contents: string }) {
-    workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-memory-watch-"));
+    workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-memory-watch-"));
     extraDir = path.join(workspaceDir, "extra");
     await fs.mkdir(path.join(workspaceDir, "memory"), { recursive: true });
     await fs.mkdir(extraDir, { recursive: true });
     await fs.writeFile(path.join(extraDir, seedFile.name), seedFile.contents);
   }
 
-  function createWatcherConfig(overrides?: Partial<MemorySearchConfig>): KaijiBotConfig {
-    const defaults: NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]> = {
+  function createWatcherConfig(overrides?: Partial<MemorySearchConfig>): AllBotConfig {
+    const defaults: NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]> = {
       workspace: workspaceDir,
       memorySearch: {
         provider: "openai",
@@ -113,10 +113,10 @@ describe("memory watcher config", () => {
         defaults,
         list: [{ id: "main", default: true }],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
   }
 
-  async function expectWatcherManager(cfg: KaijiBotConfig) {
+  async function expectWatcherManager(cfg: AllBotConfig) {
     const result = await getMemorySearchManager({ cfg, agentId: "main" });
     expect(result.manager).not.toBeNull();
     if (!result.manager) {

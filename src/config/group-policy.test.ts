@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import { resolveChannelGroupPolicy, resolveToolsBySender } from "./group-policy.js";
 
 describe("resolveChannelGroupPolicy", () => {
@@ -10,7 +10,7 @@ describe("resolveChannelGroupPolicy", () => {
           groupPolicy: "allowlist",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const policy = resolveChannelGroupPolicy({
       cfg,
@@ -32,7 +32,7 @@ describe("resolveChannelGroupPolicy", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const policy = resolveChannelGroupPolicy({
       cfg,
@@ -54,7 +54,7 @@ describe("resolveChannelGroupPolicy", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const policy = resolveChannelGroupPolicy({
       cfg,
@@ -77,7 +77,7 @@ describe("resolveChannelGroupPolicy", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const policy = resolveChannelGroupPolicy({
       cfg,
@@ -97,7 +97,7 @@ describe("resolveChannelGroupPolicy", () => {
           groupPolicy: "allowlist",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const policy = resolveChannelGroupPolicy({
       cfg,
@@ -117,7 +117,7 @@ describe("resolveChannelGroupPolicy", () => {
           groupPolicy: "allowlist",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const policy = resolveChannelGroupPolicy({
       cfg,
@@ -262,7 +262,7 @@ describe("resolveToolsBySender", () => {
     expect(warningSpy).toHaveBeenCalledTimes(1);
     expect(String(warningSpy.mock.calls[0]?.[0])).toContain(`toolsBySender key "${legacyKey}"`);
     expect(warningSpy.mock.calls[0]?.[1]).toMatchObject({
-      code: "KAIJIBOT_TOOLS_BY_SENDER_UNTYPED_KEY",
+      code: "ALLBOT_TOOLS_BY_SENDER_UNTYPED_KEY",
     });
   });
 });

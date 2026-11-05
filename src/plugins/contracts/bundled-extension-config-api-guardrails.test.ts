@@ -33,10 +33,10 @@ const BUNDLED_EXTENSION_CONFIG_IMPORT_GUARDS = [
   },
   {
     path: "extensions/googlechat/src/config-schema.ts",
-    allowedSpecifier: "kaijibot/plugin-sdk/googlechat",
+    allowedSpecifier: "allbot/plugin-sdk/googlechat",
   },
   // Teams keeps a package-local config barrel so production code does not
-  // self-import via kaijibot/plugin-sdk/msteams from inside the same extension.
+  // self-import via allbot/plugin-sdk/msteams from inside the same extension.
   {
     path: "extensions/msteams/src/config-schema.ts",
     allowedSpecifier: "../config-api.js",
@@ -48,7 +48,7 @@ describe("bundled extension config api guardrails", () => {
     it(`keeps ${entry.path} off the generic concrete-schema barrel`, () => {
       const source = readFileSync(resolve(REPO_ROOT, entry.path), "utf8");
       expect(source).toContain(entry.allowedSpecifier);
-      expect(source).not.toContain("kaijibot/plugin-sdk/channel-config-schema");
+      expect(source).not.toContain("allbot/plugin-sdk/channel-config-schema");
     });
   }
 });

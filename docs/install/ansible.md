@@ -1,5 +1,5 @@
 ---
-summary: "Automated, hardened KaijiBot installation with Ansible, Tailscale VPN, and firewall isolation"
+summary: "Automated, hardened AllBot installation with Ansible, Tailscale VPN, and firewall isolation"
 read_when:
   - You want automated server deployment with security hardening
   - You need firewall-isolated setup with VPN access
@@ -9,10 +9,10 @@ title: "Ansible"
 
 # Ansible Installation
 
-Deploy KaijiBot to production servers with **[kaijibot-ansible](https://github.com/kaijibot/kaijibot-ansible)** -- an automated installer with security-first architecture.
+Deploy AllBot to production servers with **[allbot-ansible](https://github.com/allbot/allbot-ansible)** -- an automated installer with security-first architecture.
 
 <Info>
-The [kaijibot-ansible](https://github.com/kaijibot/kaijibot-ansible) repo is the source of truth for Ansible deployment. This page is a quick overview.
+The [allbot-ansible](https://github.com/allbot/allbot-ansible) repo is the source of truth for Ansible deployment. This page is a quick overview.
 </Info>
 
 ## Prerequisites
@@ -38,7 +38,7 @@ The [kaijibot-ansible](https://github.com/kaijibot/kaijibot-ansible) repo is the
 One-command install:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/kaijibot/kaijibot-ansible/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/allbot/allbot-ansible/main/install.sh | bash
 ```
 
 ## What Gets Installed
@@ -49,7 +49,7 @@ The Ansible playbook installs and configures:
 2. **UFW firewall** -- SSH + Tailscale ports only
 3. **Docker CE + Compose V2** -- for agent sandboxes
 4. **Node.js 24 + pnpm** -- runtime dependencies (Node 22 LTS, currently `22.14+`, remains supported)
-5. **KaijiBot** -- host-based, not containerized
+5. **AllBot** -- host-based, not containerized
 6. **Systemd service** -- auto-start with security hardening
 
 <Note>
@@ -59,24 +59,24 @@ The gateway runs directly on the host (not in Docker), but agent sandboxes use D
 ## Post-Install Setup
 
 <Steps>
-  <Step title="Switch to the kaijibot user">
+  <Step title="Switch to the allbot user">
     ```bash
-    sudo -i -u kaijibot
+    sudo -i -u allbot
     ```
   </Step>
   <Step title="Run the onboarding wizard">
-    The post-install script guides you through configuring KaijiBot settings.
+    The post-install script guides you through configuring AllBot settings.
   </Step>
   <Step title="Connect messaging providers">
     Log in to WhatsApp, Telegram, Discord, or Signal:
     ```bash
-    kaijibot channels login
+    allbot channels login
     ```
   </Step>
   <Step title="Verify the installation">
     ```bash
-    sudo systemctl status kaijibot
-    sudo journalctl -u kaijibot -f
+    sudo systemctl status allbot
+    sudo journalctl -u allbot -f
     ```
   </Step>
   <Step title="Connect to Tailscale">
@@ -88,17 +88,17 @@ The gateway runs directly on the host (not in Docker), but agent sandboxes use D
 
 ```bash
 # Check service status
-sudo systemctl status kaijibot
+sudo systemctl status allbot
 
 # View live logs
-sudo journalctl -u kaijibot -f
+sudo journalctl -u allbot -f
 
 # Restart gateway
-sudo systemctl restart kaijibot
+sudo systemctl restart allbot
 
-# Provider login (run as kaijibot user)
-sudo -i -u kaijibot
-kaijibot channels login
+# Provider login (run as allbot user)
+sudo -i -u allbot
+allbot channels login
 ```
 
 ## Security Architecture
@@ -132,8 +132,8 @@ If you prefer manual control over the automation:
   </Step>
   <Step title="Clone the repository">
     ```bash
-    git clone https://github.com/kaijibot/kaijibot-ansible.git
-    cd kaijibot-ansible
+    git clone https://github.com/allbot/allbot-ansible.git
+    cd allbot-ansible
     ```
   </Step>
   <Step title="Install Ansible collections">
@@ -149,7 +149,7 @@ If you prefer manual control over the automation:
     Alternatively, run directly and then manually execute the setup script afterward:
     ```bash
     ansible-playbook playbook.yml --ask-become-pass
-    # Then run: /tmp/kaijibot-setup.sh
+    # Then run: /tmp/allbot-setup.sh
     ```
 
   </Step>
@@ -157,12 +157,12 @@ If you prefer manual control over the automation:
 
 ## Updating
 
-The Ansible installer sets up KaijiBot for manual updates. See [Updating](/install/updating) for the standard update flow.
+The Ansible installer sets up AllBot for manual updates. See [Updating](/install/updating) for the standard update flow.
 
 To re-run the Ansible playbook (for example, for configuration changes):
 
 ```bash
-cd kaijibot-ansible
+cd allbot-ansible
 ./run-playbook.sh
 ```
 
@@ -179,15 +179,15 @@ This is idempotent and safe to run multiple times.
   <Accordion title="Service will not start">
     ```bash
     # Check logs
-    sudo journalctl -u kaijibot -n 100
+    sudo journalctl -u allbot -n 100
 
     # Verify permissions
-    sudo ls -la /opt/kaijibot
+    sudo ls -la /opt/allbot
 
     # Test manual start
-    sudo -i -u kaijibot
-    cd ~/kaijibot
-    kaijibot gateway run
+    sudo -i -u allbot
+    cd ~/allbot
+    allbot gateway run
     ```
 
   </Accordion>
@@ -197,34 +197,34 @@ This is idempotent and safe to run multiple times.
     sudo systemctl status docker
 
     # Check sandbox image
-    sudo docker images | grep kaijibot-sandbox
+    sudo docker images | grep allbot-sandbox
 
     # Build sandbox image if missing
-    cd /opt/kaijibot/kaijibot
-    sudo -u kaijibot ./scripts/sandbox-setup.sh
+    cd /opt/allbot/allbot
+    sudo -u allbot ./scripts/sandbox-setup.sh
     ```
 
   </Accordion>
   <Accordion title="Provider login fails">
-    Make sure you are running as the `kaijibot` user:
+    Make sure you are running as the `allbot` user:
     ```bash
-    sudo -i -u kaijibot
-    kaijibot channels login
+    sudo -i -u allbot
+    allbot channels login
     ```
   </Accordion>
 </AccordionGroup>
 
 ## Advanced Configuration
 
-For detailed security architecture and troubleshooting, see the kaijibot-ansible repo:
+For detailed security architecture and troubleshooting, see the allbot-ansible repo:
 
-- [Security Architecture](https://github.com/kaijibot/kaijibot-ansible/blob/main/docs/security.md)
-- [Technical Details](https://github.com/kaijibot/kaijibot-ansible/blob/main/docs/architecture.md)
-- [Troubleshooting Guide](https://github.com/kaijibot/kaijibot-ansible/blob/main/docs/troubleshooting.md)
+- [Security Architecture](https://github.com/allbot/allbot-ansible/blob/main/docs/security.md)
+- [Technical Details](https://github.com/allbot/allbot-ansible/blob/main/docs/architecture.md)
+- [Troubleshooting Guide](https://github.com/allbot/allbot-ansible/blob/main/docs/troubleshooting.md)
 
 ## Related
 
-- [kaijibot-ansible](https://github.com/kaijibot/kaijibot-ansible) -- full deployment guide
+- [allbot-ansible](https://github.com/allbot/allbot-ansible) -- full deployment guide
 - [Docker](/install/docker) -- containerized gateway setup
 - [Sandboxing](/gateway/sandboxing) -- agent sandbox configuration
 - [Multi-Agent Sandbox and Tools](/tools/multi-agent-sandbox-tools) -- per-agent isolation

@@ -5,11 +5,11 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { captureFullEnv } from "../test-utils/env.js";
 
 const spawnMock = vi.hoisted(() => vi.fn());
-const resolvePreferredKaijiBotTmpDirMock = vi.hoisted(() => vi.fn(() => os.tmpdir()));
+const resolvePreferredAllBotTmpDirMock = vi.hoisted(() => vi.fn(() => os.tmpdir()));
 const resolveTaskScriptPathMock = vi.hoisted(() =>
   vi.fn((env: Record<string, string | undefined>) => {
     const home = env.USERPROFILE || env.HOME || os.homedir();
-    return path.join(home, ".kaijibot", "gateway.cmd");
+    return path.join(home, ".allbot", "gateway.cmd");
   }),
 );
 
@@ -22,8 +22,8 @@ vi.mock("node:child_process", async () => {
     },
   );
 });
-vi.mock("./tmp-kaijibot-dir.js", () => ({
-  resolvePreferredKaijiBotTmpDir: () => resolvePreferredKaijiBotTmpDirMock(),
+vi.mock("./tmp-allbot-dir.js", () => ({
+  resolvePreferredAllBotTmpDir: () => resolvePreferredAllBotTmpDirMock(),
 }));
 vi.mock("../daemon/schtasks.js", () => ({
   resolveTaskScriptPath: (env: Record<string, string | undefined>) =>
@@ -73,12 +73,12 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
 
   beforeEach(() => {
     spawnMock.mockReset();
-    resolvePreferredKaijiBotTmpDirMock.mockReset();
-    resolvePreferredKaijiBotTmpDirMock.mockReturnValue(os.tmpdir());
+    resolvePreferredAllBotTmpDirMock.mockReset();
+    resolvePreferredAllBotTmpDirMock.mockReturnValue(os.tmpdir());
     resolveTaskScriptPathMock.mockReset();
     resolveTaskScriptPathMock.mockImplementation((env: Record<string, string | undefined>) => {
       const home = env.USERPROFILE || env.HOME || os.homedir();
-      return path.join(home, ".kaijibot", "gateway.cmd");
+      return path.join(home, ".allbot", "gateway.cmd");
     });
   });
 
@@ -91,12 +91,12 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
       return { unref };
     });
 
-    const result = relaunchGatewayScheduledTask({ KAIJIBOT_PROFILE: "work" });
+    const result = relaunchGatewayScheduledTask({ ALLBOT_PROFILE: "work" });
 
     expect(result).toMatchObject({
       ok: true,
       method: "schtasks",
-      tried: expect.arrayContaining(['schtasks /Run /TN "KaijiBot Gateway (work)"']),
+      tried: expect.arrayContaining(['schtasks /Run /TN "AllBot Gateway (work)"']),
     });
     expect(result.tried).toContain(`cmd.exe /d /s /c ${seenCommandArg}`);
     expect(spawnMock).toHaveBeenCalledWith(
@@ -114,24 +114,24 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
     expect(scriptPath).toBeTruthy();
     const script = fs.readFileSync(scriptPath, "utf8");
     expect(script).toContain("timeout /t 1 /nobreak >nul");
-    expect(script).toContain('schtasks /Run /TN "KaijiBot Gateway (work)" >nul 2>&1');
+    expect(script).toContain('schtasks /Run /TN "AllBot Gateway (work)" >nul 2>&1');
     expect(script).toContain('del "%~f0" >nul 2>&1');
   });
 
-  it("prefers KAIJIBOT_WINDOWS_TASK_NAME overrides", () => {
+  it("prefers ALLBOT_WINDOWS_TASK_NAME overrides", () => {
     spawnMock.mockImplementation((_file: string, args: string[]) => {
       createdScriptPaths.add(decodeCmdPathArg(args[3]));
       return { unref: vi.fn() };
     });
 
     relaunchGatewayScheduledTask({
-      KAIJIBOT_PROFILE: "work",
-      KAIJIBOT_WINDOWS_TASK_NAME: "KaijiBot Gateway (custom)",
+      ALLBOT_PROFILE: "work",
+      ALLBOT_WINDOWS_TASK_NAME: "AllBot Gateway (custom)",
     });
 
     const scriptPath = [...createdScriptPaths][0];
     const script = fs.readFileSync(scriptPath, "utf8");
-    expect(script).toContain('schtasks /Run /TN "KaijiBot Gateway (custom)" >nul 2>&1');
+    expect(script).toContain('schtasks /Run /TN "AllBot Gateway (custom)" >nul 2>&1');
   });
 
   it("returns failed when the helper cannot be spawned", () => {
@@ -139,7 +139,7 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
       throw new Error("spawn failed");
     });
 
-    const result = relaunchGatewayScheduledTask({ KAIJIBOT_PROFILE: "work" });
+    const result = relaunchGatewayScheduledTask({ ALLBOT_PROFILE: "work" });
 
     expect(result.ok).toBe(false);
     expect(result.method).toBe("schtasks");
@@ -148,12 +148,12 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
 
   it("quotes the cmd /c script path when temp paths contain metacharacters", () => {
     const unref = vi.fn();
-    const metacharTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot&(restart)-"));
+    const metacharTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot&(restart)-"));
     createdTmpDirs.add(metacharTmpDir);
-    resolvePreferredKaijiBotTmpDirMock.mockReturnValue(metacharTmpDir);
+    resolvePreferredAllBotTmpDirMock.mockReturnValue(metacharTmpDir);
     spawnMock.mockReturnValue({ unref });
 
-    relaunchGatewayScheduledTask({ KAIJIBOT_PROFILE: "work" });
+    relaunchGatewayScheduledTask({ ALLBOT_PROFILE: "work" });
 
     expect(spawnMock).toHaveBeenCalledWith(
       "cmd.exe",
@@ -163,7 +163,7 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
   });
 
   it("includes startup fallback", () => {
-    const taskScriptDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-state-"));
+    const taskScriptDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-state-"));
     createdTmpDirs.add(taskScriptDir);
     const taskScriptPath = path.join(taskScriptDir, "gateway.cmd");
     fs.writeFileSync(taskScriptPath, "@echo off\r\nrem placeholder\r\n", "utf8");
@@ -174,7 +174,7 @@ describe.skipIf(process.env.CI)("relaunchGatewayScheduledTask", () => {
       return { unref: vi.fn() };
     });
 
-    const result = relaunchGatewayScheduledTask({ KAIJIBOT_PROFILE: "work" });
+    const result = relaunchGatewayScheduledTask({ ALLBOT_PROFILE: "work" });
 
     expect(result.ok).toBe(true);
     const scriptPath = [...createdScriptPaths][0];

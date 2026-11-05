@@ -19,23 +19,23 @@ import type {
 } from "../channels/plugins/types.core.js";
 import type { ChannelMeta } from "../channels/plugins/types.js";
 import type { ChannelConfigSchema, ChannelPlugin } from "../channels/plugins/types.plugin.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ReplyToMode } from "../config/types.base.js";
 import { buildOutboundBaseSessionKey } from "../infra/outbound/base-session-key.js";
 import type { OutboundDeliveryResult } from "../infra/outbound/deliver.js";
 import type { PluginRuntime } from "../plugins/runtime/types.js";
-import type { KaijiBotPluginApi } from "../plugins/types.js";
+import type { AllBotPluginApi } from "../plugins/types.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 
 export type {
   AnyAgentTool,
   MediaUnderstandingProviderPlugin,
-  KaijiBotPluginApi,
-  KaijiBotPluginCommandDefinition,
-  KaijiBotPluginConfigSchema,
-  KaijiBotPluginDefinition,
-  KaijiBotPluginService,
-  KaijiBotPluginServiceContext,
+  AllBotPluginApi,
+  AllBotPluginCommandDefinition,
+  AllBotPluginConfigSchema,
+  AllBotPluginDefinition,
+  AllBotPluginService,
+  AllBotPluginServiceContext,
   PluginCommandContext,
   PluginLogger,
   ProviderAuthContext,
@@ -83,7 +83,7 @@ export type {
   ProviderWrapStreamFnContext,
   SpeechProviderPlugin,
 } from "./plugin-entry.js";
-export type { KaijiBotPluginToolContext, KaijiBotPluginToolFactory } from "../plugins/types.js";
+export type { AllBotPluginToolContext, AllBotPluginToolFactory } from "../plugins/types.js";
 export type {
   MemoryPluginCapability,
   MemoryPluginPublicArtifact,
@@ -94,7 +94,7 @@ export type {
   PluginHookReplyDispatchEvent,
   PluginHookReplyDispatchResult,
 } from "../plugins/types.js";
-export type { KaijiBotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
 export type { OutboundIdentity } from "../infra/outbound/identity.js";
 export type { HistoryEntry } from "../auto-reply/reply/history.js";
 export type { ReplyPayload } from "../auto-reply/types.js";
@@ -256,7 +256,7 @@ export function stripTargetKindPrefix(raw: string): string {
  * message adapters.
  */
 export function buildChannelOutboundSessionRoute(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   channel: string;
   accountId?: string | null;
@@ -297,8 +297,8 @@ type DefineChannelPluginEntryOptions<TPlugin = ChannelPlugin> = {
   plugin: TPlugin;
   configSchema?: ChannelEntryConfigSchema<TPlugin> | (() => ChannelEntryConfigSchema<TPlugin>);
   setRuntime?: (runtime: PluginRuntime) => void;
-  registerCliMetadata?: (api: KaijiBotPluginApi) => void;
-  registerFull?: (api: KaijiBotPluginApi) => void;
+  registerCliMetadata?: (api: AllBotPluginApi) => void;
+  registerFull?: (api: AllBotPluginApi) => void;
 };
 
 type DefinedChannelPluginEntry<TPlugin> = {
@@ -306,7 +306,7 @@ type DefinedChannelPluginEntry<TPlugin> = {
   name: string;
   description: string;
   configSchema: ChannelEntryConfigSchema<TPlugin>;
-  register: (api: KaijiBotPluginApi) => void;
+  register: (api: AllBotPluginApi) => void;
   channelPlugin: TPlugin;
   setChannelRuntime?: (runtime: PluginRuntime) => void;
 };
@@ -377,7 +377,7 @@ export function defineChannelPluginEntry<TPlugin>({
     name,
     description,
     configSchema: resolvedConfigSchema,
-    register(api: KaijiBotPluginApi) {
+    register(api: AllBotPluginApi) {
       if (api.registrationMode === "cli-metadata") {
         registerCliMetadata?.(api);
         return;
@@ -453,7 +453,7 @@ type ChatChannelThreadingReplyModeOptions<TResolvedAccount> =
   | { topLevelReplyToMode: string }
   | {
       scopedAccountReplyToMode: {
-        resolveAccount: (cfg: KaijiBotConfig, accountId?: string | null) => TResolvedAccount;
+        resolveAccount: (cfg: AllBotConfig, accountId?: string | null) => TResolvedAccount;
         resolveReplyToMode: (
           account: TResolvedAccount,
           chatType?: string | null,

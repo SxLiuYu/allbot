@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { mergeMissing } from "../../../config/legacy.shared.js";
 import {
   loadPluginManifestRegistry,
@@ -254,7 +254,7 @@ function normalizeLegacyWebSearchConfigRecord<T extends JsonRecord>(
 }
 
 export function resolvePluginWebSearchConfig(
-  config: KaijiBotConfig | undefined,
+  config: AllBotConfig | undefined,
   pluginId: string,
 ): Record<string, unknown> | undefined {
   const pluginConfig = config?.plugins?.entries?.[pluginId]?.config;

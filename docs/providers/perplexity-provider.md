@@ -25,13 +25,13 @@ This page covers the Perplexity **provider** setup. For the Perplexity
 1. Set the API key:
 
 ```bash
-kaijibot configure --section web
+allbot configure --section web
 ```
 
 Or set it directly:
 
 ```bash
-kaijibot config set plugins.entries.perplexity.config.webSearch.apiKey "pplx-xxxxxxxxxxxx"
+allbot config set plugins.entries.perplexity.config.webSearch.apiKey "pplx-xxxxxxxxxxxx"
 ```
 
 2. The agent will automatically use Perplexity for web searches when configured.
@@ -59,4 +59,4 @@ When using the native Perplexity API (`pplx-` key), searches support:
 
 If the Gateway runs as a daemon (launchd/systemd), make sure
 `PERPLEXITY_API_KEY` is available to that process (for example, in
-`~/.kaijibot/.env` or via `env.shellEnv`).
+`~/.allbot/.env` or via `env.shellEnv`).

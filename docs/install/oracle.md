@@ -1,15 +1,15 @@
 ---
-summary: "Host KaijiBot on Oracle Cloud's Always Free ARM tier"
+summary: "Host AllBot on Oracle Cloud's Always Free ARM tier"
 read_when:
-  - Setting up KaijiBot on Oracle Cloud
-  - Looking for free VPS hosting for KaijiBot
-  - Want 24/7 KaijiBot on a small server
+  - Setting up AllBot on Oracle Cloud
+  - Looking for free VPS hosting for AllBot
+  - Want 24/7 AllBot on a small server
 title: "Oracle Cloud"
 ---
 
 # Oracle Cloud
 
-Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up to 4 OCPU, 24 GB RAM, 200 GB storage) at no cost.
+Run a persistent AllBot Gateway on Oracle Cloud's **Always Free** ARM tier (up to 4 OCPU, 24 GB RAM, 200 GB storage) at no cost.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
     1. Log into [Oracle Cloud Console](https://cloud.oracle.com/).
     2. Navigate to **Compute > Instances > Create Instance**.
     3. Configure:
-       - **Name:** `kaijibot`
+       - **Name:** `allbot`
        - **Image:** Ubuntu 24.04 (aarch64)
        - **Shape:** `VM.Standard.A1.Flex` (Ampere ARM)
        - **OCPUs:** 2 (or up to 4)
@@ -54,7 +54,7 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
 
   <Step title="Configure user and hostname">
     ```bash
-    sudo hostnamectl set-hostname kaijibot
+    sudo hostnamectl set-hostname allbot
     sudo passwd ubuntu
     sudo loginctl enable-linger ubuntu
     ```
@@ -66,17 +66,17 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
   <Step title="Install Tailscale">
     ```bash
     curl -fsSL https://tailscale.com/install.sh | sh
-    sudo tailscale up --ssh --hostname=kaijibot
+    sudo tailscale up --ssh --hostname=allbot
     ```
 
-    From now on, connect via Tailscale: `ssh ubuntu@kaijibot`.
+    From now on, connect via Tailscale: `ssh ubuntu@allbot`.
 
   </Step>
 
-  <Step title="Install KaijiBot">
+  <Step title="Install AllBot">
     ```bash
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install && pnpm build
     source ~/.bashrc
     ```
@@ -89,13 +89,13 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
     Use token auth with Tailscale Serve for secure remote access.
 
     ```bash
-    kaijibot config set gateway.bind loopback
-    kaijibot config set gateway.auth.mode token
-    kaijibot doctor --generate-gateway-token
-    kaijibot config set gateway.tailscale.mode serve
-    kaijibot config set gateway.trustedProxies '["127.0.0.1"]'
+    allbot config set gateway.bind loopback
+    allbot config set gateway.auth.mode token
+    allbot doctor --generate-gateway-token
+    allbot config set gateway.tailscale.mode serve
+    allbot config set gateway.trustedProxies '["127.0.0.1"]'
 
-    systemctl --user restart kaijibot-gateway.service
+    systemctl --user restart allbot-gateway.service
     ```
 
     `gateway.trustedProxies=["127.0.0.1"]` here is only for the local Tailscale Serve proxy's forwarded-IP/local-client handling. It is **not** `gateway.auth.mode: "trusted-proxy"`. Diff viewer routes keep fail-closed behavior in this setup: raw `127.0.0.1` viewer requests without forwarded proxy headers can return `Diff not found`. Use `mode=file` / `mode=both` for attachments, or intentionally enable remote viewers and set `plugins.entries.diffs.config.viewerBaseUrl` (or pass a proxy `baseUrl`) if you need shareable viewer links.
@@ -116,8 +116,8 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
 
   <Step title="Verify">
     ```bash
-    kaijibot --version
-    systemctl --user status kaijibot-gateway.service
+    allbot --version
+    systemctl --user status allbot-gateway.service
     tailscale serve status
     curl http://localhost:18789
     ```
@@ -125,7 +125,7 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
     Access the Control UI from any device on your tailnet:
 
     ```
-    https://kaijibot.<tailnet-name>.ts.net/
+    https://allbot.<tailnet-name>.ts.net/
     ```
 
     Replace `<tailnet-name>` with your tailnet name (visible in `tailscale status`).
@@ -138,7 +138,7 @@ Run a persistent KaijiBot Gateway on Oracle Cloud's **Always Free** ARM tier (up
 If Tailscale Serve is not working, use an SSH tunnel from your local machine:
 
 ```bash
-ssh -L 18789:127.0.0.1:18789 ubuntu@kaijibot
+ssh -L 18789:127.0.0.1:18789 ubuntu@allbot
 ```
 
 Then open `http://localhost:18789`.
@@ -147,9 +147,9 @@ Then open `http://localhost:18789`.
 
 **Instance creation fails ("Out of capacity")** -- Free tier ARM instances are popular. Try a different availability domain or retry during off-peak hours.
 
-**Tailscale will not connect** -- Run `sudo tailscale up --ssh --hostname=kaijibot --reset` to re-authenticate.
+**Tailscale will not connect** -- Run `sudo tailscale up --ssh --hostname=allbot --reset` to re-authenticate.
 
-**Gateway will not start** -- Run `kaijibot doctor --non-interactive` and check logs with `journalctl --user -u kaijibot-gateway.service -n 50`.
+**Gateway will not start** -- Run `allbot doctor --non-interactive` and check logs with `journalctl --user -u allbot-gateway.service -n 50`.
 
 **ARM binary issues** -- Most npm packages work on ARM64. For native binaries, look for `linux-arm64` or `aarch64` releases. Verify architecture with `uname -m`.
 
@@ -157,4 +157,4 @@ Then open `http://localhost:18789`.
 
 - [Channels](/channels) -- connect Telegram, WhatsApp, Discord, and more
 - [Gateway configuration](/gateway/configuration) -- all config options
-- [Updating](/install/updating) -- keep KaijiBot up to date
+- [Updating](/install/updating) -- keep AllBot up to date

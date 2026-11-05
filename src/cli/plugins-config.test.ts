@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setPluginEnabledInConfig } from "./plugins-config.js";
 
 describe("setPluginEnabledInConfig", () => {
@@ -10,7 +10,7 @@ describe("setPluginEnabledInConfig", () => {
           alpha: { enabled: false, custom: "x" },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const next = setPluginEnabledInConfig(config, "alpha", true);
 
@@ -21,7 +21,7 @@ describe("setPluginEnabledInConfig", () => {
   });
 
   it("creates a plugin entry when it does not exist", () => {
-    const config = {} as KaijiBotConfig;
+    const config = {} as AllBotConfig;
 
     const next = setPluginEnabledInConfig(config, "beta", false);
 
@@ -45,7 +45,7 @@ describe("setPluginEnabledInConfig", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const disabled = setPluginEnabledInConfig(config, "feishu", false);
     expect(disabled.channels?.feishu).toEqual({

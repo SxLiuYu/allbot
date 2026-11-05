@@ -9,7 +9,7 @@ import { createTrackedTempDirs } from "../test-utils/tracked-temp-dirs.js";
 const tempDirs = createTrackedTempDirs();
 
 async function makeTempDir(label: string): Promise<string> {
-  return await tempDirs.make(`kaijibot-${label}-`);
+  return await tempDirs.make(`allbot-${label}-`);
 }
 
 async function makeFakeGitRepo(
@@ -180,7 +180,7 @@ describe("git commit resolution", () => {
     );
   });
 
-  it("does not walk out of the kaijibot package into a host repo", async () => {
+  it("does not walk out of the allbot package into a host repo", async () => {
     const temp = await makeTempDir("git-commit-package-boundary");
     const hostRepo = path.join(temp, "host");
     await fs.mkdir(hostRepo, { recursive: true });
@@ -193,11 +193,11 @@ describe("git commit resolution", () => {
       { cwd: hostRepo },
     );
 
-    const packageRoot = path.join(hostRepo, "node_modules", "kaijibot");
+    const packageRoot = path.join(hostRepo, "node_modules", "allbot");
     await fs.mkdir(path.join(packageRoot, "dist"), { recursive: true });
     await fs.writeFile(
       path.join(packageRoot, "package.json"),
-      JSON.stringify({ name: "kaijibot", version: "2026.3.10" }),
+      JSON.stringify({ name: "allbot", version: "2026.3.10" }),
       "utf-8",
     );
     const moduleUrl = pathToFileURL(path.join(packageRoot, "dist", "entry.js")).href;

@@ -22,7 +22,7 @@ import type { ResolvedGatewayAuth } from "./auth.js";
 import { sendJson } from "./http-common.js";
 import { handleGatewayPostJsonEndpoint } from "./http-endpoint-helpers.js";
 import {
-  KAIJIBOT_MODEL_ID,
+  ALLBOT_MODEL_ID,
   getHeader,
   resolveAgentIdForRequest,
   resolveAgentIdFromModel,
@@ -239,10 +239,10 @@ export async function handleOpenAiEmbeddingsHttpRequest(
   }
 
   const cfg = loadConfig();
-  if (requestModel !== KAIJIBOT_MODEL_ID && !resolveAgentIdFromModel(requestModel, cfg)) {
+  if (requestModel !== ALLBOT_MODEL_ID && !resolveAgentIdFromModel(requestModel, cfg)) {
     sendJson(res, 400, {
       error: {
-        message: "Invalid `model`. Use `kaijibot` or `kaijibot/<agentId>`.",
+        message: "Invalid `model`. Use `allbot` or `allbot/<agentId>`.",
         type: "invalid_request_error",
       },
     });
@@ -272,7 +272,7 @@ export async function handleOpenAiEmbeddingsHttpRequest(
   const memorySearch = resolveMemorySearchConfig(cfg, agentId);
   const configuredProvider = memorySearch?.provider ?? "openai";
   const overrideModel =
-    normalizeOptionalString(getHeader(req, "x-kaijibot-model")) ||
+    normalizeOptionalString(getHeader(req, "x-allbot-model")) ||
     normalizeOptionalString(memorySearch?.model) ||
     "";
   const target = resolveEmbeddingsTarget({

@@ -13,8 +13,8 @@ import {
   resolveMemorySearchConfig,
   resolveSessionAgentId,
   type AnyAgentTool,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-runtime-core";
 import { Type } from "typebox";
 import { localDateStr } from "./local-date.js";
 import { MemoryIndexManager } from "./memory-index.js";
@@ -1060,7 +1060,7 @@ export { isTidyEnabled };
 // ---------------------------------------------------------------------------
 
 export function createMemoryTidyTool(options: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentSessionKey?: string;
 }): AnyAgentTool | null {
   const cfg = options.config;
@@ -1096,7 +1096,7 @@ export function createMemoryTidyTool(options: {
       if (!generateTextInit) {
         generateTextInit = true;
         try {
-          const sdkModule = await import("kaijibot/plugin-sdk/generate-text");
+          const sdkModule = await import("allbot/plugin-sdk/generate-text");
           const createStandaloneGenerateText = sdkModule.createStandaloneGenerateText;
           generateTextFn = await createStandaloneGenerateText(cfg);
         } catch {

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { resolveDefaultAgentId } from "../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import type { SessionScope } from "../config/sessions.js";
 import { normalizeAgentId, normalizeMainKey } from "../routing/session-key.js";
@@ -26,7 +26,7 @@ function listExistingAgentIdsFromDisk(): string[] {
   }
 }
 
-function listConfiguredAgentIds(cfg: KaijiBotConfig): string[] {
+function listConfiguredAgentIds(cfg: AllBotConfig): string[] {
   const ids = new Set<string>();
   const defaultId = normalizeAgentId(resolveDefaultAgentId(cfg));
   ids.add(defaultId);
@@ -48,7 +48,7 @@ function listConfiguredAgentIds(cfg: KaijiBotConfig): string[] {
     : sorted;
 }
 
-export function listGatewayAgentsBasic(cfg: KaijiBotConfig): {
+export function listGatewayAgentsBasic(cfg: AllBotConfig): {
   defaultId: string;
   mainKey: string;
   scope: SessionScope;

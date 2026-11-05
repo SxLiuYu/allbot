@@ -1,6 +1,6 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   applyAgentBindings,
   applyAgentConfig,
@@ -11,7 +11,7 @@ import {
 
 describe("agents helpers", () => {
   it("buildAgentSummaries includes default + configured agents", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           workspace: "/main-ws",
@@ -57,7 +57,7 @@ describe("agents helpers", () => {
   });
 
   it("applyAgentConfig merges updates", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [{ id: "work", workspace: "/old-ws", model: "anthropic/claude" }],
       },
@@ -78,7 +78,7 @@ describe("agents helpers", () => {
   });
 
   it("applyAgentBindings skips duplicates and reports conflicts", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       bindings: [
         {
           agentId: "main",
@@ -109,7 +109,7 @@ describe("agents helpers", () => {
   });
 
   it("applyAgentBindings upgrades channel-only binding to account-specific binding for same agent", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       bindings: [
         {
           agentId: "main",
@@ -137,7 +137,7 @@ describe("agents helpers", () => {
   });
 
   it("applyAgentBindings treats role-based bindings as distinct routes", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       bindings: [
         {
           agentId: "main",
@@ -168,7 +168,7 @@ describe("agents helpers", () => {
   });
 
   it("removeAgentBindings does not remove role-based bindings when removing channel-level routes", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       bindings: [
         {
           agentId: "main",
@@ -217,7 +217,7 @@ describe("agents helpers", () => {
   });
 
   it("pruneAgentConfig removes agent, bindings, and allowlist entries", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           { id: "work", default: true, workspace: "/work-ws" },

@@ -19,27 +19,27 @@ const mocks = vi.hoisted(() => {
   };
   return {
     runtime,
-    serveKaijiBotChannelMcp: vi.fn(),
+    serveAllBotChannelMcp: vi.fn(),
   };
 });
 
 const defaultRuntime = mocks.runtime;
 const mockLog = defaultRuntime.log;
 const mockError = defaultRuntime.error;
-const serveKaijiBotChannelMcp = mocks.serveKaijiBotChannelMcp;
+const serveAllBotChannelMcp = mocks.serveAllBotChannelMcp;
 
 vi.mock("../runtime.js", () => ({
   defaultRuntime: mocks.runtime,
 }));
 
 vi.mock("../mcp/channel-server.js", () => ({
-  serveKaijiBotChannelMcp: mocks.serveKaijiBotChannelMcp,
+  serveAllBotChannelMcp: mocks.serveAllBotChannelMcp,
 }));
 
 const tempDirs: string[] = [];
 
 async function createWorkspace(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-cli-mcp-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-cli-mcp-"));
   tempDirs.push(dir);
   return dir;
 }
@@ -69,7 +69,7 @@ describe("mcp cli", () => {
   });
 
   it("sets and shows a configured MCP server", async () => {
-    await withTempHome("kaijibot-cli-mcp-home-", async () => {
+    await withTempHome("allbot-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -83,7 +83,7 @@ describe("mcp cli", () => {
   });
 
   it("fails when removing an unknown MCP server", async () => {
-    await withTempHome("kaijibot-cli-mcp-home-", async () => {
+    await withTempHome("allbot-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
 
@@ -95,7 +95,7 @@ describe("mcp cli", () => {
   });
 
   it("starts the channel bridge with parsed serve options", async () => {
-    await withTempHome("kaijibot-cli-mcp-home-", async () => {
+    await withTempHome("allbot-cli-mcp-home-", async () => {
       const workspaceDir = await createWorkspace();
       const tokenFile = path.join(workspaceDir, "gateway.token");
       vi.spyOn(process, "cwd").mockReturnValue(workspaceDir);
@@ -113,7 +113,7 @@ describe("mcp cli", () => {
         "--verbose",
       ]);
 
-      expect(serveKaijiBotChannelMcp).toHaveBeenCalledWith({
+      expect(serveAllBotChannelMcp).toHaveBeenCalledWith({
         gatewayUrl: "ws://127.0.0.1:18789",
         gatewayToken: "secret-token",
         gatewayPassword: undefined,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveGatewayTokenForDriftCheck } from "./gateway-token-drift.js";
 
 describe("resolveGatewayTokenForDriftCheck", () => {
@@ -12,9 +12,9 @@ describe("resolveGatewayTokenForDriftCheck", () => {
             token: "config-token",
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_TOKEN: "env-token",
       } as NodeJS.ProcessEnv,
     });
 
@@ -36,7 +36,7 @@ describe("resolveGatewayTokenForDriftCheck", () => {
             token: { source: "env", provider: "default", id: "SERVICE_GATEWAY_TOKEN" },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       env: {
         SERVICE_GATEWAY_TOKEN: "service-token",
       } as NodeJS.ProcessEnv,
@@ -64,7 +64,7 @@ describe("resolveGatewayTokenForDriftCheck", () => {
               token: "remote-token",
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         env: {} as NodeJS.ProcessEnv,
       }),
     ).rejects.toThrow(/gateway\.auth\.token/i);
@@ -84,7 +84,7 @@ describe("resolveGatewayTokenForDriftCheck", () => {
             token: { source: "env", provider: "default", id: "MISSING_LOCAL_TOKEN" },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       env: {} as NodeJS.ProcessEnv,
     });
     expect(token).toBeUndefined();
@@ -98,9 +98,9 @@ describe("resolveGatewayTokenForDriftCheck", () => {
             password: "config-password",
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       env: {
-        KAIJIBOT_GATEWAY_PASSWORD: "env-password",
+        ALLBOT_GATEWAY_PASSWORD: "env-password",
       } as NodeJS.ProcessEnv,
     });
 
@@ -121,9 +121,9 @@ describe("resolveGatewayTokenForDriftCheck", () => {
               token: { source: "env", provider: "default", id: "MISSING_LOCAL_TOKEN" },
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         env: {
-          KAIJIBOT_GATEWAY_PASSWORD: "env-password",
+          ALLBOT_GATEWAY_PASSWORD: "env-password",
         } as NodeJS.ProcessEnv,
       }),
     ).rejects.toThrow(/gateway\.auth\.token/i);

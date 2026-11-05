@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { resolveGatewayProbeAuth as resolveStatusGatewayProbeAuth } from "../commands/status.gateway-probe.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveGatewayAuth } from "./auth.js";
 import { resolveGatewayCredentialsFromConfig } from "./credentials.js";
 import { resolveGatewayProbeAuth } from "./probe-auth.js";
@@ -14,17 +14,17 @@ type ExpectedCredentialSet = {
 
 type TestCase = {
   name: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   expected: ExpectedCredentialSet;
 };
 
 const gatewayEnv = {
-  KAIJIBOT_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
-  KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+  ALLBOT_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
+  ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
 } as NodeJS.ProcessEnv;
 
-function makeRemoteGatewayConfig(remote: { token?: string; password?: string }): KaijiBotConfig {
+function makeRemoteGatewayConfig(remote: { token?: string; password?: string }): AllBotConfig {
   return {
     gateway: {
       mode: "remote",
@@ -34,14 +34,14 @@ function makeRemoteGatewayConfig(remote: { token?: string; password?: string }):
         password: "local-password", // pragma: allowlist secret
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function withGatewayAuthEnv<T>(env: NodeJS.ProcessEnv, fn: () => T): T {
   const keys = [
-    "KAIJIBOT_GATEWAY_TOKEN",
-    "KAIJIBOT_GATEWAY_PASSWORD",
-    "KAIJIBOT_SERVICE_KIND",
+    "ALLBOT_GATEWAY_TOKEN",
+    "ALLBOT_GATEWAY_PASSWORD",
+    "ALLBOT_SERVICE_KIND",
   ] as const;
   const previous = new Map<string, string | undefined>();
   for (const key of keys) {
@@ -79,10 +79,10 @@ describe("gateway credential precedence coverage", () => {
             password: "config-password", // pragma: allowlist secret
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
-        KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        ALLBOT_GATEWAY_TOKEN: "env-token", // pragma: allowlist secret
+        ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
       } as NodeJS.ProcessEnv,
       expected: {
         call: { token: "env-token", password: "env-password" }, // pragma: allowlist secret
@@ -128,11 +128,11 @@ describe("gateway credential precedence coverage", () => {
             password: "config-password", // pragma: allowlist secret
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
-        KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
-        KAIJIBOT_SERVICE_KIND: "gateway",
+        ALLBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        ALLBOT_SERVICE_KIND: "gateway",
       } as NodeJS.ProcessEnv,
       expected: {
         call: { token: "config-token", password: "env-password" }, // pragma: allowlist secret

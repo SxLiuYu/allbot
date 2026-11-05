@@ -30,7 +30,7 @@ describe("shared/entry-status", () => {
         requires: {
           bins: ["bun"],
           anyBins: ["ffmpeg", "sox"],
-          env: ["KAIJIBOT_TOKEN"],
+          env: ["ALLBOT_TOKEN"],
           config: ["gateway.bind"],
         },
         os: ["darwin"],
@@ -54,14 +54,14 @@ describe("shared/entry-status", () => {
       required: {
         bins: ["bun"],
         anyBins: ["ffmpeg", "sox"],
-        env: ["KAIJIBOT_TOKEN"],
+        env: ["ALLBOT_TOKEN"],
         config: ["gateway.bind"],
         os: ["darwin"],
       },
       missing: {
         bins: [],
         anyBins: [],
-        env: ["KAIJIBOT_TOKEN"],
+        env: ["ALLBOT_TOKEN"],
         config: [],
         os: ["darwin"],
       },

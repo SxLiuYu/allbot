@@ -1,7 +1,7 @@
 import {
   createModelCatalogPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildHuggingfaceModelDefinition,
   HUGGINGFACE_BASE_URL,
@@ -12,7 +12,7 @@ export const HUGGINGFACE_DEFAULT_MODEL_REF = "huggingface/deepseek-ai/DeepSeek-R
 
 const huggingfacePresetAppliers = createModelCatalogPresetAppliers({
   primaryModelRef: HUGGINGFACE_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => ({
+  resolveParams: (_cfg: AllBotConfig) => ({
     providerId: "huggingface",
     api: "openai-completions",
     baseUrl: HUGGINGFACE_BASE_URL,
@@ -21,10 +21,10 @@ const huggingfacePresetAppliers = createModelCatalogPresetAppliers({
   }),
 });
 
-export function applyHuggingfaceProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyHuggingfaceProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return huggingfacePresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyHuggingfaceConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyHuggingfaceConfig(cfg: AllBotConfig): AllBotConfig {
   return huggingfacePresetAppliers.applyConfig(cfg);
 }

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "@kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "@allbot/plugin-sdk/config-runtime";
 import { isRecord } from "./tool-config-shared.js";
 
 type JsonRecord = Record<string, unknown>;
@@ -10,13 +10,13 @@ function cloneRecord<T extends JsonRecord | undefined>(value: T): T {
   return { ...value } as T;
 }
 
-export function resolveLegacyXSearchConfig(config?: KaijiBotConfig): JsonRecord | undefined {
+export function resolveLegacyXSearchConfig(config?: AllBotConfig): JsonRecord | undefined {
   const web = config?.tools?.web as Record<string, unknown> | undefined;
   const xSearch = web?.x_search;
   return isRecord(xSearch) ? cloneRecord(xSearch) : undefined;
 }
 
-export function resolvePluginXSearchConfig(config?: KaijiBotConfig): JsonRecord | undefined {
+export function resolvePluginXSearchConfig(config?: AllBotConfig): JsonRecord | undefined {
   const pluginConfig = config?.plugins?.entries?.xai?.config;
   if (!isRecord(pluginConfig?.xSearch)) {
     return undefined;
@@ -24,7 +24,7 @@ export function resolvePluginXSearchConfig(config?: KaijiBotConfig): JsonRecord 
   return cloneRecord(pluginConfig.xSearch);
 }
 
-export function resolveEffectiveXSearchConfig(config?: KaijiBotConfig): JsonRecord | undefined {
+export function resolveEffectiveXSearchConfig(config?: AllBotConfig): JsonRecord | undefined {
   const legacy = resolveLegacyXSearchConfig(config);
   const pluginOwned = resolvePluginXSearchConfig(config);
   if (!legacy) {
@@ -40,7 +40,7 @@ export function resolveEffectiveXSearchConfig(config?: KaijiBotConfig): JsonReco
 }
 
 export function setPluginXSearchConfigValue(
-  configTarget: KaijiBotConfig,
+  configTarget: AllBotConfig,
   key: string,
   value: unknown,
 ): void {

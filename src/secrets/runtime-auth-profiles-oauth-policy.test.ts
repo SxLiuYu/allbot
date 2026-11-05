@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { prepareSecretsRuntimeSnapshot } from "./runtime.js";
 
-function withAuthProfileMode(mode: "api_key" | "oauth" | "token"): KaijiBotConfig {
+function withAuthProfileMode(mode: "api_key" | "oauth" | "token"): AllBotConfig {
   return {
     auth: {
       profiles: {
@@ -18,7 +18,7 @@ function withAuthProfileMode(mode: "api_key" | "oauth" | "token"): KaijiBotConfi
         default: { source: "env" },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("secrets runtime oauth auth-profile SecretRef policy", () => {
@@ -40,7 +40,7 @@ describe("secrets runtime oauth auth-profile SecretRef policy", () => {
         env: { ANTHROPIC_TOKEN: "token-value" } as NodeJS.ProcessEnv,
         loadAuthStore: () => store,
         loadablePluginOrigins: new Map(),
-        agentDirs: ["/tmp/kaijibot-secrets-runtime-main"],
+        agentDirs: ["/tmp/allbot-secrets-runtime-main"],
       }),
     ).rejects.toThrow(/OAuth \+ SecretRef is not supported/i);
   });
@@ -62,7 +62,7 @@ describe("secrets runtime oauth auth-profile SecretRef policy", () => {
       env: { ANTHROPIC_TOKEN: "token-value" } as NodeJS.ProcessEnv,
       loadAuthStore: () => store,
       loadablePluginOrigins: new Map(),
-      agentDirs: ["/tmp/kaijibot-secrets-runtime-main"],
+      agentDirs: ["/tmp/allbot-secrets-runtime-main"],
     });
 
     const resolved = snapshot.authStores[0]?.store.profiles["anthropic:default"];

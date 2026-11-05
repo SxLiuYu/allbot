@@ -1,7 +1,7 @@
 ---
-summary: "Use Z.AI (GLM models) with KaijiBot"
+summary: "Use Z.AI (GLM models) with AllBot"
 read_when:
-  - You want Z.AI / GLM models in KaijiBot
+  - You want Z.AI / GLM models in AllBot
   - You need a simple ZAI_API_KEY setup
 title: "Z.AI"
 ---
@@ -9,26 +9,26 @@ title: "Z.AI"
 # Z.AI
 
 Z.AI is the API platform for **GLM** models. It provides REST APIs for GLM and uses API keys
-for authentication. Create your API key in the Z.AI console. KaijiBot uses the `zai` provider
+for authentication. Create your API key in the Z.AI console. AllBot uses the `zai` provider
 with a Z.AI API key.
 
 ## CLI setup
 
 ```bash
 # Generic API-key setup with endpoint auto-detection
-kaijibot onboard --auth-choice zai-api-key
+allbot onboard --auth-choice zai-api-key
 
 # Coding Plan Global, recommended for Coding Plan users
-kaijibot onboard --auth-choice zai-coding-global
+allbot onboard --auth-choice zai-coding-global
 
 # Coding Plan CN (China region), recommended for Coding Plan users
-kaijibot onboard --auth-choice zai-coding-cn
+allbot onboard --auth-choice zai-coding-cn
 
 # General API
-kaijibot onboard --auth-choice zai-global
+allbot onboard --auth-choice zai-global
 
 # General API CN (China region)
-kaijibot onboard --auth-choice zai-cn
+allbot onboard --auth-choice zai-cn
 ```
 
 ## Config snippet
@@ -40,13 +40,13 @@ kaijibot onboard --auth-choice zai-cn
 }
 ```
 
-`zai-api-key` lets KaijiBot detect the matching Z.AI endpoint from the key and
+`zai-api-key` lets AllBot detect the matching Z.AI endpoint from the key and
 apply the correct base URL automatically. Use the explicit regional choices when
 you want to force a specific Coding Plan or general API surface.
 
 ## Bundled GLM catalog
 
-KaijiBot currently seeds the bundled `zai` provider with:
+AllBot currently seeds the bundled `zai` provider with:
 
 - `glm-5.1`
 - `glm-5`

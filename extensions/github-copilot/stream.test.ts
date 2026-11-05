@@ -1,4 +1,4 @@
-import { buildCopilotDynamicHeaders } from "kaijibot/plugin-sdk/provider-stream-shared";
+import { buildCopilotDynamicHeaders } from "allbot/plugin-sdk/provider-stream-shared";
 import { describe, expect, it, vi } from "vitest";
 import { wrapCopilotAnthropicStream, wrapCopilotProviderStream } from "./stream.js";
 

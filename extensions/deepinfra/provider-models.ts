@@ -1,7 +1,7 @@
-import { fetchWithTimeout } from "kaijibot/plugin-sdk/provider-http";
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
-import manifest from "./kaijibot.plugin.json" with { type: "json" };
+import { fetchWithTimeout } from "allbot/plugin-sdk/provider-http";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
+import manifest from "./allbot.plugin.json" with { type: "json" };
 
 const log = createSubsystemLogger("deepinfra-models");
 

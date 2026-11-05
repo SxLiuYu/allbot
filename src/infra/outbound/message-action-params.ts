@@ -1,7 +1,7 @@
 import { assertMediaNotDataUrl, resolveSandboxedMediaSource } from "../../agents/sandbox-paths.js";
 import { readStringParam } from "../../agents/tools/common.js";
 import type { ChannelId, ChannelMessageActionName } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createRootScopedReadFile } from "../../infra/fs-safe.js";
 import { basenameFromMediaSource } from "../../infra/local-file-access.js";
 import {
@@ -38,7 +38,7 @@ function readAttachmentFileHint(args: Record<string, unknown>): string | undefin
 }
 
 function resolveAttachmentMaxBytes(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   accountId?: string | null;
 }): number | undefined {
@@ -165,7 +165,7 @@ function buildAttachmentMediaLoadOptions(params: {
 }
 
 async function hydrateAttachmentPayload(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   accountId?: string | null;
   args: Record<string, unknown>;
@@ -267,7 +267,7 @@ export async function normalizeSandboxMediaList(params: {
 }
 
 async function hydrateAttachmentActionPayload(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   accountId?: string | null;
   args: Record<string, unknown>;
@@ -303,7 +303,7 @@ async function hydrateAttachmentActionPayload(params: {
 }
 
 export async function hydrateAttachmentParamsForAction(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: ChannelId;
   accountId?: string | null;
   args: Record<string, unknown>;

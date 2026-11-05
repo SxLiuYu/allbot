@@ -18,7 +18,7 @@ import {
 } from "./install.js";
 import * as hookInstallRuntime from "./install.runtime.js";
 
-const fixtureRoot = path.join(process.cwd(), ".tmp", `kaijibot-hook-install-${randomUUID()}`);
+const fixtureRoot = path.join(process.cwd(), ".tmp", `allbot-hook-install-${randomUUID()}`);
 const sharedArchiveDir = path.join(fixtureRoot, "_archives");
 let tempDirIndex = 0;
 const sharedArchivePathByName = new Map<string, string>();
@@ -112,9 +112,9 @@ function writeHookPackManifest(params: {
   fs.writeFileSync(
     path.join(params.pkgDir, "package.json"),
     JSON.stringify({
-      name: "@kaijibot/test-hooks",
+      name: "@allbot/test-hooks",
       version: "0.0.1",
-      kaijibot: { hooks: params.hooks },
+      allbot: { hooks: params.hooks },
       ...(params.dependencies ? { dependencies: params.dependencies } : {}),
     }),
     "utf-8",
@@ -141,7 +141,7 @@ function expectPathInstallFailureContains(
   expect(result.error).toContain(snippet);
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("installHooksFromArchive", () => {
   it.each([
     {
@@ -232,7 +232,7 @@ describe.skipIf(process.env.CI)("installHooksFromPath", () => {
         "---",
         "name: one-hook",
         "description: One hook",
-        'metadata: {"kaijibot":{"events":["command:new"]}}',
+        'metadata: {"allbot":{"events":["command:new"]}}',
         "---",
         "",
         "# One Hook",
@@ -267,7 +267,7 @@ describe.skipIf(process.env.CI)("installHooksFromPath", () => {
         "---",
         "name: my-hook",
         "description: My hook",
-        'metadata: {"kaijibot":{"events":["command:new"]}}',
+        'metadata: {"allbot":{"events":["command:new"]}}',
         "---",
         "",
         "# My Hook",
@@ -294,12 +294,12 @@ describe.skipIf(process.env.CI)("installHooksFromPath", () => {
       {
         hooks: ["../outside"],
         setupLink: false,
-        expected: "kaijibot.hooks entry escapes package directory",
+        expected: "allbot.hooks entry escapes package directory",
       },
       {
         hooks: ["./linked"],
         setupLink: true,
-        expected: "kaijibot.hooks entry resolves outside package directory",
+        expected: "allbot.hooks entry resolves outside package directory",
       },
     ] as const;
 
@@ -366,7 +366,7 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
 
     try {
       const result = await installHooksFromNpmSpec({
-        spec: "@kaijibot/test-hooks@0.0.1",
+        spec: "@allbot/test-hooks@0.0.1",
       });
 
       expect(result.ok).toBe(true);
@@ -393,8 +393,8 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
           code: 0,
           stdout: JSON.stringify([
             {
-              id: "@kaijibot/test-hooks@0.0.1",
-              name: "@kaijibot/test-hooks",
+              id: "@allbot/test-hooks@0.0.1",
+              name: "@allbot/test-hooks",
               version: "0.0.1",
               filename: packedName,
               integrity: "sha512-hook-test",
@@ -412,7 +412,7 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
 
     const hooksDir = path.join(stateDir, "hooks");
     const result = await installHooksFromNpmSpec({
-      spec: "@kaijibot/test-hooks@0.0.1",
+      spec: "@allbot/test-hooks@0.0.1",
       hooksDir,
       logger: { info: () => {}, warn: () => {} },
     });
@@ -421,13 +421,13 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
       return;
     }
     expect(result.hookPackId).toBe("test-hooks");
-    expect(result.npmResolution?.resolvedSpec).toBe("@kaijibot/test-hooks@0.0.1");
+    expect(result.npmResolution?.resolvedSpec).toBe("@allbot/test-hooks@0.0.1");
     expect(result.npmResolution?.integrity).toBe("sha512-hook-test");
     expect(fs.existsSync(path.join(result.targetDir, "hooks", "one-hook", "HOOK.md"))).toBe(true);
 
     expectSingleNpmPackIgnoreScriptsCall({
       calls: run.mock.calls,
-      expectedSpec: "@kaijibot/test-hooks@0.0.1",
+      expectedSpec: "@allbot/test-hooks@0.0.1",
     });
 
     expect(packTmpDir).not.toBe("");
@@ -437,8 +437,8 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
   it("aborts when integrity drift callback rejects the fetched artifact", async () => {
     const run = vi.mocked(runCommandWithTimeout);
     mockNpmPackMetadataResult(run, {
-      id: "@kaijibot/test-hooks@0.0.1",
-      name: "@kaijibot/test-hooks",
+      id: "@allbot/test-hooks@0.0.1",
+      name: "@allbot/test-hooks",
       version: "0.0.1",
       filename: "test-hooks-0.0.1.tgz",
       integrity: "sha512-new",
@@ -447,7 +447,7 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
 
     const onIntegrityDrift = vi.fn(async () => false);
     const result = await installHooksFromNpmSpec({
-      spec: "@kaijibot/test-hooks@0.0.1",
+      spec: "@allbot/test-hooks@0.0.1",
       expectedIntegrity: "sha512-old",
       onIntegrityDrift,
     });
@@ -464,8 +464,8 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
 
     const run = vi.mocked(runCommandWithTimeout);
     mockNpmPackMetadataResult(run, {
-      id: "@kaijibot/test-hooks@0.0.2-beta.1",
-      name: "@kaijibot/test-hooks",
+      id: "@allbot/test-hooks@0.0.2-beta.1",
+      name: "@allbot/test-hooks",
       version: "0.0.2-beta.1",
       filename: "test-hooks-0.0.2-beta.1.tgz",
       integrity: "sha512-beta",
@@ -473,13 +473,13 @@ describe.skipIf(process.env.CI)("installHooksFromNpmSpec", () => {
     });
 
     const result = await installHooksFromNpmSpec({
-      spec: "@kaijibot/test-hooks",
+      spec: "@allbot/test-hooks",
       logger: { info: () => {}, warn: () => {} },
     });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toContain("prerelease version 0.0.2-beta.1");
-      expect(result.error).toContain('"@kaijibot/test-hooks@beta"');
+      expect(result.error).toContain('"@allbot/test-hooks@beta"');
     }
   });
 });

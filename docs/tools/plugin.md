@@ -1,5 +1,5 @@
 ---
-summary: "Install, configure, and manage KaijiBot plugins"
+summary: "Install, configure, and manage AllBot plugins"
 read_when:
   - Installing or configuring plugins
   - Understanding plugin discovery and load rules
@@ -10,10 +10,10 @@ sidebarTitle: "Install and Configure"
 
 # Plugins
 
-Plugins extend KaijiBot with new capabilities: channels, model providers,
+Plugins extend AllBot with new capabilities: channels, model providers,
 tools, skills, speech, realtime transcription, realtime voice,
 media-understanding, image generation, video generation, web fetch, web
-search, and more. Some plugins are **core** (shipped with KaijiBot), others
+search, and more. Some plugins are **core** (shipped with AllBot), others
 are **external** (published on npm by the community).
 
 ## Quick start
@@ -21,25 +21,25 @@ are **external** (published on npm by the community).
 <Steps>
   <Step title="See what is loaded">
     ```bash
-    kaijibot plugins list
+    allbot plugins list
     ```
   </Step>
 
   <Step title="Install a plugin">
     ```bash
     # From npm
-    kaijibot plugins install @kaijibot/voice-call
+    allbot plugins install @allbot/voice-call
 
     # From a local directory or archive
-    kaijibot plugins install ./my-plugin
-    kaijibot plugins install ./my-plugin.tgz
+    allbot plugins install ./my-plugin
+    allbot plugins install ./my-plugin.tgz
     ```
 
   </Step>
 
   <Step title="Restart the Gateway">
     ```bash
-    kaijibot gateway restart
+    allbot gateway restart
     ```
 
     Then configure under `plugins.entries.\<id\>.config` in your config file.
@@ -50,7 +50,7 @@ are **external** (published on npm by the community).
 If you prefer chat-native control, enable `commands.plugins: true` and use:
 
 ```text
-/plugin install clawhub:@kaijibot/voice-call
+/plugin install clawhub:@allbot/voice-call
 /plugin show voice-call
 /plugin enable voice-call
 ```
@@ -59,20 +59,20 @@ The install path uses the same resolver as the CLI: local path/archive, explicit
 `clawhub:<pkg>`, or bare package spec (ClawHub first, then npm fallback).
 
 If config is invalid, install normally fails closed and points you at
-`kaijibot doctor --fix`. The only recovery exception is a narrow bundled-plugin
+`allbot doctor --fix`. The only recovery exception is a narrow bundled-plugin
 reinstall path for plugins that opt into
-`kaijibot.install.allowInvalidConfigRecovery`.
+`allbot.install.allowInvalidConfigRecovery`.
 
 ## Plugin types
 
-KaijiBot recognizes two plugin formats:
+AllBot recognizes two plugin formats:
 
 | Format     | How it works                                                       | Examples                                               |
 | ---------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
-| **Native** | `kaijibot.plugin.json` + runtime module; executes in-process       | Official plugins, community npm packages               |
-| **Bundle** | Codex/Claude/Cursor-compatible layout; mapped to KaijiBot features | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
+| **Native** | `allbot.plugin.json` + runtime module; executes in-process       | Official plugins, community npm packages               |
+| **Bundle** | Codex/Claude/Cursor-compatible layout; mapped to AllBot features | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
 
-Both show up under `kaijibot plugins list`. See [Plugin Bundles](/plugins/bundles) for bundle details.
+Both show up under `allbot plugins list`. See [Plugin Bundles](/plugins/bundles) for bundle details.
 
 If you are writing a native plugin, start with [Building Plugins](/plugins/building-plugins)
 and the [Plugin SDK Overview](/plugins/sdk-overview).
@@ -83,14 +83,14 @@ and the [Plugin SDK Overview](/plugins/sdk-overview).
 
 | Plugin          | Package                | Docs                                 |
 | --------------- | ---------------------- | ------------------------------------ |
-| Matrix          | `@kaijibot/matrix`     | [Matrix](/channels/matrix)           |
-| Microsoft Teams | `@kaijibot/msteams`    | [Microsoft Teams](/channels/msteams) |
-| Nostr           | `@kaijibot/nostr`      | [Nostr](/channels/nostr)             |
-| Voice Call      | `@kaijibot/voice-call` | [Voice Call](/plugins/voice-call)    |
-| Zalo            | `@kaijibot/zalo`       | [Zalo](/channels/zalo)               |
-| Zalo Personal   | `@kaijibot/zalouser`   | [Zalo Personal](/plugins/zalouser)   |
+| Matrix          | `@allbot/matrix`     | [Matrix](/channels/matrix)           |
+| Microsoft Teams | `@allbot/msteams`    | [Microsoft Teams](/channels/msteams) |
+| Nostr           | `@allbot/nostr`      | [Nostr](/channels/nostr)             |
+| Voice Call      | `@allbot/voice-call` | [Voice Call](/plugins/voice-call)    |
+| Zalo            | `@allbot/zalo`       | [Zalo](/channels/zalo)               |
+| Zalo Personal   | `@allbot/zalouser`   | [Zalo Personal](/plugins/zalouser)   |
 
-### Core (shipped with KaijiBot)
+### Core (shipped with AllBot)
 
 <AccordionGroup>
   <Accordion title="Model providers (enabled by default)">
@@ -111,7 +111,7 @@ and the [Plugin SDK Overview](/plugins/sdk-overview).
   </Accordion>
 
   <Accordion title="Other">
-    - `browser` — bundled browser plugin for the browser tool, `kaijibot browser` CLI, `browser.request` gateway method, browser runtime, and default browser control service (enabled by default; disable before replacing it)
+    - `browser` — bundled browser plugin for the browser tool, `allbot browser` CLI, `browser.request` gateway method, browser runtime, and default browser control service (enabled by default; disable before replacing it)
     - `copilot-proxy` — VS Code Copilot Proxy bridge (disabled by default)
   </Accordion>
 </AccordionGroup>
@@ -144,7 +144,7 @@ Looking for third-party plugins? See [Community Plugins](/plugins/community).
 | `entries.\<id\>` | Per-plugin toggles + config                               |
 
 Config changes **require a gateway restart**. If the Gateway is running with config
-watch + in-process restart enabled (the default `kaijibot gateway` path), that
+watch + in-process restart enabled (the default `allbot gateway` path), that
 restart is usually performed automatically a moment after the config write lands.
 
 <Accordion title="Plugin states: disabled vs missing vs invalid">
@@ -155,7 +155,7 @@ restart is usually performed automatically a moment after the config write lands
 
 ## Discovery and precedence
 
-KaijiBot scans for plugins in this order (first match wins):
+AllBot scans for plugins in this order (first match wins):
 
 <Steps>
   <Step title="Config paths">
@@ -163,15 +163,15 @@ KaijiBot scans for plugins in this order (first match wins):
   </Step>
 
   <Step title="Workspace extensions">
-    `\<workspace\>/.kaijibot/<plugin-root>/*.ts` and `\<workspace\>/.kaijibot/<plugin-root>/*/index.ts`.
+    `\<workspace\>/.allbot/<plugin-root>/*.ts` and `\<workspace\>/.allbot/<plugin-root>/*/index.ts`.
   </Step>
 
   <Step title="Global extensions">
-    `~/.kaijibot/<plugin-root>/*.ts` and `~/.kaijibot/<plugin-root>/*/index.ts`.
+    `~/.allbot/<plugin-root>/*.ts` and `~/.allbot/<plugin-root>/*/index.ts`.
   </Step>
 
   <Step title="Bundled plugins">
-    Shipped with KaijiBot. Many are enabled by default (model providers, speech).
+    Shipped with AllBot. Many are enabled by default (model providers, speech).
     Others require explicit enablement.
   </Step>
 </Steps>
@@ -208,40 +208,40 @@ Some categories are exclusive (only one active at a time):
 ## CLI reference
 
 ```bash
-kaijibot plugins list                       # compact inventory
-kaijibot plugins list --enabled            # only loaded plugins
-kaijibot plugins list --verbose            # per-plugin detail lines
-kaijibot plugins list --json               # machine-readable inventory
-kaijibot plugins inspect <id>              # deep detail
-kaijibot plugins inspect <id> --json       # machine-readable
-kaijibot plugins inspect --all             # fleet-wide table
-kaijibot plugins info <id>                 # inspect alias
-kaijibot plugins doctor                    # diagnostics
+allbot plugins list                       # compact inventory
+allbot plugins list --enabled            # only loaded plugins
+allbot plugins list --verbose            # per-plugin detail lines
+allbot plugins list --json               # machine-readable inventory
+allbot plugins inspect <id>              # deep detail
+allbot plugins inspect <id> --json       # machine-readable
+allbot plugins inspect --all             # fleet-wide table
+allbot plugins info <id>                 # inspect alias
+allbot plugins doctor                    # diagnostics
 
-kaijibot plugins install <package>         # install (ClawHub first, then npm)
-kaijibot plugins install clawhub:<pkg>     # install from ClawHub only
-kaijibot plugins install <spec> --force    # overwrite existing install
-kaijibot plugins install <path>            # install from local path
-kaijibot plugins install -l <path>         # link (no copy) for dev
-kaijibot plugins install <plugin> --marketplace <source>
-kaijibot plugins install <plugin> --marketplace https://github.com/<owner>/<repo>
-kaijibot plugins install <spec> --pin      # record exact resolved npm spec
-kaijibot plugins install <spec> --dangerously-force-unsafe-install
-kaijibot plugins update <id>             # update one plugin
-kaijibot plugins update <id> --dangerously-force-unsafe-install
-kaijibot plugins update --all            # update all
-kaijibot plugins uninstall <id>          # remove config/install records
-kaijibot plugins uninstall <id> --keep-files
-kaijibot plugins marketplace list <source>
-kaijibot plugins marketplace list <source> --json
+allbot plugins install <package>         # install (ClawHub first, then npm)
+allbot plugins install clawhub:<pkg>     # install from ClawHub only
+allbot plugins install <spec> --force    # overwrite existing install
+allbot plugins install <path>            # install from local path
+allbot plugins install -l <path>         # link (no copy) for dev
+allbot plugins install <plugin> --marketplace <source>
+allbot plugins install <plugin> --marketplace https://github.com/<owner>/<repo>
+allbot plugins install <spec> --pin      # record exact resolved npm spec
+allbot plugins install <spec> --dangerously-force-unsafe-install
+allbot plugins update <id>             # update one plugin
+allbot plugins update <id> --dangerously-force-unsafe-install
+allbot plugins update --all            # update all
+allbot plugins uninstall <id>          # remove config/install records
+allbot plugins uninstall <id> --keep-files
+allbot plugins marketplace list <source>
+allbot plugins marketplace list <source> --json
 
-kaijibot plugins enable <id>
-kaijibot plugins disable <id>
+allbot plugins enable <id>
+allbot plugins disable <id>
 ```
 
-Bundled plugins ship with KaijiBot. Many are enabled by default (for example
+Bundled plugins ship with AllBot. Many are enabled by default (for example
 bundled model providers, bundled speech providers, and the bundled browser
-plugin). Other bundled plugins still need `kaijibot plugins enable <id>`.
+plugin). Other bundled plugins still need `allbot plugins enable <id>`.
 
 `--force` overwrites an existing installed plugin or hook pack in place.
 It is not supported with `--link`, which reuses the source path instead of
@@ -257,7 +257,7 @@ does not bypass plugin `before_install` policy blocks or scan-failure blocking.
 
 This CLI flag applies to plugin install/update flows only. Gateway-backed skill
 dependency installs use the matching `dangerouslyForceUnsafeInstall` request
-override instead, while `kaijibot skills install` remains the separate ClawHub
+override instead, while `allbot skills install` remains the separate ClawHub
 skill download/install flow.
 
 Compatible bundles participate in the same plugin list/inspect/enable/disable
@@ -266,7 +266,7 @@ Claude `settings.json` defaults, Claude `.lsp.json` and manifest-declared
 `lspServers` defaults, Cursor command-skills, and compatible Codex hook
 directories.
 
-`kaijibot plugins inspect <id>` also reports detected bundle capabilities plus
+`allbot plugins inspect <id>` also reports detected bundle capabilities plus
 supported or unsupported MCP and LSP server entries for bundle-backed plugins.
 
 Marketplace sources can be a Claude known-marketplace name from
@@ -275,7 +275,7 @@ Marketplace sources can be a Claude known-marketplace name from
 URL, or a git URL. For remote marketplaces, plugin entries must stay inside the
 cloned marketplace repo and use relative path sources only.
 
-See [`kaijibot plugins` CLI reference](/cli/plugins) for full details.
+See [`allbot plugins` CLI reference](/cli/plugins) for full details.
 
 ## Plugin API overview
 
@@ -301,7 +301,7 @@ export default definePluginEntry({
 });
 ```
 
-KaijiBot loads the entry object and calls `register(api)` during plugin
+AllBot loads the entry object and calls `register(api)` during plugin
 activation. The loader still falls back to `activate(api)` for older plugins,
 but bundled plugins and new external plugins should treat `register` as the
 public contract.

@@ -1,1 +1,1 @@
-export { isLoopbackHost } from "kaijibot/plugin-sdk/browser-config-support";
+export { isLoopbackHost } from "allbot/plugin-sdk/browser-config-support";

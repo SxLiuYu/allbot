@@ -8,7 +8,7 @@ import {
   trimBundledPluginString,
 } from "./bundled-plugin-scan.js";
 import type {
-  KaijiBotPackageManifest,
+  AllBotPackageManifest,
   PluginManifest,
   PluginManifestChannelConfig,
 } from "./manifest.js";
@@ -117,9 +117,9 @@ function loadChannelConfigSurfaceModuleSync(modulePath: string): ChannelConfigSu
 }
 
 function resolvePackageChannelMeta(
-  packageManifest: KaijiBotPackageManifest | undefined,
+  packageManifest: AllBotPackageManifest | undefined,
   channelId: string,
-): KaijiBotPackageManifest["channel"] | undefined {
+): AllBotPackageManifest["channel"] | undefined {
   const channelMeta = packageManifest?.channel;
   return channelMeta?.id?.trim() === channelId ? channelMeta : undefined;
 }
@@ -127,7 +127,7 @@ function resolvePackageChannelMeta(
 export function collectBundledChannelConfigs(params: {
   pluginDir: string;
   manifest: PluginManifest;
-  packageManifest?: KaijiBotPackageManifest;
+  packageManifest?: AllBotPackageManifest;
 }): Record<string, PluginManifestChannelConfig> | undefined {
   const channelIds = normalizeBundledPluginStringList(params.manifest.channels);
   const existingChannelConfigs: Record<string, PluginManifestChannelConfig> =

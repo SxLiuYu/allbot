@@ -1,7 +1,7 @@
 import { isPlainObject } from "../utils.js";
 import { parseConfigPath, setConfigValueAtPath, unsetConfigValueAtPath } from "./config-paths.js";
 import { isBlockedObjectKey } from "./prototype-keys.js";
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
 type OverrideTree = Record<string, unknown>;
 
@@ -83,9 +83,9 @@ export function unsetConfigOverride(pathRaw: string): {
   return { ok: true, removed };
 }
 
-export function applyConfigOverrides(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyConfigOverrides(cfg: AllBotConfig): AllBotConfig {
   if (!overrides || Object.keys(overrides).length === 0) {
     return cfg;
   }
-  return mergeOverrides(cfg, overrides) as KaijiBotConfig;
+  return mergeOverrides(cfg, overrides) as AllBotConfig;
 }

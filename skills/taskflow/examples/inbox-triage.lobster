@@ -8,7 +8,7 @@ steps:
 
   - id: classify
     command: >-
-      kaijibot.invoke --tool llm-task --action json --args-json
+      allbot.invoke --tool llm-task --action json --args-json
       '{"prompt":"Classify each inbox item as business, personal, or later. Return one JSON object per item with route and summary.","thinking":"low","schema":{"type":"object","properties":{"items":{"type":"array"}},"required":["items"],"additionalProperties":false}}'
     stdin: $fetch.stdout
 
@@ -23,7 +23,7 @@ steps:
 
   - id: notify_personal
     command: >-
-      kaijibot.invoke --tool message --action send --args-json
+      allbot.invoke --tool message --action send --args-json
       '{"provider":"feishu","to":"owner-thread","content":"Personal inbox item needs attention."}'
     condition: $classify.json.items[0].route == "personal"
 

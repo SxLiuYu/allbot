@@ -3,7 +3,7 @@ import type {
   ChannelOutboundAdapter,
   ChannelPlugin,
 } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeLowercaseStringOrEmpty } from "../../shared/string-coerce.js";
 import { createTestRegistry } from "../../test-utils/channel-plugins.js";
 
@@ -98,7 +98,7 @@ export function createTestChannelPlugin(params: {
   label?: string;
   outbound?: ChannelOutboundAdapter;
   messaging?: ChannelMessagingAdapter;
-  resolveDefaultTo?: (params: { cfg: KaijiBotConfig }) => string | undefined;
+  resolveDefaultTo?: (params: { cfg: AllBotConfig }) => string | undefined;
 }): ChannelPlugin {
   return {
     id: params.id,

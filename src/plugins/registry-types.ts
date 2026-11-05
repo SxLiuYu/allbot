@@ -11,17 +11,17 @@ import type {
   ImageGenerationProviderPlugin,
   MediaUnderstandingProviderPlugin,
   MusicGenerationProviderPlugin,
-  KaijiBotPluginChannelRegistration,
-  KaijiBotPluginCliCommandDescriptor,
-  KaijiBotPluginCliRegistrar,
-  KaijiBotPluginCommandDefinition,
-  KaijiBotPluginHttpRouteAuth,
-  KaijiBotPluginHttpRouteHandler,
-  KaijiBotPluginHttpRouteMatch,
-  KaijiBotPluginReloadRegistration,
-  KaijiBotPluginSecurityAuditCollector,
-  KaijiBotPluginService,
-  KaijiBotPluginToolFactory,
+  AllBotPluginChannelRegistration,
+  AllBotPluginCliCommandDescriptor,
+  AllBotPluginCliRegistrar,
+  AllBotPluginCommandDefinition,
+  AllBotPluginHttpRouteAuth,
+  AllBotPluginHttpRouteHandler,
+  AllBotPluginHttpRouteMatch,
+  AllBotPluginReloadRegistration,
+  AllBotPluginSecurityAuditCollector,
+  AllBotPluginService,
+  AllBotPluginToolFactory,
   PluginBundleFormat,
   PluginConfigUiHint,
   PluginConversationBindingResolvedEvent,
@@ -43,7 +43,7 @@ import type {
 export type PluginToolRegistration = {
   pluginId: string;
   pluginName?: string;
-  factory: KaijiBotPluginToolFactory;
+  factory: AllBotPluginToolFactory;
   names: string[];
   optional: boolean;
   source: string;
@@ -53,9 +53,9 @@ export type PluginToolRegistration = {
 export type PluginCliRegistration = {
   pluginId: string;
   pluginName?: string;
-  register: KaijiBotPluginCliRegistrar;
+  register: AllBotPluginCliRegistrar;
   commands: string[];
-  descriptors: KaijiBotPluginCliCommandDescriptor[];
+  descriptors: AllBotPluginCliCommandDescriptor[];
   source: string;
   rootDir?: string;
 };
@@ -63,9 +63,9 @@ export type PluginCliRegistration = {
 export type PluginHttpRouteRegistration = {
   pluginId?: string;
   path: string;
-  handler: KaijiBotPluginHttpRouteHandler;
-  auth: KaijiBotPluginHttpRouteAuth;
-  match: KaijiBotPluginHttpRouteMatch;
+  handler: AllBotPluginHttpRouteHandler;
+  auth: AllBotPluginHttpRouteAuth;
+  match: AllBotPluginHttpRouteMatch;
   source?: string;
 };
 
@@ -142,7 +142,7 @@ export type PluginHookRegistration = {
 export type PluginServiceRegistration = {
   pluginId: string;
   pluginName?: string;
-  service: KaijiBotPluginService;
+  service: AllBotPluginService;
   source: string;
   rootDir?: string;
 };
@@ -150,7 +150,7 @@ export type PluginServiceRegistration = {
 export type PluginReloadRegistration = {
   pluginId: string;
   pluginName?: string;
-  registration: KaijiBotPluginReloadRegistration;
+  registration: AllBotPluginReloadRegistration;
   source: string;
   rootDir?: string;
 };
@@ -158,7 +158,7 @@ export type PluginReloadRegistration = {
 export type PluginNodeHostCommandRegistration = {
   pluginId: string;
   pluginName?: string;
-  command: import("./types.js").KaijiBotPluginNodeHostCommand;
+  command: import("./types.js").AllBotPluginNodeHostCommand;
   source: string;
   rootDir?: string;
 };
@@ -166,7 +166,7 @@ export type PluginNodeHostCommandRegistration = {
 export type PluginSecurityAuditCollectorRegistration = {
   pluginId: string;
   pluginName?: string;
-  collector: KaijiBotPluginSecurityAuditCollector;
+  collector: AllBotPluginSecurityAuditCollector;
   source: string;
   rootDir?: string;
 };
@@ -174,7 +174,7 @@ export type PluginSecurityAuditCollectorRegistration = {
 export type PluginCommandRegistration = {
   pluginId: string;
   pluginName?: string;
-  command: KaijiBotPluginCommandDefinition;
+  command: AllBotPluginCommandDefinition;
   source: string;
   rootDir?: string;
 };
@@ -279,11 +279,11 @@ export type PluginRegistryParams = {
 };
 
 export type PluginRegistrationMode = import("./types.js").PluginRegistrationMode;
-export type KaijiBotPluginNodeHostCommand = import("./types.js").KaijiBotPluginNodeHostCommand;
-export type KaijiBotPluginToolContext = import("./types.js").KaijiBotPluginToolContext;
-export type KaijiBotPluginHttpRouteParams = import("./types.js").KaijiBotPluginHttpRouteParams;
-export type KaijiBotPluginHookOptions = import("./types.js").KaijiBotPluginHookOptions;
+export type AllBotPluginNodeHostCommand = import("./types.js").AllBotPluginNodeHostCommand;
+export type AllBotPluginToolContext = import("./types.js").AllBotPluginToolContext;
+export type AllBotPluginHttpRouteParams = import("./types.js").AllBotPluginHttpRouteParams;
+export type AllBotPluginHookOptions = import("./types.js").AllBotPluginHookOptions;
 export type PluginHookHandlerMap = import("./types.js").PluginHookHandlerMap;
-export type KaijiBotPluginApi = import("./types.js").KaijiBotPluginApi;
+export type AllBotPluginApi = import("./types.js").AllBotPluginApi;
 export type TypedPluginHook = TypedPluginHookRegistration;
-export type KaijiBotPluginChannelReg = KaijiBotPluginChannelRegistration;
+export type AllBotPluginChannelReg = AllBotPluginChannelRegistration;

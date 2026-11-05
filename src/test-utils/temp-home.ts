@@ -9,7 +9,7 @@ const HOME_ENV_KEYS = [
   "USERPROFILE",
   "HOMEDRIVE",
   "HOMEPATH",
-  "KAIJIBOT_STATE_DIR",
+  "ALLBOT_STATE_DIR",
 ] as const;
 
 export type TempHomeEnv = {
@@ -46,12 +46,12 @@ export async function createTempHomeEnv(prefix: string): Promise<TempHomeEnv> {
   const home = path.join(prefixRoot, `home-${String(nextHomeIndex)}`);
   nextHomeIndex += 1;
   await fs.rm(home, { recursive: true, force: true });
-  await fs.mkdir(path.join(home, ".kaijibot"), { recursive: true });
+  await fs.mkdir(path.join(home, ".allbot"), { recursive: true });
 
   const snapshot = captureEnv([...HOME_ENV_KEYS]);
   process.env.HOME = home;
   process.env.USERPROFILE = home;
-  process.env.KAIJIBOT_STATE_DIR = path.join(home, ".kaijibot");
+  process.env.ALLBOT_STATE_DIR = path.join(home, ".allbot");
 
   if (process.platform === "win32") {
     const match = home.match(/^([A-Za-z]:)(.*)$/);

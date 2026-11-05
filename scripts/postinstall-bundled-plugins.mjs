@@ -16,7 +16,7 @@ export const BUNDLED_PLUGIN_INSTALL_TARGETS = [];
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_EXTENSIONS_DIR = join(__dirname, "..", "dist", "extensions");
 const DEFAULT_PACKAGE_ROOT = join(__dirname, "..");
-const DISABLE_POSTINSTALL_ENV = "KAIJIBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL";
+const DISABLE_POSTINSTALL_ENV = "ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL";
 
 function readJson(filePath) {
   return JSON.parse(readFileSync(filePath, "utf8"));
@@ -222,7 +222,7 @@ export function runBundledPluginPostinstall(params = {}) {
   }
 }
 
-const DISABLE_LARK_SKILLS_ENV = "KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL";
+const DISABLE_LARK_SKILLS_ENV = "ALLBOT_DISABLE_LARK_SKILLS_INSTALL";
 const SKILLS_INSTALL_TIMEOUT_MS = 120_000;
 
 function areLarkSkillsInstalledInDir(skillsDir, pathExists, readDir) {

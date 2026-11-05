@@ -1,13 +1,13 @@
 import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core";
-import type { MemorySearchResult } from "kaijibot/plugin-sdk/memory-core-host-runtime-files";
-import { appendMemoryHostEvent } from "kaijibot/plugin-sdk/memory-host-events";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core";
+import type { MemorySearchResult } from "allbot/plugin-sdk/memory-core-host-runtime-files";
+import { appendMemoryHostEvent } from "allbot/plugin-sdk/memory-host-events";
 import {
   asNullableRecord as asRecord,
   normalizeLowercaseStringOrEmpty,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import {
   deriveConceptTags,
   MAX_CONCEPT_TAGS,
@@ -84,7 +84,7 @@ export const DEFAULT_PROMOTION_MIN_UNIQUE_QUERIES = 2;
 
 export function resolveShortTermPromotionConfig(_params: {
   pluginConfig?: Record<string, unknown>;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): ShortTermPromotionConfig {
   return {
     enabled: false,
@@ -102,7 +102,7 @@ export function resolveShortTermPromotionConfig(_params: {
   };
 }
 
-const PROMOTION_MARKER_PREFIX = "kaijibot-memory-promotion:";
+const PROMOTION_MARKER_PREFIX = "allbot-memory-promotion:";
 const MAX_QUERY_HASHES = 32;
 const MAX_RECALL_DAYS = 16;
 const SHORT_TERM_STORE_RELATIVE_PATH = path.join("memory", ".dreams", "short-term-recall.json");
@@ -357,7 +357,7 @@ function isContaminatedSnippet(raw: string): boolean {
     return false;
   }
   if (
-    /<!--\s*kaijibot-memory-promotion:/i.test(snippet) ||
+    /<!--\s*allbot-memory-promotion:/i.test(snippet) ||
     LEGACY_TRANSCRIPT_PROMPT_LINE_RE.test(snippet)
   ) {
     return true;
@@ -1587,7 +1587,7 @@ function withTrailingNewline(content: string): string {
 
 function extractPromotionMarkers(memoryText: string): Set<string> {
   const markers = new Set<string>();
-  const matches = memoryText.matchAll(/<!--\s*kaijibot-memory-promotion:([^\n]+?)\s*-->/gi);
+  const matches = memoryText.matchAll(/<!--\s*allbot-memory-promotion:([^\n]+?)\s*-->/gi);
   for (const match of matches) {
     const key = match[1]?.trim();
     if (key) {

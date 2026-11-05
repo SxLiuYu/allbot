@@ -22,9 +22,9 @@ const NONCE_REFUSAL_MARKERS = [
   "can't comply",
   "can’t comply",
   "cannot comply",
-  "isn't a real kaijibot probe",
-  "is not a real kaijibot probe",
-  "not a real kaijibot probe",
+  "isn't a real allbot probe",
+  "is not a real allbot probe",
+  "not a real allbot probe",
   "no part of the system asks me",
 ];
 

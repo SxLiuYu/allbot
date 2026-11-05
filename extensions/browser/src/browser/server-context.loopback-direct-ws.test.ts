@@ -33,15 +33,15 @@ describe("browser server-context loopback direct WebSocket profiles", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
-    state.resolved.profiles.kaijibot = {
+    const state = makeState("allbot");
+    state.resolved.profiles.allbot = {
       cdpUrl: "ws://127.0.0.1:18800/devtools/browser/SESSION?token=abc",
       color: "#FF4500",
     };
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    const opened = await kaijibot.openTab("http://127.0.0.1:8080");
+    const opened = await allbot.openTab("http://127.0.0.1:8080");
     expect(opened.targetId).toBe("CREATED");
     expect(createTargetViaCdp).toHaveBeenCalledWith({
       cdpUrl: "ws://127.0.0.1:18800/devtools/browser/SESSION?token=abc",
@@ -77,16 +77,16 @@ describe("browser server-context loopback direct WebSocket profiles", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
-    state.resolved.profiles.kaijibot = {
+    const state = makeState("allbot");
+    state.resolved.profiles.allbot = {
       cdpUrl: "ws://127.0.0.1:18800/devtools/browser/SESSION?token=abc",
       color: "#FF4500",
     };
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    await kaijibot.focusTab("T1");
-    await kaijibot.closeTab("T1");
+    await allbot.focusTab("T1");
+    await allbot.closeTab("T1");
 
     expect(fetchMock).toHaveBeenCalledWith(
       "http://127.0.0.1:18800/json/activate/T1?token=abc",
@@ -125,18 +125,18 @@ describe("browser server-context loopback direct WebSocket profiles", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
-    state.resolved.profiles.kaijibot = {
+    const state = makeState("allbot");
+    state.resolved.profiles.allbot = {
       cdpUrl: "wss://127.0.0.1:18800/cdp?token=abc",
       color: "#FF4500",
     };
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    const tabs = await kaijibot.listTabs();
+    const tabs = await allbot.listTabs();
     expect(tabs.map((tab) => tab.targetId)).toEqual(["T2"]);
 
-    await kaijibot.focusTab("T2");
-    await kaijibot.closeTab("T2");
+    await allbot.focusTab("T2");
+    await allbot.closeTab("T2");
   });
 });

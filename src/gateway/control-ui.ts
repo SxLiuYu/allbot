@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { matchBoundaryFileOpenFailure, openBoundaryFileSync } from "../infra/boundary-file-read.js";
 import {
   isPackageProvenControlUiRootSync,
@@ -36,7 +36,7 @@ const CONTROL_UI_ASSETS_MISSING_MESSAGE =
 
 export type ControlUiRequestOptions = {
   basePath?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   root?: ControlUiRootState;
 };

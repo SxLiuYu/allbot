@@ -5,7 +5,7 @@ import type { PluginManifestRegistry } from "../plugins/manifest-registry.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import { normalizeStringEntries } from "../shared/string-normalization.js";
 import { isRecord, resolveConfigDir, resolveUserPath } from "../utils.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import type { PluginAutoEnableCandidate } from "./plugin-auto-enable.types.js";
 
 type ExternalCatalogChannelEntry = {
@@ -13,7 +13,7 @@ type ExternalCatalogChannelEntry = {
   preferOver: string[];
 };
 
-const ENV_CATALOG_PATHS = ["KAIJIBOT_PLUGIN_CATALOG_PATHS", "KAIJIBOT_MPM_CATALOG_PATHS"];
+const ENV_CATALOG_PATHS = ["ALLBOT_PLUGIN_CATALOG_PATHS", "ALLBOT_MPM_CATALOG_PATHS"];
 
 function splitEnvPaths(value: string): string[] {
   const trimmed = normalizeOptionalString(value) ?? "";
@@ -54,10 +54,10 @@ function parseExternalCatalogChannelEntries(raw: unknown): ExternalCatalogChanne
 
   const channels: ExternalCatalogChannelEntry[] = [];
   for (const entry of list) {
-    if (!isRecord(entry) || !isRecord(entry.kaijibot) || !isRecord(entry.kaijibot.channel)) {
+    if (!isRecord(entry) || !isRecord(entry.allbot) || !isRecord(entry.allbot.channel)) {
       continue;
     }
-    const channel = entry.kaijibot.channel;
+    const channel = entry.allbot.channel;
     const id = normalizeOptionalString(channel.id) ?? "";
     if (!id) {
       continue;
@@ -113,13 +113,13 @@ function resolvePreferredOverIds(
 }
 
 export function shouldSkipPreferredPluginAutoEnable(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   entry: PluginAutoEnableCandidate;
   configured: readonly PluginAutoEnableCandidate[];
   env: NodeJS.ProcessEnv;
   registry: PluginManifestRegistry;
-  isPluginDenied: (config: KaijiBotConfig, pluginId: string) => boolean;
-  isPluginExplicitlyDisabled: (config: KaijiBotConfig, pluginId: string) => boolean;
+  isPluginDenied: (config: AllBotConfig, pluginId: string) => boolean;
+  isPluginExplicitlyDisabled: (config: AllBotConfig, pluginId: string) => boolean;
 }): boolean {
   for (const other of params.configured) {
     if (other.pluginId === params.entry.pluginId) {

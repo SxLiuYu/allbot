@@ -43,8 +43,8 @@ const serviceReadCommand = vi.fn<
 >(async (_env?: NodeJS.ProcessEnv) => ({
   programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
   environment: {
-    KAIJIBOT_STATE_DIR: "/tmp/kaijibot-daemon",
-    KAIJIBOT_CONFIG_PATH: "/tmp/kaijibot-daemon/kaijibot.json",
+    ALLBOT_STATE_DIR: "/tmp/allbot-daemon",
+    ALLBOT_CONFIG_PATH: "/tmp/allbot-daemon/allbot.json",
   },
 }));
 const resolveGatewayBindHost = vi.fn(
@@ -53,10 +53,10 @@ const resolveGatewayBindHost = vi.fn(
 const pickPrimaryTailnetIPv4 = vi.fn(() => "100.64.0.9");
 const resolveGatewayPort = vi.fn((_cfg?: unknown, _env?: unknown) => 18789);
 const resolveStateDir = vi.fn(
-  (env: NodeJS.ProcessEnv) => env.KAIJIBOT_STATE_DIR ?? "/tmp/kaijibot-cli",
+  (env: NodeJS.ProcessEnv) => env.ALLBOT_STATE_DIR ?? "/tmp/allbot-cli",
 );
 const resolveConfigPath = vi.fn((env: NodeJS.ProcessEnv, stateDir: string) => {
-  return env.KAIJIBOT_CONFIG_PATH ?? `${stateDir}/kaijibot.json`;
+  return env.ALLBOT_CONFIG_PATH ?? `${stateDir}/allbot.json`;
 });
 const readConfigFileSnapshotCalls = vi.fn((configPath: string) => configPath);
 const loadConfigCalls = vi.fn((configPath: string) => configPath);
@@ -75,7 +75,7 @@ let cliLoadedConfig: Record<string, unknown> = {
 
 vi.mock("../../config/config.js", () => ({
   createConfigIO: ({ configPath }: { configPath: string }) => {
-    const isDaemon = configPath.includes("/kaijibot-daemon/");
+    const isDaemon = configPath.includes("/allbot-daemon/");
     const runtimeConfig = isDaemon ? daemonLoadedConfig : cliLoadedConfig;
     return {
       readConfigFileSnapshot: async () => {
@@ -153,17 +153,17 @@ describe("gatherDaemonStatus", () => {
 
   beforeEach(() => {
     envSnapshot = captureEnv([
-      "KAIJIBOT_STATE_DIR",
-      "KAIJIBOT_CONFIG_PATH",
-      "KAIJIBOT_GATEWAY_TOKEN",
-      "KAIJIBOT_GATEWAY_PASSWORD",
+      "ALLBOT_STATE_DIR",
+      "ALLBOT_CONFIG_PATH",
+      "ALLBOT_GATEWAY_TOKEN",
+      "ALLBOT_GATEWAY_PASSWORD",
       "DAEMON_GATEWAY_TOKEN",
       "DAEMON_GATEWAY_PASSWORD",
     ]);
-    process.env.KAIJIBOT_STATE_DIR = "/tmp/kaijibot-cli";
-    process.env.KAIJIBOT_CONFIG_PATH = "/tmp/kaijibot-cli/kaijibot.json";
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-    delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
+    process.env.ALLBOT_STATE_DIR = "/tmp/allbot-cli";
+    process.env.ALLBOT_CONFIG_PATH = "/tmp/allbot-cli/allbot.json";
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_PASSWORD;
     delete process.env.DAEMON_GATEWAY_TOKEN;
     delete process.env.DAEMON_GATEWAY_PASSWORD;
     callGatewayStatusProbe.mockClear();
@@ -220,7 +220,7 @@ describe("gatherDaemonStatus", () => {
     expect(callGatewayStatusProbe).toHaveBeenCalledWith(
       expect.objectContaining({
         requireRpc: true,
-        configPath: "/tmp/kaijibot-daemon/kaijibot.json",
+        configPath: "/tmp/allbot-daemon/allbot.json",
       }),
     );
   });
@@ -237,7 +237,7 @@ describe("gatherDaemonStatus", () => {
     });
 
     expect(readConfigFileSnapshotCalls).toHaveBeenCalledTimes(1);
-    expect(readConfigFileSnapshotCalls).toHaveBeenCalledWith("/tmp/kaijibot-cli/kaijibot.json");
+    expect(readConfigFileSnapshotCalls).toHaveBeenCalledWith("/tmp/allbot-cli/allbot.json");
     expect(loadConfigCalls).not.toHaveBeenCalled();
   });
 
@@ -311,14 +311,14 @@ describe("gatherDaemonStatus", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        KAIJIBOT_GATEWAY_PORT: "19001",
-        KAIJIBOT_CONFIG_PATH: "/tmp/kaijibot-daemon/kaijibot.json",
-        KAIJIBOT_STATE_DIR: "/tmp/kaijibot-daemon",
+        ALLBOT_GATEWAY_PORT: "19001",
+        ALLBOT_CONFIG_PATH: "/tmp/allbot-daemon/allbot.json",
+        ALLBOT_STATE_DIR: "/tmp/allbot-daemon",
       } as Record<string, string>,
     });
     serviceReadRuntime.mockImplementationOnce(async (env?: NodeJS.ProcessEnv) => ({
-      status: env?.KAIJIBOT_GATEWAY_PORT === "19001" ? "running" : "unknown",
-      detail: env?.KAIJIBOT_GATEWAY_PORT ?? "missing-port",
+      status: env?.ALLBOT_GATEWAY_PORT === "19001" ? "running" : "unknown",
+      detail: env?.ALLBOT_GATEWAY_PORT ?? "missing-port",
     }));
 
     const status = await gatherDaemonStatus({
@@ -329,7 +329,7 @@ describe("gatherDaemonStatus", () => {
 
     expect(serviceReadRuntime).toHaveBeenCalledWith(
       expect.objectContaining({
-        KAIJIBOT_GATEWAY_PORT: "19001",
+        ALLBOT_GATEWAY_PORT: "19001",
       }),
     );
     expect(status.service.runtime).toMatchObject({
@@ -513,8 +513,8 @@ describe("gatherDaemonStatus", () => {
         },
       },
     };
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "env-token";
-    process.env.KAIJIBOT_GATEWAY_PASSWORD = "env-password"; // pragma: allowlist secret
+    process.env.ALLBOT_GATEWAY_TOKEN = "env-token";
+    process.env.ALLBOT_GATEWAY_PASSWORD = "env-password"; // pragma: allowlist secret
 
     await gatherDaemonStatus({
       rpc: {},
@@ -548,7 +548,7 @@ describe("gatherDaemonStatus", () => {
       portUsage: {
         port: 19001,
         status: "busy",
-        listeners: [{ pid: 9000, ppid: 8999, commandLine: "kaijibot-gateway" }],
+        listeners: [{ pid: 9000, ppid: 8999, commandLine: "allbot-gateway" }],
         hints: [],
       },
       healthy: false,

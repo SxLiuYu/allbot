@@ -1,22 +1,22 @@
 ---
-summary: "KaijiBot is a self-hosted proactive AI assistant for Feishu with a built-in cognitive layer."
+summary: "AllBot is a self-hosted proactive AI assistant for Feishu with a built-in cognitive layer."
 read_when:
-  - Introducing KaijiBot to newcomers
-title: "KaijiBot"
+  - Introducing AllBot to newcomers
+title: "AllBot"
 ---
 
-# KaijiBot 🦞
+# AllBot 🦞
 
 <p align="center">
     <img
-        src="/assets/kaijibot-logo-text-dark.png"
-        alt="KaijiBot"
+        src="/assets/allbot-logo-text-dark.png"
+        alt="AllBot"
         width="500"
         class="dark:hidden"
     />
     <img
-        src="/assets/kaijibot-logo-text.png"
-        alt="KaijiBot"
+        src="/assets/allbot-logo-text.png"
+        alt="AllBot"
         width="500"
         class="hidden dark:block"
     />
@@ -31,19 +31,19 @@ title: "KaijiBot"
 
 <Columns>
   <Card title="Get Started" href="/start/getting-started" icon="rocket">
-    Install KaijiBot and bring up the Gateway in minutes.
+    Install AllBot and bring up the Gateway in minutes.
   </Card>
   <Card title="Run Onboarding" href="/start/wizard" icon="sparkles">
-    Guided setup with `kaijibot onboard` and pairing flows.
+    Guided setup with `allbot onboard` and pairing flows.
   </Card>
   <Card title="Open the Control UI" href="/web/control-ui" icon="layout-dashboard">
     Launch the browser dashboard for chat, config, and sessions.
   </Card>
 </Columns>
 
-## What is KaijiBot?
+## What is AllBot?
 
-KaijiBot is a **self-hosted proactive AI assistant** that forked from [OpenClaw](https://github.com/openclaw/openclaw) and now develops independently, tailored for Chinese users with deep Feishu + WeChat integration. It connects to **60+ extensions** covering 40+ LLM providers — Z.AI (智谱 GLM, default), DeepSeek, Qwen (通义千问), Anthropic, Google, OpenRouter, and more — through a single Gateway, and adds an original **cognitive AI layer** that makes the assistant genuinely proactive.
+AllBot is a **self-hosted proactive AI assistant** that forked from [OpenClaw](https://github.com/openclaw/openclaw) and now develops independently, tailored for Chinese users with deep Feishu + WeChat integration. It connects to **60+ extensions** covering 40+ LLM providers — Z.AI (智谱 GLM, default), DeepSeek, Qwen (通义千问), Anthropic, Google, OpenRouter, and more — through a single Gateway, and adds an original **cognitive AI layer** that makes the assistant genuinely proactive.
 
 **Who is it for?** Developers and power users who want an AI partner that knows them, learns their interests, and initiates conversations with relevant insights — all running on their own hardware.
 
@@ -95,7 +95,7 @@ The Gateway is the single source of truth for sessions, routing, and channel con
 ## Quick start
 
 <Steps>
-  <Step title="Install KaijiBot">
+  <Step title="Install AllBot">
 
 **One-click (recommended):**
 
@@ -106,14 +106,14 @@ curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.sh | ba
 **Or npm install:**
 
 ```bash
-npm install -g kaijibot
+npm install -g allbot
 ```
 
 **Or build from source:**
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot
-cd kaijibot
+cd allbot
 pnpm install
 pnpm build
 ```
@@ -125,17 +125,17 @@ pnpm build
     export ZAI_API_KEY="your-api-key"
 
     # Configure Feishu channel
-    kaijibot config set channels.feishu.appId "your-app-id"
-    kaijibot config set channels.feishu.appSecret "your-app-secret"
+    allbot config set channels.feishu.appId "your-app-id"
+    allbot config set channels.feishu.appSecret "your-app-secret"
     ```
 
   </Step>
   <Step title="Start and chat">
     ```bash
-    kaijibot gateway --port 18789 --verbose
+    allbot gateway --port 18789 --verbose
     ```
 
-    Open Feishu, find your bot, and send a message. KaijiBot will start building your cognitive persona automatically — after a few conversations it begins proactive outreach with tailored insights.
+    Open Feishu, find your bot, and send a message. AllBot will start building your cognitive persona automatically — after a few conversations it begins proactive outreach with tailored insights.
 
   </Step>
 </Steps>
@@ -151,9 +151,9 @@ Open the browser Control UI after the Gateway starts.
 
 ## Configuration (optional)
 
-Config lives at `~/.kaijibot/kaijibot.json`.
+Config lives at `~/.allbot/allbot.json`.
 
-- If you **do nothing**, KaijiBot uses Z.AI GLM with per-sender sessions and the cognitive layer enabled.
+- If you **do nothing**, AllBot uses Z.AI GLM with per-sender sessions and the cognitive layer enabled.
 - To customize, set Feishu access controls or cognitive parameters.
 
 Example:

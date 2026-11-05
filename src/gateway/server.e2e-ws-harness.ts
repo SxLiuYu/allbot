@@ -20,8 +20,8 @@ export type GatewayServerHarness = {
 };
 
 export async function startGatewayServerHarness(): Promise<GatewayServerHarness> {
-  const envSnapshot = captureEnv(["KAIJIBOT_GATEWAY_TOKEN"]);
-  delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+  const envSnapshot = captureEnv(["ALLBOT_GATEWAY_TOKEN"]);
+  delete process.env.ALLBOT_GATEWAY_TOKEN;
   const port = await getFreePort();
   const server = await startGatewayServer(port, {
     auth: { mode: "none" },

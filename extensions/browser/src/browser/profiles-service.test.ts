@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { loadConfig, writeConfigFile } from "../config/config.js";
-import { resolveKaijiBotUserDataDir } from "./chrome.js";
+import { resolveAllBotUserDataDir } from "./chrome.js";
 import type { BrowserRouteContext, BrowserServerState } from "./server-context.js";
 import { movePathToTrash } from "./trash.js";
 
@@ -20,7 +20,7 @@ vi.mock("./trash.js", () => ({
 }));
 
 vi.mock("./chrome.js", () => ({
-  resolveKaijiBotUserDataDir: vi.fn(() => "/tmp/kaijibot-test/kaijibot/user-data"),
+  resolveAllBotUserDataDir: vi.fn(() => "/tmp/allbot-test/allbot/user-data"),
 }));
 
 const [{ resolveBrowserConfig }, { createBrowserProfilesService }] = await Promise.all([
@@ -218,7 +218,7 @@ describe("BrowserProfilesService", () => {
     const { ctx, state } = createCtx(resolved);
     vi.mocked(loadConfig).mockReturnValue({ browser: { profiles: {} } });
 
-    const tempDir = fs.mkdtempSync(path.join("/tmp", "kaijibot-profile-"));
+    const tempDir = fs.mkdtempSync(path.join("/tmp", "allbot-profile-"));
     const userDataDir = path.join(tempDir, "BraveSoftware", "Brave-Browser");
     fs.mkdirSync(userDataDir, { recursive: true });
 
@@ -244,7 +244,7 @@ describe("BrowserProfilesService", () => {
     const { ctx } = createCtx(resolved);
     vi.mocked(loadConfig).mockReturnValue({ browser: { profiles: {} } });
 
-    const tempDir = fs.mkdtempSync(path.join("/tmp", "kaijibot-profile-"));
+    const tempDir = fs.mkdtempSync(path.join("/tmp", "allbot-profile-"));
     const userDataDir = path.join(tempDir, "BraveSoftware", "Brave-Browser");
     fs.mkdirSync(userDataDir, { recursive: true });
 
@@ -268,9 +268,9 @@ describe("BrowserProfilesService", () => {
 
     vi.mocked(loadConfig).mockReturnValue({
       browser: {
-        defaultProfile: "kaijibot",
+        defaultProfile: "allbot",
         profiles: {
-          kaijibot: { cdpPort: 18800, color: "#FF4500" },
+          allbot: { cdpPort: 18800, color: "#FF4500" },
           remote: { cdpUrl: "http://10.0.0.42:9222", color: "#0066CC" },
         },
       },
@@ -294,18 +294,18 @@ describe("BrowserProfilesService", () => {
 
     vi.mocked(loadConfig).mockReturnValue({
       browser: {
-        defaultProfile: "kaijibot",
+        defaultProfile: "allbot",
         profiles: {
-          kaijibot: { cdpPort: 18800, color: "#FF4500" },
+          allbot: { cdpPort: 18800, color: "#FF4500" },
           work: { cdpPort: 18801, color: "#0066CC" },
         },
       },
     });
 
-    const tempDir = fs.mkdtempSync(path.join("/tmp", "kaijibot-profile-"));
+    const tempDir = fs.mkdtempSync(path.join("/tmp", "allbot-profile-"));
     const userDataDir = path.join(tempDir, "work", "user-data");
     fs.mkdirSync(path.dirname(userDataDir), { recursive: true });
-    vi.mocked(resolveKaijiBotUserDataDir).mockReturnValue(userDataDir);
+    vi.mocked(resolveAllBotUserDataDir).mockReturnValue(userDataDir);
 
     const service = createBrowserProfilesService(ctx);
     const result = await service.deleteProfile("work");
@@ -329,9 +329,9 @@ describe("BrowserProfilesService", () => {
 
     vi.mocked(loadConfig).mockReturnValue({
       browser: {
-        defaultProfile: "kaijibot",
+        defaultProfile: "allbot",
         profiles: {
-          kaijibot: { cdpPort: 18800, color: "#FF4500" },
+          allbot: { cdpPort: 18800, color: "#FF4500" },
           "chrome-live": {
             cdpPort: 18801,
             color: "#0066CC",

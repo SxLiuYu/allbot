@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-types";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-types";
 import {
   applyAnthropicConfigDefaults,
   normalizeAnthropicProviderConfig,

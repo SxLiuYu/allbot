@@ -5,7 +5,7 @@ const { TEST_STATE_DIR, SANDBOX_REGISTRY_PATH, SANDBOX_BROWSER_REGISTRY_PATH } =
   const path = require("node:path");
   const { mkdtempSync } = require("node:fs");
   const { tmpdir } = require("node:os");
-  const baseDir = mkdtempSync(path.join(tmpdir(), "kaijibot-sandbox-registry-"));
+  const baseDir = mkdtempSync(path.join(tmpdir(), "allbot-sandbox-registry-"));
 
   return {
     TEST_STATE_DIR: baseDir,
@@ -152,7 +152,7 @@ function browserEntry(
     sessionKey: "agent:main",
     createdAtMs: 1,
     lastUsedAtMs: 1,
-    image: "kaijibot-browser:test",
+    image: "allbot-browser:test",
     cdpPort: 9222,
     ...overrides,
   };
@@ -164,7 +164,7 @@ function containerEntry(overrides: Partial<SandboxRegistryEntry> = {}): SandboxR
     sessionKey: "agent:main",
     createdAtMs: 1,
     lastUsedAtMs: 1,
-    image: "kaijibot-sandbox:test",
+    image: "allbot-sandbox:test",
     ...overrides,
   };
 }
@@ -189,7 +189,7 @@ describe("registry race safety", () => {
         sessionKey: "agent:main",
         createdAtMs: 1,
         lastUsedAtMs: 1,
-        image: "kaijibot-sandbox:test",
+        image: "allbot-sandbox:test",
       },
     ]);
 

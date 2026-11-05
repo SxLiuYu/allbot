@@ -14,10 +14,10 @@ describe("skills-cli (e2e)", () => {
   let envSnapshot: ReturnType<typeof captureEnv>;
 
   beforeAll(() => {
-    envSnapshot = captureEnv(["KAIJIBOT_BUNDLED_SKILLS_DIR"]);
-    tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-skills-test-"));
-    tempBundledDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-bundled-skills-test-"));
-    process.env.KAIJIBOT_BUNDLED_SKILLS_DIR = tempBundledDir;
+    envSnapshot = captureEnv(["ALLBOT_BUNDLED_SKILLS_DIR"]);
+    tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-skills-test-"));
+    tempBundledDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-bundled-skills-test-"));
+    process.env.ALLBOT_BUNDLED_SKILLS_DIR = tempBundledDir;
   });
 
   afterAll(() => {
@@ -40,7 +40,7 @@ describe("skills-cli (e2e)", () => {
           description: "Capture UI screenshots",
           filePath,
           baseDir,
-          source: "kaijibot-bundled",
+          source: "allbot-bundled",
         }),
         frontmatter: {},
         metadata: { emoji: "📸" },

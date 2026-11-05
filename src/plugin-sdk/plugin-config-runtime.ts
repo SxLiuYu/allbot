@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 
 export { normalizePluginsConfig, resolveEffectiveEnableState } from "../plugins/config-state.js";
 
-export function requireRuntimeConfig(config: KaijiBotConfig, context: string): KaijiBotConfig {
+export function requireRuntimeConfig(config: AllBotConfig, context: string): AllBotConfig {
   if (config) {
     return config;
   }
@@ -12,7 +12,7 @@ export function requireRuntimeConfig(config: KaijiBotConfig, context: string): K
 }
 
 export function resolvePluginConfigObject(
-  config: KaijiBotConfig | undefined,
+  config: AllBotConfig | undefined,
   pluginId: string,
 ): Record<string, unknown> | undefined {
   const plugins =
@@ -34,7 +34,7 @@ export function resolvePluginConfigObject(
 }
 
 export function resolveLivePluginConfigObject(
-  runtimeConfigLoader: (() => KaijiBotConfig | undefined) | undefined,
+  runtimeConfigLoader: (() => AllBotConfig | undefined) | undefined,
   pluginId: string,
   startupPluginConfig?: Record<string, unknown>,
 ): Record<string, unknown> | undefined {

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   mergeSessionEntry,
   setSessionRuntimeModel,
@@ -19,7 +19,7 @@ function resolveNonNegativeNumber(value: number | undefined): number | undefined
 }
 
 export async function updateSessionStoreAfterAgentRun(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   contextTokensOverride?: number;
   sessionId: string;
   sessionKey: string;

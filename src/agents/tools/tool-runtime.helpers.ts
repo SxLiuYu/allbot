@@ -1,6 +1,6 @@
 export { getApiKeyForModel, requireApiKey } from "../model-auth.js";
 export { runWithImageModelFallback } from "../model-fallback.js";
-export { ensureKaijiBotModelsJson } from "../models-config.js";
+export { ensureAllBotModelsJson } from "../models-config.js";
 export { discoverAuthStorage, discoverModels } from "../pi-model-discovery.js";
 export {
   createSandboxBridgeReadFile,

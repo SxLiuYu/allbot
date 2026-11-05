@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MemoryIndexManager } from "./manager.js";
 
@@ -31,7 +31,7 @@ describe("memory manager incremental sync with loadable sqlite-vec and no provid
   beforeAll(async () => {
     vi.resetModules();
     ({ getMemorySearchManager, closeAllMemorySearchManagers } = await import("./index.js"));
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-mem-vec-incr-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-mem-vec-incr-"));
   });
 
   beforeEach(async () => {
@@ -75,7 +75,7 @@ describe("memory manager incremental sync with loadable sqlite-vec and no provid
         },
         list: [{ id: "main", default: true }],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = await getMemorySearchManager({ cfg, agentId: "main" });
     if (!result.manager) {
       throw new Error(result.error ?? "manager missing");

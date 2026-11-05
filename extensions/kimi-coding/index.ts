@@ -1,8 +1,8 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { normalizeProviderId } from "kaijibot/plugin-sdk/provider-model-shared";
-import type { SecretInput } from "kaijibot/plugin-sdk/secret-input";
-import { isRecord, normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { normalizeProviderId } from "allbot/plugin-sdk/provider-model-shared";
+import type { SecretInput } from "allbot/plugin-sdk/secret-input";
+import { isRecord, normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { applyKimiCodeConfig, KIMI_CODING_MODEL_REF } from "./onboard.js";
 import { buildKimiCodingProvider } from "./provider-catalog.js";
 import { KIMI_REPLAY_POLICY } from "./replay-policy.js";

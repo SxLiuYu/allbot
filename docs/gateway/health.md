@@ -12,20 +12,20 @@ Short guide to verify channel connectivity without guessing.
 
 ## Quick checks
 
-- `kaijibot status` — local summary: gateway reachability/mode, update hint, linked channel auth age, sessions + recent activity.
-- `kaijibot status --all` — full local diagnosis (read-only, color, safe to paste for debugging).
-- `kaijibot status --deep` — asks the running gateway for a live health probe (`health` with `probe:true`), including per-account channel probes when supported.
-- `kaijibot health` — asks the running gateway for its health snapshot (WS-only; no direct channel sockets from the CLI).
-- `kaijibot health --verbose` — forces a live health probe and prints gateway connection details.
-- `kaijibot health --json` — machine-readable health snapshot output.
+- `allbot status` — local summary: gateway reachability/mode, update hint, linked channel auth age, sessions + recent activity.
+- `allbot status --all` — full local diagnosis (read-only, color, safe to paste for debugging).
+- `allbot status --deep` — asks the running gateway for a live health probe (`health` with `probe:true`), including per-account channel probes when supported.
+- `allbot health` — asks the running gateway for its health snapshot (WS-only; no direct channel sockets from the CLI).
+- `allbot health --verbose` — forces a live health probe and prints gateway connection details.
+- `allbot health --json` — machine-readable health snapshot output.
 - Send `/status` as a standalone message in WhatsApp/WebChat to get a status reply without invoking the agent.
-- Logs: tail `/tmp/kaijibot/kaijibot-*.log` and filter for `web-heartbeat`, `web-reconnect`, `web-auto-reply`, `web-inbound`.
+- Logs: tail `/tmp/allbot/allbot-*.log` and filter for `web-heartbeat`, `web-reconnect`, `web-auto-reply`, `web-inbound`.
 
 ## Deep diagnostics
 
-- Creds on disk: `ls -l ~/.kaijibot/credentials/whatsapp/<accountId>/creds.json` (mtime should be recent).
-- Session store: `ls -l ~/.kaijibot/agents/<agentId>/sessions/sessions.json` (path can be overridden in config). Count and recent recipients are surfaced via `status`.
-- Relink flow: `kaijibot channels logout && kaijibot channels login --verbose` when status codes 409–515 or `loggedOut` appear in logs. (Note: the QR login flow auto-restarts once for status 515 after pairing.)
+- Creds on disk: `ls -l ~/.allbot/credentials/whatsapp/<accountId>/creds.json` (mtime should be recent).
+- Session store: `ls -l ~/.allbot/agents/<agentId>/sessions/sessions.json` (path can be overridden in config). Count and recent recipients are surfaced via `status`.
+- Relink flow: `allbot channels logout && allbot channels login --verbose` when status codes 409–515 or `loggedOut` appear in logs. (Note: the QR login flow auto-restarts once for status 515 after pairing.)
 
 ## Health monitor config
 
@@ -38,15 +38,15 @@ Short guide to verify channel connectivity without guessing.
 
 ## When something fails
 
-- `logged out` or status 409–515 → relink with `kaijibot channels logout` then `kaijibot channels login`.
-- Gateway unreachable → start it: `kaijibot gateway --port 18789` (use `--force` if the port is busy).
+- `logged out` or status 409–515 → relink with `allbot channels logout` then `allbot channels login`.
+- Gateway unreachable → start it: `allbot gateway --port 18789` (use `--force` if the port is busy).
 - No inbound messages → confirm linked phone is online and the sender is allowed (`channels.whatsapp.allowFrom`); for group chats, ensure allowlist + mention rules match (`channels.whatsapp.groups`, `agents.list[].groupChat.mentionPatterns`).
 
 ## Dedicated "health" command
 
-`kaijibot health` asks the running gateway for its health snapshot (no direct channel
+`allbot health` asks the running gateway for its health snapshot (no direct channel
 sockets from the CLI). By default it can return a fresh cached gateway snapshot; the
-gateway then refreshes that cache in the background. `kaijibot health --verbose` forces
+gateway then refreshes that cache in the background. `allbot health --verbose` forces
 a live probe instead. The command reports linked creds/auth age when available,
 per-channel probe summaries, session-store summary, and a probe duration. It exits
 non-zero if the gateway is unreachable or the probe fails/timeouts.

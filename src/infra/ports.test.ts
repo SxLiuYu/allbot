@@ -81,7 +81,7 @@ describe("ports helpers", () => {
     expect(runtime.exit).toHaveBeenCalledWith(1);
   });
 
-  it("prints an KaijiBot-specific hint when port details look like another KaijiBot instance", async () => {
+  it("prints an AllBot-specific hint when port details look like another AllBot instance", async () => {
     const runtime = {
       error: vi.fn(),
       log: vi.fn(),
@@ -89,14 +89,14 @@ describe("ports helpers", () => {
     };
 
     await handlePortError(
-      new PortInUseError(18789, "node dist/index.js kaijibot gateway"),
+      new PortInUseError(18789, "node dist/index.js allbot gateway"),
       18789,
       "gateway start",
       runtime,
     ).catch(() => {});
 
     const messages = runtime.error.mock.calls.map((call) => stripAnsi(String(call[0] ?? "")));
-    expect(messages.join("\n")).toContain("another KaijiBot instance is already running");
+    expect(messages.join("\n")).toContain("another AllBot instance is already running");
   });
 });
 
@@ -148,7 +148,7 @@ describeUnix("inspectPortUsage", () => {
       if (command === "ps") {
         if (argv.includes("command=")) {
           return {
-            stdout: "node /tmp/kaijibot/dist/index.js gateway --port 18789\n",
+            stdout: "node /tmp/allbot/dist/index.js gateway --port 18789\n",
             stderr: "",
             code: 0,
           };
@@ -176,7 +176,7 @@ describeUnix("inspectPortUsage", () => {
       expect(result.status).toBe("busy");
       expect(result.listeners.length).toBeGreaterThan(0);
       expect(result.listeners[0]?.pid).toBe(process.pid);
-      expect(result.listeners[0]?.commandLine).toContain("kaijibot");
+      expect(result.listeners[0]?.commandLine).toContain("allbot");
       expect(result.errors).toBeUndefined();
     } finally {
       await new Promise<void>((resolve) => server.close(() => resolve()));

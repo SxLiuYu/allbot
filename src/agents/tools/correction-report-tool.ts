@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Type } from "typebox";
 import { t } from "../../cli/i18n/translate.js";
 import { resolveCorrectionUserId } from "../../cognitive/correction/userid.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult, textResult } from "./common.js";
@@ -19,7 +19,7 @@ export const RecordCorrectionSchema = Type.Object({
 });
 
 export function createCorrectionReportTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   deliveryTo?: string;
   agentId?: string;

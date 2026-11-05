@@ -20,13 +20,13 @@ export function registerNodesCli(program: Command) {
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["kaijibot nodes status", "List known nodes with live status."],
-          ["kaijibot nodes pairing pending", "Show pending node pairing requests."],
+          ["allbot nodes status", "List known nodes with live status."],
+          ["allbot nodes pairing pending", "Show pending node pairing requests."],
           [
-            'kaijibot nodes invoke --node <id> --command system.which --params \'{"name":"uname"}\'',
+            'allbot nodes invoke --node <id> --command system.which --params \'{"name":"uname"}\'',
             "Invoke a node command directly.",
           ],
-          ["kaijibot nodes camera snap --node <id>", "Capture a photo from a node camera."],
+          ["allbot nodes camera snap --node <id>", "Capture a photo from a node camera."],
         ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/nodes", "gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/nodes.md")}\n`,
     );
 

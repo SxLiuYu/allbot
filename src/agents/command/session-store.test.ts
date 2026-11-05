@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadSessionStore, type SessionEntry } from "../../config/sessions.js";
 import type { EmbeddedPiRunResult } from "../pi-embedded.js";
 import { updateSessionStoreAfterAgentRun } from "./session-store.js";
@@ -12,7 +12,7 @@ describe("updateSessionStoreAfterAgentRun", () => {
   let storePath: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-session-store-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-session-store-"));
     storePath = path.join(tmpDir, "sessions.json");
   });
 
@@ -31,9 +31,9 @@ describe("updateSessionStoreAfterAgentRun", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const sessionKey = "agent:main:explicit:test-claude-cli";
-    const sessionId = "test-kaijibot-session";
+    const sessionId = "test-allbot-session";
     const sessionStore: Record<string, SessionEntry> = {
       [sessionKey]: {
         sessionId,

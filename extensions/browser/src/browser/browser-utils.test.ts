@@ -215,14 +215,14 @@ describe("fetchBrowserJson loopback auth (bridge auth registry)", () => {
 describe("browser server-context listKnownProfileNames", () => {
   it("includes configured and runtime-only profile names", () => {
     const resolved = resolveBrowserConfig({
-      defaultProfile: "kaijibot",
+      defaultProfile: "allbot",
       profiles: {
-        kaijibot: { cdpPort: 18800, color: "#FF4500" },
+        allbot: { cdpPort: 18800, color: "#FF4500" },
       },
     });
-    const kaijibot = resolveProfile(resolved, "kaijibot");
-    if (!kaijibot) {
-      throw new Error("expected kaijibot profile");
+    const allbot = resolveProfile(resolved, "allbot");
+    if (!allbot) {
+      throw new Error("expected allbot profile");
     }
 
     const state: BrowserServerState = {
@@ -233,13 +233,13 @@ describe("browser server-context listKnownProfileNames", () => {
         [
           "stale-removed",
           {
-            profile: { ...kaijibot, name: "stale-removed" },
+            profile: { ...allbot, name: "stale-removed" },
             running: null,
           },
         ],
       ]),
     };
 
-    expect(listKnownProfileNames(state).toSorted()).toEqual(["kaijibot", "stale-removed", "user"]);
+    expect(listKnownProfileNames(state).toSorted()).toEqual(["allbot", "stale-removed", "user"]);
   });
 });

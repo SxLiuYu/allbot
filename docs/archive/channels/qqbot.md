@@ -1,17 +1,17 @@
 ---
 summary: "QQ Bot setup, config, and usage"
 read_when:
-  - You want to connect KaijiBot to QQ
+  - You want to connect AllBot to QQ
   - You need QQ Bot credential setup
   - You want QQ Bot group or private chat support
 title: QQ Bot
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # QQ Bot
 
-QQ Bot connects to KaijiBot via the official QQ Bot API (WebSocket gateway). The
+QQ Bot connects to AllBot via the official QQ Bot API (WebSocket gateway). The
 plugin supports C2C private chat, group @messages, and guild channel messages with
 rich media (images, voice, video, files).
 
@@ -20,8 +20,8 @@ media are supported. Reactions and threads are not supported.
 
 ## Bundled plugin
 
-Current KaijiBot releases bundle QQ Bot, so normal packaged builds do not need
-a separate `kaijibot plugins install` step.
+Current AllBot releases bundle QQ Bot, so normal packaged builds do not need
+a separate `allbot plugins install` step.
 
 ## Setup
 
@@ -36,7 +36,7 @@ a separate `kaijibot plugins install` step.
 4. Add the channel:
 
 ```bash
-kaijibot channels add --channel qqbot --token "AppID:AppSecret"
+allbot channels add --channel qqbot --token "AppID:AppSecret"
 ```
 
 5. Restart the Gateway.
@@ -44,8 +44,8 @@ kaijibot channels add --channel qqbot --token "AppID:AppSecret"
 Interactive setup paths:
 
 ```bash
-kaijibot channels add
-kaijibot configure --section channels
+allbot channels add
+allbot configure --section channels
 ```
 
 ## Configure
@@ -86,13 +86,13 @@ File-backed AppSecret:
 Notes:
 
 - Env fallback applies to the default QQ Bot account only.
-- `kaijibot channels add --channel qqbot --token-file ...` provides the
+- `allbot channels add --channel qqbot --token-file ...` provides the
   AppSecret only; the AppID must already be set in config or `QQBOT_APP_ID`.
 - `clientSecret` also accepts SecretRef input, not just a plaintext string.
 
 ### Multi-account setup
 
-Run multiple QQ bots under a single KaijiBot instance:
+Run multiple QQ bots under a single AllBot instance:
 
 ```json5
 {
@@ -119,7 +119,7 @@ token cache (isolated by `appId`).
 Add a second bot via CLI:
 
 ```bash
-kaijibot channels add --channel qqbot --account bot2 --token "222222222:secret-of-bot-2"
+allbot channels add --channel qqbot --account bot2 --token "222222222:secret-of-bot-2"
 ```
 
 ### Voice (STT / TTS)
@@ -176,7 +176,7 @@ Built-in commands intercepted before the AI queue:
 | Command        | Description                          |
 | -------------- | ------------------------------------ |
 | `/bot-ping`    | Latency test                         |
-| `/bot-version` | Show the KaijiBot framework version  |
+| `/bot-version` | Show the AllBot framework version  |
 | `/bot-help`    | List all commands                    |
 | `/bot-upgrade` | Show the QQBot upgrade guide link    |
 | `/bot-logs`    | Export recent gateway logs as a file |

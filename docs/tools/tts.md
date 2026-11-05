@@ -9,8 +9,8 @@ title: "Text-to-Speech"
 
 # Text-to-speech (TTS)
 
-KaijiBot can convert outbound replies into audio using ElevenLabs, Microsoft, MiniMax, or OpenAI.
-It works anywhere KaijiBot can send audio.
+AllBot can convert outbound replies into audio using ElevenLabs, Microsoft, MiniMax, or OpenAI.
+It works anywhere AllBot can send audio.
 
 ## Supported services
 
@@ -61,12 +61,12 @@ so that provider must also be authenticated if you enable summaries.
 No. Auto‑TTS is **off** by default. Enable it in config with
 `messages.tts.auto` or locally with `/tts on`.
 
-When `messages.tts.provider` is unset, KaijiBot picks the first configured
+When `messages.tts.provider` is unset, AllBot picks the first configured
 speech provider in registry auto-select order.
 
 ## Config
 
-TTS config lives under `messages.tts` in `kaijibot.json`.
+TTS config lives under `messages.tts` in `allbot.json`.
 Full schema is in [Gateway configuration](/gateway/configuration).
 
 ### Minimal config (enable + provider)
@@ -195,7 +195,7 @@ Full schema is in [Gateway configuration](/gateway/configuration).
       auto: "always",
       maxTextLength: 4000,
       timeoutMs: 30000,
-      prefsPath: "~/.kaijibot/settings/tts.json",
+      prefsPath: "~/.allbot/settings/tts.json",
     },
   },
 }
@@ -239,7 +239,7 @@ Then run:
 - `enabled`: legacy toggle (doctor migrates this to `auto`).
 - `mode`: `"final"` (default) or `"all"` (includes tool/block replies).
 - `provider`: speech provider id such as `"elevenlabs"`, `"microsoft"`, `"minimax"`, or `"openai"` (fallback is automatic).
-- If `provider` is **unset**, KaijiBot uses the first configured speech provider in registry auto-select order.
+- If `provider` is **unset**, AllBot uses the first configured speech provider in registry auto-select order.
 - Legacy `provider: "edge"` still works and is normalized to `microsoft`.
 - `summaryModel`: optional cheap model for auto-summary; defaults to `agents.defaults.model.primary`.
   - Accepts `provider/model` or a configured model alias.
@@ -345,7 +345,7 @@ Optional allowlist (enable provider switching while keeping other knobs configur
 ## Per-user preferences
 
 Slash commands write local overrides to `prefsPath` (default:
-`~/.kaijibot/settings/tts.json`, override with `KAIJIBOT_TTS_PREFS` or
+`~/.allbot/settings/tts.json`, override with `ALLBOT_TTS_PREFS` or
 `messages.tts.prefsPath`).
 
 Stored fields:
@@ -369,13 +369,13 @@ These override `messages.tts.*` for that host.
   - Output format values follow Microsoft Speech output formats (including Ogg/WebM Opus).
   - Telegram `sendVoice` accepts OGG/MP3/M4A; use OpenAI/ElevenLabs if you need
     guaranteed Opus voice messages.
-  - If the configured Microsoft output format fails, KaijiBot retries with MP3.
+  - If the configured Microsoft output format fails, AllBot retries with MP3.
 
 OpenAI/ElevenLabs output formats are fixed per channel (see above).
 
 ## Auto-TTS behavior
 
-When enabled, KaijiBot:
+When enabled, AllBot:
 
 - skips TTS if the reply already contains media or a `MEDIA:` directive.
 - skips very short replies (< 10 chars).
@@ -406,7 +406,7 @@ Reply -> TTS enabled?
 There is a single command: `/tts`.
 See [Slash commands](/tools/slash-commands) for enablement details.
 
-Discord note: `/tts` is a built-in Discord command, so KaijiBot registers
+Discord note: `/tts` is a built-in Discord command, so AllBot registers
 `/voice` as the native command there. Text `/tts ...` still works.
 
 ```
@@ -416,7 +416,7 @@ Discord note: `/tts` is a built-in Discord command, so KaijiBot registers
 /tts provider openai
 /tts limit 2000
 /tts summary off
-/tts audio Hello from KaijiBot
+/tts audio Hello from AllBot
 ```
 
 Notes:

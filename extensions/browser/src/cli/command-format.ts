@@ -1,1 +1,1 @@
-export { formatCliCommand } from "kaijibot/plugin-sdk/browser-setup-tools";
+export { formatCliCommand } from "allbot/plugin-sdk/browser-setup-tools";

@@ -3,7 +3,7 @@ import {
   getRequiredHookHandler,
   registerHookHandlersForTest,
 } from "../../../test/helpers/plugins/subagent-hooks.js";
-import type { ClawdbotConfig, KaijiBotPluginApi } from "../runtime-api.js";
+import type { ClawdbotConfig, AllBotPluginApi } from "../runtime-api.js";
 import { registerFeishuSubagentHooks } from "./subagent-hooks.js";
 import {
   createFeishuThreadBindingManager,
@@ -16,7 +16,7 @@ const baseConfig: ClawdbotConfig = {
 };
 
 function registerHandlersForTest(config: Record<string, unknown> = baseConfig) {
-  return registerHookHandlersForTest<KaijiBotPluginApi>({
+  return registerHookHandlersForTest<AllBotPluginApi>({
     config,
     register: registerFeishuSubagentHooks,
   });

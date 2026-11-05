@@ -1,6 +1,6 @@
-import { withEnv } from "kaijibot/plugin-sdk/testing";
+import { withEnv } from "allbot/plugin-sdk/testing";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../src/config/config.js";
+import type { AllBotConfig } from "../../src/config/config.js";
 import { __testing, createGeminiWebSearchProvider } from "./src/gemini-web-search-provider.js";
 
 describe("google web search provider", () => {
@@ -20,7 +20,7 @@ describe("google web search provider", () => {
 
   it("stores configured credentials at the canonical plugin config path", () => {
     const provider = createGeminiWebSearchProvider();
-    const config = {} as KaijiBotConfig;
+    const config = {} as AllBotConfig;
 
     provider.setConfiguredCredentialValue?.(config, "AIza-plugin-test");
 

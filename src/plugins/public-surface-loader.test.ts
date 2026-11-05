@@ -6,10 +6,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { importFreshModule } from "../../test/helpers/import-fresh.ts";
 
 const tempDirs: string[] = [];
-const originalBundledPluginsDir = process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+const originalBundledPluginsDir = process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
 
 function createTempDir(): string {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-public-surface-loader-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-public-surface-loader-"));
   tempDirs.push(tempDir);
   return tempDir;
 }
@@ -22,9 +22,9 @@ afterEach(() => {
   vi.resetModules();
   vi.doUnmock("jiti");
   if (originalBundledPluginsDir === undefined) {
-    delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+    delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = originalBundledPluginsDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = originalBundledPluginsDir;
   }
 });
 
@@ -42,7 +42,7 @@ describe("bundled plugin public surface loader", () => {
       >(import.meta.url, "./public-surface-loader.js?scope=windows-dist-jiti");
       const tempRoot = createTempDir();
       const bundledPluginsDir = path.join(tempRoot, "dist");
-      process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
+      process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
 
       const modulePath = path.join(bundledPluginsDir, "demo", "provider-policy-api.js");
       fs.mkdirSync(path.dirname(modulePath), { recursive: true });
@@ -91,7 +91,7 @@ describe("bundled plugin public surface loader", () => {
     >(import.meta.url, "./public-surface-loader.js?scope=source-require-fast-path");
     const tempRoot = createTempDir();
     const bundledPluginsDir = path.join(tempRoot, "extensions");
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
 
     const modulePath = path.join(bundledPluginsDir, "demo", "secret-contract-api.ts");
     fs.mkdirSync(path.dirname(modulePath), { recursive: true });

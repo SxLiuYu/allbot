@@ -1,4 +1,4 @@
-import type { KaijiBotConfig, HookConfig } from "../config/config.js";
+import type { AllBotConfig, HookConfig } from "../config/config.js";
 import { resolveHookKey } from "./frontmatter.js";
 import type { HookEntry, HookSource } from "./types.js";
 
@@ -24,33 +24,33 @@ export type HookResolutionCollision = {
 };
 
 const HOOK_SOURCE_POLICIES: Record<HookSource, HookSourcePolicy> = {
-  "kaijibot-bundled": {
+  "allbot-bundled": {
     precedence: 10,
     trustedLocalCode: true,
     defaultEnableMode: "default-on",
-    canOverride: ["kaijibot-bundled"],
-    canBeOverriddenBy: ["kaijibot-managed", "kaijibot-plugin"],
+    canOverride: ["allbot-bundled"],
+    canBeOverriddenBy: ["allbot-managed", "allbot-plugin"],
   },
-  "kaijibot-plugin": {
+  "allbot-plugin": {
     precedence: 20,
     trustedLocalCode: true,
     defaultEnableMode: "default-on",
-    canOverride: ["kaijibot-bundled", "kaijibot-plugin"],
-    canBeOverriddenBy: ["kaijibot-managed"],
+    canOverride: ["allbot-bundled", "allbot-plugin"],
+    canBeOverriddenBy: ["allbot-managed"],
   },
-  "kaijibot-managed": {
+  "allbot-managed": {
     precedence: 30,
     trustedLocalCode: true,
     defaultEnableMode: "default-on",
-    canOverride: ["kaijibot-bundled", "kaijibot-managed", "kaijibot-plugin"],
-    canBeOverriddenBy: ["kaijibot-managed"],
+    canOverride: ["allbot-bundled", "allbot-managed", "allbot-plugin"],
+    canBeOverriddenBy: ["allbot-managed"],
   },
-  "kaijibot-workspace": {
+  "allbot-workspace": {
     precedence: 40,
     trustedLocalCode: true,
     defaultEnableMode: "explicit-opt-in",
-    canOverride: ["kaijibot-workspace"],
-    canBeOverriddenBy: ["kaijibot-workspace"],
+    canOverride: ["allbot-workspace"],
+    canBeOverriddenBy: ["allbot-workspace"],
   },
 };
 
@@ -59,7 +59,7 @@ export function getHookSourcePolicy(source: HookSource): HookSourcePolicy {
 }
 
 export function resolveHookConfig(
-  config: KaijiBotConfig | undefined,
+  config: AllBotConfig | undefined,
   hookKey: string,
 ): HookConfig | undefined {
   const hooks = config?.hooks?.internal?.entries;
@@ -75,14 +75,14 @@ export function resolveHookConfig(
 
 export function resolveHookEnableState(params: {
   entry: HookEntry;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   hookConfig?: HookConfig;
 }): HookEnableState {
   const { entry, config } = params;
   const hookKey = resolveHookKey(entry.hook.name, entry);
   const hookConfig = params.hookConfig ?? resolveHookConfig(config, hookKey);
 
-  if (entry.hook.source === "kaijibot-plugin") {
+  if (entry.hook.source === "allbot-plugin") {
     return { enabled: true };
   }
   if (hookConfig?.enabled === false) {

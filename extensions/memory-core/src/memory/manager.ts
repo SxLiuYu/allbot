@@ -2,16 +2,16 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
 import { type FSWatcher } from "chokidar";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
   resolveAgentDir,
   resolveAgentWorkspaceDir,
   resolveMemorySearchConfig,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type ResolvedMemorySearchConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import { extractKeywords } from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import { extractKeywords } from "allbot/plugin-sdk/memory-core-host-engine-qmd";
 import {
   readMemoryFile,
   type MemoryEmbeddingProbeResult,
@@ -21,7 +21,7 @@ import {
   type MemorySearchResult,
   type MemorySource,
   type MemorySyncProgressUpdate,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 import {
   createEmbeddingProvider,
   type EmbeddingProvider,
@@ -67,7 +67,7 @@ type QuerySettingsWithVerify = ResolvedMemorySearchConfig["query"] & {
 const VECTOR_TABLE = "chunks_vec";
 const FTS_TABLE = "chunks_fts";
 const EMBEDDING_CACHE_TABLE = "embedding_cache";
-const MEMORY_INDEX_MANAGER_CACHE_KEY = Symbol.for("kaijibot.memoryIndexManagerCache");
+const MEMORY_INDEX_MANAGER_CACHE_KEY = Symbol.for("allbot.memoryIndexManagerCache");
 const log = createSubsystemLogger("memory");
 
 const { cache: INDEX_CACHE, pending: INDEX_CACHE_PENDING } =
@@ -84,7 +84,7 @@ export async function closeAllMemoryIndexManagers(): Promise<void> {
 
 export class MemoryIndexManager extends MemoryManagerEmbeddingOps implements MemorySearchManager {
   private readonly cacheKey: string;
-  protected readonly cfg: KaijiBotConfig;
+  protected readonly cfg: AllBotConfig;
   protected readonly agentId: string;
   protected readonly workspaceDir: string;
   protected readonly settings: ResolvedMemorySearchConfig;
@@ -148,7 +148,7 @@ export class MemoryIndexManager extends MemoryManagerEmbeddingOps implements Mem
   private readonlyRecoveryLastError?: string;
 
   private static async loadProviderResult(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     settings: ResolvedMemorySearchConfig;
   }): Promise<EmbeddingProviderResult> {
@@ -160,7 +160,7 @@ export class MemoryIndexManager extends MemoryManagerEmbeddingOps implements Mem
   }
 
   static async get(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     purpose?: "default" | "status";
   }): Promise<MemoryIndexManager | null> {
@@ -192,7 +192,7 @@ export class MemoryIndexManager extends MemoryManagerEmbeddingOps implements Mem
 
   private constructor(params: {
     cacheKey: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     workspaceDir: string;
     settings: ResolvedMemorySearchConfig;

@@ -15,7 +15,7 @@ import { resolvePluginSetupAutoEnableReasons } from "../plugins/setup-registry.j
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 import { isRecord } from "../utils.js";
 import { isChannelConfigured } from "./channel-configured.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import { shouldSkipPreferredPluginAutoEnable } from "./plugin-auto-enable.prefer-over.js";
 import type {
   PluginAutoEnableCandidate,
@@ -47,7 +47,7 @@ function resolveAutoEnableProviderPluginIds(
   return Object.fromEntries(entries);
 }
 
-function collectModelRefs(cfg: KaijiBotConfig): string[] {
+function collectModelRefs(cfg: AllBotConfig): string[] {
   const refs: string[] = [];
   const pushModelRef = (value: unknown) => {
     if (typeof value === "string" && value.trim()) {
@@ -99,7 +99,7 @@ function extractProviderFromModelRef(value: string): string | null {
   return normalizeProviderId(trimmed.slice(0, slash));
 }
 
-function isProviderConfigured(cfg: KaijiBotConfig, providerId: string): boolean {
+function isProviderConfigured(cfg: AllBotConfig, providerId: string): boolean {
   const normalized = normalizeProviderId(providerId);
   const profiles = cfg.auth?.profiles;
   if (profiles && typeof profiles === "object") {
@@ -133,12 +133,12 @@ function isProviderConfigured(cfg: KaijiBotConfig, providerId: string): boolean 
   return false;
 }
 
-function hasPluginOwnedWebSearchConfig(cfg: KaijiBotConfig, pluginId: string): boolean {
+function hasPluginOwnedWebSearchConfig(cfg: AllBotConfig, pluginId: string): boolean {
   const pluginConfig = cfg.plugins?.entries?.[pluginId]?.config;
   return isRecord(pluginConfig) && isRecord(pluginConfig.webSearch);
 }
 
-function hasPluginOwnedWebFetchConfig(cfg: KaijiBotConfig, pluginId: string): boolean {
+function hasPluginOwnedWebFetchConfig(cfg: AllBotConfig, pluginId: string): boolean {
   const pluginConfig = cfg.plugins?.entries?.[pluginId]?.config;
   return isRecord(pluginConfig) && isRecord(pluginConfig.webFetch);
 }
@@ -154,7 +154,7 @@ function resolvePluginOwnedToolConfigKeys(plugin: PluginManifestRecord): string[
   return Object.keys(properties).filter((key) => key !== "webSearch" && key !== "webFetch");
 }
 
-function hasPluginOwnedToolConfig(cfg: KaijiBotConfig, plugin: PluginManifestRecord): boolean {
+function hasPluginOwnedToolConfig(cfg: AllBotConfig, plugin: PluginManifestRecord): boolean {
   const pluginConfig = cfg.plugins?.entries?.[plugin.id]?.config;
   if (!isRecord(pluginConfig)) {
     return false;
@@ -219,13 +219,13 @@ function resolvePluginIdForChannel(
   return channelToPluginId.get(channelId) ?? channelId;
 }
 
-function collectCandidateChannelIds(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): string[] {
+function collectCandidateChannelIds(cfg: AllBotConfig, env: NodeJS.ProcessEnv): string[] {
   return listPotentialConfiguredChannelIds(cfg, env).map(
     (channelId) => normalizeChatChannelId(channelId) ?? channelId,
   );
 }
 
-function hasConfiguredWebSearchPluginEntry(cfg: KaijiBotConfig): boolean {
+function hasConfiguredWebSearchPluginEntry(cfg: AllBotConfig): boolean {
   const entries = cfg.plugins?.entries;
   return (
     !!entries &&
@@ -236,7 +236,7 @@ function hasConfiguredWebSearchPluginEntry(cfg: KaijiBotConfig): boolean {
   );
 }
 
-function hasConfiguredWebFetchPluginEntry(cfg: KaijiBotConfig): boolean {
+function hasConfiguredWebFetchPluginEntry(cfg: AllBotConfig): boolean {
   const entries = cfg.plugins?.entries;
   return (
     !!entries &&
@@ -247,7 +247,7 @@ function hasConfiguredWebFetchPluginEntry(cfg: KaijiBotConfig): boolean {
   );
 }
 
-function hasConfiguredPluginConfigEntry(cfg: KaijiBotConfig): boolean {
+function hasConfiguredPluginConfigEntry(cfg: AllBotConfig): boolean {
   const entries = cfg.plugins?.entries;
   return (
     !!entries &&
@@ -256,7 +256,7 @@ function hasConfiguredPluginConfigEntry(cfg: KaijiBotConfig): boolean {
   );
 }
 
-function configMayNeedPluginManifestRegistry(cfg: KaijiBotConfig): boolean {
+function configMayNeedPluginManifestRegistry(cfg: AllBotConfig): boolean {
   const pluginEntries = cfg.plugins?.entries;
   if (
     pluginEntries &&
@@ -289,7 +289,7 @@ function configMayNeedPluginManifestRegistry(cfg: KaijiBotConfig): boolean {
 }
 
 export function configMayNeedPluginAutoEnable(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv,
 ): boolean {
   if (hasConfiguredPluginConfigEntry(cfg)) {
@@ -342,7 +342,7 @@ export function resolvePluginAutoEnableCandidateReason(
 }
 
 export function resolveConfiguredPluginAutoEnableCandidates(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   registry: PluginManifestRegistry;
 }): PluginAutoEnableCandidate[] {
@@ -430,7 +430,7 @@ export function resolveConfiguredPluginAutoEnableCandidates(params: {
   return changes;
 }
 
-function isPluginExplicitlyDisabled(cfg: KaijiBotConfig, pluginId: string): boolean {
+function isPluginExplicitlyDisabled(cfg: AllBotConfig, pluginId: string): boolean {
   const builtInChannelId = normalizeChatChannelId(pluginId);
   if (builtInChannelId) {
     const channels = cfg.channels as Record<string, unknown> | undefined;
@@ -447,12 +447,12 @@ function isPluginExplicitlyDisabled(cfg: KaijiBotConfig, pluginId: string): bool
   return cfg.plugins?.entries?.[pluginId]?.enabled === false;
 }
 
-function isPluginDenied(cfg: KaijiBotConfig, pluginId: string): boolean {
+function isPluginDenied(cfg: AllBotConfig, pluginId: string): boolean {
   const deny = cfg.plugins?.deny;
   return Array.isArray(deny) && deny.includes(pluginId);
 }
 
-function isBuiltInChannelAlreadyEnabled(cfg: KaijiBotConfig, channelId: string): boolean {
+function isBuiltInChannelAlreadyEnabled(cfg: AllBotConfig, channelId: string): boolean {
   const channels = cfg.channels as Record<string, unknown> | undefined;
   const channelConfig = channels?.[channelId];
   return (
@@ -463,7 +463,7 @@ function isBuiltInChannelAlreadyEnabled(cfg: KaijiBotConfig, channelId: string):
   );
 }
 
-function registerPluginEntry(cfg: KaijiBotConfig, pluginId: string): KaijiBotConfig {
+function registerPluginEntry(cfg: AllBotConfig, pluginId: string): AllBotConfig {
   const builtInChannelId = normalizeChatChannelId(pluginId);
   if (builtInChannelId) {
     const channels = cfg.channels as Record<string, unknown> | undefined;
@@ -510,7 +510,7 @@ function formatAutoEnableChange(entry: PluginAutoEnableCandidate): string {
 }
 
 export function resolvePluginAutoEnableManifestRegistry(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   manifestRegistry?: PluginManifestRegistry;
 }): PluginManifestRegistry {
@@ -523,7 +523,7 @@ export function resolvePluginAutoEnableManifestRegistry(params: {
 }
 
 export function materializePluginAutoEnableCandidatesInternal(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   candidates: readonly PluginAutoEnableCandidate[];
   env: NodeJS.ProcessEnv;
   manifestRegistry: PluginManifestRegistry;

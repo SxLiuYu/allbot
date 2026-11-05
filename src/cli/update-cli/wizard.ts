@@ -106,7 +106,7 @@ export async function updateWizardCommand(opts: UpdateWizardOptions = {}): Promi
         const empty = await isEmptyDir(gitDir);
         if (!empty) {
           defaultRuntime.error(
-            `KAIJIBOT_GIT_DIR points at a non-git directory: ${gitDir}. Set KAIJIBOT_GIT_DIR to an empty folder or an kaijibot checkout.`,
+            `ALLBOT_GIT_DIR points at a non-git directory: ${gitDir}. Set ALLBOT_GIT_DIR to an empty folder or an allbot checkout.`,
           );
           defaultRuntime.exit(1);
           return;

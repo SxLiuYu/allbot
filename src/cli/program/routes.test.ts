@@ -46,16 +46,16 @@ describe("program routes", () => {
     const route = expectRoute(["status"]);
     expect(typeof route?.loadPlugins).toBe("function");
     const shouldLoad = route?.loadPlugins as (argv: string[]) => boolean;
-    expect(shouldLoad(["node", "kaijibot", "status"])).toBe(true);
-    expect(shouldLoad(["node", "kaijibot", "status", "--json"])).toBe(false);
+    expect(shouldLoad(["node", "allbot", "status"])).toBe(true);
+    expect(shouldLoad(["node", "allbot", "status", "--json"])).toBe(false);
   });
 
   it("matches health route and preloads plugins only for text output", () => {
     const route = expectRoute(["health"]);
     expect(typeof route?.loadPlugins).toBe("function");
     const shouldLoad = route?.loadPlugins as (argv: string[]) => boolean;
-    expect(shouldLoad(["node", "kaijibot", "health"])).toBe(true);
-    expect(shouldLoad(["node", "kaijibot", "health", "--json"])).toBe(false);
+    expect(shouldLoad(["node", "allbot", "health"])).toBe(true);
+    expect(shouldLoad(["node", "allbot", "health", "--json"])).toBe(false);
   });
 
   it("matches gateway status route without plugin preload", () => {
@@ -64,33 +64,33 @@ describe("program routes", () => {
   });
 
   it("returns false for gateway status route when option values are missing", async () => {
-    await expectRunFalse(["gateway", "status"], ["node", "kaijibot", "gateway", "status", "--url"]);
+    await expectRunFalse(["gateway", "status"], ["node", "allbot", "gateway", "status", "--url"]);
     await expectRunFalse(
       ["gateway", "status"],
-      ["node", "kaijibot", "gateway", "status", "--token"],
+      ["node", "allbot", "gateway", "status", "--token"],
     );
     await expectRunFalse(
       ["gateway", "status"],
-      ["node", "kaijibot", "gateway", "status", "--password"],
+      ["node", "allbot", "gateway", "status", "--password"],
     );
     await expectRunFalse(
       ["gateway", "status"],
-      ["node", "kaijibot", "gateway", "status", "--timeout"],
+      ["node", "allbot", "gateway", "status", "--timeout"],
     );
   });
 
   it("returns false for gateway status route when probe-only flags are present", async () => {
     await expectRunFalse(
       ["gateway", "status"],
-      ["node", "kaijibot", "gateway", "status", "--ssh", "user@host"],
+      ["node", "allbot", "gateway", "status", "--ssh", "user@host"],
     );
     await expectRunFalse(
       ["gateway", "status"],
-      ["node", "kaijibot", "gateway", "status", "--ssh-identity", "~/.ssh/id_test"],
+      ["node", "allbot", "gateway", "status", "--ssh-identity", "~/.ssh/id_test"],
     );
     await expectRunFalse(
       ["gateway", "status"],
-      ["node", "kaijibot", "gateway", "status", "--ssh-auto"],
+      ["node", "allbot", "gateway", "status", "--ssh-auto"],
     );
   });
 
@@ -99,7 +99,7 @@ describe("program routes", () => {
     await expect(
       route?.run([
         "node",
-        "kaijibot",
+        "allbot",
         "--profile",
         "work",
         "gateway",
@@ -133,7 +133,7 @@ describe("program routes", () => {
 
   it("passes --no-probe through to daemon status", async () => {
     const route = expectRoute(["gateway", "status"]);
-    await expect(route?.run(["node", "kaijibot", "gateway", "status", "--no-probe"])).resolves.toBe(
+    await expect(route?.run(["node", "allbot", "gateway", "status", "--no-probe"])).resolves.toBe(
       true,
     );
 
@@ -152,7 +152,7 @@ describe("program routes", () => {
   });
 
   it("returns false when status timeout flag value is missing", async () => {
-    await expectRunFalse(["status"], ["node", "kaijibot", "status", "--timeout"]);
+    await expectRunFalse(["status"], ["node", "allbot", "status", "--timeout"]);
   });
 
   it("routes status --json through the lean JSON command", async () => {
@@ -160,7 +160,7 @@ describe("program routes", () => {
     await expect(
       route?.run([
         "node",
-        "kaijibot",
+        "allbot",
         "status",
         "--json",
         "--deep",
@@ -176,15 +176,15 @@ describe("program routes", () => {
   });
 
   it("returns false for sessions route when --store value is missing", async () => {
-    await expectRunFalse(["sessions"], ["node", "kaijibot", "sessions", "--store"]);
+    await expectRunFalse(["sessions"], ["node", "allbot", "sessions", "--store"]);
   });
 
   it("returns false for sessions route when --active value is missing", async () => {
-    await expectRunFalse(["sessions"], ["node", "kaijibot", "sessions", "--active"]);
+    await expectRunFalse(["sessions"], ["node", "allbot", "sessions", "--active"]);
   });
 
   it("returns false for sessions route when --agent value is missing", async () => {
-    await expectRunFalse(["sessions"], ["node", "kaijibot", "sessions", "--agent"]);
+    await expectRunFalse(["sessions"], ["node", "allbot", "sessions", "--agent"]);
   });
 
   it("does not fast-route sessions subcommands", () => {
@@ -196,11 +196,11 @@ describe("program routes", () => {
   });
 
   it("returns false for config get route when path argument is missing", async () => {
-    await expectRunFalse(["config", "get"], ["node", "kaijibot", "config", "get", "--json"]);
+    await expectRunFalse(["config", "get"], ["node", "allbot", "config", "get", "--json"]);
   });
 
   it("returns false for config unset route when path argument is missing", async () => {
-    await expectRunFalse(["config", "unset"], ["node", "kaijibot", "config", "unset"]);
+    await expectRunFalse(["config", "unset"], ["node", "allbot", "config", "unset"]);
   });
 
   it("passes config get path correctly when root option values precede command", async () => {
@@ -208,7 +208,7 @@ describe("program routes", () => {
     await expect(
       route?.run([
         "node",
-        "kaijibot",
+        "allbot",
         "--log-level",
         "debug",
         "config",
@@ -223,7 +223,7 @@ describe("program routes", () => {
   it("passes config unset path correctly when root option values precede command", async () => {
     const route = expectRoute(["config", "unset"]);
     await expect(
-      route?.run(["node", "kaijibot", "--profile", "work", "config", "unset", "update.channel"]),
+      route?.run(["node", "allbot", "--profile", "work", "config", "unset", "update.channel"]),
     ).resolves.toBe(true);
     expect(runConfigUnsetMock).toHaveBeenCalledWith({ path: "update.channel" });
   });
@@ -233,7 +233,7 @@ describe("program routes", () => {
     await expect(
       route?.run([
         "node",
-        "kaijibot",
+        "allbot",
         "config",
         "get",
         "--log-level",
@@ -248,7 +248,7 @@ describe("program routes", () => {
   it("passes config unset path when root value options appear after subcommand", async () => {
     const route = expectRoute(["config", "unset"]);
     await expect(
-      route?.run(["node", "kaijibot", "config", "unset", "--profile", "work", "update.channel"]),
+      route?.run(["node", "allbot", "config", "unset", "--profile", "work", "update.channel"]),
     ).resolves.toBe(true);
     expect(runConfigUnsetMock).toHaveBeenCalledWith({ path: "update.channel" });
   });
@@ -256,41 +256,41 @@ describe("program routes", () => {
   it("returns false for config get route when unknown option appears", async () => {
     await expectRunFalse(
       ["config", "get"],
-      ["node", "kaijibot", "config", "get", "--mystery", "value", "update.channel"],
+      ["node", "allbot", "config", "get", "--mystery", "value", "update.channel"],
     );
   });
 
   it("returns false for models list route when --provider value is missing", async () => {
-    await expectRunFalse(["models", "list"], ["node", "kaijibot", "models", "list", "--provider"]);
+    await expectRunFalse(["models", "list"], ["node", "allbot", "models", "list", "--provider"]);
   });
 
   it("returns false for models status route when probe flags are missing values", async () => {
     await expectRunFalse(
       ["models", "status"],
-      ["node", "kaijibot", "models", "status", "--probe-provider"],
+      ["node", "allbot", "models", "status", "--probe-provider"],
     );
     await expectRunFalse(
       ["models", "status"],
-      ["node", "kaijibot", "models", "status", "--probe-timeout"],
+      ["node", "allbot", "models", "status", "--probe-timeout"],
     );
     await expectRunFalse(
       ["models", "status"],
-      ["node", "kaijibot", "models", "status", "--probe-concurrency"],
+      ["node", "allbot", "models", "status", "--probe-concurrency"],
     );
     await expectRunFalse(
       ["models", "status"],
-      ["node", "kaijibot", "models", "status", "--probe-max-tokens"],
+      ["node", "allbot", "models", "status", "--probe-max-tokens"],
     );
     await expectRunFalse(
       ["models", "status"],
-      ["node", "kaijibot", "models", "status", "--probe-provider", "openai", "--agent"],
+      ["node", "allbot", "models", "status", "--probe-provider", "openai", "--agent"],
     );
   });
 
   it("returns false for models status route when --probe-profile has no value", async () => {
     await expectRunFalse(
       ["models", "status"],
-      ["node", "kaijibot", "models", "status", "--probe-profile"],
+      ["node", "allbot", "models", "status", "--probe-profile"],
     );
   });
 
@@ -299,7 +299,7 @@ describe("program routes", () => {
     await expect(
       route?.run([
         "node",
-        "kaijibot",
+        "allbot",
         "models",
         "status",
         "--probe-provider",

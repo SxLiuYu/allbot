@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SubagentRunRecord } from "../../agents/subagent-registry.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   __testing as abortTesting,
   getAbortMemory,
@@ -91,14 +91,14 @@ describe("abort detection", () => {
     sessionIdsByKey?: Record<string, string>;
     nowMs?: number;
   }) {
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-abort-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-abort-"));
     const storePath = path.join(root, "sessions.json");
     const cfg = {
       session: { store: storePath },
       ...(typeof params?.commandsTextEnabled === "boolean"
         ? { commands: { text: params.commandsTextEnabled } }
         : {}),
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     if (params?.sessionIdsByKey) {
       await writeSessionStore(storePath, params.sessionIdsByKey, params.nowMs);
     }
@@ -106,7 +106,7 @@ describe("abort detection", () => {
   }
 
   async function runStopCommand(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     sessionKey: string;
     from: string;
     to: string;
@@ -134,7 +134,7 @@ describe("abort detection", () => {
 
   function enqueueQueuedFollowupRun(params: {
     root: string;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     sessionId: string;
     sessionKey: string;
   }) {
@@ -207,8 +207,8 @@ describe("abort detection", () => {
       "wait",
       "exit",
       "interrupt",
-      "stop kaijibot",
-      "kaijibot stop",
+      "stop allbot",
+      "allbot stop",
       "stop action",
       "stop current action",
       "stop run",
@@ -222,8 +222,8 @@ describe("abort detection", () => {
       "do not do that",
       "please stop",
       "stop please",
-      "STOP KAIJIBOT",
-      "stop kaijibot!!!",
+      "STOP ALLBOT",
+      "stop allbot!!!",
       "stop don’t do anything",
       "detente",
       "detén",
@@ -264,15 +264,15 @@ describe("abort detection", () => {
     expect(isAbortRequestText("Stop")).toBe(true);
     expect(isAbortRequestText("STOP")).toBe(true);
     expect(isAbortRequestText("stop action")).toBe(true);
-    expect(isAbortRequestText("stop kaijibot!!!")).toBe(true);
+    expect(isAbortRequestText("stop allbot!!!")).toBe(true);
     expect(isAbortRequestText("やめて")).toBe(true);
     expect(isAbortRequestText("остановись")).toBe(true);
     expect(isAbortRequestText("halt")).toBe(true);
     expect(isAbortRequestText("stopp")).toBe(true);
     expect(isAbortRequestText("pare")).toBe(true);
     expect(isAbortRequestText(" توقف ")).toBe(true);
-    expect(isAbortRequestText("/stop@kaijibot_bot", { botUsername: "kaijibot_bot" })).toBe(true);
-    expect(isAbortRequestText("/Stop@kaijibot_bot", { botUsername: "kaijibot_bot" })).toBe(true);
+    expect(isAbortRequestText("/stop@allbot_bot", { botUsername: "allbot_bot" })).toBe(true);
+    expect(isAbortRequestText("/Stop@allbot_bot", { botUsername: "allbot_bot" })).toBe(true);
 
     expect(isAbortRequestText("/status")).toBe(false);
     expect(isAbortRequestText("do not do that")).toBe(true);
@@ -842,7 +842,7 @@ describe("abort detection", () => {
     });
 
     const result = stopSubagentsForRequester({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       requesterSessionKey: oldParentKey,
     });
 

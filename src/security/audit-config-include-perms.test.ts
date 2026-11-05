@@ -2,14 +2,14 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import type { ConfigFileSnapshot } from "../config/types.kaijibot.js";
+import type { ConfigFileSnapshot } from "../config/types.allbot.js";
 import { collectIncludeFilePermFindings } from "./audit-extra.async.js";
 
 const isWindows = process.platform === "win32";
 
 describe("security audit config include permissions", () => {
   it("flags group/world-readable config include files", async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-include-perms-"));
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-include-perms-"));
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(stateDir, { recursive: true, mode: 0o700 });
 
@@ -22,7 +22,7 @@ describe("security audit config include permissions", () => {
       await fs.chmod(includePath, 0o644);
     }
 
-    const configPath = path.join(stateDir, "kaijibot.json");
+    const configPath = path.join(stateDir, "allbot.json");
     await fs.writeFile(configPath, `{ "$include": "./extra.json5" }\n`, "utf-8");
     await fs.chmod(configPath, 0o600);
 

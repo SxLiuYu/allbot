@@ -422,7 +422,7 @@ describe("stripMessageMetadata", () => {
 
 describe("getCleanDialogueContent", () => {
   it("reads file and returns clean dialogue without tool annotations", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
     try {
       const filePath = path.join(dir, "session.jsonl");
       const jsonl = buildJsonl(
@@ -452,7 +452,7 @@ describe("getCleanDialogueContent", () => {
   });
 
   it("includes all messages without cap", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
     try {
       const filePath = path.join(dir, "session.jsonl");
       const lines = [sessionHeader()];
@@ -563,7 +563,7 @@ describe("updateDialogueStaging", () => {
   let sessionPath: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-staging-test-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-staging-test-"));
     stagingPath = path.join(tmpDir, "staging", "test-session.jsonl");
     sessionPath = path.join(tmpDir, "session.jsonl");
   });
@@ -618,7 +618,7 @@ describe("getDialogueWithStaging", () => {
   let sessionPath: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-dialogue-staging-test-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-dialogue-staging-test-"));
     stagingPath = path.join(tmpDir, "staging", "test-session.jsonl");
     sessionPath = path.join(tmpDir, "session.jsonl");
   });
@@ -702,7 +702,7 @@ describe("extractFirstMessageTimestamp", () => {
   let sessionPath: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-firstmsg-test-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-firstmsg-test-"));
     sessionPath = path.join(tmpDir, "session.jsonl");
   });
 

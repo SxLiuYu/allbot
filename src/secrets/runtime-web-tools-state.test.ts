@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
 
 const { resolvePluginWebSearchProvidersMock } = vi.hoisted(() => ({
@@ -39,8 +39,8 @@ vi.mock("../plugins/web-search-providers.runtime.js", () => ({
   resolvePluginWebSearchProviders: resolvePluginWebSearchProvidersMock,
 }));
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;
@@ -96,7 +96,7 @@ describe("runtime web tools state", () => {
       env: {
         WEB_SEARCH_GEMINI_API_KEY: "web-search-gemini-ref",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 

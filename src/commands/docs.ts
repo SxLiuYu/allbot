@@ -5,7 +5,7 @@ import type { RuntimeEnv } from "../runtime.js";
 import { formatDocsLink } from "../terminal/links.js";
 import { isRich, theme } from "../terminal/theme.js";
 
-const SEARCH_TOOL = "https://gitee.com/kaiji1126/kaijibot/blob/main/docs/mcp.SearchKaijiBot.md";
+const SEARCH_TOOL = "https://gitee.com/kaiji1126/kaijibot/blob/main/docs/mcp.SearchAllBot.md";
 const SEARCH_TIMEOUT_MS = 30_000;
 const DEFAULT_SNIPPET_MAX = 220;
 
@@ -163,10 +163,10 @@ export async function docsSearchCommand(queryParts: string[], runtime: RuntimeEn
     const docs = formatDocsLink("/", "gitee.com/kaiji1126/kaijibot/blob/main/docs");
     if (isRich()) {
       runtime.log(`${theme.muted("Docs:")} ${docs}`);
-      runtime.log(`${theme.muted("Search:")} ${formatCliCommand('kaijibot docs "your query"')}`);
+      runtime.log(`${theme.muted("Search:")} ${formatCliCommand('allbot docs "your query"')}`);
     } else {
       runtime.log("Docs: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/");
-      runtime.log(`Search: ${formatCliCommand('kaijibot docs "your query"')}`);
+      runtime.log(`Search: ${formatCliCommand('allbot docs "your query"')}`);
     }
     return;
   }

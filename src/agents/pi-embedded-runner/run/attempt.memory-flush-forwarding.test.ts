@@ -37,7 +37,7 @@ function createAttemptParams(workspaceDir: string) {
 
 describe("runEmbeddedAttempt memory flush tool forwarding", () => {
   it("forwards memory trigger metadata into tool creation so append-only guards activate", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-attempt-memory-flush-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-attempt-memory-flush-"));
 
     try {
       expect(buildEmbeddedAttemptToolRunContext(createAttemptParams(workspaceDir))).toMatchObject({
@@ -50,7 +50,7 @@ describe("runEmbeddedAttempt memory flush tool forwarding", () => {
   });
 
   it("activates the memory flush append-only write wrapper", async () => {
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-attempt-memory-flush-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-attempt-memory-flush-"));
     const memoryFile = path.join(workspaceDir, MEMORY_RELATIVE_PATH);
 
     try {

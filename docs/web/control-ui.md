@@ -11,7 +11,7 @@ title: "Control UI"
 The Control UI is a small **Vite + Lit** single-page app served by the Gateway:
 
 - default: `http://<host>:18789/`
-- optional prefix: set `gateway.controlUi.basePath` (e.g. `/kaijibot`)
+- optional prefix: set `gateway.controlUi.basePath` (e.g. `/allbot`)
 
 It speaks **directly to the Gateway WebSocket** on the same port.
 
@@ -21,7 +21,7 @@ If the Gateway is running on the same computer, open:
 
 - [http://127.0.0.1:18789/](http://127.0.0.1:18789/) (or [http://localhost:18789/](http://localhost:18789/))
 
-If the page fails to load, start the Gateway first: `kaijibot gateway`.
+If the page fails to load, start the Gateway first: `allbot gateway`.
 
 Auth is supplied during the WebSocket handshake via:
 
@@ -48,18 +48,18 @@ unauthorized access.
 
 ```bash
 # List pending requests
-kaijibot devices list
+allbot devices list
 
 # Approve by request ID
-kaijibot devices approve <requestId>
+allbot devices approve <requestId>
 ```
 
 If the browser retries pairing with changed auth details (role/scopes/public
 key), the previous pending request is superseded and a new `requestId` is
-created. Re-run `kaijibot devices list` before approval.
+created. Re-run `allbot devices list` before approval.
 
 Once approved, the device is remembered and won't require re-approval unless
-you revoke it with `kaijibot devices revoke --device <id> --role <role>`. See
+you revoke it with `allbot devices revoke --device <id> --role <role>`. See
 [Devices CLI](/cli/devices) for token rotation and revocation.
 
 **Notes:**
@@ -94,7 +94,7 @@ locale picker lives in the Gateway Access card, not under Appearance.
 - Skills: status, enable/disable, install, API key updates (`skills.*`)
 - Nodes: list + caps (`node.list`)
 - Exec approvals: edit gateway or node allowlists + ask policy for `exec host=gateway/node` (`exec.approvals.*`)
-- Config: view/edit `~/.kaijibot/kaijibot.json` (`config.get`, `config.set`)
+- Config: view/edit `~/.allbot/allbot.json` (`config.get`, `config.set`)
 - Config: apply + restart with validation (`config.apply`) and wake the last active session
 - Config writes include a base-hash guard to prevent clobbering concurrent edits
 - Config writes (`config.set`/`config.apply`/`config.patch`) also preflight active SecretRef resolution for refs in the submitted config payload; unresolved active submitted refs are rejected before write
@@ -131,7 +131,7 @@ Cron jobs panel notes:
 - The chat header model and thinking pickers patch the active session immediately through `sessions.patch`; they are persistent session overrides, not one-turn-only send options.
 - Stop:
   - Click **Stop** (calls `chat.abort`)
-  - Type `/stop` (or standalone abort phrases like `stop`, `stop action`, `stop run`, `stop kaijibot`, `please stop`) to abort out-of-band
+  - Type `/stop` (or standalone abort phrases like `stop`, `stop action`, `stop run`, `stop allbot`, `please stop`) to abort out-of-band
   - `chat.abort` supports `{ sessionKey }` (no `runId`) to abort all active runs for that session
 - Abort partial retention:
   - When a run is aborted, partial assistant text can still be shown in the UI
@@ -145,7 +145,7 @@ Cron jobs panel notes:
 Keep the Gateway on loopback and let Tailscale Serve proxy it with HTTPS:
 
 ```bash
-kaijibot gateway --tailscale serve
+allbot gateway --tailscale serve
 ```
 
 Open:
@@ -153,7 +153,7 @@ Open:
 - `https://<magicdns>/` (or your configured `gateway.controlUi.basePath`)
 
 By default, Control UI/WebSocket Serve requests can authenticate via Tailscale identity headers
-(`tailscale-user-login`) when `gateway.auth.allowTailscale` is `true`. KaijiBot
+(`tailscale-user-login`) when `gateway.auth.allowTailscale` is `true`. AllBot
 verifies the identity by resolving the `x-forwarded-for` address with
 `tailscale whois` and matching it to the header, and only accepts these when the
 request hits loopback with Tailscale’s `x-forwarded-*` headers. Set
@@ -170,7 +170,7 @@ code may run on that host, require token/password auth.
 ### Bind to tailnet + token
 
 ```bash
-kaijibot gateway --bind tailnet --token "$(openssl rand -hex 32)"
+allbot gateway --bind tailnet --token "$(openssl rand -hex 32)"
 ```
 
 Then open:
@@ -184,7 +184,7 @@ Paste the matching shared secret into the UI settings (sent as
 
 If you open the dashboard over plain HTTP (`http://<lan-ip>` or `http://<tailscale-ip>`),
 the browser runs in a **non-secure context** and blocks WebCrypto. By default,
-KaijiBot **blocks** Control UI connections without device identity.
+AllBot **blocks** Control UI connections without device identity.
 
 Documented exceptions:
 
@@ -252,7 +252,7 @@ pnpm ui:build # auto-installs UI deps on first run
 Optional absolute base (when you want fixed asset URLs):
 
 ```bash
-KAIJIBOT_CONTROL_UI_BASE_PATH=/kaijibot/ pnpm ui:build
+ALLBOT_CONTROL_UI_BASE_PATH=/allbot/ pnpm ui:build
 ```
 
 For local development (separate dev server):

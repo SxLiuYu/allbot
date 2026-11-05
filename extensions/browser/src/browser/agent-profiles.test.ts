@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { BrowserConfig, KaijiBotConfig } from "../config/config.js";
+import type { BrowserConfig, AllBotConfig } from "../config/config.js";
 import {
   agentBrowserProfileName,
   ensureAgentBrowserProfile,
@@ -9,8 +9,8 @@ import type { ResolvedBrowserConfig } from "./config.js";
 
 type TestProfile = { cdpPort?: number; cdpUrl?: string; color?: string };
 
-function makeConfig(profiles: Record<string, TestProfile> = {}): KaijiBotConfig {
-  return { browser: { profiles } } as unknown as KaijiBotConfig;
+function makeConfig(profiles: Record<string, TestProfile> = {}): AllBotConfig {
+  return { browser: { profiles } } as unknown as AllBotConfig;
 }
 
 describe("agentBrowserProfileName", () => {
@@ -34,7 +34,7 @@ describe("agentBrowserProfileName", () => {
   });
 
   it("never collides with the reserved default profile names", () => {
-    expect(agentBrowserProfileName("kaijibot")).not.toBe("kaijibot");
+    expect(agentBrowserProfileName("allbot")).not.toBe("allbot");
     expect(agentBrowserProfileName("user")).not.toBe("user");
   });
 });
@@ -55,7 +55,7 @@ describe("ensureAgentBrowserProfile", () => {
   // ./config.js process-wide, so every dependency is injected here.
   const resolveWithRange = (
     browser: BrowserConfig | undefined,
-    _root: KaijiBotConfig,
+    _root: AllBotConfig,
   ): ResolvedBrowserConfig =>
     ({
       profiles: browser?.profiles ?? {},
@@ -64,9 +64,9 @@ describe("ensureAgentBrowserProfile", () => {
     }) as unknown as ResolvedBrowserConfig;
 
   it("creates the profile with an allocated port and persists config", async () => {
-    const written: KaijiBotConfig[] = [];
+    const written: AllBotConfig[] = [];
     const result = await ensureAgentBrowserProfile("main", {
-      loadConfig: () => makeConfig({ kaijibot: { cdpPort: 18800, color: "#FF4500" } }),
+      loadConfig: () => makeConfig({ allbot: { cdpPort: 18800, color: "#FF4500" } }),
       writeConfigFile: async (cfg) => {
         written.push(cfg);
       },
@@ -79,7 +79,7 @@ describe("ensureAgentBrowserProfile", () => {
     expect(profile?.cdpPort).toBe(18801);
     expect(typeof profile?.color).toBe("string");
     expect(profile?.color).not.toBe("#FF4500");
-    expect(cfg.browser?.profiles?.kaijibot).toBeDefined();
+    expect(cfg.browser?.profiles?.allbot).toBeDefined();
   });
 
   it("is idempotent when the profile already exists", async () => {

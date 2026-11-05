@@ -3,7 +3,7 @@ import { getApiKeyForModel, requireApiKey } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { resolveModelAsync } from "../../agents/pi-embedded-runner/model.js";
 import { prepareModelForSimpleCompletion } from "../../agents/simple-completion-transport.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { logVerbose } from "../../globals.js";
 
 const DEFAULT_MAX_LABEL_LENGTH = 128;
@@ -12,7 +12,7 @@ const TIMEOUT_MS = 15_000;
 export type ConversationLabelParams = {
   userMessage: string;
   prompt: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId?: string;
   agentDir?: string;
   maxLength?: number;

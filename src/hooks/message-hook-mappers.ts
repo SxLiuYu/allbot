@@ -1,6 +1,6 @@
 import type { FinalizedMsgContext } from "../auto-reply/templating.js";
 import { getChannelPlugin, normalizeChannelId } from "../channels/plugins/index.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type {
   PluginHookInboundClaimContext,
   PluginHookInboundClaimEvent,
@@ -334,8 +334,8 @@ export function toInternalMessageReceivedContext(
 
 export function toInternalMessageTranscribedContext(
   canonical: CanonicalInboundMessageHookContext,
-  cfg: KaijiBotConfig,
-): MessageTranscribedHookContext & { cfg: KaijiBotConfig } {
+  cfg: AllBotConfig,
+): MessageTranscribedHookContext & { cfg: AllBotConfig } {
   const shared = toInternalInboundMessageHookContextBase(canonical);
   return {
     ...shared,
@@ -346,8 +346,8 @@ export function toInternalMessageTranscribedContext(
 
 export function toInternalMessagePreprocessedContext(
   canonical: CanonicalInboundMessageHookContext,
-  cfg: KaijiBotConfig,
-): MessagePreprocessedHookContext & { cfg: KaijiBotConfig } {
+  cfg: AllBotConfig,
+): MessagePreprocessedHookContext & { cfg: AllBotConfig } {
   const shared = toInternalInboundMessageHookContextBase(canonical);
   return {
     ...shared,

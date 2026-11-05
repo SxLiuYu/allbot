@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createChannelTestPluginBase, createTestRegistry } from "../test-utils/channel-plugins.js";
 import { WizardCancelledError, type WizardPrompter } from "../wizard/prompts.js";
@@ -20,14 +20,14 @@ function setTelegramRegistryForTests(): void {
             capabilities: { chatTypes: ["direct", "group"] },
           }),
           setup: {
-            applyAccountConfig: ({ cfg }: { cfg: KaijiBotConfig }) => cfg,
+            applyAccountConfig: ({ cfg }: { cfg: AllBotConfig }) => cfg,
           },
           setupWizard: {
             channel: "telegram",
             status: {
               configuredLabel: "Configured",
               unconfiguredLabel: "Not configured",
-              resolveConfigured: ({ cfg }: { cfg: KaijiBotConfig }) =>
+              resolveConfigured: ({ cfg }: { cfg: AllBotConfig }) =>
                 Boolean(cfg.channels?.telegram?.botToken),
             },
             credentials: [],
@@ -74,7 +74,7 @@ describe("setupChannels per-channel failure isolation", () => {
     const prompter = createSelectingTelegramThenDonePrompter();
 
     try {
-      const cfg = await setupChannels({} as KaijiBotConfig, createExitThrowingRuntime(), prompter, {
+      const cfg = await setupChannels({} as AllBotConfig, createExitThrowingRuntime(), prompter, {
         quickstartDefaults: true,
         skipConfirm: true,
       });
@@ -106,7 +106,7 @@ describe("setupChannels per-channel failure isolation", () => {
 
     try {
       await expect(
-        setupChannels({} as KaijiBotConfig, createExitThrowingRuntime(), prompter, {
+        setupChannels({} as AllBotConfig, createExitThrowingRuntime(), prompter, {
           quickstartDefaults: true,
           skipConfirm: true,
         }),

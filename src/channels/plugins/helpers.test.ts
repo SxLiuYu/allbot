@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   buildAccountScopedDmSecurityPolicy,
   formatPairingApproveHint,
   parseOptionalDelimitedEntries,
 } from "./helpers.js";
 
-function cfgWithChannel(channelKey: string, accounts?: Record<string, unknown>): KaijiBotConfig {
+function cfgWithChannel(channelKey: string, accounts?: Record<string, unknown>): AllBotConfig {
   return {
     channels: {
       [channelKey]: accounts ? { accounts } : {},
     },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 describe("buildAccountScopedDmSecurityPolicy", () => {
@@ -83,14 +83,14 @@ describe("buildAccountScopedDmSecurityPolicy", () => {
         allowFrom: ["user-1"],
         defaultPolicy: "allowlist",
         policyPathSuffix: "dmPolicy",
-        approveHint: "kaijibot pairing approve demo-default <code>",
+        approveHint: "allbot pairing approve demo-default <code>",
       },
       expected: {
         policy: "allowlist",
         allowFrom: ["user-1"],
         policyPath: "channels.demo-default.dmPolicy",
         allowFromPath: "channels.demo-default.",
-        approveHint: "kaijibot pairing approve demo-default <code>",
+        approveHint: "allbot pairing approve demo-default <code>",
         normalizeEntry: undefined,
       },
     },

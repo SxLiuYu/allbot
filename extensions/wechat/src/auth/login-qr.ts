@@ -190,7 +190,7 @@ export type WeixinQrWaitResult = {
   connected: boolean;
   /**
    * Server reported `binded_redirect`: the scanned bot is already bound to
-   * this KaijiBot instance, so no new credentials are issued and existing
+   * this AllBot instance, so no new credentials are issued and existing
    * local credentials remain valid. Callers should treat this as a successful
    * outcome (semantically "already done") rather than a login failure.
    */
@@ -437,12 +437,12 @@ export async function waitForWeixinLogin(opts: {
           logger.info(
             `waitForWeixinLogin: binded_redirect received, bot already bound sessionKey=${opts.sessionKey}`,
           );
-          process.stdout.write("\n✅ 已连接过此 KaijiBot，无需重复连接。\n");
+          process.stdout.write("\n✅ 已连接过此 AllBot，无需重复连接。\n");
           activeLogins.delete(opts.sessionKey);
           return {
             connected: false,
             alreadyConnected: true,
-            message: "已连接过此 KaijiBot，无需重复连接。",
+            message: "已连接过此 AllBot，无需重复连接。",
           };
         }
         case "scaned_but_redirect": {
@@ -483,7 +483,7 @@ export async function waitForWeixinLogin(opts: {
             accountId: statusResponse.ilink_bot_id,
             baseUrl: statusResponse.baseurl,
             userId: statusResponse.ilink_user_id,
-            message: "已将此 KaijiBot 连接到微信。",
+            message: "已将此 AllBot 连接到微信。",
           };
         }
       }

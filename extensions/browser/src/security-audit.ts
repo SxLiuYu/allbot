@@ -1,8 +1,8 @@
-import type { KaijiBotPluginSecurityAuditContext } from "kaijibot/plugin-sdk/plugin-entry";
-import { hasConfiguredSecretInput } from "kaijibot/plugin-sdk/secret-input";
-import { formatCliCommand } from "kaijibot/plugin-sdk/setup-tools";
-import { isPrivateNetworkOptInEnabled, isPrivateIpAddress } from "kaijibot/plugin-sdk/ssrf-policy";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import type { AllBotPluginSecurityAuditContext } from "allbot/plugin-sdk/plugin-entry";
+import { hasConfiguredSecretInput } from "allbot/plugin-sdk/secret-input";
+import { formatCliCommand } from "allbot/plugin-sdk/setup-tools";
+import { isPrivateNetworkOptInEnabled, isPrivateIpAddress } from "allbot/plugin-sdk/ssrf-policy";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { redactCdpUrl, resolveBrowserConfig, resolveProfile } from "./browser/config.js";
 import { resolveBrowserControlAuth } from "./browser/control-auth.js";
 import { hasNonEmptyString } from "./record-shared.js";
@@ -18,7 +18,7 @@ function isTrustedPrivateHostname(hostname: string): boolean {
   return normalized.length > 0 && BLOCKED_HOSTNAMES.has(normalized);
 }
 
-export function collectBrowserSecurityAuditFindings(ctx: KaijiBotPluginSecurityAuditContext) {
+export function collectBrowserSecurityAuditFindings(ctx: AllBotPluginSecurityAuditContext) {
   const findings: Array<{
     checkId: string;
     severity: "warn" | "critical";
@@ -36,7 +36,7 @@ export function collectBrowserSecurityAuditFindings(ctx: KaijiBotPluginSecurityA
       severity: "warn" as const,
       title: "Browser control config looks invalid",
       detail: String(err),
-      remediation: `Fix browser.cdpUrl in ${ctx.configPath} and re-run "${formatCliCommand("kaijibot security audit --deep")}".`,
+      remediation: `Fix browser.cdpUrl in ${ctx.configPath} and re-run "${formatCliCommand("allbot security audit --deep")}".`,
     });
     return findings;
   }
@@ -49,7 +49,7 @@ export function collectBrowserSecurityAuditFindings(ctx: KaijiBotPluginSecurityA
   const explicitAuthMode = ctx.config.gateway?.auth?.mode;
   const tokenConfigured =
     Boolean(browserAuth.token) ||
-    hasNonEmptyString(ctx.env.KAIJIBOT_GATEWAY_TOKEN) ||
+    hasNonEmptyString(ctx.env.ALLBOT_GATEWAY_TOKEN) ||
     hasConfiguredSecretInput(ctx.config.gateway?.auth?.token, ctx.config.secrets?.defaults);
   const passwordCanWin =
     explicitAuthMode === "password" ||
@@ -60,7 +60,7 @@ export function collectBrowserSecurityAuditFindings(ctx: KaijiBotPluginSecurityA
   const passwordConfigured =
     Boolean(browserAuth.password) ||
     (passwordCanWin &&
-      (hasNonEmptyString(ctx.env.KAIJIBOT_GATEWAY_PASSWORD) ||
+      (hasNonEmptyString(ctx.env.ALLBOT_GATEWAY_PASSWORD) ||
         hasConfiguredSecretInput(
           ctx.config.gateway?.auth?.password,
           ctx.config.secrets?.defaults,
@@ -134,9 +134,9 @@ export function collectBrowserSecurityAuditFindings(ctx: KaijiBotPluginSecurityA
         detail:
           `browser.proxy.enabled is on and ${agentProfiles.length} agent browser profile(s) (${preview}${suffix}) ` +
           "keep persistent user-data dirs (with any manually established logins/cookies) under the " +
-          "kaijibot config directory until the profile is deleted.",
+          "allbot config directory until the profile is deleted.",
         remediation:
-          "Keep the kaijibot config directory private (it already holds credentials). Delete unused agent profiles (browser tool action=profiles, or DELETE /profiles/<name>) to trash their user-data dirs and end those sessions.",
+          "Keep the allbot config directory private (it already holds credentials). Delete unused agent profiles (browser tool action=profiles, or DELETE /profiles/<name>) to trash their user-data dirs and end those sessions.",
       });
     }
   }

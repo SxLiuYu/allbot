@@ -1,6 +1,6 @@
-export { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+export { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 export type {
-  KaijiBotPluginApi,
+  AllBotPluginApi,
   ProviderAuthContext,
   ProviderAuthResult,
-} from "kaijibot/plugin-sdk/core";
+} from "allbot/plugin-sdk/core";

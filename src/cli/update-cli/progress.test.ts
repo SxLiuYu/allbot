@@ -14,7 +14,7 @@ function makeResult(
     steps: [
       {
         name: stepName,
-        command: "npm i -g kaijibot@latest",
+        command: "npm i -g allbot@latest",
         cwd: "/tmp",
         durationMs: 1,
         exitCode: 1,

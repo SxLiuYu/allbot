@@ -371,8 +371,8 @@ describe("resolveConfigEnvVars", () => {
         },
         {
           name: "gateway auth token",
-          config: { gateway: { auth: { token: "${KAIJIBOT_GATEWAY_TOKEN}" } } },
-          env: { KAIJIBOT_GATEWAY_TOKEN: "secret-token" },
+          config: { gateway: { auth: { token: "${ALLBOT_GATEWAY_TOKEN}" } } },
+          env: { ALLBOT_GATEWAY_TOKEN: "secret-token" },
           expected: { gateway: { auth: { token: "secret-token" } } },
         },
         {

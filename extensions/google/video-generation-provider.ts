@@ -2,14 +2,14 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { GoogleGenAI } from "@google/genai";
-import { isProviderApiKeyConfigured } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { isProviderApiKeyConfigured } from "allbot/plugin-sdk/provider-auth";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import type {
   GeneratedVideoAsset,
   VideoGenerationProvider,
   VideoGenerationRequest,
-} from "kaijibot/plugin-sdk/video-generation";
+} from "allbot/plugin-sdk/video-generation";
 import { normalizeGoogleApiBaseUrl } from "./api.js";
 
 const DEFAULT_GOOGLE_VIDEO_MODEL = "veo-3.1-fast-generate-preview";
@@ -124,7 +124,7 @@ async function downloadGeneratedVideo(params: {
   file: unknown;
   index: number;
 }): Promise<GeneratedVideoAsset> {
-  const tempDir = await mkdtemp(path.join(os.tmpdir(), "kaijibot-google-video-"));
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "allbot-google-video-"));
   const downloadPath = path.join(tempDir, `video-${params.index + 1}.mp4`);
   try {
     await params.client.files.download({

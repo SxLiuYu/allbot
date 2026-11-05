@@ -63,7 +63,7 @@ async function withModeExecProviderFixture(
   label: string,
   run: (fixture: ModeExecProviderFixture) => Promise<void>,
 ) {
-  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), `kaijibot-tui-mode-${label}-`));
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), `allbot-tui-mode-${label}-`));
   const tokenMarker = path.join(tempDir, "token-provider-ran");
   const passwordMarker = path.join(tempDir, "password-provider-ran");
   const tokenExecProgram = [
@@ -106,9 +106,9 @@ describe("resolveGatewayConnection", () => {
 
   beforeEach(() => {
     envSnapshot = captureEnv([
-      "KAIJIBOT_GATEWAY_URL",
-      "KAIJIBOT_GATEWAY_TOKEN",
-      "KAIJIBOT_GATEWAY_PASSWORD",
+      "ALLBOT_GATEWAY_URL",
+      "ALLBOT_GATEWAY_TOKEN",
+      "ALLBOT_GATEWAY_PASSWORD",
     ]);
     loadConfig.mockReset();
     resolveGatewayPort.mockReset();
@@ -116,15 +116,15 @@ describe("resolveGatewayConnection", () => {
     resolveConfigPath.mockReset();
     resolveGatewayPort.mockReturnValue(18789);
     resolveStateDir.mockImplementation(
-      (env: NodeJS.ProcessEnv) => env.KAIJIBOT_STATE_DIR ?? "/tmp/kaijibot",
+      (env: NodeJS.ProcessEnv) => env.ALLBOT_STATE_DIR ?? "/tmp/allbot",
     );
     resolveConfigPath.mockImplementation(
       (env: NodeJS.ProcessEnv, stateDir: string) =>
-        env.KAIJIBOT_CONFIG_PATH ?? `${stateDir}/kaijibot.json`,
+        env.ALLBOT_CONFIG_PATH ?? `${stateDir}/allbot.json`,
     );
-    delete process.env.KAIJIBOT_GATEWAY_URL;
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-    delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
+    delete process.env.ALLBOT_GATEWAY_URL;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_PASSWORD;
   });
 
   afterEach(() => {
@@ -167,16 +167,16 @@ describe("resolveGatewayConnection", () => {
   it("uses config auth token for local mode when both config and env tokens are set", async () => {
     loadConfig.mockReturnValue({ gateway: { mode: "local", auth: { token: "config-token" } } });
 
-    await withEnvAsync({ KAIJIBOT_GATEWAY_TOKEN: "env-token" }, async () => {
+    await withEnvAsync({ ALLBOT_GATEWAY_TOKEN: "env-token" }, async () => {
       const result = await resolveGatewayConnection({});
       expect(result.token).toBe("config-token");
     });
   });
 
-  it("falls back to KAIJIBOT_GATEWAY_TOKEN when config token is missing", async () => {
+  it("falls back to ALLBOT_GATEWAY_TOKEN when config token is missing", async () => {
     loadConfig.mockReturnValue({ gateway: { mode: "local" } });
 
-    await withEnvAsync({ KAIJIBOT_GATEWAY_TOKEN: "env-token" }, async () => {
+    await withEnvAsync({ ALLBOT_GATEWAY_TOKEN: "env-token" }, async () => {
       const result = await resolveGatewayConnection({});
       expect(result.token).toBe("env-token");
     });
@@ -245,7 +245,7 @@ describe("resolveGatewayConnection", () => {
     );
   });
 
-  it("prefers KAIJIBOT_GATEWAY_PASSWORD over remote password fallback", async () => {
+  it("prefers ALLBOT_GATEWAY_PASSWORD over remote password fallback", async () => {
     loadConfig.mockReturnValue({
       gateway: {
         mode: "remote",
@@ -253,7 +253,7 @@ describe("resolveGatewayConnection", () => {
       },
     });
 
-    const gatewayPasswordEnv = "KAIJIBOT_GATEWAY_PASSWORD"; // pragma: allowlist secret
+    const gatewayPasswordEnv = "ALLBOT_GATEWAY_PASSWORD"; // pragma: allowlist secret
     const gatewayPassword = "env-pass"; // pragma: allowlist secret
     await withEnvAsync({ [gatewayPasswordEnv]: gatewayPassword }, async () => {
       const result = await resolveGatewayConnection({});
@@ -264,7 +264,7 @@ describe("resolveGatewayConnection", () => {
   it.runIf(process.platform !== "win32")(
     "resolves file-backed SecretRef token for local mode",
     async () => {
-      const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-tui-file-secret-"));
+      const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-tui-file-secret-"));
       const secretFile = path.join(tempDir, "secrets.json");
       await fs.writeFile(secretFile, JSON.stringify({ gatewayToken: "file-secret-token" }), "utf8");
       await fs.chmod(secretFile, 0o600);
@@ -433,7 +433,7 @@ describe("GatewayChatClient", () => {
     expect(
       (client as unknown as { client: { opts: { clientName?: string; mode?: string } } }).client
         .opts.clientName,
-    ).toBe("kaijibot-tui");
+    ).toBe("allbot-tui");
     expect(
       (client as unknown as { client: { opts: { clientName?: string; mode?: string } } }).client
         .opts.mode,

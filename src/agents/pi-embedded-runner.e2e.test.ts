@@ -160,7 +160,7 @@ const installRunEmbeddedMocks = () => {
     const mod = await vi.importActual<typeof import("./models-config.js")>("./models-config.js");
     return {
       ...mod,
-      ensureKaijiBotModelsJson: vi.fn(async () => ({ wrote: false })),
+      ensureAllBotModelsJson: vi.fn(async () => ({ wrote: false })),
     };
   });
 };
@@ -179,7 +179,7 @@ beforeAll(async () => {
   installRunEmbeddedMocks();
   ({ runEmbeddedPiAgent } = await import("./pi-embedded-runner/run.js"));
   ({ SessionManager } = await import("@earendil-works/pi-coding-agent"));
-  e2eWorkspace = await createEmbeddedPiRunnerTestWorkspace("kaijibot-embedded-agent-");
+  e2eWorkspace = await createEmbeddedPiRunnerTestWorkspace("allbot-embedded-agent-");
   ({ agentDir, workspaceDir } = e2eWorkspace);
 }, 180_000);
 

@@ -1,11 +1,11 @@
-import { resolveActiveTalkProviderConfig } from "kaijibot/plugin-sdk/config-runtime";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import type { SpeechVoiceOption } from "kaijibot/plugin-sdk/speech";
+import { resolveActiveTalkProviderConfig } from "allbot/plugin-sdk/config-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import type { SpeechVoiceOption } from "allbot/plugin-sdk/speech";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
-} from "kaijibot/plugin-sdk/text-runtime";
-import { definePluginEntry, type KaijiBotPluginApi } from "./api.js";
+} from "allbot/plugin-sdk/text-runtime";
+import { definePluginEntry, type AllBotPluginApi } from "./api.js";
 
 function mask(s: string, keep: number = 6): string {
   const trimmed = s.trim();
@@ -120,7 +120,7 @@ export default definePluginEntry({
   id: "talk-voice",
   name: "Talk Voice",
   description: "Command helpers for managing Talk voice configuration",
-  register(api: KaijiBotPluginApi) {
+  register(api: AllBotPluginApi) {
     api.registerCommand({
       name: "voice",
       nativeNames: {},

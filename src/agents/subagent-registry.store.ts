@@ -32,12 +32,12 @@ type LegacySubagentRunRecord = PersistedSubagentRunRecord & {
 };
 
 function resolveSubagentStateDir(env: NodeJS.ProcessEnv = process.env): string {
-  const explicit = env.KAIJIBOT_STATE_DIR?.trim();
+  const explicit = env.ALLBOT_STATE_DIR?.trim();
   if (explicit) {
     return resolveStateDir(env);
   }
   if (env.VITEST || env.NODE_ENV === "test") {
-    return path.join(os.tmpdir(), "kaijibot-test-state", String(process.pid));
+    return path.join(os.tmpdir(), "allbot-test-state", String(process.pid));
   }
   return resolveStateDir(env);
 }

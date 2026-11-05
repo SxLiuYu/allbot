@@ -4,7 +4,7 @@ import { resolveFastModeState } from "../../agents/fast-mode.js";
 import type { ModelAliasIndex } from "../../agents/model-selection.js";
 import { resolveSandboxRuntimeStatus } from "../../agents/sandbox/runtime-status.js";
 import type { SkillCommandSpec } from "../../agents/skills.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions.js";
 import { normalizeAgentId } from "../../routing/session-key.js";
 import {
@@ -37,7 +37,7 @@ import { formatElevatedUnavailableMessage, resolveElevatedPermissions } from "./
 import { stripInlineStatus } from "./reply-inline.js";
 import type { TypingController } from "./typing.js";
 
-type AgentDefaults = NonNullable<KaijiBotConfig["agents"]>["defaults"];
+type AgentDefaults = NonNullable<AllBotConfig["agents"]>["defaults"];
 
 let commandsRegistryPromise: Promise<typeof import("../commands-registry.runtime.js")> | null =
   null;
@@ -123,7 +123,7 @@ export type ReplyDirectiveResult =
 
 export async function resolveReplyDirectives(params: {
   ctx: MsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   agentDir: string;
   workspaceDir: string;
@@ -423,7 +423,7 @@ export async function resolveReplyDirectives(params: {
     : undefined;
   const useFastReplyRuntime = shouldUseReplyFastTestRuntime({
     cfg,
-    isFastTestEnv: process.env.KAIJIBOT_TEST_FAST === "1",
+    isFastTestEnv: process.env.ALLBOT_TEST_FAST === "1",
   });
 
   const modelState =

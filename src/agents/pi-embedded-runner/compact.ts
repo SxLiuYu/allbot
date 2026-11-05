@@ -9,7 +9,7 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import type { ReasoningLevel, ThinkLevel } from "../../auto-reply/thinking.js";
 import { resolveChannelCapabilities } from "../../config/channel-capabilities.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   ensureContextEnginesInitialized,
   resolveContextEngine,
@@ -39,7 +39,7 @@ import { buildTtsSystemPromptHint } from "../../tts/tts.js";
 import { resolveUserPath } from "../../utils.js";
 import { normalizeMessageChannel } from "../../utils/message-channel.js";
 import { isReasoningTagProvider } from "../../utils/provider-utils.js";
-import { resolveKaijiBotAgentDir } from "../agent-paths.js";
+import { resolveAllBotAgentDir } from "../agent-paths.js";
 import { resolveSessionAgentIds } from "../agent-scope.js";
 import type { ExecElevatedDefaults } from "../bash-tools.js";
 import { makeBootstrapWarn, resolveBootstrapContextForRun } from "../bootstrap-files.js";
@@ -56,7 +56,7 @@ import {
 import { resolveContextWindowInfo } from "../context-window-guard.js";
 import { formatUserTime, resolveUserTimeFormat, resolveUserTimezone } from "../date-time.js";
 import { DEFAULT_CONTEXT_TOKENS, DEFAULT_MODEL, DEFAULT_PROVIDER } from "../defaults.js";
-import { resolveKaijiBotDocsPath } from "../docs-path.js";
+import { resolveAllBotDocsPath } from "../docs-path.js";
 import { resolveHeartbeatPromptForSystemPrompt } from "../heartbeat-system-prompt.js";
 import {
   applyAuthHeaderOverride,
@@ -65,7 +65,7 @@ import {
   resolveModelAuthMode,
 } from "../model-auth.js";
 import { supportsModelTools } from "../model-tool-support.js";
-import { ensureKaijiBotModelsJson } from "../models-config.js";
+import { ensureAllBotModelsJson } from "../models-config.js";
 import { resolveOwnerDisplaySetting } from "../owner-display.js";
 import { createBundleLspToolRuntime } from "../pi-bundle-lsp-runtime.js";
 import { createBundleMcpToolRuntime } from "../pi-bundle-mcp-tools.js";
@@ -76,7 +76,7 @@ import {
   setCompactionSafeguardCancelReason,
 } from "../pi-hooks/compaction-safeguard-runtime.js";
 import { createPreparedEmbeddedPiSettingsManager } from "../pi-project-settings.js";
-import { createKaijiBotCodingTools } from "../pi-tools.js";
+import { createAllBotCodingTools } from "../pi-tools.js";
 import { registerProviderStreamForModel } from "../provider-stream.js";
 import { ensureRuntimePluginsLoaded } from "../runtime-plugins.js";
 import { resolveSandboxContext } from "../sandbox.js";
@@ -178,7 +178,7 @@ export type CompactEmbeddedPiSessionParams = {
   currentTokenCount?: number;
   workspaceDir: string;
   agentDir?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   skillsSnapshot?: SkillSnapshot;
   provider?: string;
   model?: string;
@@ -231,7 +231,7 @@ function prepareCompactionSessionAgent(params: {
   effectiveModel: ProviderRuntimeModel;
   resolvedApiKey?: string;
   authStorage: unknown;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   provider: string;
   modelId: string;
   thinkLevel: ThinkLevel;
@@ -266,7 +266,7 @@ function prepareCompactionSessionAgent(params: {
 
 function resolveCompactionProviderStream(params: {
   effectiveModel: ProviderRuntimeModel;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir: string;
   effectiveWorkspace: string;
 }) {
@@ -397,8 +397,8 @@ export async function compactEmbeddedPiSessionDirect(
       reason,
     };
   };
-  const agentDir = params.agentDir ?? resolveKaijiBotAgentDir();
-  await ensureKaijiBotModelsJson(params.config, agentDir);
+  const agentDir = params.agentDir ?? resolveAllBotAgentDir();
+  await ensureAllBotModelsJson(params.config, agentDir);
   const { model, error, authStorage, modelRegistry } = await resolveModelAsync(
     provider,
     modelId,
@@ -549,7 +549,7 @@ export async function compactEmbeddedPiSessionDirect(
     );
 
     const runAbortController = new AbortController();
-    const toolsRaw = createKaijiBotCodingTools({
+    const toolsRaw = createAllBotCodingTools({
       exec: {
         elevated: params.bashElevated,
       },
@@ -717,7 +717,7 @@ export async function compactEmbeddedPiSessionDirect(
       isSubagentSessionKey(params.sessionKey) || isCronSessionKey(params.sessionKey)
         ? "minimal"
         : "full";
-    const docsPath = await resolveKaijiBotDocsPath({
+    const docsPath = await resolveAllBotDocsPath({
       workspaceDir: effectiveWorkspace,
       argv1: process.argv[1],
       cwd: effectiveWorkspace,
@@ -1347,7 +1347,7 @@ export async function compactEmbeddedPiSession(
       let checkpointSnapshot: CapturedCompactionCheckpointSnapshot | null = null;
       let checkpointSnapshotRetained = false;
       try {
-        const agentDir = params.agentDir ?? resolveKaijiBotAgentDir();
+        const agentDir = params.agentDir ?? resolveAllBotAgentDir();
         const resolvedCompactionTarget = resolveEmbeddedCompactionTarget({
           config: params.config,
           provider: params.provider,

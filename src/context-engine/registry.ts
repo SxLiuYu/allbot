@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { defaultSlotIdForKey } from "../plugins/slots.js";
 import { resolveGlobalSingleton } from "../shared/global-singleton.js";
 import type { ContextEngine } from "./types.js";
@@ -14,7 +14,7 @@ type RegisterContextEngineForOwnerOptions = {
   allowSameOwnerRefresh?: boolean;
 };
 
-const LEGACY_SESSION_KEY_COMPAT = Symbol.for("kaijibot.contextEngine.sessionKeyCompat");
+const LEGACY_SESSION_KEY_COMPAT = Symbol.for("allbot.contextEngine.sessionKeyCompat");
 const SESSION_KEY_COMPAT_METHODS = [
   "bootstrap",
   "maintain",
@@ -302,7 +302,7 @@ function wrapContextEngineWithSessionKeyCompat(engine: ContextEngine): ContextEn
 // Registry (module-level singleton)
 // ---------------------------------------------------------------------------
 
-const CONTEXT_ENGINE_REGISTRY_STATE = Symbol.for("kaijibot.contextEngineRegistryState");
+const CONTEXT_ENGINE_REGISTRY_STATE = Symbol.for("allbot.contextEngineRegistryState");
 const CORE_CONTEXT_ENGINE_OWNER = "core";
 const PUBLIC_CONTEXT_ENGINE_OWNER = "public-sdk";
 
@@ -408,7 +408,7 @@ export function listContextEngineIds(): string[] {
  *
  * Throws if the resolved engine id has no registered factory.
  */
-export async function resolveContextEngine(config?: KaijiBotConfig): Promise<ContextEngine> {
+export async function resolveContextEngine(config?: AllBotConfig): Promise<ContextEngine> {
   const slotValue = config?.plugins?.slots?.contextEngine;
   const engineId =
     typeof slotValue === "string" && slotValue.trim()

@@ -109,7 +109,7 @@ describe("memory hybrid helpers", () => {
             endLine: 2,
             source: "memory",
             snippet:
-              "KaijiBot is an AI assistant that proactively sends cognitive insights to users via Feishu",
+              "AllBot is an AI assistant that proactively sends cognitive insights to users via Feishu",
             vectorScore: 0.9,
           },
           {
@@ -119,7 +119,7 @@ describe("memory hybrid helpers", () => {
             endLine: 2,
             source: "memory",
             snippet:
-              "KaijiBot is an AI assistant that proactively sends cognitive insights to users via Feishu messaging",
+              "AllBot is an AI assistant that proactively sends cognitive insights to users via Feishu messaging",
             vectorScore: 0.8,
           },
         ],
@@ -173,7 +173,7 @@ describe("memory hybrid helpers", () => {
             startLine: 1,
             endLine: 2,
             source: "memory",
-            snippet: "KaijiBot is an AI assistant for Feishu",
+            snippet: "AllBot is an AI assistant for Feishu",
             vectorScore: 0.9,
           },
           {
@@ -182,7 +182,7 @@ describe("memory hybrid helpers", () => {
             startLine: 1,
             endLine: 2,
             source: "memory",
-            snippet: "KaijiBot is an AI assistant for Feishu users",
+            snippet: "AllBot is an AI assistant for Feishu users",
             vectorScore: 0.8,
           },
         ],
@@ -203,7 +203,7 @@ describe("memory hybrid helpers", () => {
             startLine: 1,
             endLine: 2,
             source: "memory",
-            snippet: "KaijiBot proactively sends cognitive insights to users via Feishu",
+            snippet: "AllBot proactively sends cognitive insights to users via Feishu",
             vectorScore: 0.95,
           },
           {
@@ -212,7 +212,7 @@ describe("memory hybrid helpers", () => {
             startLine: 1,
             endLine: 2,
             source: "memory",
-            snippet: "KaijiBot proactively sends cognitive insights to users via Feishu chat",
+            snippet: "AllBot proactively sends cognitive insights to users via Feishu chat",
             vectorScore: 0.9,
           },
           {

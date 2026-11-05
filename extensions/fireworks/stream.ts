@@ -1,8 +1,8 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import { streamSimple } from "@earendil-works/pi-ai";
-import type { ProviderWrapStreamFnContext } from "kaijibot/plugin-sdk/plugin-entry";
-import { normalizeProviderId } from "kaijibot/plugin-sdk/provider-model-shared";
-import { streamWithPayloadPatch } from "kaijibot/plugin-sdk/provider-stream-shared";
+import type { ProviderWrapStreamFnContext } from "allbot/plugin-sdk/plugin-entry";
+import { normalizeProviderId } from "allbot/plugin-sdk/provider-model-shared";
+import { streamWithPayloadPatch } from "allbot/plugin-sdk/provider-stream-shared";
 import { isFireworksKimiModelId } from "./model-id.js";
 
 function isFireworksProviderId(providerId: string): boolean {

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   type DeliverFn,
   drainReconnectQueue,
@@ -21,7 +21,7 @@ function createMockLogger(): RecoveryLogger {
   };
 }
 
-const stubCfg = {} as KaijiBotConfig;
+const stubCfg = {} as AllBotConfig;
 
 describe("drainReconnectQueue", () => {
   let fixtureRoot = "";
@@ -29,7 +29,7 @@ describe("drainReconnectQueue", () => {
   let fixtureCount = 0;
 
   beforeAll(() => {
-    fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-drain-"));
+    fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-drain-"));
   });
 
   beforeEach(() => {

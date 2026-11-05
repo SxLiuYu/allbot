@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { Type } from "typebox";
-import { loadConfig, type KaijiBotConfig } from "../../config/config.js";
+import { loadConfig, type AllBotConfig } from "../../config/config.js";
 import { resolveAgentWorkspaceDir } from "../agent-scope.js";
 import type { AnyAgentTool } from "./common.js";
 import { jsonResult } from "./common.js";
@@ -28,7 +28,7 @@ const DialogueListToolSchema = Type.Object({
 
 const FILENAME_RE = /^(\d{4}-\d{2}-\d{2})-(\d{4})\.md$/;
 
-export function createDialogueListTool(opts?: { config?: KaijiBotConfig }): AnyAgentTool {
+export function createDialogueListTool(opts?: { config?: AllBotConfig }): AnyAgentTool {
   return {
     label: "Dialogue List",
     name: "dialogue_list",

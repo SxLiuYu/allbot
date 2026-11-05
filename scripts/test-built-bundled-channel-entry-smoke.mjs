@@ -9,17 +9,17 @@ import { installProcessWarningFilter } from "./process-warning-filter.mjs";
 
 installProcessWarningFilter();
 
-process.env.KAIJIBOT_DISABLE_BUNDLED_ENTRY_SOURCE_FALLBACK ??= "1";
+process.env.ALLBOT_DISABLE_BUNDLED_ENTRY_SOURCE_FALLBACK ??= "1";
 
 const { packageRoot } = parsePackageRootArg(
   process.argv.slice(2),
-  "KAIJIBOT_BUNDLED_CHANNEL_SMOKE_ROOT",
+  "ALLBOT_BUNDLED_CHANNEL_SMOKE_ROOT",
 );
 const distExtensionsRoot = path.join(packageRoot, "dist", "extensions");
-const installedLayoutEnv = "KAIJIBOT_BUNDLED_CHANNEL_SMOKE_INSTALLED_LAYOUT";
+const installedLayoutEnv = "ALLBOT_BUNDLED_CHANNEL_SMOKE_INSTALLED_LAYOUT";
 
 function packageRootLooksInstalled(root) {
-  return root.replaceAll("\\", "/").endsWith("/node_modules/kaijibot");
+  return root.replaceAll("\\", "/").endsWith("/node_modules/allbot");
 }
 
 function smokeInInstalledLayoutIfNeeded() {
@@ -27,9 +27,9 @@ function smokeInInstalledLayoutIfNeeded() {
     return;
   }
 
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-channel-entry-smoke-"));
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-entry-smoke-"));
   const nodeModulesRoot = path.join(tempRoot, "node_modules");
-  const installedPackageRoot = path.join(nodeModulesRoot, "kaijibot");
+  const installedPackageRoot = path.join(nodeModulesRoot, "allbot");
   fs.mkdirSync(nodeModulesRoot, { recursive: true });
   fs.symlinkSync(packageRoot, installedPackageRoot, "dir");
 
@@ -79,13 +79,13 @@ function collectBundledChannelEntryFiles() {
       continue;
     }
     const packageJson = readJson(packageJsonPath);
-    if (!packageJson.kaijibot?.channel) {
+    if (!packageJson.allbot?.channel) {
       continue;
     }
 
     const extensionEntries =
-      Array.isArray(packageJson.kaijibot.extensions) && packageJson.kaijibot.extensions.length > 0
-        ? packageJson.kaijibot.extensions
+      Array.isArray(packageJson.allbot.extensions) && packageJson.allbot.extensions.length > 0
+        ? packageJson.allbot.extensions
         : ["./index.ts"];
     for (const entry of extensionEntries) {
       if (typeof entry !== "string" || entry.trim().length === 0) {
@@ -98,7 +98,7 @@ function collectBundledChannelEntryFiles() {
       });
     }
 
-    const setupEntry = packageJson.kaijibot.setupEntry;
+    const setupEntry = packageJson.allbot.setupEntry;
     if (typeof setupEntry === "string" && setupEntry.trim().length > 0) {
       files.push({
         id: dirent.name,

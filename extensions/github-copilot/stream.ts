@@ -1,12 +1,12 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import { streamSimple } from "@earendil-works/pi-ai";
-import type { ProviderWrapStreamFnContext } from "kaijibot/plugin-sdk/plugin-entry";
+import type { ProviderWrapStreamFnContext } from "allbot/plugin-sdk/plugin-entry";
 import {
   applyAnthropicEphemeralCacheControlMarkers,
   buildCopilotDynamicHeaders,
   hasCopilotVisionInput,
   streamWithPayloadPatch,
-} from "kaijibot/plugin-sdk/provider-stream-shared";
+} from "allbot/plugin-sdk/provider-stream-shared";
 
 type _StreamContext = Parameters<StreamFn>[1];
 

@@ -48,7 +48,7 @@ interface ModelsDevCacheFile {
 }
 
 /**
- * Normalized KaijiBot-facing model metadata, derived from a models.dev entry.
+ * Normalized AllBot-facing model metadata, derived from a models.dev entry.
  */
 export interface ModelsDevMetadata {
   name?: string;
@@ -282,7 +282,7 @@ export function buildModelsDevIndex(catalog: ModelsDevCatalog): ModelsDevModelIn
 // ---------------------------------------------------------------------------
 
 /**
- * Map a models.dev model entry to KaijiBot-facing metadata.
+ * Map a models.dev model entry to AllBot-facing metadata.
  *
  * `input` always includes `"text"`. Image capability is inferred from
  * `modalities.input` containing `"image"` OR a truthy `attachment` flag.

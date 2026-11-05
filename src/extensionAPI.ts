@@ -1,16 +1,16 @@
-// Legacy compat surface for plugins that still import kaijibot/extension-api.
+// Legacy compat surface for plugins that still import allbot/extension-api.
 // Keep this file intentionally narrow and forward-only.
 
 const shouldWarnExtensionApiImport =
   process.env.VITEST !== "true" &&
   process.env.NODE_ENV !== "test" &&
-  process.env.KAIJIBOT_SUPPRESS_EXTENSION_API_WARNING !== "1";
+  process.env.ALLBOT_SUPPRESS_EXTENSION_API_WARNING !== "1";
 
 if (shouldWarnExtensionApiImport) {
   process.emitWarning(
-    "kaijibot/extension-api is deprecated. Migrate to api.runtime.agent.* or focused kaijibot/plugin-sdk/<subpath> imports. See https://gitee.com/kaiji1126/kaijibot/blob/main/docs/plugins/sdk-migration.md",
+    "allbot/extension-api is deprecated. Migrate to api.runtime.agent.* or focused allbot/plugin-sdk/<subpath> imports. See https://gitee.com/kaiji1126/kaijibot/blob/main/docs/plugins/sdk-migration.md",
     {
-      code: "KAIJIBOT_EXTENSION_API_DEPRECATED",
+      code: "ALLBOT_EXTENSION_API_DEPRECATED",
       detail:
         "This compatibility bridge is temporary. Bundled plugins should use the injected plugin runtime instead of importing host-side agent helpers directly. Migration guide: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/plugins/sdk-migration.md",
     },

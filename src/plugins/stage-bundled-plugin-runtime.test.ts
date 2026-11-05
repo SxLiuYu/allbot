@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { stageBundledPluginRuntime } from "../../scripts/stage-bundled-plugin-runtime.mjs";
 import { bundledDistPluginFile } from "../../test/helpers/bundled-plugin-paths.js";
-import { discoverKaijiBotPlugins } from "./discovery.js";
+import { discoverAllBotPlugins } from "./discovery.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 import { cleanupTrackedTempDirs, makeTrackedTempDir } from "./test-helpers/fs-fixtures.js";
 
@@ -77,7 +77,7 @@ afterEach(() => {
 
 describe("stageBundledPluginRuntime", () => {
   it("stages bundled dist plugins as runtime wrappers and links staged dist node_modules", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-");
     const distPluginDir = createDistPluginDir(repoRoot, "diffs");
     fs.mkdirSync(path.join(repoRoot, "dist"), { recursive: true });
     fs.mkdirSync(path.join(distPluginDir, "node_modules", "@pierre", "diffs"), {
@@ -105,7 +105,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("writes wrappers that forward plugin entry imports into canonical dist files", async () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-chunks-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-chunks-");
     createDistPluginDir(repoRoot, "diffs");
     setupRepoFiles(repoRoot, {
       "dist/chunk-abc.js": "export const value = 1;\n",
@@ -127,7 +127,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("stages root runtime sidecars that bundled plugin boundaries resolve directly", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-sidecars-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-sidecars-");
     createDistPluginDir(repoRoot, "whatsapp");
     setupRepoFiles(repoRoot, {
       [bundledDistPluginFile("whatsapp", "index.js")]: "export default {};\n",
@@ -152,7 +152,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("keeps plugin command registration on the canonical dist graph when loaded from dist-runtime", async () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-commands-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-commands-");
     const distPluginDir = path.join(repoRoot, "dist", "extensions", "demo");
     const distCommandsDir = path.join(repoRoot, "dist", "plugins");
     fs.mkdirSync(distPluginDir, { recursive: true });
@@ -161,7 +161,7 @@ describe("stageBundledPluginRuntime", () => {
     fs.writeFileSync(
       path.join(distCommandsDir, "commands.js"),
       [
-        "const registry = globalThis.__kaijibotTestPluginCommands ??= new Map();",
+        "const registry = globalThis.__allbotTestPluginCommands ??= new Map();",
         "export function registerPluginCommand(pluginId, command) {",
         "  registry.set(`/${command.name.toLowerCase()}`, { ...command, pluginId });",
         "}",
@@ -259,15 +259,15 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("copies package metadata files but symlinks other non-js plugin artifacts into the runtime overlay", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-assets-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-assets-");
     createDistPluginDir(repoRoot, "diffs");
     setupRepoFiles(repoRoot, {
       [bundledDistPluginFile("diffs", "package.json")]: JSON.stringify(
-        { name: "@kaijibot/diffs", kaijibot: { extensions: ["./index.js"] } },
+        { name: "@allbot/diffs", allbot: { extensions: ["./index.js"] } },
         null,
         2,
       ),
-      [bundledDistPluginFile("diffs", "kaijibot.plugin.json")]: "{}\n",
+      [bundledDistPluginFile("diffs", "allbot.plugin.json")]: "{}\n",
       [bundledDistPluginFile("diffs", "assets/info.txt")]: "ok\n",
     });
 
@@ -276,7 +276,7 @@ describe("stageBundledPluginRuntime", () => {
     expectRuntimeArtifactText({
       repoRoot,
       pluginId: "diffs",
-      relativePath: "kaijibot.plugin.json",
+      relativePath: "allbot.plugin.json",
       expectedText: "{}\n",
       symbolicLink: false,
     });
@@ -299,14 +299,14 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("preserves package metadata needed for bundled plugin discovery from dist-runtime", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-discovery-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-discovery-");
     const runtimeExtensionsDir = path.join(repoRoot, "dist-runtime", "extensions");
     createDistPluginDir(repoRoot, "demo");
     setupRepoFiles(repoRoot, {
       [bundledDistPluginFile("demo", "package.json")]: JSON.stringify(
         {
-          name: "@kaijibot/demo",
-          kaijibot: {
+          name: "@allbot/demo",
+          allbot: {
             extensions: ["./main.js"],
             setupEntry: "./setup.js",
             startup: {
@@ -317,7 +317,7 @@ describe("stageBundledPluginRuntime", () => {
         null,
         2,
       ),
-      [bundledDistPluginFile("demo", "kaijibot.plugin.json")]: JSON.stringify(
+      [bundledDistPluginFile("demo", "allbot.plugin.json")]: JSON.stringify(
         {
           id: "demo",
           channels: ["demo"],
@@ -334,10 +334,10 @@ describe("stageBundledPluginRuntime", () => {
 
     const env = {
       ...process.env,
-      KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
-      KAIJIBOT_BUNDLED_PLUGINS_DIR: runtimeExtensionsDir,
+      ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+      ALLBOT_BUNDLED_PLUGINS_DIR: runtimeExtensionsDir,
     };
-    const discovery = discoverKaijiBotPlugins({
+    const discovery = discoverAllBotPlugins({
       env,
       cache: false,
     });
@@ -368,7 +368,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("removes stale runtime plugin directories that are no longer in dist", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-stale-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-stale-");
     const staleRuntimeDir = path.join(repoRoot, "dist-runtime", "extensions", "stale");
     fs.mkdirSync(staleRuntimeDir, { recursive: true });
     fs.writeFileSync(path.join(staleRuntimeDir, "index.js"), "stale\n", "utf8");
@@ -380,7 +380,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("removes dist-runtime when the built bundled plugin tree is absent", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-missing-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-missing-");
     const runtimeRoot = path.join(repoRoot, "dist-runtime", "extensions", "diffs");
     fs.mkdirSync(runtimeRoot, { recursive: true });
 
@@ -390,7 +390,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("copies SKILL.md files instead of symlinking them", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-skill-copy-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-skill-copy-");
     createDistPluginDir(repoRoot, "feishu");
     setupRepoFiles(repoRoot, {
       [bundledDistPluginFile("feishu", "index.js")]: "export default {}\n",
@@ -414,7 +414,7 @@ describe("stageBundledPluginRuntime", () => {
   });
 
   it("tolerates EEXIST when an identical runtime symlink is materialized concurrently", () => {
-    const repoRoot = makeRepoRoot("kaijibot-stage-bundled-runtime-eexist-");
+    const repoRoot = makeRepoRoot("allbot-stage-bundled-runtime-eexist-");
     createDistPluginDir(repoRoot, "feishu");
     setupRepoFiles(repoRoot, {
       [bundledDistPluginFile("feishu", "index.js")]: "export default {}\n",

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createXSearchTool } from "./x-search.js";
 
 const liveEnabled =
-  process.env.KAIJIBOT_LIVE_TEST === "1" && (process.env.XAI_API_KEY ?? "").trim().length > 0;
+  process.env.ALLBOT_LIVE_TEST === "1" && (process.env.XAI_API_KEY ?? "").trim().length > 0;
 
 const describeLive = liveEnabled ? describe : describe.skip;
 
@@ -27,7 +27,7 @@ describeLive("xai x_search live", () => {
 
     expect(tool).toBeTruthy();
     const result = await tool!.execute("x-search:live", {
-      query: "KaijiBot from:steipete",
+      query: "AllBot from:steipete",
       to_date: "2026-03-28",
     });
 

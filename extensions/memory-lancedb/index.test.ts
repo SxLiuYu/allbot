@@ -34,7 +34,7 @@ type MemoryPluginTestConfig = {
 };
 
 const TEST_RUNTIME_MANIFEST = {
-  name: "kaijibot-memory-lancedb-runtime",
+  name: "allbot-memory-lancedb-runtime",
   private: true as const,
   type: "module" as const,
   dependencies: {
@@ -96,7 +96,7 @@ function createRuntimeLoader(
 ) {
   return createLanceDbRuntimeLoader({
     env: overrides.env ?? ({} as NodeJS.ProcessEnv),
-    resolveStateDir: () => "/tmp/kaijibot-state",
+    resolveStateDir: () => "/tmp/allbot-state",
     runtimeManifest: TEST_RUNTIME_MANIFEST,
     importBundled:
       overrides.importBundled ??
@@ -113,7 +113,7 @@ function createRuntimeLoader(
 }
 
 describe("memory plugin e2e", () => {
-  const { getDbPath } = installTmpDirHarness({ prefix: "kaijibot-memory-test-" });
+  const { getDbPath } = installTmpDirHarness({ prefix: "allbot-memory-test-" });
 
   function parseConfig(overrides: Record<string, unknown> = {}) {
     return memoryPlugin.configSchema?.parse?.({
@@ -208,7 +208,7 @@ describe("memory plugin e2e", () => {
     }));
 
     vi.resetModules();
-    vi.doMock("kaijibot/plugin-sdk/runtime-env", () => ({
+    vi.doMock("allbot/plugin-sdk/runtime-env", () => ({
       ensureGlobalUndiciEnvProxyDispatcher,
     }));
     vi.doMock("openai", () => ({
@@ -272,7 +272,7 @@ describe("memory plugin e2e", () => {
         dimensions: 1024,
       });
     } finally {
-      vi.doUnmock("kaijibot/plugin-sdk/runtime-env");
+      vi.doUnmock("allbot/plugin-sdk/runtime-env");
       vi.doUnmock("openai");
       vi.doUnmock("./lancedb-runtime.js");
       vi.resetModules();
@@ -336,7 +336,7 @@ describe("lancedb runtime loader", () => {
     const importBundled = vi.fn(async () => bundledModule);
     const importResolved = vi.fn(async () => createMockModule());
     const resolveRuntimeEntry = vi.fn(() => null);
-    const installRuntime = vi.fn(async () => "/tmp/kaijibot-state/plugin-runtimes/lancedb.js");
+    const installRuntime = vi.fn(async () => "/tmp/allbot-state/plugin-runtimes/lancedb.js");
     const loader = createRuntimeLoader({
       importBundled,
       importResolved,
@@ -355,10 +355,10 @@ describe("lancedb runtime loader", () => {
     const runtimeModule = createMockModule();
     const importResolved = vi.fn(async () => runtimeModule);
     const resolveRuntimeEntry = vi.fn(
-      () => "/tmp/kaijibot-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
+      () => "/tmp/allbot-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
     );
     const installRuntime = vi.fn(
-      async () => "/tmp/kaijibot-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
+      async () => "/tmp/allbot-state/plugin-runtimes/memory-lancedb/runtime-entry.js",
     );
     const loader = createRuntimeLoader({
       importResolved,
@@ -370,7 +370,7 @@ describe("lancedb runtime loader", () => {
 
     expect(resolveRuntimeEntry).toHaveBeenCalledWith(
       expect.objectContaining({
-        runtimeDir: "/tmp/kaijibot-state/plugin-runtimes/memory-lancedb/lancedb",
+        runtimeDir: "/tmp/allbot-state/plugin-runtimes/memory-lancedb/lancedb",
       }),
     );
     expect(installRuntime).not.toHaveBeenCalled();
@@ -398,13 +398,13 @@ describe("lancedb runtime loader", () => {
 
     expect(installRuntime).toHaveBeenCalledWith(
       expect.objectContaining({
-        runtimeDir: "/tmp/kaijibot-state/plugin-runtimes/memory-lancedb/lancedb",
+        runtimeDir: "/tmp/allbot-state/plugin-runtimes/memory-lancedb/lancedb",
         manifest: TEST_RUNTIME_MANIFEST,
       }),
     );
     expect(logger.warn).toHaveBeenCalledWith(
       expect.stringContaining(
-        "installing runtime deps under /tmp/kaijibot-state/plugin-runtimes/memory-lancedb/lancedb",
+        "installing runtime deps under /tmp/allbot-state/plugin-runtimes/memory-lancedb/lancedb",
       ),
     );
   });
@@ -431,7 +431,7 @@ describe("lancedb runtime loader", () => {
       .fn()
       .mockRejectedValueOnce(new Error("network down"))
       .mockResolvedValueOnce(
-        "/tmp/kaijibot-state/plugin-runtimes/memory-lancedb/lancedb/node_modules/@lancedb/lancedb/index.js",
+        "/tmp/allbot-state/plugin-runtimes/memory-lancedb/lancedb/node_modules/@lancedb/lancedb/index.js",
       );
     const importResolved = vi.fn(async () => runtimeModule);
     const loader = createRuntimeLoader({

@@ -1,18 +1,18 @@
 import { parseFrontmatterBlock } from "../markdown/frontmatter.js";
 import {
-  applyKaijiBotManifestInstallCommonFields,
+  applyAllBotManifestInstallCommonFields,
   getFrontmatterString,
   normalizeStringList,
-  parseKaijiBotManifestInstallBase,
+  parseAllBotManifestInstallBase,
   parseFrontmatterBool,
-  resolveKaijiBotManifestBlock,
-  resolveKaijiBotManifestInstall,
-  resolveKaijiBotManifestOs,
-  resolveKaijiBotManifestRequires,
+  resolveAllBotManifestBlock,
+  resolveAllBotManifestInstall,
+  resolveAllBotManifestOs,
+  resolveAllBotManifestRequires,
 } from "../shared/frontmatter.js";
 import { readStringValue } from "../shared/string-coerce.js";
 import type {
-  KaijiBotHookMetadata,
+  AllBotHookMetadata,
   HookEntry,
   HookInstallSpec,
   HookInvocationPolicy,
@@ -24,12 +24,12 @@ export function parseFrontmatter(content: string): ParsedHookFrontmatter {
 }
 
 function parseInstallSpec(input: unknown): HookInstallSpec | undefined {
-  const parsed = parseKaijiBotManifestInstallBase(input, ["bundled", "npm", "git"]);
+  const parsed = parseAllBotManifestInstallBase(input, ["bundled", "npm", "git"]);
   if (!parsed) {
     return undefined;
   }
   const { raw } = parsed;
-  const spec = applyKaijiBotManifestInstallCommonFields<HookInstallSpec>(
+  const spec = applyAllBotManifestInstallCommonFields<HookInstallSpec>(
     {
       kind: parsed.kind as HookInstallSpec["kind"],
     },
@@ -45,16 +45,16 @@ function parseInstallSpec(input: unknown): HookInstallSpec | undefined {
   return spec;
 }
 
-export function resolveKaijiBotMetadata(
+export function resolveAllBotMetadata(
   frontmatter: ParsedHookFrontmatter,
-): KaijiBotHookMetadata | undefined {
-  const metadataObj = resolveKaijiBotManifestBlock({ frontmatter });
+): AllBotHookMetadata | undefined {
+  const metadataObj = resolveAllBotManifestBlock({ frontmatter });
   if (!metadataObj) {
     return undefined;
   }
-  const requires = resolveKaijiBotManifestRequires(metadataObj);
-  const install = resolveKaijiBotManifestInstall(metadataObj, parseInstallSpec);
-  const osRaw = resolveKaijiBotManifestOs(metadataObj);
+  const requires = resolveAllBotManifestRequires(metadataObj);
+  const install = resolveAllBotManifestInstall(metadataObj, parseInstallSpec);
+  const osRaw = resolveAllBotManifestOs(metadataObj);
   const eventsRaw = normalizeStringList(metadataObj.events);
   return {
     always: typeof metadataObj.always === "boolean" ? metadataObj.always : undefined,

@@ -5,7 +5,7 @@ import { createTrackedTempDirs } from "../../test-utils/tracked-temp-dirs.js";
 import { resolveDockerSpawnInvocation } from "./docker.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-docker-spawn-test-");
+const createTempDir = () => tempDirs.make("allbot-docker-spawn-test-");
 
 afterEach(async () => {
   await tempDirs.cleanup();

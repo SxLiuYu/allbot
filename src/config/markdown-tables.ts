@@ -3,7 +3,7 @@ import { listChannelPlugins } from "../channels/plugins/registry.js";
 import { getActivePluginChannelRegistryVersion } from "../plugins/runtime.js";
 import { resolveAccountEntry } from "../routing/account-lookup.js";
 import { normalizeAccountId } from "../routing/session-key.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import type { MarkdownTableMode } from "./types.base.js";
 
 type MarkdownConfigEntry = {
@@ -81,7 +81,7 @@ function resolveMarkdownModeFromSection(
 }
 
 export function resolveMarkdownTableMode(params: {
-  cfg?: Partial<KaijiBotConfig>;
+  cfg?: Partial<AllBotConfig>;
   channel?: string | null;
   accountId?: string | null;
 }): MarkdownTableMode {

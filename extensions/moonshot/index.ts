@@ -1,6 +1,6 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
 import { applyMoonshotNativeStreamingUsageCompat } from "./api.js";
 import { moonshotMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import {

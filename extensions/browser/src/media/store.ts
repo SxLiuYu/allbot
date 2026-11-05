@@ -1,1 +1,1 @@
-export { ensureMediaDir, saveMediaBuffer } from "kaijibot/plugin-sdk/browser-setup-tools";
+export { ensureMediaDir, saveMediaBuffer } from "allbot/plugin-sdk/browser-setup-tools";

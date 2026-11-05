@@ -12,10 +12,10 @@ import {
   resolveLoaderPackageRoot,
   resolvePluginLoaderJitiConfig,
 } from "../plugins/sdk-alias.js";
-import type { AnyAgentTool, KaijiBotPluginApi, PluginCommandContext } from "../plugins/types.js";
+import type { AnyAgentTool, AllBotPluginApi, PluginCommandContext } from "../plugins/types.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 
-export type { AnyAgentTool, KaijiBotPluginApi, PluginCommandContext };
+export type { AnyAgentTool, AllBotPluginApi, PluginCommandContext };
 
 type ChannelEntryConfigSchema<TPlugin> =
   TPlugin extends ChannelPlugin<unknown>
@@ -36,8 +36,8 @@ type DefineBundledChannelEntryOptions<TPlugin = ChannelPlugin> = {
   secrets?: BundledEntryModuleRef;
   configSchema?: ChannelEntryConfigSchema<TPlugin> | (() => ChannelEntryConfigSchema<TPlugin>);
   runtime?: BundledEntryModuleRef;
-  registerCliMetadata?: (api: KaijiBotPluginApi) => void;
-  registerFull?: (api: KaijiBotPluginApi) => void;
+  registerCliMetadata?: (api: AllBotPluginApi) => void;
+  registerFull?: (api: AllBotPluginApi) => void;
 };
 
 type DefineBundledChannelSetupEntryOptions = {
@@ -52,7 +52,7 @@ export type BundledChannelEntryContract<TPlugin = ChannelPlugin> = {
   name: string;
   description: string;
   configSchema: ChannelEntryConfigSchema<TPlugin>;
-  register: (api: KaijiBotPluginApi) => void;
+  register: (api: AllBotPluginApi) => void;
   loadChannelPlugin: () => TPlugin;
   loadChannelSecrets?: () => ChannelPlugin["secrets"] | undefined;
   setChannelRuntime?: (runtime: PluginRuntime) => void;
@@ -67,7 +67,7 @@ export type BundledChannelSetupEntryContract<TPlugin = ChannelPlugin> = {
 const nodeRequire = createRequire(import.meta.url);
 const jitiLoaders = new Map<string, ReturnType<typeof createJiti>>();
 const loadedModuleExports = new Map<string, unknown>();
-const disableBundledEntrySourceFallbackEnv = "KAIJIBOT_DISABLE_BUNDLED_ENTRY_SOURCE_FALLBACK";
+const disableBundledEntrySourceFallbackEnv = "ALLBOT_DISABLE_BUNDLED_ENTRY_SOURCE_FALLBACK";
 
 function isTruthyEnvFlag(value: string | undefined): boolean {
   return value !== undefined && !/^(?:0|false)$/iu.test(value.trim());
@@ -359,7 +359,7 @@ export function defineBundledChannelEntry<TPlugin = ChannelPlugin>({
     name,
     description,
     configSchema: resolvedConfigSchema,
-    register(api: KaijiBotPluginApi) {
+    register(api: AllBotPluginApi) {
       if (api.registrationMode === "cli-metadata") {
         registerCliMetadata?.(api);
         return;

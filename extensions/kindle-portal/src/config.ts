@@ -1,5 +1,5 @@
 import { z } from "../api.js";
-import { buildPluginConfigSchema, type KaijiBotPluginConfigSchema } from "../api.js";
+import { buildPluginConfigSchema, type AllBotPluginConfigSchema } from "../api.js";
 
 /**
  * Zod source schema for Kindle Portal plugin config.
@@ -118,9 +118,9 @@ function normalizeIssues(
 /**
  * Plugin-facing config schema (consumed by definePluginEntry).
  * Wraps the zod source schema and normalizes safeParse issues to match
- * the KaijiBotPluginConfigSchema contract (string|number paths only).
+ * the AllBotPluginConfigSchema contract (string|number paths only).
  */
-export const KINDLE_PORTAL_CONFIG_SCHEMA: KaijiBotPluginConfigSchema = buildPluginConfigSchema(
+export const KINDLE_PORTAL_CONFIG_SCHEMA: AllBotPluginConfigSchema = buildPluginConfigSchema(
   KINDLE_PORTAL_CONFIG_SOURCE,
   {
     safeParse(value: unknown) {

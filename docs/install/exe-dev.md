@@ -1,5 +1,5 @@
 ---
-summary: "Run KaijiBot Gateway on exe.dev (VM + HTTPS proxy) for remote access"
+summary: "Run AllBot Gateway on exe.dev (VM + HTTPS proxy) for remote access"
 read_when:
   - You want a cheap always-on Linux host for the Gateway
   - You want remote Control UI access without running your own VPS
@@ -8,17 +8,17 @@ title: "exe.dev"
 
 # exe.dev
 
-Goal: KaijiBot Gateway running on an exe.dev VM, reachable from your laptop via: `https://<vm-name>.exe.xyz`
+Goal: AllBot Gateway running on an exe.dev VM, reachable from your laptop via: `https://<vm-name>.exe.xyz`
 
 This page assumes exe.dev's default **exeuntu** image. If you picked a different distro, map packages accordingly.
 
 ## Beginner quick path
 
-1. [https://exe.new/kaijibot](https://exe.new/kaijibot)
+1. [https://exe.new/allbot](https://exe.new/allbot)
 2. Fill in your auth key/token as needed
 3. Click on "Agent" next to your VM and wait for Shelley to finish provisioning
 4. Open `https://<vm-name>.exe.xyz/` and authenticate with the configured shared secret (this guide uses token auth by default, but password auth works too if you switch `gateway.auth.mode`)
-5. Approve any pending device pairing requests with `kaijibot devices approve <requestId>`
+5. Approve any pending device pairing requests with `allbot devices approve <requestId>`
 
 ## What you need
 
@@ -27,11 +27,11 @@ This page assumes exe.dev's default **exeuntu** image. If you picked a different
 
 ## Automated Install with Shelley
 
-Shelley, [exe.dev](https://exe.dev)'s agent, can install KaijiBot instantly with our
+Shelley, [exe.dev](https://exe.dev)'s agent, can install AllBot instantly with our
 prompt. The prompt used is as below:
 
 ```
-Set up KaijiBot on this VM by cloning and building from source: `git clone https://gitee.com/kaiji1126/kaijibot && cd kaijibot && pnpm install && pnpm build`. Then run `kaijibot onboard --no-prompt --accept-risk`. Add the supplied auth or token as needed. Configure nginx to forward from the default port 18789 to the root location on the default enabled site config, making sure to enable Websocket support. Pairing is done by "kaijibot devices list" and "kaijibot devices approve <request id>". Make sure the dashboard shows that KaijiBot's health is OK. exe.dev handles forwarding from port 8000 to port 80/443 and HTTPS for us, so the final "reachable" should be <vm-name>.exe.xyz, without port specification.
+Set up AllBot on this VM by cloning and building from source: `git clone https://gitee.com/kaiji1126/kaijibot && cd allbot && pnpm install && pnpm build`. Then run `allbot onboard --no-prompt --accept-risk`. Add the supplied auth or token as needed. Configure nginx to forward from the default port 18789 to the root location on the default enabled site config, making sure to enable Websocket support. Pairing is done by "allbot devices list" and "allbot devices approve <request id>". Make sure the dashboard shows that AllBot's health is OK. exe.dev handles forwarding from port 8000 to port 80/443 and HTTPS for us, so the final "reachable" should be <vm-name>.exe.xyz, without port specification.
 ```
 
 ## Manual installation
@@ -50,9 +50,9 @@ Then connect:
 ssh <vm-name>.exe.xyz
 ```
 
-Tip: keep this VM **stateful**. KaijiBot stores `kaijibot.json`, per-agent
+Tip: keep this VM **stateful**. AllBot stores `allbot.json`, per-agent
 `auth-profiles.json`, sessions, and channel/provider state under
-`~/.kaijibot/`, plus the workspace under `~/.kaijibot/workspace/`.
+`~/.allbot/`, plus the workspace under `~/.allbot/workspace/`.
 
 ## 2) Install prerequisites (on the VM)
 
@@ -61,18 +61,18 @@ sudo apt-get update
 sudo apt-get install -y git curl jq ca-certificates openssl
 ```
 
-## 3) Install KaijiBot
+## 3) Install AllBot
 
-Build and install KaijiBot from source:
+Build and install AllBot from source:
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot
-cd kaijibot
+cd allbot
 pnpm install
 pnpm build
 ```
 
-## 4) Setup nginx to proxy KaijiBot to port 8000
+## 4) Setup nginx to proxy AllBot to port 8000
 
 Edit `/etc/nginx/sites-enabled/default` with
 
@@ -107,16 +107,16 @@ server {
 ```
 
 Overwrite forwarding headers instead of preserving client-supplied chains.
-KaijiBot trusts forwarded IP metadata only from explicitly configured proxies,
+AllBot trusts forwarded IP metadata only from explicitly configured proxies,
 and append-style `X-Forwarded-For` chains are treated as a hardening risk.
 
-## 5) Access KaijiBot and grant privileges
+## 5) Access AllBot and grant privileges
 
 Access `https://<vm-name>.exe.xyz/` (see the Control UI output from onboarding). If it prompts for auth, paste the
 configured shared secret from the VM. This guide uses token auth, so retrieve `gateway.auth.token`
-with `kaijibot config get gateway.auth.token` (or generate one with `kaijibot doctor --generate-gateway-token`).
-If you changed the gateway to password auth, use `gateway.auth.password` / `KAIJIBOT_GATEWAY_PASSWORD` instead.
-Approve devices with `kaijibot devices list` and `kaijibot devices approve <requestId>`. When in doubt, use Shelley from your browser!
+with `allbot config get gateway.auth.token` (or generate one with `allbot doctor --generate-gateway-token`).
+If you changed the gateway to password auth, use `gateway.auth.password` / `ALLBOT_GATEWAY_PASSWORD` instead.
+Approve devices with `allbot devices list` and `allbot devices approve <requestId>`. When in doubt, use Shelley from your browser!
 
 ## Remote Access
 
@@ -127,13 +127,13 @@ with email auth.
 ## Updating
 
 ```bash
-cd kaijibot
+cd allbot
 git pull
 pnpm install
 pnpm build
-kaijibot doctor
-kaijibot gateway restart
-kaijibot health
+allbot doctor
+allbot gateway restart
+allbot health
 ```
 
 Guide: [Updating](/install/updating)

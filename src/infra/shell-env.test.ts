@@ -117,22 +117,22 @@ describe("shell env fallback", () => {
 
   it("is disabled by default", () => {
     expect(shouldEnableShellEnvFallback({} as NodeJS.ProcessEnv)).toBe(false);
-    expect(shouldEnableShellEnvFallback({ KAIJIBOT_LOAD_SHELL_ENV: "0" })).toBe(false);
-    expect(shouldEnableShellEnvFallback({ KAIJIBOT_LOAD_SHELL_ENV: "1" })).toBe(true);
+    expect(shouldEnableShellEnvFallback({ ALLBOT_LOAD_SHELL_ENV: "0" })).toBe(false);
+    expect(shouldEnableShellEnvFallback({ ALLBOT_LOAD_SHELL_ENV: "1" })).toBe(true);
   });
 
   it("uses the same truthy env parsing for deferred fallback", () => {
     expect(shouldDeferShellEnvFallback({} as NodeJS.ProcessEnv)).toBe(false);
-    expect(shouldDeferShellEnvFallback({ KAIJIBOT_DEFER_SHELL_ENV_FALLBACK: "false" })).toBe(false);
-    expect(shouldDeferShellEnvFallback({ KAIJIBOT_DEFER_SHELL_ENV_FALLBACK: "yes" })).toBe(true);
+    expect(shouldDeferShellEnvFallback({ ALLBOT_DEFER_SHELL_ENV_FALLBACK: "false" })).toBe(false);
+    expect(shouldDeferShellEnvFallback({ ALLBOT_DEFER_SHELL_ENV_FALLBACK: "yes" })).toBe(true);
   });
 
   it("resolves timeout from env with default fallback", () => {
     expect(resolveShellEnvFallbackTimeoutMs({} as NodeJS.ProcessEnv)).toBe(15000);
-    expect(resolveShellEnvFallbackTimeoutMs({ KAIJIBOT_SHELL_ENV_TIMEOUT_MS: "42" })).toBe(42);
+    expect(resolveShellEnvFallbackTimeoutMs({ ALLBOT_SHELL_ENV_TIMEOUT_MS: "42" })).toBe(42);
     expect(
       resolveShellEnvFallbackTimeoutMs({
-        KAIJIBOT_SHELL_ENV_TIMEOUT_MS: "nope",
+        ALLBOT_SHELL_ENV_TIMEOUT_MS: "nope",
       }),
     ).toBe(15000);
   });

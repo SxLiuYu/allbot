@@ -2,22 +2,22 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { captureEnv, withEnvAsync } from "../test-utils/env.js";
 
 const PLUGIN_MANIFEST_ENV_KEYS = [
-  "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-  "KAIJIBOT_DISABLE_BUNDLED_PLUGINS",
-  "KAIJIBOT_SKIP_PROVIDERS",
-  "KAIJIBOT_SKIP_CHANNELS",
-  "KAIJIBOT_SKIP_CRON",
-  "KAIJIBOT_TEST_MINIMAL_GATEWAY",
+  "ALLBOT_BUNDLED_PLUGINS_DIR",
+  "ALLBOT_DISABLE_BUNDLED_PLUGINS",
+  "ALLBOT_SKIP_PROVIDERS",
+  "ALLBOT_SKIP_CHANNELS",
+  "ALLBOT_SKIP_CRON",
+  "ALLBOT_TEST_MINIMAL_GATEWAY",
 ] as const;
 
 function cleanPluginManifestEnv(): Record<(typeof PLUGIN_MANIFEST_ENV_KEYS)[number], undefined> {
   return {
-    KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-    KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
-    KAIJIBOT_SKIP_PROVIDERS: undefined,
-    KAIJIBOT_SKIP_CHANNELS: undefined,
-    KAIJIBOT_SKIP_CRON: undefined,
-    KAIJIBOT_TEST_MINIMAL_GATEWAY: undefined,
+    ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+    ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+    ALLBOT_SKIP_PROVIDERS: undefined,
+    ALLBOT_SKIP_CHANNELS: undefined,
+    ALLBOT_SKIP_CRON: undefined,
+    ALLBOT_TEST_MINIMAL_GATEWAY: undefined,
   };
 }
 

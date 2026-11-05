@@ -9,7 +9,7 @@ import {
 import { createSuiteLogPathTracker } from "./log-test-helpers.js";
 
 const DEFAULT_MAX_FILE_BYTES = 500 * 1024 * 1024;
-const logPathTracker = createSuiteLogPathTracker("kaijibot-log-cap-");
+const logPathTracker = createSuiteLogPathTracker("allbot-log-cap-");
 
 describe("log file size cap", () => {
   let logPath = "";

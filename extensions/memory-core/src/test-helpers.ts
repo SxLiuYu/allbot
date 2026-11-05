@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/temp-path";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/temp-path";
 import { afterAll, beforeAll } from "vitest";
 
 export function createMemoryCoreTestHarness() {
@@ -9,7 +9,7 @@ export function createMemoryCoreTestHarness() {
 
   beforeAll(async () => {
     fixtureRoot = await fs.mkdtemp(
-      path.join(resolvePreferredKaijiBotTmpDir(), "memory-core-test-fixtures-"),
+      path.join(resolvePreferredAllBotTmpDir(), "memory-core-test-fixtures-"),
     );
   });
 

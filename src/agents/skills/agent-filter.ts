@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeAgentId } from "../../routing/session-key.js";
 import { normalizeSkillFilter } from "./filter.js";
 
@@ -7,7 +7,7 @@ import { normalizeSkillFilter } from "./filter.js";
  * Unknown agent ids also fall back to defaults so legacy/unresolved callers do not widen access.
  */
 export function resolveEffectiveAgentSkillFilter(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   agentId: string | undefined,
 ): string[] | undefined {
   if (!cfg) {

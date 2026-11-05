@@ -1,5 +1,5 @@
 ---
-summary: "How KaijiBot builds prompt context and reports token usage + costs"
+summary: "How AllBot builds prompt context and reports token usage + costs"
 read_when:
   - Explaining token usage, costs, or context windows
   - Debugging context growth or compaction behavior
@@ -8,12 +8,12 @@ title: "Token Use and Costs"
 
 # Token use & costs
 
-KaijiBot tracks **tokens**, not characters. Tokens are model-specific, but most
+AllBot tracks **tokens**, not characters. Tokens are model-specific, but most
 OpenAI-style models average ~4 characters per token for English text.
 
 ## How the system prompt is built
 
-KaijiBot assembles its own system prompt on every run. It includes:
+AllBot assembles its own system prompt on every run. It includes:
 
 - Tool list + short descriptions
 - Skills list (only metadata; instructions are loaded on demand with `read`)
@@ -36,7 +36,7 @@ Everything the model receives counts toward the context limit:
 - Compaction summaries and pruning artifacts
 - Provider wrappers or safety headers (not visible, but still counted)
 
-For images, KaijiBot downscales transcript/tool image payloads before provider calls.
+For images, AllBot downscales transcript/tool image payloads before provider calls.
 Use `agents.defaults.imageMaxDimensionPx` (default: `1200`) to tune this:
 
 - Lower values usually reduce vision-token usage and payload size.
@@ -53,12 +53,12 @@ Use these in chat:
 - `/usage off|tokens|full` → appends a **per-response usage footer** to every reply.
   - Persists per session (stored as `responseUsage`).
   - OAuth auth **hides cost** (tokens only).
-- `/usage cost` → shows a local cost summary from KaijiBot session logs.
+- `/usage cost` → shows a local cost summary from AllBot session logs.
 
 Other surfaces:
 
 - **TUI/Web TUI:** `/status` + `/usage` are supported.
-- **CLI:** `kaijibot status --usage` and `kaijibot channels list` show
+- **CLI:** `allbot status --usage` and `allbot channels list` show
   normalized provider quota windows (`X% left`, not per-response costs).
   Current usage-window providers: Anthropic, GitHub Copilot, Gemini CLI,
   OpenAI Codex, MiniMax, Xiaomi, and z.ai.
@@ -79,7 +79,7 @@ most recent transcript usage log. Existing nonzero live values still take
 precedence over transcript fallback values, and larger prompt-oriented
 transcript totals can win when stored totals are missing or smaller.
 Usage auth for provider quota windows comes from provider-specific hooks when
-available; otherwise KaijiBot falls back to matching OAuth/API-key credentials
+available; otherwise AllBot falls back to matching OAuth/API-key credentials
 from auth profiles, env, or config.
 
 ## Cost estimation (when shown)
@@ -91,12 +91,12 @@ models.providers.<provider>.models[].cost
 ```
 
 These are **USD per 1M tokens** for `input`, `output`, `cacheRead`, and
-`cacheWrite`. If pricing is missing, KaijiBot shows tokens only. OAuth tokens
+`cacheWrite`. If pricing is missing, AllBot shows tokens only. OAuth tokens
 never show dollar cost.
 
 ## Cache TTL and pruning impact
 
-Provider prompt caching only applies within the cache TTL window. KaijiBot can
+Provider prompt caching only applies within the cache TTL window. AllBot can
 optionally run **cache-ttl pruning**: it prunes the session once the cache TTL
 has expired, then resets the cache window so subsequent requests can re-use the
 freshly cached context instead of re-caching the full history. This keeps cache
@@ -160,7 +160,7 @@ override only `cacheRetention` and inherit other model defaults unchanged.
 
 ### Example: enable Anthropic 1M context beta header
 
-Anthropic's 1M context window is currently beta-gated. KaijiBot can inject the
+Anthropic's 1M context window is currently beta-gated. AllBot can inject the
 required `anthropic-beta` value when you enable `context1m` on supported Opus
 or Sonnet models.
 
@@ -181,7 +181,7 @@ Requirement: the credential must be eligible for long-context usage. If not,
 Anthropic responds with a provider-side rate limit error for that request.
 
 If you authenticate Anthropic with OAuth/subscription tokens (`sk-ant-oat-*`),
-KaijiBot skips the `context-1m-*` beta header because Anthropic currently
+AllBot skips the `context-1m-*` beta header because Anthropic currently
 rejects that combination with HTTP 401.
 
 ## Tips for reducing token pressure

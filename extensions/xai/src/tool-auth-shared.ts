@@ -1,14 +1,14 @@
-import type { KaijiBotConfig } from "@kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "@allbot/plugin-sdk/config-runtime";
 import {
   coerceSecretRef,
   resolveNonEnvSecretRefApiKeyMarker,
-} from "@kaijibot/plugin-sdk/provider-auth";
+} from "@allbot/plugin-sdk/provider-auth";
 import {
   readProviderEnvValue,
   readConfiguredSecretString,
   resolveProviderWebSearchPluginConfig,
-} from "@kaijibot/plugin-sdk/provider-web-search";
-import { normalizeSecretInputString } from "@kaijibot/plugin-sdk/secret-input";
+} from "@allbot/plugin-sdk/provider-web-search";
+import { normalizeSecretInputString } from "@allbot/plugin-sdk/secret-input";
 
 export type XaiFallbackAuth = {
   apiKey: string;
@@ -24,7 +24,7 @@ function readConfiguredOrManagedApiKey(value: unknown): string | undefined {
   return ref ? resolveNonEnvSecretRefApiKeyMarker(ref.source) : undefined;
 }
 
-function readLegacyGrokFallbackAuth(cfg?: KaijiBotConfig): XaiFallbackAuth | undefined {
+function readLegacyGrokFallbackAuth(cfg?: AllBotConfig): XaiFallbackAuth | undefined {
   const search = cfg?.tools?.web?.search;
   if (!search || typeof search !== "object") {
     return undefined;
@@ -36,7 +36,7 @@ function readLegacyGrokFallbackAuth(cfg?: KaijiBotConfig): XaiFallbackAuth | und
   return apiKey ? { apiKey, source: "tools.web.search.grok.apiKey" } : undefined;
 }
 
-export function readLegacyGrokApiKey(cfg?: KaijiBotConfig): string | undefined {
+export function readLegacyGrokApiKey(cfg?: AllBotConfig): string | undefined {
   const search = cfg?.tools?.web?.search;
   if (!search || typeof search !== "object") {
     return undefined;
@@ -48,14 +48,14 @@ export function readLegacyGrokApiKey(cfg?: KaijiBotConfig): string | undefined {
   );
 }
 
-export function readPluginXaiWebSearchApiKey(cfg?: KaijiBotConfig): string | undefined {
+export function readPluginXaiWebSearchApiKey(cfg?: AllBotConfig): string | undefined {
   return readConfiguredSecretString(
     resolveProviderWebSearchPluginConfig(cfg as Record<string, unknown> | undefined, "xai")?.apiKey,
     "plugins.entries.xai.config.webSearch.apiKey",
   );
 }
 
-export function resolveFallbackXaiAuth(cfg?: KaijiBotConfig): XaiFallbackAuth | undefined {
+export function resolveFallbackXaiAuth(cfg?: AllBotConfig): XaiFallbackAuth | undefined {
   const pluginApiKey = readConfiguredOrManagedApiKey(
     resolveProviderWebSearchPluginConfig(cfg as Record<string, unknown> | undefined, "xai")?.apiKey,
   );
@@ -68,13 +68,13 @@ export function resolveFallbackXaiAuth(cfg?: KaijiBotConfig): XaiFallbackAuth | 
   return readLegacyGrokFallbackAuth(cfg);
 }
 
-export function resolveFallbackXaiApiKey(cfg?: KaijiBotConfig): string | undefined {
+export function resolveFallbackXaiApiKey(cfg?: AllBotConfig): string | undefined {
   return readPluginXaiWebSearchApiKey(cfg) ?? readLegacyGrokApiKey(cfg);
 }
 
 export function resolveXaiToolApiKey(params: {
-  runtimeConfig?: KaijiBotConfig;
-  sourceConfig?: KaijiBotConfig;
+  runtimeConfig?: AllBotConfig;
+  sourceConfig?: AllBotConfig;
 }): string | undefined {
   return (
     resolveFallbackXaiApiKey(params.runtimeConfig) ??
@@ -85,8 +85,8 @@ export function resolveXaiToolApiKey(params: {
 
 export function isXaiToolEnabled(params: {
   enabled?: boolean;
-  runtimeConfig?: KaijiBotConfig;
-  sourceConfig?: KaijiBotConfig;
+  runtimeConfig?: AllBotConfig;
+  sourceConfig?: AllBotConfig;
 }): boolean {
   if (params.enabled === false) {
     return false;

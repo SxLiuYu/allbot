@@ -6,7 +6,7 @@ import { createCronStoreHarness } from "./service.test-harness.js";
 import { loadCronStore, resolveCronStorePath, saveCronStore } from "./store.js";
 import type { CronStoreFile } from "./types.js";
 
-const { makeStorePath } = createCronStoreHarness({ prefix: "kaijibot-cron-store-" });
+const { makeStorePath } = createCronStoreHarness({ prefix: "allbot-cron-store-" });
 
 function makeStore(jobId: string, enabled: boolean): CronStoreFile {
   const now = Date.now();
@@ -34,12 +34,12 @@ describe("resolveCronStorePath", () => {
     vi.unstubAllEnvs();
   });
 
-  it("uses KAIJIBOT_HOME for tilde expansion", () => {
-    vi.stubEnv("KAIJIBOT_HOME", "/srv/kaijibot-home");
+  it("uses ALLBOT_HOME for tilde expansion", () => {
+    vi.stubEnv("ALLBOT_HOME", "/srv/allbot-home");
     vi.stubEnv("HOME", "/home/other");
 
     const result = resolveCronStorePath("~/cron/jobs.json");
-    expect(result).toBe(path.resolve("/srv/kaijibot-home", "cron", "jobs.json"));
+    expect(result).toBe(path.resolve("/srv/allbot-home", "cron", "jobs.json"));
   });
 });
 

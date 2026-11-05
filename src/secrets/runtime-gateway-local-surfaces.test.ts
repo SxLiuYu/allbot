@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
@@ -14,8 +14,8 @@ vi.mock("../plugins/web-search-providers.runtime.js", () => ({
   resolvePluginWebSearchProviders: resolvePluginWebSearchProvidersMock,
 }));
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function createTestProvider(params: {
@@ -123,7 +123,7 @@ describe("secrets runtime gateway local surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -154,7 +154,7 @@ describe("secrets runtime gateway local surfaces", () => {
       env: {
         GATEWAY_PASSWORD_REF: "resolved-gateway-password",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -175,7 +175,7 @@ describe("secrets runtime gateway local surfaces", () => {
       env: {
         GATEWAY_TOKEN_REF: "resolved-gateway-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -194,7 +194,7 @@ describe("secrets runtime gateway local surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -218,7 +218,7 @@ describe("secrets runtime gateway local surfaces", () => {
           },
         }),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => ({ version: 1, profiles: {} }),
       }),
     ).rejects.toThrow(/MISSING_GATEWAY_TOKEN_REF/);
@@ -235,7 +235,7 @@ describe("secrets runtime gateway local surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -262,7 +262,7 @@ describe("secrets runtime gateway local surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -294,7 +294,7 @@ describe("secrets runtime gateway local surfaces", () => {
           },
         }),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => ({ version: 1, profiles: {} }),
       });
 
@@ -328,7 +328,7 @@ describe("secrets runtime gateway local surfaces", () => {
       env: {
         REMOTE_GATEWAY_TOKEN_REF: "resolved-remote-gateway-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -350,7 +350,7 @@ describe("secrets runtime gateway local surfaces", () => {
       env: {
         REMOTE_GATEWAY_PASSWORD_REF: "resolved-remote-gateway-password",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -377,7 +377,7 @@ describe("secrets runtime gateway local surfaces", () => {
         REMOTE_GATEWAY_TOKEN: "tailscale-remote-token",
         REMOTE_GATEWAY_PASSWORD: "tailscale-remote-password",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 

@@ -1,6 +1,6 @@
-import type { ImageGenerationProvider } from "kaijibot/plugin-sdk/image-generation";
-import type { MediaUnderstandingProvider } from "kaijibot/plugin-sdk/media-understanding";
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import type { ImageGenerationProvider } from "allbot/plugin-sdk/image-generation";
+import type { MediaUnderstandingProvider } from "allbot/plugin-sdk/media-understanding";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 import { buildGoogleGeminiCliBackend } from "./cli-backend.js";
 import { registerGoogleGeminiCliProvider } from "./gemini-cli-provider.js";
 import { buildGoogleMusicGenerationProvider } from "./music-generation-provider.js";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { collectGatewayConfigFindings, collectLoggingFindings } from "./audit.js";
 
@@ -23,7 +23,7 @@ describe("security audit loopback and logging findings", () => {
   it("evaluates loopback control UI and logging exposure findings", async () => {
     await Promise.all([
       (async () => {
-        const cfg: KaijiBotConfig = {
+        const cfg: AllBotConfig = {
           gateway: {
             bind: "loopback",
             controlUi: { enabled: true },
@@ -39,11 +39,11 @@ describe("security audit loopback and logging findings", () => {
       })(),
       withEnvAsync(
         {
-          KAIJIBOT_GATEWAY_TOKEN: undefined,
-          KAIJIBOT_GATEWAY_PASSWORD: undefined,
+          ALLBOT_GATEWAY_TOKEN: undefined,
+          ALLBOT_GATEWAY_PASSWORD: undefined,
         },
         async () => {
-          const cfg: KaijiBotConfig = {
+          const cfg: AllBotConfig = {
             gateway: {
               bind: "loopback",
               controlUi: { enabled: true },
@@ -60,7 +60,7 @@ describe("security audit loopback and logging findings", () => {
         },
       ),
       (async () => {
-        const cfg: KaijiBotConfig = {
+        const cfg: AllBotConfig = {
           logging: { redactSensitive: "off" },
         };
         expect(hasLoggingFinding("logging.redact_off", "warn", collectLoggingFindings(cfg))).toBe(

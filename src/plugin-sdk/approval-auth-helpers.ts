@@ -1,11 +1,11 @@
 import { normalizeOptionalString } from "../shared/string-coerce.js";
-import type { KaijiBotConfig } from "./config-runtime.js";
+import type { AllBotConfig } from "./config-runtime.js";
 
 type ApprovalKind = "exec" | "plugin";
 
 export function createResolvedApproverActionAuthAdapter(params: {
   channelLabel: string;
-  resolveApprovers: (params: { cfg: KaijiBotConfig; accountId?: string | null }) => string[];
+  resolveApprovers: (params: { cfg: AllBotConfig; accountId?: string | null }) => string[];
   normalizeSenderId?: (value: string) => string | undefined;
 }) {
   const normalizeSenderId = params.normalizeSenderId ?? normalizeOptionalString;
@@ -17,7 +17,7 @@ export function createResolvedApproverActionAuthAdapter(params: {
       senderId,
       approvalKind,
     }: {
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       accountId?: string | null;
       senderId?: string | null;
       action: "approve";

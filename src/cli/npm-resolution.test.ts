@@ -9,58 +9,58 @@ import {
   resolvePinnedNpmSpec,
 } from "./npm-resolution.js";
 
-const CLI_STATE_ROOT = "/tmp/kaijibot";
+const CLI_STATE_ROOT = "/tmp/allbot";
 const ALPHA_INSTALL_PATH = installedPluginRoot(CLI_STATE_ROOT, "alpha");
 
 describe("npm-resolution helpers", () => {
   it("keeps original spec when pin is disabled", () => {
     const result = resolvePinnedNpmSpec({
-      rawSpec: "@kaijibot/plugin-alpha@latest",
+      rawSpec: "@allbot/plugin-alpha@latest",
       pin: false,
-      resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+      resolvedSpec: "@allbot/plugin-alpha@1.2.3",
     });
     expect(result).toEqual({
-      recordSpec: "@kaijibot/plugin-alpha@latest",
+      recordSpec: "@allbot/plugin-alpha@latest",
     });
   });
 
   it("warns when pin is enabled but resolved spec is missing", () => {
     const result = resolvePinnedNpmSpec({
-      rawSpec: "@kaijibot/plugin-alpha@latest",
+      rawSpec: "@allbot/plugin-alpha@latest",
       pin: true,
     });
     expect(result).toEqual({
-      recordSpec: "@kaijibot/plugin-alpha@latest",
+      recordSpec: "@allbot/plugin-alpha@latest",
       pinWarning: "Could not resolve exact npm version for --pin; storing original npm spec.",
     });
   });
 
   it("returns pinned spec notice when resolved spec is available", () => {
     const result = resolvePinnedNpmSpec({
-      rawSpec: "@kaijibot/plugin-alpha@latest",
+      rawSpec: "@allbot/plugin-alpha@latest",
       pin: true,
-      resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+      resolvedSpec: "@allbot/plugin-alpha@1.2.3",
     });
     expect(result).toEqual({
-      recordSpec: "@kaijibot/plugin-alpha@1.2.3",
-      pinNotice: "Pinned npm install record to @kaijibot/plugin-alpha@1.2.3.",
+      recordSpec: "@allbot/plugin-alpha@1.2.3",
+      pinNotice: "Pinned npm install record to @allbot/plugin-alpha@1.2.3.",
     });
   });
 
   it("maps npm resolution metadata to install fields", () => {
     expect(
       mapNpmResolutionMetadata({
-        name: "@kaijibot/plugin-alpha",
+        name: "@allbot/plugin-alpha",
         version: "1.2.3",
-        resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+        resolvedSpec: "@allbot/plugin-alpha@1.2.3",
         integrity: "sha512-abc",
         shasum: "deadbeef",
         resolvedAt: "2026-02-21T00:00:00.000Z",
       }),
     ).toEqual({
-      resolvedName: "@kaijibot/plugin-alpha",
+      resolvedName: "@allbot/plugin-alpha",
       resolvedVersion: "1.2.3",
-      resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+      resolvedSpec: "@allbot/plugin-alpha@1.2.3",
       integrity: "sha512-abc",
       shasum: "deadbeef",
       resolvedAt: "2026-02-21T00:00:00.000Z",
@@ -70,24 +70,24 @@ describe("npm-resolution helpers", () => {
   it("builds common npm install record fields", () => {
     expect(
       buildNpmInstallRecordFields({
-        spec: "@kaijibot/plugin-alpha@1.2.3",
+        spec: "@allbot/plugin-alpha@1.2.3",
         installPath: ALPHA_INSTALL_PATH,
         version: "1.2.3",
         resolution: {
-          name: "@kaijibot/plugin-alpha",
+          name: "@allbot/plugin-alpha",
           version: "1.2.3",
-          resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+          resolvedSpec: "@allbot/plugin-alpha@1.2.3",
           integrity: "sha512-abc",
         },
       }),
     ).toEqual({
       source: "npm",
-      spec: "@kaijibot/plugin-alpha@1.2.3",
+      spec: "@allbot/plugin-alpha@1.2.3",
       installPath: ALPHA_INSTALL_PATH,
       version: "1.2.3",
-      resolvedName: "@kaijibot/plugin-alpha",
+      resolvedName: "@allbot/plugin-alpha",
       resolvedVersion: "1.2.3",
-      resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+      resolvedSpec: "@allbot/plugin-alpha@1.2.3",
       integrity: "sha512-abc",
       shasum: undefined,
       resolvedAt: undefined,
@@ -114,14 +114,14 @@ describe("npm-resolution helpers", () => {
     const logs: string[] = [];
     const warns: string[] = [];
     const record = resolvePinnedNpmInstallRecord({
-      rawSpec: "@kaijibot/plugin-alpha@latest",
+      rawSpec: "@allbot/plugin-alpha@latest",
       pin: true,
       installPath: ALPHA_INSTALL_PATH,
       version: "1.2.3",
       resolution: {
-        name: "@kaijibot/plugin-alpha",
+        name: "@allbot/plugin-alpha",
         version: "1.2.3",
-        resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+        resolvedSpec: "@allbot/plugin-alpha@1.2.3",
       },
       log: (message) => logs.push(message),
       warn: (message) => warns.push(message),
@@ -129,24 +129,24 @@ describe("npm-resolution helpers", () => {
 
     expect(record).toEqual({
       source: "npm",
-      spec: "@kaijibot/plugin-alpha@1.2.3",
+      spec: "@allbot/plugin-alpha@1.2.3",
       installPath: ALPHA_INSTALL_PATH,
       version: "1.2.3",
-      resolvedName: "@kaijibot/plugin-alpha",
+      resolvedName: "@allbot/plugin-alpha",
       resolvedVersion: "1.2.3",
-      resolvedSpec: "@kaijibot/plugin-alpha@1.2.3",
+      resolvedSpec: "@allbot/plugin-alpha@1.2.3",
       integrity: undefined,
       shasum: undefined,
       resolvedAt: undefined,
     });
-    expect(logs).toEqual(["Pinned npm install record to @kaijibot/plugin-alpha@1.2.3."]);
+    expect(logs).toEqual(["Pinned npm install record to @allbot/plugin-alpha@1.2.3."]);
     expect(warns).toEqual([]);
   });
 
   it("resolves pinned install record for CLI and formats warning output", () => {
     const logs: string[] = [];
     const record = resolvePinnedNpmInstallRecordForCli(
-      "@kaijibot/plugin-alpha@latest",
+      "@allbot/plugin-alpha@latest",
       true,
       ALPHA_INSTALL_PATH,
       "1.2.3",
@@ -157,7 +157,7 @@ describe("npm-resolution helpers", () => {
 
     expect(record).toEqual({
       source: "npm",
-      spec: "@kaijibot/plugin-alpha@latest",
+      spec: "@allbot/plugin-alpha@latest",
       installPath: ALPHA_INSTALL_PATH,
       version: "1.2.3",
       resolvedName: undefined,

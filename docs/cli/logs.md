@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot logs` (tail gateway logs via RPC)"
+summary: "CLI reference for `allbot logs` (tail gateway logs via RPC)"
 read_when:
   - You need to tail Gateway logs remotely (without SSH)
   - You want JSON log lines for tooling
 title: "logs"
 ---
 
-# `kaijibot logs`
+# `allbot logs`
 
 Tail Gateway file logs over RPC (works in remote mode).
 
@@ -28,7 +28,7 @@ Related:
 
 ## Shared Gateway RPC options
 
-`kaijibot logs` also accepts the standard Gateway client flags:
+`allbot logs` also accepts the standard Gateway client flags:
 
 - `--url <url>`: Gateway WebSocket URL
 - `--token <token>`: Gateway token
@@ -40,20 +40,20 @@ When you pass `--url`, the CLI does not auto-apply config or environment credent
 ## Examples
 
 ```bash
-kaijibot logs
-kaijibot logs --follow
-kaijibot logs --follow --interval 2000
-kaijibot logs --limit 500 --max-bytes 500000
-kaijibot logs --json
-kaijibot logs --plain
-kaijibot logs --no-color
-kaijibot logs --limit 500
-kaijibot logs --local-time
-kaijibot logs --follow --local-time
-kaijibot logs --url ws://127.0.0.1:18789 --token "$KAIJIBOT_GATEWAY_TOKEN"
+allbot logs
+allbot logs --follow
+allbot logs --follow --interval 2000
+allbot logs --limit 500 --max-bytes 500000
+allbot logs --json
+allbot logs --plain
+allbot logs --no-color
+allbot logs --limit 500
+allbot logs --local-time
+allbot logs --follow --local-time
+allbot logs --url ws://127.0.0.1:18789 --token "$ALLBOT_GATEWAY_TOKEN"
 ```
 
 ## Notes
 
 - Use `--local-time` to render timestamps in your local timezone.
-- If the local loopback Gateway asks for pairing, `kaijibot logs` falls back to the configured local log file automatically. Explicit `--url` targets do not use this fallback.
+- If the local loopback Gateway asks for pairing, `allbot logs` falls back to the configured local log file automatically. Explicit `--url` targets do not use this fallback.

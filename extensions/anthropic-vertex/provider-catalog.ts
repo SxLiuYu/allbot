@@ -1,8 +1,8 @@
 import type {
   ModelDefinitionConfig,
   ModelProviderConfig,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { resolveAnthropicVertexRegion } from "./region.js";
 export const ANTHROPIC_VERTEX_DEFAULT_MODEL_ID = "claude-sonnet-4-6";
 const ANTHROPIC_VERTEX_DEFAULT_CONTEXT_WINDOW = 1_000_000;

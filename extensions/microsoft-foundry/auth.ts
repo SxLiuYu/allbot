@@ -2,7 +2,7 @@ import type {
   ProviderAuthContext,
   ProviderAuthMethod,
   ProviderAuthResult,
-} from "kaijibot/plugin-sdk/core";
+} from "allbot/plugin-sdk/core";
 import {
   ensureApiKeyFromOptionEnvOrPrompt,
   ensureAuthProfileStore,
@@ -10,7 +10,7 @@ import {
   normalizeOptionalSecretInput,
   type SecretInput,
   validateApiKeyInput,
-} from "kaijibot/plugin-sdk/provider-auth";
+} from "allbot/plugin-sdk/provider-auth";
 import { getLoggedInAccount, isAzCliInstalled } from "./cli.js";
 import {
   loginWithTenantFallback,

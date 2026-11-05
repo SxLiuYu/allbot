@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   applyOpencodeZenModelDefault,
   OPENCODE_ZEN_DEFAULT_MODEL,
@@ -21,7 +21,7 @@ function makePrompter(): WizardPrompter {
 }
 
 function expectPrimaryModelChanged(
-  applied: { changed: boolean; next: KaijiBotConfig },
+  applied: { changed: boolean; next: AllBotConfig },
   primary: string,
 ) {
   expect(applied.changed).toBe(true);
@@ -29,8 +29,8 @@ function expectPrimaryModelChanged(
 }
 
 function expectConfigUnchanged(
-  applied: { changed: boolean; next: KaijiBotConfig },
-  cfg: KaijiBotConfig,
+  applied: { changed: boolean; next: AllBotConfig },
+  cfg: AllBotConfig,
 ) {
   expect(applied.changed).toBe(false);
   expect(applied.next).toEqual(cfg);
@@ -45,8 +45,8 @@ describe("applyDefaultModelChoice", () => {
       setDefaultModel: false,
       defaultModel,
       // Simulate a provider function that does not explicitly add the entry.
-      applyProviderConfig: (config: KaijiBotConfig) => config,
-      applyDefaultConfig: (config: KaijiBotConfig) => config,
+      applyProviderConfig: (config: AllBotConfig) => config,
+      applyDefaultConfig: (config: AllBotConfig) => config,
       noteAgentModel,
       prompter: makePrompter(),
     });
@@ -62,8 +62,8 @@ describe("applyDefaultModelChoice", () => {
       config: {},
       setDefaultModel: false,
       defaultModel,
-      applyProviderConfig: (config: KaijiBotConfig) => config,
-      applyDefaultConfig: (config: KaijiBotConfig) => config,
+      applyProviderConfig: (config: AllBotConfig) => config,
+      applyDefaultConfig: (config: AllBotConfig) => config,
       noteAgentModel: async () => {},
       prompter: makePrompter(),
     });
@@ -78,7 +78,7 @@ describe("applyDefaultModelChoice", () => {
       config: {},
       setDefaultModel: true,
       defaultModel,
-      applyProviderConfig: (config: KaijiBotConfig) => config,
+      applyProviderConfig: (config: AllBotConfig) => config,
       applyDefaultConfig: () => ({
         agents: {
           defaults: {
@@ -98,7 +98,7 @@ describe("applyDefaultModelChoice", () => {
 
 describe("applyOpencodeZenModelDefault", () => {
   it("sets defaults when model is unset", () => {
-    const cfg: KaijiBotConfig = { agents: { defaults: {} } };
+    const cfg: AllBotConfig = { agents: { defaults: {} } };
     const applied = applyOpencodeZenModelDefault(cfg);
     expectPrimaryModelChanged(applied, OPENCODE_ZEN_DEFAULT_MODEL);
   });
@@ -106,7 +106,7 @@ describe("applyOpencodeZenModelDefault", () => {
   it("overrides existing models", () => {
     const cfg = {
       agents: { defaults: { model: "anthropic/claude-opus-4-6" } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const applied = applyOpencodeZenModelDefault(cfg);
     expectPrimaryModelChanged(applied, OPENCODE_ZEN_DEFAULT_MODEL);
   });
@@ -114,13 +114,13 @@ describe("applyOpencodeZenModelDefault", () => {
   it("no-ops when already legacy opencode-zen default", () => {
     const cfg = {
       agents: { defaults: { model: "opencode-zen/claude-opus-4-5" } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const applied = applyOpencodeZenModelDefault(cfg);
     expectConfigUnchanged(applied, cfg);
   });
 
   it("preserves fallbacks when setting primary", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -141,7 +141,7 @@ describe("applyOpencodeZenModelDefault", () => {
   it("no-ops when already on the current default", () => {
     const cfg = {
       agents: { defaults: { model: OPENCODE_ZEN_DEFAULT_MODEL } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const applied = applyOpencodeZenModelDefault(cfg);
     expectConfigUnchanged(applied, cfg);
   });

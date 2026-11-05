@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import type { PluginLogger } from "../api.js";
 import { resolveRequestClientIp } from "../runtime-api.js";
 import type { DiffArtifactStore } from "./store.js";

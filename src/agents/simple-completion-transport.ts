@@ -1,5 +1,5 @@
 import { getApiProvider, type Api, type Model } from "@earendil-works/pi-ai";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createAnthropicVertexStreamFnForModel } from "./anthropic-vertex-stream.js";
 import { ensureCustomApiRegistered } from "./custom-api-registry.js";
 import { registerProviderStreamForModel } from "./provider-stream.js";
@@ -10,12 +10,12 @@ import {
 
 function resolveAnthropicVertexSimpleApi(baseUrl?: string): Api {
   const suffix = baseUrl?.trim() ? encodeURIComponent(baseUrl.trim()) : "default";
-  return `kaijibot-anthropic-vertex-simple:${suffix}`;
+  return `allbot-anthropic-vertex-simple:${suffix}`;
 }
 
 export function prepareModelForSimpleCompletion<TApi extends Api>(params: {
   model: Model<TApi>;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): Model<Api> {
   const { model, cfg } = params;
   // Only provider-owned custom APIs need runtime stream registration here.

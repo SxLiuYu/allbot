@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createConfigRuntimeEnv } from "../config/env-vars.js";
 import { unsetEnv, withTempEnv } from "./models-config.e2e-harness.js";
 import { resolveProvidersForModelsJsonWithDeps } from "./models-config.plan.js";
 import type { ProviderConfig } from "./models-config.providers.secrets.js";
 
-const TEST_ENV_VAR = "KAIJIBOT_MODELS_CONFIG_TEST_ENV";
+const TEST_ENV_VAR = "ALLBOT_MODELS_CONFIG_TEST_ENV";
 
 function createImplicitOpenRouterProvider(): ProviderConfig {
   return {
@@ -27,14 +27,14 @@ function createImplicitOpenRouterProvider(): ProviderConfig {
 }
 
 async function resolveProvidersForConfigEnvTest(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   onResolveImplicitProviders: (env: NodeJS.ProcessEnv) => void;
 }) {
   const env = createConfigRuntimeEnv(params.cfg);
   return await resolveProvidersForModelsJsonWithDeps(
     {
       cfg: params.cfg,
-      agentDir: "/tmp/kaijibot-models-config-env-vars-test",
+      agentDir: "/tmp/allbot-models-config-env-vars-test",
       env,
     },
     {
@@ -52,7 +52,7 @@ describe("models-config", () => {
   it("uses config env.vars entries for implicit provider discovery without mutating process.env", async () => {
     await withTempEnv(["OPENROUTER_API_KEY", TEST_ENV_VAR], async () => {
       unsetEnv(["OPENROUTER_API_KEY", TEST_ENV_VAR]);
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         models: { providers: {} },
         env: {
           vars: {
@@ -82,7 +82,7 @@ describe("models-config", () => {
     await withTempEnv(["OPENROUTER_API_KEY", TEST_ENV_VAR], async () => {
       process.env.OPENROUTER_API_KEY = "from-host"; // pragma: allowlist secret
       process.env[TEST_ENV_VAR] = "from-host";
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         models: { providers: {} },
         env: {
           vars: {

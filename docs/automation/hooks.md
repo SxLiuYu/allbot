@@ -8,29 +8,29 @@ title: "Hooks"
 
 # Hooks
 
-Hooks are small scripts that run when something happens inside the Gateway. They are automatically discovered from directories and can be inspected with `kaijibot hooks`.
+Hooks are small scripts that run when something happens inside the Gateway. They are automatically discovered from directories and can be inspected with `allbot hooks`.
 
-There are two kinds of hooks in KaijiBot:
+There are two kinds of hooks in AllBot:
 
 - **Internal hooks** (this page): run inside the Gateway when agent events fire, like `/new`, `/reset`, `/stop`, or lifecycle events.
-- **Webhooks**: external HTTP endpoints that let other systems trigger work in KaijiBot. See [Webhooks](/automation/cron-jobs#webhooks).
+- **Webhooks**: external HTTP endpoints that let other systems trigger work in AllBot. See [Webhooks](/automation/cron-jobs#webhooks).
 
-Hooks can also be bundled inside plugins. `kaijibot hooks list` shows both standalone hooks and plugin-managed hooks.
+Hooks can also be bundled inside plugins. `allbot hooks list` shows both standalone hooks and plugin-managed hooks.
 
 ## Quick start
 
 ```bash
 # List available hooks
-kaijibot hooks list
+allbot hooks list
 
 # Enable a hook
-kaijibot hooks enable session-memory
+allbot hooks enable session-memory
 
 # Check hook status
-kaijibot hooks check
+allbot hooks check
 
 # Get detailed information
-kaijibot hooks info session-memory
+allbot hooks info session-memory
 ```
 
 ## Event types
@@ -70,7 +70,7 @@ my-hook/
 name: my-hook
 description: "Short description of what this hook does"
 metadata:
-  { "kaijibot": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
+  { "allbot": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
 
 # My Hook
@@ -78,7 +78,7 @@ metadata:
 Detailed documentation goes here.
 ```
 
-**Metadata fields** (`metadata.kaijibot`):
+**Metadata fields** (`metadata.allbot`):
 
 | Field      | Description                                          |
 | ---------- | ---------------------------------------------------- |
@@ -132,19 +132,19 @@ Each event includes: `type`, `action`, `sessionKey`, `timestamp`, `messages` (pu
 
 Hooks are discovered from these directories, in order of increasing override precedence:
 
-1. **Bundled hooks**: shipped with KaijiBot
+1. **Bundled hooks**: shipped with AllBot
 2. **Plugin hooks**: hooks bundled inside installed plugins
-3. **Managed hooks**: `~/.kaijibot/hooks/` (user-installed, shared across workspaces). Extra directories from `hooks.internal.load.extraDirs` share this precedence.
+3. **Managed hooks**: `~/.allbot/hooks/` (user-installed, shared across workspaces). Extra directories from `hooks.internal.load.extraDirs` share this precedence.
 4. **Workspace hooks**: `<workspace>/hooks/` (per-agent, disabled by default until explicitly enabled)
 
 Workspace hooks can add new hook names but cannot override bundled, managed, or plugin-provided hooks with the same name.
 
 ### Hook packs
 
-Hook packs are npm packages that export hooks via `kaijibot.hooks` in `package.json`. Install with:
+Hook packs are npm packages that export hooks via `allbot.hooks` in `package.json`. Install with:
 
 ```bash
-kaijibot plugins install <path-or-spec>
+allbot plugins install <path-or-spec>
 ```
 
 Npm specs are registry-only (package name + optional exact version or dist-tag). Git/URL/file specs and semver ranges are rejected.
@@ -155,13 +155,13 @@ Npm specs are registry-only (package name + optional exact version or dist-tag).
 | --------------------- | ------------------------------ | ----------------------------------------------------- |
 | session-memory        | `command:new`, `command:reset` | Saves session context to `<workspace>/memory/`        |
 | bootstrap-extra-files | `agent:bootstrap`              | Injects additional bootstrap files from glob patterns |
-| command-logger        | `command`                      | Logs all commands to `~/.kaijibot/logs/commands.log`  |
+| command-logger        | `command`                      | Logs all commands to `~/.allbot/logs/commands.log`  |
 | boot-md               | `gateway:startup`              | Runs `BOOT.md` when the gateway starts                |
 
 Enable any bundled hook:
 
 ```bash
-kaijibot hooks enable <hook-name>
+allbot hooks enable <hook-name>
 ```
 
 ### session-memory details
@@ -248,17 +248,17 @@ The legacy `hooks.internal.handlers` array config format is still supported for 
 
 ```bash
 # List all hooks (add --eligible, --verbose, or --json)
-kaijibot hooks list
+allbot hooks list
 
 # Show detailed info about a hook
-kaijibot hooks info <hook-name>
+allbot hooks info <hook-name>
 
 # Show eligibility summary
-kaijibot hooks check
+allbot hooks check
 
 # Enable/disable
-kaijibot hooks enable <hook-name>
-kaijibot hooks disable <hook-name>
+allbot hooks enable <hook-name>
+allbot hooks disable <hook-name>
 ```
 
 ## Best practices
@@ -274,24 +274,24 @@ kaijibot hooks disable <hook-name>
 
 ```bash
 # Verify directory structure
-ls -la ~/.kaijibot/hooks/my-hook/
+ls -la ~/.allbot/hooks/my-hook/
 # Should show: HOOK.md, handler.ts
 
 # List all discovered hooks
-kaijibot hooks list
+allbot hooks list
 ```
 
 ### Hook not eligible
 
 ```bash
-kaijibot hooks info my-hook
+allbot hooks info my-hook
 ```
 
 Check for missing binaries (PATH), environment variables, config values, or OS compatibility.
 
 ### Hook not executing
 
-1. Verify the hook is enabled: `kaijibot hooks list`
+1. Verify the hook is enabled: `allbot hooks list`
 2. Restart your gateway process so hooks reload.
 3. Check gateway logs: `./scripts/clawlog.sh | grep hook`
 

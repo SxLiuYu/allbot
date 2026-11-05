@@ -4,7 +4,7 @@ import {
   hasBundledChannelPersistedAuthState,
   listBundledChannelIdsWithPersistedAuthState,
 } from "../channels/plugins/persisted-auth-state.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import { hasNonEmptyString } from "../infra/outbound/channel-target.js";
 import { isRecord } from "../utils.js";
@@ -39,7 +39,7 @@ function hasPersistedChannelState(env: NodeJS.ProcessEnv): boolean {
 const PERSISTED_AUTH_STATE_CHANNEL_IDS = listBundledChannelIdsWithPersistedAuthState();
 
 export function listPotentialConfiguredChannelIds(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
   options: ChannelPresenceOptions = {},
 ): string[] {
@@ -81,7 +81,7 @@ export function listPotentialConfiguredChannelIds(
 }
 
 function hasEnvConfiguredChannel(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv,
   options: ChannelPresenceOptions = {},
 ): boolean {
@@ -104,7 +104,7 @@ function hasEnvConfiguredChannel(
 }
 
 export function hasPotentialConfiguredChannels(
-  cfg: KaijiBotConfig | null | undefined,
+  cfg: AllBotConfig | null | undefined,
   env: NodeJS.ProcessEnv = process.env,
   options: ChannelPresenceOptions = {},
 ): boolean {

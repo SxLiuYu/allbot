@@ -155,7 +155,7 @@ async function withStubbedStateDir<T>(
   run: (stateDir: string) => Promise<T>,
 ): Promise<T> {
   const stateDir = path.join(os.tmpdir(), name);
-  vi.stubEnv("KAIJIBOT_STATE_DIR", stateDir);
+  vi.stubEnv("ALLBOT_STATE_DIR", stateDir);
   try {
     return await run(stateDir);
   } finally {
@@ -387,7 +387,7 @@ describe("sessions_list transcriptPath resolution", () => {
   });
 
   it("resolves cross-agent transcript paths from agent defaults when gateway store path is relative", async () => {
-    await withStubbedStateDir("kaijibot-state-relative", async () => {
+    await withStubbedStateDir("allbot-state-relative", async () => {
       callGatewayMock.mockResolvedValueOnce({
         path: "agents/main/sessions/sessions.json",
         sessions: [
@@ -408,7 +408,7 @@ describe("sessions_list transcriptPath resolution", () => {
   });
 
   it("resolves transcriptPath even when sessions.list does not return a store path", async () => {
-    await withStubbedStateDir("kaijibot-state-no-path", async () => {
+    await withStubbedStateDir("allbot-state-no-path", async () => {
       callGatewayMock.mockResolvedValueOnce({
         sessions: [
           {
@@ -428,7 +428,7 @@ describe("sessions_list transcriptPath resolution", () => {
   });
 
   it("falls back to agent defaults when gateway path is non-string", async () => {
-    await withStubbedStateDir("kaijibot-state-non-string-path", async () => {
+    await withStubbedStateDir("allbot-state-non-string-path", async () => {
       callGatewayMock.mockResolvedValueOnce({
         path: { raw: "agents/main/sessions/sessions.json" },
         sessions: [
@@ -449,7 +449,7 @@ describe("sessions_list transcriptPath resolution", () => {
   });
 
   it("falls back to agent defaults when gateway path is '(multiple)'", async () => {
-    await withStubbedStateDir("kaijibot-state-multiple", async (stateDir) => {
+    await withStubbedStateDir("allbot-state-multiple", async (stateDir) => {
       callGatewayMock.mockResolvedValueOnce({
         path: "(multiple)",
         sessions: [
@@ -470,7 +470,7 @@ describe("sessions_list transcriptPath resolution", () => {
   });
 
   it("resolves absolute {agentId} template paths per session agent", async () => {
-    const templateStorePath = "/tmp/kaijibot/agents/{agentId}/sessions/sessions.json";
+    const templateStorePath = "/tmp/allbot/agents/{agentId}/sessions/sessions.json";
 
     callGatewayMock.mockResolvedValueOnce({
       path: templateStorePath,

@@ -1,8 +1,8 @@
 {
-  "name": "@kaijibot/diffs",
+  "name": "@allbot/diffs",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot diff viewer plugin",
+  "description": "AllBot diff viewer plugin",
   "type": "module",
   "scripts": {
     "build:viewer": "bun build src/viewer-client.ts --target browser --format esm --minify --outfile assets/viewer-runtime.js"
@@ -14,9 +14,9 @@
     "typebox": "^1.1"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "bundle": {
       "stageRuntimeDependencies": true
     },

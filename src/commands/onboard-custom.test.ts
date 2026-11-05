@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CONTEXT_WINDOW_HARD_MIN_TOKENS } from "../agents/context-window-guard.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { defaultRuntime } from "../runtime.js";
 import {
   applyCustomApiConfig,
@@ -97,7 +97,7 @@ function getFirstFetchVerificationCall(fetchMock: ReturnType<typeof vi.fn>) {
 
 function buildCustomProviderConfig(contextWindow?: number) {
   if (contextWindow === undefined) {
-    return {} as KaijiBotConfig;
+    return {} as AllBotConfig;
   }
   return {
     models: {
@@ -119,7 +119,7 @@ function buildCustomProviderConfig(contextWindow?: number) {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function applyCustomModelConfigWithContextWindow(contextWindow?: number) {
@@ -400,7 +400,7 @@ describe("promptCustomApiConfig", () => {
         providers: {
           filemain: {
             source: "file",
-            path: "/tmp/kaijibot-missing-provider.json",
+            path: "/tmp/allbot-missing-provider.json",
             mode: "json",
           },
         },
@@ -617,7 +617,7 @@ describe("applyCustomApiConfig", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       baseUrl: "https://llm.example.com/v1",
       modelId: "foo-large",
       compatibility: "openai",
@@ -647,7 +647,7 @@ describe("applyCustomApiConfig", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       baseUrl: "https://my-resource.openai.azure.com",
       modelId: "o3-mini",
       compatibility: "openai",

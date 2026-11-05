@@ -32,11 +32,11 @@ import type {
 } from "./service-types.js";
 
 function resolveTaskName(env: GatewayServiceEnv): string {
-  const override = env.KAIJIBOT_WINDOWS_TASK_NAME?.trim();
+  const override = env.ALLBOT_WINDOWS_TASK_NAME?.trim();
   if (override) {
     return override;
   }
-  return resolveGatewayWindowsTaskName(env.KAIJIBOT_PROFILE);
+  return resolveGatewayWindowsTaskName(env.ALLBOT_PROFILE);
 }
 
 function shouldFallbackToStartupEntry(params: { code: number; detail: string }): boolean {
@@ -49,11 +49,11 @@ function shouldFallbackToStartupEntry(params: { code: number; detail: string }):
 }
 
 export function resolveTaskScriptPath(env: GatewayServiceEnv): string {
-  const override = env.KAIJIBOT_TASK_SCRIPT?.trim();
+  const override = env.ALLBOT_TASK_SCRIPT?.trim();
   if (override) {
     return override;
   }
-  const scriptName = env.KAIJIBOT_TASK_SCRIPT_NAME?.trim() || "gateway.cmd";
+  const scriptName = env.ALLBOT_TASK_SCRIPT_NAME?.trim() || "gateway.cmd";
   const stateDir = resolveGatewayStateDir(env);
   return path.join(stateDir, scriptName);
 }
@@ -320,7 +320,7 @@ function launchFallbackTaskScript(scriptPath: string): void {
 }
 
 function resolveConfiguredGatewayPort(env: GatewayServiceEnv): number | null {
-  const raw = env.KAIJIBOT_GATEWAY_PORT?.trim();
+  const raw = env.ALLBOT_GATEWAY_PORT?.trim();
   if (!raw) {
     return null;
   }
@@ -364,7 +364,7 @@ async function resolveScheduledTaskPort(env: GatewayServiceEnv): Promise<number 
   const command = await readScheduledTaskCommand(env).catch(() => null);
   return (
     parsePortFromProgramArguments(command?.programArguments) ??
-    parsePositivePort(command?.environment?.KAIJIBOT_GATEWAY_PORT) ??
+    parsePositivePort(command?.environment?.ALLBOT_GATEWAY_PORT) ??
     resolveConfiguredGatewayPort(env)
   );
 }
@@ -631,7 +631,7 @@ async function activateScheduledTask(params: {
   scriptPath: string;
   description?: string;
 }) {
-  const taskDescription = params.description ?? "KaijiBot Gateway";
+  const taskDescription = params.description ?? "AllBot Gateway";
 
   const taskName = resolveTaskName(params.env);
   const quotedScript = quoteSchtasksArg(params.scriptPath);
@@ -696,11 +696,11 @@ async function activateScheduledTask(params: {
 }
 
 function resolveWatchdogTaskName(env: GatewayServiceEnv): string {
-  const override = env.KAIJIBOT_WATCHDOG_TASK_NAME?.trim();
+  const override = env.ALLBOT_WATCHDOG_TASK_NAME?.trim();
   if (override) {
     return override;
   }
-  return resolveGatewayWatchdogTaskName(env.KAIJIBOT_PROFILE);
+  return resolveGatewayWatchdogTaskName(env.ALLBOT_PROFILE);
 }
 
 export function resolveWatchdogScriptsDir(env: GatewayServiceEnv): string {
@@ -718,14 +718,14 @@ export function buildWatchdogCmdScript(env: GatewayServiceEnv): string {
 
   const lines: string[] = [
     "@echo off",
-    "rem KaijiBot Gateway Watchdog - checks if gateway is running",
+    "rem AllBot Gateway Watchdog - checks if gateway is running",
     "setlocal",
     "",
     `set "LOGDIR=${logDir}"`,
     'if not exist "%LOGDIR%" mkdir "%LOGDIR%"',
     'set "LOGFILE=%LOGDIR%\\watchdog.log"',
     "",
-    "powershell -NoProfile -Command \"if (Get-CimInstance Win32_Process -Filter \\\"Name='node.exe'\\\" | Where-Object { $_.CommandLine -match 'kaijibot.*gateway' }) { exit 0 } else { exit 1 }\"",
+    "powershell -NoProfile -Command \"if (Get-CimInstance Win32_Process -Filter \\\"Name='node.exe'\\\" | Where-Object { $_.CommandLine -match 'allbot.*gateway' }) { exit 0 } else { exit 1 }\"",
     "if errorlevel 1 (",
     '    echo [%date% %time%] Gateway not running, triggering restart ^>^> "%LOGFILE%"',
     `    schtasks /run /tn "${gatewayTaskName}"`,
@@ -742,7 +742,7 @@ export function buildWatchdogVbsScript(env: GatewayServiceEnv): string {
   const cmdPath = path.join(scriptsDir, "watchdog.cmd");
   const escapedPath = cmdPath.replace(/"/g, '""');
   const lines: string[] = [
-    "' KaijiBot Gateway Watchdog VBS wrapper - runs watchdog.cmd without visible window",
+    "' AllBot Gateway Watchdog VBS wrapper - runs watchdog.cmd without visible window",
     'Set objShell = CreateObject("WScript.Shell")',
     `objShell.Run "cmd /c ""${escapedPath}""", 0, True`,
   ];

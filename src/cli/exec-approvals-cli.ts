@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import type { Command } from "commander";
 import JSON5 from "json5";
-import { readBestEffortConfig, type KaijiBotConfig } from "../config/config.js";
+import { readBestEffortConfig, type AllBotConfig } from "../config/config.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import {
   collectExecPolicyScopeSnapshots,
@@ -32,7 +32,7 @@ type ExecApprovalsSnapshot = {
 };
 
 type ConfigSnapshotLike = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 };
 type ApprovalsTargetSource = "gateway" | "node" | "local";
 type EffectivePolicyReport = {
@@ -166,7 +166,7 @@ function formatCliError(err: unknown): string {
 async function loadConfigForApprovalsTarget(params: {
   opts: ExecApprovalsCliOpts;
   source: ApprovalsTargetSource;
-}): Promise<KaijiBotConfig | null> {
+}): Promise<AllBotConfig | null> {
   try {
     if (params.source === "local") {
       return await readBestEffortConfig();
@@ -183,7 +183,7 @@ async function loadConfigForApprovalsTarget(params: {
 }
 
 function buildEffectivePolicyReport(params: {
-  cfg: KaijiBotConfig | null;
+  cfg: AllBotConfig | null;
   source: ApprovalsTargetSource;
   approvals: ExecApprovalsFile;
   hostPath: string;
@@ -543,16 +543,16 @@ export function registerExecApprovalsCli(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.execApprovals.examples"))}\n${formatExample(
-          'kaijibot approvals allowlist add "~/Projects/**/bin/rg"',
+          'allbot approvals allowlist add "~/Projects/**/bin/rg"',
           "Allowlist a local binary pattern for the main agent.",
         )}\n${formatExample(
-          'kaijibot approvals allowlist add --agent main --node <id|name|ip> "/usr/bin/uptime"',
+          'allbot approvals allowlist add --agent main --node <id|name|ip> "/usr/bin/uptime"',
           "Allowlist on a specific node/agent.",
         )}\n${formatExample(
-          'kaijibot approvals allowlist add --agent "*" "/usr/bin/uname"',
+          'allbot approvals allowlist add --agent "*" "/usr/bin/uname"',
           "Allowlist for all agents (wildcard).",
         )}\n${formatExample(
-          'kaijibot approvals allowlist remove "~/Projects/**/bin/rg"',
+          'allbot approvals allowlist remove "~/Projects/**/bin/rg"',
           "Remove an allowlist pattern.",
         )}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/approvals", "gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/approvals.md")}\n`,
     );

@@ -1,6 +1,6 @@
-// KaijiBot cognitive palette for CLI/UI theming.
+// AllBot cognitive palette for CLI/UI theming.
 // Blue-purple accent reflecting the cognitive AI identity.
-export const KAIJIBOT_PALETTE = {
+export const ALLBOT_PALETTE = {
   accent: "#6C5CE7",
   accentBright: "#A29BFE",
   accentDim: "#4834D4",
@@ -11,5 +11,5 @@ export const KAIJIBOT_PALETTE = {
   muted: "#8B8FA3",
 } as const;
 
-/** @deprecated Use KAIJIBOT_PALETTE instead. */
-export const LOBSTER_PALETTE = KAIJIBOT_PALETTE;
+/** @deprecated Use ALLBOT_PALETTE instead. */
+export const LOBSTER_PALETTE = ALLBOT_PALETTE;

@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
-import { discoverKaijiBotPlugins } from "../src/plugins/discovery.js";
+import { discoverAllBotPlugins } from "../src/plugins/discovery.js";
 import { collectFilesSync, isCodeFile, relativeToCwd } from "./check-file-utils.js";
 
 // Match exact monolithic-root specifier in any code path:
 // imports/exports, require/dynamic import, and test mocks (vi.mock/jest.mock).
-const ROOT_IMPORT_PATTERN = /["']kaijibot\/plugin-sdk["']/;
-const LEGACY_COMPAT_IMPORT_PATTERN = /["']kaijibot\/plugin-sdk\/compat["']/;
+const ROOT_IMPORT_PATTERN = /["']allbot\/plugin-sdk["']/;
+const LEGACY_COMPAT_IMPORT_PATTERN = /["']allbot\/plugin-sdk\/compat["']/;
 
 function hasMonolithicRootImport(content: string): boolean {
   return ROOT_IMPORT_PATTERN.test(content);
@@ -53,7 +53,7 @@ function collectBundledExtensionSourceFiles(): string[] {
 }
 
 function main() {
-  const discovery = discoverKaijiBotPlugins({});
+  const discovery = discoverAllBotPlugins({});
   const bundledCandidates = discovery.candidates.filter((c) => c.origin === "bundled");
   const filesToCheck = new Set<string>();
   for (const candidate of bundledCandidates) {
@@ -88,14 +88,14 @@ function main() {
 
   if (monolithicOffenders.length > 0 || legacyCompatOffenders.length > 0) {
     if (monolithicOffenders.length > 0) {
-      console.error("Bundled plugin source files must not import monolithic kaijibot/plugin-sdk.");
+      console.error("Bundled plugin source files must not import monolithic allbot/plugin-sdk.");
       for (const file of monolithicOffenders.toSorted()) {
         console.error(`- ${relativeToCwd(file)}`);
       }
     }
     if (legacyCompatOffenders.length > 0) {
       console.error(
-        "Bundled plugin source files must not import legacy kaijibot/plugin-sdk/compat.",
+        "Bundled plugin source files must not import legacy allbot/plugin-sdk/compat.",
       );
       for (const file of legacyCompatOffenders.toSorted()) {
         console.error(`- ${relativeToCwd(file)}`);
@@ -103,7 +103,7 @@ function main() {
     }
     if (monolithicOffenders.length > 0 || legacyCompatOffenders.length > 0) {
       console.error(
-        "Use kaijibot/plugin-sdk/<domain> or kaijibot/plugin-sdk/<channel> subpaths for bundled plugins; root and compat are legacy surfaces only.",
+        "Use allbot/plugin-sdk/<domain> or allbot/plugin-sdk/<channel> subpaths for bundled plugins; root and compat are legacy surfaces only.",
       );
     }
     process.exit(1);

@@ -1,5 +1,5 @@
-import type { ProviderCatalogContext } from "kaijibot/plugin-sdk/provider-catalog-shared";
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ProviderCatalogContext } from "allbot/plugin-sdk/provider-catalog-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 import { OLLAMA_DEFAULT_BASE_URL } from "./src/defaults.js";
 import {
   buildOllamaModelDefinition,

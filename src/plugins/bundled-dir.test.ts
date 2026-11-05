@@ -5,8 +5,8 @@ import { resolveBundledPluginsDir } from "./bundled-dir.js";
 import { cleanupTrackedTempDirs, makeTrackedTempDir } from "./test-helpers/fs-fixtures.js";
 
 const tempDirs: string[] = [];
-const originalBundledDir = process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-const originalDisableBundledPlugins = process.env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS;
+const originalBundledDir = process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
+const originalDisableBundledPlugins = process.env.ALLBOT_DISABLE_BUNDLED_PLUGINS;
 const originalVitest = process.env.VITEST;
 const originalArgv1 = process.argv[1];
 const originalExecArgv = [...process.execArgv];
@@ -15,7 +15,7 @@ function makeRepoRoot(prefix: string): string {
   return makeTrackedTempDir(prefix, tempDirs);
 }
 
-function createKaijiBotRoot(params: {
+function createAllBotRoot(params: {
   prefix: string;
   hasExtensions?: boolean;
   hasSrc?: boolean;
@@ -41,7 +41,7 @@ function createKaijiBotRoot(params: {
   }
   fs.writeFileSync(
     path.join(repoRoot, "package.json"),
-    `${JSON.stringify({ name: "kaijibot" }, null, 2)}\n`,
+    `${JSON.stringify({ name: "allbot" }, null, 2)}\n`,
     "utf8",
   );
   return repoRoot;
@@ -52,11 +52,11 @@ function seedBundledPluginTree(rootDir: string, relativeDir: string, pluginId = 
   fs.mkdirSync(pluginDir, { recursive: true });
   fs.writeFileSync(
     path.join(pluginDir, "package.json"),
-    `${JSON.stringify({ name: `@kaijibot/${pluginId}` }, null, 2)}\n`,
+    `${JSON.stringify({ name: `@allbot/${pluginId}` }, null, 2)}\n`,
     "utf8",
   );
   fs.writeFileSync(
-    path.join(pluginDir, "kaijibot.plugin.json"),
+    path.join(pluginDir, "allbot.plugin.json"),
     `${JSON.stringify({ id: pluginId }, null, 2)}\n`,
     "utf8",
   );
@@ -81,14 +81,14 @@ function expectResolvedBundledDir(params: {
     process.env.VITEST = params.vitest;
   }
   if (params.bundledDirOverride === undefined) {
-    delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+    delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = params.bundledDirOverride;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = params.bundledDirOverride;
   }
   if (params.disableBundledPlugins === undefined) {
-    delete process.env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS;
+    delete process.env.ALLBOT_DISABLE_BUNDLED_PLUGINS;
   } else {
-    process.env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS = params.disableBundledPlugins;
+    process.env.ALLBOT_DISABLE_BUNDLED_PLUGINS = params.disableBundledPlugins;
   }
 
   expect(fs.realpathSync(resolveBundledPluginsDir() ?? "")).toBe(
@@ -144,14 +144,14 @@ function expectInstalledBundledDirScenarioCase(
 afterEach(() => {
   vi.restoreAllMocks();
   if (originalBundledDir === undefined) {
-    delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+    delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = originalBundledDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = originalBundledDir;
   }
   if (originalDisableBundledPlugins === undefined) {
-    delete process.env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS;
+    delete process.env.ALLBOT_DISABLE_BUNDLED_PLUGINS;
   } else {
-    process.env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS = originalDisableBundledPlugins;
+    process.env.ALLBOT_DISABLE_BUNDLED_PLUGINS = originalDisableBundledPlugins;
   }
   if (originalVitest === undefined) {
     delete process.env.VITEST;
@@ -169,7 +169,7 @@ describe("resolveBundledPluginsDir", () => {
     [
       "prefers the staged runtime bundled plugin tree from the package root",
       {
-        prefix: "kaijibot-bundled-dir-runtime-",
+        prefix: "allbot-bundled-dir-runtime-",
         hasDistRuntimeExtensions: true,
         hasDistExtensions: true,
       },
@@ -180,7 +180,7 @@ describe("resolveBundledPluginsDir", () => {
     [
       "falls back to built dist/extensions in installed package roots",
       {
-        prefix: "kaijibot-bundled-dir-dist-",
+        prefix: "allbot-bundled-dir-dist-",
         hasDistExtensions: true,
       },
       {
@@ -190,7 +190,7 @@ describe("resolveBundledPluginsDir", () => {
     [
       "prefers built dist/extensions in a git checkout outside vitest",
       {
-        prefix: "kaijibot-bundled-dir-git-built-",
+        prefix: "allbot-bundled-dir-git-built-",
         hasExtensions: true,
         hasSrc: true,
         hasDistRuntimeExtensions: true,
@@ -204,7 +204,7 @@ describe("resolveBundledPluginsDir", () => {
     [
       "prefers source extensions under vitest to avoid stale staged plugins",
       {
-        prefix: "kaijibot-bundled-dir-vitest-",
+        prefix: "allbot-bundled-dir-vitest-",
         hasExtensions: true,
         hasDistRuntimeExtensions: true,
         hasDistExtensions: true,
@@ -217,7 +217,7 @@ describe("resolveBundledPluginsDir", () => {
     [
       "prefers source extensions during tsx-driven source execution",
       {
-        prefix: "kaijibot-bundled-dir-tsx-",
+        prefix: "allbot-bundled-dir-tsx-",
         hasExtensions: true,
         hasSrc: true,
         hasDistRuntimeExtensions: true,
@@ -232,7 +232,7 @@ describe("resolveBundledPluginsDir", () => {
     [
       "falls back to source extensions in a git checkout when built trees are missing",
       {
-        prefix: "kaijibot-bundled-dir-git-",
+        prefix: "allbot-bundled-dir-git-",
         hasExtensions: true,
         hasSrc: true,
         hasGitCheckout: true,
@@ -242,7 +242,7 @@ describe("resolveBundledPluginsDir", () => {
       },
     ],
   ] as const)("%s", (_name, layout, expectation) => {
-    const repoRoot = createKaijiBotRoot(layout);
+    const repoRoot = createAllBotRoot(layout);
     if (expectation.expectedRelativeDir === path.join("dist-runtime", "extensions")) {
       seedBundledPluginTree(repoRoot, path.join("dist", "extensions"));
       seedBundledPluginTree(repoRoot, path.join("dist-runtime", "extensions"));
@@ -258,8 +258,8 @@ describe("resolveBundledPluginsDir", () => {
   });
 
   it("falls back to source extensions when dist trees exist but do not contain real plugin manifests", () => {
-    const repoRoot = createKaijiBotRoot({
-      prefix: "kaijibot-bundled-dir-incomplete-built-",
+    const repoRoot = createAllBotRoot({
+      prefix: "allbot-bundled-dir-incomplete-built-",
       hasExtensions: true,
       hasSrc: true,
       hasDistRuntimeExtensions: true,
@@ -278,16 +278,16 @@ describe("resolveBundledPluginsDir", () => {
   });
 
   it("returns a stable empty bundled plugin directory when bundled plugins are disabled", () => {
-    const repoRoot = createKaijiBotRoot({
-      prefix: "kaijibot-bundled-dir-disabled-",
+    const repoRoot = createAllBotRoot({
+      prefix: "allbot-bundled-dir-disabled-",
       hasExtensions: true,
       hasSrc: true,
       hasGitCheckout: true,
     });
     vi.spyOn(process, "cwd").mockReturnValue(repoRoot);
     process.argv[1] = "/usr/bin/env";
-    process.env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS = "1";
-    delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+    process.env.ALLBOT_DISABLE_BUNDLED_PLUGINS = "1";
+    delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
 
     const bundledDir = resolveBundledPluginsDir();
 
@@ -300,13 +300,13 @@ describe("resolveBundledPluginsDir", () => {
     {
       name: "prefers the running CLI package root over an unrelated cwd checkout",
       createScenario: () => {
-        const installedRoot = createKaijiBotRoot({
-          prefix: "kaijibot-bundled-dir-installed-",
+        const installedRoot = createAllBotRoot({
+          prefix: "allbot-bundled-dir-installed-",
           hasDistExtensions: true,
         });
         seedBundledPluginTree(installedRoot, path.join("dist", "extensions"));
-        const cwdRepoRoot = createKaijiBotRoot({
-          prefix: "kaijibot-bundled-dir-cwd-",
+        const cwdRepoRoot = createAllBotRoot({
+          prefix: "allbot-bundled-dir-cwd-",
           hasExtensions: true,
           hasSrc: true,
           hasGitCheckout: true,
@@ -314,21 +314,21 @@ describe("resolveBundledPluginsDir", () => {
         return {
           installedRoot,
           cwd: cwdRepoRoot,
-          argv1: path.join(installedRoot, "kaijibot.mjs"),
+          argv1: path.join(installedRoot, "allbot.mjs"),
         };
       },
     },
     {
       name: "falls back to the running installed package when the override path is stale",
       createScenario: () => {
-        const installedRoot = createKaijiBotRoot({
-          prefix: "kaijibot-bundled-dir-override-",
+        const installedRoot = createAllBotRoot({
+          prefix: "allbot-bundled-dir-override-",
           hasDistExtensions: true,
         });
         seedBundledPluginTree(installedRoot, path.join("dist", "extensions"));
         return {
           installedRoot,
-          argv1: path.join(installedRoot, "kaijibot.mjs"),
+          argv1: path.join(installedRoot, "allbot.mjs"),
           bundledDirOverride: path.join(installedRoot, "missing-extensions"),
         };
       },

@@ -3,7 +3,7 @@ import { resolveSessionAuthProfileOverride } from "../../agents/auth-profiles/se
 import type { ExecToolDefaults } from "../../agents/bash-tools.js";
 import { resolveFastModeState } from "../../agents/fast-mode.js";
 import { t } from "../../cli/i18n/translate.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveGroupSessionKey } from "../../config/sessions/group.js";
 import {
   resolveSessionFilePath,
@@ -48,7 +48,7 @@ import { resolveTypingMode } from "./typing-mode.js";
 import { resolveRunTypingPolicy } from "./typing-policy.js";
 import type { TypingController } from "./typing.js";
 
-type AgentDefaults = NonNullable<KaijiBotConfig["agents"]>["defaults"];
+type AgentDefaults = NonNullable<AllBotConfig["agents"]>["defaults"];
 type ExecOverrides = Pick<ExecToolDefaults, "host" | "security" | "ask" | "node">;
 
 export function buildExecOverridePromptHint(params: {
@@ -110,11 +110,11 @@ function loadSessionStoreRuntime() {
 type RunPreparedReplyParams = {
   ctx: MsgContext;
   sessionCtx: TemplateContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   agentDir: string;
   agentCfg: AgentDefaults;
-  sessionCfg: KaijiBotConfig["session"];
+  sessionCfg: AllBotConfig["session"];
   commandAuthorized: boolean;
   command: ReturnType<typeof buildCommandContext>;
   commandSource?: string;
@@ -212,7 +212,7 @@ export async function runPreparedReply(
   } = params;
   const useFastReplyRuntime = shouldUseReplyFastTestRuntime({
     cfg,
-    isFastTestEnv: process.env.KAIJIBOT_TEST_FAST === "1",
+    isFastTestEnv: process.env.ALLBOT_TEST_FAST === "1",
   });
   let currentSystemSent = systemSent;
 
@@ -513,7 +513,7 @@ export async function runPreparedReply(
     });
   };
   const skillResult =
-    process.env.KAIJIBOT_TEST_FAST === "1"
+    process.env.ALLBOT_TEST_FAST === "1"
       ? {
           sessionEntry,
           skillsSnapshot: sessionEntry?.skillsSnapshot,

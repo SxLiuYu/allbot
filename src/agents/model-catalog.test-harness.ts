@@ -5,11 +5,11 @@ import { __setModelCatalogImportForTest, resetModelCatalogCacheForTest } from ".
 export type PiSdkModule = typeof import("./pi-model-discovery.js");
 
 vi.mock("./models-config.js", () => ({
-  ensureKaijiBotModelsJson: vi.fn().mockResolvedValue({ agentDir: "/tmp", wrote: false }),
+  ensureAllBotModelsJson: vi.fn().mockResolvedValue({ agentDir: "/tmp", wrote: false }),
 }));
 
 vi.mock("./agent-paths.js", () => ({
-  resolveKaijiBotAgentDir: () => "/tmp/kaijibot",
+  resolveAllBotAgentDir: () => "/tmp/allbot",
 }));
 
 vi.mock("../plugins/provider-runtime.runtime.js", () => ({

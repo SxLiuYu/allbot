@@ -39,7 +39,7 @@ export interface FleetAgent {
 }
 
 /**
- * A registered agent (from `kaijibot.json` → `agents.list`), enriched with
+ * A registered agent (from `allbot.json` → `agents.list`), enriched with
  * session-store-derived stats. The monitor dashboard always shows every
  * registered agent, even when none have active runs.
  */

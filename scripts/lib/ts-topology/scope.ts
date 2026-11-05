@@ -124,9 +124,9 @@ export function createPluginSdkScope(_repoRoot: string): TopologyScope {
     entrypoint,
     sourcePath: `src/plugin-sdk/${entrypoint}.ts`,
     importSpecifier:
-      entrypoint === "index" ? "kaijibot/plugin-sdk" : `kaijibot/plugin-sdk/${entrypoint}`,
+      entrypoint === "index" ? "allbot/plugin-sdk" : `allbot/plugin-sdk/${entrypoint}`,
   }));
-  return buildScopeFromEntrypoints("plugin-sdk", "KaijiBot plugin-sdk public surface", entrypoints);
+  return buildScopeFromEntrypoints("plugin-sdk", "AllBot plugin-sdk public surface", entrypoints);
 }
 
 export function createFilesystemPublicSurfaceScope(

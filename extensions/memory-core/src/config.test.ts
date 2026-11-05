@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { validateJsonSchemaValue } from "../../../src/plugins/schema-validator.js";
 
 const manifest = JSON.parse(
-  fs.readFileSync(new URL("../kaijibot.plugin.json", import.meta.url), "utf-8"),
+  fs.readFileSync(new URL("../allbot.plugin.json", import.meta.url), "utf-8"),
 ) as { configSchema: Record<string, unknown> };
 
 describe("memory-core manifest config schema", () => {

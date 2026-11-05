@@ -433,7 +433,7 @@ export async function loadRunOverflowCompactionHarness(): Promise<{
   }));
 
   vi.doMock("../models-config.js", () => ({
-    ensureKaijiBotModelsJson: vi.fn(async () => {}),
+    ensureAllBotModelsJson: vi.fn(async () => {}),
   }));
 
   vi.doMock("../context-window-guard.js", () => ({
@@ -452,7 +452,7 @@ export async function loadRunOverflowCompactionHarness(): Promise<{
   }));
 
   vi.doMock("../agent-paths.js", () => ({
-    resolveKaijiBotAgentDir: vi.fn(() => "/tmp/agent-dir"),
+    resolveAllBotAgentDir: vi.fn(() => "/tmp/agent-dir"),
   }));
 
   vi.doMock("../defaults.js", () => ({

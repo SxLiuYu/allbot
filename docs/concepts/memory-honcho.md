@@ -8,7 +8,7 @@ read_when:
 
 # Honcho Memory
 
-[Honcho](https://honcho.dev) adds AI-native memory to KaijiBot. It persists
+[Honcho](https://honcho.dev) adds AI-native memory to AllBot. It persists
 conversations to a dedicated service and builds user and agent models over time,
 giving your agent cross-session context that goes beyond workspace Markdown
 files.
@@ -49,9 +49,9 @@ Honcho registers tools that the agent can use during conversation:
 Install the plugin and run setup:
 
 ```bash
-kaijibot plugins install @honcho-ai/kaijibot-honcho
-kaijibot honcho setup
-kaijibot gateway --force
+allbot plugins install @honcho-ai/allbot-honcho
+allbot honcho setup
+allbot gateway --force
 ```
 
 The setup command prompts for your API credentials, writes the config, and
@@ -65,16 +65,16 @@ option.
 
 ## Configuration
 
-Settings live under `plugins.entries["kaijibot-honcho"].config`:
+Settings live under `plugins.entries["allbot-honcho"].config`:
 
 ```json5
 {
   plugins: {
     entries: {
-      "kaijibot-honcho": {
+      "allbot-honcho": {
         config: {
           apiKey: "your-api-key", // omit for self-hosted
-          workspaceId: "kaijibot", // memory isolation
+          workspaceId: "allbot", // memory isolation
           baseUrl: "https://api.honcho.dev",
         },
       },
@@ -89,7 +89,7 @@ For self-hosted instances, point `baseUrl` to your local server (for example
 ## Migrating existing memory
 
 If you have existing workspace memory files (`USER.md`, `MEMORY.md`,
-`IDENTITY.md`, `memory/`, `canvas/`), `kaijibot honcho setup` detects and
+`IDENTITY.md`, `memory/`, `canvas/`), `allbot honcho setup` detects and
 offers to migrate them.
 
 <Info>
@@ -125,16 +125,16 @@ Honcho's cross-session memory.
 ## CLI commands
 
 ```bash
-kaijibot honcho setup                        # Configure API key and migrate files
-kaijibot honcho status                       # Check connection status
-kaijibot honcho ask <question>               # Query Honcho about the user
-kaijibot honcho search <query> [-k N] [-d D] # Semantic search over memory
+allbot honcho setup                        # Configure API key and migrate files
+allbot honcho status                       # Check connection status
+allbot honcho ask <question>               # Query Honcho about the user
+allbot honcho search <query> [-k N] [-d D] # Semantic search over memory
 ```
 
 ## Further reading
 
-- [Plugin source code](https://github.com/plastic-labs/kaijibot-honcho)
+- [Plugin source code](https://github.com/plastic-labs/allbot-honcho)
 - [Honcho documentation](https://docs.honcho.dev)
-- [Honcho KaijiBot integration guide](https://docs.honcho.dev/v3/guides/integrations/kaijibot)
-- [Memory](/concepts/memory) -- KaijiBot memory overview
+- [Honcho AllBot integration guide](https://docs.honcho.dev/v3/guides/integrations/allbot)
+- [Memory](/concepts/memory) -- AllBot memory overview
 - [Context Engines](/concepts/context-engine) -- how plugin context engines work

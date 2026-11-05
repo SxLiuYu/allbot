@@ -1,5 +1,5 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import manifest from "./kaijibot.plugin.json" with { type: "json" };
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import manifest from "./allbot.plugin.json" with { type: "json" };
 
 const DEEPSEEK_MANIFEST_CATALOG = manifest.modelCatalog.providers.deepseek;
 

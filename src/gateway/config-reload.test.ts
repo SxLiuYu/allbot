@@ -345,7 +345,7 @@ function createWatcherMock() {
 
 function makeSnapshot(partial: Partial<ConfigFileSnapshot> = {}): ConfigFileSnapshot {
   return {
-    path: "/tmp/kaijibot.json",
+    path: "/tmp/allbot.json",
     exists: true,
     raw: "{}",
     parsed: {},
@@ -391,7 +391,7 @@ function createReloaderHarness(
     onHotReload,
     onRestart,
     log,
-    watchPath: "/tmp/kaijibot.json",
+    watchPath: "/tmp/allbot.json",
   });
   return {
     watcher,
@@ -546,7 +546,7 @@ describe("startGatewayConfigReloader", () => {
     const harness = createReloaderHarness(readSnapshot);
 
     harness.emitWrite({
-      configPath: "/tmp/kaijibot.json",
+      configPath: "/tmp/allbot.json",
       sourceConfig: { gateway: { reload: { debounceMs: 0 } } },
       runtimeConfig: {
         gateway: { reload: { debounceMs: 0 } },

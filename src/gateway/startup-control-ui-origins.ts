@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   ensureControlUiAllowedOriginsForNonLoopbackBind,
   type GatewayNonLoopbackBindMode,
@@ -6,10 +6,10 @@ import {
 import { isContainerEnvironment } from "./net.js";
 
 export async function maybeSeedControlUiAllowedOriginsAtStartup(params: {
-  config: KaijiBotConfig;
-  writeConfig: (config: KaijiBotConfig) => Promise<void>;
+  config: AllBotConfig;
+  writeConfig: (config: AllBotConfig) => Promise<void>;
   log: { info: (msg: string) => void; warn: (msg: string) => void };
-}): Promise<{ config: KaijiBotConfig; persistedAllowedOriginsSeed: boolean }> {
+}): Promise<{ config: AllBotConfig; persistedAllowedOriginsSeed: boolean }> {
   const seeded = ensureControlUiAllowedOriginsForNonLoopbackBind(params.config, {
     isContainerEnvironment,
   });

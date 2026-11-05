@@ -21,7 +21,7 @@ vi.mock("./logger.js", () => ({
 
 let loadConfigCalls = 0;
 let originalIsTty: boolean | undefined;
-let originalKaijiBotTestConsole: string | undefined;
+let originalAllBotTestConsole: string | undefined;
 let snapshot: ConsoleSnapshot;
 let logging: typeof import("../logging.js");
 let state: typeof import("./state.js");
@@ -37,8 +37,8 @@ beforeEach(() => {
   shouldSkipMutatingLoggingConfigReadMock.mockReturnValue(false);
   snapshot = captureConsoleSnapshot();
   originalIsTty = process.stdout.isTTY;
-  originalKaijiBotTestConsole = process.env.KAIJIBOT_TEST_CONSOLE;
-  process.env.KAIJIBOT_TEST_CONSOLE = "1";
+  originalAllBotTestConsole = process.env.ALLBOT_TEST_CONSOLE;
+  process.env.ALLBOT_TEST_CONSOLE = "1";
   Object.defineProperty(process.stdout, "isTTY", { value: false, configurable: true });
 });
 
@@ -49,10 +49,10 @@ afterEach(() => {
   console.error = snapshot.error;
   console.debug = snapshot.debug;
   console.trace = snapshot.trace;
-  if (originalKaijiBotTestConsole === undefined) {
-    delete process.env.KAIJIBOT_TEST_CONSOLE;
+  if (originalAllBotTestConsole === undefined) {
+    delete process.env.ALLBOT_TEST_CONSOLE;
   } else {
-    process.env.KAIJIBOT_TEST_CONSOLE = originalKaijiBotTestConsole;
+    process.env.ALLBOT_TEST_CONSOLE = originalAllBotTestConsole;
   }
   Object.defineProperty(process.stdout, "isTTY", { value: originalIsTty, configurable: true });
   logging.setConsoleConfigLoaderForTests();

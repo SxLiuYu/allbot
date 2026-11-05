@@ -64,14 +64,14 @@ describe("redactSensitiveStatusSummary", () => {
         },
       },
       sessions: {
-        paths: ["/tmp/kaijibot/sessions.json"],
+        paths: ["/tmp/allbot/sessions.json"],
         count: 1,
         defaults: { model: "gpt-5", contextTokens: 200_000 },
         recent: [createRecentSessionRow()],
         byAgent: [
           {
             agentId: "main",
-            path: "/tmp/kaijibot/main-sessions.json",
+            path: "/tmp/allbot/main-sessions.json",
             count: 1,
             recent: [createRecentSessionRow()],
           },

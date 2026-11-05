@@ -2,4 +2,4 @@ export {
   SafeOpenError,
   openFileWithinRoot,
   writeFileFromPathWithinRoot,
-} from "kaijibot/plugin-sdk/browser-security-runtime";
+} from "allbot/plugin-sdk/browser-security-runtime";

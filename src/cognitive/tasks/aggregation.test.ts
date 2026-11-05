@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { aggregateOnTaskTerminal } from "./aggregate.js";
 import { TaskRunner } from "./runner.js";
 import { createTaskSafely } from "./service.js";
@@ -18,11 +18,11 @@ import { TaskStore } from "./store.js";
  * the parent session is woken.
  */
 
-function config(): KaijiBotConfig {
+function config(): AllBotConfig {
   return {
     cognitive: { enabled: true, tasks: { enabled: true } },
     agents: { list: [{ id: "main" }, { id: "researcher" }, { id: "writer" }] },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 describe("parent aggregation (M3-R3)", () => {
@@ -31,7 +31,7 @@ describe("parent aggregation (M3-R3)", () => {
   const wakes: Array<{ agentId: string; userId: string; taskId: string }> = [];
 
   beforeEach(() => {
-    storeDir = mkdtempSync(join(tmpdir(), "kaijibot-task-aggregation-"));
+    storeDir = mkdtempSync(join(tmpdir(), "allbot-task-aggregation-"));
     store = new TaskStore(storeDir);
     wakes.length = 0;
   });

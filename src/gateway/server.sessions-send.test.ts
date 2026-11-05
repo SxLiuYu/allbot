@@ -12,7 +12,7 @@ import {
   testState,
 } from "./test-helpers.js";
 
-const { createKaijiBotTools } = await import("../agents/kaijibot-tools.js");
+const { createAllBotTools } = await import("../agents/allbot-tools.js");
 
 installGatewayTestHooks({ scope: "suite" });
 
@@ -21,7 +21,7 @@ let gatewayPort: number;
 const gatewayToken = "test-token";
 let envSnapshot: ReturnType<typeof captureEnv>;
 
-type SessionSendTool = ReturnType<typeof createKaijiBotTools>[number];
+type SessionSendTool = ReturnType<typeof createAllBotTools>[number];
 const SESSION_SEND_E2E_TIMEOUT_MS = 10_000;
 let cachedSessionsSendTool: SessionSendTool | null = null;
 
@@ -29,7 +29,7 @@ function getSessionsSendTool(): SessionSendTool {
   if (cachedSessionsSendTool) {
     return cachedSessionsSendTool;
   }
-  const tool = createKaijiBotTools().find((candidate) => candidate.name === "sessions_send");
+  const tool = createAllBotTools().find((candidate) => candidate.name === "sessions_send");
   if (!tool) {
     throw new Error("missing sessions_send tool");
   }
@@ -76,7 +76,7 @@ async function emitLifecycleAssistantReply(params: {
 }
 
 beforeAll(async () => {
-  envSnapshot = captureEnv(["KAIJIBOT_GATEWAY_PORT", "KAIJIBOT_GATEWAY_TOKEN"]);
+  envSnapshot = captureEnv(["ALLBOT_GATEWAY_PORT", "ALLBOT_GATEWAY_TOKEN"]);
   gatewayPort = await getFreePort();
   const { approveDevicePairing, requestDevicePairing } = await import("../infra/device-pairing.js");
   const { loadOrCreateDeviceIdentity, publicKeyRawBase64UrlFromPem } =
@@ -85,7 +85,7 @@ beforeAll(async () => {
   const pending = await requestDevicePairing({
     deviceId: identity.deviceId,
     publicKey: publicKeyRawBase64UrlFromPem(identity.publicKeyPem),
-    clientId: "kaijibot-cli",
+    clientId: "allbot-cli",
     clientMode: "cli",
     role: "operator",
     scopes: ["operator.admin", "operator.read", "operator.write", "operator.approvals"],
@@ -95,15 +95,15 @@ beforeAll(async () => {
     callerScopes: pending.request.scopes ?? ["operator.admin"],
   });
   testState.gatewayAuth = { mode: "token", token: gatewayToken };
-  process.env.KAIJIBOT_GATEWAY_PORT = String(gatewayPort);
-  process.env.KAIJIBOT_GATEWAY_TOKEN = gatewayToken;
+  process.env.ALLBOT_GATEWAY_PORT = String(gatewayPort);
+  process.env.ALLBOT_GATEWAY_TOKEN = gatewayToken;
   server = await startGatewayServer(gatewayPort);
 });
 
 beforeEach(() => {
   testState.gatewayAuth = { mode: "token", token: gatewayToken };
-  process.env.KAIJIBOT_GATEWAY_PORT = String(gatewayPort);
-  process.env.KAIJIBOT_GATEWAY_TOKEN = gatewayToken;
+  process.env.ALLBOT_GATEWAY_PORT = String(gatewayPort);
+  process.env.ALLBOT_GATEWAY_TOKEN = gatewayToken;
 });
 
 afterAll(async () => {
@@ -164,9 +164,9 @@ describe("sessions_send label lookup", () => {
     { timeout: SESSION_SEND_E2E_TIMEOUT_MS },
     async () => {
       // This is an operator feature; enable broader session tool targeting for this test.
-      const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+      const configPath = process.env.ALLBOT_CONFIG_PATH;
       if (!configPath) {
-        throw new Error("KAIJIBOT_CONFIG_PATH missing in gateway test environment");
+        throw new Error("ALLBOT_CONFIG_PATH missing in gateway test environment");
       }
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.writeFile(
@@ -192,7 +192,7 @@ describe("sessions_send label lookup", () => {
         timeoutMs: 5000,
       });
 
-      const tool = createKaijiBotTools({
+      const tool = createAllBotTools({
         config: {
           agents: {
             defaults: {

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStorePath } from "../config/sessions/paths.js";
 import { loadSessionStore } from "../config/sessions/store-load.js";
 import { normalizeOptionalAccountId } from "../routing/account-id.js";
@@ -20,7 +20,7 @@ function normalizeOptionalChannel(value?: string | null): string | undefined {
 }
 
 function resolvePersistedApprovalRequestSessionBinding(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ApprovalRequestLike;
 }): ApprovalRequestSessionBinding | null {
   const sessionKey = normalizeOptionalString(params.request.request.sessionKey);
@@ -41,7 +41,7 @@ function resolvePersistedApprovalRequestSessionBinding(params: {
 }
 
 export function resolveApprovalRequestAccountId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ApprovalRequestLike;
   channel?: string | null;
 }): string | null {
@@ -68,7 +68,7 @@ export function resolveApprovalRequestAccountId(params: {
 }
 
 export function resolveApprovalRequestChannelAccountId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ApprovalRequestLike;
   channel: string;
 }): string | null {
@@ -86,7 +86,7 @@ export function resolveApprovalRequestChannelAccountId(params: {
 }
 
 export function doesApprovalRequestMatchChannelAccount(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ApprovalRequestLike;
   channel: string;
   accountId?: string | null;

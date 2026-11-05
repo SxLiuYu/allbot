@@ -1,10 +1,10 @@
-import { definePluginEntry, type ProviderAuthContext } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry, type ProviderAuthContext } from "allbot/plugin-sdk/plugin-entry";
 import {
   coerceSecretRef,
   ensureAuthProfileStore,
   listProfilesForProvider,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-auth";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 import { PROVIDER_ID, resolveCopilotForwardCompatModel } from "./models.js";
 import { buildGithubCopilotReplayPolicy } from "./replay-policy.js";
 import { wrapCopilotProviderStream } from "./stream.js";

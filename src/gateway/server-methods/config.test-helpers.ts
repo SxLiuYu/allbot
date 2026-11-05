@@ -1,5 +1,5 @@
 import { vi, type Mock } from "vitest";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import type { GatewayRequestHandlerOptions } from "./types.js";
 
 type UnknownMock = Mock<(...args: unknown[]) => unknown>;
@@ -25,10 +25,10 @@ function createGatewayLog(): GatewayLogMocks {
   };
 }
 
-export function createConfigWriteSnapshot(config: KaijiBotConfig) {
+export function createConfigWriteSnapshot(config: AllBotConfig) {
   return {
     snapshot: {
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       exists: true,
       raw: JSON.stringify(config, null, 2),
       parsed: config,

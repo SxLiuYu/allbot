@@ -1,19 +1,19 @@
 ---
-summary: "CLI reference for `kaijibot config` (get/set/unset/file/schema/validate)"
+summary: "CLI reference for `allbot config` (get/set/unset/file/schema/validate)"
 read_when:
   - You want to read or edit config non-interactively
 title: "config"
 ---
 
-# `kaijibot config`
+# `allbot config`
 
-Config helpers for non-interactive edits in `kaijibot.json`: get/set/unset/file/schema/validate
+Config helpers for non-interactive edits in `allbot.json`: get/set/unset/file/schema/validate
 values by path and print the active config file. Run without a subcommand to
-open the configure wizard (same as `kaijibot configure`).
+open the configure wizard (same as `allbot configure`).
 
 Root options:
 
-- `--section <section>`: repeatable guided-setup section filter when you run `kaijibot config` without a subcommand
+- `--section <section>`: repeatable guided-setup section filter when you run `allbot config` without a subcommand
 
 Supported guided sections:
 
@@ -30,25 +30,25 @@ Supported guided sections:
 ## Examples
 
 ```bash
-kaijibot config file
-kaijibot config --section model
-kaijibot config --section gateway --section daemon
-kaijibot config schema
-kaijibot config get browser.executablePath
-kaijibot config set browser.executablePath "/usr/bin/google-chrome"
-kaijibot config set agents.defaults.heartbeat.every "2h"
-kaijibot config set agents.list[0].tools.exec.node "node-id-or-name"
-kaijibot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN
-kaijibot config set secrets.providers.vaultfile --provider-source file --provider-path /etc/kaijibot/secrets.json --provider-mode json
-kaijibot config unset plugins.entries.brave.config.webSearch.apiKey
-kaijibot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN --dry-run
-kaijibot config validate
-kaijibot config validate --json
+allbot config file
+allbot config --section model
+allbot config --section gateway --section daemon
+allbot config schema
+allbot config get browser.executablePath
+allbot config set browser.executablePath "/usr/bin/google-chrome"
+allbot config set agents.defaults.heartbeat.every "2h"
+allbot config set agents.list[0].tools.exec.node "node-id-or-name"
+allbot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN
+allbot config set secrets.providers.vaultfile --provider-source file --provider-path /etc/allbot/secrets.json --provider-mode json
+allbot config unset plugins.entries.brave.config.webSearch.apiKey
+allbot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN --dry-run
+allbot config validate
+allbot config validate --json
 ```
 
 ### `config schema`
 
-Print the generated JSON schema for `kaijibot.json` to stdout as JSON.
+Print the generated JSON schema for `allbot.json` to stdout as JSON.
 
 What it includes:
 
@@ -67,13 +67,13 @@ Related runtime RPC:
   path-scoped drill-down in Control UI or custom clients.
 
 ```bash
-kaijibot config schema
+allbot config schema
 ```
 
 Pipe it into a file when you want to inspect or validate it with other tools:
 
 ```bash
-kaijibot config schema > kaijibot.schema.json
+allbot config schema > allbot.schema.json
 ```
 
 ### Paths
@@ -81,15 +81,15 @@ kaijibot config schema > kaijibot.schema.json
 Paths use dot or bracket notation:
 
 ```bash
-kaijibot config get agents.defaults.workspace
-kaijibot config get agents.list[0].id
+allbot config get agents.defaults.workspace
+allbot config get agents.list[0].id
 ```
 
 Use the agent list index to target a specific agent:
 
 ```bash
-kaijibot config get agents.list
-kaijibot config set agents.list[1].tools.exec.node "node-id-or-name"
+allbot config get agents.list
+allbot config set agents.list[1].tools.exec.node "node-id-or-name"
 ```
 
 ## Values
@@ -98,22 +98,22 @@ Values are parsed as JSON5 when possible; otherwise they are treated as strings.
 Use `--strict-json` to require JSON5 parsing. `--json` remains supported as a legacy alias.
 
 ```bash
-kaijibot config set agents.defaults.heartbeat.every "0m"
-kaijibot config set gateway.port 19001 --strict-json
-kaijibot config set channels.whatsapp.groups '["*"]' --strict-json
+allbot config set agents.defaults.heartbeat.every "0m"
+allbot config set gateway.port 19001 --strict-json
+allbot config set channels.whatsapp.groups '["*"]' --strict-json
 ```
 
 `config get <path> --json` prints the raw value as JSON instead of terminal-formatted text.
 
 ## `config set` modes
 
-`kaijibot config set` supports four assignment styles:
+`allbot config set` supports four assignment styles:
 
-1. Value mode: `kaijibot config set <path> <value>`
+1. Value mode: `allbot config set <path> <value>`
 2. SecretRef builder mode:
 
 ```bash
-kaijibot config set channels.discord.token \
+allbot config set channels.discord.token \
   --ref-provider default \
   --ref-source env \
   --ref-id DISCORD_BOT_TOKEN
@@ -122,9 +122,9 @@ kaijibot config set channels.discord.token \
 3. Provider builder mode (`secrets.providers.<alias>` path only):
 
 ```bash
-kaijibot config set secrets.providers.vault \
+allbot config set secrets.providers.vault \
   --provider-source exec \
-  --provider-command /usr/local/bin/kaijibot-vault \
+  --provider-command /usr/local/bin/allbot-vault \
   --provider-arg read \
   --provider-arg openai/api-key \
   --provider-timeout-ms 5000
@@ -133,7 +133,7 @@ kaijibot config set secrets.providers.vault \
 4. Batch mode (`--batch-json` or `--batch-file`):
 
 ```bash
-kaijibot config set --batch-json '[
+allbot config set --batch-json '[
   {
     "path": "secrets.providers.default",
     "provider": { "source": "env" }
@@ -146,7 +146,7 @@ kaijibot config set --batch-json '[
 ```
 
 ```bash
-kaijibot config set --batch-file ./config-set.batch.json --dry-run
+allbot config set --batch-file ./config-set.batch.json --dry-run
 ```
 
 Policy note:
@@ -159,12 +159,12 @@ Batch parsing always uses the batch payload (`--batch-json`/`--batch-file`) as t
 JSON path/value mode remains supported for both SecretRefs and providers:
 
 ```bash
-kaijibot config set channels.discord.token \
+allbot config set channels.discord.token \
   '{"source":"env","provider":"default","id":"DISCORD_BOT_TOKEN"}' \
   --strict-json
 
-kaijibot config set secrets.providers.vaultfile \
-  '{"source":"file","path":"/etc/kaijibot/secrets.json","mode":"json"}' \
+allbot config set secrets.providers.vaultfile \
+  '{"source":"file","path":"/etc/allbot/secrets.json","mode":"json"}' \
   --strict-json
 ```
 
@@ -203,9 +203,9 @@ Exec provider (`--provider-source exec`):
 Hardened exec provider example:
 
 ```bash
-kaijibot config set secrets.providers.vault \
+allbot config set secrets.providers.vault \
   --provider-source exec \
-  --provider-command /usr/local/bin/kaijibot-vault \
+  --provider-command /usr/local/bin/allbot-vault \
   --provider-arg read \
   --provider-arg openai/api-key \
   --provider-json-only \
@@ -216,23 +216,23 @@ kaijibot config set secrets.providers.vault \
 
 ## Dry run
 
-Use `--dry-run` to validate changes without writing `kaijibot.json`.
+Use `--dry-run` to validate changes without writing `allbot.json`.
 
 ```bash
-kaijibot config set channels.discord.token \
+allbot config set channels.discord.token \
   --ref-provider default \
   --ref-source env \
   --ref-id DISCORD_BOT_TOKEN \
   --dry-run
 
-kaijibot config set channels.discord.token \
+allbot config set channels.discord.token \
   --ref-provider default \
   --ref-source env \
   --ref-id DISCORD_BOT_TOKEN \
   --dry-run \
   --json
 
-kaijibot config set channels.discord.token \
+allbot config set channels.discord.token \
   --ref-provider vault \
   --ref-source exec \
   --ref-id discord/token \
@@ -291,7 +291,7 @@ Success example:
 {
   "ok": true,
   "operations": 1,
-  "configPath": "~/.kaijibot/kaijibot.json",
+  "configPath": "~/.allbot/allbot.json",
   "inputModes": ["builder"],
   "checks": {
     "schema": false,
@@ -309,7 +309,7 @@ Failure example:
 {
   "ok": false,
   "operations": 1,
-  "configPath": "~/.kaijibot/kaijibot.json",
+  "configPath": "~/.allbot/allbot.json",
   "inputModes": ["builder"],
   "checks": {
     "schema": false,
@@ -338,7 +338,7 @@ If dry-run fails:
 
 ## Subcommands
 
-- `config file`: Print the active config file path (resolved from `KAIJIBOT_CONFIG_PATH` or default location).
+- `config file`: Print the active config file path (resolved from `ALLBOT_CONFIG_PATH` or default location).
 
 Restart the gateway after edits.
 
@@ -348,6 +348,6 @@ Validate the current config against the active schema without starting the
 gateway.
 
 ```bash
-kaijibot config validate
-kaijibot config validate --json
+allbot config validate
+allbot config validate --json
 ```

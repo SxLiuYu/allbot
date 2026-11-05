@@ -44,8 +44,8 @@ export async function initializeWikiVault(vaultRoot: string): Promise<InitVaultR
     createdDirs.push(dir);
   }
 
-  await mkdir(path.join(vaultRoot, ".kaijibot-wiki"), { recursive: true });
-  await mkdir(path.join(vaultRoot, ".kaijibot-wiki", "cache"), {
+  await mkdir(path.join(vaultRoot, ".allbot-wiki"), { recursive: true });
+  await mkdir(path.join(vaultRoot, ".allbot-wiki", "cache"), {
     recursive: true,
   });
 

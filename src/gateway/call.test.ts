@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { DeviceIdentity } from "../infra/device-identity.js";
 import { captureEnv } from "../test-utils/env.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
@@ -134,9 +134,9 @@ function resetGatewayCallMocks() {
   closeCode = 1006;
   closeReason = "";
   helloMethods = ["health", "secrets.resolve"];
-  const loadConfigForTests = loadConfig as unknown as () => KaijiBotConfig;
+  const loadConfigForTests = loadConfig as unknown as () => AllBotConfig;
   const resolveGatewayPortForTests = resolveGatewayPort as unknown as (
-    cfg?: KaijiBotConfig,
+    cfg?: AllBotConfig,
     env?: NodeJS.ProcessEnv,
   ) => number;
   __testing.setDepsForTests({
@@ -176,22 +176,22 @@ function makeRemotePasswordGatewayConfig(remotePassword: string, localPassword =
 
 describe("callGateway url resolution", () => {
   const envSnapshot = captureEnv([
-    "KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS",
-    "KAIJIBOT_CONFIG_PATH",
-    "KAIJIBOT_GATEWAY_PORT",
-    "KAIJIBOT_GATEWAY_URL",
-    "KAIJIBOT_GATEWAY_TOKEN",
-    "KAIJIBOT_STATE_DIR",
+    "ALLBOT_ALLOW_INSECURE_PRIVATE_WS",
+    "ALLBOT_CONFIG_PATH",
+    "ALLBOT_GATEWAY_PORT",
+    "ALLBOT_GATEWAY_URL",
+    "ALLBOT_GATEWAY_TOKEN",
+    "ALLBOT_STATE_DIR",
   ]);
 
   beforeEach(() => {
     envSnapshot.restore();
-    delete process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS;
-    delete process.env.KAIJIBOT_CONFIG_PATH;
-    delete process.env.KAIJIBOT_GATEWAY_PORT;
-    delete process.env.KAIJIBOT_GATEWAY_URL;
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS;
+    delete process.env.ALLBOT_CONFIG_PATH;
+    delete process.env.ALLBOT_GATEWAY_PORT;
+    delete process.env.ALLBOT_GATEWAY_URL;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_STATE_DIR;
     resetGatewayCallMocks();
   });
 
@@ -327,14 +327,14 @@ describe("callGateway url resolution", () => {
     expect(lastRequestOptions?.method).toBe("health");
   });
 
-  it("uses KAIJIBOT_GATEWAY_URL env override in remote mode when remote URL is missing", async () => {
+  it("uses ALLBOT_GATEWAY_URL env override in remote mode when remote URL is missing", async () => {
     loadConfig.mockReturnValue({
       gateway: { mode: "remote", bind: "loopback", remote: {} },
     });
     resolveGatewayPort.mockReturnValue(18789);
     pickPrimaryTailnetIPv4.mockReturnValue(undefined);
-    process.env.KAIJIBOT_GATEWAY_URL = "wss://gateway-in-container.internal:9443/ws";
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "env-token";
+    process.env.ALLBOT_GATEWAY_URL = "wss://gateway-in-container.internal:9443/ws";
+    process.env.ALLBOT_GATEWAY_TOKEN = "env-token";
 
     await callGateway({
       method: "health",
@@ -359,11 +359,11 @@ describe("callGateway url resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
     resolveGatewayPort.mockReturnValue(18789);
     pickPrimaryTailnetIPv4.mockReturnValue(undefined);
-    process.env.KAIJIBOT_GATEWAY_URL = "wss://gateway-in-container.internal:9443/ws";
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "env-token";
+    process.env.ALLBOT_GATEWAY_URL = "wss://gateway-in-container.internal:9443/ws";
+    process.env.ALLBOT_GATEWAY_TOKEN = "env-token";
 
     await callGateway({
       method: "health",
@@ -386,8 +386,8 @@ describe("callGateway url resolution", () => {
     });
     setGatewayNetworkDefaults(18789);
     pickPrimaryTailnetIPv4.mockReturnValue(undefined);
-    process.env.KAIJIBOT_GATEWAY_URL = "wss://gateway-in-container.internal:9443/ws";
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "env-token";
+    process.env.ALLBOT_GATEWAY_URL = "wss://gateway-in-container.internal:9443/ws";
+    process.env.ALLBOT_GATEWAY_TOKEN = "env-token";
 
     await callGateway({
       method: "health",
@@ -483,10 +483,10 @@ describe("callGateway url resolution", () => {
           },
           stop() {},
         }) as never,
-      loadConfig: loadConfig as unknown as () => KaijiBotConfig,
+      loadConfig: loadConfig as unknown as () => AllBotConfig,
       loadOrCreateDeviceIdentity: () => deviceIdentityState.value,
       resolveGatewayPort: resolveGatewayPort as unknown as (
-        cfg?: KaijiBotConfig,
+        cfg?: AllBotConfig,
         env?: NodeJS.ProcessEnv,
       ) => number,
     });
@@ -583,32 +583,32 @@ describe("buildGatewayConnectionDetails", () => {
     expect(details.remoteFallbackNote).toBeUndefined();
   });
 
-  it("uses env KAIJIBOT_GATEWAY_URL when set", () => {
+  it("uses env ALLBOT_GATEWAY_URL when set", () => {
     loadConfig.mockReturnValue({ gateway: { mode: "local", bind: "loopback" } });
     resolveGatewayPort.mockReturnValue(18800);
     pickPrimaryTailnetIPv4.mockReturnValue(undefined);
-    const prevUrl = process.env.KAIJIBOT_GATEWAY_URL;
+    const prevUrl = process.env.ALLBOT_GATEWAY_URL;
     try {
-      process.env.KAIJIBOT_GATEWAY_URL = "wss://browser-gateway.local:9443/ws";
+      process.env.ALLBOT_GATEWAY_URL = "wss://browser-gateway.local:9443/ws";
 
       const details = buildGatewayConnectionDetails();
 
       expect(details.url).toBe("wss://browser-gateway.local:9443/ws");
-      expect(details.urlSource).toBe("env KAIJIBOT_GATEWAY_URL");
+      expect(details.urlSource).toBe("env ALLBOT_GATEWAY_URL");
       expect(details.bindDetail).toBeUndefined();
     } finally {
       if (prevUrl === undefined) {
-        delete process.env.KAIJIBOT_GATEWAY_URL;
+        delete process.env.ALLBOT_GATEWAY_URL;
       } else {
-        process.env.KAIJIBOT_GATEWAY_URL = prevUrl;
+        process.env.ALLBOT_GATEWAY_URL = prevUrl;
       }
     }
   });
 
   it("falls back to the default config loader when test deps drift", () => {
-    const tempStateDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-gateway-call-"));
-    process.env.KAIJIBOT_STATE_DIR = tempStateDir;
-    process.env.KAIJIBOT_CONFIG_PATH = path.join(tempStateDir, "missing-config.json");
+    const tempStateDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-gateway-call-"));
+    process.env.ALLBOT_STATE_DIR = tempStateDir;
+    process.env.ALLBOT_CONFIG_PATH = path.join(tempStateDir, "missing-config.json");
     try {
       loadConfig.mockReturnValue({ gateway: { mode: "local", bind: "loopback" } });
       resolveGatewayPort.mockReturnValue(18800);
@@ -648,11 +648,11 @@ describe("buildGatewayConnectionDetails", () => {
     expect((thrown as Error).message).toContain("plaintext ws://");
     expect((thrown as Error).message).toContain("wss://");
     expect((thrown as Error).message).toContain("Tailscale Serve/Funnel");
-    expect((thrown as Error).message).toContain("kaijibot doctor --fix");
+    expect((thrown as Error).message).toContain("allbot doctor --fix");
   });
 
-  it("allows ws:// private remote URLs only when KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS=1", () => {
-    process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS = "1";
+  it("allows ws:// private remote URLs only when ALLBOT_ALLOW_INSECURE_PRIVATE_WS=1", () => {
+    process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS = "1";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "remote",
@@ -668,20 +668,20 @@ describe("buildGatewayConnectionDetails", () => {
     expect(details.urlSource).toBe("config gateway.remote.url");
   });
 
-  it("allows ws:// hostname remote URLs when KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS=1", () => {
-    process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS = "1";
+  it("allows ws:// hostname remote URLs when ALLBOT_ALLOW_INSECURE_PRIVATE_WS=1", () => {
+    process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS = "1";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "remote",
         bind: "loopback",
-        remote: { url: "ws://kaijibot-gateway.ai:18789" },
+        remote: { url: "ws://allbot-gateway.ai:18789" },
       },
     });
     resolveGatewayPort.mockReturnValue(18789);
 
     const details = buildGatewayConnectionDetails();
 
-    expect(details.url).toBe("ws://kaijibot-gateway.ai:18789");
+    expect(details.url).toBe("ws://allbot-gateway.ai:18789");
     expect(details.urlSource).toBe("config gateway.remote.url");
   });
 
@@ -808,14 +808,14 @@ describe("callGateway url override auth requirements", () => {
 
   beforeEach(() => {
     envSnapshot = captureEnv([
-      "KAIJIBOT_GATEWAY_TOKEN",
-      "KAIJIBOT_GATEWAY_PASSWORD",
-      "KAIJIBOT_GATEWAY_URL",
+      "ALLBOT_GATEWAY_TOKEN",
+      "ALLBOT_GATEWAY_PASSWORD",
+      "ALLBOT_GATEWAY_URL",
     ]);
     resetGatewayCallMocks();
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-    delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
-    delete process.env.KAIJIBOT_GATEWAY_URL;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_PASSWORD;
+    delete process.env.ALLBOT_GATEWAY_URL;
     setGatewayNetworkDefaults(18789);
   });
 
@@ -824,8 +824,8 @@ describe("callGateway url override auth requirements", () => {
   });
 
   it("throws when url override is set without explicit credentials", async () => {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "env-token";
-    process.env.KAIJIBOT_GATEWAY_PASSWORD = "env-password";
+    process.env.ALLBOT_GATEWAY_TOKEN = "env-token";
+    process.env.ALLBOT_GATEWAY_PASSWORD = "env-password";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "local",
@@ -839,7 +839,7 @@ describe("callGateway url override auth requirements", () => {
   });
 
   it("throws when env URL override is set without env credentials", async () => {
-    process.env.KAIJIBOT_GATEWAY_URL = "wss://override.example/ws";
+    process.env.ALLBOT_GATEWAY_URL = "wss://override.example/ws";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "local",
@@ -857,7 +857,7 @@ describe("callGateway password resolution", () => {
     {
       label: "password",
       authKey: "password", // pragma: allowlist secret
-      envKey: "KAIJIBOT_GATEWAY_PASSWORD",
+      envKey: "ALLBOT_GATEWAY_PASSWORD",
       envValue: "from-env",
       configValue: "from-config",
       explicitValue: "explicit-password",
@@ -865,7 +865,7 @@ describe("callGateway password resolution", () => {
     {
       label: "token",
       authKey: "token", // pragma: allowlist secret
-      envKey: "KAIJIBOT_GATEWAY_TOKEN",
+      envKey: "ALLBOT_GATEWAY_TOKEN",
       envValue: "env-token",
       configValue: "local-token",
       explicitValue: "explicit-token",
@@ -874,16 +874,16 @@ describe("callGateway password resolution", () => {
 
   beforeEach(() => {
     envSnapshot = captureEnv([
-      "KAIJIBOT_GATEWAY_PASSWORD",
-      "KAIJIBOT_GATEWAY_TOKEN",
+      "ALLBOT_GATEWAY_PASSWORD",
+      "ALLBOT_GATEWAY_TOKEN",
       "LOCAL_REMOTE_FALLBACK_TOKEN",
       "LOCAL_REF_PASSWORD",
       "REMOTE_REF_TOKEN",
       "REMOTE_REF_PASSWORD",
     ]);
     resetGatewayCallMocks();
-    delete process.env.KAIJIBOT_GATEWAY_PASSWORD;
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_PASSWORD;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
     delete process.env.LOCAL_REMOTE_FALLBACK_TOKEN;
     delete process.env.LOCAL_REF_PASSWORD;
     delete process.env.REMOTE_REF_TOKEN;
@@ -934,7 +934,7 @@ describe("callGateway password resolution", () => {
     },
   ])("$label", async ({ envPassword, config, expectedPassword }) => {
     if (envPassword !== undefined) {
-      process.env.KAIJIBOT_GATEWAY_PASSWORD = envPassword;
+      process.env.ALLBOT_GATEWAY_PASSWORD = envPassword;
     }
     loadConfig.mockReturnValue(config);
 
@@ -959,7 +959,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -967,7 +967,7 @@ describe("callGateway password resolution", () => {
   });
 
   it("does not resolve local password ref when env password takes precedence", async () => {
-    process.env.KAIJIBOT_GATEWAY_PASSWORD = "from-env";
+    process.env.ALLBOT_GATEWAY_PASSWORD = "from-env";
     loadConfig.mockReturnValue({
       gateway: {
         mode: "local",
@@ -982,7 +982,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1005,7 +1005,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1028,7 +1028,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1055,7 +1055,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await expect(callGateway({ method: "health" })).rejects.toThrow("gateway.auth.token");
   });
@@ -1077,7 +1077,7 @@ describe("callGateway password resolution", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as KaijiBotConfig);
+      } as unknown as AllBotConfig);
 
       await callGateway({ method: "health" });
 
@@ -1105,7 +1105,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1129,7 +1129,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1153,7 +1153,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1177,7 +1177,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1203,7 +1203,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1228,7 +1228,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1253,7 +1253,7 @@ describe("callGateway password resolution", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     await callGateway({ method: "health" });
 
@@ -1280,7 +1280,7 @@ describe("callGateway password resolution", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as KaijiBotConfig);
+      } as unknown as AllBotConfig);
 
       await callGateway({ method: "health" });
 

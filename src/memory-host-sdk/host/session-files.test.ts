@@ -9,15 +9,15 @@ let originalStateDir: string | undefined;
 
 beforeEach(async () => {
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "session-entry-test-"));
-  originalStateDir = process.env.KAIJIBOT_STATE_DIR;
-  process.env.KAIJIBOT_STATE_DIR = tmpDir;
+  originalStateDir = process.env.ALLBOT_STATE_DIR;
+  process.env.ALLBOT_STATE_DIR = tmpDir;
 });
 
 afterEach(async () => {
   if (originalStateDir === undefined) {
-    delete process.env.KAIJIBOT_STATE_DIR;
+    delete process.env.ALLBOT_STATE_DIR;
   } else {
-    process.env.KAIJIBOT_STATE_DIR = originalStateDir;
+    process.env.ALLBOT_STATE_DIR = originalStateDir;
   }
   await fs.rm(tmpDir, { recursive: true, force: true });
 });
@@ -60,7 +60,7 @@ describe("buildSessionEntry", () => {
     // Line 7: user message
     const jsonlLines = [
       JSON.stringify({ type: "custom", customType: "model-snapshot", data: {} }),
-      JSON.stringify({ type: "custom", customType: "kaijibot.cache-ttl", data: {} }),
+      JSON.stringify({ type: "custom", customType: "allbot.cache-ttl", data: {} }),
       JSON.stringify({ type: "session-meta", agentId: "test" }),
       JSON.stringify({ type: "message", message: { role: "user", content: "Hello world" } }),
       JSON.stringify({ type: "custom", customType: "tool-result", data: {} }),

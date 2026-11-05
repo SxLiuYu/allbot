@@ -1,6 +1,6 @@
 import type { ReplyPayload } from "../auto-reply/types.js";
 import { getChannelPlugin, resolveChannelApprovalAdapter } from "../channels/plugins/index.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig } from "../config/config.js";
 import type {
   ExecApprovalForwardingConfig,
@@ -41,7 +41,7 @@ export type { ExecApprovalRequest, ExecApprovalResolved };
 type DeliverOutboundPayloads = typeof import("./outbound/deliver.js").deliverOutboundPayloads;
 type MaybePromise<T> = T | Promise<T>;
 type ResolveSessionTargetFn = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ExecApprovalRequest;
 }) => MaybePromise<ExecApprovalForwardTarget | null>;
 
@@ -64,7 +64,7 @@ type PendingApproval<TRouteRequest extends ApprovalRouteRequest> = {
 };
 
 type ApprovalRenderContext<TRouteRequest extends ApprovalRouteRequest> = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   target: ForwardTarget;
   routeRequest: TRouteRequest;
 };
@@ -90,7 +90,7 @@ type ApprovalStrategy<
   TRouteRequest extends ApprovalRouteRequest = ApprovalRouteRequest,
 > = {
   kind: ApprovalKind;
-  config: (cfg: KaijiBotConfig) => ExecApprovalForwardingConfig | undefined;
+  config: (cfg: AllBotConfig) => ExecApprovalForwardingConfig | undefined;
   getRequestId: (request: TRequest) => string;
   getResolvedId: (resolved: TResolved) => string;
   getExpiresAtMs: (request: TRequest) => number;
@@ -123,7 +123,7 @@ export type ExecApprovalForwarder = {
 };
 
 export type ExecApprovalForwarderDeps = {
-  getConfig?: () => KaijiBotConfig;
+  getConfig?: () => AllBotConfig;
   deliver?: DeliverOutboundPayloads;
   nowMs?: () => number;
   resolveSessionTarget?: ResolveSessionTargetFn;
@@ -191,7 +191,7 @@ function buildSyntheticApprovalRequest(routeRequest: ApprovalRouteRequest): Exec
 function shouldSkipForwardingFallback(params: {
   approvalKind: "exec" | "plugin";
   target: ExecApprovalForwardTarget;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   routeRequest: ApprovalRouteRequest;
 }): boolean {
   const channel = normalizeMessageChannel(params.target.channel) ?? params.target.channel;
@@ -305,7 +305,7 @@ function extractApprovalRouteRequest(
 }
 
 function defaultResolveSessionTarget(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ExecApprovalRequest;
 }): Promise<ExecApprovalForwardTarget | null> {
   return loadExecApprovalForwarderRuntime().then(({ resolveExecApprovalSessionTarget }) => {
@@ -334,7 +334,7 @@ function defaultResolveSessionTarget(params: {
 }
 
 async function deliverToTargets(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   targets: ForwardTarget[];
   buildPayload: (target: ForwardTarget) => ReplyPayload;
   deliver: DeliverOutboundPayloads;
@@ -385,7 +385,7 @@ function buildApprovalRenderPayload<TParams>(params: {
 }
 
 function buildExecPendingPayload(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: ExecApprovalRequest;
   target: ForwardTarget;
   nowMs: number;
@@ -407,7 +407,7 @@ function buildExecPendingPayload(params: {
 }
 
 function buildExecResolvedPayload(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   resolved: ExecApprovalResolved;
   target: ForwardTarget;
 }): ReplyPayload {
@@ -425,7 +425,7 @@ function buildExecResolvedPayload(params: {
 }
 
 function buildPluginPendingPayload(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   request: PluginApprovalRequest;
   target: ForwardTarget;
   nowMs: number;
@@ -444,7 +444,7 @@ function buildPluginPendingPayload(params: {
 }
 
 function buildPluginResolvedPayload(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   resolved: PluginApprovalResolved;
   target: ForwardTarget;
 }): ReplyPayload {
@@ -460,7 +460,7 @@ function buildPluginResolvedPayload(params: {
 }
 
 async function resolveForwardTargets(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   config?: ExecApprovalForwardingConfig;
   routeRequest: ApprovalRouteRequest;
   resolveSessionTarget: ResolveSessionTargetFn;
@@ -504,7 +504,7 @@ function createApprovalHandlers<
   TRouteRequest extends ApprovalRouteRequest = ApprovalRouteRequest,
 >(params: {
   strategy: ApprovalStrategy<TRequest, TResolved, TRouteRequest>;
-  getConfig: () => KaijiBotConfig;
+  getConfig: () => AllBotConfig;
   deliver: DeliverOutboundPayloads;
   nowMs: () => number;
   resolveSessionTarget: ResolveSessionTargetFn;
@@ -677,7 +677,7 @@ function createApprovalStrategy<
   TResolved extends { id: string; request?: ApprovalRouteRequestFields | null },
 >(params: {
   kind: ApprovalKind;
-  config: (cfg: KaijiBotConfig) => ExecApprovalForwardingConfig | undefined;
+  config: (cfg: AllBotConfig) => ExecApprovalForwardingConfig | undefined;
   buildExpiredText: (request: TRequest) => string;
   buildPendingPayload: (
     params: ApprovalPendingRenderContext<TRequest, ApprovalRouteRequest>,

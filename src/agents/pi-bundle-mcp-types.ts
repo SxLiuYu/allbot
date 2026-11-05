@@ -1,5 +1,5 @@
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AnyAgentTool } from "./tools/common.js";
 
 export type BundleMcpToolRuntime = {
@@ -48,7 +48,7 @@ export type SessionMcpRuntimeManager = {
     sessionId: string;
     sessionKey?: string;
     workspaceDir: string;
-    cfg?: KaijiBotConfig;
+    cfg?: AllBotConfig;
   }) => Promise<SessionMcpRuntime>;
   bindSessionKey: (sessionKey: string, sessionId: string) => void;
   resolveSessionId: (sessionKey: string) => string | undefined;

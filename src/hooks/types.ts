@@ -7,7 +7,7 @@ export type HookInstallSpec = {
   bins?: string[];
 };
 
-export type KaijiBotHookMetadata = {
+export type AllBotHookMetadata = {
   always?: boolean;
   hookKey?: string;
   emoji?: string;
@@ -35,7 +35,7 @@ export type ParsedHookFrontmatter = Record<string, string>;
 export type Hook = {
   name: string;
   description: string;
-  source: "kaijibot-bundled" | "kaijibot-managed" | "kaijibot-workspace" | "kaijibot-plugin";
+  source: "allbot-bundled" | "allbot-managed" | "allbot-workspace" | "allbot-plugin";
   pluginId?: string;
   filePath: string; // Path to HOOK.md
   baseDir: string; // Directory containing hook
@@ -47,7 +47,7 @@ export type HookSource = Hook["source"];
 export type HookEntry = {
   hook: Hook;
   frontmatter: ParsedHookFrontmatter;
-  metadata?: KaijiBotHookMetadata;
+  metadata?: AllBotHookMetadata;
   invocation?: HookInvocationPolicy;
 };
 

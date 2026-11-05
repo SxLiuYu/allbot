@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { CliDeps } from "../../cli/deps.js";
-import { loadConfig, type KaijiBotConfig } from "../../config/config.js";
+import { loadConfig, type AllBotConfig } from "../../config/config.js";
 import { resolveMainSessionKeyFromConfig } from "../../config/sessions.js";
 import { runCronIsolatedAgentTurn } from "../../cron/isolated-agent.js";
 import type { CronJob } from "../../cron/types.js";
@@ -13,7 +13,7 @@ import { createHooksRequestHandler, type HookClientIpConfig } from "../server-ht
 
 type SubsystemLogger = ReturnType<typeof createSubsystemLogger>;
 
-export function resolveHookClientIpConfig(cfg: KaijiBotConfig): HookClientIpConfig {
+export function resolveHookClientIpConfig(cfg: AllBotConfig): HookClientIpConfig {
   return {
     trustedProxies: cfg.gateway?.trustedProxies,
     allowRealIpFallback: cfg.gateway?.allowRealIpFallback === true,

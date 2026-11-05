@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/deepinfra-provider",
+  "name": "@allbot/deepinfra-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "KaijiBot DeepInfra provider plugin",
+  "description": "AllBot DeepInfra provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

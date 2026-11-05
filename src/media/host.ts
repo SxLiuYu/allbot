@@ -37,7 +37,7 @@ export async function ensureMediaHosted(
   if (needsServerStart && !opts.startServer) {
     await fs.rm(saved.path).catch(() => {});
     throw new Error(
-      `Media hosting requires the webhook/Funnel server. Start \`${formatCliCommand("kaijibot webhook")}\`/\`${formatCliCommand("kaijibot up")}\` or re-run with --serve-media.`,
+      `Media hosting requires the webhook/Funnel server. Start \`${formatCliCommand("allbot webhook")}\`/\`${formatCliCommand("allbot up")}\` or re-run with --serve-media.`,
     );
   }
   if (needsServerStart && opts.startServer) {

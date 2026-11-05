@@ -5,11 +5,11 @@ read_when:
 title: "Channel Routing"
 ---
 
-> ⚠️ **Channel scope notice**: This document references channels (WhatsApp, Telegram, Discord, Slack, etc.) that are **not shipped** with KaijiBot. Only **Feishu** and **WeChat** have source code in this repository. The routing patterns described here apply to shipped channels; references to other channels are retained for architectural context. See `docs/archive/channels/` for archived per-channel reference docs.
+> ⚠️ **Channel scope notice**: This document references channels (WhatsApp, Telegram, Discord, Slack, etc.) that are **not shipped** with AllBot. Only **Feishu** and **WeChat** have source code in this repository. The routing patterns described here apply to shipped channels; references to other channels are retained for architectural context. See `docs/archive/channels/` for archived per-channel reference docs.
 
 # Channels & routing
 
-KaijiBot routes replies **back to the channel where a message came from**. The
+AllBot routes replies **back to the channel where a message came from**. The
 model does not choose a channel; routing is deterministic and controlled by the
 host configuration.
 
@@ -48,13 +48,13 @@ Examples:
 
 When `session.dmScope` is `main`, direct messages may share one main session.
 To prevent the session’s `lastRoute` from being overwritten by non-owner DMs,
-KaijiBot infers a pinned owner from `allowFrom` when all of these are true:
+AllBot infers a pinned owner from `allowFrom` when all of these are true:
 
 - `allowFrom` has exactly one non-wildcard entry.
 - The entry can be normalized to a concrete sender ID for that channel.
 - The inbound DM sender does not match that pinned owner.
 
-In that mismatch case, KaijiBot still records inbound session metadata, but it
+In that mismatch case, AllBot still records inbound session metadata, but it
 skips updating the main session `lastRoute`.
 
 ## Routing rules (how an agent is chosen)
@@ -76,7 +76,7 @@ The matched agent determines which workspace and session store are used.
 
 ## Broadcast groups (run multiple agents)
 
-Broadcast groups let you run **multiple agents** for the same peer **when KaijiBot would normally reply** (for example: in WhatsApp groups, after mention/activation gating).
+Broadcast groups let you run **multiple agents** for the same peer **when AllBot would normally reply** (for example: in WhatsApp groups, after mention/activation gating).
 
 Config:
 
@@ -102,7 +102,7 @@ Example:
 ```json5
 {
   agents: {
-    list: [{ id: "support", name: "Support", workspace: "~/.kaijibot/workspace-support" }],
+    list: [{ id: "support", name: "Support", workspace: "~/.allbot/workspace-support" }],
   },
   bindings: [
     { match: { channel: "slack", teamId: "T123" }, agentId: "support" },
@@ -113,9 +113,9 @@ Example:
 
 ## Session storage
 
-Session stores live under the state directory (default `~/.kaijibot`):
+Session stores live under the state directory (default `~/.allbot`):
 
-- `~/.kaijibot/agents/<agentId>/sessions/sessions.json`
+- `~/.allbot/agents/<agentId>/sessions/sessions.json`
 - JSONL transcripts live alongside the store
 
 You can override the store path via `session.store` and `{agentId}` templating.

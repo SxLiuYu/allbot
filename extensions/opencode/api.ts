@@ -1,7 +1,7 @@
 export {
   applyOpencodeZenModelDefault,
   OPENCODE_ZEN_DEFAULT_MODEL,
-} from "kaijibot/plugin-sdk/provider-onboard";
+} from "allbot/plugin-sdk/provider-onboard";
 export {
   applyOpencodeZenConfig,
   applyOpencodeZenProviderConfig,

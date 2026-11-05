@@ -1,8 +1,8 @@
 import {
   startLazyPluginServiceModule,
   type LazyPluginServiceHandle,
-  type KaijiBotPluginService,
-} from "kaijibot/plugin-sdk/browser-node-runtime";
+  type AllBotPluginService,
+} from "allbot/plugin-sdk/browser-node-runtime";
 
 type BrowserControlHandle = LazyPluginServiceHandle | null;
 const UNSAFE_BROWSER_CONTROL_OVERRIDE_SPECIFIER = /^(?:data|http|https|node):/i;
@@ -15,7 +15,7 @@ function validateBrowserControlOverrideSpecifier(specifier: string): string {
   return trimmed;
 }
 
-export function createBrowserPluginService(): KaijiBotPluginService {
+export function createBrowserPluginService(): AllBotPluginService {
   let handle: BrowserControlHandle = null;
 
   return {
@@ -25,8 +25,8 @@ export function createBrowserPluginService(): KaijiBotPluginService {
         return;
       }
       handle = await startLazyPluginServiceModule({
-        skipEnvVar: "KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER",
-        overrideEnvVar: "KAIJIBOT_BROWSER_CONTROL_MODULE",
+        skipEnvVar: "ALLBOT_SKIP_BROWSER_CONTROL_SERVER",
+        overrideEnvVar: "ALLBOT_BROWSER_CONTROL_MODULE",
         validateOverrideSpecifier: validateBrowserControlOverrideSpecifier,
         // Keep the default module import static so compiled builds still bundle it.
         loadDefaultModule: async () => await import("./server.js"),

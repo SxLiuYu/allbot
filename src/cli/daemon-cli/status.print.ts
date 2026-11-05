@@ -106,8 +106,8 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
     defaultRuntime.error(
       warnText(
         t("cli.daemon.status.recommendation", {
-          doctorCmd: formatCliCommand("kaijibot doctor"),
-          doctorRepairCmd: formatCliCommand("kaijibot doctor --repair"),
+          doctorCmd: formatCliCommand("allbot doctor"),
+          doctorRepairCmd: formatCliCommand("allbot doctor --repair"),
         }),
       ),
     );
@@ -139,7 +139,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
       defaultRuntime.error(
         errorText(
           t("cli.daemon.status.fixConfigMismatch", {
-            gatewayInstallCmd: formatCliCommand("kaijibot gateway install --force"),
+            gatewayInstallCmd: formatCliCommand("allbot gateway install --force"),
           }),
         ),
       );
@@ -231,8 +231,8 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
     defaultRuntime.error(
       errorText(
         t("cli.daemon.status.fixPidNotOwning", {
-          gatewayRestartCmd: formatCliCommand("kaijibot gateway restart"),
-          gatewayStatusCmd: formatCliCommand("kaijibot gateway status --deep"),
+          gatewayRestartCmd: formatCliCommand("allbot gateway restart"),
+          gatewayStatusCmd: formatCliCommand("allbot gateway status --deep"),
         }),
       ),
     );
@@ -275,14 +275,14 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
 
   if (service.runtime?.cachedLabel) {
     const env = service.command?.environment ?? process.env;
-    const labelValue = resolveGatewayLaunchAgentLabel(env.KAIJIBOT_PROFILE);
+    const labelValue = resolveGatewayLaunchAgentLabel(env.ALLBOT_PROFILE);
     defaultRuntime.error(
       errorText(t("cli.daemon.status.cachedLabelMissing", { label: labelValue })),
     );
     defaultRuntime.error(
       errorText(
         t("cli.daemon.status.reinstallAfterClear", {
-          gatewayInstallCmd: formatCliCommand("kaijibot gateway install"),
+          gatewayInstallCmd: formatCliCommand("allbot gateway install"),
         }),
       ),
     );
@@ -320,7 +320,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
     }
     if (process.platform === "linux") {
       const env = service.command?.environment ?? process.env;
-      const unit = resolveGatewaySystemdServiceName(env.KAIJIBOT_PROFILE);
+      const unit = resolveGatewaySystemdServiceName(env.ALLBOT_PROFILE);
       defaultRuntime.error(
         errorText(`Logs: journalctl --user -u ${unit}.service -n 200 --no-pager`),
       );
@@ -354,7 +354,7 @@ export function printDaemonStatus(status: DaemonStatus, opts: { json: boolean })
   }
 
   defaultRuntime.log(
-    `${label(t("cli.daemon.label.troubles"))} run ${formatCliCommand("kaijibot status")}`,
+    `${label(t("cli.daemon.label.troubles"))} run ${formatCliCommand("allbot status")}`,
   );
   defaultRuntime.log(
     `${label(t("cli.daemon.label.troubleshooting"))} ${t("cli.daemon.troubleshootingUrl")}`,

@@ -90,7 +90,7 @@ describe("createAuthHandlers", () => {
             origin: "bundled",
             rootDir: "/test",
             source: "bundled",
-            manifestPath: "/test/kaijibot.plugin.json",
+            manifestPath: "/test/allbot.plugin.json",
           },
           {
             id: "stepfun",
@@ -110,7 +110,7 @@ describe("createAuthHandlers", () => {
             origin: "bundled",
             rootDir: "/test",
             source: "bundled",
-            manifestPath: "/test/kaijibot.plugin.json",
+            manifestPath: "/test/allbot.plugin.json",
           },
         ],
         diagnostics: [],
@@ -174,7 +174,7 @@ describe("createAuthHandlers", () => {
             origin: "bundled",
             rootDir: "/test",
             source: "bundled",
-            manifestPath: "/test/kaijibot.plugin.json",
+            manifestPath: "/test/allbot.plugin.json",
           },
           {
             id: "qwen",
@@ -194,7 +194,7 @@ describe("createAuthHandlers", () => {
             origin: "bundled",
             rootDir: "/test",
             source: "bundled",
-            manifestPath: "/test/kaijibot.plugin.json",
+            manifestPath: "/test/allbot.plugin.json",
           },
         ],
         diagnostics: [],
@@ -274,7 +274,7 @@ describe("createAuthHandlers", () => {
       upsertAuthProfileMock.mockClear();
     });
 
-    it("passes undefined agentDir so upsertAuthProfile defaults to resolveKaijiBotAgentDir", async () => {
+    it("passes undefined agentDir so upsertAuthProfile defaults to resolveAllBotAgentDir", async () => {
       const handlers = createAuthHandlers({
         getProviderRegistrations: () => [],
         getManifestRegistry: () => ({ plugins: [], diagnostics: [] }),
@@ -403,7 +403,7 @@ describe("createAuthHandlers", () => {
             origin: "bundled",
             rootDir: "/test",
             source: "bundled",
-            manifestPath: "/test/kaijibot.plugin.json",
+            manifestPath: "/test/allbot.plugin.json",
             ...(modelCatalog ? { modelCatalog: modelCatalog as never } : {}),
           },
         ],
@@ -550,7 +550,7 @@ describe("createAuthHandlers", () => {
             origin: "bundled",
             rootDir: "/test",
             source: "bundled",
-            manifestPath: "/test/kaijibot.plugin.json",
+            manifestPath: "/test/allbot.plugin.json",
             modelCatalog: {
               providers: {
                 deepseek: {

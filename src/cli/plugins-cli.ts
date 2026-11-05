@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 import type { Command } from "commander";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig, readConfigFileSnapshot, replaceConfigFile } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
@@ -70,7 +70,7 @@ export type PluginUninstallOptions = {
 
 function resolvePluginUninstallId(params: {
   rawId: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   plugins: PluginRecord[];
 }): { pluginId: string; plugin?: PluginRecord } {
   const rawId = params.rawId.trim();
@@ -122,7 +122,7 @@ function formatPluginLine(plugin: PluginRecord, verbose = false): string {
           : plugin.description,
       )
     : theme.muted("(no description)");
-  const format = plugin.format ?? "kaijibot";
+  const format = plugin.format ?? "allbot";
 
   if (!verbose) {
     return `${name}${idSuffix} ${status} ${theme.muted(`[${format}]`)} - ${desc}`;
@@ -235,7 +235,7 @@ function formatInstallLines(install: PluginInstallRecord | undefined): string[] 
 export function registerPluginsCli(program: Command) {
   const plugins = program
     .command("plugins")
-    .description("Manage KaijiBot plugins and extensions")
+    .description("Manage AllBot plugins and extensions")
     .addHelpText(
       "after",
       () =>
@@ -290,7 +290,7 @@ export function registerPluginsCli(program: Command) {
           return {
             Name: plugin.name || plugin.id,
             ID: plugin.name && plugin.name !== plugin.id ? plugin.id : "",
-            Format: plugin.format ?? "kaijibot",
+            Format: plugin.format ?? "allbot",
             Status:
               plugin.status === "loaded"
                 ? theme.success("loaded")
@@ -464,7 +464,7 @@ export function registerPluginsCli(program: Command) {
         );
       }
       lines.push(
-        `${theme.muted(t("cli.plugins.inspect.format"))} ${inspect.plugin.format ?? "kaijibot"}`,
+        `${theme.muted(t("cli.plugins.inspect.format"))} ${inspect.plugin.format ?? "allbot"}`,
       );
       if (inspect.plugin.bundleFormat) {
         lines.push(
@@ -587,9 +587,9 @@ export function registerPluginsCli(program: Command) {
     .argument("<id>", "Plugin id")
     .action(async (id: string) => {
       const snapshot = await readConfigFileSnapshot();
-      const cfg = (snapshot.sourceConfig ?? snapshot.config) as KaijiBotConfig;
+      const cfg = (snapshot.sourceConfig ?? snapshot.config) as AllBotConfig;
       const enableResult = enablePluginInConfig(cfg, id);
-      let next: KaijiBotConfig = enableResult.config;
+      let next: AllBotConfig = enableResult.config;
       const slotResult = applySlotSelectionForPlugin(next, id);
       next = slotResult.config;
       await replaceConfigFile({
@@ -614,7 +614,7 @@ export function registerPluginsCli(program: Command) {
     .argument("<id>", "Plugin id")
     .action(async (id: string) => {
       const snapshot = await readConfigFileSnapshot();
-      const cfg = (snapshot.sourceConfig ?? snapshot.config) as KaijiBotConfig;
+      const cfg = (snapshot.sourceConfig ?? snapshot.config) as AllBotConfig;
       const next = setPluginEnabledInConfig(cfg, id, false);
       await replaceConfigFile({
         nextConfig: next,
@@ -633,7 +633,7 @@ export function registerPluginsCli(program: Command) {
     .option("--dry-run", "Show what would be removed without making changes", false)
     .action(async (id: string, opts: PluginUninstallOptions) => {
       const snapshot = await readConfigFileSnapshot();
-      const cfg = (snapshot.sourceConfig ?? snapshot.config) as KaijiBotConfig;
+      const cfg = (snapshot.sourceConfig ?? snapshot.config) as AllBotConfig;
       const report = buildPluginDiagnosticsReport({ config: cfg });
       const extensionsDir = path.join(resolveStateDir(process.env, os.homedir), "extensions");
       const keepFiles = Boolean(opts.keepFiles || opts.keepConfig);

@@ -5,7 +5,7 @@ import { getChannelPlugin, normalizeChannelId } from "../../channels/plugins/ind
 import { moveSingleAccountChannelSectionToDefaultAccount } from "../../channels/plugins/setup-helpers.js";
 import type { ChannelSetupPlugin } from "../../channels/plugins/setup-wizard-types.js";
 import type { ChannelId, ChannelPlugin, ChannelSetupInput } from "../../channels/plugins/types.js";
-import { replaceConfigFile, type KaijiBotConfig } from "../../config/config.js";
+import { replaceConfigFile, type AllBotConfig } from "../../config/config.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../../routing/session-key.js";
 import { defaultRuntime, type RuntimeEnv } from "../../runtime.js";
 import { normalizeOptionalLowercaseString } from "../../shared/string-coerce.js";
@@ -28,7 +28,7 @@ export type ChannelsAddOptions = {
   dmAllowlist?: string;
 } & Omit<ChannelSetupInput, "groupChannels" | "dmAllowlist" | "initialSyncLimit">;
 
-function resolveCatalogChannelEntry(raw: string, cfg: KaijiBotConfig | null) {
+function resolveCatalogChannelEntry(raw: string, cfg: AllBotConfig | null) {
   const trimmed = normalizeOptionalLowercaseString(raw);
   if (!trimmed) {
     return undefined;
@@ -53,7 +53,7 @@ export async function channelsAddCommand(
   if (!configSnapshot) {
     return;
   }
-  const cfg = (configSnapshot.sourceConfig ?? configSnapshot.config) as KaijiBotConfig;
+  const cfg = (configSnapshot.sourceConfig ?? configSnapshot.config) as AllBotConfig;
   const baseHash = configSnapshot.hash;
   let nextConfig = cfg;
 
@@ -200,7 +200,7 @@ export async function channelsAddCommand(
   let catalogEntry = channel ? undefined : resolveCatalogChannelEntry(rawChannel, nextConfig);
   const resolveWorkspaceDir = () =>
     resolveAgentWorkspaceDir(nextConfig, resolveDefaultAgentId(nextConfig));
-  // May trigger loadKaijiBotPlugins on cache miss (disk scan + jiti import)
+  // May trigger loadAllBotPlugins on cache miss (disk scan + jiti import)
   const loadScopedPlugin = async (
     channelId: ChannelId,
     pluginId?: string,

@@ -13,13 +13,13 @@ describe("resolveMediaToolLocalRoots", () => {
   });
 
   it("does not widen default local roots from media sources", () => {
-    const stateDir = path.join("/tmp", "kaijibot-media-tool-roots-state");
+    const stateDir = path.join("/tmp", "allbot-media-tool-roots-state");
     const picturesDir =
       process.platform === "win32" ? "C:\\Users\\peter\\Pictures" : "/Users/peter/Pictures";
     const moviesDir =
       process.platform === "win32" ? "C:\\Users\\peter\\Movies" : "/Users/peter/Movies";
 
-    vi.stubEnv("KAIJIBOT_STATE_DIR", stateDir);
+    vi.stubEnv("ALLBOT_STATE_DIR", stateDir);
 
     const roots = resolveMediaToolLocalRoots(path.join(stateDir, "workspace-agent"), undefined, [
       path.join(picturesDir, "photo.png"),

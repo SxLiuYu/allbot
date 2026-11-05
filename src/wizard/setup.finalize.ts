@@ -23,7 +23,7 @@ import {
   resolveControlUiLinks,
 } from "../commands/onboard-helpers.js";
 import type { OnboardOptions } from "../commands/onboard-types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { describeGatewayServiceRestart, tryResolveGatewayService } from "../daemon/service.js";
 import { isSystemdUserServiceAvailable } from "../daemon/systemd.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
@@ -41,8 +41,8 @@ import type { GatewayWizardSettings, WizardFlow } from "./setup.types.js";
 type FinalizeOnboardingOptions = {
   flow: WizardFlow;
   opts: OnboardOptions;
-  baseConfig: KaijiBotConfig;
-  nextConfig: KaijiBotConfig;
+  baseConfig: AllBotConfig;
+  nextConfig: AllBotConfig;
   workspaceDir: string;
   settings: GatewayWizardSettings;
   prompter: WizardPrompter;
@@ -117,7 +117,7 @@ export async function finalizeSetupWizard(
   if (!serviceManagerAvailable && installDaemon) {
     await prompter.note(
       process.platform === "android"
-        ? "No service manager on Android/Termux. Start the gateway manually: kaijibot gateway run"
+        ? "No service manager on Android/Termux. Start the gateway manually: allbot gateway run"
         : "Systemd user services are unavailable; skipping service install. Use your container supervisor or `docker compose up -d`.",
       "Gateway service",
     );
@@ -280,9 +280,9 @@ export async function finalizeSetupWizard(
         [
           "Gateway not detected yet.",
           "Setup was run without Gateway service install, so no background gateway is expected.",
-          `Start now: ${formatCliCommand("kaijibot gateway run")}`,
-          `Or rerun with: ${formatCliCommand("kaijibot onboard --install-daemon")}`,
-          `Or skip this probe next time: ${formatCliCommand("kaijibot onboard --skip-health")}`,
+          `Start now: ${formatCliCommand("allbot gateway run")}`,
+          `Or rerun with: ${formatCliCommand("allbot onboard --install-daemon")}`,
+          `Or skip this probe next time: ${formatCliCommand("allbot onboard --skip-health")}`,
         ].join("\n"),
         "Gateway",
       );
@@ -389,11 +389,11 @@ export async function finalizeSetupWizard(
     await prompter.note(
       [
         "Gateway token: shared auth for the Gateway + Control UI.",
-        "Stored in: $KAIJIBOT_CONFIG_PATH (default: ~/.kaijibot/kaijibot.json) under gateway.auth.token, or in KAIJIBOT_GATEWAY_TOKEN.",
-        `View token: ${formatCliCommand("kaijibot config get gateway.auth.token")}`,
-        `Generate token: ${formatCliCommand("kaijibot doctor --generate-gateway-token")}`,
+        "Stored in: $ALLBOT_CONFIG_PATH (default: ~/.allbot/allbot.json) under gateway.auth.token, or in ALLBOT_GATEWAY_TOKEN.",
+        `View token: ${formatCliCommand("allbot config get gateway.auth.token")}`,
+        `Generate token: ${formatCliCommand("allbot doctor --generate-gateway-token")}`,
         "Web UI keeps dashboard URL tokens in memory for the current tab and strips them from the URL after load.",
-        `Open the dashboard anytime: ${formatCliCommand("kaijibot dashboard --no-open")}`,
+        `Open the dashboard anytime: ${formatCliCommand("allbot dashboard --no-open")}`,
         "If prompted: paste the token into Control UI settings (or use the tokenized dashboard URL).",
       ].join("\n"),
       "Token",
@@ -442,8 +442,8 @@ export async function finalizeSetupWizard(
         [
           `Dashboard link (with token): ${authedUrl}`,
           controlUiOpened
-            ? "Opened in your browser. Keep that tab to control KaijiBot."
-            : "Copy/paste this URL in a browser on this machine to control KaijiBot.",
+            ? "Opened in your browser. Keep that tab to control AllBot."
+            : "Copy/paste this URL in a browser on this machine to control AllBot.",
           controlUiOpenHint,
         ]
           .filter(Boolean)
@@ -452,7 +452,7 @@ export async function finalizeSetupWizard(
       );
     } else {
       await prompter.note(
-        `When you're ready: ${formatCliCommand("kaijibot dashboard --no-open")}`,
+        `When you're ready: ${formatCliCommand("allbot dashboard --no-open")}`,
         "Later",
       );
     }
@@ -498,8 +498,8 @@ export async function finalizeSetupWizard(
       [
         `Dashboard link (with token): ${authedUrl}`,
         controlUiOpened
-          ? "Opened in your browser. Keep that tab to control KaijiBot."
-          : "Copy/paste this URL in a browser on this machine to control KaijiBot.",
+          ? "Opened in your browser. Keep that tab to control AllBot."
+          : "Copy/paste this URL in a browser on this machine to control AllBot.",
         controlUiOpenHint,
       ]
         .filter(Boolean)
@@ -534,7 +534,7 @@ export async function finalizeSetupWizard(
         [
           `Web search provider ${label} is selected but unavailable under the current plugin policy.`,
           "web_search will not work until the provider is re-enabled or a different provider is selected.",
-          `  ${formatCliCommand("kaijibot configure --section web")}`,
+          `  ${formatCliCommand("allbot configure --section web")}`,
           "",
           "Docs: https://github.com/Kaiji-Z/kaijibot",
         ].join("\n"),
@@ -556,7 +556,7 @@ export async function finalizeSetupWizard(
         [
           `Provider ${label} is selected but no API key was found.`,
           "web_search will not work until a key is added.",
-          `  ${formatCliCommand("kaijibot configure --section web")}`,
+          `  ${formatCliCommand("allbot configure --section web")}`,
           "",
           `Get your key at: ${entry?.signupUrl ?? "https://github.com/Kaiji-Z/kaijibot"}`,
           "Docs: https://github.com/Kaiji-Z/kaijibot",
@@ -567,7 +567,7 @@ export async function finalizeSetupWizard(
       await prompter.note(
         [
           `Web search (${label}) is configured but disabled.`,
-          `Re-enable: ${formatCliCommand("kaijibot configure --section web")}`,
+          `Re-enable: ${formatCliCommand("allbot configure --section web")}`,
           "",
           "Docs: https://github.com/Kaiji-Z/kaijibot",
         ].join("\n"),
@@ -602,7 +602,7 @@ export async function finalizeSetupWizard(
       await prompter.note(
         [
           "Web search was skipped. You can enable it later:",
-          `  ${formatCliCommand("kaijibot configure --section web")}`,
+          `  ${formatCliCommand("allbot configure --section web")}`,
           "",
           "Docs: https://github.com/Kaiji-Z/kaijibot",
         ].join("\n"),

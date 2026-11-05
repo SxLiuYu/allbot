@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { applyProviderAuthConfigPatch } from "./provider-auth-choice-helpers.js";
 
 describe("applyProviderAuthConfigPatch", () => {
@@ -47,7 +47,7 @@ describe("applyProviderAuthConfigPatch", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     const patch = {
       agents: {
         defaults: {

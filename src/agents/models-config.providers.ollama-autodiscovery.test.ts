@@ -2,7 +2,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizePluginDiscoveryResult,
   resolvePluginDiscoveryProviders,
@@ -24,12 +24,12 @@ describe("Ollama auto-discovery", () => {
 
   function createCleanProviderDiscoveryEnv(): NodeJS.ProcessEnv {
     const env = { ...process.env };
-    delete env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-    delete env.KAIJIBOT_DISABLE_BUNDLED_PLUGINS;
-    delete env.KAIJIBOT_SKIP_PROVIDERS;
-    delete env.KAIJIBOT_SKIP_CHANNELS;
-    delete env.KAIJIBOT_SKIP_CRON;
-    delete env.KAIJIBOT_TEST_MINIMAL_GATEWAY;
+    delete env.ALLBOT_BUNDLED_PLUGINS_DIR;
+    delete env.ALLBOT_DISABLE_BUNDLED_PLUGINS;
+    delete env.ALLBOT_SKIP_PROVIDERS;
+    delete env.ALLBOT_SKIP_CHANNELS;
+    delete env.ALLBOT_SKIP_CRON;
+    delete env.ALLBOT_TEST_MINIMAL_GATEWAY;
     return env;
   }
 
@@ -37,7 +37,7 @@ describe("Ollama auto-discovery", () => {
     originalFetch = globalThis.fetch;
     return {
       ...createCleanProviderDiscoveryEnv(),
-      KAIJIBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama",
+      ALLBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama",
       VITEST: "1",
       NODE_ENV: "test",
     };
@@ -46,7 +46,7 @@ describe("Ollama auto-discovery", () => {
   function createDiscoveryRunEnv(): NodeJS.ProcessEnv {
     return {
       ...createCleanProviderDiscoveryEnv(),
-      KAIJIBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama",
+      ALLBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama",
       VITEST: "",
       NODE_ENV: "development",
     };
@@ -68,13 +68,13 @@ describe("Ollama auto-discovery", () => {
       return undefined;
     }
     const env = createDiscoveryRunEnv();
-    const config: KaijiBotConfig | undefined = params?.explicitProviders
+    const config: AllBotConfig | undefined = params?.explicitProviders
       ? { models: { providers: params.explicitProviders } }
       : undefined;
     const result = await runProviderCatalog({
       provider,
       config: config ?? {},
-      agentDir: mkdtempSync(join(tmpdir(), "kaijibot-test-")),
+      agentDir: mkdtempSync(join(tmpdir(), "allbot-test-")),
       env,
       resolveProviderApiKey: () => ({
         apiKey: env.OLLAMA_API_KEY?.trim() ? env.OLLAMA_API_KEY : undefined,

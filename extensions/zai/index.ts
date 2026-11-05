@@ -7,8 +7,8 @@ import {
   type ProviderResolveDynamicModelContext,
   type ProviderRuntimeModel,
   type ProviderWrapStreamFnContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { upsertAuthProfileWithLock } from "kaijibot/plugin-sdk/provider-auth";
+} from "allbot/plugin-sdk/plugin-entry";
+import { upsertAuthProfileWithLock } from "allbot/plugin-sdk/provider-auth";
 import {
   applyAuthProfileConfig,
   buildApiKeyCredential,
@@ -17,14 +17,14 @@ import {
   normalizeOptionalSecretInput,
   type SecretInput,
   validateApiKeyInput,
-} from "kaijibot/plugin-sdk/provider-auth-api-key";
+} from "allbot/plugin-sdk/provider-auth-api-key";
 import {
   buildProviderReplayFamilyHooks,
   normalizeModelCompat,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { createToolStreamWrapper } from "kaijibot/plugin-sdk/provider-stream-shared";
-import { fetchZaiUsage, resolveLegacyPiAgentAccessToken } from "kaijibot/plugin-sdk/provider-usage";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { createToolStreamWrapper } from "allbot/plugin-sdk/provider-stream-shared";
+import { fetchZaiUsage, resolveLegacyPiAgentAccessToken } from "allbot/plugin-sdk/provider-usage";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/string-coerce-runtime";
 import { detectZaiEndpoint, type ZaiEndpointId } from "./detect.js";
 import { zaiMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import { buildZaiModelDefinition } from "./model-definitions.js";

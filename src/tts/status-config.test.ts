@@ -2,13 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { withTempHome } from "../../test/helpers/temp-home.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveStatusTtsSnapshot } from "./status-config.js";
 
 describe("resolveStatusTtsSnapshot", () => {
   it("uses prefs overrides without loading speech providers", async () => {
     await withTempHome(async (home) => {
-      const prefsPath = path.join(home, ".kaijibot", "settings", "tts.json");
+      const prefsPath = path.join(home, ".allbot", "settings", "tts.json");
       fs.mkdirSync(path.dirname(prefsPath), { recursive: true });
       fs.writeFileSync(
         prefsPath,
@@ -30,7 +30,7 @@ describe("resolveStatusTtsSnapshot", () => {
                 prefsPath,
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
         }),
       ).toEqual({
         autoMode: "always",
@@ -51,7 +51,7 @@ describe("resolveStatusTtsSnapshot", () => {
                 auto: "always",
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
         }),
       ).toEqual({
         autoMode: "always",
@@ -62,10 +62,10 @@ describe("resolveStatusTtsSnapshot", () => {
     });
   });
 
-  it("derives the default prefs path from KAIJIBOT_CONFIG_PATH when set", async () => {
+  it("derives the default prefs path from ALLBOT_CONFIG_PATH when set", async () => {
     await withTempHome(
       async (home) => {
-        const stateDir = path.join(home, ".kaijibot-dev");
+        const stateDir = path.join(home, ".allbot-dev");
         const prefsPath = path.join(stateDir, "settings", "tts.json");
         fs.mkdirSync(path.dirname(prefsPath), { recursive: true });
         fs.writeFileSync(
@@ -78,7 +78,7 @@ describe("resolveStatusTtsSnapshot", () => {
           }),
         );
 
-        vi.stubEnv("KAIJIBOT_CONFIG_PATH", path.join(stateDir, "kaijibot.json"));
+        vi.stubEnv("ALLBOT_CONFIG_PATH", path.join(stateDir, "allbot.json"));
         try {
           expect(
             resolveStatusTtsSnapshot({
@@ -86,7 +86,7 @@ describe("resolveStatusTtsSnapshot", () => {
                 messages: {
                   tts: {},
                 },
-              } as KaijiBotConfig,
+              } as AllBotConfig,
             }),
           ).toEqual({
             autoMode: "always",
@@ -98,7 +98,7 @@ describe("resolveStatusTtsSnapshot", () => {
           vi.unstubAllEnvs();
         }
       },
-      { env: { KAIJIBOT_STATE_DIR: undefined } },
+      { env: { ALLBOT_STATE_DIR: undefined } },
     );
   });
 });

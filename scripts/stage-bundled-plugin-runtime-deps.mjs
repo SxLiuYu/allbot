@@ -140,7 +140,7 @@ function hasRuntimeDeps(packageJson) {
 }
 
 function shouldStageRuntimeDeps(packageJson) {
-  return packageJson.kaijibot?.bundle?.stageRuntimeDependencies === true;
+  return packageJson.allbot?.bundle?.stageRuntimeDependencies === true;
 }
 
 function sanitizeBundledManifestForRuntimeInstall(pluginDir) {
@@ -171,7 +171,7 @@ function sanitizeBundledManifestForRuntimeInstall(pluginDir) {
 }
 
 function resolveRuntimeDepsStampPath(pluginDir) {
-  return path.join(pluginDir, ".kaijibot-runtime-deps-stamp.json");
+  return path.join(pluginDir, ".allbot-runtime-deps-stamp.json");
 }
 
 function createRuntimeDepsFingerprint(packageJson) {
@@ -218,7 +218,7 @@ function stageInstalledRootRuntimeDeps(params) {
   const stagedNodeModulesDir = path.join(
     makeTempDir(
       os.tmpdir(),
-      `kaijibot-runtime-deps-${sanitizeTempPrefixSegment(path.basename(pluginDir))}-`,
+      `allbot-runtime-deps-${sanitizeTempPrefixSegment(path.basename(pluginDir))}-`,
     ),
     "node_modules",
   );
@@ -255,7 +255,7 @@ function installPluginRuntimeDeps(params) {
   const stampPath = resolveRuntimeDepsStampPath(pluginDir);
   const tempInstallDir = makeTempDir(
     os.tmpdir(),
-    `kaijibot-runtime-deps-${sanitizeTempPrefixSegment(pluginId)}-`,
+    `allbot-runtime-deps-${sanitizeTempPrefixSegment(pluginId)}-`,
   );
   const npmRunner = resolveNpmRunner({
     npmArgs: [

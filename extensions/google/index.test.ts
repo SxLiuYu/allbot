@@ -3,7 +3,7 @@ import type { Context, Model } from "@earendil-works/pi-ai";
 import type {
   ProviderReplaySessionEntry,
   ProviderSanitizeReplayHistoryContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import { describe, expect, it } from "vitest";
 import {
   registerProviderPlugin,

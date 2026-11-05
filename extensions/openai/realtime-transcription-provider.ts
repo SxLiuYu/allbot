@@ -3,8 +3,8 @@ import type {
   RealtimeTranscriptionProviderPlugin,
   RealtimeTranscriptionSession,
   RealtimeTranscriptionSessionCreateRequest,
-} from "kaijibot/plugin-sdk/realtime-transcription";
-import { normalizeResolvedSecretInputString } from "kaijibot/plugin-sdk/secret-input";
+} from "allbot/plugin-sdk/realtime-transcription";
+import { normalizeResolvedSecretInputString } from "allbot/plugin-sdk/secret-input";
 import WebSocket from "ws";
 import {
   asFiniteNumber,

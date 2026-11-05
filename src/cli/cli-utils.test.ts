@@ -19,14 +19,14 @@ describe("waitForever", () => {
 
 describe("shouldSkipRespawnForArgv", () => {
   it.each([
-    { argv: ["node", "kaijibot", "--help"] },
-    { argv: ["node", "kaijibot", "-V"] },
+    { argv: ["node", "allbot", "--help"] },
+    { argv: ["node", "allbot", "-V"] },
   ] as const)("skips respawn for argv %j", ({ argv }) => {
     expect(shouldSkipRespawnForArgv([...argv]), argv.join(" ")).toBe(true);
   });
 
   it("keeps respawn path for normal commands", () => {
-    expect(shouldSkipRespawnForArgv(["node", "kaijibot", "status"])).toBe(false);
+    expect(shouldSkipRespawnForArgv(["node", "allbot", "status"])).toBe(false);
   });
 });
 
@@ -51,10 +51,10 @@ describe("dns cli", () => {
     try {
       const program = new Command();
       registerDnsCli(program);
-      await program.parseAsync(["dns", "setup", "--domain", "kaijibot.internal"], { from: "user" });
+      await program.parseAsync(["dns", "setup", "--domain", "allbot.internal"], { from: "user" });
       const output = log.mock.calls.map((call) => call.join(" ")).join("\\n");
       expect(output).toContain("DNS setup");
-      expect(output).toContain("kaijibot.internal");
+      expect(output).toContain("allbot.internal");
     } finally {
       log.mockRestore();
     }

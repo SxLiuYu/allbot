@@ -1,8 +1,8 @@
 ---
-summary: "Use OpenRouter's unified API to access many models in KaijiBot"
+summary: "Use OpenRouter's unified API to access many models in AllBot"
 read_when:
   - You want a single API key for many LLMs
-  - You want to run models via OpenRouter in KaijiBot
+  - You want to run models via OpenRouter in AllBot
 title: "OpenRouter"
 ---
 
@@ -14,7 +14,7 @@ endpoint and API key. It is OpenAI-compatible, so most OpenAI SDKs work by switc
 ## CLI setup
 
 ```bash
-kaijibot onboard --auth-choice openrouter-api-key
+allbot onboard --auth-choice openrouter-api-key
 ```
 
 ## Config snippet
@@ -34,26 +34,26 @@ kaijibot onboard --auth-choice openrouter-api-key
 
 - Model refs are `openrouter/<provider>/<model>`.
 - Onboarding defaults to `openrouter/auto`. Switch to a concrete model later with
-  `kaijibot models set openrouter/<provider>/<model>`.
+  `allbot models set openrouter/<provider>/<model>`.
 - For more model/provider options, see [/concepts/model-providers](/concepts/model-providers).
 - OpenRouter uses a Bearer token with your API key under the hood.
-- On real OpenRouter requests (`https://openrouter.ai/api/v1`), KaijiBot also
+- On real OpenRouter requests (`https://openrouter.ai/api/v1`), AllBot also
   adds OpenRouter's documented app-attribution headers:
-  `HTTP-Referer: https://github.com/kaijibot/kaijibot`, `X-OpenRouter-Title: KaijiBot`, and
+  `HTTP-Referer: https://github.com/allbot/allbot`, `X-OpenRouter-Title: AllBot`, and
   `X-OpenRouter-Categories: cli-agent`.
 - On verified OpenRouter routes, Anthropic model refs also keep the
-  OpenRouter-specific Anthropic `cache_control` markers that KaijiBot uses for
+  OpenRouter-specific Anthropic `cache_control` markers that AllBot uses for
   better prompt-cache reuse on system/developer prompt blocks.
-- If you repoint the OpenRouter provider at some other proxy/base URL, KaijiBot
+- If you repoint the OpenRouter provider at some other proxy/base URL, AllBot
   does not inject those OpenRouter-specific headers or Anthropic cache markers.
 - OpenRouter still runs through the proxy-style OpenAI-compatible path, so
   native OpenAI-only request shaping such as `serviceTier`, Responses `store`,
   OpenAI reasoning-compat payloads, and prompt-cache hints is not forwarded.
-- Gemini-backed OpenRouter refs stay on the proxy-Gemini path: KaijiBot keeps
+- Gemini-backed OpenRouter refs stay on the proxy-Gemini path: AllBot keeps
   Gemini thought-signature sanitation there, but does not enable native Gemini
   replay validation or bootstrap rewrites.
-- On supported non-`auto` routes, KaijiBot maps the selected thinking level to
+- On supported non-`auto` routes, AllBot maps the selected thinking level to
   OpenRouter proxy reasoning payloads. Unsupported model hints and
   `openrouter/auto` skip that reasoning injection.
-- If you pass OpenRouter provider routing under model params, KaijiBot forwards
+- If you pass OpenRouter provider routing under model params, AllBot forwards
   it as OpenRouter routing metadata before the shared stream wrappers run.

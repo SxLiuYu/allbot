@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 let mockStore: AuthProfileStore;
 let mockOrder: string[];
@@ -59,7 +59,7 @@ async function resolveRefOnlyAuthLabel(params: {
 
   return resolveAuthLabel(
     params.provider,
-    {} as KaijiBotConfig,
+    {} as AllBotConfig,
     "/tmp/models.json",
     undefined,
     params.mode,

@@ -92,7 +92,7 @@ describe("profile CRUD endpoints", () => {
     const createDuplicate = await realFetch(`${base}/profiles/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "kaijibot" }),
+      body: JSON.stringify({ name: "allbot" }),
     });
     expect(createDuplicate.status).toBe(409);
     const createDuplicateBody = (await createDuplicate.json()) as { error: string };
@@ -139,7 +139,7 @@ describe("profile CRUD endpoints", () => {
     expect(createClawdBody.cdpPort).toBeTypeOf("number");
     expect(createClawdBody.userDataDir).toBeNull();
 
-    const explicitUserDataDir = "/tmp/kaijibot-brave-profile";
+    const explicitUserDataDir = "/tmp/allbot-brave-profile";
     await fs.promises.mkdir(explicitUserDataDir, { recursive: true });
     const createExistingSession = await realFetch(`${base}/profiles/create`, {
       method: "POST",
@@ -190,7 +190,7 @@ describe("profile CRUD endpoints", () => {
     const deleteMissingBody = (await deleteMissing.json()) as { error: string };
     expect(deleteMissingBody.error).toContain("not found");
 
-    const deleteDefault = await realFetch(`${base}/profiles/kaijibot`, {
+    const deleteDefault = await realFetch(`${base}/profiles/allbot`, {
       method: "DELETE",
     });
     expect(deleteDefault.status).toBe(400);

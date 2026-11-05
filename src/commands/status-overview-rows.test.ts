@@ -38,7 +38,7 @@ describe("status-overview-rows", () => {
           gatewayService: {
             label: "LaunchAgent",
             installed: true,
-            managedByKaijiBot: true,
+            managedByAllBot: true,
             loadedText: "loaded",
             runtimeShort: "running",
           },
@@ -127,7 +127,7 @@ describe("status-overview-rows", () => {
           gatewayService: {
             label: "LaunchAgent",
             installed: true,
-            managedByKaijiBot: true,
+            managedByAllBot: true,
             loadedText: "loaded",
             runtimeShort: "running",
           },
@@ -140,7 +140,7 @@ describe("status-overview-rows", () => {
           nodeOnlyGateway: null,
         },
         osLabel: "macOS",
-        configPath: "/tmp/kaijibot.json",
+        configPath: "/tmp/allbot.json",
         secretDiagnosticsCount: 2,
         agentStatus: {
           bootstrapPendingCount: 1,
@@ -153,8 +153,8 @@ describe("status-overview-rows", () => {
       expect.arrayContaining([
         { Item: "Version", Value: expect.any(String) },
         { Item: "OS", Value: "macOS" },
-        { Item: "Config", Value: "/tmp/kaijibot.json" },
-        { Item: "Security", Value: "Run: kaijibot security audit --deep" },
+        { Item: "Config", Value: "/tmp/allbot.json" },
+        { Item: "Security", Value: "Run: allbot security audit --deep" },
         { Item: "Secrets", Value: "2 diagnostics" },
       ]),
     );

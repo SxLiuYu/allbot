@@ -1,8 +1,8 @@
-// KaijiBot Control UI — App Shell Service Worker
+// AllBot Control UI — App Shell Service Worker
 // Strategy: cache static assets (cache-first), network-first for navigations
 // with cached index.html fallback. API and websocket requests are never intercepted.
 
-const CACHE_VERSION = "kaijibot-shell-v2";
+const CACHE_VERSION = "allbot-shell-v2";
 const APP_SHELL = ["./", "./manifest.webmanifest"];
 
 // --- Install: precache minimal shell ---
@@ -43,7 +43,7 @@ self.addEventListener("fetch", (event) => {
   if (
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/avatar/") ||
-    url.pathname.startsWith("/__kaijibot/") ||
+    url.pathname.startsWith("/__allbot/") ||
     request.headers.get("upgrade") === "websocket"
   ) {
     return;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectSandboxBrowserHashLabelFindings } from "./audit-extra.async.js";
 import { collectSandboxDangerousConfigFindings } from "./audit-extra.sync.js";
 
@@ -21,19 +21,19 @@ describe("security audit sandbox browser findings", () => {
       execDockerRawFn: async (args: string[]) => {
         if (args[0] === "ps") {
           return {
-            stdout: Buffer.from("kaijibot-sbx-browser-old\nkaijibot-sbx-browser-missing-hash\n"),
+            stdout: Buffer.from("allbot-sbx-browser-old\nallbot-sbx-browser-missing-hash\n"),
             stderr: Buffer.alloc(0),
             code: 0,
           };
         }
-        if (args[0] === "inspect" && args.at(-1) === "kaijibot-sbx-browser-old") {
+        if (args[0] === "inspect" && args.at(-1) === "allbot-sbx-browser-old") {
           return {
             stdout: Buffer.from("abc123\tepoch-v0\n"),
             stderr: Buffer.alloc(0),
             code: 0,
           };
         }
-        if (args[0] === "inspect" && args.at(-1) === "kaijibot-sbx-browser-missing-hash") {
+        if (args[0] === "inspect" && args.at(-1) === "allbot-sbx-browser-missing-hash") {
           return {
             stdout: Buffer.from("<no value>\t<no value>\n"),
             stderr: Buffer.alloc(0),
@@ -53,7 +53,7 @@ describe("security audit sandbox browser findings", () => {
     const staleEpoch = findings.find(
       (finding) => finding.checkId === "sandbox.browser_container.hash_epoch_stale",
     );
-    expect(staleEpoch?.detail).toContain("kaijibot-sbx-browser-old");
+    expect(staleEpoch?.detail).toContain("allbot-sbx-browser-old");
   });
 
   it("skips sandbox browser hash label checks when docker inspect is unavailable", async () => {
@@ -73,19 +73,19 @@ describe("security audit sandbox browser findings", () => {
       execDockerRawFn: async (args: string[]) => {
         if (args[0] === "ps") {
           return {
-            stdout: Buffer.from("kaijibot-sbx-browser-exposed\n"),
+            stdout: Buffer.from("allbot-sbx-browser-exposed\n"),
             stderr: Buffer.alloc(0),
             code: 0,
           };
         }
-        if (args[0] === "inspect" && args.at(-1) === "kaijibot-sbx-browser-exposed") {
+        if (args[0] === "inspect" && args.at(-1) === "allbot-sbx-browser-exposed") {
           return {
             stdout: Buffer.from("hash123\t2026-02-21-novnc-auth-default\n"),
             stderr: Buffer.alloc(0),
             code: 0,
           };
         }
-        if (args[0] === "port" && args.at(-1) === "kaijibot-sbx-browser-exposed") {
+        if (args[0] === "port" && args.at(-1) === "allbot-sbx-browser-exposed") {
           return {
             stdout: Buffer.from("6080/tcp -> 0.0.0.0:49101\n9222/tcp -> 127.0.0.1:49100\n"),
             stderr: Buffer.alloc(0),
@@ -115,7 +115,7 @@ describe("security audit sandbox browser findings", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig);
+    } satisfies AllBotConfig);
     const finding = findings.find(
       (entry) => entry.checkId === "sandbox.browser_cdp_bridge_unrestricted",
     );
@@ -137,7 +137,7 @@ describe("security audit sandbox browser findings", () => {
               },
             },
           },
-        } satisfies KaijiBotConfig),
+        } satisfies AllBotConfig),
       ),
     ).toBe(false);
   });

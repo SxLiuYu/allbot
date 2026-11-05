@@ -83,7 +83,7 @@ export function resolveLanceDbDependencySpec(
 const MEMORY_LANCEDB_RUNTIME_MANIFEST: RuntimeManifest = (() => {
   const lanceDbSpec = resolveLanceDbDependencySpec(fileURLToPath(import.meta.url));
   return {
-    name: "kaijibot-memory-lancedb-runtime",
+    name: "allbot-memory-lancedb-runtime",
     private: true,
     type: "module",
     dependencies: {

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveGatewayClientBootstrap } from "../gateway/client-bootstrap.js";
 import { GatewayClient } from "../gateway/client.js";
 import { APPROVALS_SCOPE, READ_SCOPE, WRITE_SCOPE } from "../gateway/method-scopes.js";
@@ -41,7 +41,7 @@ type ServerNotification = {
 const CLAUDE_PERMISSION_REPLY_RE = /^(yes|no)\s+([a-km-z]{5})$/i;
 const QUEUE_LIMIT = 1_000;
 
-export class KaijiBotChannelBridge {
+export class AllBotChannelBridge {
   private gateway: GatewayClient | null = null;
   private readonly verbose: boolean;
   private readonly claudeChannelMode: ClaudeChannelMode;
@@ -60,7 +60,7 @@ export class KaijiBotChannelBridge {
   private readySettled = false;
 
   constructor(
-    private readonly cfg: KaijiBotConfig,
+    private readonly cfg: AllBotConfig,
     private readonly params: {
       gatewayUrl?: string;
       gatewayToken?: string;
@@ -106,7 +106,7 @@ export class KaijiBotChannelBridge {
       token: bootstrap.auth.token,
       password: bootstrap.auth.password,
       clientName: GATEWAY_CLIENT_NAMES.CLI,
-      clientDisplayName: "KaijiBot MCP",
+      clientDisplayName: "AllBot MCP",
       clientVersion: VERSION,
       mode: GATEWAY_CLIENT_MODES.CLI,
       scopes: [READ_SCOPE, WRITE_SCOPE, APPROVALS_SCOPE],
@@ -290,7 +290,7 @@ export class KaijiBotChannelBridge {
       inputPreview: params.inputPreview,
     });
     if (this.verbose) {
-      process.stderr.write(`kaijibot mcp: pending Claude permission ${params.requestId}\n`);
+      process.stderr.write(`allbot mcp: pending Claude permission ${params.requestId}\n`);
     }
   }
 
@@ -313,7 +313,7 @@ export class KaijiBotChannelBridge {
     } catch (error) {
       if (this.verbose && !this.closed) {
         process.stderr.write(
-          `kaijibot mcp: notification ${notification.method} failed: ${String(error)}\n`,
+          `allbot mcp: notification ${notification.method} failed: ${String(error)}\n`,
         );
       }
     }

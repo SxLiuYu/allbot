@@ -44,16 +44,16 @@ describe("runDaemonInstall integration", () => {
   beforeAll(async () => {
     envSnapshot = captureEnv([
       "HOME",
-      "KAIJIBOT_STATE_DIR",
-      "KAIJIBOT_CONFIG_PATH",
-      "KAIJIBOT_GATEWAY_TOKEN",
-      "KAIJIBOT_GATEWAY_PASSWORD",
+      "ALLBOT_STATE_DIR",
+      "ALLBOT_CONFIG_PATH",
+      "ALLBOT_GATEWAY_TOKEN",
+      "ALLBOT_GATEWAY_PASSWORD",
     ]);
-    tempHome = await makeTempWorkspace("kaijibot-daemon-install-int-");
-    configPath = path.join(tempHome, "kaijibot.json");
+    tempHome = await makeTempWorkspace("allbot-daemon-install-int-");
+    configPath = path.join(tempHome, "allbot.json");
     process.env.HOME = tempHome;
-    process.env.KAIJIBOT_STATE_DIR = tempHome;
-    process.env.KAIJIBOT_CONFIG_PATH = configPath;
+    process.env.ALLBOT_STATE_DIR = tempHome;
+    process.env.ALLBOT_CONFIG_PATH = configPath;
   });
 
   afterAll(async () => {
@@ -66,8 +66,8 @@ describe("runDaemonInstall integration", () => {
     resetRuntimeCapture();
     clearRuntimeConfigSnapshot();
     // Keep these defined-but-empty so dotenv won't repopulate from local .env.
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "";
-    process.env.KAIJIBOT_GATEWAY_PASSWORD = "";
+    process.env.ALLBOT_GATEWAY_TOKEN = "";
+    process.env.ALLBOT_GATEWAY_PASSWORD = "";
     serviceMock.isLoaded.mockResolvedValue(false);
     await fs.writeFile(configPath, JSON.stringify({}, null, 2));
     clearConfigCache();
@@ -134,6 +134,6 @@ describe("runDaemonInstall integration", () => {
     expect((persistedToken ?? "").length).toBeGreaterThan(0);
 
     const installEnv = serviceMock.install.mock.calls[0]?.[0]?.environment;
-    expect(installEnv?.KAIJIBOT_GATEWAY_TOKEN).toBeUndefined();
+    expect(installEnv?.ALLBOT_GATEWAY_TOKEN).toBeUndefined();
   });
 });

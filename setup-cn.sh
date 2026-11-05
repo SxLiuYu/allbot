@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# 🧠 KaijiBot 一键部署脚本（非 Docker）
-# 面向中国开发者，从源码运行 KaijiBot 主动型 AI 私人助手
+# 🧠 AllBot 一键部署脚本（非 Docker）
+# 面向中国开发者，从源码运行 AllBot 主动型 AI 私人助手
 #
 # 用法: bash setup-cn.sh [选项]
 # 选项:
@@ -29,7 +29,7 @@ for arg in "$@"; do
     --skip-feishu) SKIP_FEISHU=true ;;
     --skip-build)  SKIP_BUILD=true ;;
     --help|-h)
-      echo "🧠 KaijiBot 一键部署脚本"
+      echo "🧠 AllBot 一键部署脚本"
       echo ""
       echo "用法: bash setup-cn.sh [选项]"
       echo ""
@@ -105,7 +105,7 @@ ask_value() {
 print_banner() {
   echo ""
   echo -e "${BOLD}${CYAN}╔══════════════════════════════════════════╗${NC}"
-  echo -e "${BOLD}${CYAN}║  🧠 KaijiBot — 主动型 AI 私人助手      ║${NC}"
+  echo -e "${BOLD}${CYAN}║  🧠 AllBot — 主动型 AI 私人助手      ║${NC}"
   echo -e "${BOLD}${CYAN}║  认知驱动，主动思考。                    ║${NC}"
   echo -e "${BOLD}${CYAN}╚══════════════════════════════════════════╝${NC}"
   echo ""
@@ -185,22 +185,22 @@ check_pnpm() {
 setup_project() {
   step 3 6 "准备项目代码"
 
-  # 检测当前目录是否已经是 KaijiBot 项目
-  if [[ -f "package.json" ]] && grep -q '"name": "kaijibot"' package.json 2>/dev/null; then
-    ok "已在 KaijiBot 项目目录中"
+  # 检测当前目录是否已经是 AllBot 项目
+  if [[ -f "package.json" ]] && grep -q '"name": "allbot"' package.json 2>/dev/null; then
+    ok "已在 AllBot 项目目录中"
     return 0
   fi
 
-  warn "当前目录不是 KaijiBot 项目"
+  warn "当前目录不是 AllBot 项目"
 
-  if ask_yes_no "是否从 Gitee 克隆 KaijiBot？"; then
+  if ask_yes_no "是否从 Gitee 克隆 AllBot？"; then
     local repo_url="https://gitee.com/kaiji1126/kaijibot.git"
     info "正在克隆: ${repo_url}"
     git clone "$repo_url" || fail "克隆失败，请检查网络连接"
-    cd kaijibot || fail "进入项目目录失败"
+    cd allbot || fail "进入项目目录失败"
     ok "项目克隆完成"
   else
-    fail "请手动进入 KaijiBot 项目目录后重新运行此脚本"
+    fail "请手动进入 AllBot 项目目录后重新运行此脚本"
   fi
 }
 
@@ -227,7 +227,7 @@ build_project() {
     return 0
   fi
 
-  if [[ -d "dist" ]] && [[ -f "kaijibot.mjs" ]]; then
+  if [[ -d "dist" ]] && [[ -f "allbot.mjs" ]]; then
     ok "项目已构建，跳过（如需重新构建请删除 dist 目录）"
     return 0
   fi
@@ -246,24 +246,24 @@ launch_onboard() {
   echo -e "${YELLOW}💡 提示：向导中可选择「扫码自动创建飞书机器人」，10 秒搞定，无需手动在开放平台创建应用。${NC}"
   echo ""
 
-  pnpm kaijibot onboard || warn "配置向导退出（可能未完成配置）"
+  pnpm allbot onboard || warn "配置向导退出（可能未完成配置）"
 }
 
 # ── 完成提示 ───────────────────────────────────────────────────────────────────
 show_completion() {
   echo ""
   echo -e "${BOLD}${CYAN}════════════════════════════════════════════════════════${NC}"
-  echo -e "${BOLD}${GREEN}  🧠 KaijiBot 部署完成！${NC}"
+  echo -e "${BOLD}${GREEN}  🧠 AllBot 部署完成！${NC}"
   echo -e "${BOLD}${CYAN}════════════════════════════════════════════════════════${NC}"
   echo ""
   echo -e "${DIM}配置向导已完成。如向导中未启动网关，请手动启动：${NC}"
   echo ""
   echo -e "  ${BOLD}前台运行：${NC}"
-  echo "    pnpm kaijibot gateway --port 18789 --verbose"
+  echo "    pnpm allbot gateway --port 18789 --verbose"
   echo ""
   echo -e "  ${BOLD}后台运行：${NC}"
-  echo "    nohup pnpm kaijibot gateway --port 18789 > kaijibot.log 2>&1 &"
-  echo "    # 查看日志: tail -f kaijibot.log"
+  echo "    nohup pnpm allbot gateway --port 18789 > allbot.log 2>&1 &"
+  echo "    # 查看日志: tail -f allbot.log"
 }
 
 # ── 后续步骤 ──────────────────────────────────────────────────────────────────
@@ -274,18 +274,18 @@ show_next_steps() {
   echo ""
   echo -e "${BOLD}1. 查看日志${NC}"
   echo "   启动时加 --verbose 查看详细日志"
-  echo "   日志目录: ~/.kaijibot/logs/"
+  echo "   日志目录: ~/.allbot/logs/"
   echo ""
   echo -e "${BOLD}2. 配置认知系统${NC}"
-  echo "   kaijibot config set cognitive.enabled true"
-  echo "   kaijibot config set cognitive.proactive.enabled true"
-  echo "   kaijibot config set cognitive.proactive.minIntervalHours 4"
-  echo "   kaijibot config set cognitive.proactive.activeHours \"09:00-22:00\""
+  echo "   allbot config set cognitive.enabled true"
+  echo "   allbot config set cognitive.proactive.enabled true"
+  echo "   allbot config set cognitive.proactive.minIntervalHours 4"
+  echo "   allbot config set cognitive.proactive.activeHours \"09:00-22:00\""
   echo ""
   echo -e "${BOLD}3. systemd 服务（推荐生产环境）${NC}"
-  echo "   模板文件: docs/install/kaijibot.service.template"
-  echo "   cp docs/install/kaijibot.service.template /etc/systemd/system/kaijibot.service"
-  echo "   # 编辑后: sudo systemctl enable --now kaijibot"
+  echo "   模板文件: docs/install/allbot.service.template"
+  echo "   cp docs/install/allbot.service.template /etc/systemd/system/allbot.service"
+  echo "   # 编辑后: sudo systemctl enable --now allbot"
   echo ""
   echo -e "${BOLD}4. 更新版本${NC}"
   echo "   git pull origin main"

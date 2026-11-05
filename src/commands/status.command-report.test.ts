@@ -32,7 +32,7 @@ describe("buildStatusCommandReportLines", () => {
     });
 
     expect(lines).toEqual([
-      "# KaijiBot status",
+      "# AllBot status",
       "",
       "# Overview",
       "table:Item:1",

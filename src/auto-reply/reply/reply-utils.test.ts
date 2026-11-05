@@ -16,13 +16,13 @@ import { createTypingSignaler, resolveTypingMode } from "./typing-mode.js";
 import { createTypingController } from "./typing.js";
 
 describe("matchesMentionWithExplicit", () => {
-  const mentionRegexes = [/\bkaijibot\b/i];
+  const mentionRegexes = [/\ballbot\b/i];
 
   it("combines explicit-mention state with regex fallback rules", () => {
     const cases = [
       {
         name: "regex match with explicit resolver available",
-        text: "@kaijibot hello",
+        text: "@allbot hello",
         mentionRegexes,
         explicit: {
           hasAnyMention: true,
@@ -55,7 +55,7 @@ describe("matchesMentionWithExplicit", () => {
       },
       {
         name: "falls back to regex when explicit cannot resolve",
-        text: "kaijibot please",
+        text: "allbot please",
         mentionRegexes,
         explicit: {
           hasAnyMention: true,
@@ -517,14 +517,14 @@ describe("resolveResponsePrefixTemplate", () => {
       {
         name: "identity.name",
         template: "[{identity.name}]",
-        values: { identityName: "KaijiBot" },
-        expected: "[KaijiBot]",
+        values: { identityName: "AllBot" },
+        expected: "[AllBot]",
       },
       {
         name: "identityName alias",
         template: "[{identityName}]",
-        values: { identityName: "KaijiBot" },
-        expected: "[KaijiBot]",
+        values: { identityName: "AllBot" },
+        expected: "[AllBot]",
       },
       {
         name: "case-insensitive variables",
@@ -536,12 +536,12 @@ describe("resolveResponsePrefixTemplate", () => {
         name: "all variables",
         template: "[{identity.name}] {provider}/{model} (think:{thinkingLevel})",
         values: {
-          identityName: "KaijiBot",
+          identityName: "AllBot",
           provider: "anthropic",
           model: "claude-opus-4-6",
           thinkingLevel: "high",
         },
-        expected: "[KaijiBot] anthropic/claude-opus-4-6 (think:high)",
+        expected: "[AllBot] anthropic/claude-opus-4-6 (think:high)",
       },
     ] as const;
     expectResolvedTemplateCases(cases);

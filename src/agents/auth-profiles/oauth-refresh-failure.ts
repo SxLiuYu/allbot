@@ -63,6 +63,6 @@ export function classifyOAuthRefreshFailure(message: string): {
 export function buildOAuthRefreshFailureLoginCommand(provider: string | null | undefined): string {
   const safeProvider = sanitizeOAuthRefreshFailureProvider(provider);
   return safeProvider
-    ? formatCliCommand(`kaijibot models auth login --provider ${safeProvider}`)
-    : formatCliCommand("kaijibot models auth login");
+    ? formatCliCommand(`allbot models auth login --provider ${safeProvider}`)
+    : formatCliCommand("allbot models auth login");
 }

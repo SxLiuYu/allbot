@@ -4,7 +4,7 @@ import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
   normalizeSingleOrTrimmedStringList,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import YAML from "yaml";
 
 export const WIKI_PAGE_KINDS = [
@@ -15,8 +15,8 @@ export const WIKI_PAGE_KINDS = [
   "report",
   "summary",
 ] as const;
-export const WIKI_RELATED_START_MARKER = "<!-- kaijibot:wiki:related:start -->";
-export const WIKI_RELATED_END_MARKER = "<!-- kaijibot:wiki:related:end -->";
+export const WIKI_RELATED_START_MARKER = "<!-- allbot:wiki:related:start -->";
+export const WIKI_RELATED_END_MARKER = "<!-- allbot:wiki:related:end -->";
 
 export type WikiPageKind = (typeof WIKI_PAGE_KINDS)[number];
 

@@ -1,14 +1,14 @@
 ---
-summary: "CLI reference for `kaijibot setup` (initialize config + workspace)"
+summary: "CLI reference for `allbot setup` (initialize config + workspace)"
 read_when:
   - You’re doing first-run setup without full CLI onboarding
   - You want to set the default workspace path
 title: "setup"
 ---
 
-# `kaijibot setup`
+# `allbot setup`
 
-Initialize `~/.kaijibot/kaijibot.json` and the agent workspace.
+Initialize `~/.allbot/allbot.json` and the agent workspace.
 
 Related:
 
@@ -18,10 +18,10 @@ Related:
 ## Examples
 
 ```bash
-kaijibot setup
-kaijibot setup --workspace ~/.kaijibot/workspace
-kaijibot setup --wizard
-kaijibot setup --non-interactive --mode remote --remote-url wss://gateway-host:18789 --remote-token <token>
+allbot setup
+allbot setup --workspace ~/.allbot/workspace
+allbot setup --wizard
+allbot setup --non-interactive --mode remote --remote-url wss://gateway-host:18789 --remote-token <token>
 ```
 
 ## Options
@@ -36,10 +36,10 @@ kaijibot setup --non-interactive --mode remote --remote-url wss://gateway-host:1
 To run onboarding via setup:
 
 ```bash
-kaijibot setup --wizard
+allbot setup --wizard
 ```
 
 Notes:
 
-- Plain `kaijibot setup` initializes config + workspace without the full onboarding flow.
+- Plain `allbot setup` initializes config + workspace without the full onboarding flow.
 - Onboarding auto-runs when any onboarding flags are present (`--wizard`, `--non-interactive`, `--mode`, `--remote-url`, `--remote-token`).

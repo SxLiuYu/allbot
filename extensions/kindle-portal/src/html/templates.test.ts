@@ -165,7 +165,7 @@ describe("renderMapHtml", () => {
 
   it("page title is 'Knowledge Graph'", () => {
     const html = renderMapHtml({ mapRefreshSeconds: 300 });
-    expect(html).toContain("<title>KaijiBot Knowledge Graph</title>");
+    expect(html).toContain("<title>AllBot Knowledge Graph</title>");
     expect(html).toContain(">Knowledge Graph<");
   });
 

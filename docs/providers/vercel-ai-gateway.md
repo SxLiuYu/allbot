@@ -2,7 +2,7 @@
 title: "Vercel AI Gateway"
 summary: "Vercel AI Gateway setup (auth + model selection)"
 read_when:
-  - You want to use Vercel AI Gateway with KaijiBot
+  - You want to use Vercel AI Gateway with AllBot
   - You need the API key env var or CLI auth choice
 ---
 
@@ -13,7 +13,7 @@ The [Vercel AI Gateway](https://vercel.com/ai-gateway) provides a unified API to
 - Provider: `vercel-ai-gateway`
 - Auth: `AI_GATEWAY_API_KEY`
 - API: Anthropic Messages compatible
-- KaijiBot auto-discovers the Gateway `/v1/models` catalog, so `/models vercel-ai-gateway`
+- AllBot auto-discovers the Gateway `/v1/models` catalog, so `/models vercel-ai-gateway`
   includes current model refs such as `vercel-ai-gateway/openai/gpt-5.4`.
 
 ## Quick start
@@ -21,7 +21,7 @@ The [Vercel AI Gateway](https://vercel.com/ai-gateway) provides a unified API to
 1. Set the API key (recommended: store it for the Gateway):
 
 ```bash
-kaijibot onboard --auth-choice ai-gateway-api-key
+allbot onboard --auth-choice ai-gateway-api-key
 ```
 
 2. Set a default model:
@@ -39,7 +39,7 @@ kaijibot onboard --auth-choice ai-gateway-api-key
 ## Non-interactive example
 
 ```bash
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice ai-gateway-api-key \
   --ai-gateway-api-key "$AI_GATEWAY_API_KEY"
@@ -48,12 +48,12 @@ kaijibot onboard --non-interactive \
 ## Environment note
 
 If the Gateway runs as a daemon (launchd/systemd), make sure `AI_GATEWAY_API_KEY`
-is available to that process (for example, in `~/.kaijibot/.env` or via
+is available to that process (for example, in `~/.allbot/.env` or via
 `env.shellEnv`).
 
 ## Model ID shorthand
 
-KaijiBot accepts Vercel Claude shorthand model refs and normalizes them at
+AllBot accepts Vercel Claude shorthand model refs and normalizes them at
 runtime:
 
 - `vercel-ai-gateway/claude-opus-4.6` -> `vercel-ai-gateway/anthropic/claude-opus-4.6`

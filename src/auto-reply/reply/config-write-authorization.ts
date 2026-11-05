@@ -4,10 +4,10 @@ import {
   formatConfigWriteDeniedMessage,
 } from "../../channels/plugins/config-writes.js";
 import type { ChannelId } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 export function resolveConfigWriteDeniedText(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string | null;
   channelId: ChannelId | null;
   accountId?: string;

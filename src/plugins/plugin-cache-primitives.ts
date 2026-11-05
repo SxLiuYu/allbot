@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 export type PluginLruCacheResult<T> = { hit: true; value: T } | { hit: false };
 
@@ -66,16 +66,16 @@ export class PluginLruCache<T> {
   }
 }
 
-export type ConfigScopedRuntimeCache<T> = WeakMap<KaijiBotConfig, Map<string, T>>;
+export type ConfigScopedRuntimeCache<T> = WeakMap<AllBotConfig, Map<string, T>>;
 
 export type ConfigScopedPromiseLoader<T> = {
-  load(config?: KaijiBotConfig): Promise<T>;
+  load(config?: AllBotConfig): Promise<T>;
   clear(): void;
 };
 
 export function resolveConfigScopedRuntimeCacheValue<T>(params: {
   cache: ConfigScopedRuntimeCache<T>;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   key: string;
   load: () => T;
 }): T {
@@ -100,12 +100,12 @@ export function createPluginCacheKey(parts: readonly unknown[]): string {
 }
 
 export function createConfigScopedPromiseLoader<T>(
-  load: (config?: KaijiBotConfig) => T | Promise<T>,
+  load: (config?: AllBotConfig) => T | Promise<T>,
 ): ConfigScopedPromiseLoader<T> {
   let defaultPromise: Promise<T> | undefined;
-  let promisesByConfig = new WeakMap<KaijiBotConfig, Promise<T>>();
+  let promisesByConfig = new WeakMap<AllBotConfig, Promise<T>>();
 
-  const createPromise = (config?: KaijiBotConfig): Promise<T> => {
+  const createPromise = (config?: AllBotConfig): Promise<T> => {
     const promise = Promise.resolve().then(() => load(config));
     void promise.catch(() => {
       if (config) {
@@ -118,7 +118,7 @@ export function createConfigScopedPromiseLoader<T>(
   };
 
   return {
-    async load(config?: KaijiBotConfig): Promise<T> {
+    async load(config?: AllBotConfig): Promise<T> {
       if (!config) {
         defaultPromise ??= createPromise();
         return await defaultPromise;
@@ -133,7 +133,7 @@ export function createConfigScopedPromiseLoader<T>(
     },
     clear(): void {
       defaultPromise = undefined;
-      promisesByConfig = new WeakMap<KaijiBotConfig, Promise<T>>();
+      promisesByConfig = new WeakMap<AllBotConfig, Promise<T>>();
     },
   };
 }

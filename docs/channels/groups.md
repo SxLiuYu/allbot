@@ -5,23 +5,23 @@ read_when:
 title: "Groups"
 ---
 
-> ⚠️ **Channel scope notice**: This document describes group chat behavior for channels (Discord, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo) that are **not shipped** with KaijiBot. Only **Feishu** and **WeChat** have source code in this repository. The group/mention patterns described here apply to shipped channels where relevant; references to unshipped channels are retained for architectural context. See `docs/archive/channels/` for archived per-channel reference docs.
+> ⚠️ **Channel scope notice**: This document describes group chat behavior for channels (Discord, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo) that are **not shipped** with AllBot. Only **Feishu** and **WeChat** have source code in this repository. The group/mention patterns described here apply to shipped channels where relevant; references to unshipped channels are retained for architectural context. See `docs/archive/channels/` for archived per-channel reference docs.
 
 # Groups
 
-KaijiBot treats group chats consistently across surfaces: Discord, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo.
+AllBot treats group chats consistently across surfaces: Discord, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo.
 
 ## Beginner intro (2 minutes)
 
-KaijiBot “lives” on your own messaging accounts. There is no separate WhatsApp bot user.
-If **you** are in a group, KaijiBot can see that group and respond there.
+AllBot “lives” on your own messaging accounts. There is no separate WhatsApp bot user.
+If **you** are in a group, AllBot can see that group and respond there.
 
 Default behavior:
 
 - Groups are restricted (`groupPolicy: "allowlist"`).
 - Replies require a mention unless you explicitly disable mention gating.
 
-Translation: allowlisted senders can trigger KaijiBot by mentioning it.
+Translation: allowlisted senders can trigger AllBot by mentioning it.
 
 > TL;DR
 >
@@ -45,7 +45,7 @@ Two different controls are involved in group safety:
 - **Trigger authorization**: who can trigger the agent (`groupPolicy`, `groups`, `groupAllowFrom`, channel-specific allowlists).
 - **Context visibility**: what supplemental context is injected into the model (reply text, quotes, thread history, forwarded metadata).
 
-By default, KaijiBot prioritizes normal chat behavior and keeps context mostly as received. This means allowlists primarily decide who can trigger actions, not a universal redaction boundary for every quoted or historical snippet.
+By default, AllBot prioritizes normal chat behavior and keeps context mostly as received. This means allowlists primarily decide who can trigger actions, not a universal redaction boundary for every quoted or historical snippet.
 
 Current behavior is channel-specific:
 
@@ -261,7 +261,7 @@ Telegram, WhatsApp, Slack, Discord, Microsoft Teams, and ZaloUser.
       {
         id: "main",
         groupChat: {
-          mentionPatterns: ["@kaijibot", "kaijibot", "\\+15555550123"],
+          mentionPatterns: ["@allbot", "allbot", "\\+15555550123"],
           historyLimit: 50,
         },
       },

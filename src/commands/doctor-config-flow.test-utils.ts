@@ -11,10 +11,10 @@ export async function runDoctorConfigWithInput<T>(params: {
   }) => Promise<T>;
 }) {
   return withTempHome(async (home) => {
-    const configDir = path.join(home, ".kaijibot");
+    const configDir = path.join(home, ".allbot");
     await fs.mkdir(configDir, { recursive: true });
     await fs.writeFile(
-      path.join(configDir, "kaijibot.json"),
+      path.join(configDir, "allbot.json"),
       JSON.stringify(params.config, null, 2),
       "utf-8",
     );

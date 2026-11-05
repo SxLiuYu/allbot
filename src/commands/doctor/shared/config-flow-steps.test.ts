@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import type { DoctorConfigPreflightResult } from "../../doctor-config-preflight.js";
 import { applyLegacyCompatibilityStep, applyUnknownConfigKeyStep } from "./config-flow-steps.js";
 
@@ -27,13 +27,13 @@ describe("doctor config flow steps", () => {
         fixHints: [],
       },
       shouldRepair: false,
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     expect(result.issueLines).toEqual([expect.stringContaining("- heartbeat:")]);
     expect(result.changeLines).not.toEqual([]);
     expect(result.state.fixHints).toContain(
-      'Run "kaijibot doctor --fix" to migrate legacy config keys.',
+      'Run "allbot doctor --fix" to migrate legacy config keys.',
     );
     expect(result.state.pendingChanges).toBe(true);
   });
@@ -66,13 +66,13 @@ describe("doctor config flow steps", () => {
         fixHints: [],
       },
       shouldRepair: false,
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     expect(result.changeLines).toEqual([]);
     expect(result.state.pendingChanges).toBe(true);
     expect(result.state.fixHints).toContain(
-      'Run "kaijibot doctor --fix" to migrate legacy config keys.',
+      'Run "allbot doctor --fix" to migrate legacy config keys.',
     );
   });
 
@@ -80,16 +80,16 @@ describe("doctor config flow steps", () => {
     const result = applyUnknownConfigKeyStep({
       state: {
         cfg: {},
-        candidate: { bogus: true } as unknown as KaijiBotConfig,
+        candidate: { bogus: true } as unknown as AllBotConfig,
         pendingChanges: false,
         fixHints: [],
       },
       shouldRepair: false,
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     expect(result.removed).toEqual(["bogus"]);
     expect(result.state.candidate).toEqual({});
-    expect(result.state.fixHints).toContain('Run "kaijibot doctor --fix" to remove these keys.');
+    expect(result.state.fixHints).toContain('Run "allbot doctor --fix" to remove these keys.');
   });
 });

@@ -53,7 +53,7 @@ describe("resolvePluginRuntimeLoadContext", () => {
         },
       },
     };
-    const env = { HOME: "/tmp/kaijibot-home" } as NodeJS.ProcessEnv;
+    const env = { HOME: "/tmp/allbot-home" } as NodeJS.ProcessEnv;
 
     applyPluginAutoEnableMock.mockReturnValue({
       config: resolvedConfig,
@@ -91,7 +91,7 @@ describe("resolvePluginRuntimeLoadContext", () => {
   it("builds plugin load options from the shared runtime context", () => {
     const context = resolvePluginRuntimeLoadContext({
       config: { plugins: {} },
-      env: { HOME: "/tmp/kaijibot-home" } as NodeJS.ProcessEnv,
+      env: { HOME: "/tmp/allbot-home" } as NodeJS.ProcessEnv,
       workspaceDir: "/explicit-workspace",
     });
 

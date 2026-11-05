@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
  * counterpart of Grok Bot's always-on task execution).
  *
  * Persisted per (agentId, userId) at
- * `~/.kaijibot/cognitive/tasks/{agentId}/{userId}.json`.
+ * `~/.allbot/cognitive/tasks/{agentId}/{userId}.json`.
  */
 
 export type TaskStatus =

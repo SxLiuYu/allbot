@@ -19,8 +19,8 @@ function restoreEnvKey(key: string, previous: string | undefined): void {
 
 describe("env test utils", () => {
   it("captureEnv restores mutated keys", () => {
-    const keyA = "KAIJIBOT_ENV_TEST_A";
-    const keyB = "KAIJIBOT_ENV_TEST_B";
+    const keyA = "ALLBOT_ENV_TEST_A";
+    const keyB = "ALLBOT_ENV_TEST_B";
     const snapshot = captureEnv([keyA, keyB]);
     const prevA = process.env[keyA];
     const prevB = process.env[keyB];
@@ -34,7 +34,7 @@ describe("env test utils", () => {
   });
 
   it("captureFullEnv restores added keys and baseline values", () => {
-    const key = "KAIJIBOT_ENV_TEST_ADDED";
+    const key = "ALLBOT_ENV_TEST_ADDED";
     const prevHome = process.env.HOME;
     const snapshot = captureFullEnv();
     process.env[key] = "1";
@@ -47,7 +47,7 @@ describe("env test utils", () => {
   });
 
   it("withEnv applies values only inside callback", () => {
-    const key = "KAIJIBOT_ENV_TEST_SYNC";
+    const key = "ALLBOT_ENV_TEST_SYNC";
     const prev = process.env[key];
 
     const seen = withEnv({ [key]: "inside" }, () => process.env[key]);
@@ -57,7 +57,7 @@ describe("env test utils", () => {
   });
 
   it("withEnv restores values when callback throws", () => {
-    const key = "KAIJIBOT_ENV_TEST_SYNC_THROW";
+    const key = "ALLBOT_ENV_TEST_SYNC_THROW";
     const prev = process.env[key];
 
     expect(() =>
@@ -71,7 +71,7 @@ describe("env test utils", () => {
   });
 
   it("withEnv can delete a key only inside callback", () => {
-    const key = "KAIJIBOT_ENV_TEST_SYNC_DELETE";
+    const key = "ALLBOT_ENV_TEST_SYNC_DELETE";
     const prev = process.env[key];
     process.env[key] = "outer";
 
@@ -83,7 +83,7 @@ describe("env test utils", () => {
   });
 
   it("withEnvAsync restores values when callback throws", async () => {
-    const key = "KAIJIBOT_ENV_TEST_ASYNC";
+    const key = "ALLBOT_ENV_TEST_ASYNC";
     const prev = process.env[key];
 
     await expect(
@@ -97,7 +97,7 @@ describe("env test utils", () => {
   });
 
   it("withEnvAsync applies values only inside async callback", async () => {
-    const key = "KAIJIBOT_ENV_TEST_ASYNC_OK";
+    const key = "ALLBOT_ENV_TEST_ASYNC_OK";
     const prev = process.env[key];
 
     const seen = await withEnvAsync({ [key]: "inside" }, async () => process.env[key]);
@@ -107,7 +107,7 @@ describe("env test utils", () => {
   });
 
   it("withEnvAsync can delete a key only inside callback", async () => {
-    const key = "KAIJIBOT_ENV_TEST_ASYNC_DELETE";
+    const key = "ALLBOT_ENV_TEST_ASYNC_DELETE";
     const prev = process.env[key];
     process.env[key] = "outer";
 
@@ -119,58 +119,58 @@ describe("env test utils", () => {
   });
 
   it("createPathResolutionEnv clears leaked path overrides before applying explicit ones", () => {
-    const homeDir = path.join(path.sep, "tmp", "kaijibot-home");
+    const homeDir = path.join(path.sep, "tmp", "allbot-home");
     const resolvedHomeDir = path.resolve(homeDir);
-    const previousKaijiBotHome = process.env.KAIJIBOT_HOME;
-    const previousStateDir = process.env.KAIJIBOT_STATE_DIR;
-    const previousBundledDir = process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
-    process.env.KAIJIBOT_HOME = "/srv/kaijibot-home";
-    process.env.KAIJIBOT_STATE_DIR = "/srv/kaijibot-state";
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/srv/kaijibot-bundled";
+    const previousAllBotHome = process.env.ALLBOT_HOME;
+    const previousStateDir = process.env.ALLBOT_STATE_DIR;
+    const previousBundledDir = process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
+    process.env.ALLBOT_HOME = "/srv/allbot-home";
+    process.env.ALLBOT_STATE_DIR = "/srv/allbot-state";
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/srv/allbot-bundled";
 
     try {
       const env = createPathResolutionEnv(homeDir, {
-        KAIJIBOT_STATE_DIR: "~/state",
+        ALLBOT_STATE_DIR: "~/state",
       });
 
       expect(env.HOME).toBe(resolvedHomeDir);
-      expect(env.KAIJIBOT_HOME).toBeUndefined();
-      expect(env.KAIJIBOT_BUNDLED_PLUGINS_DIR).toBeUndefined();
-      expect(env.KAIJIBOT_STATE_DIR).toBe("~/state");
+      expect(env.ALLBOT_HOME).toBeUndefined();
+      expect(env.ALLBOT_BUNDLED_PLUGINS_DIR).toBeUndefined();
+      expect(env.ALLBOT_STATE_DIR).toBe("~/state");
     } finally {
-      restoreEnvKey("KAIJIBOT_HOME", previousKaijiBotHome);
-      restoreEnvKey("KAIJIBOT_STATE_DIR", previousStateDir);
-      restoreEnvKey("KAIJIBOT_BUNDLED_PLUGINS_DIR", previousBundledDir);
+      restoreEnvKey("ALLBOT_HOME", previousAllBotHome);
+      restoreEnvKey("ALLBOT_STATE_DIR", previousStateDir);
+      restoreEnvKey("ALLBOT_BUNDLED_PLUGINS_DIR", previousBundledDir);
     }
   });
 
   it("withPathResolutionEnv only applies the explicit path env inside the callback", () => {
-    const homeDir = path.join(path.sep, "tmp", "kaijibot-home");
+    const homeDir = path.join(path.sep, "tmp", "allbot-home");
     const resolvedHomeDir = path.resolve(homeDir);
-    const previousKaijiBotHome = process.env.KAIJIBOT_HOME;
-    process.env.KAIJIBOT_HOME = "/srv/kaijibot-home";
+    const previousAllBotHome = process.env.ALLBOT_HOME;
+    process.env.ALLBOT_HOME = "/srv/allbot-home";
 
     try {
       const seen = withPathResolutionEnv(
         homeDir,
-        { KAIJIBOT_BUNDLED_PLUGINS_DIR: "~/bundled" },
+        { ALLBOT_BUNDLED_PLUGINS_DIR: "~/bundled" },
         (env) => ({
           processHome: process.env.HOME,
-          processKaijiBotHome: process.env.KAIJIBOT_HOME,
-          processBundledDir: process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR,
-          envBundledDir: env.KAIJIBOT_BUNDLED_PLUGINS_DIR,
+          processAllBotHome: process.env.ALLBOT_HOME,
+          processBundledDir: process.env.ALLBOT_BUNDLED_PLUGINS_DIR,
+          envBundledDir: env.ALLBOT_BUNDLED_PLUGINS_DIR,
         }),
       );
 
       expect(seen).toEqual({
         processHome: resolvedHomeDir,
-        processKaijiBotHome: undefined,
+        processAllBotHome: undefined,
         processBundledDir: "~/bundled",
         envBundledDir: "~/bundled",
       });
-      expect(process.env.KAIJIBOT_HOME).toBe("/srv/kaijibot-home");
+      expect(process.env.ALLBOT_HOME).toBe("/srv/allbot-home");
     } finally {
-      restoreEnvKey("KAIJIBOT_HOME", previousKaijiBotHome);
+      restoreEnvKey("ALLBOT_HOME", previousAllBotHome);
     }
   });
 });

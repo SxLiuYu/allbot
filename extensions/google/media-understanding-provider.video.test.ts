@@ -1,5 +1,5 @@
-import * as ssrf from "kaijibot/plugin-sdk/infra-runtime";
-import { withFetchPreconnect } from "kaijibot/plugin-sdk/testing";
+import * as ssrf from "allbot/plugin-sdk/infra-runtime";
+import { withFetchPreconnect } from "allbot/plugin-sdk/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createRequestCaptureJsonFetch } from "../../test/helpers/plugins/media-understanding.js";
 import { describeGeminiVideo } from "./media-understanding-provider.js";

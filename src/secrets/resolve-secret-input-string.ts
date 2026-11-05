@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizeSecretInputString,
   resolveSecretInputRef,
@@ -6,10 +6,10 @@ import {
 } from "../config/types.secrets.js";
 import { resolveSecretRefString } from "./resolve.js";
 
-type SecretDefaults = NonNullable<KaijiBotConfig["secrets"]>["defaults"];
+type SecretDefaults = NonNullable<AllBotConfig["secrets"]>["defaults"];
 
 export async function resolveSecretInputString(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   value: unknown;
   env: NodeJS.ProcessEnv;
   defaults?: SecretDefaults;

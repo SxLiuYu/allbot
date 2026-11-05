@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { normalizeOptionalString } from "../../../shared/string-coerce.js";
 import { sanitizeForLog } from "../../../terminal/ansi.js";
 import { resolveAllowFromMode, type AllowFromMode } from "./allow-from-mode.js";
@@ -21,8 +21,8 @@ export function collectOpenPolicyAllowFromWarnings(params: {
   ];
 }
 
-export function maybeRepairOpenPolicyAllowFrom(cfg: KaijiBotConfig): {
-  config: KaijiBotConfig;
+export function maybeRepairOpenPolicyAllowFrom(cfg: AllBotConfig): {
+  config: AllBotConfig;
   changes: string[];
 } {
   const channels = cfg.channels;

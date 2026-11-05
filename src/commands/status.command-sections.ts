@@ -225,10 +225,10 @@ export function buildStatusSecurityAuditLines(params: {
     }
   }
   lines.push(
-    params.theme.muted(`Full report: ${params.formatCliCommand("kaijibot security audit")}`),
+    params.theme.muted(`Full report: ${params.formatCliCommand("allbot security audit")}`),
   );
   lines.push(
-    params.theme.muted(`Deep probe: ${params.formatCliCommand("kaijibot security audit --deep")}`),
+    params.theme.muted(`Deep probe: ${params.formatCliCommand("allbot security audit --deep")}`),
   );
   return lines;
 }
@@ -318,13 +318,13 @@ export function buildStatusFooterLines(params: {
     "Troubleshooting: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/help/troubleshooting.md",
     ...(params.updateHint ? ["", params.warn(params.updateHint)] : []),
     "Next steps:",
-    `  Need to share?      ${params.formatCliCommand("kaijibot status --all")}`,
-    `  Need to debug live? ${params.formatCliCommand("kaijibot logs --follow")}`,
+    `  Need to share?      ${params.formatCliCommand("allbot status --all")}`,
+    `  Need to debug live? ${params.formatCliCommand("allbot logs --follow")}`,
     params.nodeOnlyGateway
-      ? `  Need node service?  ${params.formatCliCommand("kaijibot node status")}`
+      ? `  Need node service?  ${params.formatCliCommand("allbot node status")}`
       : params.gatewayReachable
-        ? `  Need to test channels? ${params.formatCliCommand("kaijibot status --deep")}`
-        : `  Fix reachability first: ${params.formatCliCommand("kaijibot gateway probe")}`,
+        ? `  Need to test channels? ${params.formatCliCommand("allbot status --deep")}`
+        : `  Fix reachability first: ${params.formatCliCommand("allbot gateway probe")}`,
   ];
 }
 
@@ -366,12 +366,12 @@ export function buildStatusPairingRecoveryLines(params: {
     ...(params.pairingRecovery.requestId
       ? [
           params.muted(
-            `Recovery: ${params.formatCliCommand(`kaijibot devices approve ${params.pairingRecovery.requestId}`)}`,
+            `Recovery: ${params.formatCliCommand(`allbot devices approve ${params.pairingRecovery.requestId}`)}`,
           ),
         ]
       : []),
-    params.muted(`Fallback: ${params.formatCliCommand("kaijibot devices approve --latest")}`),
-    params.muted(`Inspect: ${params.formatCliCommand("kaijibot devices list")}`),
+    params.muted(`Fallback: ${params.formatCliCommand("allbot devices approve --latest")}`),
+    params.muted(`Inspect: ${params.formatCliCommand("allbot devices list")}`),
   ];
 }
 

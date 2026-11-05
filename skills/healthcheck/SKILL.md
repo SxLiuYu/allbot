@@ -1,13 +1,13 @@
 ---
 name: healthcheck
-description: Host security hardening and risk-tolerance configuration for KaijiBot deployments. Use when a user asks for security audits, firewall/SSH/update hardening, risk posture, exposure review, KaijiBot cron scheduling for periodic checks, or version status checks on a machine running KaijiBot (laptop, workstation, Pi, VPS).
+description: Host security hardening and risk-tolerance configuration for AllBot deployments. Use when a user asks for security audits, firewall/SSH/update hardening, risk posture, exposure review, AllBot cron scheduling for periodic checks, or version status checks on a machine running AllBot (laptop, workstation, Pi, VPS).
 ---
 
-# KaijiBot Host Hardening
+# AllBot Host Hardening
 
 ## Overview
 
-Assess and harden the host running KaijiBot, then align it to a user-defined risk tolerance without breaking access. Use KaijiBot security tooling as a first-class signal, but treat OS hardening as a separate, explicit set of steps.
+Assess and harden the host running AllBot, then align it to a user-defined risk tolerance without breaking access. Use AllBot security tooling as a first-class signal, but treat OS hardening as a separate, explicit set of steps.
 
 ## Core rules
 
@@ -15,7 +15,7 @@ Assess and harden the host running KaijiBot, then align it to a user-defined ris
 - Require explicit approval before any state-changing action.
 - Do not modify remote access settings without confirming how the user connects.
 - Prefer reversible, staged changes with a rollback plan.
-- Never claim KaijiBot changes the host firewall, SSH, or OS updates; it does not.
+- Never claim AllBot changes the host firewall, SSH, or OS updates; it does not.
 - If role/identity is unknown, provide recommendations only.
 - Formatting: every set of user choices must be numbered so the user can reply with a single digit.
 - System-level backups are recommended; try to verify status.
@@ -36,12 +36,12 @@ Determine (in order):
 2. Privilege level (root/admin vs user).
 3. Access path (local console, SSH, RDP, tailnet).
 4. Network exposure (public IP, reverse proxy, tunnel).
-5. KaijiBot gateway status and bind address.
+5. AllBot gateway status and bind address.
 6. Backup system and status (e.g., Time Machine, system images, snapshots).
 7. Deployment context (local mac app, headless gateway host, remote gateway, container/CI).
 8. Disk encryption status (FileVault/LUKS/BitLocker).
 9. OS automatic security updates status.
-   Note: these are not blocking items, but are highly recommended, especially if KaijiBot can access sensitive data.
+   Note: these are not blocking items, but are highly recommended, especially if AllBot can access sensitive data.
 10. Usage mode for a personal assistant with full access (local workstation vs headless/remote vs other).
 
 First ask once for permission to run read-only checks. If granted, run them by default and only ask questions for items you cannot infer or verify. Do not ask for information already visible in runtime or command output. Keep the permission ask as a single sentence, and list follow-up info needed as an unordered list (not numbered) unless you are presenting selectable choices.
@@ -74,24 +74,24 @@ If the user grants read-only permission, run the OS-appropriate checks by defaul
    - macOS: `/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate` and `pfctl -s info`.
 4. Backups (macOS): `tmutil status` (if Time Machine is used).
 
-### 2) Run KaijiBot security audits (read-only)
+### 2) Run AllBot security audits (read-only)
 
-As part of the default read-only checks, run `kaijibot security audit --deep`. Only offer alternatives if the user requests them:
+As part of the default read-only checks, run `allbot security audit --deep`. Only offer alternatives if the user requests them:
 
-1. `kaijibot security audit` (faster, non-probing)
-2. `kaijibot security audit --json` (structured output)
+1. `allbot security audit` (faster, non-probing)
+2. `allbot security audit --json` (structured output)
 
-Offer to apply KaijiBot safe defaults (numbered):
+Offer to apply AllBot safe defaults (numbered):
 
-1. `kaijibot security audit --fix`
+1. `allbot security audit --fix`
 
-Be explicit that `--fix` only tightens KaijiBot defaults and file permissions. It does not change host firewall, SSH, or OS update policies.
+Be explicit that `--fix` only tightens AllBot defaults and file permissions. It does not change host firewall, SSH, or OS update policies.
 
 If browser control is enabled, recommend that 2FA be enabled on all important accounts, with hardware keys preferred and SMS not sufficient.
 
-### 3) Check KaijiBot version/update status (read-only)
+### 3) Check AllBot version/update status (read-only)
 
-As part of the default read-only checks, run `kaijibot update status`.
+As part of the default read-only checks, run `allbot update status`.
 
 Report the current channel and whether an update is available.
 
@@ -117,7 +117,7 @@ Provide a plan that includes:
 - Access-preservation strategy and rollback
 - Risks and potential lockout scenarios
 - Least-privilege notes (e.g., avoid admin usage, tighten ownership/permissions where safe)
-- Credential hygiene notes (location of KaijiBot creds, prefer disk encryption)
+- Credential hygiene notes (location of AllBot creds, prefer disk encryption)
 
 Always show the plan before any changes.
 
@@ -146,7 +146,7 @@ Re-check:
 - Firewall status
 - Listening ports
 - Remote access still works
-- KaijiBot security audit (re-run)
+- AllBot security audit (re-run)
 
 Deliver a final posture report and note any deferred items.
 
@@ -168,50 +168,50 @@ If unsure, ask.
 
 ## Periodic checks
 
-After KaijiBot install or first hardening pass, run at least one baseline audit and version check:
+After AllBot install or first hardening pass, run at least one baseline audit and version check:
 
-- `kaijibot security audit`
-- `kaijibot security audit --deep`
-- `kaijibot update status`
+- `allbot security audit`
+- `allbot security audit --deep`
+- `allbot update status`
 
-Ongoing monitoring is recommended. Use the KaijiBot cron tool/CLI to schedule periodic audits (Gateway scheduler). Do not create scheduled tasks without explicit approval. Store outputs in a user-approved location and avoid secrets in logs.
+Ongoing monitoring is recommended. Use the AllBot cron tool/CLI to schedule periodic audits (Gateway scheduler). Do not create scheduled tasks without explicit approval. Store outputs in a user-approved location and avoid secrets in logs.
 When scheduling headless cron runs, include a note in the output that instructs the user to call `healthcheck` so issues can be fixed.
 
 ### Required prompt to schedule (always)
 
 After any audit or hardening pass, explicitly offer scheduling and require a direct response. Use a short prompt like (numbered):
 
-1. “Do you want me to schedule periodic audits (e.g., daily/weekly) via `kaijibot cron add`?”
+1. “Do you want me to schedule periodic audits (e.g., daily/weekly) via `allbot cron add`?”
 
 If the user says yes, ask for:
 
 - cadence (daily/weekly), preferred time window, and output location
-- whether to also schedule `kaijibot update status`
+- whether to also schedule `allbot update status`
 
 Use a stable cron job name so updates are deterministic. Prefer exact names:
 
 - `healthcheck:security-audit`
 - `healthcheck:update-status`
 
-Before creating, `kaijibot cron list` and match on exact `name`. If found, `kaijibot cron edit <id> ...`.
-If not found, `kaijibot cron add --name <name> ...`.
+Before creating, `allbot cron list` and match on exact `name`. If found, `allbot cron edit <id> ...`.
+If not found, `allbot cron add --name <name> ...`.
 
 Also offer a periodic version check so the user can decide when to update (numbered):
 
-1. `kaijibot update status` (preferred for source checkouts and channels)
-2. `npm view kaijibot version` (published npm version)
+1. `allbot update status` (preferred for source checkouts and channels)
+2. `npm view allbot version` (published npm version)
 
-## KaijiBot command accuracy
+## AllBot command accuracy
 
 Use only supported commands and flags:
 
-- `kaijibot security audit [--deep] [--fix] [--json]`
-- `kaijibot status` / `kaijibot status --deep`
-- `kaijibot health --json`
-- `kaijibot update status`
-- `kaijibot cron add|list|runs|run`
+- `allbot security audit [--deep] [--fix] [--json]`
+- `allbot status` / `allbot status --deep`
+- `allbot health --json`
+- `allbot update status`
+- `allbot cron add|list|runs|run`
 
-Do not invent CLI flags or imply KaijiBot enforces host firewall/SSH policies.
+Do not invent CLI flags or imply AllBot enforces host firewall/SSH policies.
 
 ## Logging and audit trail
 
@@ -230,7 +230,7 @@ Only write to memory files when the user explicitly opts in and the session is a
 (per `docs/reference/templates/AGENTS.md`). Otherwise provide a redacted, paste-ready summary the user can
 decide to save elsewhere.
 
-Follow the durable-memory prompt format used by KaijiBot compaction:
+Follow the durable-memory prompt format used by AllBot compaction:
 
 - Write lasting notes to `memory/YYYY-MM-DD.md`.
 

@@ -2,7 +2,7 @@
 title: "Arcee AI"
 summary: "Arcee AI setup (auth + model selection)"
 read_when:
-  - You want to use Arcee AI with KaijiBot
+  - You want to use Arcee AI with AllBot
   - You need the API key env var or CLI auth choice
 ---
 
@@ -25,10 +25,10 @@ Arcee AI models can be accessed directly via the Arcee platform or through [Open
 
 ```bash
 # Direct (Arcee platform)
-kaijibot onboard --auth-choice arceeai-api-key
+allbot onboard --auth-choice arceeai-api-key
 
 # Via OpenRouter
-kaijibot onboard --auth-choice arceeai-openrouter
+allbot onboard --auth-choice arceeai-openrouter
 ```
 
 3. Set a default model:
@@ -47,13 +47,13 @@ kaijibot onboard --auth-choice arceeai-openrouter
 
 ```bash
 # Direct (Arcee platform)
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice arceeai-api-key \
   --arceeai-api-key "$ARCEEAI_API_KEY"
 
 # Via OpenRouter
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice arceeai-openrouter \
   --openrouter-api-key "$OPENROUTER_API_KEY"
@@ -63,11 +63,11 @@ kaijibot onboard --non-interactive \
 
 If the Gateway runs as a daemon (launchd/systemd), make sure `ARCEEAI_API_KEY`
 (or `OPENROUTER_API_KEY`) is available to that process (for example, in
-`~/.kaijibot/.env` or via `env.shellEnv`).
+`~/.allbot/.env` or via `env.shellEnv`).
 
 ## Built-in catalog
 
-KaijiBot currently ships this bundled Arcee catalog:
+AllBot currently ships this bundled Arcee catalog:
 
 | Model ref                      | Name                   | Input | Context | Cost (in/out per 1M) | Notes                                     |
 | ------------------------------ | ---------------------- | ----- | ------- | -------------------- | ----------------------------------------- |

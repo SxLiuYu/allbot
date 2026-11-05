@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { installedPluginRoot } from "../../../test/helpers/bundled-plugin-paths.js";
 import { createPluginRecord, createPluginStatusReport } from "../../plugins/status.test-helpers.js";
 
-const WORKSPACE_PLUGIN_ROOT = installedPluginRoot("/tmp/workspace/.kaijibot", "superpowers");
+const WORKSPACE_PLUGIN_ROOT = installedPluginRoot("/tmp/workspace/.allbot", "superpowers");
 
 const {
   readConfigFileSnapshotMock,
@@ -67,7 +67,7 @@ describe("handleCommands /plugins toggle", () => {
     const config = buildCfg();
     readConfigFileSnapshotMock.mockResolvedValue({
       valid: true,
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       resolved: config,
     });
     buildPluginDiagnosticsReportMock.mockReturnValue(
@@ -107,7 +107,7 @@ describe("handleCommands /plugins toggle", () => {
     const config = buildCfg();
     readConfigFileSnapshotMock.mockResolvedValue({
       valid: true,
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       resolved: config,
     });
     buildPluginDiagnosticsReportMock.mockReturnValue(
@@ -146,7 +146,7 @@ describe("handleCommands /plugins toggle", () => {
     const config = buildCfg();
     readConfigFileSnapshotMock.mockResolvedValue({
       valid: true,
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       resolved: config,
     });
     buildPluginSnapshotReportMock.mockReturnValue(

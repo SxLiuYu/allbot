@@ -29,10 +29,10 @@ describe("tagline (locale-aware)", () => {
       expect(pickTagline({ mode: "default" })).toBe("认知驱动，主动思考。");
     });
 
-    it("honors KAIJIBOT_TAGLINE_INDEX in random mode (en)", () => {
+    it("honors ALLBOT_TAGLINE_INDEX in random mode (en)", () => {
       const value = pickTagline({
         mode: "random",
-        env: { KAIJIBOT_TAGLINE_INDEX: "0" } as NodeJS.ProcessEnv,
+        env: { ALLBOT_TAGLINE_INDEX: "0" } as NodeJS.ProcessEnv,
       });
       expect(value.length).toBeGreaterThan(0);
       // Index 0 = first philosophical entry, never the default tagline.
@@ -41,20 +41,20 @@ describe("tagline (locale-aware)", () => {
       expect(value).toContain("True intelligence");
     });
 
-    it("honors KAIJIBOT_TAGLINE_INDEX in random mode (zh-CN)", () => {
+    it("honors ALLBOT_TAGLINE_INDEX in random mode (zh-CN)", () => {
       initCliI18n({ locale: "zh-CN" });
       const value = pickTagline({
         mode: "random",
-        env: { KAIJIBOT_TAGLINE_INDEX: "0" } as NodeJS.ProcessEnv,
+        env: { ALLBOT_TAGLINE_INDEX: "0" } as NodeJS.ProcessEnv,
       });
       expect(value).toContain("真正的智能");
     });
 
     it("locale switch is observable without re-import", () => {
       initCliI18n({ locale: "en" });
-      const en = pickTagline({ mode: "random", env: { KAIJIBOT_TAGLINE_INDEX: "1" } });
+      const en = pickTagline({ mode: "random", env: { ALLBOT_TAGLINE_INDEX: "1" } });
       initCliI18n({ locale: "zh-CN" });
-      const zh = pickTagline({ mode: "random", env: { KAIJIBOT_TAGLINE_INDEX: "1" } });
+      const zh = pickTagline({ mode: "random", env: { ALLBOT_TAGLINE_INDEX: "1" } });
       expect(en).toContain("Every conversation");
       expect(zh).toContain("每一次对话");
     });

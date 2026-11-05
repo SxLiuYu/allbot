@@ -2,7 +2,7 @@ import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 
-const LIVE = process.env.KAIJIBOT_LIVE_TEST === "1";
+const LIVE = process.env.ALLBOT_LIVE_TEST === "1";
 const TMP = path.join(process.cwd(), ".tmp-live-wiki-test");
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 
@@ -48,13 +48,13 @@ Rust + eBPF 的组合在性能和安全性上都满足了需求。
     const config = resolveWikiConfig(undefined);
     await initializeWikiVault(vaultRoot);
 
-    const { createStandaloneGenerateText } = await import("kaijibot/plugin-sdk/generate-text");
+    const { createStandaloneGenerateText } = await import("allbot/plugin-sdk/generate-text");
 
     let generateText;
     try {
       const { readFileSync } = await import("node:fs");
       const os = await import("node:os");
-      const cfgPath = path.join(os.homedir(), ".kaijibot", "kaijibot.json");
+      const cfgPath = path.join(os.homedir(), ".allbot", "allbot.json");
       const rawCfg = JSON.parse(readFileSync(cfgPath, "utf8"));
       generateText = await createStandaloneGenerateText(rawCfg, {
         maxTokens: 4000,

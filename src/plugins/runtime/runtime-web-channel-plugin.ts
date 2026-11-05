@@ -1,7 +1,7 @@
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
 import { createJiti } from "jiti";
 import type { ChannelAgentTool } from "../../channels/plugins/types.core.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   getDefaultLocalRoots as getDefaultLocalRootsImpl,
   loadWebMedia as loadWebMediaImpl,
@@ -55,7 +55,7 @@ type WebChannelHeavyRuntimeModule = {
     body: string,
     options: {
       verbose: boolean;
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       mediaUrl?: string;
       mediaAccess?: {
         localRoots?: readonly string[];
@@ -70,7 +70,7 @@ type WebChannelHeavyRuntimeModule = {
   sendPollWhatsApp: (
     to: string,
     poll: PollInput,
-    options: { verbose: boolean; accountId?: string; cfg?: KaijiBotConfig },
+    options: { verbose: boolean; accountId?: string; cfg?: AllBotConfig },
   ) => Promise<{ messageId: string; toJid: string }>;
   sendReactionWhatsApp: (
     chatJid: string,
@@ -90,7 +90,7 @@ type WebChannelHeavyRuntimeModule = {
   ) => Promise<unknown>;
   handleWhatsAppAction: (
     params: Record<string, unknown>,
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
   ) => Promise<AgentToolResult<unknown>>;
   monitorWebChannel: (...args: unknown[]) => Promise<unknown>;
   monitorWebInbox: (...args: unknown[]) => Promise<unknown>;

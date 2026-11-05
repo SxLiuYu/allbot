@@ -5,7 +5,7 @@ import {
 } from "../../acp/persistent-bindings.types.js";
 import { resolveConfiguredBindingRecord } from "../../channels/plugins/binding-registry.js";
 import { listAcpBindings } from "../../config/bindings.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { getSessionBindingService } from "../../infra/outbound/session-binding-service.js";
 import { DEFAULT_ACCOUNT_ID, isAcpSessionKey } from "../../routing/session-key.js";
 import {
@@ -36,7 +36,7 @@ export const __testing = {
 };
 
 function resolveResetTargetAccountId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId?: string | null;
 }): string {
@@ -53,7 +53,7 @@ function resolveResetTargetAccountId(params: {
 }
 
 function resolveRawConfiguredAcpSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: string;
   accountId: string;
   conversationId: string;
@@ -101,7 +101,7 @@ function resolveRawConfiguredAcpSessionKey(params: {
 }
 
 export function resolveEffectiveResetTargetSessionKey(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string | null;
   accountId?: string | null;
   conversationId?: string | null;

@@ -2,7 +2,7 @@
 summary: "Scheduled jobs, webhooks, and Gmail PubSub triggers for the Gateway scheduler"
 read_when:
   - Scheduling background jobs or wakeups
-  - Wiring external triggers (webhooks, Gmail) into KaijiBot
+  - Wiring external triggers (webhooks, Gmail) into AllBot
   - Deciding between heartbeat and cron for scheduled tasks
 title: "Scheduled Tasks"
 ---
@@ -15,7 +15,7 @@ Cron is the Gateway's built-in scheduler. It persists jobs, wakes the agent at t
 
 ```bash
 # Add a one-shot reminder
-kaijibot cron add \
+allbot cron add \
   --name "Reminder" \
   --at "2026-02-01T16:00:00Z" \
   --session main \
@@ -24,23 +24,23 @@ kaijibot cron add \
   --delete-after-run
 
 # Check your jobs
-kaijibot cron list
+allbot cron list
 
 # See run history
-kaijibot cron runs --id <job-id>
+allbot cron runs --id <job-id>
 ```
 
 ## How cron works
 
 - Cron runs **inside the Gateway** process (not inside the model).
-- Jobs persist at `~/.kaijibot/cron/jobs.json` so restarts do not lose schedules.
+- Jobs persist at `~/.allbot/cron/jobs.json` so restarts do not lose schedules.
 - All cron executions create [background task](/automation/tasks) records.
 - One-shot jobs (`--at`) auto-delete after success by default.
 - Isolated cron runs best-effort close tracked browser tabs/processes for their `cron:<jobId>` session when the run completes, so detached browser automation does not leave orphaned processes behind.
 - Isolated cron runs also guard against stale acknowledgement replies. If the
   first result is just an interim status update (`on it`, `pulling everything
 together`, and similar hints) and no descendant subagent run is still
-  responsible for the final answer, KaijiBot re-prompts once for the actual
+  responsible for the final answer, AllBot re-prompts once for the actual
   result before delivery.
 
 Task reconciliation for cron is runtime-owned: an active cron task stays live while the
@@ -75,7 +75,7 @@ For isolated jobs, runtime teardown now includes best-effort browser cleanup for
 
 When isolated cron runs orchestrate subagents, delivery also prefers the final
 descendant output over stale parent interim text. If descendants are still
-running, KaijiBot suppresses that partial parent update instead of announcing it.
+running, AllBot suppresses that partial parent update instead of announcing it.
 
 ### Payload options for isolated jobs
 
@@ -138,7 +138,7 @@ Failure notifications follow a separate destination path:
 One-shot reminder (main session):
 
 ```bash
-kaijibot cron add \
+allbot cron add \
   --name "Calendar check" \
   --at "20m" \
   --session main \
@@ -149,7 +149,7 @@ kaijibot cron add \
 Recurring isolated job with delivery:
 
 ```bash
-kaijibot cron add \
+allbot cron add \
   --name "Morning brief" \
   --cron "0 7 * * *" \
   --tz "America/Los_Angeles" \
@@ -163,7 +163,7 @@ kaijibot cron add \
 Isolated job with model and thinking override:
 
 ```bash
-kaijibot cron add \
+allbot cron add \
   --name "Deep analysis" \
   --cron "0 6 * * 1" \
   --tz "America/Los_Angeles" \
@@ -193,7 +193,7 @@ Gateway can expose HTTP webhook endpoints for external triggers. Enable in confi
 Every request must include the hook token via header:
 
 - `Authorization: Bearer <token>` (recommended)
-- `x-kaijibot-token: <token>`
+- `x-allbot-token: <token>`
 
 Query-string tokens are rejected.
 
@@ -240,21 +240,21 @@ Custom hook names are resolved via `hooks.mappings` in config. Mappings can tran
 
 ## Gmail PubSub integration
 
-Wire Gmail inbox triggers to KaijiBot via Google PubSub.
+Wire Gmail inbox triggers to AllBot via Google PubSub.
 
-**Prerequisites**: `gcloud` CLI, `gog` (gogcli), KaijiBot hooks enabled, Tailscale for the public HTTPS endpoint.
+**Prerequisites**: `gcloud` CLI, `gog` (gogcli), AllBot hooks enabled, Tailscale for the public HTTPS endpoint.
 
 ### Wizard setup (recommended)
 
 ```bash
-kaijibot webhooks gmail setup --account kaijibot@gmail.com
+allbot webhooks gmail setup --account allbot@gmail.com
 ```
 
 This writes `hooks.gmail` config, enables the Gmail preset, and uses Tailscale Funnel for the push endpoint.
 
 ### Gateway auto-start
 
-When `hooks.enabled=true` and `hooks.gmail.account` is set, the Gateway starts `gog gmail watch serve` on boot and auto-renews the watch. Set `KAIJIBOT_SKIP_GMAIL_WATCHER=1` to opt out.
+When `hooks.enabled=true` and `hooks.gmail.account` is set, the Gateway starts `gog gmail watch serve` on boot and auto-renews the watch. Set `ALLBOT_SKIP_GMAIL_WATCHER=1` to opt out.
 
 ### Manual one-time setup
 
@@ -279,7 +279,7 @@ gcloud pubsub topics add-iam-policy-binding gog-gmail-watch \
 
 ```bash
 gog gmail watch start \
-  --account kaijibot@gmail.com \
+  --account allbot@gmail.com \
   --label INBOX \
   --topic projects/<project-id>/topics/gog-gmail-watch
 ```
@@ -301,31 +301,31 @@ gog gmail watch start \
 
 ```bash
 # List all jobs
-kaijibot cron list
+allbot cron list
 
 # Edit a job
-kaijibot cron edit <jobId> --message "Updated prompt" --model "opus"
+allbot cron edit <jobId> --message "Updated prompt" --model "opus"
 
 # Force run a job now
-kaijibot cron run <jobId>
+allbot cron run <jobId>
 
 # Run only if due
-kaijibot cron run <jobId> --due
+allbot cron run <jobId> --due
 
 # View run history
-kaijibot cron runs --id <jobId> --limit 50
+allbot cron runs --id <jobId> --limit 50
 
 # Delete a job
-kaijibot cron remove <jobId>
+allbot cron remove <jobId>
 
 # Agent selection (multi-agent setups)
-kaijibot cron add --name "Ops sweep" --cron "0 6 * * *" --session isolated --message "Check ops queue" --agent ops
-kaijibot cron edit <jobId> --clear-agent
+allbot cron add --name "Ops sweep" --cron "0 6 * * *" --session isolated --message "Check ops queue" --agent ops
+allbot cron edit <jobId> --clear-agent
 ```
 
 Model override note:
 
-- `kaijibot cron add|edit --model ...` changes the job's selected model.
+- `allbot cron add|edit --model ...` changes the job's selected model.
 - If the model is allowed, that exact provider/model reaches the isolated agent
   run.
 - If it is not allowed, cron warns and falls back to the job's agent/default
@@ -340,7 +340,7 @@ Model override note:
 {
   cron: {
     enabled: true,
-    store: "~/.kaijibot/cron/jobs.json",
+    store: "~/.allbot/cron/jobs.json",
     maxConcurrentRuns: 1,
     retry: {
       maxAttempts: 3,
@@ -354,7 +354,7 @@ Model override note:
 }
 ```
 
-Disable cron: `cron.enabled: false` or `KAIJIBOT_SKIP_CRON=1`.
+Disable cron: `cron.enabled: false` or `ALLBOT_SKIP_CRON=1`.
 
 **One-shot retry**: transient errors (rate limit, overload, network, server error) retry up to 3 times with exponential backoff. Permanent errors disable immediately.
 
@@ -367,22 +367,22 @@ Disable cron: `cron.enabled: false` or `KAIJIBOT_SKIP_CRON=1`.
 ### Command ladder
 
 ```bash
-kaijibot status
-kaijibot gateway status
-kaijibot cron status
-kaijibot cron list
-kaijibot cron runs --id <jobId> --limit 20
-kaijibot system heartbeat last
-kaijibot logs --follow
-kaijibot doctor
+allbot status
+allbot gateway status
+allbot cron status
+allbot cron list
+allbot cron runs --id <jobId> --limit 20
+allbot system heartbeat last
+allbot logs --follow
+allbot doctor
 ```
 
 ### Cron not firing
 
-- Check `cron.enabled` and `KAIJIBOT_SKIP_CRON` env var.
+- Check `cron.enabled` and `ALLBOT_SKIP_CRON` env var.
 - Confirm the Gateway is running continuously.
 - For `cron` schedules, verify timezone (`--tz`) vs the host timezone.
-- `reason: not-due` in run output means manual run was checked with `kaijibot cron run <jobId> --due` and the job was not due yet.
+- `reason: not-due` in run output means manual run was checked with `allbot cron run <jobId> --due` and the job was not due yet.
 
 ### Cron fired but no delivery
 
@@ -390,7 +390,7 @@ kaijibot doctor
 - Delivery target missing/invalid (`channel`/`to`) means outbound was skipped.
 - Channel auth errors (`unauthorized`, `Forbidden`) mean delivery was blocked by credentials.
 - If the isolated run returns only the silent token (`NO_REPLY` / `no_reply`),
-  KaijiBot suppresses direct outbound delivery and also suppresses the fallback
+  AllBot suppresses direct outbound delivery and also suppresses the fallback
   queued summary path, so nothing is posted back to chat.
 - For cron-owned isolated jobs, do not expect the agent to use the message tool
   as a fallback. The runner owns final delivery; `--no-deliver` keeps it

@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { STATE_DIR } from "../config/paths.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { PluginRegistry } from "./registry.js";
-import type { KaijiBotPluginServiceContext, PluginLogger } from "./types.js";
+import type { AllBotPluginServiceContext, PluginLogger } from "./types.js";
 
 const log = createSubsystemLogger("plugins");
 function createPluginLogger(): PluginLogger {
@@ -15,9 +15,9 @@ function createPluginLogger(): PluginLogger {
 }
 
 function createServiceContext(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
-}): KaijiBotPluginServiceContext {
+}): AllBotPluginServiceContext {
   return {
     config: params.config,
     workspaceDir: params.workspaceDir,
@@ -32,7 +32,7 @@ export type PluginServicesHandle = {
 
 export async function startPluginServices(params: {
   registry: PluginRegistry;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
 }): Promise<PluginServicesHandle> {
   const running: Array<{

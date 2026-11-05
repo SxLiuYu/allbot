@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { MediaAttachment, MediaUnderstandingOutput } from "../media-understanding/types.js";
 import { describeImageFile, runMediaUnderstandingFile } from "./runtime.js";
 
@@ -52,7 +52,7 @@ describe("media-understanding runtime", () => {
               },
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         agentDir: "/tmp/agent",
       }),
     ).resolves.toEqual({
@@ -85,7 +85,7 @@ describe("media-understanding runtime", () => {
       describeImageFile({
         filePath: "/tmp/sample.jpg",
         mime: "image/jpeg",
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         agentDir: "/tmp/agent",
       }),
     ).resolves.toEqual({

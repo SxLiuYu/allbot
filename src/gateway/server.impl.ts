@@ -13,7 +13,7 @@ import type { SchedulerEvent } from "../cognitive/scheduler/types.js";
 import { isRestartEnabled } from "../config/commands.js";
 import {
   type ConfigFileSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
   applyConfigOverrides,
   getRuntimeConfig,
   isNixMode,
@@ -52,7 +52,7 @@ import {
   resolveLarkCliBinDir,
 } from "../infra/lark-cli/index.js";
 import { getMachineDisplayName } from "../infra/machine-name.js";
-import { ensureKaijiBotCliOnPath } from "../infra/path-env.js";
+import { ensureAllBotCliOnPath } from "../infra/path-env.js";
 import { applyPathPrepend } from "../infra/path-prepend.js";
 import { setGatewaySigusr1RestartPolicy, setPreRestartDeferralCheck } from "../infra/restart.js";
 import {
@@ -167,7 +167,7 @@ import { loadGatewayTlsRuntime } from "./server/tls.js";
 import { resolveSharedGatewaySessionGeneration } from "./server/ws-shared-generation.js";
 import { resolveSessionKeyForTranscriptFile } from "./session-transcript-key.js";
 import {
-  attachKaijiBotTranscriptMeta,
+  attachAllBotTranscriptMeta,
   loadGatewaySessionRow,
   loadSessionEntry,
   readSessionMessages,
@@ -181,7 +181,7 @@ import { maybeSeedControlUiAllowedOriginsAtStartup } from "./startup-control-ui-
 
 export { __resetModelCatalogCacheForTest } from "./server-model-catalog.js";
 
-ensureKaijiBotCliOnPath();
+ensureAllBotCliOnPath();
 
 const MAX_MEDIA_TTL_HOURS = 24 * 7;
 
@@ -207,10 +207,10 @@ function getChannelRuntime() {
   return cachedChannelRuntime;
 }
 
-function pruneSkippedStartupSecretSurfaces(config: KaijiBotConfig): KaijiBotConfig {
+function pruneSkippedStartupSecretSurfaces(config: AllBotConfig): AllBotConfig {
   const skipChannels =
-    isTruthyEnvValue(process.env.KAIJIBOT_SKIP_CHANNELS) ||
-    isTruthyEnvValue(process.env.KAIJIBOT_SKIP_PROVIDERS);
+    isTruthyEnvValue(process.env.ALLBOT_SKIP_CHANNELS) ||
+    isTruthyEnvValue(process.env.ALLBOT_SKIP_PROVIDERS);
   if (!skipChannels || !config.channels) {
     return config;
   }
@@ -246,7 +246,7 @@ function createGatewayAuthRateLimiters(rateLimitConfig: AuthRateLimitConfig | un
 }
 
 function logGatewayAuthSurfaceDiagnostics(prepared: {
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   warnings: Array<{ code: string; path: string; message: string }>;
 }): void {
   const states = evaluateGatewayAuthSurfaceStates({
@@ -275,9 +275,9 @@ function logGatewayAuthSurfaceDiagnostics(prepared: {
 }
 
 function applyGatewayAuthOverridesForStartupPreflight(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   overrides: Pick<GatewayServerOptions, "auth" | "tailscale">,
-): KaijiBotConfig {
+): AllBotConfig {
   if (!overrides.auth && !overrides.tailscale) {
     return config;
   }
@@ -303,7 +303,7 @@ function assertValidGatewayStartupConfigSnapshot(
       ? formatConfigIssueLines(snapshot.issues, "", { normalizeRoot: true }).join("\n")
       : "Unknown validation issue.";
   const doctorHint = options.includeDoctorHint
-    ? `\nRun "${formatCliCommand("kaijibot doctor --fix")}" to repair, then retry.`
+    ? `\nRun "${formatCliCommand("allbot doctor --fix")}" to repair, then retry.`
     : "";
   throw new Error(`Invalid config at ${snapshot.path}.\n${issues}${doctorHint}`);
 }
@@ -312,13 +312,13 @@ async function prepareGatewayStartupConfig(params: {
   configSnapshot: ConfigFileSnapshot;
   // Keep startup auth/runtime behavior aligned with loadConfig(), which applies
   // runtime overrides beyond the raw on-disk snapshot.
-  runtimeConfig: KaijiBotConfig;
+  runtimeConfig: AllBotConfig;
   authOverride?: GatewayServerOptions["auth"];
   tailscaleOverride?: GatewayServerOptions["tailscale"];
   activateRuntimeSecrets: (
-    config: KaijiBotConfig,
+    config: AllBotConfig,
     options: { reason: "startup"; activate: boolean },
-  ) => Promise<{ config: KaijiBotConfig }>;
+  ) => Promise<{ config: AllBotConfig }>;
 }): Promise<Awaited<ReturnType<typeof ensureGatewayStartupAuth>>> {
   assertValidGatewayStartupConfigSnapshot(params.configSnapshot);
 
@@ -438,10 +438,10 @@ export async function startGatewayServer(
   opts: GatewayServerOptions = {},
 ): Promise<GatewayServer> {
   const minimalTestGateway =
-    process.env.VITEST === "1" && process.env.KAIJIBOT_TEST_MINIMAL_GATEWAY === "1";
+    process.env.VITEST === "1" && process.env.ALLBOT_TEST_MINIMAL_GATEWAY === "1";
 
   // Ensure all default port derivations (browser/canvas) see the actual runtime port.
-  process.env.KAIJIBOT_GATEWAY_PORT = String(port);
+  process.env.ALLBOT_GATEWAY_PORT = String(port);
 
   {
     const {
@@ -456,11 +456,11 @@ export async function startGatewayServer(
     }
   }
   logAcceptedEnvOption({
-    key: "KAIJIBOT_RAW_STREAM",
+    key: "ALLBOT_RAW_STREAM",
     description: "raw stream logging enabled",
   });
   logAcceptedEnvOption({
-    key: "KAIJIBOT_RAW_STREAM_PATH",
+    key: "ALLBOT_RAW_STREAM_PATH",
     description: "raw stream log path override",
   });
 
@@ -498,7 +498,7 @@ export async function startGatewayServer(
   const emitSecretsStateEvent = (
     code: "SECRETS_RELOADER_DEGRADED" | "SECRETS_RELOADER_RECOVERED",
     message: string,
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
   ) => {
     enqueueSystemEvent(`[${code}] ${message}`, {
       sessionKey: resolveMainSessionKey(cfg),
@@ -515,7 +515,7 @@ export async function startGatewayServer(
     return await run;
   };
   const activateRuntimeSecrets = async (
-    config: KaijiBotConfig,
+    config: AllBotConfig,
     params: { reason: "startup" | "reload" | "restart-check"; activate: boolean },
   ) =>
     await runWithSecretsActivationLock(async () => {
@@ -562,7 +562,7 @@ export async function startGatewayServer(
       }
     });
 
-  let cfgAtStart: KaijiBotConfig;
+  let cfgAtStart: AllBotConfig;
   let startupInternalWriteHash: string | null = null;
   const startupRuntimeConfig = applyConfigOverrides(configSnapshot.config);
   const authBootstrap = await prepareGatewayStartupConfig({
@@ -580,7 +580,7 @@ export async function startGatewayServer(
       );
     } else {
       log.warn(
-        "Gateway auth token was missing. Generated a runtime token for this startup without changing config; restart will generate a different token. Persist one with `kaijibot config set gateway.auth.mode token` and `kaijibot config set gateway.auth.token <token>`.",
+        "Gateway auth token was missing. Generated a runtime token for this startup without changing config; restart will generate a different token. Persist one with `allbot config set gateway.auth.mode token` and `allbot config set gateway.auth.token <token>`.",
       );
     }
   }
@@ -607,7 +607,7 @@ export async function startGatewayServer(
       });
   cfgAtStart = controlUiSeed.config;
 
-  // KaijiBot default: isolate DM sessions per channel+peer so Feishu users get
+  // AllBot default: isolate DM sessions per channel+peer so Feishu users get
   // dedicated session keys (agent:main:feishu:direct:ou_xxx).  This enables
   // per-user persona and cognitive insight delivery.  Explicit config wins.
   // Persist to disk so all config consumers (channel routing, getReply, etc.)
@@ -845,7 +845,7 @@ export async function startGatewayServer(
       env: process.env,
       tailscaleMode,
     });
-  const resolveSharedGatewaySessionGenerationForConfig = (config: KaijiBotConfig) =>
+  const resolveSharedGatewaySessionGenerationForConfig = (config: AllBotConfig) =>
     resolveSharedGatewaySessionGeneration(
       resolveGatewayAuth({
         authConfig: config.gateway?.auth,
@@ -1024,7 +1024,7 @@ export async function startGatewayServer(
       requiredSharedGatewaySessionGeneration = null;
     }
   };
-  const enforceSharedGatewaySessionGenerationForConfigWrite = (nextConfig: KaijiBotConfig) => {
+  const enforceSharedGatewaySessionGenerationForConfigWrite = (nextConfig: AllBotConfig) => {
     const reloadMode = resolveGatewayReloadSettings(nextConfig).mode;
     const nextSharedGatewaySessionGeneration =
       resolveSharedGatewaySessionGenerationForRuntimeSnapshot();
@@ -1317,7 +1317,7 @@ export async function startGatewayServer(
                 latestCompactionCheckpoint: sessionRow.latestCompactionCheckpoint,
               }
             : {};
-          const message = attachKaijiBotTranscriptMeta(update.message, {
+          const message = attachAllBotTranscriptMeta(update.message, {
             ...(typeof update.messageId === "string" ? { id: update.messageId } : {}),
             ...(typeof messageSeq === "number" ? { seq: messageSeq } : {}),
           });
@@ -1808,7 +1808,7 @@ export async function startGatewayServer(
             const allEntries: Array<{ agentId: string; userId: string }> = [];
             for (const agentId of agentIds) {
               const userIds = (await cognitiveStore.listUserIds(agentId)).filter(
-                (id) => !id.startsWith("kaijibot-"),
+                (id) => !id.startsWith("allbot-"),
               );
               for (const userId of userIds) {
                 allEntries.push({ agentId, userId });
@@ -1829,15 +1829,15 @@ export async function startGatewayServer(
           personaChangeSource.onEvent(handleEventForAllUsers);
           infoScanSource.onEvent(handleEventForAllUsers);
           infoScanSource.start();
-          const schedulerIntervalMs = process.env.KAIJIBOT_COGNITIVE_TEST_INTERVAL_MS
-            ? Number(process.env.KAIJIBOT_COGNITIVE_TEST_INTERVAL_MS)
+          const schedulerIntervalMs = process.env.ALLBOT_COGNITIVE_TEST_INTERVAL_MS
+            ? Number(process.env.ALLBOT_COGNITIVE_TEST_INTERVAL_MS)
             : (cfgAtStart.cognitive?.proactive?.minIntervalHours ?? 0.5) * 3600_000;
           proactiveScheduler.start(async () => {
             const agentIds = await cognitiveStore.listAgentIds();
             const entries: Array<{ agentId: string; userId: string }> = [];
             for (const agentId of agentIds) {
               const userIds = (await cognitiveStore.listUserIds(agentId)).filter(
-                (id) => !id.startsWith("kaijibot-"),
+                (id) => !id.startsWith("allbot-"),
               );
               for (const userId of userIds) {
                 entries.push({ agentId, userId });
@@ -1902,7 +1902,7 @@ export async function startGatewayServer(
                 resolveSharedTaskDir: (task2) => {
                   const rootId = task2.parentTaskId ?? task2.id;
                   const ownerAgentId = task2.parentAgentId ?? task2.agentId;
-                  return `${resolveAgentWorkspaceDir(cfgAtStart, ownerAgentId)}/.kaijibot/tasks/${rootId}`;
+                  return `${resolveAgentWorkspaceDir(cfgAtStart, ownerAgentId)}/.allbot/tasks/${rootId}`;
                 },
               })(task);
             },
@@ -1991,8 +1991,8 @@ export async function startGatewayServer(
           };
           // Boot-time pass resumes tasks left running by a crash.
           void runTaskTickForAllUsers();
-          const taskTickMs = process.env.KAIJIBOT_TASK_TICK_MS
-            ? Number(process.env.KAIJIBOT_TASK_TICK_MS)
+          const taskTickMs = process.env.ALLBOT_TASK_TICK_MS
+            ? Number(process.env.ALLBOT_TASK_TICK_MS)
             : 60_000;
           const taskTicker = setInterval(() => void runTaskTickForAllUsers(), taskTickMs);
           taskTicker.unref?.();
@@ -2616,7 +2616,7 @@ export async function startGatewayServer(
           }
         }
       },
-      enforceSharedGatewayAuthGenerationForConfigWrite: (nextConfig: KaijiBotConfig) => {
+      enforceSharedGatewayAuthGenerationForConfigWrite: (nextConfig: AllBotConfig) => {
         enforceSharedGatewaySessionGenerationForConfigWrite(nextConfig);
       },
       nodeRegistry,

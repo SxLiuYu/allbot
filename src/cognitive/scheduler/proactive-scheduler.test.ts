@@ -3336,7 +3336,7 @@ describeDet("insight hallucination gates", () => {
     };
     const mockBotConfig = {
       cognitive: { persona: {} },
-    } as unknown as import("../../config/types.kaijibot.js").KaijiBotConfig;
+    } as unknown as import("../../config/types.allbot.js").AllBotConfig;
 
     const scheduler = new ProactiveScheduler(
       config,
@@ -3460,7 +3460,7 @@ describeDet("insight hallucination gates", () => {
     };
     const mockBotConfig = {
       cognitive: { persona: {} },
-    } as unknown as import("../../config/types.kaijibot.js").KaijiBotConfig;
+    } as unknown as import("../../config/types.allbot.js").AllBotConfig;
 
     const scheduler = new ProactiveScheduler(
       config,

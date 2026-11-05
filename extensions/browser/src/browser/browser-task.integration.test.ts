@@ -26,8 +26,8 @@ import { TaskRunner } from "../../../../src/cognitive/tasks/runner.js";
 import { createTaskSafely } from "../../../../src/cognitive/tasks/service.js";
 import { createProductionStepDriver } from "../../../../src/cognitive/tasks/step-driver.js";
 import { TaskStore } from "../../../../src/cognitive/tasks/store.js";
-import type { KaijiBotConfig } from "../../../../src/config/config.js";
-import { launchKaijiBotChrome, stopKaijiBotChrome, type RunningChrome } from "./chrome.js";
+import type { AllBotConfig } from "../../../../src/config/config.js";
+import { launchAllBotChrome, stopAllBotChrome, type RunningChrome } from "./chrome.js";
 import type { ResolvedBrowserConfig, ResolvedBrowserProfile } from "./config.js";
 
 function findChromiumExecutable(): string | null {
@@ -139,7 +139,7 @@ describe("browser-step task e2e (T7)", () => {
   });
 
   beforeEach(() => {
-    storeDir = mkdtempSync(path.join(os.tmpdir(), "kaijibot-t7-store-"));
+    storeDir = mkdtempSync(path.join(os.tmpdir(), "allbot-t7-store-"));
     store = new TaskStore(storeDir);
     enqueued = [];
     heartbeats = [];
@@ -148,7 +148,7 @@ describe("browser-step task e2e (T7)", () => {
 
   afterEach(async () => {
     if (running) {
-      await stopKaijiBotChrome(running);
+      await stopAllBotChrome(running);
       await waitForChromeExit(running.proc);
       running = undefined;
     }
@@ -156,10 +156,10 @@ describe("browser-step task e2e (T7)", () => {
     vi.restoreAllMocks();
   });
 
-  function config(): KaijiBotConfig {
+  function config(): AllBotConfig {
     return {
       cognitive: { enabled: true, tasks: { enabled: true } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
   }
 
   function makeRunner(): TaskRunner {
@@ -210,7 +210,7 @@ describe("browser-step task e2e (T7)", () => {
         noSandbox: true,
         attachOnly: false,
         proxyEnabled: true,
-        defaultProfile: "kaijibot",
+        defaultProfile: "allbot",
         profiles: {},
         extraArgs: [],
         executablePath: executablePath ?? undefined,
@@ -222,10 +222,10 @@ describe("browser-step task e2e (T7)", () => {
         cdpHost: "127.0.0.1",
         cdpIsLoopback: true,
         color: "#0066CC",
-        driver: "kaijibot",
+        driver: "allbot",
         attachOnly: false,
       };
-      running = await launchKaijiBotChrome(resolved, profile);
+      running = await launchAllBotChrome(resolved, profile);
 
       // Task creation through the service (flag on, healthy persona).
       const created = await createTaskSafely(

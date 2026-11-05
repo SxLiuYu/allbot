@@ -19,7 +19,7 @@ function readRepoFile(relativePath: string): string {
   return fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("talk silence timeout defaults", () => {
   it("keeps help text and docs aligned with the policy", async () => {
     const defaultsDescription = describeTalkSilenceTimeoutDefaults();
@@ -35,10 +35,10 @@ describe.skipIf(process.env.CI)("talk silence timeout defaults", () => {
   });
 
   it("matches the Apple and Android runtime constants", () => {
-    const macDefaults = readRepoFile("apps/macos/Sources/KaijiBot/TalkDefaults.swift");
+    const macDefaults = readRepoFile("apps/macos/Sources/AllBot/TalkDefaults.swift");
     const iosDefaults = readRepoFile("apps/ios/Sources/Voice/TalkDefaults.swift");
     const androidDefaults = readRepoFile(
-      "apps/android/app/src/main/java/ai/kaijibot/app/voice/TalkDefaults.kt",
+      "apps/android/app/src/main/java/ai/allbot/app/voice/TalkDefaults.kt",
     );
 
     expect(macDefaults).toContain(

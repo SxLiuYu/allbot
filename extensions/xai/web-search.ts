@@ -17,7 +17,7 @@ import {
   type WebSearchProviderSetupContext,
   type WebSearchProviderPlugin,
   writeCache,
-} from "kaijibot/plugin-sdk/provider-web-search";
+} from "allbot/plugin-sdk/provider-web-search";
 import { Type } from "typebox";
 import {
   buildXaiWebSearchPayload,
@@ -68,7 +68,7 @@ async function runXaiSearchProviderSetup(
     [
       "x_search lets your agent search X (formerly Twitter) posts via xAI.",
       "It reuses the same xAI API key you just configured for Grok web search.",
-      `You can change this later with ${formatCliCommand("kaijibot configure --section web")}.`,
+      `You can change this later with ${formatCliCommand("allbot configure --section web")}.`,
     ].join("\n"),
     "X search",
   );

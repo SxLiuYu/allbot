@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { runHeartbeatOnce, type HeartbeatDeps } from "./heartbeat-runner.js";
 import { installHeartbeatRunnerTestRuntime } from "./heartbeat-runner.test-harness.js";
 import {
@@ -22,7 +22,7 @@ describe("runHeartbeatOnce ack handling", () => {
     heartbeat: Record<string, unknown>;
     channels: Record<string, unknown>;
     messages?: Record<string, unknown>;
-  }): KaijiBotConfig {
+  }): AllBotConfig {
     return {
       agents: {
         defaults: {
@@ -122,7 +122,7 @@ describe("runHeartbeatOnce ack handling", () => {
     storePath: string;
     heartbeat?: Record<string, unknown>;
     visibility?: Record<string, unknown>;
-  }): KaijiBotConfig {
+  }): AllBotConfig {
     return createHeartbeatConfig({
       tmpDir: params.tmpDir,
       storePath: params.storePath,
@@ -145,7 +145,7 @@ describe("runHeartbeatOnce ack handling", () => {
     storePath: string;
     heartbeat?: Record<string, unknown>;
     visibility?: Record<string, unknown>;
-  }): Promise<KaijiBotConfig> {
+  }): Promise<AllBotConfig> {
     const cfg = createWhatsAppHeartbeatConfig(params);
     await seedMainSessionStore(params.storePath, cfg, {
       lastChannel: "whatsapp",
@@ -222,8 +222,8 @@ describe("runHeartbeatOnce ack handling", () => {
     },
     {
       title: "strips responsePrefix before HEARTBEAT_OK detection and suppresses short ack text",
-      replyText: "[kaijibot] HEARTBEAT_OK all good",
-      messages: { responsePrefix: "[kaijibot]" },
+      replyText: "[allbot] HEARTBEAT_OK all good",
+      messages: { responsePrefix: "[allbot]" },
       expectedCalls: 0,
     },
     {

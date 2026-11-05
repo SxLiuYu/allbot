@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import {
   resolveChannelContextVisibilityMode,
   resolveDefaultContextVisibility,
@@ -45,7 +45,7 @@ describe("resolveChannelContextVisibilityMode", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     expect(
       resolveChannelContextVisibilityMode({
         cfg,
@@ -66,7 +66,7 @@ describe("resolveChannelContextVisibilityMode", () => {
           channels: {
             defaults: { contextVisibility: "allowlist_quote" },
           },
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "signal",
       }),
     ).toBe("allowlist_quote");

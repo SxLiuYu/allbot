@@ -125,8 +125,8 @@ type HomeEnvSnapshot = {
   USERPROFILE: string | undefined;
   HOMEDRIVE: string | undefined;
   HOMEPATH: string | undefined;
-  KAIJIBOT_STATE_DIR: string | undefined;
-  KAIJIBOT_AGENT_DIR: string | undefined;
+  ALLBOT_STATE_DIR: string | undefined;
+  ALLBOT_AGENT_DIR: string | undefined;
   PI_CODING_AGENT_DIR: string | undefined;
 };
 
@@ -136,8 +136,8 @@ function snapshotHomeEnv(): HomeEnvSnapshot {
     USERPROFILE: process.env.USERPROFILE,
     HOMEDRIVE: process.env.HOMEDRIVE,
     HOMEPATH: process.env.HOMEPATH,
-    KAIJIBOT_STATE_DIR: process.env.KAIJIBOT_STATE_DIR,
-    KAIJIBOT_AGENT_DIR: process.env.KAIJIBOT_AGENT_DIR,
+    ALLBOT_STATE_DIR: process.env.ALLBOT_STATE_DIR,
+    ALLBOT_AGENT_DIR: process.env.ALLBOT_AGENT_DIR,
     PI_CODING_AGENT_DIR: process.env.PI_CODING_AGENT_DIR,
   };
 }
@@ -169,13 +169,13 @@ export function createTempHomeHarness(options: { prefix: string; beforeEachCase?
 
   async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
     const home = path.join(fixtureRoot, `case-${++caseId}`);
-    await fs.mkdir(path.join(home, ".kaijibot", "agents", "main", "sessions"), { recursive: true });
+    await fs.mkdir(path.join(home, ".allbot", "agents", "main", "sessions"), { recursive: true });
     const envSnapshot = snapshotHomeEnv();
     process.env.HOME = home;
     process.env.USERPROFILE = home;
-    process.env.KAIJIBOT_STATE_DIR = path.join(home, ".kaijibot");
-    process.env.KAIJIBOT_AGENT_DIR = path.join(home, ".kaijibot", "agent");
-    process.env.PI_CODING_AGENT_DIR = path.join(home, ".kaijibot", "agent");
+    process.env.ALLBOT_STATE_DIR = path.join(home, ".allbot");
+    process.env.ALLBOT_AGENT_DIR = path.join(home, ".allbot", "agent");
+    process.env.PI_CODING_AGENT_DIR = path.join(home, ".allbot", "agent");
 
     if (process.platform === "win32") {
       const match = home.match(/^([A-Za-z]:)(.*)$/);
@@ -201,7 +201,7 @@ export function makeReplyConfig(home: string) {
     agents: {
       defaults: {
         model: "anthropic/claude-opus-4-6",
-        workspace: path.join(home, "kaijibot"),
+        workspace: path.join(home, "allbot"),
       },
     },
     channels: {

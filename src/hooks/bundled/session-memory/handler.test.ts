@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { writeWorkspaceFile } from "../../../test-helpers/workspace.js";
 import { createHookEvent } from "../../hooks.js";
 import {
@@ -30,7 +30,7 @@ async function createCaseWorkspace(prefix = "case"): Promise<string> {
 
 beforeAll(async () => {
   ({ default: handler, isCorrectionExtractionEnabled } = await import("./handler.js"));
-  suiteWorkspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-session-memory-"));
+  suiteWorkspaceRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-session-memory-"));
 });
 
 afterAll(async () => {
@@ -68,7 +68,7 @@ function createMockSessionContent(
 async function runNewWithPreviousSessionEntry(params: {
   tempDir: string;
   previousSessionEntry: { sessionId: string; sessionFile?: string };
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   action?: "new" | "reset";
   sessionKey?: string;
   workspaceDirOverride?: string;
@@ -82,7 +82,7 @@ async function runNewWithPreviousSessionEntry(params: {
         params.cfg ??
         ({
           agents: { defaults: { workspace: params.tempDir } },
-        } satisfies KaijiBotConfig),
+        } satisfies AllBotConfig),
       previousSessionEntry: params.previousSessionEntry,
       ...(params.workspaceDirOverride ? { workspaceDir: params.workspaceDirOverride } : {}),
     },
@@ -99,7 +99,7 @@ async function runNewWithPreviousSessionEntry(params: {
 
 async function runNewWithPreviousSession(params: {
   sessionContent: string;
-  cfg?: (tempDir: string) => KaijiBotConfig;
+  cfg?: (tempDir: string) => AllBotConfig;
   action?: "new" | "reset";
 }): Promise<{ tempDir: string; files: string[]; memoryContent: string }> {
   const tempDir = await createCaseWorkspace("workspace");
@@ -116,7 +116,7 @@ async function runNewWithPreviousSession(params: {
     params.cfg?.(tempDir) ??
     ({
       agents: { defaults: { workspace: tempDir } },
-    } satisfies KaijiBotConfig);
+    } satisfies AllBotConfig);
 
   const { files, memoryContent } = await runNewWithPreviousSessionEntry({
     tempDir,
@@ -270,7 +270,7 @@ describe("session-memory hook", () => {
           defaults: { workspace: mainWorkspace },
           list: [{ id: "navi", workspace: naviWorkspace }],
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       sessionKey: "agent:main:main",
       workspaceDirOverride: naviWorkspace,
       previousSessionEntry: {
@@ -552,11 +552,11 @@ describe("isCorrectionExtractionEnabled", () => {
   });
 
   it("stays enabled with empty cognitive config", () => {
-    expect(isCorrectionExtractionEnabled({ cognitive: {} } as KaijiBotConfig)).toBe(true);
+    expect(isCorrectionExtractionEnabled({ cognitive: {} } as AllBotConfig)).toBe(true);
   });
 
   it("returns false when cognitive.enabled is false", () => {
-    expect(isCorrectionExtractionEnabled({ cognitive: { enabled: false } } as KaijiBotConfig)).toBe(
+    expect(isCorrectionExtractionEnabled({ cognitive: { enabled: false } } as AllBotConfig)).toBe(
       false,
     );
   });
@@ -565,7 +565,7 @@ describe("isCorrectionExtractionEnabled", () => {
     expect(
       isCorrectionExtractionEnabled({
         cognitive: { correction: { enabled: false } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
     ).toBe(false);
   });
 });

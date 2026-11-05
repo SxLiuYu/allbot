@@ -3,8 +3,8 @@ import {
   buildCanonicalSentMessageHookContext,
   toPluginMessageContext,
   toPluginMessageSentEvent,
-} from "kaijibot/plugin-sdk/hook-runtime";
-import { getGlobalHookRunner } from "kaijibot/plugin-sdk/plugin-runtime";
+} from "allbot/plugin-sdk/hook-runtime";
+import { getGlobalHookRunner } from "allbot/plugin-sdk/plugin-runtime";
 import { logger } from "../util/logger.js";
 
 const CHANNEL_ID = "wechat";

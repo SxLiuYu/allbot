@@ -16,7 +16,7 @@ const ChannelModelByChannelSchema = z
   .optional();
 
 let directChannelRuntimeSchemasCache: ReadonlyMap<string, ChannelConfigRuntimeSchema> | undefined;
-const KAIJIBOT_PACKAGE_ROOT =
+const ALLBOT_PACKAGE_ROOT =
   resolveLoaderPackageRoot({
     modulePath: fileURLToPath(import.meta.url),
     moduleUrl: import.meta.url,
@@ -48,7 +48,7 @@ function getDirectChannelRuntimeSchema(channelId: string): ChannelConfigRuntimeS
       continue;
     }
     const collectedChannelConfigs = collectBundledChannelConfigs({
-      pluginDir: path.resolve(KAIJIBOT_PACKAGE_ROOT, "extensions", entry.dirName),
+      pluginDir: path.resolve(ALLBOT_PACKAGE_ROOT, "extensions", entry.dirName),
       manifest: entry.manifest,
       ...(entry.packageManifest ? { packageManifest: entry.packageManifest } : {}),
     });

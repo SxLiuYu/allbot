@@ -3,14 +3,14 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveAgentWorkspaceDir } from "../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveMemoryBackendConfig } from "./backend-config.js";
 import { isQmdScopeAllowed } from "./qmd-scope.js";
 
 const resolveComparablePath = (value: string, workspaceDir = "/workspace/root"): string =>
   path.isAbsolute(value) ? path.resolve(value) : path.resolve(workspaceDir, value);
 
-function resolveCollectionNamesForAgent(cfg: KaijiBotConfig, agentId: string): Set<string> {
+function resolveCollectionNamesForAgent(cfg: AllBotConfig, agentId: string): Set<string> {
   return new Set(
     (resolveMemoryBackendConfig({ cfg, agentId }).qmd?.collections ?? []).map(
       (collection) => collection.name,
@@ -18,7 +18,7 @@ function resolveCollectionNamesForAgent(cfg: KaijiBotConfig, agentId: string): S
   );
 }
 
-function resolveCustomCollectionPathsForAgent(cfg: KaijiBotConfig, agentId: string): string[] {
+function resolveCustomCollectionPathsForAgent(cfg: AllBotConfig, agentId: string): string[] {
   return (resolveMemoryBackendConfig({ cfg, agentId }).qmd?.collections ?? [])
     .filter((collection) => collection.kind === "custom")
     .map((collection) => collection.path);
@@ -26,7 +26,7 @@ function resolveCustomCollectionPathsForAgent(cfg: KaijiBotConfig, agentId: stri
 
 describe("resolveMemoryBackendConfig", () => {
   it("defaults to builtin backend when config missing", () => {
-    const cfg = { agents: { defaults: { workspace: "/tmp/memory-test" } } } as KaijiBotConfig;
+    const cfg = { agents: { defaults: { workspace: "/tmp/memory-test" } } } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.backend).toBe("builtin");
     expect(resolved.citations).toBe("auto");
@@ -40,7 +40,7 @@ describe("resolveMemoryBackendConfig", () => {
         backend: "qmd",
         qmd: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.backend).toBe("qmd");
     expect(resolved.qmd?.collections.length).toBe(2);
@@ -63,7 +63,7 @@ describe("resolveMemoryBackendConfig", () => {
         backend: "qmd",
         qmd: {},
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
 
     expect(isQmdScopeAllowed(resolved.qmd?.scope, "agent:main:discord:direct:user-123")).toBe(true);
@@ -84,7 +84,7 @@ describe("resolveMemoryBackendConfig", () => {
           command: '"/Applications/QMD Tools/qmd" --flag',
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.qmd?.command).toBe("/Applications/QMD Tools/qmd");
   });
@@ -98,7 +98,7 @@ describe("resolveMemoryBackendConfig", () => {
           command: "/opt/homebrew/bin/qmd",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.qmd?.command).toBe("/opt/homebrew/bin/qmd");
   });
@@ -121,7 +121,7 @@ describe("resolveMemoryBackendConfig", () => {
           ],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     const custom = resolved.qmd?.collections.find((c) => c.name.startsWith("custom-notes"));
     expect(custom).toBeDefined();
@@ -145,7 +145,7 @@ describe("resolveMemoryBackendConfig", () => {
           paths: [{ path: "notes", name: "workspace", pattern: "**/*.md" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const mainNames = resolveCollectionNamesForAgent(cfg, "main");
     const devNames = resolveCollectionNamesForAgent(cfg, "dev");
     expect(mainNames.has("memory-dir-main")).toBe(true);
@@ -196,7 +196,7 @@ describe("resolveMemoryBackendConfig", () => {
           includeDefaultMemory: false,
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const names = resolveCollectionNamesForAgent(cfg, "main");
     expect(names.has("team-notes")).toBe(true);
     expect(names.has("notes-main")).toBe(true);
@@ -218,7 +218,7 @@ describe("resolveMemoryBackendConfig", () => {
           paths: [{ path: "/shared/notion-mirror", name: "notion-mirror", pattern: "**/*.md" }],
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const mainNames = resolveCollectionNamesForAgent(cfg, "main");
     const devNames = resolveCollectionNamesForAgent(cfg, "dev");
     expect(mainNames.has("memory-dir-main")).toBe(true);
@@ -246,7 +246,7 @@ describe("resolveMemoryBackendConfig", () => {
             paths: [{ path: workspaceAliasDir, name: "workspace", pattern: "**/*.md" }],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
       const names = resolveCollectionNamesForAgent(cfg, "main");
       expect(names.has("workspace-main")).toBe(true);
       expect(names.has("workspace")).toBe(false);
@@ -278,7 +278,7 @@ describe("resolveMemoryBackendConfig", () => {
             ],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
       const names = resolveCollectionNamesForAgent(cfg, "main");
       expect(names.has("notes-main")).toBe(true);
       expect(names.has("notes")).toBe(false);
@@ -301,7 +301,7 @@ describe("resolveMemoryBackendConfig", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.qmd?.update.waitForBootSync).toBe(true);
     expect(resolved.qmd?.update.commandTimeoutMs).toBe(12_000);
@@ -318,7 +318,7 @@ describe("resolveMemoryBackendConfig", () => {
           searchMode: "vsearch",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.qmd?.searchMode).toBe("vsearch");
   });
@@ -333,7 +333,7 @@ describe("resolveMemoryBackendConfig", () => {
           searchTool: " hybrid_search ",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const resolved = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     expect(resolved.qmd?.searchMode).toBe("query");
     expect(resolved.qmd?.searchTool).toBe("hybrid_search");
@@ -352,7 +352,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = resolveMemoryBackendConfig({ cfg, agentId: "test-agent" });
     expect(result.backend).toBe("qmd");
     const customCollections = (result.qmd?.collections ?? []).filter(
@@ -386,7 +386,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = resolveMemoryBackendConfig({ cfg, agentId: "my-agent" });
     expect(result.backend).toBe("qmd");
     const paths = resolveCustomCollectionPathsForAgent(cfg, "my-agent");
@@ -413,7 +413,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = resolveMemoryBackendConfig({ cfg, agentId: "my-agent" });
     expect(result.backend).toBe("qmd");
     const paths = resolveCustomCollectionPathsForAgent(cfg, "my-agent");
@@ -439,7 +439,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const paths = resolveCustomCollectionPathsForAgent(cfg, "my-agent");
 
@@ -460,7 +460,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = resolveMemoryBackendConfig({ cfg, agentId: "my-agent" });
     const customCollections = (result.qmd?.collections ?? []).filter(
       (collection) => collection.kind === "custom",
@@ -484,7 +484,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const result = resolveMemoryBackendConfig({ cfg, agentId: "my-agent" });
     const customCollections = (result.qmd?.collections ?? []).filter(
@@ -512,7 +512,7 @@ describe("memorySearch.extraPaths integration", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const result = resolveMemoryBackendConfig({ cfg, agentId: "main" });
     const customCollections = (result.qmd?.collections ?? []).filter(

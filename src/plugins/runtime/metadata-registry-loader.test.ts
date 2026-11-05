@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const loadConfigMock = vi.fn();
 const applyPluginAutoEnableMock = vi.fn();
-const loadKaijiBotPluginsMock = vi.fn();
+const loadAllBotPluginsMock = vi.fn();
 
 let loadPluginMetadataRegistrySnapshot: typeof import("./metadata-registry-loader.js").loadPluginMetadataRegistrySnapshot;
 
@@ -15,7 +15,7 @@ vi.mock("../../config/plugin-auto-enable.js", () => ({
 }));
 
 vi.mock("../loader.js", () => ({
-  loadKaijiBotPlugins: (...args: unknown[]) => loadKaijiBotPluginsMock(...args),
+  loadAllBotPlugins: (...args: unknown[]) => loadAllBotPluginsMock(...args),
 }));
 
 vi.mock("../../agents/agent-scope.js", () => ({
@@ -31,31 +31,31 @@ describe("loadPluginMetadataRegistrySnapshot", () => {
   beforeEach(() => {
     loadConfigMock.mockReset();
     applyPluginAutoEnableMock.mockReset();
-    loadKaijiBotPluginsMock.mockReset();
+    loadAllBotPluginsMock.mockReset();
     loadConfigMock.mockReturnValue({ plugins: {} });
     applyPluginAutoEnableMock.mockImplementation((params: { config: unknown }) => ({
       config: params.config,
       changes: [],
       autoEnabledReasons: {},
     }));
-    loadKaijiBotPluginsMock.mockReturnValue({ plugins: [], diagnostics: [] });
+    loadAllBotPluginsMock.mockReturnValue({ plugins: [], diagnostics: [] });
   });
 
   it("defaults to a non-activating validate snapshot", () => {
     loadPluginMetadataRegistrySnapshot({
       config: { plugins: {} },
       activationSourceConfig: { plugins: { allow: ["demo"] } },
-      env: { HOME: "/tmp/kaijibot-home" } as NodeJS.ProcessEnv,
+      env: { HOME: "/tmp/allbot-home" } as NodeJS.ProcessEnv,
       workspaceDir: "/workspace",
       onlyPluginIds: ["demo"],
     });
 
-    expect(loadKaijiBotPluginsMock).toHaveBeenCalledWith(
+    expect(loadAllBotPluginsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         config: { plugins: {} },
         activationSourceConfig: { plugins: { allow: ["demo"] } },
         workspaceDir: "/workspace",
-        env: { HOME: "/tmp/kaijibot-home" },
+        env: { HOME: "/tmp/allbot-home" },
         onlyPluginIds: ["demo"],
         cache: false,
         activate: false,
@@ -71,7 +71,7 @@ describe("loadPluginMetadataRegistrySnapshot", () => {
       loadModules: false,
     });
 
-    expect(loadKaijiBotPluginsMock).toHaveBeenCalledWith(
+    expect(loadAllBotPluginsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         loadModules: false,
         mode: "validate",

@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { afterEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import {
   generateInsightCandidatesLLM,
@@ -97,8 +97,8 @@ const validResponse = JSON.stringify([
   },
 ]);
 
-function makeConfig(): KaijiBotConfig {
-  return { cognitive: { insight: {} } } as KaijiBotConfig;
+function makeConfig(): AllBotConfig {
+  return { cognitive: { insight: {} } } as AllBotConfig;
 }
 
 const tempDirs: string[] = [];
@@ -108,7 +108,7 @@ afterEach(async () => {
 });
 
 async function tempDir(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-insight-ctx-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-insight-ctx-"));
   tempDirs.push(dir);
   return dir;
 }

@@ -1,5 +1,5 @@
 import { normalizeChatChannelId } from "../../../channels/ids.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { readChannelAllowFromStore } from "../../../pairing/pairing-store.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../../../routing/session-key.js";
 import { normalizeOptionalLowercaseString } from "../../../shared/string-coerce.js";
@@ -8,8 +8,8 @@ import { resolveAllowFromMode, type AllowFromMode } from "./allow-from-mode.js";
 import { hasAllowFromEntries } from "./allowlist.js";
 import { asObjectRecord } from "./object.js";
 
-export async function maybeRepairAllowlistPolicyAllowFrom(cfg: KaijiBotConfig): Promise<{
-  config: KaijiBotConfig;
+export async function maybeRepairAllowlistPolicyAllowFrom(cfg: AllBotConfig): Promise<{
+  config: AllBotConfig;
   changes: string[];
 }> {
   const channels = cfg.channels;

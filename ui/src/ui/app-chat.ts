@@ -1,7 +1,7 @@
 import { scheduleChatScroll, resetChatScroll } from "./app-scroll.ts";
 import { setLastActiveSessionKey } from "./app-settings.ts";
 import { resetToolStream } from "./app-tool-stream.ts";
-import type { KaijiBotApp } from "./app.ts";
+import type { AllBotApp } from "./app.ts";
 import { executeSlashCommand } from "./chat/slash-command-executor.ts";
 import { parseSlashCommand } from "./chat/slash-commands.ts";
 import { abortChatRun, loadChatHistory, sendChatMessage } from "./controllers/chat.ts";
@@ -85,7 +85,7 @@ export async function handleAbortChat(host: ChatHost) {
     return;
   }
   host.chatMessage = "";
-  await abortChatRun(host as unknown as KaijiBotApp);
+  await abortChatRun(host as unknown as AllBotApp);
 }
 
 function enqueueChatMessage(
@@ -145,7 +145,7 @@ async function sendChatMessageNow(
   resetToolStream(host as unknown as Parameters<typeof resetToolStream>[0]);
   // Reset scroll state before sending to ensure auto-scroll works for the response
   resetChatScroll(host as unknown as Parameters<typeof resetChatScroll>[0]);
-  const runId = await sendChatMessage(host as unknown as KaijiBotApp, message, opts?.attachments);
+  const runId = await sendChatMessage(host as unknown as AllBotApp, message, opts?.attachments);
   const ok = Boolean(runId);
   if (!ok && opts?.previousDraft != null) {
     host.chatMessage = opts.previousDraft;
@@ -378,7 +378,7 @@ async function clearChatHistory(host: ChatHost) {
     host.chatMessages = [];
     host.chatStream = null;
     host.chatRunId = null;
-    await loadChatHistory(host as unknown as KaijiBotApp);
+    await loadChatHistory(host as unknown as AllBotApp);
   } catch (err) {
     host.lastError = String(err);
   }
@@ -398,8 +398,8 @@ function injectCommandResult(host: ChatHost, content: string) {
 
 export async function refreshChat(host: ChatHost, opts?: { scheduleScroll?: boolean }) {
   await Promise.all([
-    loadChatHistory(host as unknown as KaijiBotApp),
-    loadSessions(host as unknown as KaijiBotApp, {
+    loadChatHistory(host as unknown as AllBotApp),
+    loadSessions(host as unknown as AllBotApp, {
       activeMinutes: 0,
       limit: 0,
       includeGlobal: true,

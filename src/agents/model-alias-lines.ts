@@ -1,7 +1,7 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 
-export function buildModelAliasLines(cfg?: KaijiBotConfig) {
+export function buildModelAliasLines(cfg?: AllBotConfig) {
   const models = cfg?.agents?.defaults?.models ?? {};
   const entries: Array<{ alias: string; model: string }> = [];
   for (const [keyRaw, entryRaw] of Object.entries(models)) {

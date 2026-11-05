@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   resolveAllowlistProviderRuntimeGroupPolicy,
   resolveDefaultGroupPolicy,
@@ -9,9 +9,9 @@ import type { GroupPolicy } from "../../config/types.base.js";
 type GroupPolicyWarningCollector = (groupPolicy: GroupPolicy) => string[];
 type AccountGroupPolicyWarningCollector<ResolvedAccount> = (params: {
   account: ResolvedAccount;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }) => string[];
-type ConfigGroupPolicyWarningCollector<Params extends { cfg: KaijiBotConfig }> = (
+type ConfigGroupPolicyWarningCollector<Params extends { cfg: AllBotConfig }> = (
   params: Params,
 ) => string[];
 type WarningCollector<Params> = (params: Params) => string[];
@@ -29,16 +29,16 @@ export function projectWarningCollector<Params, Projected>(
   return (params) => collector(project(params));
 }
 
-export function projectConfigWarningCollector<Params extends { cfg: KaijiBotConfig }>(
-  collector: WarningCollector<{ cfg: KaijiBotConfig }>,
+export function projectConfigWarningCollector<Params extends { cfg: AllBotConfig }>(
+  collector: WarningCollector<{ cfg: AllBotConfig }>,
 ): WarningCollector<Params> {
   return projectWarningCollector((params) => ({ cfg: params.cfg }), collector);
 }
 
 export function projectConfigAccountIdWarningCollector<
-  Params extends { cfg: KaijiBotConfig; accountId?: string | null },
+  Params extends { cfg: AllBotConfig; accountId?: string | null },
 >(
-  collector: WarningCollector<{ cfg: KaijiBotConfig; accountId?: string | null }>,
+  collector: WarningCollector<{ cfg: AllBotConfig; accountId?: string | null }>,
 ): WarningCollector<Params> {
   return projectWarningCollector(
     (params) => ({ cfg: params.cfg, accountId: params.accountId }),
@@ -56,9 +56,9 @@ export function projectAccountWarningCollector<
 export function projectAccountConfigWarningCollector<
   ResolvedAccount,
   ProjectedCfg,
-  Params extends { account: ResolvedAccount; cfg: KaijiBotConfig },
+  Params extends { account: ResolvedAccount; cfg: AllBotConfig },
 >(
-  projectCfg: (cfg: KaijiBotConfig) => ProjectedCfg,
+  projectCfg: (cfg: AllBotConfig) => ProjectedCfg,
   collector: WarningCollector<{ account: ResolvedAccount; cfg: ProjectedCfg }>,
 ): WarningCollector<Params> {
   return projectWarningCollector(
@@ -166,7 +166,7 @@ export function collectOpenGroupPolicyRestrictSendersWarnings(
 
 export function collectAllowlistProviderRestrictSendersWarnings(
   params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     providerConfigPresent: boolean;
     configuredGroupPolicy?: GroupPolicy | null;
   } & Omit<Parameters<typeof collectOpenGroupPolicyRestrictSendersWarnings>[0], "groupPolicy">,
@@ -190,7 +190,7 @@ export function collectAllowlistProviderRestrictSendersWarnings(
 /** Build an account-aware allowlist-provider warning collector for sender-restricted groups. */
 export function createAllowlistProviderRestrictSendersWarningCollector<ResolvedAccount>(
   params: {
-    providerConfigPresent: (cfg: KaijiBotConfig) => boolean;
+    providerConfigPresent: (cfg: AllBotConfig) => boolean;
     resolveGroupPolicy: (account: ResolvedAccount) => GroupPolicy | null | undefined;
   } & Omit<
     Parameters<typeof collectAllowlistProviderRestrictSendersWarnings>[0],
@@ -199,7 +199,7 @@ export function createAllowlistProviderRestrictSendersWarningCollector<ResolvedA
 ): AccountGroupPolicyWarningCollector<ResolvedAccount> {
   return createAllowlistProviderGroupPolicyWarningCollector({
     providerConfigPresent: params.providerConfigPresent,
-    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: KaijiBotConfig }) =>
+    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: AllBotConfig }) =>
       params.resolveGroupPolicy(account),
     collect: ({ groupPolicy }) =>
       collectOpenGroupPolicyRestrictSendersWarnings({
@@ -232,7 +232,7 @@ export function createOpenGroupPolicyRestrictSendersWarningCollector<ResolvedAcc
 }
 
 export function collectAllowlistProviderGroupPolicyWarnings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerConfigPresent: boolean;
   configuredGroupPolicy?: GroupPolicy | null;
   collect: GroupPolicyWarningCollector;
@@ -248,9 +248,9 @@ export function collectAllowlistProviderGroupPolicyWarnings(params: {
 
 /** Build a config-aware allowlist-provider warning collector from an arbitrary policy resolver. */
 export function createAllowlistProviderGroupPolicyWarningCollector<
-  Params extends { cfg: KaijiBotConfig },
+  Params extends { cfg: AllBotConfig },
 >(params: {
-  providerConfigPresent: (cfg: KaijiBotConfig) => boolean;
+  providerConfigPresent: (cfg: AllBotConfig) => boolean;
   resolveGroupPolicy: (params: Params) => GroupPolicy | null | undefined;
   collect: (params: Params & { groupPolicy: GroupPolicy }) => string[];
 }): ConfigGroupPolicyWarningCollector<Params> {
@@ -264,7 +264,7 @@ export function createAllowlistProviderGroupPolicyWarningCollector<
 }
 
 export function collectOpenProviderGroupPolicyWarnings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerConfigPresent: boolean;
   configuredGroupPolicy?: GroupPolicy | null;
   collect: GroupPolicyWarningCollector;
@@ -280,9 +280,9 @@ export function collectOpenProviderGroupPolicyWarnings(params: {
 
 /** Build a config-aware open-provider warning collector from an arbitrary policy resolver. */
 export function createOpenProviderGroupPolicyWarningCollector<
-  Params extends { cfg: KaijiBotConfig },
+  Params extends { cfg: AllBotConfig },
 >(params: {
-  providerConfigPresent: (cfg: KaijiBotConfig) => boolean;
+  providerConfigPresent: (cfg: AllBotConfig) => boolean;
   resolveGroupPolicy: (params: Params) => GroupPolicy | null | undefined;
   collect: (params: Params & { groupPolicy: GroupPolicy }) => string[];
 }): ConfigGroupPolicyWarningCollector<Params> {
@@ -297,13 +297,13 @@ export function createOpenProviderGroupPolicyWarningCollector<
 
 /** Build an account-aware allowlist-provider warning collector for simple open-policy warnings. */
 export function createAllowlistProviderOpenWarningCollector<ResolvedAccount>(params: {
-  providerConfigPresent: (cfg: KaijiBotConfig) => boolean;
+  providerConfigPresent: (cfg: AllBotConfig) => boolean;
   resolveGroupPolicy: (account: ResolvedAccount) => GroupPolicy | null | undefined;
   buildOpenWarning: Parameters<typeof buildOpenGroupPolicyWarning>[0];
 }): AccountGroupPolicyWarningCollector<ResolvedAccount> {
   return createAllowlistProviderGroupPolicyWarningCollector({
     providerConfigPresent: params.providerConfigPresent,
-    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: KaijiBotConfig }) =>
+    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: AllBotConfig }) =>
       params.resolveGroupPolicy(account),
     collect: ({ groupPolicy }) =>
       groupPolicy === "open" ? [buildOpenGroupPolicyWarning(params.buildOpenWarning)] : [],
@@ -327,7 +327,7 @@ export function collectOpenGroupPolicyRouteAllowlistWarnings(params: {
 
 /** Build an account-aware allowlist-provider warning collector for route-allowlisted groups. */
 export function createAllowlistProviderRouteAllowlistWarningCollector<ResolvedAccount>(params: {
-  providerConfigPresent: (cfg: KaijiBotConfig) => boolean;
+  providerConfigPresent: (cfg: AllBotConfig) => boolean;
   resolveGroupPolicy: (account: ResolvedAccount) => GroupPolicy | null | undefined;
   resolveRouteAllowlistConfigured: (account: ResolvedAccount) => boolean;
   restrictSenders: Parameters<typeof buildOpenGroupPolicyRestrictSendersWarning>[0];
@@ -335,7 +335,7 @@ export function createAllowlistProviderRouteAllowlistWarningCollector<ResolvedAc
 }): AccountGroupPolicyWarningCollector<ResolvedAccount> {
   return createAllowlistProviderGroupPolicyWarningCollector({
     providerConfigPresent: params.providerConfigPresent,
-    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: KaijiBotConfig }) =>
+    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: AllBotConfig }) =>
       params.resolveGroupPolicy(account),
     collect: ({ account, groupPolicy }) =>
       collectOpenGroupPolicyRouteAllowlistWarnings({
@@ -364,7 +364,7 @@ export function collectOpenGroupPolicyConfiguredRouteWarnings(params: {
 
 /** Build an account-aware open-provider warning collector for configured-route channels. */
 export function createOpenProviderConfiguredRouteWarningCollector<ResolvedAccount>(params: {
-  providerConfigPresent: (cfg: KaijiBotConfig) => boolean;
+  providerConfigPresent: (cfg: AllBotConfig) => boolean;
   resolveGroupPolicy: (account: ResolvedAccount) => GroupPolicy | null | undefined;
   resolveRouteAllowlistConfigured: (account: ResolvedAccount) => boolean;
   configureRouteAllowlist: Parameters<typeof buildOpenGroupPolicyConfigureRouteAllowlistWarning>[0];
@@ -372,7 +372,7 @@ export function createOpenProviderConfiguredRouteWarningCollector<ResolvedAccoun
 }): AccountGroupPolicyWarningCollector<ResolvedAccount> {
   return createOpenProviderGroupPolicyWarningCollector({
     providerConfigPresent: params.providerConfigPresent,
-    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: KaijiBotConfig }) =>
+    resolveGroupPolicy: ({ account }: { account: ResolvedAccount; cfg: AllBotConfig }) =>
       params.resolveGroupPolicy(account),
     collect: ({ account, groupPolicy }) =>
       collectOpenGroupPolicyConfiguredRouteWarnings({

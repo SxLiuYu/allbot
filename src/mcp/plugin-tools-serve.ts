@@ -1,5 +1,5 @@
 /**
- * Standalone MCP server that exposes KaijiBot plugin-registered tools
+ * Standalone MCP server that exposes AllBot plugin-registered tools
  * (e.g. memory-lancedb's memory_recall, memory_store, memory_forget)
  * so ACP sessions running Claude Code can use them.
  *
@@ -11,7 +11,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import type { AnyAgentTool } from "../agents/tools/common.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { loadConfig } from "../config/config.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { routeLogsToStderr } from "../logging/console.js";
@@ -27,7 +27,7 @@ function resolveJsonSchemaForTool(tool: AnyAgentTool): Record<string, unknown> {
   return { type: "object", properties: {} };
 }
 
-function resolveTools(config: KaijiBotConfig): AnyAgentTool[] {
+function resolveTools(config: AllBotConfig): AnyAgentTool[] {
   return resolvePluginTools({
     context: { config },
     suppressNameConflicts: true,
@@ -36,7 +36,7 @@ function resolveTools(config: KaijiBotConfig): AnyAgentTool[] {
 
 export function createPluginToolsMcpServer(
   params: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     tools?: AnyAgentTool[];
   } = {},
 ): Server {
@@ -49,7 +49,7 @@ export function createPluginToolsMcpServer(
   }
 
   const server = new Server(
-    { name: "kaijibot-plugin-tools", version: VERSION },
+    { name: "allbot-plugin-tools", version: VERSION },
     { capabilities: { tools: {} } },
   );
 

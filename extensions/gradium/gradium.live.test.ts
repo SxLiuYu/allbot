@@ -1,8 +1,8 @@
 import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { registerProviderPlugin } from "kaijibot/plugin-sdk/plugin-test-runtime";
-import { isLiveTestEnabled } from "kaijibot/plugin-sdk/test-env";
+import { registerProviderPlugin } from "allbot/plugin-sdk/plugin-test-runtime";
+import { isLiveTestEnabled } from "allbot/plugin-sdk/test-env";
 import { describe, expect, it } from "vitest";
 import plugin from "./index.js";
 

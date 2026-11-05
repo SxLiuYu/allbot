@@ -3,7 +3,7 @@
  *
  * Tests the full surprise-mode pipeline: interest inference → web search → insight generation.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY \
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY \
  *     pnpm test src/cognitive/insight/insight-live-surprise.test.ts
  */
 
@@ -21,7 +21,7 @@ import { generateInsightCandidatesLLM, GENERIC_INSIGHT_PATTERNS } from "./llm-en
 import type { LlmInsightDeps, WebSearchResult } from "./llm-engine.js";
 import type { InsightEngineInput } from "./types.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";

@@ -6,7 +6,7 @@ import {
   normalizeChannelId,
 } from "../channels/plugins/index.js";
 import type { ChannelId } from "../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentBinding } from "../config/types.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";
 
@@ -44,7 +44,7 @@ function formatProviderState(entry: ProviderAccountStatus): string {
 }
 
 export async function buildProviderStatusIndex(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): Promise<Map<string, ProviderAccountStatus>> {
   const map = new Map<string, ProviderAccountStatus>();
 
@@ -92,7 +92,7 @@ export async function buildProviderStatusIndex(
   return map;
 }
 
-function resolveDefaultAccountId(cfg: KaijiBotConfig, provider: ChannelId): string {
+function resolveDefaultAccountId(cfg: AllBotConfig, provider: ChannelId): string {
   const plugin = getChannelPlugin(provider);
   if (!plugin) {
     return DEFAULT_ACCOUNT_ID;
@@ -100,7 +100,7 @@ function resolveDefaultAccountId(cfg: KaijiBotConfig, provider: ChannelId): stri
   return resolveChannelDefaultAccountId({ plugin, cfg });
 }
 
-function shouldShowProviderEntry(entry: ProviderAccountStatus, cfg: KaijiBotConfig): boolean {
+function shouldShowProviderEntry(entry: ProviderAccountStatus, cfg: AllBotConfig): boolean {
   const plugin = getChannelPlugin(entry.provider);
   if (!plugin) {
     return Boolean(entry.configured);
@@ -121,7 +121,7 @@ function formatProviderEntry(entry: ProviderAccountStatus): string {
   return `${label}: ${formatProviderState(entry)}`;
 }
 
-export function summarizeBindings(cfg: KaijiBotConfig, bindings: AgentBinding[]): string[] {
+export function summarizeBindings(cfg: AllBotConfig, bindings: AgentBinding[]): string[] {
   if (bindings.length === 0) {
     return [];
   }
@@ -146,7 +146,7 @@ export function summarizeBindings(cfg: KaijiBotConfig, bindings: AgentBinding[])
 
 export function listProvidersForAgent(params: {
   summaryIsDefault: boolean;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   bindings: AgentBinding[];
   providerStatus: Map<string, ProviderAccountStatus>;
 }): string[] {

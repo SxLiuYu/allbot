@@ -10,7 +10,7 @@ sidebarTitle: "Release Channels"
 
 # Development channels
 
-KaijiBot ships three update channels:
+AllBot ships three update channels:
 
 - **stable**: npm dist-tag `latest`. Recommended for most users.
 - **beta**: npm dist-tag `beta` when it is current; if beta is missing or older than
@@ -28,9 +28,9 @@ installs.
 ## Switching channels
 
 ```bash
-kaijibot update --channel stable
-kaijibot update --channel beta
-kaijibot update --channel dev
+allbot update --channel stable
+allbot update --channel beta
+allbot update --channel dev
 ```
 
 `--channel` persists your choice in config (`update.channel`) and aligns the
@@ -42,8 +42,8 @@ install method:
 - **`stable`** (git installs): checks out the latest stable git tag.
 - **`beta`** (git installs): prefers the latest beta git tag, but falls back to
   the latest stable git tag when beta is missing or older.
-- **`dev`**: ensures a git checkout (default `~/kaijibot`, override with
-  `KAIJIBOT_GIT_DIR`), switches to `main`, rebases on upstream, builds, and
+- **`dev`**: ensures a git checkout (default `~/allbot`, override with
+  `ALLBOT_GIT_DIR`), switches to `main`, rebases on upstream, builds, and
   installs the global CLI from that checkout.
 
 Tip: if you want stable + dev in parallel, keep two clones and point your
@@ -56,38 +56,38 @@ update **without** changing your persisted channel:
 
 ```bash
 # Install a specific version
-kaijibot update --tag 2026.4.1-beta.1
+allbot update --tag 2026.4.1-beta.1
 
 # Install from the beta dist-tag (one-off, does not persist)
-kaijibot update --tag beta
+allbot update --tag beta
 
 # Install from GitHub main branch (npm tarball)
-kaijibot update --tag main
+allbot update --tag main
 
 # Install a specific npm package spec
-kaijibot update --tag kaijibot@2026.4.1-beta.1
+allbot update --tag allbot@2026.4.1-beta.1
 ```
 
 Notes:
 
 - `--tag` applies to **package (npm) installs only**. Git installs ignore it.
-- The tag is not persisted. Your next `kaijibot update` uses your configured
+- The tag is not persisted. Your next `allbot update` uses your configured
   channel as usual.
 - Downgrade protection: if the target version is older than your current version,
-  KaijiBot prompts for confirmation (skip with `--yes`).
+  AllBot prompts for confirmation (skip with `--yes`).
 - `--channel beta` is different from `--tag beta`: the channel flow can fall back
   to stable/latest when beta is missing or older, while `--tag beta` targets the
   raw `beta` dist-tag for that one run.
 
 ## Dry run
 
-Preview what `kaijibot update` would do without making changes:
+Preview what `allbot update` would do without making changes:
 
 ```bash
-kaijibot update --dry-run
-kaijibot update --channel beta --dry-run
-kaijibot update --tag 2026.4.1-beta.1 --dry-run
-kaijibot update --dry-run --json
+allbot update --dry-run
+allbot update --channel beta --dry-run
+allbot update --tag 2026.4.1-beta.1 --dry-run
+allbot update --dry-run --json
 ```
 
 The dry run shows the effective channel, target version, planned actions, and
@@ -95,7 +95,7 @@ whether a downgrade confirmation would be required.
 
 ## Plugins and channels
 
-When you switch channels with `kaijibot update`, KaijiBot also syncs plugin
+When you switch channels with `allbot update`, AllBot also syncs plugin
 sources:
 
 - `dev` prefers bundled plugins from the git checkout.
@@ -105,7 +105,7 @@ sources:
 ## Checking current status
 
 ```bash
-kaijibot update status
+allbot update status
 ```
 
 Shows the active channel, install kind (git or package), current version, and

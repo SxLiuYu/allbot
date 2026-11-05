@@ -156,7 +156,7 @@ export function renderMapHtml(
     '<meta http-equiv="refresh" content="' +
     sec +
     '">' +
-    "<title>KaijiBot Knowledge Graph</title>" +
+    "<title>AllBot Knowledge Graph</title>" +
     "<style>" +
     'body { font-family: "Bookerly", "Palatino", serif; font-size: 24px;' +
     " margin: 0; padding: 8px; background: #fff; color: #000;" +

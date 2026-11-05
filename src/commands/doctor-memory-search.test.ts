@@ -1,6 +1,6 @@
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { checkQmdBinaryAvailability as checkQmdBinaryAvailabilityFn } from "../memory-host-sdk/engine-qmd.js";
 import type { DoctorPrompter } from "./doctor-prompter.js";
 
@@ -77,7 +77,7 @@ import { maybeRepairMemoryRecallHealth, noteMemoryRecallHealth } from "./doctor-
 import { detectLegacyWorkspaceDirs } from "./doctor-workspace.js";
 
 describe("noteMemorySearchHealth", () => {
-  const cfg = {} as KaijiBotConfig;
+  const cfg = {} as AllBotConfig;
 
   async function expectNoWarningWithConfiguredRemoteApiKey(provider: string) {
     resolveMemorySearchConfig.mockReturnValue({
@@ -349,8 +349,8 @@ describe("noteMemorySearchHealth", () => {
 
     const message = note.mock.calls[0]?.[0] as string;
     expect(message).toContain("Gateway memory probe for default agent is not ready");
-    expect(message).toContain("kaijibot configure --section model");
-    expect(message).not.toContain("kaijibot auth add --provider");
+    expect(message).toContain("allbot configure --section model");
+    expect(message).not.toContain("allbot auth add --provider");
   });
 
   it("warns in auto mode when no local modelPath and no API keys are configured", async () => {
@@ -368,7 +368,7 @@ describe("noteMemorySearchHealth", () => {
     expect(note).toHaveBeenCalledTimes(1);
     const message = String(note.mock.calls[0]?.[0] ?? "");
     expect(message).toContain("needs at least one embedding provider");
-    expect(message).toContain("kaijibot configure --section model");
+    expect(message).toContain("allbot configure --section model");
   });
 
   it("still warns in auto mode when only ollama credentials exist", async () => {
@@ -425,7 +425,7 @@ describe("noteMemorySearchHealth", () => {
 });
 
 describe("memory recall doctor integration", () => {
-  const cfg = {} as KaijiBotConfig;
+  const cfg = {} as AllBotConfig;
 
   beforeEach(() => {
     note.mockClear();
@@ -552,7 +552,7 @@ describe("memory recall doctor integration", () => {
 
 describe("detectLegacyWorkspaceDirs", () => {
   it("returns active workspace and no legacy dirs", () => {
-    const workspaceDir = "/home/user/kaijibot";
+    const workspaceDir = "/home/user/allbot";
     const detection = detectLegacyWorkspaceDirs({ workspaceDir });
     expect(detection.activeWorkspace).toBe(path.resolve(workspaceDir));
     expect(detection.legacyDirs).toEqual([]);

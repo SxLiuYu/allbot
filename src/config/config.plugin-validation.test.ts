@@ -9,7 +9,7 @@ import { validateConfigObjectWithPlugins } from "./config.js";
 vi.unmock("../version.js");
 
 const voiceCallAvailable = existsSync(
-  path.join(process.cwd(), "extensions", "voice-call", "kaijibot.plugin.json"),
+  path.join(process.cwd(), "extensions", "voice-call", "allbot.plugin.json"),
 );
 
 async function chmodSafeDir(dir: string) {
@@ -44,7 +44,7 @@ async function writePluginFixture(params: {
     manifest.channels = params.channels;
   }
   await fs.writeFile(
-    path.join(params.dir, "kaijibot.plugin.json"),
+    path.join(params.dir, "allbot.plugin.json"),
     JSON.stringify(manifest, null, 2),
     "utf-8",
   );
@@ -98,7 +98,7 @@ function expectRemovedPluginWarnings(
   }
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("config plugin validation", () => {
   let fixtureRoot = "";
   let suiteHome = "";
@@ -112,12 +112,12 @@ describe.skipIf(process.env.CI)("config plugin validation", () => {
   const suiteEnv = () =>
     ({
       HOME: suiteHome,
-      KAIJIBOT_HOME: undefined,
-      KAIJIBOT_STATE_DIR: path.join(suiteHome, ".kaijibot"),
-      KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS: "10000",
-      KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
-      KAIJIBOT_BUNDLED_PLUGINS_DIR: undefined,
-      KAIJIBOT_VERSION: undefined,
+      ALLBOT_HOME: undefined,
+      ALLBOT_STATE_DIR: path.join(suiteHome, ".allbot"),
+      ALLBOT_PLUGIN_MANIFEST_CACHE_MS: "10000",
+      ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE: "1",
+      ALLBOT_BUNDLED_PLUGINS_DIR: undefined,
+      ALLBOT_VERSION: undefined,
       VITEST: "true",
     }) satisfies NodeJS.ProcessEnv;
 
@@ -137,7 +137,7 @@ describe.skipIf(process.env.CI)("config plugin validation", () => {
     });
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-config-plugin-validation-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-config-plugin-validation-"));
     await chmodSafeDir(fixtureRoot);
     suiteHome = path.join(fixtureRoot, "home");
     await mkdirSafe(suiteHome);
@@ -202,7 +202,7 @@ describe.skipIf(process.env.CI)("config plugin validation", () => {
       process.cwd(),
       "extensions",
       "voice-call",
-      "kaijibot.plugin.json",
+      "allbot.plugin.json",
     );
     let voiceCallManifest: { configSchema?: Record<string, unknown> } | null = null;
     try {
@@ -210,7 +210,7 @@ describe.skipIf(process.env.CI)("config plugin validation", () => {
         configSchema?: Record<string, unknown>;
       };
     } catch {
-      // voice-call extension not present in KaijiBot (upstream-only), skip voice-call fixture setup
+      // voice-call extension not present in AllBot (upstream-only), skip voice-call fixture setup
     }
     if (voiceCallManifest?.configSchema) {
       await writePluginFixture({
@@ -299,7 +299,7 @@ describe.skipIf(process.env.CI)("config plugin validation", () => {
       {
         env: {
           ...suiteEnv(),
-          KAIJIBOT_BUNDLED_PLUGINS_DIR: path.join(suiteHome, "missing-bundled-plugins"),
+          ALLBOT_BUNDLED_PLUGINS_DIR: path.join(suiteHome, "missing-bundled-plugins"),
         },
       },
     );

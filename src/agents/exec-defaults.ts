@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import {
   loadExecApprovals,
@@ -19,12 +19,12 @@ type ResolvedExecConfig = {
 };
 
 function resolveExecConfigState(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   sessionEntry?: SessionEntry;
   agentId?: string;
   sessionKey?: string;
 }): {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   host: ExecTarget;
   agentExec?: ResolvedExecConfig;
   globalExec?: ResolvedExecConfig;
@@ -54,7 +54,7 @@ function resolveExecConfigState(params: {
 }
 
 export function canExecRequestNode(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   sessionEntry?: SessionEntry;
   agentId?: string;
   sessionKey?: string;
@@ -67,7 +67,7 @@ export function canExecRequestNode(params: {
 }
 
 export function resolveExecDefaults(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   sessionEntry?: SessionEntry;
   agentId?: string;
   sessionKey?: string;

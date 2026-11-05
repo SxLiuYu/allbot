@@ -1,9 +1,9 @@
-import { definePluginEntry, type KaijiBotPluginApi } from "./api.js";
+import { definePluginEntry, type AllBotPluginApi } from "./api.js";
 import { KINDLE_PORTAL_CONFIG_SCHEMA, resolveKindleConfigSafe } from "./src/config.js";
 import { registerKindlePortalPlugin } from "./src/plugin.js";
 
 /**
- * Kindle Portal — KaijiBot extension that serves two Kindle-friendly pages
+ * Kindle Portal — AllBot extension that serves two Kindle-friendly pages
  * over the gateway HTTP port (default :18789):
  *
  *   /kindle/          — Live agent state monitor (XHR polling, ES5 HTML)
@@ -26,7 +26,7 @@ export default definePluginEntry({
   description:
     "Kindle e-ink dashboard: live agent state monitor and cognitive map visualization. Served at /kindle/ on the gateway HTTP port for Kindle's experimental browser.",
   configSchema: KINDLE_PORTAL_CONFIG_SCHEMA,
-  async register(api: KaijiBotPluginApi) {
+  async register(api: AllBotPluginApi) {
     const cfg = resolveKindleConfigSafe(api.pluginConfig, (issues) => {
       api.logger.warn?.(`[kindle-portal] config validation failed: ${JSON.stringify(issues)}`);
     });

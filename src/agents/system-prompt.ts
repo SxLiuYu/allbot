@@ -35,7 +35,7 @@ export type PromptMode = "full" | "minimal" | "none";
 type OwnerIdDisplay = "raw" | "hash";
 
 const CONTEXT_FILE_ORDER = new Map<string, number>([
-  ["kaijibot-guide.md", 9],
+  ["allbot-guide.md", 9],
   ["agents.md", 10],
   ["soul.md", 20],
   ["identity.md", 30],
@@ -219,7 +219,7 @@ function buildMessagingSection(params: {
     "- Cross-session messaging → use sessions_send(sessionKey, message)",
     "- Sub-agent orchestration → use subagents(action=list|steer|kill)",
     `- Runtime-generated completion events may ask for a user update. Rewrite those in your normal assistant voice and send the update (do not forward raw internal metadata or default to ${SILENT_REPLY_TOKEN}).`,
-    "- Never use exec/curl for provider messaging; KaijiBot handles all routing internally.",
+    "- Never use exec/curl for provider messaging; AllBot handles all routing internally.",
     params.availableTools.has("message")
       ? [
           "",
@@ -260,11 +260,11 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
   }
   return [
     "## Documentation",
-    `KaijiBot docs: ${docsPath}`,
+    `AllBot docs: ${docsPath}`,
     "Source: https://github.com/Kaiji-Z/kaijibot",
     "Find new skills: https://clawhub.ai",
-    "For KaijiBot behavior, commands, config, or architecture: consult local docs first.",
-    "When diagnosing issues, run `kaijibot status` yourself when possible; only ask the user if you lack access (e.g., sandboxed).",
+    "For AllBot behavior, commands, config, or architecture: consult local docs first.",
+    "When diagnosing issues, run `allbot status` yourself when possible; only ask the user if you lack access (e.g., sandboxed).",
     "",
   ];
 }
@@ -325,9 +325,9 @@ function buildCapabilitiesSection(params: { isMinimal: boolean }): string[] {
   }
   return [
     "## Capabilities",
-    "You are KaijiBot, a proactive AI personal assistant powered by cognitive AI.",
+    "You are AllBot, a proactive AI personal assistant powered by cognitive AI.",
     "",
-    "### Proactive Intelligence (Unique to KaijiBot)",
+    "### Proactive Intelligence (Unique to AllBot)",
     "You are NOT a passive Q&A bot. You proactively reach out when you have something valuable to share:",
     "- **Persona Learning** — You learn the user's interests, domains, communication style, and trust level from every conversation",
     "- **Insight Engine** — You generate cross-domain insights, revisit unanswered questions, and suggest domain extensions",
@@ -520,11 +520,11 @@ export function buildAgentSystemPrompt(params: {
 
   // For "none" mode, return just the basic identity line
   if (promptMode === "none") {
-    return "You are a personal assistant operating inside KaijiBot.";
+    return "You are a personal assistant operating inside AllBot.";
   }
 
   const lines = [
-    "You are a personal assistant operating inside KaijiBot.",
+    "You are a personal assistant operating inside AllBot.",
     "",
     "## Context Layer Priority",
     "This prompt mixes instructions from three layers. When they conflict, apply in this order:",
@@ -603,26 +603,26 @@ export function buildAgentSystemPrompt(params: {
       fallback: [],
     }),
     ...safetySection,
-    "## KaijiBot CLI Quick Reference",
-    "KaijiBot is controlled via subcommands. Do not invent commands.",
+    "## AllBot CLI Quick Reference",
+    "AllBot is controlled via subcommands. Do not invent commands.",
     "To manage the Gateway daemon service (start/stop/restart):",
-    "- kaijibot gateway status",
-    "- kaijibot gateway start",
-    "- kaijibot gateway stop",
-    "- kaijibot gateway restart",
-    "If unsure, ask the user to run `kaijibot help` (or `kaijibot gateway --help`) and paste the output.",
+    "- allbot gateway status",
+    "- allbot gateway start",
+    "- allbot gateway stop",
+    "- allbot gateway restart",
+    "If unsure, ask the user to run `allbot help` (or `allbot gateway --help`) and paste the output.",
     "",
     ...skillsSection,
     ...memorySection,
     // Skip self-update for subagent/none modes
-    hasGateway && !isMinimal ? "## KaijiBot Self-Update" : "",
+    hasGateway && !isMinimal ? "## AllBot Self-Update" : "",
     hasGateway && !isMinimal
       ? [
           "Get Updates (self-update) is ONLY allowed when the user explicitly asks for it.",
           "Do not run config.apply or update.run unless the user explicitly requests an update or config change; if it's not explicit, ask first.",
           "Use config.schema.lookup with a specific dot path to inspect only the relevant config subtree before making config changes or answering config-field questions; avoid guessing field names/types.",
           "Actions: config.schema.lookup, config.get, config.apply (validate + write full config, then hot-reload or restart as needed), config.patch (partial update, merges with existing), update.run (update deps or git, then restart).",
-          "After restart, KaijiBot pings the last active session automatically.",
+          "After restart, AllBot pings the last active session automatically.",
         ].join("\n")
       : "",
     hasGateway && !isMinimal ? "" : "",
@@ -696,7 +696,7 @@ export function buildAgentSystemPrompt(params: {
       userTimezone,
     }),
     "## Workspace Files (injected)",
-    "These user-editable files are loaded by KaijiBot and included below in Project Context.",
+    "These user-editable files are loaded by AllBot and included below in Project Context.",
     "",
     ...buildReplyTagsSection(isMinimal),
     ...buildMessagingSection({
@@ -788,7 +788,7 @@ export function buildAgentSystemPrompt(params: {
       `Heartbeat prompt: ${heartbeatPrompt}`,
       "If you receive a heartbeat poll (a user message matching the heartbeat prompt above), and there is nothing that needs attention, reply exactly:",
       "HEARTBEAT_OK",
-      'KaijiBot treats a leading/trailing "HEARTBEAT_OK" as a heartbeat ack (and may discard it).',
+      'AllBot treats a leading/trailing "HEARTBEAT_OK" as a heartbeat ack (and may discard it).',
       'If something needs attention, do NOT include "HEARTBEAT_OK"; reply with the alert text instead.',
       "",
     );
@@ -809,7 +809,7 @@ export function buildAgentSystemPrompt(params: {
   }
 
   const assembledSystemPrompt = lines.filter(Boolean).join("\n");
-  if (process.env.KAIJIBOT_DEBUG_CONTEXT === "1") {
+  if (process.env.ALLBOT_DEBUG_CONTEXT === "1") {
     emitContextDebugBreakdown(assembledSystemPrompt);
   }
   return assembledSystemPrompt;

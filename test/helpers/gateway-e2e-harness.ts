@@ -105,10 +105,10 @@ export async function spawnGatewayInstance(name: string): Promise<GatewayInstanc
   const port = await getFreePort();
   const hookToken = `token-${name}-${randomUUID()}`;
   const gatewayToken = `gateway-${name}-${randomUUID()}`;
-  const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), `kaijibot-e2e-${name}-`));
-  const configDir = path.join(homeDir, ".kaijibot");
+  const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), `allbot-e2e-${name}-`));
+  const configDir = path.join(homeDir, ".allbot");
   await fs.mkdir(configDir, { recursive: true });
-  const configPath = path.join(configDir, "kaijibot.json");
+  const configPath = path.join(configDir, "allbot.json");
   const stateDir = path.join(configDir, "state");
   const config = {
     gateway: {
@@ -141,17 +141,17 @@ export async function spawnGatewayInstance(name: string): Promise<GatewayInstanc
         env: {
           ...process.env,
           HOME: homeDir,
-          KAIJIBOT_CONFIG_PATH: configPath,
-          KAIJIBOT_STATE_DIR: stateDir,
-          KAIJIBOT_GATEWAY_TOKEN: "",
-          KAIJIBOT_GATEWAY_PASSWORD: "",
-          KAIJIBOT_SKIP_CHANNELS: "1",
-          KAIJIBOT_SKIP_PROVIDERS: "1",
-          KAIJIBOT_SKIP_GMAIL_WATCHER: "1",
-          KAIJIBOT_SKIP_CRON: "1",
-          KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER: "1",
-          KAIJIBOT_SKIP_CANVAS_HOST: "1",
-          KAIJIBOT_TEST_MINIMAL_GATEWAY: "1",
+          ALLBOT_CONFIG_PATH: configPath,
+          ALLBOT_STATE_DIR: stateDir,
+          ALLBOT_GATEWAY_TOKEN: "",
+          ALLBOT_GATEWAY_PASSWORD: "",
+          ALLBOT_SKIP_CHANNELS: "1",
+          ALLBOT_SKIP_PROVIDERS: "1",
+          ALLBOT_SKIP_GMAIL_WATCHER: "1",
+          ALLBOT_SKIP_CRON: "1",
+          ALLBOT_SKIP_BROWSER_CONTROL_SERVER: "1",
+          ALLBOT_SKIP_CANVAS_HOST: "1",
+          ALLBOT_TEST_MINIMAL_GATEWAY: "1",
           VITEST: "1",
         },
         stdio: ["ignore", "pipe", "pipe"],

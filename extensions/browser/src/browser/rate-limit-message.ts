@@ -1,4 +1,4 @@
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 
 const BROWSER_SERVICE_RATE_LIMIT_MESSAGE =
   "Browser service rate limit reached. " +

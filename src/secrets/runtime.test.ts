@@ -1,8 +1,8 @@
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 const EMPTY_LOADABLE_PLUGIN_ORIGINS = new Map();
@@ -118,7 +118,7 @@ describe("secrets runtime snapshot", () => {
         }),
         env: {},
         includeAuthStoreRefs: false,
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => ({ version: 1, profiles: {} }),
         loadablePluginOrigins: EMPTY_LOADABLE_PLUGIN_ORIGINS,
       }),

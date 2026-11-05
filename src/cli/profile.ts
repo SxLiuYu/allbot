@@ -88,7 +88,7 @@ function resolveProfileStateDir(
   homedir: () => string,
 ): string {
   const suffix = normalizeLowercaseStringOrEmpty(profile) === "default" ? "" : `-${profile}`;
-  return path.join(resolveRequiredHomeDir(env as NodeJS.ProcessEnv, homedir), `.kaijibot${suffix}`);
+  return path.join(resolveRequiredHomeDir(env as NodeJS.ProcessEnv, homedir), `.allbot${suffix}`);
 }
 
 export function applyCliProfileEnv(params: {
@@ -104,19 +104,19 @@ export function applyCliProfileEnv(params: {
   }
 
   // Convenience only: fill defaults, never override explicit env values.
-  env.KAIJIBOT_PROFILE = profile;
+  env.ALLBOT_PROFILE = profile;
 
-  const existingStateDir = normalizeOptionalString(env.KAIJIBOT_STATE_DIR);
+  const existingStateDir = normalizeOptionalString(env.ALLBOT_STATE_DIR);
   const stateDir = existingStateDir || resolveProfileStateDir(profile, env, homedir);
   if (!existingStateDir) {
-    env.KAIJIBOT_STATE_DIR = stateDir;
+    env.ALLBOT_STATE_DIR = stateDir;
   }
 
-  if (!normalizeOptionalString(env.KAIJIBOT_CONFIG_PATH)) {
-    env.KAIJIBOT_CONFIG_PATH = path.join(stateDir, "kaijibot.json");
+  if (!normalizeOptionalString(env.ALLBOT_CONFIG_PATH)) {
+    env.ALLBOT_CONFIG_PATH = path.join(stateDir, "allbot.json");
   }
 
-  if (profile === "dev" && !env.KAIJIBOT_GATEWAY_PORT?.trim()) {
-    env.KAIJIBOT_GATEWAY_PORT = "19001";
+  if (profile === "dev" && !env.ALLBOT_GATEWAY_PORT?.trim()) {
+    env.ALLBOT_GATEWAY_PORT = "19001";
   }
 }

@@ -36,7 +36,7 @@ export function writeJsonFile(filePath, value) {
 export function runVitestJsonReport({
   config,
   reportPath = "",
-  prefix = "kaijibot-vitest-report",
+  prefix = "allbot-vitest-report",
 }) {
   const resolvedReportPath = reportPath || path.join(os.tmpdir(), `${prefix}-${Date.now()}.json`);
 

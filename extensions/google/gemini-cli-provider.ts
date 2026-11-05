@@ -1,13 +1,13 @@
 import type {
-  KaijiBotPluginApi,
+  AllBotPluginApi,
   ProviderAuthContext,
   ProviderFetchUsageSnapshotContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { buildOauthProviderAuthResult } from "kaijibot/plugin-sdk/provider-auth-result";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
-import { buildProviderToolCompatFamilyHooks } from "kaijibot/plugin-sdk/provider-tools";
-import { fetchGeminiUsage } from "kaijibot/plugin-sdk/provider-usage";
+} from "allbot/plugin-sdk/plugin-entry";
+import { buildOauthProviderAuthResult } from "allbot/plugin-sdk/provider-auth-result";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
+import { buildProviderToolCompatFamilyHooks } from "allbot/plugin-sdk/provider-tools";
+import { fetchGeminiUsage } from "allbot/plugin-sdk/provider-usage";
 import { formatGoogleOauthApiKey, parseGoogleUsageToken } from "./oauth-token-shared.js";
 import { isModernGoogleModel, resolveGoogleGeminiForwardCompatModel } from "./provider-models.js";
 
@@ -15,8 +15,8 @@ const PROVIDER_ID = "google-gemini-cli";
 const PROVIDER_LABEL = "Gemini CLI OAuth";
 const DEFAULT_MODEL = "google-gemini-cli/gemini-3.1-pro-preview";
 const ENV_VARS = [
-  "KAIJIBOT_GEMINI_OAUTH_CLIENT_ID",
-  "KAIJIBOT_GEMINI_OAUTH_CLIENT_SECRET",
+  "ALLBOT_GEMINI_OAUTH_CLIENT_ID",
+  "ALLBOT_GEMINI_OAUTH_CLIENT_SECRET",
   "GEMINI_CLI_OAUTH_CLIENT_ID",
   "GEMINI_CLI_OAUTH_CLIENT_SECRET",
 ] as const;
@@ -31,7 +31,7 @@ async function fetchGeminiCliUsage(ctx: ProviderFetchUsageSnapshotContext) {
   return await fetchGeminiUsage(ctx.token, ctx.timeoutMs, ctx.fetchFn, PROVIDER_ID);
 }
 
-export function registerGoogleGeminiCliProvider(api: KaijiBotPluginApi) {
+export function registerGoogleGeminiCliProvider(api: AllBotPluginApi) {
   api.registerProvider({
     id: PROVIDER_ID,
     label: PROVIDER_LABEL,

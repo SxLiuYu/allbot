@@ -152,7 +152,7 @@ describe("Claude bundle plugin inspect integration", () => {
   }
 
   beforeAll(() => {
-    rootDir = makeTrackedTempDir("kaijibot-claude-bundle", tempDirs);
+    rootDir = makeTrackedTempDir("allbot-claude-bundle", tempDirs);
     setupClaudeInspectFixture();
   });
 

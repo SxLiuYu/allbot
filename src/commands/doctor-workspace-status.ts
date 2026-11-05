@@ -1,7 +1,7 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { buildWorkspaceSkillStatus } from "../agents/skills-status.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   buildPluginCompatibilityWarnings,
   buildPluginDiagnosticsReport,
@@ -43,8 +43,8 @@ function noteFlowRecoveryHints() {
     [
       ...suspicious.slice(0, 5),
       suspicious.length > 5 ? `...and ${suspicious.length - 5} more.` : null,
-      `Inspect: ${formatCliCommand("kaijibot tasks flow show <flow-id>")}`,
-      `Cancel: ${formatCliCommand("kaijibot tasks flow cancel <flow-id>")}`,
+      `Inspect: ${formatCliCommand("allbot tasks flow show <flow-id>")}`,
+      `Cancel: ${formatCliCommand("allbot tasks flow cancel <flow-id>")}`,
     ]
       .filter((line): line is string => Boolean(line))
       .join("\n"),
@@ -52,7 +52,7 @@ function noteFlowRecoveryHints() {
   );
 }
 
-export function noteWorkspaceStatus(cfg: KaijiBotConfig) {
+export function noteWorkspaceStatus(cfg: AllBotConfig) {
   const workspaceDir = resolveAgentWorkspaceDir(cfg, resolveDefaultAgentId(cfg));
   const legacyWorkspace = detectLegacyWorkspaceDirs({ workspaceDir });
   if (legacyWorkspace.legacyDirs.length > 0) {

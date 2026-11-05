@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 import { resolveAuthProfileOrder } from "../auth-profiles/order.js";
 import { ensureAuthProfileStore, hasAnyAuthProfileStoreSource } from "../auth-profiles/store.js";
@@ -48,7 +48,7 @@ export async function clearSessionAuthProfileOverride(params: {
 }
 
 export async function resolveSessionAuthProfileOverride(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   provider: string;
   agentDir: string;
   sessionEntry?: SessionEntry;

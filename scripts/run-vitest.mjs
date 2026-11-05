@@ -15,7 +15,7 @@ function isTruthyEnvValue(value) {
 }
 
 export function resolveVitestNodeArgs(env = process.env) {
-  if (isTruthyEnvValue(env.KAIJIBOT_VITEST_ENABLE_MAGLEV)) {
+  if (isTruthyEnvValue(env.ALLBOT_VITEST_ENABLE_MAGLEV)) {
     return [];
   }
 

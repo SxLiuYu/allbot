@@ -30,17 +30,17 @@ export function registerMessageCommands(program: Command, ctx: ProgramContext) {
         `
 ${theme.heading("Examples:")}
 ${formatHelpExamples([
-  ['kaijibot message send --target +15555550123 --message "Hi"', "Send a text message."],
+  ['allbot message send --target +15555550123 --message "Hi"', "Send a text message."],
   [
-    'kaijibot message send --target +15555550123 --message "Hi" --media photo.jpg',
+    'allbot message send --target +15555550123 --message "Hi" --media photo.jpg',
     "Send a message with media.",
   ],
   [
-    'kaijibot message poll --channel feishu --target ou_xxx --poll-question "Snack?" --poll-option Pizza --poll-option Sushi',
+    'allbot message poll --channel feishu --target ou_xxx --poll-question "Snack?" --poll-option Pizza --poll-option Sushi',
     "Create a Discord poll.",
   ],
   [
-    'kaijibot message react --channel feishu --target ou_xxx --message-id 456 --emoji "✅"',
+    'allbot message react --channel feishu --target ou_xxx --message-id 456 --emoji "✅"',
     "React to a message.",
   ],
 ])}

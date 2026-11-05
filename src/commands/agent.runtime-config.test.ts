@@ -9,7 +9,7 @@ import { loadModelCatalog } from "../agents/model-catalog.js";
 import * as modelSelectionModule from "../agents/model-selection.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import * as commandConfigResolutionModule from "../cli/command-config-resolution.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import * as configModule from "../config/config.js";
 import { clearSessionStoreCacheForTest } from "../config/sessions.js";
 import { resetAgentEventsForTest, resetAgentRunContextForTest } from "../infra/agent-events.js";
@@ -54,7 +54,7 @@ const configSpy = vi.spyOn(configModule, "loadConfig");
 const readConfigFileSnapshotForWriteSpy = vi.spyOn(configModule, "readConfigFileSnapshotForWrite");
 
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
-  return withAgentCommandTempHome("kaijibot-agent-", fn);
+  return withAgentCommandTempHome("allbot-agent-", fn);
 }
 
 function mockConfig(
@@ -77,7 +77,7 @@ beforeEach(() => {
   vi.mocked(loadModelCatalog).mockResolvedValue([]);
   vi.mocked(modelSelectionModule.isCliProvider).mockImplementation(() => false);
   readConfigFileSnapshotForWriteSpy.mockResolvedValue({
-    snapshot: { valid: false, resolved: {} as KaijiBotConfig },
+    snapshot: { valid: false, resolved: {} as AllBotConfig },
     writeOptions: {},
   } as Awaited<ReturnType<typeof configModule.readConfigFileSnapshotForWrite>>);
 });
@@ -93,7 +93,7 @@ describe("agentCommand runtime config", () => {
           defaults: {
             model: { primary: "anthropic/claude-opus-4-6" },
             models: { "anthropic/claude-opus-4-6": {} },
-            workspace: path.join(home, "kaijibot"),
+            workspace: path.join(home, "allbot"),
           },
         },
         session: { store, mainKey: "main" },
@@ -106,7 +106,7 @@ describe("agentCommand runtime config", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
       const sourceConfig = {
         ...loadedConfig,
         models: {
@@ -118,7 +118,7 @@ describe("agentCommand runtime config", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
       const resolvedConfig = {
         ...loadedConfig,
         models: {
@@ -130,7 +130,7 @@ describe("agentCommand runtime config", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       configSpy.mockReturnValue(loadedConfig);
       readConfigFileSnapshotForWriteSpy.mockResolvedValue({

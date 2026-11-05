@@ -173,10 +173,10 @@ describe("gateway-cli coverage", () => {
     discoverGatewayBeacons.mockClear();
     discoverGatewayBeacons.mockResolvedValueOnce([
       {
-        instanceName: "Studio (KaijiBot)",
+        instanceName: "Studio (AllBot)",
         displayName: "Studio",
-        domain: "kaijibot.internal.",
-        host: "studio.kaijibot.internal",
+        domain: "allbot.internal.",
+        host: "studio.allbot.internal",
         port: 18789,
         lanHost: "studio.local",
         tailnetDns: "studio.tailnet.ts.net",
@@ -257,14 +257,14 @@ describe("gateway-cli coverage", () => {
         LAUNCH_JOB_LABEL: undefined,
         LAUNCH_JOB_NAME: undefined,
         XPC_SERVICE_NAME: undefined,
-        KAIJIBOT_LAUNCHD_LABEL: undefined,
-        KAIJIBOT_SYSTEMD_UNIT: undefined,
+        ALLBOT_LAUNCHD_LABEL: undefined,
+        ALLBOT_SYSTEMD_UNIT: undefined,
         INVOCATION_ID: undefined,
         SYSTEMD_EXEC_PID: undefined,
         JOURNAL_STREAM: undefined,
-        KAIJIBOT_WINDOWS_TASK_NAME: undefined,
-        KAIJIBOT_SERVICE_MARKER: undefined,
-        KAIJIBOT_SERVICE_KIND: undefined,
+        ALLBOT_WINDOWS_TASK_NAME: undefined,
+        ALLBOT_SERVICE_MARKER: undefined,
+        ALLBOT_SERVICE_KIND: undefined,
       },
       async () => {
         serviceIsLoaded.mockResolvedValue(true);
@@ -300,7 +300,7 @@ describe("gateway-cli coverage", () => {
     runtimeErrors.length = 0;
     serviceIsLoaded.mockResolvedValue(true);
     startGatewayServer.mockRejectedValueOnce(
-      new GatewayLockError("failed to acquire gateway lock at /tmp/kaijibot/gateway.lock"),
+      new GatewayLockError("failed to acquire gateway lock at /tmp/allbot/gateway.lock"),
     );
 
     await expectGatewayExit(["gateway", "--token", "test-token", "--allow-unconfigured"]);
@@ -309,7 +309,7 @@ describe("gateway-cli coverage", () => {
   });
 
   it("uses env/config port when --port is omitted", async () => {
-    await withEnvOverride({ KAIJIBOT_GATEWAY_PORT: "19001" }, async () => {
+    await withEnvOverride({ ALLBOT_GATEWAY_PORT: "19001" }, async () => {
       runtimeLogs.length = 0;
       runtimeErrors.length = 0;
       startGatewayServer.mockClear();

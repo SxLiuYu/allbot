@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { withTempHome } from "../../config/home-env.test-harness.js";
 import { handleCommands } from "./commands-core.js";
 import { createCommandWorkspaceHarness } from "./commands-filesystem.test-support.js";
 import { buildCommandTestParams } from "./commands.test-harness.js";
 
-const workspaceHarness = createCommandWorkspaceHarness("kaijibot-command-mcp-");
+const workspaceHarness = createCommandWorkspaceHarness("allbot-command-mcp-");
 
-function buildCfg(): KaijiBotConfig {
+function buildCfg(): AllBotConfig {
   return {
     commands: {
       text: true,
@@ -22,7 +22,7 @@ describe("handleCommands /mcp", () => {
   });
 
   it("writes MCP config and shows it back", async () => {
-    await withTempHome("kaijibot-command-mcp-home-", async () => {
+    await withTempHome("allbot-command-mcp-home-", async () => {
       const workspaceDir = await workspaceHarness.createWorkspace();
       const setParams = buildCommandTestParams(
         '/mcp set context7={"command":"uvx","args":["context7-mcp"]}',
@@ -46,7 +46,7 @@ describe("handleCommands /mcp", () => {
   });
 
   it("rejects internal writes without operator.admin", async () => {
-    await withTempHome("kaijibot-command-mcp-home-", async () => {
+    await withTempHome("allbot-command-mcp-home-", async () => {
       const workspaceDir = await workspaceHarness.createWorkspace();
       const params = buildCommandTestParams(
         '/mcp set context7={"command":"uvx","args":["context7-mcp"]}',
@@ -66,7 +66,7 @@ describe("handleCommands /mcp", () => {
   });
 
   it("accepts non-stdio MCP config at the config layer", async () => {
-    await withTempHome("kaijibot-command-mcp-home-", async () => {
+    await withTempHome("allbot-command-mcp-home-", async () => {
       const workspaceDir = await workspaceHarness.createWorkspace();
       const params = buildCommandTestParams(
         '/mcp set remote={"url":"https://example.com/mcp"}',

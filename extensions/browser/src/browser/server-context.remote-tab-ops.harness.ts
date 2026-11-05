@@ -6,7 +6,7 @@ import { createBrowserRouteContext } from "./server-context.js";
 export const originalFetch = globalThis.fetch;
 
 export function makeState(
-  profile: "remote" | "kaijibot",
+  profile: "remote" | "allbot",
 ): BrowserServerState & { profiles: Map<string, { lastTargetId?: string | null }> } {
   return {
     server: null as unknown as BrowserServerState["server"],
@@ -36,7 +36,7 @@ export function makeState(
           cdpPort: 443,
           color: "#00AA00",
         },
-        kaijibot: { cdpPort: 18800, color: "#FF4500" },
+        allbot: { cdpPort: 18800, color: "#FF4500" },
       },
     },
     profiles: new Map(),

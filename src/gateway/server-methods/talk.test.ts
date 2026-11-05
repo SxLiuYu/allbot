@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { talkHandlers } from "./talk.js";
 
 const mocks = vi.hoisted(() => ({
-  loadConfig: vi.fn<() => KaijiBotConfig>(),
+  loadConfig: vi.fn<() => AllBotConfig>(),
   readConfigFileSnapshot: vi.fn(),
   canonicalizeSpeechProviderId: vi.fn((providerId: string | undefined) => providerId),
   getSpeechProvider: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("../../tts/tts.js", () => ({
   synthesizeSpeech: mocks.synthesizeSpeech,
 }));
 
-function createTalkConfig(apiKey: unknown): KaijiBotConfig {
+function createTalkConfig(apiKey: unknown): AllBotConfig {
   return {
     talk: {
       provider: "acme",
@@ -35,7 +35,7 @@ function createTalkConfig(apiKey: unknown): KaijiBotConfig {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("talk.speak handler", () => {
@@ -53,7 +53,7 @@ describe("talk.speak handler", () => {
 
     mocks.loadConfig.mockReturnValue(runtimeConfig);
     mocks.readConfigFileSnapshot.mockResolvedValue({
-      path: "/tmp/kaijibot.json",
+      path: "/tmp/allbot.json",
       hash: "test-hash",
       valid: true,
       config: diskConfig,
@@ -68,7 +68,7 @@ describe("talk.speak handler", () => {
       }) => talkProviderConfig,
     });
     mocks.synthesizeSpeech.mockImplementation(
-      async ({ cfg }: { cfg: KaijiBotConfig; text: string; disableFallback: boolean }) => {
+      async ({ cfg }: { cfg: AllBotConfig; text: string; disableFallback: boolean }) => {
         expect(cfg.messages?.tts?.provider).toBe("acme");
         expect(cfg.messages?.tts?.providers?.acme?.apiKey).toBe("env-acme-key");
         return {

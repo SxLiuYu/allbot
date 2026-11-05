@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveConversationIdFromTargets } from "../infra/outbound/conversation-id.js";
 import { getActivePluginChannelRegistry } from "../plugins/runtime.js";
 import {
@@ -19,7 +19,7 @@ export type ConversationBindingContext = {
 };
 
 export type ResolveConversationBindingContextInput = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string | null;
   accountId?: string | null;
   chatType?: string | null;
@@ -61,7 +61,7 @@ function shouldDefaultParentConversationToSelf(plugin?: ChannelPlugin): boolean 
 function resolveBindingAccountId(params: {
   rawAccountId?: string | null;
   plugin?: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): string {
   return (
     normalizeOptionalString(params.rawAccountId) ||

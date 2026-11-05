@@ -60,10 +60,10 @@ function buildConfig(enableNoVnc: boolean): SandboxConfig {
     backend: "docker",
     scope: "session",
     workspaceAccess: "none",
-    workspaceRoot: "/tmp/kaijibot-sandboxes",
+    workspaceRoot: "/tmp/allbot-sandboxes",
     docker: {
-      image: "kaijibot-sandbox:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-",
+      image: "allbot-sandbox:bookworm-slim",
+      containerPrefix: "allbot-sbx-",
       workdir: "/workspace",
       readOnlyRoot: true,
       tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -73,15 +73,15 @@ function buildConfig(enableNoVnc: boolean): SandboxConfig {
     },
     ssh: {
       command: "ssh",
-      workspaceRoot: "/tmp/kaijibot-sandboxes",
+      workspaceRoot: "/tmp/allbot-sandboxes",
       strictHostKeyChecking: true,
       updateHostKeys: true,
     },
     browser: {
       enabled: true,
-      image: "kaijibot-sandbox-browser:bookworm-slim",
-      containerPrefix: "kaijibot-sbx-browser-",
-      network: "kaijibot-sandbox-browser",
+      image: "allbot-sandbox-browser:bookworm-slim",
+      containerPrefix: "allbot-sbx-browser-",
+      network: "allbot-sandbox-browser",
       cdpPort: 9222,
       vncPort: 5900,
       noVncPort: 6080,
@@ -167,11 +167,11 @@ describe("ensureSandboxBrowser create args", () => {
     expect(createArgs).toBeDefined();
     expect(createArgs).toContain("127.0.0.1::6080");
     const envEntries = collectDockerFlagValues(createArgs ?? [], "-e");
-    expect(envEntries).toContain("KAIJIBOT_BROWSER_NO_SANDBOX=1");
+    expect(envEntries).toContain("ALLBOT_BROWSER_NO_SANDBOX=1");
     const passwordEntry = envEntries.find((entry) =>
-      entry.startsWith("KAIJIBOT_BROWSER_NOVNC_PASSWORD="),
+      entry.startsWith("ALLBOT_BROWSER_NOVNC_PASSWORD="),
     );
-    expect(passwordEntry).toMatch(/^KAIJIBOT_BROWSER_NOVNC_PASSWORD=[A-Za-z0-9]{8}$/);
+    expect(passwordEntry).toMatch(/^ALLBOT_BROWSER_NOVNC_PASSWORD=[A-Za-z0-9]{8}$/);
     expect(result?.noVncUrl).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/sandbox\/novnc\?token=/);
     expect(result?.noVncUrl).not.toContain("password=");
   });
@@ -186,7 +186,7 @@ describe("ensureSandboxBrowser create args", () => {
 
     const createArgs = findDockerArgsCall(dockerMocks.execDocker.mock.calls, "create");
     const envEntries = collectDockerFlagValues(createArgs ?? [], "-e");
-    expect(envEntries.some((entry) => entry.startsWith("KAIJIBOT_BROWSER_NOVNC_PASSWORD="))).toBe(
+    expect(envEntries.some((entry) => entry.startsWith("ALLBOT_BROWSER_NOVNC_PASSWORD="))).toBe(
       false,
     );
     expect(result?.noVncUrl).toBeUndefined();
@@ -237,6 +237,6 @@ describe("ensureSandboxBrowser create args", () => {
 
     const createArgs = findDockerArgsCall(dockerMocks.execDocker.mock.calls, "create");
     const labels = collectDockerFlagValues(createArgs ?? [], "--label");
-    expect(labels).toContain(`kaijibot.mountFormatVersion=${SANDBOX_MOUNT_FORMAT_VERSION}`);
+    expect(labels).toContain(`allbot.mountFormatVersion=${SANDBOX_MOUNT_FORMAT_VERSION}`);
   });
 });

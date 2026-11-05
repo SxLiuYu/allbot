@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginWebFetchProviderEntry } from "../plugins/types.js";
 import type { RuntimeWebFetchMetadata } from "../secrets/runtime-web-tools.types.js";
 import {
@@ -25,7 +25,7 @@ vi.mock("../plugins/web-fetch-providers.runtime.js", () => ({
   resolveRuntimeWebFetchProviders: resolveRuntimeWebFetchProvidersMock,
 }));
 
-function getFirecrawlApiKey(config?: KaijiBotConfig): unknown {
+function getFirecrawlApiKey(config?: AllBotConfig): unknown {
   const pluginConfig = config?.plugins?.entries?.firecrawl?.config as
     | TestPluginWebFetchConfig
     | undefined;
@@ -54,7 +54,7 @@ function createThirdPartyFetchProvider(): PluginWebFetchProviderEntry {
   });
 }
 
-function createFirecrawlPluginConfig(apiKey: unknown): KaijiBotConfig {
+function createFirecrawlPluginConfig(apiKey: unknown): AllBotConfig {
   return {
     plugins: {
       entries: {
@@ -178,7 +178,7 @@ describe("web fetch runtime", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
     });
 
     expect(resolved?.provider.id).toBe("firecrawl");

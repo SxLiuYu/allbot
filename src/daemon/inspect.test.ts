@@ -12,28 +12,28 @@ vi.mock("./schtasks-exec.js", () => ({
   execSchtasks: (...args: unknown[]) => execSchtasksMock(...args),
 }));
 
-// Real content from the kaijibot-gateway.service unit file (the canonical gateway unit).
+// Real content from the allbot-gateway.service unit file (the canonical gateway unit).
 const GATEWAY_SERVICE_CONTENTS = `\
 [Unit]
-Description=KaijiBot Gateway (v2026.3.8)
+Description=AllBot Gateway (v2026.3.8)
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/bin/node /home/kaijibot/.npm-global/lib/node_modules/kaijibot/dist/entry.js gateway --port 18789
+ExecStart=/usr/bin/node /home/allbot/.npm-global/lib/node_modules/allbot/dist/entry.js gateway --port 18789
 Restart=always
-Environment=KAIJIBOT_SERVICE_MARKER=kaijibot
-Environment=KAIJIBOT_SERVICE_KIND=gateway
-Environment=KAIJIBOT_SERVICE_VERSION=2026.3.8
+Environment=ALLBOT_SERVICE_MARKER=allbot
+Environment=ALLBOT_SERVICE_KIND=gateway
+Environment=ALLBOT_SERVICE_VERSION=2026.3.8
 
 [Install]
 WantedBy=default.target
 `;
 
-// Real content from the kaijibot-test.service unit file (a non-gateway kaijibot service).
+// Real content from the allbot-test.service unit file (a non-gateway allbot service).
 const TEST_SERVICE_CONTENTS = `\
 [Unit]
-Description=KaijiBot test service
+Description=AllBot test service
 After=default.target
 
 [Service]
@@ -54,12 +54,12 @@ Environment=HOME=/home/clawdbot
 `;
 
 describe("detectMarkerLineWithGateway", () => {
-  it("returns null for kaijibot-test.service (kaijibot only in description, no gateway on same line)", () => {
+  it("returns null for allbot-test.service (allbot only in description, no gateway on same line)", () => {
     expect(detectMarkerLineWithGateway(TEST_SERVICE_CONTENTS)).toBeNull();
   });
 
-  it("returns kaijibot for the canonical gateway unit (ExecStart has both kaijibot and gateway)", () => {
-    expect(detectMarkerLineWithGateway(GATEWAY_SERVICE_CONTENTS)).toBe("kaijibot");
+  it("returns allbot for the canonical gateway unit (ExecStart has both allbot and gateway)", () => {
+    expect(detectMarkerLineWithGateway(GATEWAY_SERVICE_CONTENTS)).toBe("allbot");
   });
 
   it("returns clawdbot for a clawdbot gateway unit", () => {
@@ -67,8 +67,8 @@ describe("detectMarkerLineWithGateway", () => {
   });
 
   it("handles line continuations — marker and gateway split across physical lines", () => {
-    const contents = `[Service]\nExecStart=/usr/bin/node /opt/kaijibot/dist/entry.js \\\n  gateway --port 18789\n`;
-    expect(detectMarkerLineWithGateway(contents)).toBe("kaijibot");
+    const contents = `[Service]\nExecStart=/usr/bin/node /opt/allbot/dist/entry.js \\\n  gateway --port 18789\n`;
+    expect(detectMarkerLineWithGateway(contents)).toBe("allbot");
   });
 });
 
@@ -78,12 +78,12 @@ describe("findExtraGatewayServices (linux / scanSystemdDir) — real filesystem"
   // Only runs on Linux/macOS where the linux branch of findExtraGatewayServices is active.
   const isLinux = process.platform === "linux";
 
-  it.skipIf(!isLinux)("does not report kaijibot-test.service as a gateway service", async () => {
-    const tmpHome = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+  it.skipIf(!isLinux)("does not report allbot-test.service as a gateway service", async () => {
+    const tmpHome = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
     const systemdDir = path.join(tmpHome, ".config", "systemd", "user");
     try {
       await fs.mkdir(systemdDir, { recursive: true });
-      await fs.writeFile(path.join(systemdDir, "kaijibot-test.service"), TEST_SERVICE_CONTENTS);
+      await fs.writeFile(path.join(systemdDir, "allbot-test.service"), TEST_SERVICE_CONTENTS);
       const result = await findExtraGatewayServices({ HOME: tmpHome });
       expect(result).toEqual([]);
     } finally {
@@ -92,14 +92,14 @@ describe("findExtraGatewayServices (linux / scanSystemdDir) — real filesystem"
   });
 
   it.skipIf(!isLinux)(
-    "does not report the canonical kaijibot-gateway.service as an extra service",
+    "does not report the canonical allbot-gateway.service as an extra service",
     async () => {
-      const tmpHome = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+      const tmpHome = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
       const systemdDir = path.join(tmpHome, ".config", "systemd", "user");
       try {
         await fs.mkdir(systemdDir, { recursive: true });
         await fs.writeFile(
-          path.join(systemdDir, "kaijibot-gateway.service"),
+          path.join(systemdDir, "allbot-gateway.service"),
           GATEWAY_SERVICE_CONTENTS,
         );
         const result = await findExtraGatewayServices({ HOME: tmpHome });
@@ -113,7 +113,7 @@ describe("findExtraGatewayServices (linux / scanSystemdDir) — real filesystem"
   it.skipIf(!isLinux)(
     "reports a legacy clawdbot-gateway service as an extra gateway service",
     async () => {
-      const tmpHome = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-test-"));
+      const tmpHome = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-test-"));
       const systemdDir = path.join(tmpHome, ".config", "systemd", "user");
       const unitPath = path.join(systemdDir, "clawdbot-gateway.service");
       try {
@@ -172,12 +172,12 @@ describe("findExtraGatewayServices (win32)", () => {
     expect(result).toEqual([]);
   });
 
-  it("collects only non-kaijibot marker tasks from schtasks output", async () => {
+  it("collects only non-allbot marker tasks from schtasks output", async () => {
     execSchtasksMock.mockResolvedValueOnce({
       code: 0,
       stdout: [
-        "TaskName: KaijiBot Gateway",
-        "Task To Run: C:\\Program Files\\KaijiBot\\kaijibot.exe gateway run",
+        "TaskName: AllBot Gateway",
+        "Task To Run: C:\\Program Files\\AllBot\\allbot.exe gateway run",
         "",
         "TaskName: Clawdbot Legacy",
         "Task To Run: C:\\clawdbot\\clawdbot.exe run",

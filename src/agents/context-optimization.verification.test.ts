@@ -17,7 +17,7 @@ const BASELINE_CAPABILITIES_TOKENS = 675;
 
 function buildVerificationPrompt(): string {
   return buildAgentSystemPrompt({
-    workspaceDir: "/tmp/kaijibot-verification",
+    workspaceDir: "/tmp/allbot-verification",
     toolNames: [
       "read",
       "exec",
@@ -129,7 +129,7 @@ describe("Context Engineering Optimization Verification", () => {
       expect(prompt).not.toMatch(/### Core Abilities/);
     });
 
-    it("retained 'Proactive Intelligence' section (KaijiBot differentiation)", () => {
+    it("retained 'Proactive Intelligence' section (AllBot differentiation)", () => {
       const prompt = buildVerificationPrompt();
       expect(prompt).toMatch(/### Proactive Intelligence/);
       expect(prompt).toMatch(/You are NOT a passive Q&A bot/);
@@ -246,7 +246,7 @@ describe("Context Engineering Optimization Verification", () => {
     let tempDir: string;
 
     it("loads legacy correction file (no triggerWhen/usageCount/lastReferencedAt)", async () => {
-      tempDir = mkdtempSync(join(tmpdir(), "kaiji-verify-"));
+      tempDir = mkdtempSync(join(tmpdir(), "allbot-verify-"));
       const store = new CorrectionStore(tempDir);
       const legacyRecord: CorrectionRecord = {
         id: "legacy-1",
@@ -275,7 +275,7 @@ describe("Context Engineering Optimization Verification", () => {
     });
 
     it("initializes usageCount=0 when adding new correction", async () => {
-      tempDir = mkdtempSync(join(tmpdir(), "kaiji-verify-"));
+      tempDir = mkdtempSync(join(tmpdir(), "allbot-verify-"));
       const store = new CorrectionStore(tempDir);
       await store.add("main", "u1", makeCorrection({ id: "new-1" }));
       const loaded = await store.loadAll("main", "u1");
@@ -284,7 +284,7 @@ describe("Context Engineering Optimization Verification", () => {
     });
 
     it("preserves triggerWhen through store round-trip", async () => {
-      tempDir = mkdtempSync(join(tmpdir(), "kaiji-verify-"));
+      tempDir = mkdtempSync(join(tmpdir(), "allbot-verify-"));
       const store = new CorrectionStore(tempDir);
       await store.add(
         "main",
@@ -405,7 +405,7 @@ describe("Context Engineering Optimization Verification", () => {
     const TTL_DAYS = 90;
 
     function seedStore(records: CorrectionRecord[]): CorrectionStore {
-      tempDir = mkdtempSync(join(tmpdir(), "kaiji-gc-"));
+      tempDir = mkdtempSync(join(tmpdir(), "allbot-gc-"));
       const store = new CorrectionStore(tempDir);
       const fileDir = join(tempDir, "cognitive", "corrections", "main");
       mkdirSync(fileDir, { recursive: true });
@@ -568,7 +568,7 @@ describe("Context Engineering Optimization Verification", () => {
     it("prompt cache boundary still exists between stable and dynamic sections", () => {
       const prompt = buildVerificationPrompt();
       const lines = prompt.split("\n");
-      const boundaryIdx = lines.findIndex((l) => l.includes("--- kaijibot-cache-boundary"));
+      const boundaryIdx = lines.findIndex((l) => l.includes("--- allbot-cache-boundary"));
       if (boundaryIdx === -1) {
         const stableEnd = lines.findIndex((l) => l.startsWith("## Silent Replies"));
         const dynamicStart = lines.findIndex((l) => l.includes("Dynamic Project Context"));

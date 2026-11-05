@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   loadConfig,
   registerPluginsCli,
@@ -17,7 +17,7 @@ function createTrackedPluginConfig(params: {
   pluginId: string;
   spec: string;
   resolvedName?: string;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     plugins: {
       installs: {
@@ -29,7 +29,7 @@ function createTrackedPluginConfig(params: {
         },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("plugins cli update", () => {
@@ -64,7 +64,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const nextConfig = {
       hooks: {
         internal: {
@@ -77,7 +77,7 @@ describe("plugins cli update", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     loadConfig.mockReturnValue(cfg);
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -116,7 +116,7 @@ describe("plugins cli update", () => {
       plugins: {
         installs: {},
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     await expect(runPluginsCommand(["plugins", "update"])).rejects.toThrow("__exit__:1");
 
@@ -129,7 +129,7 @@ describe("plugins cli update", () => {
       plugins: {
         installs: {},
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     await runPluginsCommand(["plugins", "update", "--all"]);
 
@@ -142,15 +142,15 @@ describe("plugins cli update", () => {
     const config = {
       plugins: {
         installs: {
-          "kaijibot-codex-app-server": {
+          "allbot-codex-app-server": {
             source: "npm",
-            spec: "kaijibot-codex-app-server",
-            installPath: "/tmp/kaijibot-codex-app-server",
-            resolvedName: "kaijibot-codex-app-server",
+            spec: "allbot-codex-app-server",
+            installPath: "/tmp/allbot-codex-app-server",
+            resolvedName: "allbot-codex-app-server",
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     loadConfig.mockReturnValue(config);
     updateNpmInstalledPlugins.mockResolvedValue({
       config,
@@ -158,14 +158,14 @@ describe("plugins cli update", () => {
       outcomes: [],
     });
 
-    await runPluginsCommand(["plugins", "update", "kaijibot-codex-app-server@beta"]);
+    await runPluginsCommand(["plugins", "update", "allbot-codex-app-server@beta"]);
 
     expect(updateNpmInstalledPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
-        pluginIds: ["kaijibot-codex-app-server"],
+        pluginIds: ["allbot-codex-app-server"],
         specOverrides: {
-          "kaijibot-codex-app-server": "kaijibot-codex-app-server@beta",
+          "allbot-codex-app-server": "allbot-codex-app-server@beta",
         },
       }),
     );
@@ -177,13 +177,13 @@ describe("plugins cli update", () => {
         installs: {
           "voice-call": {
             source: "npm",
-            spec: "@kaijibot/voice-call",
+            spec: "@allbot/voice-call",
             installPath: "/tmp/voice-call",
-            resolvedName: "@kaijibot/voice-call",
+            resolvedName: "@allbot/voice-call",
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     loadConfig.mockReturnValue(config);
     updateNpmInstalledPlugins.mockResolvedValue({
       config,
@@ -191,14 +191,14 @@ describe("plugins cli update", () => {
       outcomes: [],
     });
 
-    await runPluginsCommand(["plugins", "update", "@kaijibot/voice-call@beta"]);
+    await runPluginsCommand(["plugins", "update", "@allbot/voice-call@beta"]);
 
     expect(updateNpmInstalledPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
         pluginIds: ["voice-call"],
         specOverrides: {
-          "voice-call": "@kaijibot/voice-call@beta",
+          "voice-call": "@allbot/voice-call@beta",
         },
       }),
     );
@@ -208,15 +208,15 @@ describe("plugins cli update", () => {
     const config = {
       plugins: {
         installs: {
-          "kaijibot-codex-app-server": {
+          "allbot-codex-app-server": {
             source: "npm",
-            spec: "kaijibot-codex-app-server",
-            installPath: "/tmp/kaijibot-codex-app-server",
-            resolvedName: "kaijibot-codex-app-server",
+            spec: "allbot-codex-app-server",
+            installPath: "/tmp/allbot-codex-app-server",
+            resolvedName: "allbot-codex-app-server",
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     loadConfig.mockReturnValue(config);
     updateNpmInstalledPlugins.mockResolvedValue({
       config,
@@ -224,14 +224,14 @@ describe("plugins cli update", () => {
       outcomes: [],
     });
 
-    await runPluginsCommand(["plugins", "update", "kaijibot-codex-app-server@0.2.0-beta.4"]);
+    await runPluginsCommand(["plugins", "update", "allbot-codex-app-server@0.2.0-beta.4"]);
 
     expect(updateNpmInstalledPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
-        pluginIds: ["kaijibot-codex-app-server"],
+        pluginIds: ["allbot-codex-app-server"],
         specOverrides: {
-          "kaijibot-codex-app-server": "kaijibot-codex-app-server@0.2.0-beta.4",
+          "allbot-codex-app-server": "allbot-codex-app-server@0.2.0-beta.4",
         },
       }),
     );
@@ -239,8 +239,8 @@ describe("plugins cli update", () => {
 
   it("passes dangerous force unsafe install to plugin updates", async () => {
     const config = createTrackedPluginConfig({
-      pluginId: "kaijibot-codex-app-server",
-      spec: "kaijibot-codex-app-server@beta",
+      pluginId: "allbot-codex-app-server",
+      spec: "allbot-codex-app-server@beta",
     });
     loadConfig.mockReturnValue(config);
     updateNpmInstalledPlugins.mockResolvedValue({
@@ -252,14 +252,14 @@ describe("plugins cli update", () => {
     await runPluginsCommand([
       "plugins",
       "update",
-      "kaijibot-codex-app-server",
+      "allbot-codex-app-server",
       "--dangerously-force-unsafe-install",
     ]);
 
     expect(updateNpmInstalledPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
-        pluginIds: ["kaijibot-codex-app-server"],
+        pluginIds: ["allbot-codex-app-server"],
         dangerouslyForceUnsafeInstall: true,
       }),
     );
@@ -269,15 +269,15 @@ describe("plugins cli update", () => {
     const config = {
       plugins: {
         installs: {
-          "kaijibot-codex-app-server": {
+          "allbot-codex-app-server": {
             source: "npm",
-            spec: "kaijibot-codex-app-server@beta",
-            installPath: "/tmp/kaijibot-codex-app-server",
-            resolvedName: "kaijibot-codex-app-server",
+            spec: "allbot-codex-app-server@beta",
+            installPath: "/tmp/allbot-codex-app-server",
+            resolvedName: "allbot-codex-app-server",
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     loadConfig.mockReturnValue(config);
     updateNpmInstalledPlugins.mockResolvedValue({
       config,
@@ -285,12 +285,12 @@ describe("plugins cli update", () => {
       outcomes: [],
     });
 
-    await runPluginsCommand(["plugins", "update", "kaijibot-codex-app-server"]);
+    await runPluginsCommand(["plugins", "update", "allbot-codex-app-server"]);
 
     expect(updateNpmInstalledPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config,
-        pluginIds: ["kaijibot-codex-app-server"],
+        pluginIds: ["allbot-codex-app-server"],
       }),
     );
     expect(updateNpmInstalledPlugins).not.toHaveBeenCalledWith(
@@ -306,21 +306,21 @@ describe("plugins cli update", () => {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@kaijibot/alpha@1.0.0",
+            spec: "@allbot/alpha@1.0.0",
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const nextConfig = {
       plugins: {
         installs: {
           alpha: {
             source: "npm",
-            spec: "@kaijibot/alpha@1.1.0",
+            spec: "@allbot/alpha@1.1.0",
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     loadConfig.mockReturnValue(cfg);
     updateNpmInstalledPlugins.mockResolvedValue({
       outcomes: [{ status: "ok", message: "Updated alpha -> 1.1.0" }],

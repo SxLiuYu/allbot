@@ -30,11 +30,11 @@ Use this page for day-1 startup and day-2 operations of the Gateway service.
   <Step title="Start the Gateway">
 
 ```bash
-kaijibot gateway --port 18789
+allbot gateway --port 18789
 # debug/trace mirrored to stdio
-kaijibot gateway --port 18789 --verbose
+allbot gateway --port 18789 --verbose
 # force-kill listener on selected port, then start
-kaijibot gateway --force
+allbot gateway --force
 ```
 
   </Step>
@@ -42,9 +42,9 @@ kaijibot gateway --force
   <Step title="Verify service health">
 
 ```bash
-kaijibot gateway status
-kaijibot status
-kaijibot logs --follow
+allbot gateway status
+allbot status
+allbot logs --follow
 ```
 
 Healthy baseline: `Runtime: running` and `RPC probe: ok`.
@@ -54,7 +54,7 @@ Healthy baseline: `Runtime: running` and `RPC probe: ok`.
   <Step title="Validate channel readiness">
 
 ```bash
-kaijibot channels status --probe
+allbot channels status --probe
 ```
 
 With a reachable gateway this runs live per-account channel probes and optional audits.
@@ -65,7 +65,7 @@ of live probe output.
 </Steps>
 
 <Note>
-Gateway config reload watches the active config file path (resolved from profile/state defaults, or `KAIJIBOT_CONFIG_PATH` when set).
+Gateway config reload watches the active config file path (resolved from profile/state defaults, or `ALLBOT_CONFIG_PATH` when set).
 Default mode is `gateway.reload.mode="hybrid"`.
 After the first successful load, the running process serves the active in-memory config snapshot; successful reload swaps that snapshot atomically.
 </Note>
@@ -80,12 +80,12 @@ After the first successful load, the running process serves the active in-memory
 - Default bind mode: `loopback`.
 - Auth is required by default. Shared-secret setups use
   `gateway.auth.token` / `gateway.auth.password` (or
-  `KAIJIBOT_GATEWAY_TOKEN` / `KAIJIBOT_GATEWAY_PASSWORD`), and non-loopback
+  `ALLBOT_GATEWAY_TOKEN` / `ALLBOT_GATEWAY_PASSWORD`), and non-loopback
   reverse-proxy setups can use `gateway.auth.mode: "trusted-proxy"`.
 
 ## OpenAI-compatible endpoints
 
-KaijiBot’s highest-leverage compatibility surface is now:
+AllBot’s highest-leverage compatibility surface is now:
 
 - `GET /v1/models`
 - `GET /v1/models/{id}`
@@ -101,9 +101,9 @@ Why this set matters:
 
 Planning note:
 
-- `/v1/models` is agent-first: it returns `kaijibot`, `kaijibot/default`, and `kaijibot/<agentId>`.
-- `kaijibot/default` is the stable alias that always maps to the configured default agent.
-- Use `x-kaijibot-model` when you want a backend provider/model override; otherwise the selected agent's normal model and embedding setup stays in control.
+- `/v1/models` is agent-first: it returns `allbot`, `allbot/default`, and `allbot/<agentId>`.
+- `allbot/default` is the stable alias that always maps to the configured default agent.
+- Use `x-allbot-model` when you want a backend provider/model override; otherwise the selected agent's normal model and embedding setup stays in control.
 
 All of these run on the main Gateway port and use the same trusted operator auth boundary as the rest of the Gateway HTTP API.
 
@@ -111,7 +111,7 @@ All of these run on the main Gateway port and use the same trusted operator auth
 
 | Setting      | Resolution order                                              |
 | ------------ | ------------------------------------------------------------- |
-| Gateway port | `--port` → `KAIJIBOT_GATEWAY_PORT` → `gateway.port` → `18789` |
+| Gateway port | `--port` → `ALLBOT_GATEWAY_PORT` → `gateway.port` → `18789` |
 | Bind mode    | CLI/override → `gateway.bind` → `loopback`                    |
 
 ### Hot reload modes
@@ -126,15 +126,15 @@ All of these run on the main Gateway port and use the same trusted operator auth
 ## Operator command set
 
 ```bash
-kaijibot gateway status
-kaijibot gateway status --deep   # adds a system-level service scan
-kaijibot gateway status --json
-kaijibot gateway install
-kaijibot gateway restart
-kaijibot gateway stop
-kaijibot secrets reload
-kaijibot logs --follow
-kaijibot doctor
+allbot gateway status
+allbot gateway status --deep   # adds a system-level service scan
+allbot gateway status --json
+allbot gateway install
+allbot gateway restart
+allbot gateway stop
+allbot secrets reload
+allbot logs --follow
+allbot doctor
 ```
 
 `gateway status --deep` is for extra service discovery (LaunchDaemons/systemd system
@@ -150,8 +150,8 @@ You only need multiple gateways when you intentionally want isolation or a rescu
 Useful checks:
 
 ```bash
-kaijibot gateway status --deep
-kaijibot gateway probe
+allbot gateway status --deep
+allbot gateway probe
 ```
 
 What to expect:
@@ -191,22 +191,22 @@ Use supervised runs for production-like reliability.
   <Tab title="macOS (launchd)">
 
 ```bash
-kaijibot gateway install
-kaijibot gateway status
-kaijibot gateway restart
-kaijibot gateway stop
+allbot gateway install
+allbot gateway status
+allbot gateway restart
+allbot gateway stop
 ```
 
-LaunchAgent labels are `ai.kaijibot.gateway` (default) or `ai.kaijibot.<profile>` (named profile). `kaijibot doctor` audits and repairs service config drift.
+LaunchAgent labels are `ai.allbot.gateway` (default) or `ai.allbot.<profile>` (named profile). `allbot doctor` audits and repairs service config drift.
 
   </Tab>
 
   <Tab title="Linux (systemd user)">
 
 ```bash
-kaijibot gateway install
-systemctl --user enable --now kaijibot-gateway[-<profile>].service
-kaijibot gateway status
+allbot gateway install
+systemctl --user enable --now allbot-gateway[-<profile>].service
+allbot gateway status
 ```
 
 For persistence after logout, enable lingering:
@@ -219,12 +219,12 @@ Manual user-unit example when you need a custom install path:
 
 ```ini
 [Unit]
-Description=KaijiBot Gateway
+Description=AllBot Gateway
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/kaijibot gateway --port 18789
+ExecStart=/usr/local/bin/allbot gateway --port 18789
 Restart=always
 RestartSec=5
 TimeoutStopSec=30
@@ -241,15 +241,15 @@ WantedBy=default.target
   <Tab title="Windows (native)">
 
 ```powershell
-kaijibot gateway install
-kaijibot gateway status --json
-kaijibot gateway restart
-kaijibot gateway stop
+allbot gateway install
+allbot gateway status --json
+allbot gateway restart
+allbot gateway stop
 ```
 
-Native Windows managed startup uses a Scheduled Task named `KaijiBot Gateway`
-(or `KaijiBot Gateway (<profile>)` for named profiles). If Scheduled Task
-creation is denied, KaijiBot falls back to a per-user Startup-folder launcher
+Native Windows managed startup uses a Scheduled Task named `AllBot Gateway`
+(or `AllBot Gateway (<profile>)` for named profiles). If Scheduled Task
+creation is denied, AllBot falls back to a per-user Startup-folder launcher
 that points at `gateway.cmd` inside the state directory.
 
   </Tab>
@@ -260,12 +260,12 @@ Use a system unit for multi-user/always-on hosts.
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now kaijibot-gateway[-<profile>].service
+sudo systemctl enable --now allbot-gateway[-<profile>].service
 ```
 
 Use the same service body as the user unit, but install it under
-`/etc/systemd/system/kaijibot-gateway[-<profile>].service` and adjust
-`ExecStart=` if your `kaijibot` binary lives elsewhere.
+`/etc/systemd/system/allbot-gateway[-<profile>].service` and adjust
+`ExecStart=` if your `allbot` binary lives elsewhere.
 
   </Tab>
 </Tabs>
@@ -278,15 +278,15 @@ Use multiple only for strict isolation/redundancy (for example a rescue profile)
 Checklist per instance:
 
 - Unique `gateway.port`
-- Unique `KAIJIBOT_CONFIG_PATH`
-- Unique `KAIJIBOT_STATE_DIR`
+- Unique `ALLBOT_CONFIG_PATH`
+- Unique `ALLBOT_STATE_DIR`
 - Unique `agents.defaults.workspace`
 
 Example:
 
 ```bash
-KAIJIBOT_CONFIG_PATH=~/.kaijibot/a.json KAIJIBOT_STATE_DIR=~/.kaijibot-a kaijibot gateway --port 19001
-KAIJIBOT_CONFIG_PATH=~/.kaijibot/b.json KAIJIBOT_STATE_DIR=~/.kaijibot-b kaijibot gateway --port 19002
+ALLBOT_CONFIG_PATH=~/.allbot/a.json ALLBOT_STATE_DIR=~/.allbot-a allbot gateway --port 19001
+ALLBOT_CONFIG_PATH=~/.allbot/b.json ALLBOT_STATE_DIR=~/.allbot-b allbot gateway --port 19002
 ```
 
 See: [Multiple gateways](/gateway/multiple-gateways).
@@ -294,9 +294,9 @@ See: [Multiple gateways](/gateway/multiple-gateways).
 ### Dev profile quick path
 
 ```bash
-kaijibot --dev setup
-kaijibot --dev gateway --allow-unconfigured
-kaijibot --dev status
+allbot --dev setup
+allbot --dev gateway --allow-unconfigured
+allbot --dev status
 ```
 
 Defaults include isolated state/config and base gateway port `19001`.
@@ -329,9 +329,9 @@ See full protocol docs: [Gateway Protocol](/gateway/protocol).
 ### Readiness
 
 ```bash
-kaijibot gateway status
-kaijibot channels status --probe
-kaijibot health
+allbot gateway status
+allbot channels status --probe
+allbot health
 ```
 
 ### Gap recovery

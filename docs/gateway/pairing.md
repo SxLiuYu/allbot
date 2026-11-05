@@ -37,11 +37,11 @@ Pending requests expire automatically after **5 minutes**.
 ## CLI workflow (headless friendly)
 
 ```bash
-kaijibot nodes pending
-kaijibot nodes approve <requestId>
-kaijibot nodes reject <requestId>
-kaijibot nodes status
-kaijibot nodes rename --node <id|name|ip> --name "Living Room iPad"
+allbot nodes pending
+allbot nodes approve <requestId>
+allbot nodes reject <requestId>
+allbot nodes status
+allbot nodes rename --node <id|name|ip> --name "Living Room iPad"
 ```
 
 `nodes status` shows paired/connected nodes and their capabilities.
@@ -119,12 +119,12 @@ If silent approval fails, it falls back to the normal “Approve/Reject” promp
 
 ## Storage (local, private)
 
-Pairing state is stored under the Gateway state directory (default `~/.kaijibot`):
+Pairing state is stored under the Gateway state directory (default `~/.allbot`):
 
-- `~/.kaijibot/nodes/paired.json`
-- `~/.kaijibot/nodes/pending.json`
+- `~/.allbot/nodes/paired.json`
+- `~/.allbot/nodes/pending.json`
 
-If you override `KAIJIBOT_STATE_DIR`, the `nodes/` folder moves with it.
+If you override `ALLBOT_STATE_DIR`, the `nodes/` folder moves with it.
 
 Security notes:
 

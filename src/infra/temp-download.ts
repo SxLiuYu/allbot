@@ -1,9 +1,9 @@
 import crypto from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir } from "./tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "./tmp-allbot-dir.js";
 
-export { resolvePreferredKaijiBotTmpDir } from "./tmp-kaijibot-dir.js";
+export { resolvePreferredAllBotTmpDir } from "./tmp-allbot-dir.js";
 
 export type TempDownloadTarget = {
   dir: string;
@@ -33,7 +33,7 @@ export function sanitizeTempFileName(fileName: string): string {
 }
 
 function resolveTempRoot(tmpDir?: string): string {
-  return tmpDir ?? resolvePreferredKaijiBotTmpDir();
+  return tmpDir ?? resolvePreferredAllBotTmpDir();
 }
 
 function isNodeErrorWithCode(err: unknown, code: string): boolean {

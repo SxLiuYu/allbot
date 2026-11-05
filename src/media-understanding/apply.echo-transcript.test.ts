@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MsgContext } from "../auto-reply/templating.js";
-import type { KaijiBotConfig } from "../config/config.js";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import type { AllBotConfig } from "../config/config.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { createSafeAudioFixtureBuffer } from "./runner.test-utils.js";
 import type { MediaUnderstandingProvider } from "./types.js";
 
@@ -53,7 +53,7 @@ const { MediaFetchErrorMock } = vi.hoisted(() => {
 let applyMediaUnderstanding: typeof import("./apply.js").applyMediaUnderstanding;
 let clearMediaUnderstandingBinaryCacheForTests: () => void;
 
-const TEMP_MEDIA_PREFIX = "kaijibot-echo-transcript-test-";
+const TEMP_MEDIA_PREFIX = "allbot-echo-transcript-test-";
 let suiteTempMediaRootDir = "";
 
 async function createTempAudioFile(): Promise<string> {
@@ -80,10 +80,10 @@ function createAudioConfigWithEcho(opts?: {
   echoFormat?: string;
   transcribedText?: string;
 }): {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providers: Record<string, { id: string; transcribeAudio: () => Promise<{ text: string }> }>;
 } {
-  const cfg: KaijiBotConfig = {
+  const cfg: AllBotConfig = {
     tools: {
       media: {
         audio: {
@@ -206,7 +206,7 @@ describe("applyMediaUnderstanding – echo transcript", () => {
       };
     });
 
-    const baseDir = resolvePreferredKaijiBotTmpDir();
+    const baseDir = resolvePreferredAllBotTmpDir();
     await fs.mkdir(baseDir, { recursive: true });
     suiteTempMediaRootDir = await fs.mkdtemp(path.join(baseDir, TEMP_MEDIA_PREFIX));
     const mod = await import("./apply.js");

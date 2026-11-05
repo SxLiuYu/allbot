@@ -1,5 +1,5 @@
 import type { TSchema } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { defaultRuntime } from "../../runtime.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -14,7 +14,7 @@ import type {
 } from "./types.js";
 
 export type ChannelMessageActionDiscoveryInput = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   channel?: string | null;
   currentChannelProvider?: string | null;
   currentChannelId?: string | null;
@@ -42,7 +42,7 @@ export function createMessageActionDiscoveryContext(
     params.channel ?? params.currentChannelProvider,
   );
   return {
-    cfg: params.cfg ?? ({} as KaijiBotConfig),
+    cfg: params.cfg ?? ({} as AllBotConfig),
     currentChannelId: params.currentChannelId,
     currentChannelProvider,
     currentThreadTs: params.currentThreadTs,
@@ -143,7 +143,7 @@ export function resolveMessageActionDiscoveryForPlugin(params: {
   };
 }
 
-export function listChannelMessageActions(cfg: KaijiBotConfig): ChannelMessageActionName[] {
+export function listChannelMessageActions(cfg: AllBotConfig): ChannelMessageActionName[] {
   const actions = new Set<ChannelMessageActionName>(["send", "broadcast"]);
   for (const plugin of listChannelPlugins()) {
     for (const action of resolveMessageActionDiscoveryForPlugin({
@@ -158,7 +158,7 @@ export function listChannelMessageActions(cfg: KaijiBotConfig): ChannelMessageAc
   return Array.from(actions);
 }
 
-export function listChannelMessageCapabilities(cfg: KaijiBotConfig): ChannelMessageCapability[] {
+export function listChannelMessageCapabilities(cfg: AllBotConfig): ChannelMessageCapability[] {
   const capabilities = new Set<ChannelMessageCapability>();
   for (const plugin of listChannelPlugins()) {
     for (const capability of resolveMessageActionDiscoveryForPlugin({
@@ -174,7 +174,7 @@ export function listChannelMessageCapabilities(cfg: KaijiBotConfig): ChannelMess
 }
 
 export function listChannelMessageCapabilitiesForChannel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
   currentChannelId?: string | null;
   currentThreadTs?: string | null;
@@ -217,7 +217,7 @@ function mergeToolSchemaProperties(
 }
 
 export function resolveChannelMessageToolSchemaProperties(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string;
   currentChannelId?: string | null;
   currentThreadTs?: string | null;
@@ -257,7 +257,7 @@ export function resolveChannelMessageToolSchemaProperties(params: {
 }
 
 export function channelSupportsMessageCapability(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   capability: ChannelMessageCapability,
 ): boolean {
   return listChannelMessageCapabilities(cfg).includes(capability);
@@ -265,7 +265,7 @@ export function channelSupportsMessageCapability(
 
 export function channelSupportsMessageCapabilityForChannel(
   params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     channel?: string;
     currentChannelId?: string | null;
     currentThreadTs?: string | null;

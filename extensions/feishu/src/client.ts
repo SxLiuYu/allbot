@@ -1,6 +1,6 @@
 import type { Agent } from "node:https";
 import * as Lark from "@larksuiteoapi/node-sdk";
-import { resolveAmbientNodeProxyAgent } from "kaijibot/plugin-sdk/extension-shared";
+import { resolveAmbientNodeProxyAgent } from "allbot/plugin-sdk/extension-shared";
 import type { FeishuConfig, FeishuDomain, ResolvedFeishuAccount } from "./types.js";
 
 type FeishuClientSdk = Pick<
@@ -29,7 +29,7 @@ let feishuClientSdk: FeishuClientSdk = defaultFeishuClientSdk;
 /** Default HTTP timeout for Feishu API requests (30 seconds). */
 export const FEISHU_HTTP_TIMEOUT_MS = 30_000;
 export const FEISHU_HTTP_TIMEOUT_MAX_MS = 300_000;
-export const FEISHU_HTTP_TIMEOUT_ENV_VAR = "KAIJIBOT_FEISHU_HTTP_TIMEOUT_MS";
+export const FEISHU_HTTP_TIMEOUT_ENV_VAR = "ALLBOT_FEISHU_HTTP_TIMEOUT_MS";
 
 type FeishuHttpInstanceLike = Pick<
   typeof feishuClientSdk.defaultHttpInstance,

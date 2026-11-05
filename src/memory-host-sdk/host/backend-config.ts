@@ -3,7 +3,7 @@ import path from "node:path";
 import { resolveAgentWorkspaceDir } from "../../agents/agent-scope.js";
 import { parseDurationMs } from "../../cli/parse-duration.js";
 import type { SessionSendPolicyConfig } from "../../config/types.base.js";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import type {
   MemoryBackend,
   MemoryCitationsMode,
@@ -347,7 +347,7 @@ function resolveDefaultCollections(
 }
 
 export function resolveMemoryBackendConfig(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
 }): ResolvedMemoryBackendConfig {
   const normalizedAgentId = normalizeAgentId(params.agentId);

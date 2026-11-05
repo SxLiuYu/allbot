@@ -1,12 +1,12 @@
 ---
-summary: "Deploy KaijiBot on Render with Infrastructure-as-Code"
+summary: "Deploy AllBot on Render with Infrastructure-as-Code"
 read_when:
-  - Deploying KaijiBot to Render
+  - Deploying AllBot to Render
   - You want a declarative cloud deploy with Render Blueprints
 title: "Render"
 ---
 
-Deploy KaijiBot on Render using Infrastructure as Code. The included `render.yaml` Blueprint defines your entire stack declaratively, service, disk, environment variables, so you can deploy with a single click and version your infrastructure alongside your code.
+Deploy AllBot on Render using Infrastructure as Code. The included `render.yaml` Blueprint defines your entire stack declaratively, service, disk, environment variables, so you can deploy with a single click and version your infrastructure alongside your code.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ Deploy KaijiBot on Render using Infrastructure as Code. The included `render.yam
 
 ## Deploy with a Render Blueprint
 
-[Deploy to Render](https://render.com/deploy?repo=https://github.com/kaijibot/kaijibot)
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/allbot/allbot)
 
 Clicking this link will:
 
@@ -27,26 +27,26 @@ Once deployed, your service URL follows the pattern `https://<service-name>.onre
 ## Understanding the Blueprint
 
 Render Blueprints are YAML files that define your infrastructure. The `render.yaml` in this
-repository configures everything needed to run KaijiBot:
+repository configures everything needed to run AllBot:
 
 ```yaml
 services:
   - type: web
-    name: kaijibot
+    name: allbot
     runtime: docker
     plan: starter
     healthCheckPath: /health
     envVars:
-      - key: KAIJIBOT_GATEWAY_PORT
+      - key: ALLBOT_GATEWAY_PORT
         value: "8080"
-      - key: KAIJIBOT_STATE_DIR
-        value: /data/.kaijibot
-      - key: KAIJIBOT_WORKSPACE_DIR
+      - key: ALLBOT_STATE_DIR
+        value: /data/.allbot
+      - key: ALLBOT_WORKSPACE_DIR
         value: /data/workspace
-      - key: KAIJIBOT_GATEWAY_TOKEN
+      - key: ALLBOT_GATEWAY_TOKEN
         generateValue: true # auto-generates a secure token
     disk:
-      name: kaijibot-data
+      name: allbot-data
       mountPath: /data
       sizeGB: 1
 ```
@@ -69,7 +69,7 @@ Key Blueprint features used:
 | Standard+ | Never             | 1GB+          | Production, multiple channels |
 
 The Blueprint defaults to `starter`. To use free tier, change `plan: free` in
-your fork's `render.yaml` (but note: no persistent disk means KaijiBot state
+your fork's `render.yaml` (but note: no persistent disk means AllBot state
 resets on each deploy).
 
 ## After deployment
@@ -79,7 +79,7 @@ resets on each deploy).
 The web dashboard is available at `https://<your-service>.onrender.com/`.
 
 Connect using the configured shared secret. This deploy template auto-generates
-`KAIJIBOT_GATEWAY_TOKEN` (find it in **Dashboard → your service →
+`ALLBOT_GATEWAY_TOKEN` (find it in **Dashboard → your service →
 Environment**); if you replace it with password auth, use that password
 instead.
 
@@ -103,7 +103,7 @@ Modify variables in **Dashboard → your service → Environment**. Changes trig
 
 ### Auto-deploy
 
-If you use the original KaijiBot repository, Render will not auto-deploy your KaijiBot. To update it, run a manual Blueprint sync from the dashboard.
+If you use the original AllBot repository, Render will not auto-deploy your AllBot. To update it, run a manual Blueprint sync from the dashboard.
 
 ## Custom domain
 
@@ -119,7 +119,7 @@ Render supports horizontal and vertical scaling:
 - **Vertical**: Change the plan to get more CPU/RAM
 - **Horizontal**: Increase instance count (Standard plan and above)
 
-For KaijiBot, vertical scaling is usually sufficient. Horizontal scaling requires sticky sessions or external state management.
+For AllBot, vertical scaling is usually sufficient. Horizontal scaling requires sticky sessions or external state management.
 
 ## Backups and migration
 
@@ -127,10 +127,10 @@ Export your state, config, auth profiles, and workspace at any time using the
 shell access in the Render Dashboard:
 
 ```bash
-kaijibot backup create
+allbot backup create
 ```
 
-This creates a portable backup archive with KaijiBot state plus any configured
+This creates a portable backup archive with AllBot state plus any configured
 workspace. See [Backup](/cli/backup) for details.
 
 ## Troubleshooting
@@ -139,8 +139,8 @@ workspace. See [Backup](/cli/backup) for details.
 
 Check the deploy logs in the Render Dashboard. Common issues:
 
-- Missing `KAIJIBOT_GATEWAY_TOKEN` — verify it is set in **Dashboard → Environment**
-- Port mismatch — ensure `KAIJIBOT_GATEWAY_PORT=8080` is set so the gateway binds to the port Render expects
+- Missing `ALLBOT_GATEWAY_TOKEN` — verify it is set in **Dashboard → Environment**
+- Port mismatch — ensure `ALLBOT_GATEWAY_PORT=8080` is set so the gateway binds to the port Render expects
 
 ### Slow cold starts (free tier)
 
@@ -149,7 +149,7 @@ Free tier services spin down after 15 minutes of inactivity. The first request a
 ### Data loss after redeploy
 
 This happens on free tier (no persistent disk). Upgrade to a paid plan, or
-regularly export a full backup via `kaijibot backup create` in the Render shell.
+regularly export a full backup via `allbot backup create` in the Render shell.
 
 ### Health check failures
 
@@ -162,4 +162,4 @@ Render expects a 200 response from `/health` within 30 seconds. If builds succee
 
 - Set up messaging channels: [Channels](/channels)
 - Configure the Gateway: [Gateway configuration](/gateway/configuration)
-- Keep KaijiBot up to date: [Updating](/install/updating)
+- Keep AllBot up to date: [Updating](/install/updating)

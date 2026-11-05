@@ -3,7 +3,7 @@ import {
   normalizeLegacyDotBetaVersion,
 } from "../infra/semver-compare.js";
 
-export type KaijiBotVersion = {
+export type AllBotVersion = {
   major: number;
   minor: number;
   patch: number;
@@ -13,7 +13,7 @@ export type KaijiBotVersion = {
 
 const VERSION_RE = /^v?(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/;
 
-export function parseKaijiBotVersion(raw: string | null | undefined): KaijiBotVersion | null {
+export function parseAllBotVersion(raw: string | null | undefined): AllBotVersion | null {
   if (!raw) {
     return null;
   }
@@ -33,20 +33,20 @@ export function parseKaijiBotVersion(raw: string | null | undefined): KaijiBotVe
   };
 }
 
-export function normalizeKaijiBotVersionBase(raw: string | null | undefined): string | null {
-  const parsed = parseKaijiBotVersion(raw);
+export function normalizeAllBotVersionBase(raw: string | null | undefined): string | null {
+  const parsed = parseAllBotVersion(raw);
   if (!parsed) {
     return null;
   }
   return `${parsed.major}.${parsed.minor}.${parsed.patch}`;
 }
 
-export function isSameKaijiBotStableFamily(
+export function isSameAllBotStableFamily(
   a: string | null | undefined,
   b: string | null | undefined,
 ): boolean {
-  const parsedA = parseKaijiBotVersion(a);
-  const parsedB = parseKaijiBotVersion(b);
+  const parsedA = parseAllBotVersion(a);
+  const parsedB = parseAllBotVersion(b);
   if (!parsedA || !parsedB) {
     return false;
   }
@@ -60,12 +60,12 @@ export function isSameKaijiBotStableFamily(
   );
 }
 
-export function compareKaijiBotVersions(
+export function compareAllBotVersions(
   a: string | null | undefined,
   b: string | null | undefined,
 ): number | null {
-  const parsedA = parseKaijiBotVersion(a);
-  const parsedB = parseKaijiBotVersion(b);
+  const parsedA = parseAllBotVersion(a);
+  const parsedB = parseAllBotVersion(b);
   if (!parsedA || !parsedB) {
     return null;
   }
@@ -104,8 +104,8 @@ export function shouldWarnOnTouchedVersion(
   current: string | null | undefined,
   touched: string | null | undefined,
 ): boolean {
-  const parsedCurrent = parseKaijiBotVersion(current);
-  const parsedTouched = parseKaijiBotVersion(touched);
+  const parsedCurrent = parseAllBotVersion(current);
+  const parsedTouched = parseAllBotVersion(touched);
   if (
     parsedCurrent &&
     parsedTouched &&
@@ -116,14 +116,14 @@ export function shouldWarnOnTouchedVersion(
   ) {
     return false;
   }
-  if (isSameKaijiBotStableFamily(current, touched)) {
+  if (isSameAllBotStableFamily(current, touched)) {
     return false;
   }
-  const cmp = compareKaijiBotVersions(current, touched);
+  const cmp = compareAllBotVersions(current, touched);
   return cmp !== null && cmp < 0;
 }
 
-function releaseRank(version: KaijiBotVersion): number {
+function releaseRank(version: AllBotVersion): number {
   if (version.prerelease?.length) {
     return 0;
   }

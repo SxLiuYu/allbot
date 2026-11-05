@@ -1,7 +1,7 @@
 import {
   createModelCatalogPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildVeniceModelDefinition,
   VENICE_BASE_URL,
@@ -13,7 +13,7 @@ export { VENICE_DEFAULT_MODEL_REF };
 
 const venicePresetAppliers = createModelCatalogPresetAppliers({
   primaryModelRef: VENICE_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => ({
+  resolveParams: (_cfg: AllBotConfig) => ({
     providerId: "venice",
     api: "openai-completions",
     baseUrl: VENICE_BASE_URL,
@@ -22,10 +22,10 @@ const venicePresetAppliers = createModelCatalogPresetAppliers({
   }),
 });
 
-export function applyVeniceProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyVeniceProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return venicePresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyVeniceConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyVeniceConfig(cfg: AllBotConfig): AllBotConfig {
   return venicePresetAppliers.applyConfig(cfg);
 }

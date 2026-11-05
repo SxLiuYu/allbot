@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { networkInterfaces } from "node:os";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import { loadProviderUsageSummary } from "../infra/provider-usage.load.js";
 import { loadCostUsageSummary } from "../infra/session-cost-usage.js";
 import { VERSION } from "../version.js";
@@ -65,7 +65,7 @@ export async function handleStatusHttpRequest(
 
   // Lazy-load config — the config module graph is heavy. Load it here so this
   // module stays cheap to import even when /api/status is never hit.
-  let cfg: KaijiBotConfig | null = null;
+  let cfg: AllBotConfig | null = null;
   try {
     const { loadConfig } = await import("../config/config.js");
     cfg = loadConfig();

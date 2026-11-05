@@ -3,7 +3,7 @@ import { createBrowserPluginService } from "./plugin-service.js";
 
 const SERVICE_CONTEXT = {
   config: {},
-  stateDir: "/tmp/kaijibot-state",
+  stateDir: "/tmp/allbot-state",
   logger: console,
 };
 
@@ -18,7 +18,7 @@ const runtimeMocks = vi.hoisted(() => ({
   startLazyPluginServiceModule: vi.fn(async (_params: StartLazyPluginServiceModuleParams) => null),
 }));
 
-vi.mock("kaijibot/plugin-sdk/browser-node-runtime", () => ({
+vi.mock("allbot/plugin-sdk/browser-node-runtime", () => ({
   startLazyPluginServiceModule: runtimeMocks.startLazyPluginServiceModule,
 }));
 

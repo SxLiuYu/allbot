@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { resetConfigRuntimeState, setRuntimeConfigSnapshot } from "../config/config.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { withStateDirEnv } from "../test-helpers/state-dir-env.js";
 import {
@@ -40,19 +40,19 @@ function createSymlinkOrSkip(targetPath: string, linkPath: string): boolean {
   }
 }
 
-function createSingleAgentAvatarConfig(workspace: string): KaijiBotConfig {
+function createSingleAgentAvatarConfig(workspace: string): AllBotConfig {
   return {
     session: { mainKey: "main" },
     agents: {
       list: [{ id: "main", default: true, workspace, identity: { avatar: "avatar-link.png" } }],
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createModelDefaultsConfig(params: {
   primary: string;
   models?: Record<string, Record<string, never>>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -60,7 +60,7 @@ function createModelDefaultsConfig(params: {
         models: params.models,
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("gateway session utils", () => {
@@ -100,7 +100,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:ops:work");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "work" })).toBe("agent:ops:work");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "agent:ops:main" })).toBe("agent:ops:work");
@@ -112,7 +112,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "discord:group:123" })).toBe(
       "agent:ops:discord:group:123",
     );
@@ -125,7 +125,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops" }, { id: "review" }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:ops:main");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "discord:group:123" })).toBe(
       "agent:ops:discord:group:123",
@@ -135,7 +135,7 @@ describe("gateway session utils", () => {
   test("resolveSessionStoreKey falls back to main when agents.list is missing", () => {
     const cfg = {
       session: { mainKey: "work" },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("agent:main:work");
     expect(resolveSessionStoreKey({ cfg, sessionKey: "thread-1" })).toBe("agent:main:thread-1");
   });
@@ -144,7 +144,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "CoP" })).toBe(
       resolveSessionStoreKey({ cfg, sessionKey: "cop" }),
     );
@@ -159,7 +159,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { scope: "global", mainKey: "work" },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expect(resolveSessionStoreKey({ cfg, sessionKey: "main" })).toBe("global");
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "main" });
     expect(target.canonicalKey).toBe("global");
@@ -169,14 +169,14 @@ describe("gateway session utils", () => {
   test("resolveGatewaySessionStoreTarget uses canonical key for main alias", () => {
     const storeTemplate = path.join(
       os.tmpdir(),
-      "kaijibot-session-utils",
+      "allbot-session-utils",
       "{agentId}",
       "sessions.json",
     );
     const cfg = {
       session: { mainKey: "main", store: storeTemplate },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "main" });
     expect(target.canonicalKey).toBe("agent:ops:main");
     expect(target.storeKeys).toEqual(expect.arrayContaining(["agent:ops:main", "main"]));
@@ -194,7 +194,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main", store: storePath },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:ops:mysession" });
     expect(target.canonicalKey).toBe("agent:ops:mysession");
     expect(target.storeKeys).toEqual(
@@ -219,7 +219,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main", store: storePath },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:ops:mysession" });
     expect(target.storeKeys).toEqual(
       expect.arrayContaining(["agent:ops:mysession", "agent:ops:MySession"]),
@@ -237,7 +237,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "work", store: storePath },
       agents: { list: [{ id: "ops", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:ops:main" });
     expect(target.canonicalKey).toBe("agent:ops:work");
     expect(target.storeKeys).toEqual(expect.arrayContaining(["agent:ops:MAIN"]));
@@ -262,7 +262,7 @@ describe("gateway session utils", () => {
           store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
         },
         agents: { list: [{ id: "main", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const target = resolveGatewaySessionStoreTarget({ cfg, key: "agent:retired-agent:main" });
 
@@ -290,7 +290,7 @@ describe("gateway session utils", () => {
             store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
           },
           agents: { list: [{ id: "main", default: true }] },
-        } as KaijiBotConfig;
+        } as AllBotConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:retired-agent:main");
@@ -328,7 +328,7 @@ describe("gateway session utils", () => {
             store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
           },
           agents: { list: [{ id: "main", default: true }] },
-        } as KaijiBotConfig;
+        } as AllBotConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:main:main");
@@ -379,7 +379,7 @@ describe("gateway session utils", () => {
             store: path.join(stateDir, "agents", "{agentId}", "sessions", "sessions.json"),
           },
           agents: { list: [{ id: "main", default: true }] },
-        } as KaijiBotConfig;
+        } as AllBotConfig;
         setRuntimeConfigSnapshot(cfg, cfg);
 
         const loaded = loadSessionEntry("agent:main:main");
@@ -410,7 +410,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "main", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const store: Record<string, SessionEntry> = {
       "agent:main:Main": {
         sessionId: "sess-stale",
@@ -439,7 +439,7 @@ describe("gateway session utils", () => {
     const cfg = {
       session: { mainKey: "main" },
       agents: { list: [{ id: "main", default: true }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const store: Record<string, SessionEntry> = {
       "agent:main:main": {
         sessionId: "sess-stale",
@@ -500,14 +500,14 @@ describe("gateway session utils", () => {
   });
 
   test("listAgentsForGateway keeps explicit agents.list scope over disk-only agents (scope boundary)", async () => {
-    await withStateDirEnv("kaijibot-agent-list-scope-", async ({ stateDir }) => {
+    await withStateDirEnv("allbot-agent-list-scope-", async ({ stateDir }) => {
       fs.mkdirSync(path.join(stateDir, "agents", "main"), { recursive: true });
       fs.mkdirSync(path.join(stateDir, "agents", "codex"), { recursive: true });
 
       const cfg = {
         session: { mainKey: "main" },
         agents: { list: [{ id: "main", default: true }] },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const { agents } = listAgentsForGateway(cfg);
       expect(agents.map((agent) => agent.id)).toEqual(["main"]);
@@ -527,7 +527,7 @@ describe("gateway session utils", () => {
         },
         list: [{ id: "main", default: true }],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const result = listAgentsForGateway(cfg);
     expect(result.agents[0]).toMatchObject({
@@ -561,7 +561,7 @@ describe("gateway session utils", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const result = listAgentsForGateway(cfg);
     const ops = result.agents.find((agent) => agent.id === "ops");
@@ -732,7 +732,7 @@ describe("listSessionsFromStore selected model display", () => {
 
 describe("resolveSessionModelIdentityRef", () => {
   const resolveLegacyIdentityRef = (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     modelProvider: string | undefined = undefined,
   ) =>
     resolveSessionModelIdentityRef(cfg, {
@@ -775,7 +775,7 @@ describe("resolveSessionModelIdentityRef", () => {
           models: [{ id: "qwen-max" }],
         },
       },
-    } as unknown as KaijiBotConfig["models"];
+    } as unknown as AllBotConfig["models"];
 
     const resolved = resolveSessionModelIdentityRef(cfg, {
       sessionId: "custom-provider-runtime-model",
@@ -814,7 +814,7 @@ describe("resolveSessionModelIdentityRef", () => {
           models: [{ id: "qwen-max" }],
         },
       },
-    } as unknown as KaijiBotConfig["models"];
+    } as unknown as AllBotConfig["models"];
 
     const resolved = resolveSessionModelIdentityRef(cfg, {
       sessionId: "ambiguous-custom-provider-runtime-model",

@@ -1,9 +1,9 @@
 ---
-summary: "Schema-accurate configuration examples for common KaijiBot setups"
+summary: "Schema-accurate configuration examples for common AllBot setups"
 read_when:
-  - Learning how to configure KaijiBot
+  - Learning how to configure AllBot
   - Looking for configuration examples
-  - Setting up KaijiBot for the first time
+  - Setting up AllBot for the first time
 title: "Configuration Examples"
 ---
 
@@ -17,12 +17,12 @@ Examples below are aligned with the current config schema. For the exhaustive re
 
 ```json5
 {
-  agent: { workspace: "~/.kaijibot/workspace" },
+  agent: { workspace: "~/.allbot/workspace" },
   channels: { whatsapp: { allowFrom: ["+15555550123"] } },
 }
 ```
 
-Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
+Save to `~/.allbot/allbot.json` and you can DM the bot from that number.
 
 ### Recommended starter
 
@@ -34,7 +34,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
     emoji: "🦞",
   },
   agent: {
-    workspace: "~/.kaijibot/workspace",
+    workspace: "~/.allbot/workspace",
     model: { primary: "anthropic/claude-sonnet-4-6" },
   },
   channels: {
@@ -89,7 +89,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
   // Logging
   logging: {
     level: "info",
-    file: "/tmp/kaijibot/kaijibot.log",
+    file: "/tmp/allbot/allbot.log",
     consoleLevel: "info",
     consoleStyle: "pretty",
     redactSensitive: "tools",
@@ -97,7 +97,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
 
   // Message formatting
   messages: {
-    messagePrefix: "[kaijibot]",
+    messagePrefix: "[allbot]",
     responsePrefix: ">",
     ackReaction: "👀",
     ackReactionScope: "group-mentions",
@@ -106,7 +106,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
   // Routing + queue
   routing: {
     groupChat: {
-      mentionPatterns: ["@kaijibot", "kaijibot"],
+      mentionPatterns: ["@allbot", "allbot"],
       historyLimit: 50,
     },
     queue: {
@@ -160,7 +160,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
       discord: { mode: "idle", idleMinutes: 10080 },
     },
     resetTriggers: ["/new", "/reset"],
-    store: "~/.kaijibot/agents/default/sessions/sessions.json",
+    store: "~/.allbot/agents/default/sessions/sessions.json",
     maintenance: {
       mode: "warn",
       pruneAfter: "30d",
@@ -202,7 +202,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
       dm: { enabled: true, allowFrom: ["123456789012345678"] },
       guilds: {
         "123456789012345678": {
-          slug: "friends-of-kaijibot",
+          slug: "friends-of-allbot",
           requireMention: false,
           channels: {
             general: { allow: true },
@@ -222,7 +222,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
       dm: { enabled: true, allowFrom: ["U123"] },
       slashCommand: {
         enabled: true,
-        name: "kaijibot",
+        name: "allbot",
         sessionPrefix: "slack:slash",
         ephemeral: true,
       },
@@ -232,7 +232,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
   // Agent runtime
   agents: {
     defaults: {
-      workspace: "~/.kaijibot/workspace",
+      workspace: "~/.allbot/workspace",
       userTimezone: "America/Chicago",
       model: {
         primary: "anthropic/claude-sonnet-4-6",
@@ -287,9 +287,9 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
       sandbox: {
         mode: "non-main",
         scope: "session", // preferred over legacy perSession: true
-        workspaceRoot: "~/.kaijibot/sandboxes",
+        workspaceRoot: "~/.allbot/sandboxes",
         docker: {
-          image: "kaijibot-sandbox:bookworm-slim",
+          image: "allbot-sandbox:bookworm-slim",
           workdir: "/workspace",
           readOnlyRoot: true,
           tmpfs: ["/tmp", "/var/tmp", "/run"],
@@ -370,7 +370,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
   // Cron jobs
   cron: {
     enabled: true,
-    store: "~/.kaijibot/cron/cron.json",
+    store: "~/.allbot/cron/cron.json",
     maxConcurrentRuns: 2,
     sessionRetention: "24h",
     runLog: {
@@ -385,7 +385,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
     path: "/hooks",
     token: "shared-secret",
     presets: ["gmail"],
-    transformsDir: "~/.kaijibot/hooks/transforms",
+    transformsDir: "~/.allbot/hooks/transforms",
     mappings: [
       {
         id: "gmail-hook",
@@ -408,7 +408,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
       },
     ],
     gmail: {
-      account: "kaijibot@gmail.com",
+      account: "allbot@gmail.com",
       label: "INBOX",
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",
@@ -427,7 +427,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
     mode: "local",
     port: 18789,
     bind: "loopback",
-    controlUi: { enabled: true, basePath: "/kaijibot" },
+    controlUi: { enabled: true, basePath: "/allbot" },
     auth: {
       mode: "token",
       token: "gateway-token",
@@ -467,12 +467,12 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
 {
   agents: {
     defaults: {
-      workspace: "~/.kaijibot/workspace",
+      workspace: "~/.allbot/workspace",
       skills: ["github", "weather"],
     },
     list: [
       { id: "main", default: true },
-      { id: "docs", workspace: "~/.kaijibot/workspace-docs", skills: ["docs-search"] },
+      { id: "docs", workspace: "~/.allbot/workspace-docs", skills: ["docs-search"] },
     ],
   },
 }
@@ -486,7 +486,7 @@ Save to `~/.kaijibot/kaijibot.json` and you can DM the bot from that number.
 
 ```json5
 {
-  agent: { workspace: "~/.kaijibot/workspace" },
+  agent: { workspace: "~/.allbot/workspace" },
   channels: {
     whatsapp: { allowFrom: ["+15555550123"] },
     telegram: {
@@ -557,7 +557,7 @@ Only enable direct mutable name/email/nick matching with each channel's `dangero
     },
   },
   agent: {
-    workspace: "~/.kaijibot/workspace",
+    workspace: "~/.allbot/workspace",
     model: {
       primary: "anthropic/claude-opus-4-6",
       fallbacks: ["minimax/MiniMax-M2.7"],
@@ -575,7 +575,7 @@ Only enable direct mutable name/email/nick matching with each channel's `dangero
     theme: "professional assistant",
   },
   agent: {
-    workspace: "~/work-kaijibot",
+    workspace: "~/work-allbot",
     elevated: { enabled: false },
   },
   channels: {
@@ -596,7 +596,7 @@ Only enable direct mutable name/email/nick matching with each channel's `dangero
 ```json5
 {
   agent: {
-    workspace: "~/.kaijibot/workspace",
+    workspace: "~/.allbot/workspace",
     model: { primary: "lmstudio/my-local-model" },
   },
   models: {

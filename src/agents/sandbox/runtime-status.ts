@@ -1,5 +1,5 @@
 import { formatCliCommand } from "../../cli/command-format.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   canonicalizeMainSessionAlias,
   resolveAgentMainSessionKey,
@@ -24,7 +24,7 @@ function shouldSandboxSession(cfg: SandboxConfig, sessionKey: string, mainSessio
 }
 
 function resolveMainSessionKeyForSandbox(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentId: string;
 }): string {
   if (params.cfg?.session?.scope === "global") {
@@ -37,7 +37,7 @@ function resolveMainSessionKeyForSandbox(params: {
 }
 
 function resolveComparableSessionKeyForSandbox(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentId: string;
   sessionKey: string;
 }): string {
@@ -49,7 +49,7 @@ function resolveComparableSessionKeyForSandbox(params: {
 }
 
 export function resolveSandboxRuntimeStatus(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   sessionKey?: string;
 }): {
   agentId: string;
@@ -126,7 +126,7 @@ function shellEscapeSingleArg(value: string): string {
 }
 
 export function formatSandboxToolPolicyBlockedMessage(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   sessionKey?: string;
   toolName: string;
 }): string | undefined {
@@ -178,9 +178,9 @@ export function formatSandboxToolPolicyBlockedMessage(params: {
   }
   const explainCommand = runtime.sessionKey
     ? hasUnsafeControlChars(runtime.sessionKey)
-      ? `kaijibot sandbox explain --agent ${runtime.agentId}`
-      : `kaijibot sandbox explain --session ${shellEscapeSingleArg(runtime.sessionKey)}`
-    : "kaijibot sandbox explain";
+      ? `allbot sandbox explain --agent ${runtime.agentId}`
+      : `allbot sandbox explain --session ${shellEscapeSingleArg(runtime.sessionKey)}`
+    : "allbot sandbox explain";
   lines.push(`- See: ${formatCliCommand(explainCommand)}`);
 
   return lines.join("\n");

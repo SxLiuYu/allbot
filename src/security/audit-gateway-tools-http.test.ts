@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectGatewayConfigFindings } from "./audit.js";
 
 function hasFinding(
@@ -22,7 +22,7 @@ describe("security audit gateway HTTP tool findings", () => {
           auth: { token: "secret" },
           tools: { allow: ["sessions_spawn"] },
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       expectedSeverity: "warn" as const,
     },
     {
@@ -33,7 +33,7 @@ describe("security audit gateway HTTP tool findings", () => {
           auth: { token: "secret" },
           tools: { allow: ["sessions_spawn", "gateway"] },
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       expectedSeverity: "critical" as const,
     },
     {
@@ -44,7 +44,7 @@ describe("security audit gateway HTTP tool findings", () => {
           auth: { token: "secret" },
           tools: { allow: ["exec"] },
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       expectedSeverity: "critical" as const,
     },
   ])(

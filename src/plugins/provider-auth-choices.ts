@@ -1,5 +1,5 @@
 import { resolveProviderIdForAuth } from "../agents/provider-auth-aliases.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizePluginsConfig, resolveEffectiveEnableState } from "./config-state.js";
 import { loadPluginManifestRegistry, type PluginManifestRecord } from "./manifest-registry.js";
 import type { PluginOrigin } from "./types.js";
@@ -91,7 +91,7 @@ function stripChoiceOrigin(choice: ProviderAuthChoiceCandidate): ProviderAuthCho
 }
 
 function resolveManifestProviderAuthChoiceCandidates(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeUntrustedWorkspacePlugins?: boolean;
@@ -166,7 +166,7 @@ function resolvePreferredManifestAuthChoicesByChoiceId(
 }
 
 export function resolveManifestProviderAuthChoices(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeUntrustedWorkspacePlugins?: boolean;
@@ -179,7 +179,7 @@ export function resolveManifestProviderAuthChoices(params?: {
 export function resolveManifestProviderAuthChoice(
   choiceId: string,
   params?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
     includeUntrustedWorkspacePlugins?: boolean;
@@ -198,7 +198,7 @@ export function resolveManifestProviderAuthChoice(
 
 export function resolveManifestProviderApiKeyChoice(params: {
   providerId: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeUntrustedWorkspacePlugins?: boolean;
@@ -220,7 +220,7 @@ export function resolveManifestProviderApiKeyChoice(params: {
 export function resolveManifestDeprecatedProviderAuthChoice(
   choiceId: string,
   params?: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     workspaceDir?: string;
     env?: NodeJS.ProcessEnv;
     includeUntrustedWorkspacePlugins?: boolean;
@@ -238,7 +238,7 @@ export function resolveManifestDeprecatedProviderAuthChoice(
 }
 
 export function resolveManifestProviderOnboardAuthFlags(params?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
   includeUntrustedWorkspacePlugins?: boolean;

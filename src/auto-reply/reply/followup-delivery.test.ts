@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveFollowupDeliveryPayloads } from "./followup-delivery.js";
 
-const baseConfig = {} as KaijiBotConfig;
+const baseConfig = {} as AllBotConfig;
 
 describe("resolveFollowupDeliveryPayloads", () => {
   it("drops heartbeat ack payloads without media", () => {

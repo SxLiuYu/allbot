@@ -1,14 +1,14 @@
 ---
-summary: "CLI reference for `kaijibot update` (safe-ish source update + gateway auto-restart)"
+summary: "CLI reference for `allbot update` (safe-ish source update + gateway auto-restart)"
 read_when:
   - You want to update a source checkout safely
   - You need to understand `--update` shorthand behavior
 title: "update"
 ---
 
-# `kaijibot update`
+# `allbot update`
 
-Safely update KaijiBot and switch between stable/beta/dev channels.
+Safely update AllBot and switch between stable/beta/dev channels.
 
 If you installed via **npm/pnpm/bun** (global install, no git metadata),
 updates happen via the package-manager flow in [Updating](/install/updating).
@@ -16,25 +16,25 @@ updates happen via the package-manager flow in [Updating](/install/updating).
 ## Usage
 
 ```bash
-kaijibot update
-kaijibot update status
-kaijibot update wizard
-kaijibot update --channel beta
-kaijibot update --channel dev
-kaijibot update --tag beta
-kaijibot update --tag main
-kaijibot update --dry-run
-kaijibot update --no-restart
-kaijibot update --yes
-kaijibot update --json
-kaijibot --update
+allbot update
+allbot update status
+allbot update wizard
+allbot update --channel beta
+allbot update --channel dev
+allbot update --tag beta
+allbot update --tag main
+allbot update --dry-run
+allbot update --no-restart
+allbot update --yes
+allbot update --json
+allbot --update
 ```
 
 ## Options
 
 - `--no-restart`: skip restarting the Gateway service after a successful update.
 - `--channel <stable|beta|dev>`: set the update channel (git + npm; persisted in config).
-- `--tag <dist-tag|version|spec>`: override the package target for this update only. For package installs, `main` maps to `github:kaijibot/kaijibot#main`.
+- `--tag <dist-tag|version|spec>`: override the package target for this update only. For package installs, `main` maps to `github:allbot/allbot#main`.
 - `--dry-run`: preview planned update actions (channel/tag/target/restart flow) without writing config, installing, syncing plugins, or restarting.
 - `--json`: print machine-readable `UpdateRunResult` JSON.
 - `--timeout <seconds>`: per-step timeout (default is 1200s).
@@ -47,9 +47,9 @@ Note: downgrades require confirmation because older versions can break configura
 Show the active update channel + git tag/branch/SHA (for source checkouts), plus update availability.
 
 ```bash
-kaijibot update status
-kaijibot update status --json
-kaijibot update status --timeout 10
+allbot update status
+allbot update status --json
+allbot update status --timeout 10
 ```
 
 Options:
@@ -69,10 +69,10 @@ Options:
 
 ## What it does
 
-When you switch channels explicitly (`--channel ...`), KaijiBot also keeps the
+When you switch channels explicitly (`--channel ...`), AllBot also keeps the
 install method aligned:
 
-- `dev` → ensures a git checkout (default: `~/kaijibot`, override with `KAIJIBOT_GIT_DIR`),
+- `dev` → ensures a git checkout (default: `~/allbot`, override with `ALLBOT_GIT_DIR`),
   updates it, and installs the global CLI from that checkout.
 - `stable` → installs from npm using `latest`.
 - `beta` → prefers npm dist-tag `beta`, but falls back to `latest` when beta is
@@ -98,18 +98,18 @@ High-level:
 5. Rebases onto the selected commit (dev only).
 6. Installs deps with the repo package manager. For pnpm checkouts, the updater bootstraps `pnpm` on demand (via `corepack` first, then a temporary `npm install pnpm@10` fallback) instead of running `npm run build` inside a pnpm workspace.
 7. Builds + builds the Control UI.
-8. Runs `kaijibot doctor` as the final “safe update” check.
+8. Runs `allbot doctor` as the final “safe update” check.
 9. Syncs plugins to the active channel (dev uses bundled extensions; stable/beta uses npm) and updates npm-installed plugins.
 
 If pnpm bootstrap still fails, the updater now stops early with a package-manager-specific error instead of trying `npm run build` inside the checkout.
 
 ## `--update` shorthand
 
-`kaijibot --update` rewrites to `kaijibot update` (useful for shells and launcher scripts).
+`allbot --update` rewrites to `allbot update` (useful for shells and launcher scripts).
 
 ## See also
 
-- `kaijibot doctor` (offers to run update first on git checkouts)
+- `allbot doctor` (offers to run update first on git checkouts)
 - [Development channels](/install/development-channels)
 - [Updating](/install/updating)
 - [CLI reference](/cli)

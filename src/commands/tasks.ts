@@ -545,6 +545,6 @@ export async function tasksMaintenanceCommand(
     );
   }
   if (!opts.apply) {
-    runtime.log("Dry run only. Re-run with `kaijibot tasks maintenance --apply` to write changes.");
+    runtime.log("Dry run only. Re-run with `allbot tasks maintenance --apply` to write changes.");
   }
 }

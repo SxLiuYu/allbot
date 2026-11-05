@@ -1,13 +1,13 @@
 ---
-summary: "KaijiBot 微信 (WeChat / iLink Bot) 频道接入指南"
+summary: "AllBot 微信 (WeChat / iLink Bot) 频道接入指南"
 read_when:
-  - 你想在微信里跟 KaijiBot 对话
+  - 你想在微信里跟 AllBot 对话
 title: "WeChat / 微信"
 ---
 
 # WeChat / 微信
 
-KaijiBot 通过 **iLink Bot** 协议接入微信，作为一等频道与飞书同等深度支持。
+AllBot 通过 **iLink Bot** 协议接入微信，作为一等频道与飞书同等深度支持。
 
 ## 能力
 
@@ -20,36 +20,36 @@ KaijiBot 通过 **iLink Bot** 协议接入微信，作为一等频道与飞书�
 ## 接入步骤
 
 ```bash
-# 1. 确保 KaijiBot 已安装且 LLM API Key 已配置（运行 kaijibot onboard 完成）
+# 1. 确保 AllBot 已安装且 LLM API Key 已配置（运行 allbot onboard 完成）
 
 # 2. 登录微信
-kaijibot channels login --channel wechat
+allbot channels login --channel wechat
 
 # 这会弹出二维码，用手机微信扫码确认登录
 
 # 3. 启动 gateway
-kaijibot gateway --port 18789
+allbot gateway --port 18789
 ```
 
 登录成功后，向你的微信机器人账号发消息即可开始对话。
 
 ## 配置
 
-微信频道通过 `kaijibot config set` 配置：
+微信频道通过 `allbot config set` 配置：
 
 ```bash
 # 启用/禁用（默认启用当且仅当已登录）
-kaijibot config set channels.wechat.enabled true
+allbot config set channels.wechat.enabled true
 
 # 自定义 iLink Bot 服务地址（默认使用公共服务）
-kaijibot config set channels.wechat.api.baseUrl "https://your-ilink-bot-server"
+allbot config set channels.wechat.api.baseUrl "https://your-ilink-bot-server"
 ```
 
 ## 故障排除
 
 | 问题           | 解决方案                                                                                    |
 | -------------- | ------------------------------------------------------------------------------------------- |
-| 扫码后无响应   | 检查 `kaijibot channels login --channel wechat` 是否报错；查看 gateway 日志的 `[wechat]` 行 |
+| 扫码后无响应   | 检查 `allbot channels login --channel wechat` 是否报错；查看 gateway 日志的 `[wechat]` 行 |
 | 群消息不响应   | 群聊默认需要 @机器人，配置 `channels.wechat.replyOnGroupMentionOnly: false` 可改变行为      |
 | 语音消息听不懂 | 确保 `silk-wasm` 已安装（`pnpm install` 后自动）                                            |
 | 图片发不出去   | iLink Bot CDN 偶有限速，等几分钟重试                                                        |

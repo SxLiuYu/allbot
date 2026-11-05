@@ -1,5 +1,5 @@
-import type { CliBackendConfig } from "kaijibot/plugin-sdk/cli-backend";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+import type { CliBackendConfig } from "allbot/plugin-sdk/cli-backend";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 
 export const CLAUDE_CLI_BACKEND_ID = "claude-cli";
 export const CLAUDE_CLI_DEFAULT_MODEL_REF = `${CLAUDE_CLI_BACKEND_ID}/claude-sonnet-4-6`;
@@ -46,7 +46,7 @@ export const CLAUDE_CLI_HOST_MANAGED_ENV = {
 
 // Claude Code honors provider-routing, auth, and config-root env before
 // consulting its local login state, so inherited shell overrides must not
-// steer KaijiBot-managed Claude CLI runs toward a different provider,
+// steer AllBot-managed Claude CLI runs toward a different provider,
 // endpoint, token source, plugin/config tree, or telemetry bootstrap mode.
 export const CLAUDE_CLI_CLEAR_ENV = [
   "ANTHROPIC_API_KEY",

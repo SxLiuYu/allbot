@@ -3,23 +3,23 @@ import { OPERATOR_USER_ID, resolveOperatorSenderId, resolveCognitiveUserId } fro
 
 describe("resolveOperatorSenderId", () => {
   it("maps Control UI client id to operator", () => {
-    expect(resolveOperatorSenderId("kaijibot-control-ui")).toBe(OPERATOR_USER_ID);
+    expect(resolveOperatorSenderId("allbot-control-ui")).toBe(OPERATOR_USER_ID);
   });
 
   it("maps TUI client id to operator", () => {
-    expect(resolveOperatorSenderId("kaijibot-tui")).toBe(OPERATOR_USER_ID);
+    expect(resolveOperatorSenderId("allbot-tui")).toBe(OPERATOR_USER_ID);
   });
 
   it("maps macOS app client id to operator", () => {
-    expect(resolveOperatorSenderId("kaijibot-macos")).toBe(OPERATOR_USER_ID);
+    expect(resolveOperatorSenderId("allbot-macos")).toBe(OPERATOR_USER_ID);
   });
 
   it("maps iOS app client id to operator", () => {
-    expect(resolveOperatorSenderId("kaijibot-ios")).toBe(OPERATOR_USER_ID);
+    expect(resolveOperatorSenderId("allbot-ios")).toBe(OPERATOR_USER_ID);
   });
 
   it("maps Android app client id to operator", () => {
-    expect(resolveOperatorSenderId("kaijibot-android")).toBe(OPERATOR_USER_ID);
+    expect(resolveOperatorSenderId("allbot-android")).toBe(OPERATOR_USER_ID);
   });
 
   it("returns undefined for feishu user id", () => {
@@ -75,7 +75,7 @@ describe("resolveCognitiveUserId", () => {
   });
 
   it("maps operator clientId via senderId (S6)", () => {
-    expect(resolveCognitiveUserId(undefined, "kaijibot-control-ui")).toBe("operator");
+    expect(resolveCognitiveUserId(undefined, "allbot-control-ui")).toBe("operator");
   });
 
   it("passes through non-operator senderId (S7)", () => {

@@ -1,14 +1,14 @@
 ---
-summary: "Use MiniMax models in KaijiBot"
+summary: "Use MiniMax models in AllBot"
 read_when:
-  - You want MiniMax models in KaijiBot
+  - You want MiniMax models in AllBot
   - You need MiniMax setup guidance
 title: "MiniMax"
 ---
 
 # MiniMax
 
-KaijiBot's MiniMax provider defaults to **MiniMax M2.7**.
+AllBot's MiniMax provider defaults to **MiniMax M2.7**.
 
 MiniMax also provides:
 
@@ -57,7 +57,7 @@ Both `minimax` and `minimax-portal` register `image_generate` with the same
 the bundled `minimax-portal` auth path instead.
 
 When onboarding or API-key setup writes explicit `models.providers.minimax`
-entries, KaijiBot materializes `MiniMax-M2.7` and
+entries, AllBot materializes `MiniMax-M2.7` and
 `MiniMax-M2.7-highspeed` with `input: ["text", "image"]`.
 
 The built-in bundled MiniMax text catalog itself stays text-only metadata until
@@ -157,9 +157,9 @@ See [MiniMax Search](/tools/minimax-search).
 Authenticate with the explicit regional OAuth choice:
 
 ```bash
-kaijibot onboard --auth-choice minimax-global-oauth
+allbot onboard --auth-choice minimax-global-oauth
 # or
-kaijibot onboard --auth-choice minimax-cn-oauth
+allbot onboard --auth-choice minimax-cn-oauth
 ```
 
 Choice mapping:
@@ -167,7 +167,7 @@ Choice mapping:
 - `minimax-global-oauth`: International users (`api.minimax.io`)
 - `minimax-cn-oauth`: Users in China (`api.minimaxi.com`)
 
-See the MiniMax plugin package README in the KaijiBot repo for details.
+See the MiniMax plugin package README in the AllBot repo for details.
 
 ### MiniMax M2.7 (API key)
 
@@ -178,9 +178,9 @@ Configure via CLI:
 - Interactive onboarding:
 
 ```bash
-kaijibot onboard --auth-choice minimax-global-api
+allbot onboard --auth-choice minimax-global-api
 # or
-kaijibot onboard --auth-choice minimax-cn-api
+allbot onboard --auth-choice minimax-cn-api
 ```
 
 - `minimax-global-api`: International users (`api.minimax.io`)
@@ -223,7 +223,7 @@ kaijibot onboard --auth-choice minimax-cn-api
 }
 ```
 
-On the Anthropic-compatible streaming path, KaijiBot now disables MiniMax
+On the Anthropic-compatible streaming path, AllBot now disables MiniMax
 thinking by default unless you explicitly set `thinking` yourself. MiniMax's
 streaming endpoint emits `reasoning_content` in OpenAI-style delta chunks
 instead of native Anthropic thinking blocks, which can leak internal reasoning
@@ -252,11 +252,11 @@ Example below uses Opus as a concrete primary; swap to your preferred latest-gen
 }
 ```
 
-## Configure via `kaijibot configure`
+## Configure via `allbot configure`
 
 Use the interactive config wizard to set MiniMax without editing JSON:
 
-1. Run `kaijibot configure`.
+1. Run `allbot configure`.
 2. Select **Model/auth**.
 3. Choose a **MiniMax** auth option.
 4. Pick your default model when prompted.
@@ -284,7 +284,7 @@ Current MiniMax auth choices in the wizard/CLI:
   - OAuth setup: `minimax-portal/<model>`
 - Default chat model: `MiniMax-M2.7`
 - Alternate chat model: `MiniMax-M2.7-highspeed`
-- On `api: "anthropic-messages"`, KaijiBot injects
+- On `api: "anthropic-messages"`, AllBot injects
   `thinking: { type: "disabled" }` unless thinking is already explicitly set in
   params/config.
 - `/fast on` or `params.fastMode: true` rewrites `MiniMax-M2.7` to
@@ -294,11 +294,11 @@ Current MiniMax auth choices in the wizard/CLI:
 - The bundled provider catalog currently exposes the chat refs as text-only
   metadata until explicit MiniMax provider config exists
 - Coding Plan usage API: `https://api.minimaxi.com/v1/api/openplatform/coding_plan/remains` (requires a coding plan key).
-- KaijiBot normalizes MiniMax coding-plan usage to the same `% left` display
+- AllBot normalizes MiniMax coding-plan usage to the same `% left` display
   used by other providers. MiniMax's raw `usage_percent` / `usagePercent`
-  fields are remaining quota, not consumed quota, so KaijiBot inverts them.
+  fields are remaining quota, not consumed quota, so AllBot inverts them.
   Count-based fields win when present. When the API returns `model_remains`,
-  KaijiBot prefers the chat-model entry, derives the window label from
+  AllBot prefers the chat-model entry, derives the window label from
   `start_time` / `end_time` when needed, and includes the selected model name
   in the plan label so coding-plan windows are easier to distinguish.
 - Usage snapshots treat `minimax`, `minimax-cn`, and `minimax-portal` as the
@@ -307,9 +307,9 @@ Current MiniMax auth choices in the wizard/CLI:
 - Update pricing values in `models.json` if you need exact cost tracking.
 - Referral link for MiniMax Coding Plan (10% off): [https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link](https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link)
 - See [/concepts/model-providers](/concepts/model-providers) for provider rules.
-- Use `kaijibot models list` to confirm the current provider id, then switch with
-  `kaijibot models set minimax/MiniMax-M2.7` or
-  `kaijibot models set minimax-portal/MiniMax-M2.7`.
+- Use `allbot models list` to confirm the current provider id, then switch with
+  `allbot models set minimax/MiniMax-M2.7` or
+  `allbot models set minimax-portal/MiniMax-M2.7`.
 
 ## Troubleshooting
 
@@ -320,7 +320,7 @@ provider entry and no MiniMax auth profile/env key found). A fix for this
 detection is in **2026.1.12**. Fix by:
 
 - Upgrading to **2026.1.12** (or run from source `main`), then restarting the gateway.
-- Running `kaijibot configure` and selecting a **MiniMax** auth option, or
+- Running `allbot configure` and selecting a **MiniMax** auth option, or
 - Adding the matching `models.providers.minimax` or
   `models.providers.minimax-portal` block manually, or
 - Setting `MINIMAX_API_KEY`, `MINIMAX_OAUTH_TOKEN`, or a MiniMax auth profile
@@ -335,5 +335,5 @@ Make sure the model id is **case‑sensitive**:
 Then recheck with:
 
 ```bash
-kaijibot models list
+allbot models list
 ```

@@ -10,7 +10,7 @@ import { formatHelpExamples } from "../help-format.js";
 export function registerBackupCommand(program: Command) {
   const backup = program
     .command("backup")
-    .description("Create and verify local backup archives for KaijiBot state")
+    .description("Create and verify local backup archives for AllBot state")
     .addHelpText(
       "after",
       () =>
@@ -30,24 +30,24 @@ export function registerBackupCommand(program: Command) {
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["kaijibot backup create", "Create a timestamped backup in the current directory."],
+          ["allbot backup create", "Create a timestamped backup in the current directory."],
           [
-            "kaijibot backup create --output ~/Backups",
+            "allbot backup create --output ~/Backups",
             "Write the archive into an existing backup directory.",
           ],
           [
-            "kaijibot backup create --dry-run --json",
+            "allbot backup create --dry-run --json",
             "Preview the archive plan without writing any files.",
           ],
           [
-            "kaijibot backup create --verify",
+            "allbot backup create --verify",
             "Create the archive and immediately validate its manifest and payload layout.",
           ],
           [
-            "kaijibot backup create --no-include-workspace",
+            "allbot backup create --no-include-workspace",
             "Back up state/config without agent workspace files.",
           ],
-          ["kaijibot backup create --only-config", "Back up only the active JSON config file."],
+          ["allbot backup create --only-config", "Back up only the active JSON config file."],
         ])}`,
     )
     .action(async (opts) => {
@@ -72,11 +72,11 @@ export function registerBackupCommand(program: Command) {
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
           [
-            "kaijibot backup verify ./2026-03-09T00-00-00.000Z-kaijibot-backup.tar.gz",
+            "allbot backup verify ./2026-03-09T00-00-00.000Z-allbot-backup.tar.gz",
             "Check that the archive structure and manifest are intact.",
           ],
           [
-            "kaijibot backup verify ~/Backups/latest.tar.gz --json",
+            "allbot backup verify ~/Backups/latest.tar.gz --json",
             "Emit machine-readable verification output.",
           ],
         ])}`,

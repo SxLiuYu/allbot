@@ -1,20 +1,20 @@
 ---
-summary: "Install and use Codex, Claude, and Cursor bundles as KaijiBot plugins"
+summary: "Install and use Codex, Claude, and Cursor bundles as AllBot plugins"
 read_when:
   - You want to install a Codex, Claude, or Cursor-compatible bundle
-  - You need to understand how KaijiBot maps bundle content into native features
+  - You need to understand how AllBot maps bundle content into native features
   - You are debugging bundle detection or missing capabilities
 title: "Plugin Bundles"
 ---
 
 # Plugin Bundles
 
-KaijiBot can install plugins from three external ecosystems: **Codex**, **Claude**,
+AllBot can install plugins from three external ecosystems: **Codex**, **Claude**,
 and **Cursor**. These are called **bundles** — content and metadata packs that
-KaijiBot maps into native features like skills, hooks, and MCP tools.
+AllBot maps into native features like skills, hooks, and MCP tools.
 
 <Info>
-  Bundles are **not** the same as native KaijiBot plugins. Native plugins run
+  Bundles are **not** the same as native AllBot plugins. Native plugins run
   in-process and can register any capability. Bundles are content packs with
   selective feature mapping and a narrower trust boundary.
 </Info>
@@ -22,7 +22,7 @@ KaijiBot maps into native features like skills, hooks, and MCP tools.
 ## Why bundles exist
 
 Many useful plugins are published in Codex, Claude, or Cursor format. Instead
-of requiring authors to rewrite them as native KaijiBot plugins, KaijiBot
+of requiring authors to rewrite them as native AllBot plugins, AllBot
 detects these formats and maps their supported content into the native feature
 set. This means you can install a Claude command pack or a Codex skill bundle
 and use it immediately.
@@ -33,22 +33,22 @@ and use it immediately.
   <Step title="Install from a directory, archive, or marketplace">
     ```bash
     # Local directory
-    kaijibot plugins install ./my-bundle
+    allbot plugins install ./my-bundle
 
     # Archive
-    kaijibot plugins install ./my-bundle.tgz
+    allbot plugins install ./my-bundle.tgz
 
     # Claude marketplace
-    kaijibot plugins marketplace list <marketplace-name>
-    kaijibot plugins install <plugin-name>@<marketplace-name>
+    allbot plugins marketplace list <marketplace-name>
+    allbot plugins install <plugin-name>@<marketplace-name>
     ```
 
   </Step>
 
   <Step title="Verify detection">
     ```bash
-    kaijibot plugins list
-    kaijibot plugins inspect <id>
+    allbot plugins list
+    allbot plugins inspect <id>
     ```
 
     Bundles show as `Format: bundle` with a subtype of `codex`, `claude`, or `cursor`.
@@ -57,7 +57,7 @@ and use it immediately.
 
   <Step title="Restart and use">
     ```bash
-    kaijibot gateway restart
+    allbot gateway restart
     ```
 
     Mapped features (skills, hooks, MCP tools, LSP defaults) are available in the next session.
@@ -65,34 +65,34 @@ and use it immediately.
   </Step>
 </Steps>
 
-## What KaijiBot maps from bundles
+## What AllBot maps from bundles
 
-Not every bundle feature runs in KaijiBot today. Here is what works and what
+Not every bundle feature runs in AllBot today. Here is what works and what
 is detected but not yet wired.
 
 ### Supported now
 
 | Feature       | How it maps                                                                                 | Applies to     |
 | ------------- | ------------------------------------------------------------------------------------------- | -------------- |
-| Skill content | Bundle skill roots load as normal KaijiBot skills                                           | All formats    |
+| Skill content | Bundle skill roots load as normal AllBot skills                                           | All formats    |
 | Commands      | `commands/` and `.cursor/commands/` treated as skill roots                                  | Claude, Cursor |
-| Hook packs    | KaijiBot-style `HOOK.md` + `handler.ts` layouts                                             | Codex          |
+| Hook packs    | AllBot-style `HOOK.md` + `handler.ts` layouts                                             | Codex          |
 | MCP tools     | Bundle MCP config merged into embedded Pi settings; supported stdio and HTTP servers loaded | All formats    |
 | LSP servers   | Claude `.lsp.json` and manifest-declared `lspServers` merged into embedded Pi LSP defaults  | Claude         |
 | Settings      | Claude `settings.json` imported as embedded Pi defaults                                     | Claude         |
 
 #### Skill content
 
-- bundle skill roots load as normal KaijiBot skill roots
+- bundle skill roots load as normal AllBot skill roots
 - Claude `commands` roots are treated as additional skill roots
 - Cursor `.cursor/commands` roots are treated as additional skill roots
 
-This means Claude markdown command files work through the normal KaijiBot skill
+This means Claude markdown command files work through the normal AllBot skill
 loader. Cursor command markdown works through the same path.
 
 #### Hook packs
 
-- bundle hook roots work **only** when they use the normal KaijiBot hook-pack
+- bundle hook roots work **only** when they use the normal AllBot hook-pack
   layout. Today this is primarily the Codex-compatible case:
   - `HOOK.md`
   - `handler.ts` or `handler.js`
@@ -100,9 +100,9 @@ loader. Cursor command markdown works through the same path.
 #### MCP for Pi
 
 - enabled bundles can contribute MCP server config
-- KaijiBot merges bundle MCP config into the effective embedded Pi settings as
+- AllBot merges bundle MCP config into the effective embedded Pi settings as
   `mcpServers`
-- KaijiBot exposes supported bundle MCP tools during embedded Pi agent turns by
+- AllBot exposes supported bundle MCP tools during embedded Pi agent turns by
   launching stdio servers or connecting to HTTP servers
 - project-local Pi settings still apply after bundle defaults, so workspace
   settings can override bundle MCP entries when needed
@@ -148,7 +148,7 @@ MCP servers can use stdio or HTTP transport:
 }
 ```
 
-- `transport` may be set to `"streamable-http"` or `"sse"`; when omitted, KaijiBot uses `sse`
+- `transport` may be set to `"streamable-http"` or `"sse"`; when omitted, AllBot uses `sse`
 - only `http:` and `https:` URL schemes are allowed
 - `headers` values support `${ENV_VAR}` interpolation
 - a server entry with both `command` and `url` is rejected
@@ -159,7 +159,7 @@ MCP servers can use stdio or HTTP transport:
 
 ##### Tool naming
 
-KaijiBot registers bundle MCP tools with provider-safe names in the form
+AllBot registers bundle MCP tools with provider-safe names in the form
 `serverName__toolName`. For example, a server keyed `"vigil-harbor"` exposing a
 `memory_search` tool registers as `vigil-harbor__memory_search`.
 
@@ -175,7 +175,7 @@ KaijiBot registers bundle MCP tools with provider-safe names in the form
 
 - Claude `settings.json` is imported as default embedded Pi settings when the
   bundle is enabled
-- KaijiBot sanitizes shell override keys before applying them
+- AllBot sanitizes shell override keys before applying them
 
 Sanitized keys:
 
@@ -185,14 +185,14 @@ Sanitized keys:
 #### Embedded Pi LSP
 
 - enabled Claude bundles can contribute LSP server config
-- KaijiBot loads `.lsp.json` plus any manifest-declared `lspServers` paths
+- AllBot loads `.lsp.json` plus any manifest-declared `lspServers` paths
 - bundle LSP config is merged into the effective embedded Pi LSP defaults
 - only supported stdio-backed LSP servers are runnable today; unsupported
-  transports still show up in `kaijibot plugins inspect <id>`
+  transports still show up in `allbot plugins inspect <id>`
 
 ### Detected but not executed
 
-These are recognized and shown in diagnostics, but KaijiBot does not run them:
+These are recognized and shown in diagnostics, but AllBot does not run them:
 
 - Claude `agents`, `hooks.json` automation, `outputStyles`
 - Cursor `.cursor/agents`, `.cursor/hooks.json`, `.cursor/rules`
@@ -206,7 +206,7 @@ These are recognized and shown in diagnostics, but KaijiBot does not run them:
 
     Optional content: `skills/`, `hooks/`, `.mcp.json`, `.app.json`
 
-    Codex bundles fit KaijiBot best when they use skill roots and KaijiBot-style
+    Codex bundles fit AllBot best when they use skill roots and AllBot-style
     hook-pack directories (`HOOK.md` + `handler.ts`).
 
   </Accordion>
@@ -241,19 +241,19 @@ These are recognized and shown in diagnostics, but KaijiBot does not run them:
 
 ## Detection precedence
 
-KaijiBot checks for native plugin format first:
+AllBot checks for native plugin format first:
 
-1. `kaijibot.plugin.json` or valid `package.json` with `kaijibot.extensions` — treated as **native plugin**
+1. `allbot.plugin.json` or valid `package.json` with `allbot.extensions` — treated as **native plugin**
 2. Bundle markers (`.codex-plugin/`, `.claude-plugin/`, or default Claude/Cursor layout) — treated as **bundle**
 
-If a directory contains both, KaijiBot uses the native path. This prevents
+If a directory contains both, AllBot uses the native path. This prevents
 dual-format packages from being partially installed as bundles.
 
 ## Security
 
 Bundles have a narrower trust boundary than native plugins:
 
-- KaijiBot does **not** load arbitrary bundle runtime modules in-process
+- AllBot does **not** load arbitrary bundle runtime modules in-process
 - Skills and hook-pack paths must stay inside the plugin root (boundary-checked)
 - Settings files are read with the same boundary checks
 - Supported stdio MCP servers may be launched as subprocesses
@@ -265,7 +265,7 @@ bundles as trusted content for the features they do expose.
 
 <AccordionGroup>
   <Accordion title="Bundle is detected but capabilities do not run">
-    Run `kaijibot plugins inspect <id>`. If a capability is listed but marked as
+    Run `allbot plugins inspect <id>`. If a capability is listed but marked as
     not wired, that is a product limit — not a broken install.
   </Accordion>
 
@@ -275,13 +275,13 @@ bundles as trusted content for the features they do expose.
   </Accordion>
 
   <Accordion title="Claude settings do not apply">
-    Only embedded Pi settings from `settings.json` are supported. KaijiBot does
+    Only embedded Pi settings from `settings.json` are supported. AllBot does
     not treat bundle settings as raw config patches.
   </Accordion>
 
   <Accordion title="Claude hooks do not execute">
     `hooks/hooks.json` is detect-only. If you need runnable hooks, use the
-    KaijiBot hook-pack layout or ship a native plugin.
+    AllBot hook-pack layout or ship a native plugin.
   </Accordion>
 </AccordionGroup>
 

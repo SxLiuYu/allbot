@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { getPath } from "./path-utils.js";
 import { getCoreSecretTargetRegistry, getSecretTargetRegistry } from "./target-registry-data.js";
 import {
@@ -19,15 +19,15 @@ let compiledSecretTargetRegistryState: {
   authProfilesTargetsById: Map<string, CompiledTargetRegistryEntry[]>;
   compiledSecretTargetRegistry: CompiledTargetRegistryEntry[];
   knownTargetIds: Set<string>;
-  kaijiBotCompiledSecretTargets: CompiledTargetRegistryEntry[];
-  kaijiBotTargetsById: Map<string, CompiledTargetRegistryEntry[]>;
+  allBotCompiledSecretTargets: CompiledTargetRegistryEntry[];
+  allBotTargetsById: Map<string, CompiledTargetRegistryEntry[]>;
   targetsByType: Map<string, CompiledTargetRegistryEntry[]>;
 } | null = null;
 
-let compiledCoreKaijiBotTargetState: {
+let compiledCoreAllBotTargetState: {
   knownTargetIds: Set<string>;
-  kaijiBotCompiledSecretTargets: CompiledTargetRegistryEntry[];
-  kaijiBotTargetsById: Map<string, CompiledTargetRegistryEntry[]>;
+  allBotCompiledSecretTargets: CompiledTargetRegistryEntry[];
+  allBotTargetsById: Map<string, CompiledTargetRegistryEntry[]>;
 } | null = null;
 
 function buildTargetTypeIndex(
@@ -71,8 +71,8 @@ function getCompiledSecretTargetRegistryState() {
     return compiledSecretTargetRegistryState;
   }
   const compiledSecretTargetRegistry = getSecretTargetRegistry().map(compileTargetRegistryEntry);
-  const kaijiBotCompiledSecretTargets = compiledSecretTargetRegistry.filter(
-    (entry) => entry.configFile === "kaijibot.json",
+  const allBotCompiledSecretTargets = compiledSecretTargetRegistry.filter(
+    (entry) => entry.configFile === "allbot.json",
   );
   const authProfilesCompiledSecretTargets = compiledSecretTargetRegistry.filter(
     (entry) => entry.configFile === "auth-profiles.json",
@@ -82,26 +82,26 @@ function getCompiledSecretTargetRegistryState() {
     authProfilesTargetsById: buildConfigTargetIdIndex(authProfilesCompiledSecretTargets),
     compiledSecretTargetRegistry,
     knownTargetIds: new Set(compiledSecretTargetRegistry.map((entry) => entry.id)),
-    kaijiBotCompiledSecretTargets,
-    kaijiBotTargetsById: buildConfigTargetIdIndex(kaijiBotCompiledSecretTargets),
+    allBotCompiledSecretTargets,
+    allBotTargetsById: buildConfigTargetIdIndex(allBotCompiledSecretTargets),
     targetsByType: buildTargetTypeIndex(compiledSecretTargetRegistry),
   };
   return compiledSecretTargetRegistryState;
 }
 
-function getCompiledCoreKaijiBotTargetState() {
-  if (compiledCoreKaijiBotTargetState) {
-    return compiledCoreKaijiBotTargetState;
+function getCompiledCoreAllBotTargetState() {
+  if (compiledCoreAllBotTargetState) {
+    return compiledCoreAllBotTargetState;
   }
-  const kaijiBotCompiledSecretTargets = getCoreSecretTargetRegistry()
-    .filter((entry) => entry.configFile === "kaijibot.json")
+  const allBotCompiledSecretTargets = getCoreSecretTargetRegistry()
+    .filter((entry) => entry.configFile === "allbot.json")
     .map(compileTargetRegistryEntry);
-  compiledCoreKaijiBotTargetState = {
-    knownTargetIds: new Set(kaijiBotCompiledSecretTargets.map((entry) => entry.id)),
-    kaijiBotCompiledSecretTargets,
-    kaijiBotTargetsById: buildConfigTargetIdIndex(kaijiBotCompiledSecretTargets),
+  compiledCoreAllBotTargetState = {
+    knownTargetIds: new Set(allBotCompiledSecretTargets.map((entry) => entry.id)),
+    allBotCompiledSecretTargets,
+    allBotTargetsById: buildConfigTargetIdIndex(allBotCompiledSecretTargets),
   };
-  return compiledCoreKaijiBotTargetState;
+  return compiledCoreAllBotTargetState;
 }
 
 function normalizeAllowedTargetIds(targetIds?: Iterable<string>): Set<string> | null {
@@ -274,7 +274,7 @@ export function resolvePlanTargetAgainstRegistry(candidate: {
 }
 
 export function resolveConfigSecretTargetByPath(pathSegments: string[]): ResolvedPlanTarget | null {
-  for (const entry of getCompiledSecretTargetRegistryState().kaijiBotCompiledSecretTargets) {
+  for (const entry of getCompiledSecretTargetRegistryState().allBotCompiledSecretTargets) {
     if (!entry.includeInPlan) {
       continue;
     }
@@ -292,27 +292,27 @@ export function resolveConfigSecretTargetByPath(pathSegments: string[]): Resolve
 }
 
 export function discoverConfigSecretTargets(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
 ): DiscoveredConfigSecretTarget[] {
   return discoverConfigSecretTargetsByIds(config);
 }
 
 export function discoverConfigSecretTargetsByIds(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   targetIds?: Iterable<string>,
 ): DiscoveredConfigSecretTarget[] {
   const allowedTargetIds = normalizeAllowedTargetIds(targetIds);
   const registryState =
     allowedTargetIds !== null &&
     Array.from(allowedTargetIds).every((targetId) =>
-      getCompiledCoreKaijiBotTargetState().knownTargetIds.has(targetId),
+      getCompiledCoreAllBotTargetState().knownTargetIds.has(targetId),
     )
-      ? getCompiledCoreKaijiBotTargetState()
+      ? getCompiledCoreAllBotTargetState()
       : getCompiledSecretTargetRegistryState();
   const discoveryEntries = resolveDiscoveryEntries({
     allowedTargetIds,
-    defaultEntries: registryState.kaijiBotCompiledSecretTargets,
-    entriesById: registryState.kaijiBotTargetsById,
+    defaultEntries: registryState.allBotCompiledSecretTargets,
+    entriesById: registryState.allBotTargetsById,
   });
   return discoverSecretTargetsFromEntries(config, discoveryEntries);
 }

@@ -1,6 +1,6 @@
 import { DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { normalizeProviderId } from "../agents/model-selection.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
@@ -108,7 +108,7 @@ export function buildProviderPluginMethodChoice(providerId: string, methodId: st
 }
 
 function resolveProviderWizardProviders(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): ProviderPlugin[] {
@@ -121,7 +121,7 @@ function resolveProviderWizardProviders(params: {
 }
 
 export function resolveProviderWizardOptions(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): ProviderWizardOption[] {
@@ -192,7 +192,7 @@ function resolveModelPickerChoiceValue(
 }
 
 export function resolveProviderModelPickerEntries(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): ProviderModelPickerEntry[] {
@@ -273,7 +273,7 @@ export function resolveProviderPluginChoice(params: {
 }
 
 export async function runProviderModelSelectedHook(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   model: string;
   prompter: WizardPrompter;
   agentDir?: string;

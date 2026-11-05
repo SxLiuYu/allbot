@@ -17,13 +17,13 @@ function withNodeServiceEnv(
 ): Record<string, string | undefined> {
   return {
     ...env,
-    KAIJIBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
-    KAIJIBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-    KAIJIBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-    KAIJIBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
-    KAIJIBOT_LOG_PREFIX: "node",
-    KAIJIBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
-    KAIJIBOT_SERVICE_KIND: NODE_SERVICE_KIND,
+    ALLBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+    ALLBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
+    ALLBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
+    ALLBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
+    ALLBOT_LOG_PREFIX: "node",
+    ALLBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
+    ALLBOT_SERVICE_KIND: NODE_SERVICE_KIND,
   };
 }
 
@@ -33,13 +33,13 @@ function withNodeInstallEnv(args: GatewayServiceInstallArgs): GatewayServiceInst
     env: withNodeServiceEnv(args.env),
     environment: {
       ...args.environment,
-      KAIJIBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
-      KAIJIBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-      KAIJIBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-      KAIJIBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
-      KAIJIBOT_LOG_PREFIX: "node",
-      KAIJIBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
-      KAIJIBOT_SERVICE_KIND: NODE_SERVICE_KIND,
+      ALLBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+      ALLBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
+      ALLBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
+      ALLBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
+      ALLBOT_LOG_PREFIX: "node",
+      ALLBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
+      ALLBOT_SERVICE_KIND: NODE_SERVICE_KIND,
     },
   };
 }

@@ -11,7 +11,7 @@ export function readEmbeddedGatewayTokenForTest(
     environmentValueSources?: Record<string, "inline" | "file">;
   } | null,
 ) {
-  return command?.environmentValueSources?.KAIJIBOT_GATEWAY_TOKEN === "file"
+  return command?.environmentValueSources?.ALLBOT_GATEWAY_TOKEN === "file"
     ? undefined
-    : normalizeOptionalString(command?.environment?.KAIJIBOT_GATEWAY_TOKEN);
+    : normalizeOptionalString(command?.environment?.ALLBOT_GATEWAY_TOKEN);
 }

@@ -1,4 +1,4 @@
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/string-coerce-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/string-coerce-runtime";
 
 export function normalizeOpenRouterModelId(modelId: unknown): string | undefined {
   if (typeof modelId !== "string") {

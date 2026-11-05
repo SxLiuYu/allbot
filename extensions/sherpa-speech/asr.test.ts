@@ -70,7 +70,7 @@ beforeEach(() => {
   tmpRoot = makeTmpDir();
   env = {
     ...process.env,
-    KAIJIBOT_STATE_DIR: tmpRoot,
+    ALLBOT_STATE_DIR: tmpRoot,
     HOME: tmpRoot,
     SHERPA_ONNX_ASR_MODEL: "",
     SHERPA_ONNX_NUM_THREADS: "",

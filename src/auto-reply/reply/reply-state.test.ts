@@ -42,7 +42,7 @@ async function seedSessionStore(params: {
 }
 
 async function createCompactionSessionFixture(entry: SessionEntry) {
-  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-compact-"));
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-compact-"));
   tempDirs.push(tmp);
   const storePath = path.join(tmp, "sessions.json");
   const sessionKey = "main";
@@ -460,7 +460,7 @@ describe("incrementCompactionCount", () => {
 
   it("updates sessionId and sessionFile when compaction rotated transcripts", async () => {
     const { stored, sessionKey, expectedDir } = await rotateCompactionSessionFile({
-      tempPrefix: "kaijibot-compact-rotate-",
+      tempPrefix: "allbot-compact-rotate-",
       sessionFile: (tmp) => path.join(tmp, "s1-topic-456.jsonl"),
       newSessionId: "s2",
     });
@@ -470,7 +470,7 @@ describe("incrementCompactionCount", () => {
 
   it("preserves fork transcript filenames when compaction rotates transcripts", async () => {
     const { stored, sessionKey, expectedDir } = await rotateCompactionSessionFile({
-      tempPrefix: "kaijibot-compact-fork-",
+      tempPrefix: "allbot-compact-fork-",
       sessionFile: (tmp) => path.join(tmp, "2026-03-23T12-34-56-789Z_s1.jsonl"),
       newSessionId: "s2",
     });
@@ -482,7 +482,7 @@ describe("incrementCompactionCount", () => {
 
   it("keeps rewritten absolute sessionFile paths that stay inside the sessions directory", async () => {
     const { stored, sessionKey, expectedDir } = await rotateCompactionSessionFile({
-      tempPrefix: "kaijibot-compact-unsafe-",
+      tempPrefix: "allbot-compact-unsafe-",
       sessionFile: (tmp) => path.join(tmp, "outside", "s1.jsonl"),
       newSessionId: "s2",
     });

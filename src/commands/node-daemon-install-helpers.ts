@@ -62,7 +62,7 @@ export async function buildNodeInstallPlan(params: {
     extraPathDirs: resolveDaemonNodeBinDir(nodePath),
   });
   const description = formatNodeServiceDescription({
-    version: environment.KAIJIBOT_SERVICE_VERSION,
+    version: environment.ALLBOT_SERVICE_VERSION,
   });
 
   return { programArguments, workingDirectory, environment, description };

@@ -1,56 +1,56 @@
 ---
-summary: "Expose KaijiBot channel conversations over MCP and manage saved MCP server definitions"
+summary: "Expose AllBot channel conversations over MCP and manage saved MCP server definitions"
 read_when:
-  - Connecting Codex, Claude Code, or another MCP client to KaijiBot-backed channels
-  - Running `kaijibot mcp serve`
-  - Managing KaijiBot-saved MCP server definitions
+  - Connecting Codex, Claude Code, or another MCP client to AllBot-backed channels
+  - Running `allbot mcp serve`
+  - Managing AllBot-saved MCP server definitions
 title: "mcp"
 ---
 
 # mcp
 
-`kaijibot mcp` has two jobs:
+`allbot mcp` has two jobs:
 
-- run KaijiBot as an MCP server with `kaijibot mcp serve`
-- manage KaijiBot-owned outbound MCP server definitions with `list`, `show`,
+- run AllBot as an MCP server with `allbot mcp serve`
+- manage AllBot-owned outbound MCP server definitions with `list`, `show`,
   `set`, and `unset`
 
 In other words:
 
-- `serve` is KaijiBot acting as an MCP server
-- `list` / `show` / `set` / `unset` is KaijiBot acting as an MCP client-side
+- `serve` is AllBot acting as an MCP server
+- `list` / `show` / `set` / `unset` is AllBot acting as an MCP client-side
   registry for other MCP servers its runtimes may consume later
 
-Use [`kaijibot acp`](/cli/acp) when KaijiBot should host a coding harness
+Use [`allbot acp`](/cli/acp) when AllBot should host a coding harness
 session itself and route that runtime through ACP.
 
-## KaijiBot as an MCP server
+## AllBot as an MCP server
 
-This is the `kaijibot mcp serve` path.
+This is the `allbot mcp serve` path.
 
 ## When to use `serve`
 
-Use `kaijibot mcp serve` when:
+Use `allbot mcp serve` when:
 
 - Codex, Claude Code, or another MCP client should talk directly to
-  KaijiBot-backed channel conversations
-- you already have a local or remote KaijiBot Gateway with routed sessions
-- you want one MCP server that works across KaijiBot's channel backends instead
+  AllBot-backed channel conversations
+- you already have a local or remote AllBot Gateway with routed sessions
+- you want one MCP server that works across AllBot's channel backends instead
   of running separate per-channel bridges
 
-Use [`kaijibot acp`](/cli/acp) instead when KaijiBot should host the coding
-runtime itself and keep the agent session inside KaijiBot.
+Use [`allbot acp`](/cli/acp) instead when AllBot should host the coding
+runtime itself and keep the agent session inside AllBot.
 
 ## How it works
 
-`kaijibot mcp serve` starts a stdio MCP server. The MCP client owns that
+`allbot mcp serve` starts a stdio MCP server. The MCP client owns that
 process. While the client keeps the stdio session open, the bridge connects to a
-local or remote KaijiBot Gateway over WebSocket and exposes routed channel
+local or remote AllBot Gateway over WebSocket and exposes routed channel
 conversations over MCP.
 
 Lifecycle:
 
-1. the MCP client spawns `kaijibot mcp serve`
+1. the MCP client spawns `allbot mcp serve`
 2. the bridge connects to Gateway
 3. routed sessions become MCP conversations and transcript/history tools
 4. live events are queued in memory while the bridge is connected
@@ -80,7 +80,7 @@ yet.
 ## What `serve` exposes
 
 The bridge uses existing Gateway session route metadata to expose channel-backed
-conversations. A conversation appears when KaijiBot already has session state
+conversations. A conversation appears when AllBot already has session state
 with a known route such as:
 
 - `channel`
@@ -100,19 +100,19 @@ This gives MCP clients one place to:
 
 ```bash
 # Local Gateway
-kaijibot mcp serve
+allbot mcp serve
 
 # Remote Gateway
-kaijibot mcp serve --url wss://gateway-host:18789 --token-file ~/.kaijibot/gateway.token
+allbot mcp serve --url wss://gateway-host:18789 --token-file ~/.allbot/gateway.token
 
 # Remote Gateway with password auth
-kaijibot mcp serve --url wss://gateway-host:18789 --password-file ~/.kaijibot/gateway.password
+allbot mcp serve --url wss://gateway-host:18789 --password-file ~/.allbot/gateway.password
 
 # Enable verbose bridge logs
-kaijibot mcp serve --verbose
+allbot mcp serve --verbose
 
 # Disable Claude-specific push notifications
-kaijibot mcp serve --claude-channel-mode off
+allbot mcp serve --claude-channel-mode off
 ```
 
 ## Bridge tools
@@ -213,7 +213,7 @@ Important limits:
 ## Claude channel notifications
 
 The bridge can also expose Claude-specific channel notifications. This is the
-KaijiBot equivalent of a Claude Code channel adapter: standard MCP tools remain
+AllBot equivalent of a Claude Code channel adapter: standard MCP tools remain
 available, but live inbound messages can also arrive as Claude-specific MCP
 notifications.
 
@@ -249,8 +249,8 @@ Example stdio client config:
 ```json
 {
   "mcpServers": {
-    "kaijibot": {
-      "command": "kaijibot",
+    "allbot": {
+      "command": "allbot",
       "args": [
         "mcp",
         "serve",
@@ -270,7 +270,7 @@ Claude-specific notification methods.
 
 ## Options
 
-`kaijibot mcp serve` supports:
+`allbot mcp serve` supports:
 
 - `--url <url>`: Gateway WebSocket URL
 - `--token <token>`: Gateway token
@@ -290,7 +290,7 @@ already knows how to route.
 That means:
 
 - sender allowlists, pairing, and channel-level trust still belong to the
-  underlying KaijiBot channel configuration
+  underlying AllBot channel configuration
 - `messages_send` can only reply through an existing stored route
 - approval state is live/in-memory only for the current bridge session
 - bridge auth should use the same Gateway token or password controls you would
@@ -302,7 +302,7 @@ Gateway session.
 
 ## Testing
 
-KaijiBot ships a deterministic Docker smoke for this bridge:
+AllBot ships a deterministic Docker smoke for this bridge:
 
 ```bash
 pnpm test:docker:mcp-channels
@@ -311,7 +311,7 @@ pnpm test:docker:mcp-channels
 That smoke:
 
 - starts a seeded Gateway container
-- starts a second container that spawns `kaijibot mcp serve`
+- starts a second container that spawns `allbot mcp serve`
 - verifies conversation discovery, transcript reads, attachment metadata reads,
   live event queue behavior, and outbound send routing
 - validates Claude-style channel and permission notifications over the real
@@ -349,21 +349,21 @@ Check all of these:
 `permissions_list_open` only shows approval requests observed while the bridge
 was connected. It is not a durable approval history API.
 
-## KaijiBot as an MCP client registry
+## AllBot as an MCP client registry
 
-This is the `kaijibot mcp list`, `show`, `set`, and `unset` path.
+This is the `allbot mcp list`, `show`, `set`, and `unset` path.
 
-These commands do not expose KaijiBot over MCP. They manage KaijiBot-owned MCP
-server definitions under `mcp.servers` in KaijiBot config.
+These commands do not expose AllBot over MCP. They manage AllBot-owned MCP
+server definitions under `mcp.servers` in AllBot config.
 
-Those saved definitions are for runtimes that KaijiBot launches or configures
-later, such as embedded Pi and other runtime adapters. KaijiBot stores the
+Those saved definitions are for runtimes that AllBot launches or configures
+later, such as embedded Pi and other runtime adapters. AllBot stores the
 definitions centrally so those runtimes do not need to keep their own duplicate
 MCP server lists.
 
 Important behavior:
 
-- these commands only read or write KaijiBot config
+- these commands only read or write AllBot config
 - they do not connect to the target MCP server
 - they do not validate whether the command, URL, or remote transport is
   reachable right now
@@ -372,15 +372,15 @@ Important behavior:
 
 ## Saved MCP server definitions
 
-KaijiBot also stores a lightweight MCP server registry in config for surfaces
-that want KaijiBot-managed MCP definitions.
+AllBot also stores a lightweight MCP server registry in config for surfaces
+that want AllBot-managed MCP definitions.
 
 Commands:
 
-- `kaijibot mcp list`
-- `kaijibot mcp show [name]`
-- `kaijibot mcp set <name> <json>`
-- `kaijibot mcp unset <name>`
+- `allbot mcp list`
+- `allbot mcp show [name]`
+- `allbot mcp set <name> <json>`
+- `allbot mcp unset <name>`
 
 Notes:
 
@@ -392,11 +392,11 @@ Notes:
 Examples:
 
 ```bash
-kaijibot mcp list
-kaijibot mcp show context7 --json
-kaijibot mcp set context7 '{"command":"uvx","args":["context7-mcp"]}'
-kaijibot mcp set docs '{"url":"https://mcp.example.com"}'
-kaijibot mcp unset context7
+allbot mcp list
+allbot mcp show context7 --json
+allbot mcp set context7 '{"command":"uvx","args":["context7-mcp"]}'
+allbot mcp set docs '{"url":"https://mcp.example.com"}'
+allbot mcp unset context7
 ```
 
 Example config shape:
@@ -465,7 +465,7 @@ status output.
 | Field                 | Description                                                                            |
 | --------------------- | -------------------------------------------------------------------------------------- |
 | `url`                 | HTTP or HTTPS URL of the remote server (required)                                      |
-| `transport`           | Set to `"streamable-http"` to select this transport; when omitted, KaijiBot uses `sse` |
+| `transport`           | Set to `"streamable-http"` to select this transport; when omitted, AllBot uses `sse` |
 | `headers`             | Optional key-value map of HTTP headers (for example auth tokens)                       |
 | `connectionTimeoutMs` | Per-server connection timeout in ms (optional)                                         |
 

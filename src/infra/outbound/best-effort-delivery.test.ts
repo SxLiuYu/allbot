@@ -4,7 +4,7 @@ import {
   shouldDowngradeDeliveryToSessionOnly,
 } from "./best-effort-delivery.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("best-effort delivery helpers", () => {
   it("resolves external delivery targets only for deliverable channels with to", () => {
     expect(

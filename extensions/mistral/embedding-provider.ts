@@ -5,8 +5,8 @@ import {
   resolveRemoteEmbeddingClient,
   type MemoryEmbeddingProvider,
   type MemoryEmbeddingProviderCreateOptions,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
-import type { SsrFPolicy } from "kaijibot/plugin-sdk/ssrf-runtime";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
+import type { SsrFPolicy } from "allbot/plugin-sdk/ssrf-runtime";
 
 type MistralEmbeddingClient = {
   baseUrl: string;

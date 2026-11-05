@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { isRecord } from "../utils.js";
 import {
   mergeProviders,
@@ -14,10 +14,10 @@ import {
   type ProviderConfig,
 } from "./models-config.providers.js";
 
-type ModelsConfig = NonNullable<KaijiBotConfig["models"]>;
+type ModelsConfig = NonNullable<AllBotConfig["models"]>;
 export type ResolveImplicitProvidersForModelsJson = (params: {
   agentDir: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   explicitProviders: Record<string, ProviderConfig>;
 }) => Promise<Record<string, ProviderConfig>>;
@@ -36,7 +36,7 @@ export type ModelsJsonPlan =
 
 export async function resolveProvidersForModelsJsonWithDeps(
   params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentDir: string;
     env: NodeJS.ProcessEnv;
   },
@@ -60,7 +60,7 @@ export async function resolveProvidersForModelsJsonWithDeps(
 }
 
 function resolveExplicitBaseUrlProviders(
-  providers: KaijiBotConfig["models"] | undefined,
+  providers: AllBotConfig["models"] | undefined,
 ): ReadonlySet<string> {
   return new Set(
     Object.entries(providers?.providers ?? {})
@@ -99,10 +99,10 @@ function resolveProvidersForMode(params: {
   });
 }
 
-export async function planKaijiBotModelsJsonWithDeps(
+export async function planAllBotModelsJsonWithDeps(
   params: {
-    cfg: KaijiBotConfig;
-    sourceConfigForSecrets?: KaijiBotConfig;
+    cfg: AllBotConfig;
+    sourceConfigForSecrets?: AllBotConfig;
     agentDir: string;
     env: NodeJS.ProcessEnv;
     existingRaw: string;
@@ -160,10 +160,10 @@ export async function planKaijiBotModelsJsonWithDeps(
   };
 }
 
-export async function planKaijiBotModelsJson(
-  params: Parameters<typeof planKaijiBotModelsJsonWithDeps>[0],
+export async function planAllBotModelsJson(
+  params: Parameters<typeof planAllBotModelsJsonWithDeps>[0],
 ): Promise<ModelsJsonPlan> {
-  return planKaijiBotModelsJsonWithDeps(params);
+  return planAllBotModelsJsonWithDeps(params);
 }
 
 function applyDiscoveryOverrides(

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { cancelTaskById, listTasksForFlowId } from "../../tasks/runtime-internal.js";
 import {
   mapTaskFlowDetail,
@@ -21,7 +21,7 @@ import {
   resolveTaskForLookupTokenForOwner,
 } from "../../tasks/task-owner-access.js";
 import { normalizeDeliveryContext } from "../../utils/delivery-context.js";
-import type { KaijiBotPluginToolContext } from "../types.js";
+import type { AllBotPluginToolContext } from "../types.js";
 import type { PluginRuntimeTaskFlow } from "./runtime-taskflow.js";
 import type {
   TaskFlowDetail,
@@ -58,7 +58,7 @@ export type BoundTaskRunsRuntime = {
   list: () => TaskRunView[];
   findLatest: () => TaskRunDetail | undefined;
   resolve: (token: string) => TaskRunDetail | undefined;
-  cancel: (params: { taskId: string; cfg: KaijiBotConfig }) => Promise<TaskRunCancelResult>;
+  cancel: (params: { taskId: string; cfg: AllBotConfig }) => Promise<TaskRunCancelResult>;
 };
 
 export type PluginRuntimeTaskRuns = {
@@ -67,7 +67,7 @@ export type PluginRuntimeTaskRuns = {
     requesterOrigin?: import("../../tasks/task-registry.types.js").TaskDeliveryState["requesterOrigin"];
   }) => BoundTaskRunsRuntime;
   fromToolContext: (
-    ctx: Pick<KaijiBotPluginToolContext, "sessionKey" | "deliveryContext">,
+    ctx: Pick<AllBotPluginToolContext, "sessionKey" | "deliveryContext">,
   ) => BoundTaskRunsRuntime;
 };
 
@@ -87,7 +87,7 @@ export type PluginRuntimeTaskFlows = {
     requesterOrigin?: import("../../tasks/task-registry.types.js").TaskDeliveryState["requesterOrigin"];
   }) => BoundTaskFlowsRuntime;
   fromToolContext: (
-    ctx: Pick<KaijiBotPluginToolContext, "sessionKey" | "deliveryContext">,
+    ctx: Pick<AllBotPluginToolContext, "sessionKey" | "deliveryContext">,
   ) => BoundTaskFlowsRuntime;
 };
 

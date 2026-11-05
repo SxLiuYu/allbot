@@ -1,6 +1,6 @@
 import os from "node:os";
 import path from "node:path";
-import { buildPluginConfigSchema, z, type KaijiBotPluginConfigSchema } from "../api.js";
+import { buildPluginConfigSchema, z, type AllBotPluginConfigSchema } from "../api.js";
 
 // === Config Types ===
 
@@ -37,7 +37,7 @@ export const DEFAULT_SCAN_EXTENSIONS = [".md", ".txt", ".rst"] as const;
 export const DEFAULT_EXCLUDE_DIRS = [
   ".git",
   "node_modules",
-  ".kaijibot",
+  ".allbot",
   "wiki",
   "sessions",
   ".pnpm-store",
@@ -64,7 +64,7 @@ function expandHomePath(inputPath: string, homedir: string): string {
 }
 
 export function resolveDefaultWikiVaultPath(homedir = os.homedir()): string {
-  return path.join(homedir, ".kaijibot", "workspace", "wiki");
+  return path.join(homedir, ".allbot", "workspace", "wiki");
 }
 
 export function resolveAgentVaultRoot(workspaceDir: string): string {
@@ -143,9 +143,9 @@ export function resolveWikiConfig(
   };
 }
 
-// === Plugin Config Schema (for kaijibot.plugin.json) ===
+// === Plugin Config Schema (for allbot.plugin.json) ===
 
-export const knowledgeWikiConfigSchema: KaijiBotPluginConfigSchema = buildPluginConfigSchema(
+export const knowledgeWikiConfigSchema: AllBotPluginConfigSchema = buildPluginConfigSchema(
   WikiConfigSource,
   {
     safeParse(value: unknown) {

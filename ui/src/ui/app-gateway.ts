@@ -15,7 +15,7 @@ import {
   setLastActiveSessionKey,
 } from "./app-settings.ts";
 import { handleAgentEvent, resetToolStream, type AgentEventPayload } from "./app-tool-stream.ts";
-import type { KaijiBotApp } from "./app.ts";
+import type { AllBotApp } from "./app.ts";
 import { shouldReloadHistoryForFinalEvent } from "./chat-event-reload.ts";
 import { setGatewayAudioClient } from "./chat/audio-playback.ts";
 import { formatConnectError } from "./connect-error.ts";
@@ -211,7 +211,7 @@ export function connectGateway(host: GatewayHost, options?: ConnectGatewayOption
     url: host.settings.gatewayUrl,
     token: normalizeOptionalString(host.settings.token) ? host.settings.token : undefined,
     password: normalizeOptionalString(host.password) ? host.password : undefined,
-    clientName: "kaijibot-control-ui",
+    clientName: "allbot-control-ui",
     clientVersion,
     mode: "webchat",
     instanceId: host.clientInstanceId,
@@ -239,9 +239,9 @@ export function connectGateway(host: GatewayHost, options?: ConnectGatewayOption
           host as unknown as Parameters<typeof flushChatQueueForEvent>[0],
         );
       }
-      void subscribeSessions(host as unknown as KaijiBotApp);
-      void loadAssistantIdentity(host as unknown as KaijiBotApp);
-      void loadAgents(host as unknown as KaijiBotApp);
+      void subscribeSessions(host as unknown as AllBotApp);
+      void loadAssistantIdentity(host as unknown as AllBotApp);
+      void loadAgents(host as unknown as AllBotApp);
       void refreshActiveTab(host as unknown as Parameters<typeof refreshActiveTab>[0]);
       void loadMemoryHealth(host as unknown as SystemStatusState);
       void loadUsageStatus(host as unknown as SystemStatusState);
@@ -325,7 +325,7 @@ function handleTerminalChatEvent(
   if (runId && host.refreshSessionsAfterChat.has(runId)) {
     host.refreshSessionsAfterChat.delete(runId);
     if (state === "final") {
-      void loadSessions(host as unknown as KaijiBotApp, {
+      void loadSessions(host as unknown as AllBotApp, {
         activeMinutes: CHAT_SESSIONS_ACTIVE_MINUTES,
       });
     }
@@ -333,7 +333,7 @@ function handleTerminalChatEvent(
   // Reload history when tools were used so the persisted tool results
   // replace the now-cleared streaming state.
   if (hadToolEvents && state === "final") {
-    void loadChatHistory(host as unknown as KaijiBotApp);
+    void loadChatHistory(host as unknown as AllBotApp);
     return true;
   }
   return false;
@@ -346,10 +346,10 @@ function handleChatGatewayEvent(host: GatewayHost, payload: ChatEventPayload | u
       payload.sessionKey,
     );
   }
-  const state = handleChatEvent(host as unknown as KaijiBotApp, payload);
+  const state = handleChatEvent(host as unknown as AllBotApp, payload);
   const historyReloaded = handleTerminalChatEvent(host, payload, state);
   if (state === "final" && !historyReloaded && shouldReloadHistoryForFinalEvent(payload)) {
-    void loadChatHistory(host as unknown as KaijiBotApp);
+    void loadChatHistory(host as unknown as AllBotApp);
   }
 }
 
@@ -491,7 +491,7 @@ function handleGatewayEventUnsafe(host: GatewayHost, evt: GatewayEventFrame) {
   }
 
   if (evt.event === "sessions.changed") {
-    void loadSessions(host as unknown as KaijiBotApp);
+    void loadSessions(host as unknown as AllBotApp);
     return;
   }
 

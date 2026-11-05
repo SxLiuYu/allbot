@@ -63,17 +63,17 @@ async function getServerModule() {
 const GATEWAY_TEST_ENV_KEYS = [
   "HOME",
   "USERPROFILE",
-  "KAIJIBOT_STATE_DIR",
-  "KAIJIBOT_CONFIG_PATH",
-  "KAIJIBOT_GATEWAY_TOKEN",
-  "KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER",
-  "KAIJIBOT_SKIP_GMAIL_WATCHER",
-  "KAIJIBOT_SKIP_CANVAS_HOST",
-  "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-  "KAIJIBOT_SKIP_CHANNELS",
-  "KAIJIBOT_SKIP_PROVIDERS",
-  "KAIJIBOT_SKIP_CRON",
-  "KAIJIBOT_TEST_MINIMAL_GATEWAY",
+  "ALLBOT_STATE_DIR",
+  "ALLBOT_CONFIG_PATH",
+  "ALLBOT_GATEWAY_TOKEN",
+  "ALLBOT_SKIP_BROWSER_CONTROL_SERVER",
+  "ALLBOT_SKIP_GMAIL_WATCHER",
+  "ALLBOT_SKIP_CANVAS_HOST",
+  "ALLBOT_BUNDLED_PLUGINS_DIR",
+  "ALLBOT_SKIP_CHANNELS",
+  "ALLBOT_SKIP_PROVIDERS",
+  "ALLBOT_SKIP_CRON",
+  "ALLBOT_TEST_MINIMAL_GATEWAY",
 ] as const;
 
 let gatewayEnvSnapshot: ReturnType<typeof captureEnv> | undefined;
@@ -119,20 +119,20 @@ function hasUnsyncedGatewayTestSessionConfig(): boolean {
 }
 
 async function persistTestSessionConfig(): Promise<void> {
-  // Safety guard: prevent writing to real ~/.kaijibot/ if env is misconfigured.
-  const stateDir = process.env.KAIJIBOT_STATE_DIR;
+  // Safety guard: prevent writing to real ~/.allbot/ if env is misconfigured.
+  const stateDir = process.env.ALLBOT_STATE_DIR;
   if (stateDir && !stateDir.startsWith(os.tmpdir())) {
     throw new Error(
-      `[test-safety] persistTestSessionConfig: KAIJIBOT_STATE_DIR="${stateDir}" ` +
+      `[test-safety] persistTestSessionConfig: ALLBOT_STATE_DIR="${stateDir}" ` +
         `does not point to a temp directory. Aborting to prevent real config overwrite.`,
     );
   }
   const configPaths = new Set<string>();
-  if (process.env.KAIJIBOT_CONFIG_PATH) {
-    configPaths.add(process.env.KAIJIBOT_CONFIG_PATH);
+  if (process.env.ALLBOT_CONFIG_PATH) {
+    configPaths.add(process.env.ALLBOT_CONFIG_PATH);
   }
-  if (process.env.KAIJIBOT_STATE_DIR) {
-    configPaths.add(path.join(process.env.KAIJIBOT_STATE_DIR, "kaijibot.json"));
+  if (process.env.ALLBOT_STATE_DIR) {
+    configPaths.add(path.join(process.env.ALLBOT_STATE_DIR, "allbot.json"));
   }
   const parsedConfigs = new Map<string, Record<string, unknown>>();
   let preservedTemplateStore: string | undefined;
@@ -228,24 +228,24 @@ export async function writeSessionStore(params: {
 
 async function setupGatewayTestHome() {
   gatewayEnvSnapshot = captureEnv([...GATEWAY_TEST_ENV_KEYS]);
-  tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-gateway-home-"));
+  tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-gateway-home-"));
   process.env.HOME = tempHome;
   process.env.USERPROFILE = tempHome;
-  process.env.KAIJIBOT_STATE_DIR = path.join(tempHome, ".kaijibot");
-  delete process.env.KAIJIBOT_CONFIG_PATH;
+  process.env.ALLBOT_STATE_DIR = path.join(tempHome, ".allbot");
+  delete process.env.ALLBOT_CONFIG_PATH;
 }
 
 function applyGatewaySkipEnv() {
-  process.env.KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
-  process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = "1";
-  process.env.KAIJIBOT_SKIP_CANVAS_HOST = "1";
-  process.env.KAIJIBOT_SKIP_CHANNELS = "1";
-  process.env.KAIJIBOT_SKIP_PROVIDERS = "1";
-  process.env.KAIJIBOT_SKIP_CRON = "1";
-  process.env.KAIJIBOT_TEST_MINIMAL_GATEWAY = "1";
-  process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = tempHome
-    ? path.join(tempHome, "kaijibot-test-no-bundled-extensions")
-    : "kaijibot-test-no-bundled-extensions";
+  process.env.ALLBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
+  process.env.ALLBOT_SKIP_GMAIL_WATCHER = "1";
+  process.env.ALLBOT_SKIP_CANVAS_HOST = "1";
+  process.env.ALLBOT_SKIP_CHANNELS = "1";
+  process.env.ALLBOT_SKIP_PROVIDERS = "1";
+  process.env.ALLBOT_SKIP_CRON = "1";
+  process.env.ALLBOT_TEST_MINIMAL_GATEWAY = "1";
+  process.env.ALLBOT_BUNDLED_PLUGINS_DIR = tempHome
+    ? path.join(tempHome, "allbot-test-no-bundled-extensions")
+    : "allbot-test-no-bundled-extensions";
 }
 
 async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
@@ -256,8 +256,8 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
     throw new Error("resetGatewayTestState called before temp home was initialized");
   }
   applyGatewaySkipEnv();
-  delete process.env.KAIJIBOT_GATEWAY_TOKEN;
-  const stateDir = process.env.KAIJIBOT_STATE_DIR;
+  delete process.env.ALLBOT_GATEWAY_TOKEN;
+  const stateDir = process.env.ALLBOT_STATE_DIR;
   if (stateDir) {
     await fs.rm(stateDir, {
       recursive: true,
@@ -268,7 +268,7 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
     await fs.mkdir(stateDir, { recursive: true });
   }
   if (options.uniqueConfigRoot) {
-    const suiteRoot = path.join(tempHome, ".kaijibot-test-suite");
+    const suiteRoot = path.join(tempHome, ".allbot-test-suite");
     await fs.mkdir(suiteRoot, { recursive: true });
     tempConfigRoot = path.join(suiteRoot, `case-${suiteConfigRootSeq++}`);
     await fs.rm(tempConfigRoot, {
@@ -279,7 +279,7 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
     });
     await fs.mkdir(tempConfigRoot, { recursive: true });
   } else {
-    tempConfigRoot = path.join(tempHome, ".kaijibot-test");
+    tempConfigRoot = path.join(tempHome, ".allbot-test");
     await fs.rm(tempConfigRoot, {
       recursive: true,
       force: true,
@@ -296,13 +296,13 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
   // agent request and later model-override checks throw
   // MissingAgentModelConfigError.
   await fs.writeFile(
-    path.join(tempConfigRoot, "kaijibot.json"),
+    path.join(tempConfigRoot, "allbot.json"),
     JSON.stringify(
       {
         agents: {
           defaults: {
             model: { primary: "anthropic/claude-opus-4-6" },
-            workspace: path.join(os.tmpdir(), "kaijibot-gateway-test"),
+            workspace: path.join(os.tmpdir(), "allbot-gateway-test"),
           },
         },
       },
@@ -311,7 +311,7 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
     ),
     "utf-8",
   );
-  tempControlUiRoot = path.join(tempHome, ".kaijibot-test-control-ui");
+  tempControlUiRoot = path.join(tempHome, ".allbot-test-control-ui");
   await fs.rm(tempControlUiRoot, {
     recursive: true,
     force: true,
@@ -321,7 +321,7 @@ async function resetGatewayTestState(options: { uniqueConfigRoot: boolean }) {
   await fs.mkdir(tempControlUiRoot, { recursive: true });
   await fs.writeFile(
     path.join(tempControlUiRoot, "index.html"),
-    "<!doctype html><title>kaijibot-test-control-ui</title>\n",
+    "<!doctype html><title>allbot-test-control-ui</title>\n",
     "utf-8",
   );
   setTestConfigRoot(tempConfigRoot);
@@ -414,7 +414,7 @@ async function resetGatewayTestRuntimeOnly() {
   vi.useRealTimers();
   setLoggerOverride({ level: "silent", consoleLevel: "silent" });
   applyGatewaySkipEnv();
-  delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+  delete process.env.ALLBOT_GATEWAY_TOKEN;
   resetConfigRuntimeState();
   resetTestPluginRegistry();
   clearGatewaySubagentRuntime();
@@ -545,8 +545,8 @@ type GatewayTestMessage = {
   [key: string]: unknown;
 };
 
-const CONNECT_CHALLENGE_NONCE_KEY = "__kaijibotTestConnectChallengeNonce";
-const CONNECT_CHALLENGE_TRACKED_KEY = "__kaijibotTestConnectChallengeTracked";
+const CONNECT_CHALLENGE_NONCE_KEY = "__allbotTestConnectChallengeNonce";
+const CONNECT_CHALLENGE_TRACKED_KEY = "__allbotTestConnectChallengeTracked";
 type TrackedWs = WebSocket & Record<string, unknown>;
 
 export function getTrackedConnectChallengeNonce(ws: WebSocket): string | undefined {
@@ -611,7 +611,7 @@ export async function startGatewayServer(port: number, opts?: GatewayServerOptio
     opts?.controlUiEnabled === undefined ? { ...opts, controlUiEnabled: false } : opts;
   if (
     resolvedOpts?.controlUiEnabled === true &&
-    process.env.KAIJIBOT_TEST_MINIMAL_GATEWAY === "1" &&
+    process.env.ALLBOT_TEST_MINIMAL_GATEWAY === "1" &&
     tempControlUiRoot &&
     typeof (testState.gatewayControlUi as { root?: unknown } | undefined)?.root !== "string"
   ) {
@@ -748,8 +748,8 @@ export async function startServerWithClient(
 ) {
   const { wsHeaders, ...gatewayOpts } = opts ?? {};
   let port = await getFreePort();
-  const envSnapshot = captureEnv(["KAIJIBOT_GATEWAY_TOKEN"]);
-  const prev = process.env.KAIJIBOT_GATEWAY_TOKEN;
+  const envSnapshot = captureEnv(["ALLBOT_GATEWAY_TOKEN"]);
+  const prev = process.env.ALLBOT_GATEWAY_TOKEN;
   if (typeof token === "string") {
     testState.gatewayAuth = { mode: "token", token };
   }
@@ -759,9 +759,9 @@ export async function startServerWithClient(
       ? (testState.gatewayAuth as { token?: string }).token
       : undefined);
   if (fallbackToken === undefined) {
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
   } else {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = fallbackToken;
+    process.env.ALLBOT_GATEWAY_TOKEN = fallbackToken;
   }
 
   const resolvedGatewayOpts: GatewayServerOptions =
@@ -810,7 +810,7 @@ function resolveDefaultTestDeviceIdentityPath(params: {
       "_",
     ),
   );
-  const suiteRoot = process.env.KAIJIBOT_STATE_DIR ?? process.env.HOME ?? os.tmpdir();
+  const suiteRoot = process.env.ALLBOT_STATE_DIR ?? process.env.HOME ?? os.tmpdir();
   return path.join(suiteRoot, "test-device-identities", `${safe}.json`);
 }
 
@@ -907,13 +907,13 @@ export async function connectReq(
       ? undefined
       : typeof (testState.gatewayAuth as { token?: unknown } | undefined)?.token === "string"
         ? ((testState.gatewayAuth as { token?: string }).token ?? undefined)
-        : process.env.KAIJIBOT_GATEWAY_TOKEN;
+        : process.env.ALLBOT_GATEWAY_TOKEN;
   const defaultPassword =
     opts?.skipDefaultAuth === true
       ? undefined
       : typeof (testState.gatewayAuth as { password?: unknown } | undefined)?.password === "string"
         ? ((testState.gatewayAuth as { password?: string }).password ?? undefined)
-        : process.env.KAIJIBOT_GATEWAY_PASSWORD;
+        : process.env.ALLBOT_GATEWAY_PASSWORD;
   const token = opts?.token ?? defaultToken;
   const bootstrapToken = normalizeOptionalString(opts?.bootstrapToken);
   const deviceToken = normalizeOptionalString(opts?.deviceToken);

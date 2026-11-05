@@ -1,7 +1,7 @@
 import { expect } from "vitest";
 import { restoreRedactedValues as restoreRedactedValues_orig } from "./redact-snapshot.js";
 import type { ConfigUiHints } from "./schema.js";
-import type { ConfigFileSnapshot } from "./types.kaijibot.js";
+import type { ConfigFileSnapshot } from "./types.allbot.js";
 
 export type TestSnapshot<TConfig extends Record<string, unknown>> = ConfigFileSnapshot & {
   parsed: TConfig;
@@ -16,7 +16,7 @@ export function makeSnapshot<TConfig extends Record<string, unknown>>(
   raw?: string,
 ): TestSnapshot<TConfig> {
   return {
-    path: "/home/user/.kaijibot/config.json5",
+    path: "/home/user/.allbot/config.json5",
     exists: true,
     raw: raw ?? JSON.stringify(config),
     parsed: config,

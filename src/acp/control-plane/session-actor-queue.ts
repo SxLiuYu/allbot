@@ -1,4 +1,4 @@
-import { KeyedAsyncQueue } from "kaijibot/plugin-sdk/keyed-async-queue";
+import { KeyedAsyncQueue } from "allbot/plugin-sdk/keyed-async-queue";
 
 export class SessionActorQueue {
   private readonly queue = new KeyedAsyncQueue();

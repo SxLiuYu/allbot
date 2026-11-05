@@ -107,7 +107,7 @@ describe("canvas host", () => {
     ({ fetch: realFetch } = require("undici") as typeof import("undici"));
     const wsModule = await vi.importActual<typeof import("ws")>("ws");
     WebSocketServerClass = wsModule.WebSocketServer;
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-canvas-fixtures-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-canvas-fixtures-"));
   });
 
   beforeEach(() => {
@@ -123,8 +123,8 @@ describe("canvas host", () => {
     const out = injectCanvasLiveReload("<html><body>Hello</body></html>");
     expect(out).toContain(CANVAS_WS_PATH);
     expect(out).toContain("location.reload");
-    expect(out).toContain("kaijibotCanvasA2UIAction");
-    expect(out).toContain("kaijibotSendUserAction");
+    expect(out).toContain("allbotCanvasA2UIAction");
+    expect(out).toContain("allbotSendUserAction");
   });
 
   it("creates a default index.html when missing", async () => {
@@ -143,7 +143,7 @@ describe("canvas host", () => {
       const { res, html } = await fetchCanvasHtml(server.port);
       expect(res.status).toBe(200);
       expect(html).toContain("Interactive test page");
-      expect(html).toContain("kaijibotSendUserAction");
+      expect(html).toContain("allbotSendUserAction");
       expect(html).toContain(CANVAS_WS_PATH);
       expect(html).toContain('document.createElement("span")');
       expect(html).not.toContain("statusEl.innerHTML");
@@ -398,7 +398,7 @@ describe("canvas host", () => {
     try {
       await fs.stat(bundlePath);
     } catch {
-      await fs.writeFile(bundlePath, "window.kaijibotA2UI = {};", "utf8");
+      await fs.writeFile(bundlePath, "window.allbotA2UI = {};", "utf8");
       createdBundle = true;
     }
 
@@ -415,18 +415,18 @@ describe("canvas host", () => {
         throw error;
       }
 
-      const res = await realFetch(`http://127.0.0.1:${server.port}/__kaijibot__/a2ui/`);
+      const res = await realFetch(`http://127.0.0.1:${server.port}/__allbot__/a2ui/`);
       const html = await res.text();
       expect(res.status).toBe(200);
-      expect(html).toContain("kaijibot-a2ui-host");
-      expect(html).toContain("kaijibotCanvasA2UIAction");
+      expect(html).toContain("allbot-a2ui-host");
+      expect(html).toContain("allbotCanvasA2UIAction");
 
       const bundleRes = await realFetch(
-        `http://127.0.0.1:${server.port}/__kaijibot__/a2ui/a2ui.bundle.js`,
+        `http://127.0.0.1:${server.port}/__allbot__/a2ui/a2ui.bundle.js`,
       );
       const js = await bundleRes.text();
       expect(bundleRes.status).toBe(200);
-      expect(js).toContain("kaijibotA2UI");
+      expect(js).toContain("allbotA2UI");
       const traversalRes = await realFetch(
         `http://127.0.0.1:${server.port}${A2UI_PATH}/%2e%2e%2fpackage.json`,
       );

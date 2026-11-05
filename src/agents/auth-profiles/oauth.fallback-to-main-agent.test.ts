@@ -57,8 +57,8 @@ async function loadFreshOAuthModuleForTest() {
 
 describe("resolveApiKeyForProfile fallback to main agent", () => {
   const envSnapshot = captureEnv([
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_AGENT_DIR",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
   ]);
   let tmpDir: string;
@@ -77,9 +77,9 @@ describe("resolveApiKeyForProfile fallback to main agent", () => {
     await fs.mkdir(mainAgentDir, { recursive: true });
     await fs.mkdir(secondaryAgentDir, { recursive: true });
 
-    // Set environment variables so resolveKaijiBotAgentDir() returns mainAgentDir
-    process.env.KAIJIBOT_STATE_DIR = tmpDir;
-    process.env.KAIJIBOT_AGENT_DIR = mainAgentDir;
+    // Set environment variables so resolveAllBotAgentDir() returns mainAgentDir
+    process.env.ALLBOT_STATE_DIR = tmpDir;
+    process.env.ALLBOT_AGENT_DIR = mainAgentDir;
     process.env.PI_CODING_AGENT_DIR = mainAgentDir;
     await loadFreshOAuthModuleForTest();
     clearRuntimeAuthProfileStoreSnapshots();

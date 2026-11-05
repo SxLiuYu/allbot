@@ -10,8 +10,8 @@
  * terminal report (both valid; splitting propensity is model-dependent).
  *
  * Run (local only, real API cost):
- *   KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/tasks/task-step-prompt.live.test.ts
- * Requires ZAI_API_KEY (loaded from ~/.kaijibot/.env in dev environments).
+ *   ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/tasks/task-step-prompt.live.test.ts
+ * Requires ZAI_API_KEY (loaded from ~/.allbot/.env in dev environments).
  * Live-named test files are excluded from normal `pnpm test`; this config is
  * reached only through the dedicated live entrypoint.
  */
@@ -20,7 +20,7 @@ import { createTaskTool, createTaskStepReportTool } from "../../agents/tools/tas
 import { buildStepPrompt } from "./step-driver.js";
 import type { TaskRecord } from "./types.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5.3-flash";
@@ -64,7 +64,7 @@ async function chatWithTools(params: {
     if (data.error) {
       // Auth failures mean the local key is stale — the harness itself is fine.
       throw new Error(
-        `ZAI API error (verify ZAI_API_KEY freshness in ~/.kaijibot/.env): ${data.error.message}`,
+        `ZAI API error (verify ZAI_API_KEY freshness in ~/.allbot/.env): ${data.error.message}`,
       );
     }
     return (data.choices?.[0]?.message.tool_calls ?? [])
@@ -94,7 +94,7 @@ function makeTask(overrides: Partial<TaskRecord> = {}): TaskRecord {
   };
 }
 
-const SYSTEM = "你是 KaijiBot，一个常驻的个人助理 agent。严格按照指令使用工具。";
+const SYSTEM = "你是 AllBot，一个常驻的个人助理 agent。严格按照指令使用工具。";
 
 const describeLive = isLive && ZAI_API_KEY ? describe : describe.skip;
 

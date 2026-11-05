@@ -111,7 +111,7 @@ describe("decodeStrictBase64", () => {
 describe("spawnSubagentDirect filename validation", () => {
   beforeEach(async () => {
     workspaceDirOverride = fs.mkdtempSync(
-      path.join(os.tmpdir(), `kaijibot-subagent-attachments-${process.pid}-${Date.now()}-`),
+      path.join(os.tmpdir(), `allbot-subagent-attachments-${process.pid}-${Date.now()}-`),
     );
     configOverride = createSubagentSpawnTestConfig(workspaceDirOverride);
     ({ resetSubagentRegistryForTests } = await loadSubagentSpawnModuleForTest({
@@ -236,7 +236,7 @@ describe("spawnSubagentDirect filename validation", () => {
       status: "error",
       error: "lineage patch failed",
     });
-    const attachmentsRoot = path.join(workspaceDirOverride, ".kaijibot", "attachments");
+    const attachmentsRoot = path.join(workspaceDirOverride, ".allbot", "attachments");
     const retainedDirs = fs.existsSync(attachmentsRoot)
       ? fs.readdirSync(attachmentsRoot).filter((entry) => !entry.startsWith("."))
       : [];

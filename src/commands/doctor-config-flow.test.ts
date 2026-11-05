@@ -385,10 +385,10 @@ describe("doctor config flow", () => {
     const noteSpy = vi.spyOn(noteModule, "note").mockImplementation(() => {});
     try {
       await withTempHome(async (home) => {
-        const stateDir = path.join(home, ".kaijibot");
+        const stateDir = path.join(home, ".allbot");
         await fs.mkdir(path.join(stateDir, "matrix"), { recursive: true });
         await fs.writeFile(
-          path.join(stateDir, "kaijibot.json"),
+          path.join(stateDir, "allbot.json"),
           JSON.stringify({
             channels: {
               matrix: {
@@ -431,7 +431,7 @@ describe("doctor config flow", () => {
     const noteSpy = vi.spyOn(noteModule, "note").mockImplementation(() => {});
     try {
       await withTempHome(async (home) => {
-        const stateDir = path.join(home, ".kaijibot");
+        const stateDir = path.join(home, ".allbot");
         const { rootDir: accountRoot } = resolveMatrixAccountStorageRoot({
           stateDir,
           homeserver: "https://matrix.example.org",
@@ -440,7 +440,7 @@ describe("doctor config flow", () => {
         });
         await fs.mkdir(path.join(accountRoot, "crypto"), { recursive: true });
         await fs.writeFile(
-          path.join(stateDir, "kaijibot.json"),
+          path.join(stateDir, "allbot.json"),
           JSON.stringify({
             channels: {
               matrix: {
@@ -483,10 +483,10 @@ describe("doctor config flow", () => {
     const noteSpy = vi.spyOn(noteModule, "note").mockImplementation(() => {});
     try {
       await withTempHome(async (home) => {
-        const stateDir = path.join(home, ".kaijibot");
+        const stateDir = path.join(home, ".allbot");
         await fs.mkdir(path.join(stateDir, "matrix"), { recursive: true });
         await fs.writeFile(
-          path.join(stateDir, "kaijibot.json"),
+          path.join(stateDir, "allbot.json"),
           JSON.stringify({
             channels: {
               matrix: {
@@ -541,10 +541,10 @@ describe("doctor config flow", () => {
 
   it("creates no Matrix migration snapshot when no migration runs", async () => {
     await withTempHome(async (home) => {
-      const stateDir = path.join(home, ".kaijibot");
+      const stateDir = path.join(home, ".allbot");
       await fs.mkdir(path.join(stateDir, "matrix"), { recursive: true });
       await fs.writeFile(
-        path.join(stateDir, "kaijibot.json"),
+        path.join(stateDir, "allbot.json"),
         JSON.stringify({
           channels: {
             matrix: {
@@ -562,7 +562,7 @@ describe("doctor config flow", () => {
         confirm: async () => false,
       });
 
-      const snapshotDir = path.join(home, "Backups", "kaijibot-migrations");
+      const snapshotDir = path.join(home, "Backups", "allbot-migrations");
       expect(
         await fs
           .access(snapshotDir)
@@ -590,8 +590,8 @@ describe("doctor config flow", () => {
         installs: {
           matrix: {
             source: "path",
-            sourcePath: "/tmp/kaijibot-matrix-missing",
-            installPath: "/tmp/kaijibot-matrix-missing",
+            sourcePath: "/tmp/allbot-matrix-missing",
+            installPath: "/tmp/allbot-matrix-missing",
           },
         },
       },
@@ -1023,10 +1023,10 @@ describe("doctor config flow", () => {
   // is not bundled in this repo; numeric ids pass through the repair as-is.
   it("keeps numeric discord ids as-is on repair", async () => {
     await withTempHome(async (home) => {
-      const configDir = path.join(home, ".kaijibot");
+      const configDir = path.join(home, ".allbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "kaijibot.json"),
+        path.join(configDir, "allbot.json"),
         JSON.stringify(
           {
             channels: {
@@ -1258,11 +1258,11 @@ describe("doctor config flow", () => {
 
   it('repairs dmPolicy="allowlist" by restoring allowFrom from pairing store on repair', async () => {
     const result = await withTempHome(async (home) => {
-      const configDir = path.join(home, ".kaijibot");
+      const configDir = path.join(home, ".allbot");
       const credentialsDir = path.join(configDir, "credentials");
       await fs.mkdir(credentialsDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "kaijibot.json"),
+        path.join(configDir, "allbot.json"),
         JSON.stringify(
           {
             channels: {
@@ -1512,7 +1512,7 @@ describe("doctor config flow", () => {
         noteSpy.mock.calls.some(
           ([message, title]) =>
             title === "Doctor" &&
-            String(message).includes('Run "kaijibot doctor --fix" to migrate legacy config keys.'),
+            String(message).includes('Run "allbot doctor --fix" to migrate legacy config keys.'),
         ),
       ).toBe(true);
     } finally {
@@ -1576,7 +1576,7 @@ describe("doctor config flow", () => {
         noteSpy.mock.calls.some(
           ([message, title]) =>
             title === "Doctor" &&
-            String(message).includes('Run "kaijibot doctor --fix" to migrate legacy config keys.'),
+            String(message).includes('Run "allbot doctor --fix" to migrate legacy config keys.'),
         ),
       ).toBe(true);
     } finally {
@@ -1659,7 +1659,7 @@ describe("doctor config flow", () => {
         noteSpy.mock.calls.some(
           ([message, title]) =>
             title === "Doctor" &&
-            String(message).includes('Run "kaijibot doctor --fix" to migrate legacy config keys.'),
+            String(message).includes('Run "allbot doctor --fix" to migrate legacy config keys.'),
         ),
       ).toBe(true);
     } finally {
@@ -1787,7 +1787,7 @@ describe("doctor config flow", () => {
         noteSpy.mock.calls.some(
           ([message, title]) =>
             title === "Doctor" &&
-            String(message).includes('Run "kaijibot doctor --fix" to migrate legacy config keys.'),
+            String(message).includes('Run "allbot doctor --fix" to migrate legacy config keys.'),
         ),
       ).toBe(true);
     } finally {
@@ -1896,10 +1896,10 @@ describe("doctor config flow", () => {
   it("does not report repeat talk provider normalization on consecutive repair runs", async () => {
     await withTempHome(async (home) => {
       const providerId = "acme-speech";
-      const configDir = path.join(home, ".kaijibot");
+      const configDir = path.join(home, ".allbot");
       await fs.mkdir(configDir, { recursive: true });
       await fs.writeFile(
-        path.join(configDir, "kaijibot.json"),
+        path.join(configDir, "allbot.json"),
         JSON.stringify(
           {
             talk: {

@@ -21,14 +21,14 @@ export {
   listImportedBundledPluginFacadeIds,
 } from "./facade-loader.js";
 
-const KAIJIBOT_PACKAGE_ROOT =
+const ALLBOT_PACKAGE_ROOT =
   resolveLoaderPackageRoot({
     modulePath: fileURLToPath(import.meta.url),
     moduleUrl: import.meta.url,
   }) ?? fileURLToPath(new URL("../..", import.meta.url));
 const CURRENT_MODULE_PATH = fileURLToPath(import.meta.url);
 const PUBLIC_SURFACE_SOURCE_EXTENSIONS = [".ts", ".mts", ".js", ".mjs", ".cts", ".cjs"] as const;
-const KAIJIBOT_SOURCE_EXTENSIONS_ROOT = path.resolve(KAIJIBOT_PACKAGE_ROOT, "extensions");
+const ALLBOT_SOURCE_EXTENSIONS_ROOT = path.resolve(ALLBOT_PACKAGE_ROOT, "extensions");
 const cachedFacadeModuleLocationsByKey = new Map<
   string,
   {
@@ -49,7 +49,7 @@ function resolveSourceFirstPublicSurfacePath(params: {
 }): string | null {
   const artifactBasename = normalizeBundledPluginArtifactSubpath(params.artifactBasename);
   const sourceBaseName = artifactBasename.replace(/\.js$/u, "");
-  const sourceRoot = params.bundledPluginsDir ?? path.resolve(KAIJIBOT_PACKAGE_ROOT, "extensions");
+  const sourceRoot = params.bundledPluginsDir ?? path.resolve(ALLBOT_PACKAGE_ROOT, "extensions");
   for (const ext of PUBLIC_SURFACE_SOURCE_EXTENSIONS) {
     const candidate = path.resolve(sourceRoot, params.dirName, `${sourceBaseName}${ext}`);
     if (fs.existsSync(candidate)) {
@@ -114,7 +114,7 @@ function resolveFacadeModuleLocationUncached(params: {
       }) ??
       resolveSourceFirstPublicSurfacePath(params) ??
       resolveBundledPluginPublicSurfacePath({
-        rootDir: KAIJIBOT_PACKAGE_ROOT,
+        rootDir: ALLBOT_PACKAGE_ROOT,
         ...(bundledPluginsDir ? { bundledPluginsDir } : {}),
         dirName: params.dirName,
         artifactBasename: params.artifactBasename,
@@ -125,13 +125,13 @@ function resolveFacadeModuleLocationUncached(params: {
         boundaryRoot:
           bundledPluginsDir && modulePath.startsWith(path.resolve(bundledPluginsDir) + path.sep)
             ? path.resolve(bundledPluginsDir)
-            : KAIJIBOT_PACKAGE_ROOT,
+            : ALLBOT_PACKAGE_ROOT,
       };
     }
     return resolveRegistryPluginModuleLocation(params);
   }
   const modulePath = resolveBundledPluginPublicSurfacePath({
-    rootDir: KAIJIBOT_PACKAGE_ROOT,
+    rootDir: ALLBOT_PACKAGE_ROOT,
     ...(bundledPluginsDir ? { bundledPluginsDir } : {}),
     dirName: params.dirName,
     artifactBasename: params.artifactBasename,
@@ -142,7 +142,7 @@ function resolveFacadeModuleLocationUncached(params: {
       boundaryRoot:
         bundledPluginsDir && modulePath.startsWith(path.resolve(bundledPluginsDir) + path.sep)
           ? path.resolve(bundledPluginsDir)
-          : KAIJIBOT_PACKAGE_ROOT,
+          : ALLBOT_PACKAGE_ROOT,
     };
   }
   return resolveRegistryPluginModuleLocation(params);
@@ -228,7 +228,7 @@ function buildFacadeActivationCheckParams(
   return {
     ...params,
     location,
-    sourceExtensionsRoot: KAIJIBOT_SOURCE_EXTENSIONS_ROOT,
+    sourceExtensionsRoot: ALLBOT_SOURCE_EXTENSIONS_ROOT,
     resolutionKey: createFacadeResolutionKey(params),
   };
 }

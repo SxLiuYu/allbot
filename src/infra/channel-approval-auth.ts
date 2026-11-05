@@ -1,5 +1,5 @@
 import { getChannelPlugin, resolveChannelApprovalCapability } from "../channels/plugins/index.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeMessageChannel } from "../utils/message-channel.js";
 
 export type ApprovalCommandAuthorization = {
@@ -9,7 +9,7 @@ export type ApprovalCommandAuthorization = {
 };
 
 export function resolveApprovalCommandAuthorization(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel?: string | null;
   accountId?: string | null;
   senderId?: string | null;

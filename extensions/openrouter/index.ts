@@ -2,16 +2,16 @@ import {
   definePluginEntry,
   type ProviderResolveDynamicModelContext,
   type ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
+} from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
 import {
   DEFAULT_CONTEXT_TOKENS,
   buildProviderReplayFamilyHooks,
-} from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/provider-model-shared";
 import {
   getOpenRouterModelCapabilities,
   loadOpenRouterModelCapabilities,
-} from "kaijibot/plugin-sdk/provider-stream-family";
+} from "allbot/plugin-sdk/provider-stream-family";
 import { openrouterMediaUnderstandingProvider } from "./media-understanding-provider.js";
 import { buildOpenRouterMusicGenerationProvider } from "./music-generation-provider.js";
 import { applyOpenrouterConfig, OPENROUTER_DEFAULT_MODEL_REF } from "./onboard.js";

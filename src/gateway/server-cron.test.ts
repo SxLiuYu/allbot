@@ -2,7 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CliDeps } from "../cli/deps.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { SsrFBlockedError } from "../infra/net/ssrf.js";
 import { mergeMockedModule } from "../test-utils/vitest-module-mocks.js";
 
@@ -67,7 +67,7 @@ vi.mock("../browser-lifecycle-cleanup.js", () => ({
 
 import { buildGatewayCronService } from "./server-cron.js";
 
-function createCronConfig(name: string): KaijiBotConfig {
+function createCronConfig(name: string): AllBotConfig {
   const tmpDir = path.join(os.tmpdir(), `${name}-${Date.now()}`);
   return {
     session: {
@@ -76,7 +76,7 @@ function createCronConfig(name: string): KaijiBotConfig {
     cron: {
       store: path.join(tmpDir, "cron.json"),
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("buildGatewayCronService", () => {
@@ -181,7 +181,7 @@ describe("buildGatewayCronService", () => {
       cron: {
         store: path.join(tmpDir, "cron.json"),
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     loadConfigMock.mockReturnValue(cfg);
 
     const state = buildGatewayCronService({

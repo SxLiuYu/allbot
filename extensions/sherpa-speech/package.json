@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/sherpa-speech",
+  "name": "@allbot/sherpa-speech",
   "version": "2026.8.19",
   "private": true,
-  "description": "KaijiBot local ASR plugin (sherpa-onnx, offline)",
+  "description": "AllBot local ASR plugin (sherpa-onnx, offline)",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

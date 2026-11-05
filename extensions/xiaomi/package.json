@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/xiaomi-provider",
+  "name": "@allbot/xiaomi-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Xiaomi provider plugin",
+  "description": "AllBot Xiaomi provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

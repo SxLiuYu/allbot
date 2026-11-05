@@ -5,8 +5,8 @@ import os from "node:os";
 import path from "node:path";
 import readline from "node:readline";
 import chokidar, { type FSWatcher } from "chokidar";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import { withFileLock } from "kaijibot/plugin-sdk/file-lock";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import { withFileLock } from "allbot/plugin-sdk/file-lock";
 import {
   createSubsystemLogger,
   resolveMemorySearchSyncConfig,
@@ -14,9 +14,9 @@ import {
   resolveGlobalSingleton,
   resolveStateDir,
   writeFileWithinRoot,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type ResolvedMemorySearchSyncConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+} from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import {
   buildSessionEntry,
   deriveQmdScopeChannel,
@@ -28,7 +28,7 @@ import {
   runCliCommand,
   type QmdQueryResult,
   type SessionFileEntry,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
+} from "allbot/plugin-sdk/memory-core-host-engine-qmd";
 import {
   isFileMissingError,
   requireNodeSqlite,
@@ -43,12 +43,12 @@ import {
   type ResolvedMemoryBackendConfig,
   type ResolvedQmdConfig,
   type ResolvedQmdMcporterConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 import {
   asNullableRecord as asRecord,
   localeLowercasePreservingWhitespace,
   normalizeLowercaseStringOrEmpty,
-} from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/text-runtime";
 import { resolveQmdCollectionPatternFlags, type QmdCollectionPatternFlag } from "./qmd-compat.js";
 
 type SqliteDatabase = import("node:sqlite").DatabaseSync;
@@ -70,8 +70,8 @@ const QMD_EMBED_LOCK_RETRY_TEMPLATE = {
   maxTimeout: 10_000,
   randomize: true,
 } as const;
-const MCPORTER_STATE_KEY = Symbol.for("kaijibot.mcporterState");
-const QMD_EMBED_QUEUE_KEY = Symbol.for("kaijibot.qmdEmbedQueueTail");
+const MCPORTER_STATE_KEY = Symbol.for("allbot.mcporterState");
+const QMD_EMBED_QUEUE_KEY = Symbol.for("allbot.qmdEmbedQueueTail");
 const IGNORED_MEMORY_WATCH_DIR_NAMES = new Set([
   ".git",
   "node_modules",
@@ -119,7 +119,7 @@ function _hasHanScript(value: string): boolean {
 
 function normalizeHanBm25Query(query: string): string {
   const trimmed = query.trim();
-  // Keep Han/CJK BM25 queries intact so KaijiBot search semantics match direct qmd search.
+  // Keep Han/CJK BM25 queries intact so AllBot search semantics match direct qmd search.
   return trimmed;
 }
 
@@ -231,7 +231,7 @@ type QmdMcporterAcrossCollectionsParams =
 
 export class QmdMemoryManager implements MemorySearchManager {
   static async create(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     resolved: ResolvedMemoryBackendConfig;
     mode?: QmdManagerMode;
@@ -245,7 +245,7 @@ export class QmdMemoryManager implements MemorySearchManager {
     return manager;
   }
 
-  private readonly cfg: KaijiBotConfig;
+  private readonly cfg: AllBotConfig;
   private readonly agentId: string;
   private readonly qmd: ResolvedQmdConfig;
   private readonly workspaceDir: string;
@@ -296,7 +296,7 @@ export class QmdMemoryManager implements MemorySearchManager {
   private collectionPatternFlag: QmdCollectionPatternFlag | null = "--glob";
 
   private constructor(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     resolved: ResolvedQmdConfig;
   }) {

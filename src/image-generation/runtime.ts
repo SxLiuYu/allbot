@@ -1,7 +1,7 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
 import { describeFailoverError, isFailoverError } from "../agents/failover-error.js";
 import type { FallbackAttempt } from "../agents/model-fallback.types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
@@ -25,7 +25,7 @@ import type {
 const log = createSubsystemLogger("image-generation");
 
 export type GenerateImageParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompt: string;
   agentDir?: string;
   authStore?: AuthProfileStore;
@@ -47,7 +47,7 @@ export type GenerateImageRuntimeResult = {
   ignoredOverrides: ImageGenerationIgnoredOverride[];
 };
 
-function buildNoImageGenerationModelConfiguredMessage(cfg: KaijiBotConfig): string {
+function buildNoImageGenerationModelConfiguredMessage(cfg: AllBotConfig): string {
   return buildNoCapabilityModelConfiguredMessage({
     capabilityLabel: "image-generation",
     modelConfigKey: "imageGenerationModel",
@@ -55,7 +55,7 @@ function buildNoImageGenerationModelConfiguredMessage(cfg: KaijiBotConfig): stri
   });
 }
 
-export function listRuntimeImageGenerationProviders(params?: { config?: KaijiBotConfig }) {
+export function listRuntimeImageGenerationProviders(params?: { config?: AllBotConfig }) {
   return listImageGenerationProviders(params?.config);
 }
 

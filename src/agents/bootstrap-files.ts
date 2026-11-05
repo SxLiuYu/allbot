@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { AgentContextInjection } from "../config/types.agent-defaults.js";
 import type { SoulPreset } from "../config/types.soul.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
@@ -25,9 +25,9 @@ export type BootstrapContextRunKind = "default" | "heartbeat" | "cron";
 
 const CONTINUATION_SCAN_MAX_TAIL_BYTES = 256 * 1024;
 const CONTINUATION_SCAN_MAX_RECORDS = 500;
-export const FULL_BOOTSTRAP_COMPLETED_CUSTOM_TYPE = "kaijibot:bootstrap-context:full";
+export const FULL_BOOTSTRAP_COMPLETED_CUSTOM_TYPE = "allbot:bootstrap-context:full";
 
-export function resolveContextInjectionMode(config?: KaijiBotConfig): AgentContextInjection {
+export function resolveContextInjectionMode(config?: AllBotConfig): AgentContextInjection {
   return config?.agents?.defaults?.contextInjection ?? "always";
 }
 
@@ -148,7 +148,7 @@ function applyContextModeFilter(params: {
 }
 
 function shouldExcludeHeartbeatBootstrapFile(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;
@@ -183,7 +183,7 @@ function filterHeartbeatBootstrapFile(
 }
 
 export function resolveSoulPreset(
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
   agentId?: string,
   sessionKey?: string,
 ): SoulPreset | undefined {
@@ -197,7 +197,7 @@ export function resolveSoulPreset(
 
 export async function resolveBootstrapFilesForRun(params: {
   workspaceDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;
@@ -237,7 +237,7 @@ export async function resolveBootstrapFilesForRun(params: {
 
 export async function resolveBootstrapContextForRun(params: {
   workspaceDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sessionKey?: string;
   sessionId?: string;
   agentId?: string;

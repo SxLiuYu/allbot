@@ -1,6 +1,6 @@
 ---
 title: Lobster
-summary: "Typed workflow runtime for KaijiBot with resumable approval gates."
+summary: "Typed workflow runtime for AllBot with resumable approval gates."
 read_when:
   - You want deterministic multi-step workflows with explicit approvals
   - You need to resume a workflow without re-running earlier steps
@@ -8,9 +8,9 @@ read_when:
 
 # Lobster
 
-Lobster is a workflow shell that lets KaijiBot run multi-step tool sequences as a single, deterministic operation with explicit approval checkpoints.
+Lobster is a workflow shell that lets AllBot run multi-step tool sequences as a single, deterministic operation with explicit approval checkpoints.
 
-Lobster is one authoring layer above detached background work. For flow orchestration above individual tasks, see [Task Flow](/automation/taskflow) (`kaijibot tasks flow`). For the task activity ledger, see [`kaijibot tasks`](/automation/tasks).
+Lobster is one authoring layer above detached background work. For flow orchestration above individual tasks, see [Task Flow](/automation/taskflow) (`allbot tasks flow`). For the task activity ledger, see [`allbot tasks`](/automation/tasks).
 
 ## Hook
 
@@ -20,7 +20,7 @@ Your assistant can build the tools that manage itself. Ask for a workflow, and 3
 
 Today, complex workflows require many back-and-forth tool calls. Each call costs tokens, and the LLM has to orchestrate every step. Lobster moves that orchestration into a typed runtime:
 
-- **One call instead of many**: KaijiBot runs one Lobster tool call and gets a structured result.
+- **One call instead of many**: AllBot runs one Lobster tool call and gets a structured result.
 - **Approvals built in**: Side effects (send email, post comment) halt the workflow until explicitly approved.
 - **Resumable**: Halted workflows return a token; approve and resume without re-running everything.
 
@@ -36,7 +36,7 @@ Lobster is intentionally small. The goal is not "a new language," it's a predict
 
 ## How it works
 
-KaijiBot runs Lobster workflows **in-process** using an embedded runner. No external CLI subprocess is spawned; the workflow engine executes inside the gateway process and returns a JSON envelope directly.
+AllBot runs Lobster workflows **in-process** using an embedded runner. No external CLI subprocess is spawned; the workflow engine executes inside the gateway process and returns a JSON envelope directly.
 If the pipeline pauses for approval, the tool returns a `resumeToken` so you can continue later.
 
 ## Pattern: small CLI + JSON pipes + approvals
@@ -73,7 +73,7 @@ Example: map input items into tool calls:
 
 ```bash
 gog.gmail.search --query 'newer_than:1d' \
-  | kaijibot.invoke --tool message --action send --each --item-key message --args-json '{"provider":"telegram","to":"..."}'
+  | allbot.invoke --tool message --action send --each --item-key message --args-json '{"provider":"telegram","to":"..."}'
 ```
 
 ## JSON-only LLM steps (llm-task)
@@ -105,7 +105,7 @@ Enable the tool:
 Use it in a pipeline:
 
 ```lobster
-kaijibot.invoke --tool llm-task --action json --args-json '{
+allbot.invoke --tool llm-task --action json --args-json '{
   "prompt": "Given the input email, return intent and draft.",
   "thinking": "low",
   "input": { "subject": "Hello", "body": "Can you help?" },
@@ -125,7 +125,7 @@ See [LLM Task](/tools/llm-task) for details and configuration options.
 
 ## Workflow files (.lobster)
 
-Lobster can run YAML/JSON workflow files with `name`, `args`, `steps`, `env`, `condition`, and `approval` fields. In KaijiBot tool calls, set `pipeline` to the file path.
+Lobster can run YAML/JSON workflow files with `name`, `args`, `steps`, `env`, `condition`, and `approval` fields. In AllBot tool calls, set `pipeline` to the file path.
 
 ```yaml
 name: inbox-triage
@@ -157,7 +157,7 @@ Notes:
 
 Bundled Lobster workflows run in-process; no separate `lobster` binary is required. The embedded runner ships with the Lobster plugin.
 
-If you need the standalone Lobster CLI for development or external pipelines, install it from the [Lobster repo](https://github.com/kaijibot/lobster) and ensure `lobster` is on `PATH`.
+If you need the standalone Lobster CLI for development or external pipelines, install it from the [Lobster repo](https://github.com/allbot/lobster) and ensure `lobster` is on `PATH`.
 
 ## Enable the tool
 
@@ -193,7 +193,7 @@ Or per-agent:
 Avoid using `tools.allow: ["lobster"]` unless you intend to run in restrictive allowlist mode.
 
 Note: allowlists are opt-in for optional plugins. If your allowlist only names
-plugin tools (like `lobster`), KaijiBot keeps core tools enabled. To restrict core
+plugin tools (like `lobster`), AllBot keeps core tools enabled. To restrict core
 tools, include the core tools or groups you want in the allowlist too.
 
 ## Example: Email triage
@@ -202,12 +202,12 @@ Without Lobster:
 
 ```
 User: "Check my email and draft replies"
-→ kaijibot calls gmail.list
+→ allbot calls gmail.list
 → LLM summarizes
 → User: "draft replies to #2 and #5"
 → LLM drafts
 → User: "send #2"
-→ kaijibot calls gmail.send
+→ allbot calls gmail.send
 (repeat daily, no memory of what was triaged)
 ```
 
@@ -320,7 +320,7 @@ OpenProse pairs well with Lobster: use `/prose` to orchestrate multi-agent prep,
 ## Safety
 
 - **Local in-process only** — workflows execute inside the gateway process; no network calls from the plugin itself.
-- **No secrets** — Lobster doesn't manage OAuth; it calls KaijiBot tools that do.
+- **No secrets** — Lobster doesn't manage OAuth; it calls AllBot tools that do.
 - **Sandbox-aware** — disabled when the tool context is sandboxed.
 - **Hardened** — timeouts and output caps enforced by the embedded runner.
 

@@ -1,5 +1,5 @@
 ---
-summary: "Scripted onboarding and agent setup for the KaijiBot CLI"
+summary: "Scripted onboarding and agent setup for the AllBot CLI"
 read_when:
   - You are automating onboarding in scripts or CI
   - You need non-interactive examples for specific providers
@@ -9,7 +9,7 @@ sidebarTitle: "CLI automation"
 
 # CLI Automation
 
-Use `--non-interactive` to automate `kaijibot onboard`.
+Use `--non-interactive` to automate `allbot onboard`.
 
 <Note>
 `--json` does not imply non-interactive mode. Use `--non-interactive` (and `--workspace`) for scripts.
@@ -18,7 +18,7 @@ Use `--non-interactive` to automate `kaijibot onboard`.
 ## Baseline non-interactive example
 
 ```bash
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice apiKey \
   --anthropic-api-key "$ANTHROPIC_API_KEY" \
@@ -41,7 +41,7 @@ Passing inline key flags without the matching env var now fails fast.
 Example:
 
 ```bash
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice openai-api-key \
   --secret-input-mode ref \
@@ -53,7 +53,7 @@ kaijibot onboard --non-interactive \
 <AccordionGroup>
   <Accordion title="Anthropic API key example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice apiKey \
       --anthropic-api-key "$ANTHROPIC_API_KEY" \
@@ -63,7 +63,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Gemini example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice gemini-api-key \
       --gemini-api-key "$GEMINI_API_KEY" \
@@ -73,7 +73,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Z.AI example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice zai-api-key \
       --zai-api-key "$ZAI_API_KEY" \
@@ -83,7 +83,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Vercel AI Gateway example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice ai-gateway-api-key \
       --ai-gateway-api-key "$AI_GATEWAY_API_KEY" \
@@ -93,7 +93,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Cloudflare AI Gateway example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice cloudflare-ai-gateway-api-key \
       --cloudflare-ai-gateway-account-id "your-account-id" \
@@ -105,7 +105,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Moonshot example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice moonshot-api-key \
       --moonshot-api-key "$MOONSHOT_API_KEY" \
@@ -115,7 +115,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Mistral example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice mistral-api-key \
       --mistral-api-key "$MISTRAL_API_KEY" \
@@ -125,7 +125,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Synthetic example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice synthetic-api-key \
       --synthetic-api-key "$SYNTHETIC_API_KEY" \
@@ -135,7 +135,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="OpenCode example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice opencode-zen \
       --opencode-zen-api-key "$OPENCODE_API_KEY" \
@@ -146,7 +146,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Ollama example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice ollama \
       --custom-model-id "qwen3.5:27b" \
@@ -157,7 +157,7 @@ kaijibot onboard --non-interactive \
   </Accordion>
   <Accordion title="Custom provider example">
     ```bash
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice custom-api-key \
       --custom-base-url "https://llm.example.com/v1" \
@@ -175,7 +175,7 @@ kaijibot onboard --non-interactive \
 
     ```bash
     export CUSTOM_API_KEY="your-key"
-    kaijibot onboard --non-interactive \
+    allbot onboard --non-interactive \
       --mode local \
       --auth-choice custom-api-key \
       --custom-base-url "https://llm.example.com/v1" \
@@ -192,17 +192,17 @@ kaijibot onboard --non-interactive \
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token remains available as a supported onboarding token path, but KaijiBot now prefers Claude CLI reuse when available.
+Anthropic setup-token remains available as a supported onboarding token path, but AllBot now prefers Claude CLI reuse when available.
 For production, prefer an Anthropic API key.
 
 ## Add another agent
 
-Use `kaijibot agents add <name>` to create a separate agent with its own workspace,
+Use `allbot agents add <name>` to create a separate agent with its own workspace,
 sessions, and auth profiles. Running without `--workspace` launches the wizard.
 
 ```bash
-kaijibot agents add work \
-  --workspace ~/.kaijibot/workspace-work \
+allbot agents add work \
+  --workspace ~/.allbot/workspace-work \
   --model openai/gpt-5.4 \
   --bind whatsapp:biz \
   --non-interactive \
@@ -217,7 +217,7 @@ What it sets:
 
 Notes:
 
-- Default workspaces follow `~/.kaijibot/workspace-<agentId>`.
+- Default workspaces follow `~/.allbot/workspace-<agentId>`.
 - Add `bindings` to route inbound messages (the wizard can do this).
 - Non-interactive flags: `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
 
@@ -225,4 +225,4 @@ Notes:
 
 - Onboarding hub: [Onboarding (CLI)](/start/wizard)
 - Full reference: [CLI Setup Reference](/start/wizard-cli-reference)
-- Command reference: [`kaijibot onboard`](/cli/onboard)
+- Command reference: [`allbot onboard`](/cli/onboard)

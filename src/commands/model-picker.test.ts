@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   applyModelAllowlist,
   applyModelFallbacksFromSelection,
@@ -130,7 +130,7 @@ describe("promptDefaultModel", () => {
     const prompter = makePrompter({ select });
 
     await promptDefaultModel({
-      config: { agents: { defaults: {} } } as KaijiBotConfig,
+      config: { agents: { defaults: {} } } as AllBotConfig,
       prompter,
       allowKeep: false,
       includeManual: false,
@@ -174,7 +174,7 @@ describe("promptDefaultModel", () => {
           model: "openai/gpt-5.4",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const result = await promptDefaultModel({
       config,
@@ -241,7 +241,7 @@ describe("promptDefaultModel", () => {
       return (vllm?.value ?? "") as never;
     });
     const prompter = makePrompter({ select });
-    const config = { agents: { defaults: {} } } as KaijiBotConfig;
+    const config = { agents: { defaults: {} } } as AllBotConfig;
 
     const result = await promptDefaultModel({
       config,
@@ -250,7 +250,7 @@ describe("promptDefaultModel", () => {
       includeManual: false,
       includeProviderPluginSetups: true,
       ignoreAllowlist: true,
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       runtime: {} as never,
     });
 
@@ -308,13 +308,13 @@ describe("promptDefaultModel", () => {
     const prompter = makePrompter({ select });
 
     await promptDefaultModel({
-      config: { agents: { defaults: {} } } as KaijiBotConfig,
+      config: { agents: { defaults: {} } } as AllBotConfig,
       prompter,
       allowKeep: false,
       includeManual: false,
       includeProviderPluginSetups: true,
       ignoreAllowlist: true,
-      agentDir: "/tmp/kaijibot-agent",
+      agentDir: "/tmp/allbot-agent",
       runtime: {} as never,
     });
 
@@ -350,7 +350,7 @@ describe("promptModelAllowlist", () => {
 
     const multiselect = createSelectAllMultiselect();
     const prompter = makePrompter({ multiselect });
-    const config = { agents: { defaults: {} } } as KaijiBotConfig;
+    const config = { agents: { defaults: {} } } as AllBotConfig;
 
     await promptModelAllowlist({
       config,
@@ -385,7 +385,7 @@ describe("promptModelAllowlist", () => {
 
     const multiselect = createSelectAllMultiselect();
     const prompter = makePrompter({ multiselect });
-    const config = { agents: { defaults: {} } } as KaijiBotConfig;
+    const config = { agents: { defaults: {} } } as AllBotConfig;
 
     await promptModelAllowlist({
       config,
@@ -412,7 +412,7 @@ describe("router model filtering", () => {
     const multiselect = createSelectAllMultiselect();
     const defaultPrompter = makePrompter({ select });
     const allowlistPrompter = makePrompter({ multiselect });
-    const config = { agents: { defaults: {} } } as KaijiBotConfig;
+    const config = { agents: { defaults: {} } } as AllBotConfig;
 
     await promptDefaultModel({
       config,
@@ -444,7 +444,7 @@ describe("applyModelAllowlist", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const next = applyModelAllowlist(config, ["openai/gpt-5.4"]);
     expect(next.agents?.defaults?.models).toEqual({
@@ -461,7 +461,7 @@ describe("applyModelAllowlist", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const next = applyModelAllowlist(config, []);
     expect(next.agents?.defaults?.models).toBeUndefined();
@@ -476,7 +476,7 @@ describe("applyModelFallbacksFromSelection", () => {
           model: { primary: "anthropic/claude-opus-4-6" },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const next = applyModelFallbacksFromSelection(config, [
       "anthropic/claude-opus-4-6",
@@ -495,7 +495,7 @@ describe("applyModelFallbacksFromSelection", () => {
           model: { primary: "anthropic/claude-opus-4-6", fallbacks: ["openai/gpt-5.4"] },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const next = applyModelFallbacksFromSelection(config, ["openai/gpt-5.4"]);
     expect(next.agents?.defaults?.model).toEqual({

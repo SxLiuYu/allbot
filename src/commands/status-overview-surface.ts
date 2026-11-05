@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import type { UpdateCheckResult } from "../infra/update-check.js";
 import {
   buildGatewayStatusJsonPayload,
@@ -37,7 +37,7 @@ type StatusGatewaySelf =
 type StatusServiceSummary = {
   label: string;
   installed: boolean | null;
-  managedByKaijiBot?: boolean;
+  managedByAllBot?: boolean;
   loadedText: string;
   runtimeShort?: string | null;
   runtime?: {
@@ -47,7 +47,7 @@ type StatusServiceSummary = {
 };
 
 export type StatusOverviewSurface = {
-  cfg: Pick<KaijiBotConfig, "update" | "gateway">;
+  cfg: Pick<AllBotConfig, "update" | "gateway">;
   update: UpdateCheckResult;
   tailscaleMode: string;
   tailscaleDns?: string | null;

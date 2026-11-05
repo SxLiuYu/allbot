@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import * as routingBindings from "./bindings.js";
 import {
   deriveLastRoutePolicy,
@@ -20,7 +20,7 @@ type CompatRoutePeerKind =
   | "dm";
 
 const resolveRoute = (
-  params: Omit<Parameters<typeof resolveAgentRoute>[0], "cfg"> & { cfg?: KaijiBotConfig },
+  params: Omit<Parameters<typeof resolveAgentRoute>[0], "cfg"> & { cfg?: AllBotConfig },
 ) =>
   resolveAgentRoute({
     cfg: params.cfg ?? {},
@@ -50,7 +50,7 @@ function createCompatPeer(kind: CompatRoutePeerKind, id: string) {
 
 describe("resolveAgentRoute", () => {
   const expectDirectRouteSessionKey = (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     channel: Parameters<typeof resolveAgentRoute>[0]["channel"];
     peerId: string;
     expected: string;
@@ -66,7 +66,7 @@ describe("resolveAgentRoute", () => {
   };
 
   const expectRouteResolutionCase = (params: {
-    routeParams: Omit<Parameters<typeof resolveRoute>[0], "cfg"> & { cfg: KaijiBotConfig };
+    routeParams: Omit<Parameters<typeof resolveRoute>[0], "cfg"> & { cfg: AllBotConfig };
     expected: ResolvedRouteExpectation;
   }) => {
     expectResolvedRoute(resolveRoute(params.routeParams), params.expected);
@@ -99,7 +99,7 @@ describe("resolveAgentRoute", () => {
   };
 
   test("defaults to main/default when no bindings exist", () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const route = resolveAgentRoute({
       cfg,
       channel: "whatsapp",
@@ -122,7 +122,7 @@ describe("resolveAgentRoute", () => {
       expected: "agent:main:whatsapp:direct:+15551234567",
     },
   ])("dmScope=%s controls direct-message session key isolation", ({ dmScope, expected }) => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       session: { dmScope },
     };
     const route = expectDirectRouteSessionKey({
@@ -194,7 +194,7 @@ describe("resolveAgentRoute", () => {
   ])(
     "identityLinks applies to direct-message scopes: $channel $dmScope",
     ({ dmScope, channel, peerId, expected }) => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         session: {
           dmScope,
           identityLinks: {
@@ -230,7 +230,7 @@ describe("resolveAgentRoute", () => {
               match: { channel: "whatsapp", accountId: "biz" },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "whatsapp" as const,
         accountId: "biz",
         peer: { kind: "direct" as const, id: "+1000" },
@@ -263,7 +263,7 @@ describe("resolveAgentRoute", () => {
               },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "discord" as const,
         accountId: "default",
         guildId: "g1",
@@ -293,7 +293,7 @@ describe("resolveAgentRoute", () => {
               match: { channel: "discord", accountId: "default" },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "discord" as const,
         accountId: "default",
         guildId: "g1",
@@ -309,7 +309,7 @@ describe("resolveAgentRoute", () => {
   });
 
   test("coerces numeric peer ids to stable session keys", () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const route = resolveAgentRoute({
       cfg,
       channel: "discord",
@@ -341,7 +341,7 @@ describe("resolveAgentRoute", () => {
               },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "discord" as const,
         guildId: "GUILD_1",
         peer: { kind: "channel" as const, id: "CHANNEL_B" },
@@ -372,7 +372,7 @@ describe("resolveAgentRoute", () => {
               },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "discord" as const,
         guildId: "g2",
         peer: { kind: "channel" as const, id: "c1" },
@@ -403,7 +403,7 @@ describe("resolveAgentRoute", () => {
               },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "slack" as const,
         teamId: "T1",
         peer: { kind: "channel" as const, id: "C_B" },
@@ -434,7 +434,7 @@ describe("resolveAgentRoute", () => {
               },
             },
           ],
-        } satisfies KaijiBotConfig,
+        } satisfies AllBotConfig,
         channel: "slack" as const,
         teamId: "T2",
         peer: { kind: "channel" as const, id: "C1" },
@@ -449,7 +449,7 @@ describe("resolveAgentRoute", () => {
   });
 
   test("missing accountId in binding matches default account only", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       bindings: [{ agentId: "defaultAcct", match: { channel: "whatsapp" } }],
     };
 
@@ -490,7 +490,7 @@ describe("resolveAgentRoute", () => {
             match: { channel: "whatsapp", accountId: "*" },
           },
         ],
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       channel: "whatsapp" as const,
       accountId: "biz",
       peer: { kind: "direct" as const, id: "+1000" },
@@ -503,7 +503,7 @@ describe("resolveAgentRoute", () => {
       name: "binding accountId matching is canonicalized",
       cfg: {
         bindings: [{ agentId: "biz", match: { channel: "discord", accountId: "BIZ" } }],
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       channel: "discord" as const,
       accountId: " biz ",
       peer: { kind: "direct" as const, id: "u-1" },
@@ -517,9 +517,9 @@ describe("resolveAgentRoute", () => {
       name: "defaultAgentId is used when no binding matches",
       cfg: {
         agents: {
-          list: [{ id: "home", default: true, workspace: "~/kaijibot-home" }],
+          list: [{ id: "home", default: true, workspace: "~/allbot-home" }],
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       channel: "whatsapp" as const,
       accountId: "biz",
       peer: { kind: "direct" as const, id: "+1000" },
@@ -590,7 +590,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
   }
 
   function resolveDiscordThreadRoute(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     parentPeer?: { kind: "channel"; id: string } | null;
     guildId?: string;
   }) {
@@ -605,7 +605,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
   }
 
   function expectDiscordThreadRoute(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     parentPeer?: { kind: "channel"; id: string } | null;
     guildId?: string;
     expectedAgentId: string;
@@ -663,7 +663,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
           makeDiscordPeerBinding("other-parent-agent", "other-parent-999"),
           makeDiscordGuildBinding("guild-agent", "guild-789"),
         ],
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       guildId: "guild-789",
       expectedAgentId: "guild-agent",
       expectedMatchedBy: "binding.guild",
@@ -672,7 +672,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
       name: "parentPeer with empty id is ignored",
       cfg: {
         bindings: [makeDiscordPeerBinding("parent-agent", defaultParentPeer.id)],
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       parentPeer: { kind: "channel" as const, id: "" },
       expectedAgentId: "main",
       expectedMatchedBy: "default",
@@ -681,7 +681,7 @@ describe("parentPeer binding inheritance (thread support)", () => {
       name: "null parentPeer is handled gracefully",
       cfg: {
         bindings: [makeDiscordPeerBinding("parent-agent", defaultParentPeer.id)],
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       parentPeer: null,
       expectedAgentId: "main",
       expectedMatchedBy: "default",
@@ -781,7 +781,7 @@ describe("backward compatibility: peer.kind group ↔ channel", () => {
 });
 
 describe("role-based agent routing", () => {
-  type DiscordBinding = NonNullable<KaijiBotConfig["bindings"]>[number];
+  type DiscordBinding = NonNullable<AllBotConfig["bindings"]>[number];
 
   function makeDiscordRoleBinding(
     agentId: string,
@@ -924,7 +924,7 @@ describe("role-based agent routing", () => {
 
 describe("wildcard peer bindings (peer.id=*)", () => {
   test("peer.id=* matches any direct peer and routes to the bound agent", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: { list: [{ id: "second-ana" }] },
       bindings: [
         {
@@ -949,7 +949,7 @@ describe("wildcard peer bindings (peer.id=*)", () => {
   });
 
   test("peer.id=* does not match group peers when kind is direct", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: { list: [{ id: "main", default: true }, { id: "dm-only" }] },
       bindings: [
         {
@@ -973,7 +973,7 @@ describe("wildcard peer bindings (peer.id=*)", () => {
   });
 
   test("exact peer binding wins over wildcard peer binding", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: { list: [{ id: "exact" }, { id: "wild" }] },
       bindings: [
         {
@@ -1005,7 +1005,7 @@ describe("wildcard peer bindings (peer.id=*)", () => {
   });
 
   test("wildcard peer binding wins over default fallback for unmatched peers", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: { list: [{ id: "exact" }, { id: "wild" }] },
       bindings: [
         {
@@ -1037,7 +1037,7 @@ describe("wildcard peer bindings (peer.id=*)", () => {
   });
 
   test("group wildcard peer matches any group peer", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: { list: [{ id: "grp" }] },
       bindings: [
         {
@@ -1064,7 +1064,7 @@ describe("wildcard peer bindings (peer.id=*)", () => {
 describe("binding evaluation cache scalability", () => {
   test("does not rescan full bindings after channel/account cache rollover (#36915)", () => {
     const bindingCount = 2_205;
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       bindings: Array.from({ length: bindingCount }, (_, idx) => ({
         agentId: `agent-${idx}`,
         match: {

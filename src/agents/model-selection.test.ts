@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import { resetLogger, setLoggerOverride } from "../logging/logger.js";
 import { createWarnLogCapture } from "../logging/test-helpers/warn-log-capture.js";
 import { MissingAgentModelConfigError } from "./defaults.js";
@@ -32,7 +32,7 @@ const EXPLICIT_ALLOWLIST_CONFIG = {
       },
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 const BUNDLED_ALLOWLIST_CATALOG = [
   { provider: "anthropic", id: "claude-sonnet-4-6", name: "Claude Sonnet 4.5" },
@@ -48,7 +48,7 @@ const ANTHROPIC_OPUS_CATALOG = [
   },
 ];
 
-function resolveAnthropicOpusThinking(cfg: KaijiBotConfig) {
+function resolveAnthropicOpusThinking(cfg: AllBotConfig) {
   return resolveThinkingDefault({
     cfg,
     provider: "anthropic",
@@ -87,7 +87,7 @@ function createAgentFallbackConfig(params: {
           }
         : {}),
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createProviderWithModelsConfig(provider: string, models: Array<Record<string, unknown>>) {
@@ -100,12 +100,12 @@ function createProviderWithModelsConfig(provider: string, models: Array<Record<s
         },
       },
     },
-  } as Partial<KaijiBotConfig>;
+  } as Partial<AllBotConfig>;
 }
 
-function resolveConfiguredRefForTest(cfg: Partial<KaijiBotConfig>) {
+function resolveConfiguredRefForTest(cfg: Partial<AllBotConfig>) {
   return resolveConfiguredModelRef({
-    cfg: cfg as KaijiBotConfig,
+    cfg: cfg as AllBotConfig,
     defaultProvider: "openai",
     defaultModel: "gpt-5.4",
   });
@@ -137,11 +137,11 @@ describe("model-selection", () => {
 
   describe("isCliProvider", () => {
     it("returns true for setup-registered cli backends", () => {
-      expect(isCliProvider("claude-cli", {} as KaijiBotConfig)).toBe(true);
+      expect(isCliProvider("claude-cli", {} as AllBotConfig)).toBe(true);
     });
 
     it("returns false for provider ids", () => {
-      expect(isCliProvider("example-cli", {} as KaijiBotConfig)).toBe(false);
+      expect(isCliProvider("example-cli", {} as AllBotConfig)).toBe(false);
     });
   });
 
@@ -405,7 +405,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       expect(
         inferUniqueProviderFromConfiguredModels({
@@ -425,7 +425,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       expect(
         inferUniqueProviderFromConfiguredModels({
@@ -444,7 +444,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       expect(
         inferUniqueProviderFromConfiguredModels({
@@ -463,7 +463,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       expect(
         inferUniqueProviderFromConfiguredModels({
@@ -482,7 +482,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       expect(
         inferUniqueProviderFromConfiguredModels({
@@ -504,7 +504,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       expect(
         inferUniqueProviderFromConfiguredModels({
@@ -517,7 +517,7 @@ describe("model-selection", () => {
 
   describe("buildModelAliasIndex", () => {
     it("should build alias index from config", () => {
-      const cfg: Partial<KaijiBotConfig> = {
+      const cfg: Partial<AllBotConfig> = {
         agents: {
           defaults: {
             models: {
@@ -529,7 +529,7 @@ describe("model-selection", () => {
       };
 
       const index = buildModelAliasIndex({
-        cfg: cfg as KaijiBotConfig,
+        cfg: cfg as AllBotConfig,
         defaultProvider: "anthropic",
       });
 
@@ -563,7 +563,7 @@ describe("model-selection", () => {
     });
 
     it("overlays configured provider metadata and alias onto matching catalog entries", () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           defaults: {
             model: { primary: "openai/gpt-test-z" },
@@ -586,7 +586,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const result = buildAllowedModelSet({
         cfg,
@@ -607,7 +607,7 @@ describe("model-selection", () => {
     });
 
     it("applies configured provider metadata and alias to synthetic allowlist entries", () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           defaults: {
             model: { primary: "nvidia/moonshotai/kimi-k2.5" },
@@ -631,7 +631,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as unknown as KaijiBotConfig;
+      } as unknown as AllBotConfig;
 
       const result = buildAllowedModelSet({
         cfg,
@@ -722,7 +722,7 @@ describe("model-selection", () => {
     });
 
     it("strips trailing auth profile suffix before allowlist matching", () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           defaults: {
             models: {
@@ -730,7 +730,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const result = resolveAllowedModelRef({
         cfg,
@@ -756,7 +756,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       // When session default is openai-codex, switching to a bare "kimi-k2.5"
       // should resolve to opencode-go/kimi-k2.5, not openai-codex/kimi-k2.5
@@ -885,7 +885,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const result = resolveConfiguredModelRef({
         cfg,
@@ -900,7 +900,7 @@ describe("model-selection", () => {
       setLoggerOverride({ level: "silent", consoleLevel: "warn" });
       const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       try {
-        const cfg: Partial<KaijiBotConfig> = {
+        const cfg: Partial<AllBotConfig> = {
           agents: {
             defaults: {
               model: { primary: "claude-3-5-sonnet" },
@@ -909,7 +909,7 @@ describe("model-selection", () => {
         };
 
         const result = resolveConfiguredModelRef({
-          cfg: cfg as KaijiBotConfig,
+          cfg: cfg as AllBotConfig,
           defaultProvider: "google",
           defaultModel: "gemini-pro",
         });
@@ -926,9 +926,9 @@ describe("model-selection", () => {
     });
 
     it("sanitizes control characters in providerless-model warnings", () => {
-      const warnLogs = createWarnLogCapture("kaijibot-model-selection-test");
+      const warnLogs = createWarnLogCapture("allbot-model-selection-test");
       try {
-        const cfg: Partial<KaijiBotConfig> = {
+        const cfg: Partial<AllBotConfig> = {
           agents: {
             defaults: {
               model: { primary: "\u001B[31mclaude-3-5-sonnet\nspoof" },
@@ -937,7 +937,7 @@ describe("model-selection", () => {
         };
 
         const result = resolveConfiguredModelRef({
-          cfg: cfg as KaijiBotConfig,
+          cfg: cfg as AllBotConfig,
           defaultProvider: "google",
           defaultModel: "gemini-pro",
         });
@@ -968,7 +968,7 @@ describe("model-selection", () => {
               },
             },
           },
-        } as KaijiBotConfig;
+        } as AllBotConfig;
 
         const result = resolveConfiguredModelRef({
           cfg,
@@ -986,10 +986,10 @@ describe("model-selection", () => {
     });
 
     it("should throw MissingAgentModelConfigError if config is empty", () => {
-      const cfg: Partial<KaijiBotConfig> = {};
+      const cfg: Partial<AllBotConfig> = {};
       expect(() =>
         resolveConfiguredModelRef({
-          cfg: cfg as KaijiBotConfig,
+          cfg: cfg as AllBotConfig,
           defaultProvider: "openai",
           defaultModel: "gpt-4",
         }),
@@ -1035,7 +1035,7 @@ describe("model-selection", () => {
             model: { primary: "google-vertex/gemini-3.1-flash-lite" },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const result = resolveConfiguredModelRef({
         cfg,
@@ -1059,7 +1059,7 @@ describe("model-selection", () => {
       setLoggerOverride({ level: "silent", consoleLevel: "warn" });
       const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       try {
-        const cfg: Partial<KaijiBotConfig> = {
+        const cfg: Partial<AllBotConfig> = {
           agents: {
             defaults: {
               model: { primary: "openai/" },
@@ -1069,7 +1069,7 @@ describe("model-selection", () => {
 
         expect(() =>
           resolveConfiguredModelRef({
-            cfg: cfg as KaijiBotConfig,
+            cfg: cfg as AllBotConfig,
             defaultProvider: "openai",
             defaultModel: "gpt-5.4",
           }),
@@ -1098,7 +1098,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       expect(resolveAnthropicOpusThinking(cfg)).toBe("high");
     });
@@ -1114,7 +1114,7 @@ describe("model-selection", () => {
             },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       expect(
         resolveThinkingDefault({
@@ -1136,13 +1136,13 @@ describe("model-selection", () => {
             },
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       expect(resolveAnthropicOpusThinking(cfg)).toBe("adaptive");
     });
 
     it("falls back to low when no provider thinking hook is active", () => {
-      const cfg = {} as KaijiBotConfig;
+      const cfg = {} as AllBotConfig;
 
       expect(resolveAnthropicOpusThinking(cfg)).toBe("low");
 
@@ -1208,7 +1208,7 @@ describe("resolveSubagentConfiguredModelSelection", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(resolveSubagentConfiguredModelSelection({ cfg, agentId: "research" })).toBe(
       "anthropic/claude-opus-4-6",
@@ -1230,7 +1230,7 @@ describe("resolveSubagentConfiguredModelSelection", () => {
           },
         ],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(resolveSubagentConfiguredModelSelection({ cfg, agentId: "research" })).toBe(
       "google/gemini-2.5-pro",

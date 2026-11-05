@@ -5,7 +5,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { createSuiteTempRootTracker } from "../../test-helpers/temp-dir.js";
 import type { SessionEntry } from "./types.js";
 
-// Keep integration tests deterministic: never read a real kaijibot.json.
+// Keep integration tests deterministic: never read a real allbot.json.
 vi.mock("../config.js", async () => ({
   ...(await vi.importActual<typeof import("../config.js")>("../config.js")),
   loadConfig: vi.fn().mockReturnValue({}),
@@ -31,7 +31,7 @@ const ENFORCED_MAINTENANCE_OVERRIDE = {
 
 const archiveTimestamp = (ms: number) => new Date(ms).toISOString().replaceAll(":", "-");
 
-const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-pruning-integ-" });
+const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-pruning-integ-" });
 
 function makeEntry(updatedAt: number): SessionEntry {
   return { sessionId: crypto.randomUUID(), updatedAt };
@@ -95,8 +95,8 @@ describe("Integration: saveSessionStore with pruning", () => {
     mockLoadConfig = vi.mocked(loadConfig) as ReturnType<typeof vi.fn>;
     testDir = await createCaseDir("pruning-integ");
     storePath = path.join(testDir, "sessions.json");
-    savedCacheTtl = process.env.KAIJIBOT_SESSION_CACHE_TTL_MS;
-    process.env.KAIJIBOT_SESSION_CACHE_TTL_MS = "0";
+    savedCacheTtl = process.env.ALLBOT_SESSION_CACHE_TTL_MS;
+    process.env.ALLBOT_SESSION_CACHE_TTL_MS = "0";
     clearSessionStoreCacheForTest();
     mockLoadConfig.mockClear();
   });
@@ -105,9 +105,9 @@ describe("Integration: saveSessionStore with pruning", () => {
     vi.restoreAllMocks();
     clearSessionStoreCacheForTest();
     if (savedCacheTtl === undefined) {
-      delete process.env.KAIJIBOT_SESSION_CACHE_TTL_MS;
+      delete process.env.ALLBOT_SESSION_CACHE_TTL_MS;
     } else {
-      process.env.KAIJIBOT_SESSION_CACHE_TTL_MS = savedCacheTtl;
+      process.env.ALLBOT_SESSION_CACHE_TTL_MS = savedCacheTtl;
     }
   });
 

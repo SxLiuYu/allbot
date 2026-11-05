@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import * as pdfExtractModule from "../../media/pdf-extract.js";
 import * as webMedia from "../../media/web-media.js";
 import * as modelAuth from "../model-auth.js";
@@ -33,7 +33,7 @@ async function loadCreatePdfTool() {
 }
 
 async function withTempAgentDir<T>(run: (agentDir: string) => Promise<T>): Promise<T> {
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-pdf-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-pdf-"));
   try {
     return await run(agentDir);
   } finally {
@@ -88,10 +88,10 @@ function resetAuthEnv() {
   vi.stubEnv("GITHUB_TOKEN", "");
 }
 
-function withPdfModel(primary: string): KaijiBotConfig {
+function withPdfModel(primary: string): AllBotConfig {
   return {
     agents: { defaults: { pdfModel: { primary } } },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 async function stubPdfToolInfra(
@@ -118,7 +118,7 @@ async function stubPdfToolInfra(
           }) as never;
   vi.spyOn(modelDiscovery, "discoverModels").mockReturnValue({ find } as never);
 
-  vi.spyOn(modelsConfig, "ensureKaijiBotModelsJson").mockResolvedValue({
+  vi.spyOn(modelsConfig, "ensureAllBotModelsJson").mockResolvedValue({
     agentDir,
     wrote: false,
   });
@@ -179,8 +179,8 @@ describe("createPdfTool", () => {
 
   it("respects fsPolicy.workspaceOnly for non-sandbox pdf paths", async () => {
     await withTempAgentDir(async (agentDir) => {
-      const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-pdf-ws-"));
-      const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-pdf-out-"));
+      const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-pdf-ws-"));
+      const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-pdf-out-"));
       try {
         const cfg = withPdfModel(ANTHROPIC_PDF_MODEL);
         const tool = requirePdfTool(

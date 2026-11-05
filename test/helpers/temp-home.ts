@@ -10,7 +10,7 @@ type EnvSnapshot = {
   userProfile: string | undefined;
   homeDrive: string | undefined;
   homePath: string | undefined;
-  kaijibotHome: string | undefined;
+  allbotHome: string | undefined;
   stateDir: string | undefined;
 };
 
@@ -27,8 +27,8 @@ function snapshotEnv(): EnvSnapshot {
     userProfile: process.env.USERPROFILE,
     homeDrive: process.env.HOMEDRIVE,
     homePath: process.env.HOMEPATH,
-    kaijibotHome: process.env.KAIJIBOT_HOME,
-    stateDir: process.env.KAIJIBOT_STATE_DIR,
+    allbotHome: process.env.ALLBOT_HOME,
+    stateDir: process.env.ALLBOT_STATE_DIR,
   };
 }
 
@@ -44,8 +44,8 @@ function restoreEnv(snapshot: EnvSnapshot) {
   restoreKey("USERPROFILE", snapshot.userProfile);
   restoreKey("HOMEDRIVE", snapshot.homeDrive);
   restoreKey("HOMEPATH", snapshot.homePath);
-  restoreKey("KAIJIBOT_HOME", snapshot.kaijibotHome);
-  restoreKey("KAIJIBOT_STATE_DIR", snapshot.stateDir);
+  restoreKey("ALLBOT_HOME", snapshot.allbotHome);
+  restoreKey("ALLBOT_STATE_DIR", snapshot.stateDir);
 }
 
 function snapshotExtraEnv(keys: string[]): Record<string, string | undefined> {
@@ -69,9 +69,9 @@ function restoreExtraEnv(snapshot: Record<string, string | undefined>) {
 function setTempHome(base: string) {
   process.env.HOME = base;
   process.env.USERPROFILE = base;
-  // Ensure tests using HOME isolation aren't affected by leaked KAIJIBOT_HOME.
-  delete process.env.KAIJIBOT_HOME;
-  process.env.KAIJIBOT_STATE_DIR = path.join(base, ".kaijibot");
+  // Ensure tests using HOME isolation aren't affected by leaked ALLBOT_HOME.
+  delete process.env.ALLBOT_HOME;
+  process.env.ALLBOT_STATE_DIR = path.join(base, ".allbot");
 
   if (process.platform !== "win32") {
     return;
@@ -107,7 +107,7 @@ export async function withTempHome<T>(
     skipSessionCleanup?: boolean;
   } = {},
 ): Promise<T> {
-  const prefix = opts.prefix ?? "kaijibot-test-home-";
+  const prefix = opts.prefix ?? "allbot-test-home-";
   const base = await allocateTempHomeBase(prefix);
   const snapshot = snapshotEnv();
   const envKeys = Object.keys(opts.env ?? {});
@@ -119,7 +119,7 @@ export async function withTempHome<T>(
   const envSnapshot = snapshotExtraEnv(envKeys);
 
   setTempHome(base);
-  await fs.mkdir(path.join(base, ".kaijibot", "agents", "main", "sessions"), { recursive: true });
+  await fs.mkdir(path.join(base, ".allbot", "agents", "main", "sessions"), { recursive: true });
   if (opts.env) {
     for (const [key, raw] of Object.entries(opts.env)) {
       const value = typeof raw === "function" ? raw(base) : raw;

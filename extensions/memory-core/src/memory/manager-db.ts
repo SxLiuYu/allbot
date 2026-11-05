@@ -1,6 +1,6 @@
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { ensureDir, requireNodeSqlite } from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+import { ensureDir, requireNodeSqlite } from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 export function openMemoryDatabaseAtPath(dbPath: string, allowExtension: boolean): DatabaseSync {
   const dir = path.dirname(dbPath);

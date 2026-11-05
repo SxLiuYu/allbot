@@ -70,12 +70,12 @@ describe("resolveCommandConfigWithSecrets", () => {
       commandName: "message",
       targetIds: new Set(["channels.telegram.token"]),
       autoEnable: true,
-      env: { KAIJIBOT_AUTO_ENABLE: "1" } as NodeJS.ProcessEnv,
+      env: { ALLBOT_AUTO_ENABLE: "1" } as NodeJS.ProcessEnv,
     });
 
     expect(mocks.applyPluginAutoEnable).toHaveBeenCalledWith({
       config: resolvedConfig,
-      env: { KAIJIBOT_AUTO_ENABLE: "1" },
+      env: { ALLBOT_AUTO_ENABLE: "1" },
     });
     expect(result.effectiveConfig).toBe(effectiveConfig);
   });

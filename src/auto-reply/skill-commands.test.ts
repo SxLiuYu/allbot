@@ -156,7 +156,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("deduplicates by skillName across agents, keeping the first registration", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-");
+    const baseDir = await makeTempDir("allbot-skills-");
     const mainWorkspace = path.join(baseDir, "main");
     const researchWorkspace = path.join(baseDir, "research");
     await fs.mkdir(mainWorkspace, { recursive: true });
@@ -179,7 +179,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("scopes to specific agents when agentIds is provided", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-filter-");
+    const baseDir = await makeTempDir("allbot-skills-filter-");
     const researchWorkspace = path.join(baseDir, "research");
     await fs.mkdir(researchWorkspace, { recursive: true });
 
@@ -197,7 +197,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("prevents cross-agent skill leakage when each agent has an allowlist", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-leak-");
+    const baseDir = await makeTempDir("allbot-skills-leak-");
     const mainWorkspace = path.join(baseDir, "main");
     const researchWorkspace = path.join(baseDir, "research");
     await fs.mkdir(mainWorkspace, { recursive: true });
@@ -220,7 +220,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("merges allowlists for agents that share one workspace", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-shared-");
+    const baseDir = await makeTempDir("allbot-skills-shared-");
     const sharedWorkspace = path.join(baseDir, "research");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 
@@ -241,7 +241,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("deduplicates overlapping allowlists for shared workspace", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-overlap-");
+    const baseDir = await makeTempDir("allbot-skills-overlap-");
     const sharedWorkspace = path.join(baseDir, "research");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 
@@ -263,7 +263,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("keeps workspace unrestricted when one co-tenant agent has no skills filter", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-unfiltered-");
+    const baseDir = await makeTempDir("allbot-skills-unfiltered-");
     const sharedWorkspace = path.join(baseDir, "research");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 
@@ -285,7 +285,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("merges empty allowlist with non-empty allowlist for shared workspace", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-empty-");
+    const baseDir = await makeTempDir("allbot-skills-empty-");
     const sharedWorkspace = path.join(baseDir, "research");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 
@@ -305,7 +305,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("uses inherited defaults for agents that share one workspace", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-defaults-");
+    const baseDir = await makeTempDir("allbot-skills-defaults-");
     const sharedWorkspace = path.join(baseDir, "shared-defaults");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 
@@ -329,7 +329,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("does not inherit defaults when an agent sets an explicit empty skills list", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-defaults-empty-");
+    const baseDir = await makeTempDir("allbot-skills-defaults-empty-");
     const sharedWorkspace = path.join(baseDir, "shared-defaults");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 
@@ -352,7 +352,7 @@ describe("listSkillCommandsForAgents", () => {
   });
 
   it("skips agents with missing workspaces gracefully", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-missing-");
+    const baseDir = await makeTempDir("allbot-skills-missing-");
     const validWorkspace = path.join(baseDir, "research");
     const missingWorkspace = path.join(baseDir, "nonexistent");
     await fs.mkdir(validWorkspace, { recursive: true });
@@ -389,7 +389,7 @@ describe("listSkillCommandsForWorkspace", () => {
   });
 
   it("inherits defaults when agentId is provided without an explicit skill filter", async () => {
-    const baseDir = await makeTempDir("kaijibot-skills-workspace-defaults-");
+    const baseDir = await makeTempDir("allbot-skills-workspace-defaults-");
     const sharedWorkspace = path.join(baseDir, "shared-defaults");
     await fs.mkdir(sharedWorkspace, { recursive: true });
 

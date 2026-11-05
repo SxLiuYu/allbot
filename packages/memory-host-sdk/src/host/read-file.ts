@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { resolveAgentWorkspaceDir } from "../../../../src/agents/agent-scope.js";
 import { resolveMemorySearchConfig } from "../../../../src/agents/memory-search.js";
-import type { KaijiBotConfig } from "../../../../src/config/config.js";
+import type { AllBotConfig } from "../../../../src/config/config.js";
 import { isFileMissingError, statRegularFile } from "./fs-utils.js";
 import { isMemoryPath, normalizeExtraMemoryPaths } from "./internal.js";
 
@@ -76,7 +76,7 @@ export async function readMemoryFile(params: {
 }
 
 export async function readAgentMemoryFile(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   relPath: string;
   from?: number;

@@ -1,4 +1,4 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
 import { registerAnthropicPlugin } from "./register.runtime.js";
 
 export default definePluginEntry({

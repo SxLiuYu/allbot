@@ -1,11 +1,11 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
-import { getSessionBindingService } from "kaijibot/plugin-sdk/conversation-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
+import { getSessionBindingService } from "allbot/plugin-sdk/conversation-runtime";
 import { beforeEach, describe, expect, it } from "vitest";
 import { __testing, createFeishuThreadBindingManager } from "./thread-bindings.js";
 
 const baseCfg = {
   session: { mainKey: "main", scope: "per-sender" },
-} satisfies KaijiBotConfig;
+} satisfies AllBotConfig;
 
 describe("Feishu thread bindings", () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
 ---
-summary: "Sign in to GitHub Copilot from KaijiBot using the device flow"
+summary: "Sign in to GitHub Copilot from AllBot using the device flow"
 read_when:
   - You want to use GitHub Copilot as a model provider
-  - You need the `kaijibot models auth login-github-copilot` flow
+  - You need the `allbot models auth login-github-copilot` flow
 title: "GitHub Copilot"
 ---
 
@@ -11,20 +11,20 @@ title: "GitHub Copilot"
 ## What is GitHub Copilot?
 
 GitHub Copilot is GitHub's AI coding assistant. It provides access to Copilot
-models for your GitHub account and plan. KaijiBot can use Copilot as a model
+models for your GitHub account and plan. AllBot can use Copilot as a model
 provider in two different ways.
 
-## Two ways to use Copilot in KaijiBot
+## Two ways to use Copilot in AllBot
 
 ### 1) Built-in GitHub Copilot provider (`github-copilot`)
 
 Use the native device-login flow to obtain a GitHub token, then exchange it for
-Copilot API tokens when KaijiBot runs. This is the **default** and simplest path
+Copilot API tokens when AllBot runs. This is the **default** and simplest path
 because it does not require VS Code.
 
 ### 2) Copilot Proxy plugin (`copilot-proxy`)
 
-Use the **Copilot Proxy** VS Code extension as a local bridge. KaijiBot talks to
+Use the **Copilot Proxy** VS Code extension as a local bridge. AllBot talks to
 the proxy’s `/v1` endpoint and uses the model list you configure there. Choose
 this when you already run Copilot Proxy in VS Code or need to route through it.
 You must enable the plugin and keep the VS Code extension running.
@@ -36,7 +36,7 @@ profile.
 ## CLI setup
 
 ```bash
-kaijibot models auth login-github-copilot
+allbot models auth login-github-copilot
 ```
 
 You'll be prompted to visit a URL and enter a one-time code. Keep the terminal
@@ -45,20 +45,20 @@ open until it completes.
 ### Optional flags
 
 ```bash
-kaijibot models auth login-github-copilot --yes
+allbot models auth login-github-copilot --yes
 ```
 
 To also apply the provider's recommended default model in one step, use the
 generic auth command instead:
 
 ```bash
-kaijibot models auth login --provider github-copilot --method device --set-default
+allbot models auth login --provider github-copilot --method device --set-default
 ```
 
 ## Set a default model
 
 ```bash
-kaijibot models set github-copilot/gpt-4o
+allbot models set github-copilot/gpt-4o
 ```
 
 ### Config snippet
@@ -77,4 +77,4 @@ kaijibot models set github-copilot/gpt-4o
 - Claude model IDs use the Anthropic Messages transport automatically; GPT, o-series,
   and Gemini models keep the OpenAI Responses transport.
 - The login stores a GitHub token in the auth profile store and exchanges it for a
-  Copilot API token when KaijiBot runs.
+  Copilot API token when AllBot runs.

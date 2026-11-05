@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestPluginApi } from "../../../test/helpers/plugins/plugin-api.js";
-import type { KaijiBotPluginApi, KaijiBotPluginToolContext } from "../api.js";
+import type { AllBotPluginApi, AllBotPluginToolContext } from "../api.js";
 import type { DiffScreenshotter } from "./browser.js";
 import { DEFAULT_DIFFS_TOOL_DEFAULTS } from "./config.js";
 import { DiffArtifactStore } from "./store.js";
@@ -15,7 +15,7 @@ describe("diffs tool", () => {
   let cleanupRootDir: () => Promise<void>;
 
   beforeEach(async () => {
-    ({ store, cleanup: cleanupRootDir } = await createDiffStoreHarness("kaijibot-diffs-tool-"));
+    ({ store, cleanup: cleanupRootDir } = await createDiffStoreHarness("allbot-diffs-tool-"));
   });
 
   afterEach(async () => {
@@ -44,11 +44,11 @@ describe("diffs tool", () => {
   it("uses configured viewerBaseUrl when tool input omits baseUrl", async () => {
     const tool = createDiffsTool({
       api: createApi({
-        viewerBaseUrl: "https://example.com/kaijibot/",
+        viewerBaseUrl: "https://example.com/allbot/",
       }),
       store,
       defaults: DEFAULT_DIFFS_TOOL_DEFAULTS,
-      viewerBaseUrl: "https://example.com/kaijibot",
+      viewerBaseUrl: "https://example.com/allbot",
     });
 
     const result = await tool.execute?.("tool-viewer-config", {
@@ -59,21 +59,21 @@ describe("diffs tool", () => {
     });
 
     expect(readTextContent(result, 0)).toContain(
-      "https://example.com/kaijibot/plugins/diffs/view/",
+      "https://example.com/allbot/plugins/diffs/view/",
     );
     expect((result?.details as Record<string, unknown>).viewerUrl).toEqual(
-      expect.stringContaining("https://example.com/kaijibot/plugins/diffs/view/"),
+      expect.stringContaining("https://example.com/allbot/plugins/diffs/view/"),
     );
   });
 
   it("prefers per-call baseUrl over configured viewerBaseUrl", async () => {
     const tool = createDiffsTool({
       api: createApi({
-        viewerBaseUrl: "https://example.com/kaijibot",
+        viewerBaseUrl: "https://example.com/allbot",
       }),
       store,
       defaults: DEFAULT_DIFFS_TOOL_DEFAULTS,
-      viewerBaseUrl: "https://example.com/kaijibot",
+      viewerBaseUrl: "https://example.com/allbot",
     });
 
     const result = await tool.execute?.("tool-viewer-override", {
@@ -471,7 +471,7 @@ describe("diffs tool", () => {
   });
 });
 
-function createApi(pluginConfig?: Record<string, unknown>): KaijiBotPluginApi {
+function createApi(pluginConfig?: Record<string, unknown>): AllBotPluginApi {
   return createTestPluginApi({
     id: "diffs",
     name: "Diffs",
@@ -484,7 +484,7 @@ function createApi(pluginConfig?: Record<string, unknown>): KaijiBotPluginApi {
       },
     },
     pluginConfig,
-    runtime: {} as KaijiBotPluginApi["runtime"],
+    runtime: {} as AllBotPluginApi["runtime"],
   });
 }
 
@@ -492,7 +492,7 @@ function createToolWithScreenshotter(
   store: DiffArtifactStore,
   screenshotter: DiffScreenshotter,
   defaults = DEFAULT_DIFFS_TOOL_DEFAULTS,
-  context: KaijiBotPluginToolContext | undefined = {
+  context: AllBotPluginToolContext | undefined = {
     agentId: "main",
     sessionId: "session-123",
     messageChannel: "discord",

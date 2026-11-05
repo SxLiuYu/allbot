@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { Static, Type } from "typebox";
-import type { AnyAgentTool, KaijiBotPluginApi, KaijiBotPluginToolContext } from "../api.js";
+import type { AnyAgentTool, AllBotPluginApi, AllBotPluginToolContext } from "../api.js";
 import { PlaywrightDiffScreenshotter, type DiffScreenshotter } from "./browser.js";
 import { resolveDiffImageRenderOptions } from "./config.js";
 import { renderDiffDocument } from "./render.js";
@@ -141,12 +141,12 @@ type DiffsToolRawParams = DiffsToolParams & {
 };
 
 export function createDiffsTool(params: {
-  api: KaijiBotPluginApi;
+  api: AllBotPluginApi;
   store: DiffArtifactStore;
   defaults: DiffToolDefaults;
   viewerBaseUrl?: string;
   screenshotter?: DiffScreenshotter;
-  context?: KaijiBotPluginToolContext;
+  context?: AllBotPluginToolContext;
 }): AnyAgentTool {
   return {
     name: "diffs",
@@ -421,7 +421,7 @@ async function renderDiffArtifactFile(params: {
 }
 
 function buildArtifactContext(
-  context: KaijiBotPluginToolContext | undefined,
+  context: AllBotPluginToolContext | undefined,
 ): DiffArtifactContext | undefined {
   if (!context) {
     return undefined;

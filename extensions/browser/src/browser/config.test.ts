@@ -40,15 +40,15 @@ describe("browser config", () => {
     expect(resolved.cdpHost).toBe("127.0.0.1");
     expect(resolved.cdpProtocol).toBe("http");
     const profile = resolveProfile(resolved, resolved.defaultProfile);
-    expect(profile?.name).toBe("kaijibot");
-    expect(profile?.driver).toBe("kaijibot");
+    expect(profile?.name).toBe("allbot");
+    expect(profile?.driver).toBe("allbot");
     expect(profile?.cdpPort).toBe(18800);
     expect(profile?.cdpUrl).toBe("http://127.0.0.1:18800");
 
-    const kaijibot = resolveProfile(resolved, "kaijibot");
-    expect(kaijibot?.driver).toBe("kaijibot");
-    expect(kaijibot?.cdpPort).toBe(18800);
-    expect(kaijibot?.cdpUrl).toBe("http://127.0.0.1:18800");
+    const allbot = resolveProfile(resolved, "allbot");
+    expect(allbot?.driver).toBe("allbot");
+    expect(allbot?.cdpPort).toBe(18800);
+    expect(allbot?.cdpUrl).toBe("http://127.0.0.1:18800");
     const user = resolveProfile(resolved, "user");
     expect(user?.driver).toBe("existing-session");
     expect(user?.cdpPort).toBe(0);
@@ -60,27 +60,27 @@ describe("browser config", () => {
     expect(resolved.remoteCdpHandshakeTimeoutMs).toBe(3000);
   });
 
-  it("derives default ports from KAIJIBOT_GATEWAY_PORT when unset", () => {
-    withEnv({ KAIJIBOT_GATEWAY_PORT: "19001" }, () => {
+  it("derives default ports from ALLBOT_GATEWAY_PORT when unset", () => {
+    withEnv({ ALLBOT_GATEWAY_PORT: "19001" }, () => {
       const resolved = resolveBrowserConfig(undefined);
       expect(resolved.controlPort).toBe(19003);
       expect(resolveProfile(resolved, "chrome-relay")).toBe(null);
 
-      const kaijibot = resolveProfile(resolved, "kaijibot");
-      expect(kaijibot?.cdpPort).toBe(19012);
-      expect(kaijibot?.cdpUrl).toBe("http://127.0.0.1:19012");
+      const allbot = resolveProfile(resolved, "allbot");
+      expect(allbot?.cdpPort).toBe(19012);
+      expect(allbot?.cdpUrl).toBe("http://127.0.0.1:19012");
     });
   });
 
   it("derives default ports from gateway.port when env is unset", () => {
-    withEnv({ KAIJIBOT_GATEWAY_PORT: undefined }, () => {
+    withEnv({ ALLBOT_GATEWAY_PORT: undefined }, () => {
       const resolved = resolveBrowserConfig(undefined, { gateway: { port: 19011 } });
       expect(resolved.controlPort).toBe(19013);
       expect(resolveProfile(resolved, "chrome-relay")).toBe(null);
 
-      const kaijibot = resolveProfile(resolved, "kaijibot");
-      expect(kaijibot?.cdpPort).toBe(19022);
-      expect(kaijibot?.cdpUrl).toBe("http://127.0.0.1:19022");
+      const allbot = resolveProfile(resolved, "allbot");
+      expect(allbot?.cdpPort).toBe(19022);
+      expect(allbot?.cdpUrl).toBe("http://127.0.0.1:19022");
     });
   });
 
@@ -88,10 +88,10 @@ describe("browser config", () => {
     const resolved = resolveBrowserConfig({
       cdpPortRangeStart: 19000,
     });
-    const kaijibot = resolveProfile(resolved, "kaijibot");
+    const allbot = resolveProfile(resolved, "allbot");
     expect(resolved.cdpPortRangeStart).toBe(19000);
-    expect(kaijibot?.cdpPort).toBe(19000);
-    expect(kaijibot?.cdpUrl).toBe("http://127.0.0.1:19000");
+    expect(allbot?.cdpPort).toBe(19000);
+    expect(allbot?.cdpUrl).toBe("http://127.0.0.1:19000");
   });
 
   it("rejects cdpPortRangeStart values that overflow the CDP range window", () => {
@@ -127,7 +127,7 @@ describe("browser config", () => {
     const resolved = resolveBrowserConfig({
       cdpUrl: "http://example.com:9222",
     });
-    const profile = resolveProfile(resolved, "kaijibot");
+    const profile = resolveProfile(resolved, "allbot");
     expect(profile?.cdpIsLoopback).toBe(false);
   });
 
@@ -135,7 +135,7 @@ describe("browser config", () => {
     const resolved = resolveBrowserConfig({
       cdpUrl: "http://example.com:9222",
     });
-    const profile = resolveProfile(resolved, "kaijibot");
+    const profile = resolveProfile(resolved, "allbot");
     expect(profile?.cdpPort).toBe(9222);
     expect(profile?.cdpUrl).toBe("http://example.com:9222");
     expect(profile?.cdpIsLoopback).toBe(false);
@@ -194,7 +194,7 @@ describe("browser config", () => {
     const resolved = resolveBrowserConfig({
       cdpUrl: "wss://connect.browserbase.com?apiKey=test-key",
     });
-    const profile = resolveProfile(resolved, "kaijibot");
+    const profile = resolveProfile(resolved, "allbot");
     expect(profile?.cdpUrl).toBe("wss://connect.browserbase.com/?apiKey=test-key");
     expect(profile?.cdpHost).toBe("connect.browserbase.com");
     expect(profile?.cdpPort).toBe(443);
@@ -374,7 +374,7 @@ describe("browser config", () => {
     const existingSession = resolveProfile(resolved, "chrome-live")!;
     expect(getBrowserProfileCapabilities(existingSession).usesChromeMcp).toBe(true);
 
-    const managed = resolveProfile(resolved, "kaijibot")!;
+    const managed = resolveProfile(resolved, "allbot")!;
     expect(getBrowserProfileCapabilities(managed).usesChromeMcp).toBe(false);
 
     const work = resolveProfile(resolved, "work")!;
@@ -382,34 +382,34 @@ describe("browser config", () => {
   });
 
   describe("default profile preference", () => {
-    it("defaults to kaijibot profile when defaultProfile is not configured", () => {
+    it("defaults to allbot profile when defaultProfile is not configured", () => {
       const resolved = resolveBrowserConfig({
         headless: false,
         noSandbox: false,
       });
-      expect(resolved.defaultProfile).toBe("kaijibot");
+      expect(resolved.defaultProfile).toBe("allbot");
     });
 
-    it("keeps kaijibot default when headless=true", () => {
+    it("keeps allbot default when headless=true", () => {
       const resolved = resolveBrowserConfig({
         headless: true,
       });
-      expect(resolved.defaultProfile).toBe("kaijibot");
+      expect(resolved.defaultProfile).toBe("allbot");
     });
 
-    it("keeps kaijibot default when noSandbox=true", () => {
+    it("keeps allbot default when noSandbox=true", () => {
       const resolved = resolveBrowserConfig({
         noSandbox: true,
       });
-      expect(resolved.defaultProfile).toBe("kaijibot");
+      expect(resolved.defaultProfile).toBe("allbot");
     });
 
-    it("keeps kaijibot default when both headless and noSandbox are true", () => {
+    it("keeps allbot default when both headless and noSandbox are true", () => {
       const resolved = resolveBrowserConfig({
         headless: true,
         noSandbox: true,
       });
-      expect(resolved.defaultProfile).toBe("kaijibot");
+      expect(resolved.defaultProfile).toBe("allbot");
     });
 
     it("explicit defaultProfile config overrides defaults in headless mode", () => {

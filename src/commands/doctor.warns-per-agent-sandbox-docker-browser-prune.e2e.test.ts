@@ -28,7 +28,7 @@ describe("doctor command", () => {
           list: [
             {
               id: "work",
-              workspace: "~/kaijibot-work",
+              workspace: "~/allbot-work",
               sandbox: {
                 mode: "all",
                 scope: "shared",
@@ -61,17 +61,17 @@ describe("doctor command", () => {
   it("does not warn when only the active workspace is present", async () => {
     mockDoctorConfigSnapshot({
       config: {
-        agents: { defaults: { workspace: "/Users/steipete/kaijibot" } },
+        agents: { defaults: { workspace: "/Users/steipete/allbot" } },
       },
     });
 
     const homedirSpy = vi.spyOn(os, "homedir").mockReturnValue("/Users/steipete");
     const realExists = fs.existsSync;
-    const legacyPath = path.join("/Users/steipete", "kaijibot");
+    const legacyPath = path.join("/Users/steipete", "allbot");
     const legacyAgentsPath = path.join(legacyPath, "AGENTS.md");
     const existsSpy = vi.spyOn(fs, "existsSync").mockImplementation((value) => {
       if (
-        value === "/Users/steipete/kaijibot" ||
+        value === "/Users/steipete/allbot" ||
         value === legacyPath ||
         value === legacyAgentsPath
       ) {

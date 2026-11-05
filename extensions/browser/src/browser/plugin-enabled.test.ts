@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { isDefaultBrowserPluginEnabled } from "../plugin-enabled.js";
 
 describe("isDefaultBrowserPluginEnabled", () => {
   it("defaults to enabled", () => {
-    expect(isDefaultBrowserPluginEnabled({} as KaijiBotConfig)).toBe(true);
+    expect(isDefaultBrowserPluginEnabled({} as AllBotConfig)).toBe(true);
   });
 
   it("respects explicit plugin disablement", () => {
@@ -17,7 +17,7 @@ describe("isDefaultBrowserPluginEnabled", () => {
             },
           },
         },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
     ).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 import type { ImageContent } from "@earendil-works/pi-ai";
 import type { ReplyOperation } from "../../auto-reply/reply/reply-run-registry.js";
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { CliSessionBinding } from "../../config/sessions.js";
 import type { SessionSystemPromptReport } from "../../config/sessions/types.js";
 import type { CliBackendConfig } from "../../config/types.js";
@@ -14,7 +14,7 @@ export type RunCliAgentParams = {
   agentId?: string;
   sessionFile: string;
   workspaceDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   prompt: string;
   provider: string;
   model?: string;

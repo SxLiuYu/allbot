@@ -1,5 +1,5 @@
-import type { MemoryPluginRuntime } from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
-import { resolveMemoryBackendConfig } from "kaijibot/plugin-sdk/memory-core-host-runtime-files";
+import type { MemoryPluginRuntime } from "allbot/plugin-sdk/memory-core-host-runtime-core";
+import { resolveMemoryBackendConfig } from "allbot/plugin-sdk/memory-core-host-runtime-files";
 import { closeAllMemorySearchManagers, getMemorySearchManager } from "./memory/index.js";
 
 export const memoryRuntime: MemoryPluginRuntime = {

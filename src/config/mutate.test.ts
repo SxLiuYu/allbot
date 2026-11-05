@@ -11,8 +11,8 @@ import { withTempHome } from "./home-env.test-harness.js";
 
 describe("config mutate helpers", () => {
   it("mutates source config with optimistic hash protection", async () => {
-    await withTempHome("kaijibot-config-mutate-source-", async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+    await withTempHome("allbot-config-mutate-source-", async (home) => {
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.writeFile(configPath, `${JSON.stringify({ gateway: { port: 18789 } }, null, 2)}\n`);
 
@@ -39,8 +39,8 @@ describe("config mutate helpers", () => {
   });
 
   it("rejects stale replace attempts when the base hash changed", async () => {
-    await withTempHome("kaijibot-config-replace-conflict-", async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+    await withTempHome("allbot-config-replace-conflict-", async (home) => {
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.writeFile(configPath, `${JSON.stringify({ gateway: { port: 18789 } }, null, 2)}\n`);
 

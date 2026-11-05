@@ -3,7 +3,7 @@ import {
   listChannelPlugins,
   resolveChannelApprovalCapability,
 } from "../channels/plugins/index.js";
-import { loadConfig, type KaijiBotConfig } from "../config/config.js";
+import { loadConfig, type AllBotConfig } from "../config/config.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import {
   INTERNAL_MESSAGE_CHANNEL,
@@ -40,7 +40,7 @@ function hasNativeExecApprovalCapability(channel?: string): boolean {
 export function resolveExecApprovalInitiatingSurfaceState(params: {
   channel?: string | null;
   accountId?: string | null;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): ExecApprovalInitiatingSurfaceState {
   const channel = normalizeMessageChannel(params.channel);
   const channelLabel = labelForChannel(channel);

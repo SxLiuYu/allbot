@@ -7,7 +7,7 @@
  */
 
 import { createBackgroundGenerateText } from "../../../cognitive/evolution/standalone-generate.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { createSubsystemLogger } from "../../../logging/subsystem.js";
 import { normalizeLowercaseStringOrEmpty } from "../../../shared/string-coerce.js";
 
@@ -265,7 +265,7 @@ function createFallbackSummary(transcript: string): StructuredSummary {
  */
 export async function generateStructuredSummary(params: {
   transcript: string;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   existingTopics?: Array<{ name: string; description: string }>;
 }): Promise<StructuredSummary> {
   const { transcript, cfg, existingTopics } = params;

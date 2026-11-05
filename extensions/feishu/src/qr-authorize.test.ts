@@ -66,16 +66,16 @@ afterEach(() => {
 
 describe("registerFeishuAppViaQr", () => {
   describe("registerApp call shape", () => {
-    it("calls lark.registerApp with source=kaijibot and appPreset.name containing KaijiBot", async () => {
+    it("calls lark.registerApp with source=allbot and appPreset.name containing AllBot", async () => {
       registerAppMock.mockResolvedValue({ client_id: "cli_1", client_secret: "s1" });
       await registerFeishuAppViaQr();
 
       expect(registerAppMock).toHaveBeenCalledTimes(1);
       const opts = registerAppMock.mock.calls[0]![0] as Record<string, unknown>;
-      expect(opts.source).toBe("kaijibot");
+      expect(opts.source).toBe("allbot");
       const preset = opts.appPreset as { name?: string; desc?: string };
       expect(typeof preset.name).toBe("string");
-      expect(preset.name).toContain("KaijiBot");
+      expect(preset.name).toContain("AllBot");
       // onQRCodeReady is always provided.
       expect(typeof opts.onQRCodeReady).toBe("function");
       // A signal is always provided so the 9-minute guard is enforced.

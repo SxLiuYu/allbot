@@ -1,7 +1,7 @@
 import {
   createModelCatalogPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   QWEN_CN_BASE_URL,
   QWEN_DEFAULT_MODEL_REF,
@@ -13,7 +13,7 @@ import { buildQwenProvider } from "./provider-catalog.js";
 
 const qwenPresetAppliers = createModelCatalogPresetAppliers<[string]>({
   primaryModelRef: QWEN_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig, baseUrl: string) => {
+  resolveParams: (_cfg: AllBotConfig, baseUrl: string) => {
     const provider = buildQwenProvider({ baseUrl });
     return {
       providerId: "qwen",
@@ -31,35 +31,35 @@ const qwenPresetAppliers = createModelCatalogPresetAppliers<[string]>({
   },
 });
 
-function applyQwenProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+function applyQwenProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyProviderConfig(cfg, QWEN_GLOBAL_BASE_URL);
 }
 
-function applyQwenProviderConfigCn(cfg: KaijiBotConfig): KaijiBotConfig {
+function applyQwenProviderConfigCn(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyProviderConfig(cfg, QWEN_CN_BASE_URL);
 }
 
-export function applyQwenConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyQwenConfig(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyConfig(cfg, QWEN_GLOBAL_BASE_URL);
 }
 
-export function applyQwenConfigCn(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyQwenConfigCn(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyConfig(cfg, QWEN_CN_BASE_URL);
 }
 
-function applyQwenStandardProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+function applyQwenStandardProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyProviderConfig(cfg, QWEN_STANDARD_GLOBAL_BASE_URL);
 }
 
-function applyQwenStandardProviderConfigCn(cfg: KaijiBotConfig): KaijiBotConfig {
+function applyQwenStandardProviderConfigCn(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyProviderConfig(cfg, QWEN_STANDARD_CN_BASE_URL);
 }
 
-export function applyQwenStandardConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyQwenStandardConfig(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyConfig(cfg, QWEN_STANDARD_GLOBAL_BASE_URL);
 }
 
-export function applyQwenStandardConfigCn(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyQwenStandardConfigCn(cfg: AllBotConfig): AllBotConfig {
   return qwenPresetAppliers.applyConfig(cfg, QWEN_STANDARD_CN_BASE_URL);
 }
 

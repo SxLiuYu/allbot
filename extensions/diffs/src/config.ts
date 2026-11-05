@@ -1,6 +1,6 @@
-import { buildPluginConfigSchema } from "kaijibot/plugin-sdk/plugin-entry";
-import { z } from "kaijibot/plugin-sdk/zod";
-import type { KaijiBotPluginConfigSchema } from "../api.js";
+import { buildPluginConfigSchema } from "allbot/plugin-sdk/plugin-entry";
+import { z } from "allbot/plugin-sdk/zod";
+import type { AllBotPluginConfigSchema } from "../api.js";
 import {
   DIFF_IMAGE_QUALITY_PRESETS,
   DIFF_INDICATORS,
@@ -192,7 +192,7 @@ const diffsPluginConfigSchemaBase = buildPluginConfigSchema(DiffsPluginJsonSchem
   },
 });
 
-export const diffsPluginConfigSchema: KaijiBotPluginConfigSchema = {
+export const diffsPluginConfigSchema: AllBotPluginConfigSchema = {
   ...diffsPluginConfigSchemaBase,
   jsonSchema: {
     ...diffsPluginConfigSchemaBase.jsonSchema,

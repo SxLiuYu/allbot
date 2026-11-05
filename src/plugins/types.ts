@@ -22,7 +22,7 @@ import type { FinalizedMsgContext } from "../auto-reply/templating.js";
 import type { ThinkLevel } from "../auto-reply/thinking.js";
 import type { ReplyPayload } from "../auto-reply/types.js";
 import type { ChannelId, ChannelPlugin } from "../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type {
   CliBackendConfig,
   ModelProviderAuthMode,
@@ -123,7 +123,7 @@ export type PluginConfigValidation =
  * function, or both. `uiHints` and `jsonSchema` are optional extras for docs,
  * forms, and config UIs.
  */
-export type KaijiBotPluginConfigSchema = {
+export type AllBotPluginConfigSchema = {
   safeParse?: (value: unknown) => {
     success: boolean;
     data?: unknown;
@@ -138,10 +138,10 @@ export type KaijiBotPluginConfigSchema = {
 };
 
 /** Trusted execution context passed to plugin-owned agent tool factories. */
-export type KaijiBotPluginToolContext = {
-  config?: KaijiBotConfig;
+export type AllBotPluginToolContext = {
+  config?: AllBotConfig;
   /** Active runtime-resolved config snapshot when one is available. */
-  runtimeConfig?: KaijiBotConfig;
+  runtimeConfig?: AllBotConfig;
   /** Effective filesystem policy for the active tool run. */
   fsPolicy?: ToolFsPolicy;
   workspaceDir?: string;
@@ -165,17 +165,17 @@ export type KaijiBotPluginToolContext = {
   sandboxed?: boolean;
 };
 
-export type KaijiBotPluginToolFactory = (
-  ctx: KaijiBotPluginToolContext,
+export type AllBotPluginToolFactory = (
+  ctx: AllBotPluginToolContext,
 ) => AnyAgentTool | AnyAgentTool[] | null | undefined;
 
-export type KaijiBotPluginToolOptions = {
+export type AllBotPluginToolOptions = {
   name?: string;
   names?: string[];
   optional?: boolean;
 };
 
-export type KaijiBotPluginHookOptions = {
+export type AllBotPluginHookOptions = {
   entry?: HookEntry;
   name?: string;
   description?: string;
@@ -194,14 +194,14 @@ export type ProviderAuthResult = {
    * `models.providers.<id>` entries, default aliases, or agent model helpers.
    * The caller still persists auth-profile bindings separately.
    */
-  configPatch?: Partial<KaijiBotConfig>;
+  configPatch?: Partial<AllBotConfig>;
   defaultModel?: string;
   notes?: string[];
 };
 
 /** Interactive auth context passed to provider login/setup methods. */
 export type ProviderAuthContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   agentDir?: string;
   workspaceDir?: string;
@@ -265,8 +265,8 @@ export type ProviderNonInteractiveApiKeyCredentialParams = {
 
 export type ProviderAuthMethodNonInteractiveContext = {
   authChoice: string;
-  config: KaijiBotConfig;
-  baseConfig: KaijiBotConfig;
+  config: AllBotConfig;
+  baseConfig: AllBotConfig;
   opts: ProviderAuthOptionBag;
   runtime: RuntimeEnv;
   agentDir?: string;
@@ -290,21 +290,21 @@ export type ProviderAuthMethod = {
    * Optional wizard/onboarding metadata for this specific auth method.
    *
    * Use this when one provider exposes multiple setup entries (for example API
-   * key + OAuth, or region-specific login flows). KaijiBot uses this to expose
+   * key + OAuth, or region-specific login flows). AllBot uses this to expose
    * method-specific auth choices while keeping the provider id stable.
    */
   wizard?: ProviderPluginWizardSetup;
   run: (ctx: ProviderAuthContext) => Promise<ProviderAuthResult>;
   runNonInteractive?: (
     ctx: ProviderAuthMethodNonInteractiveContext,
-  ) => Promise<KaijiBotConfig | null>;
-  applyConfig?: (cfg: KaijiBotConfig) => KaijiBotConfig;
+  ) => Promise<AllBotConfig | null>;
+  applyConfig?: (cfg: AllBotConfig) => AllBotConfig;
 };
 
 export type ProviderCatalogOrder = "simple" | "profile" | "paired" | "late";
 
 export type ProviderCatalogContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -364,7 +364,7 @@ export type ProviderRuntimeProviderConfig = {
  * belong in `prepareDynamicModel`.
  */
 export type ProviderResolveDynamicModelContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -383,7 +383,7 @@ export type ProviderResolveDynamicModelContext = {
 export type ProviderPrepareDynamicModelContext = ProviderResolveDynamicModelContext;
 
 export type ProviderPreferRuntimeResolvedModelContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -393,12 +393,12 @@ export type ProviderPreferRuntimeResolvedModelContext = {
 /**
  * Last-chance rewrite hook for provider-owned transport normalization.
  *
- * Runs after KaijiBot resolves an explicit/discovered/dynamic model and before
+ * Runs after AllBot resolves an explicit/discovered/dynamic model and before
  * the embedded runner uses it. Typical uses: swap API ids, fix base URLs, or
  * patch provider-specific compat bits.
  */
 export type ProviderNormalizeResolvedModelContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -459,7 +459,7 @@ export type ProviderResolveConfigApiKeyContext = {
  * for the request.
  */
 export type ProviderPrepareRuntimeAuthContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -493,7 +493,7 @@ export type ProviderPreparedRuntimeAuth = {
  * snapshots often need a different credential source than live inference
  * requests, and they run outside the embedded runner.
  *
- * The helper methods cover the common KaijiBot auth resolution paths:
+ * The helper methods cover the common AllBot auth resolution paths:
  *
  * - `resolveApiKeyFromConfigAndStore`: env/config/plain token/api_key profiles
  * - `resolveOAuthToken`: oauth/token profiles resolved through the auth store,
@@ -503,7 +503,7 @@ export type ProviderPreparedRuntimeAuth = {
  * token blob, read a legacy credential file, or pick between aliases).
  */
 export type ProviderResolveUsageAuthContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -535,7 +535,7 @@ export type ProviderResolvedUsageAuth = {
  * owns the provider-specific HTTP request + response normalization.
  */
 export type ProviderFetchUsageSnapshotContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -549,26 +549,26 @@ export type ProviderFetchUsageSnapshotContext = {
 /**
  * Provider-owned auth-doctor hint input.
  *
- * Called when OAuth refresh fails and KaijiBot wants a provider-specific repair
+ * Called when OAuth refresh fails and AllBot wants a provider-specific repair
  * hint to append to the generic re-auth message. Use this for legacy profile-id
  * migrations or other provider-owned auth-store cleanup guidance.
  */
 export type ProviderAuthDoctorHintContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   store: AuthProfileStore;
   provider: string;
   profileId?: string;
 };
 
 /**
- * Provider-owned extra-param normalization before KaijiBot builds its generic
+ * Provider-owned extra-param normalization before AllBot builds its generic
  * stream option wrapper.
  *
  * Use this to set provider defaults or rewrite provider-specific config keys
  * into the merged `extraParams` object. Return the full next extraParams object.
  */
 export type ProviderPrepareExtraParamsContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -587,7 +587,7 @@ export type ProviderReasoningOutputMode = "native" | "tagged";
  * @deprecated Legacy static provider capability bag.
  *
  * Core replay/runtime ownership now lives on explicit provider hooks such as
- * `buildReplayPolicy`, `normalizeToolSchemas`, and `wrapStreamFn`. KaijiBot no
+ * `buildReplayPolicy`, `normalizeToolSchemas`, and `wrapStreamFn`. AllBot no
  * longer reads this bag at runtime, but the field remains typed so existing
  * third-party plugins do not fail to compile immediately.
  */
@@ -625,7 +625,7 @@ export type ProviderReplayPolicy = {
  * behavior and should stay with the provider plugin instead of core tables.
  */
 export type ProviderReplayPolicyContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
@@ -702,7 +702,7 @@ export type ProviderReasoningOutputModeContext = ProviderReplayPolicyContext;
  * as a wrapper around `streamSimple`).
  */
 export type ProviderCreateStreamFnContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -711,7 +711,7 @@ export type ProviderCreateStreamFnContext = {
 };
 
 /**
- * Provider-owned stream wrapper hook after KaijiBot applies its generic
+ * Provider-owned stream wrapper hook after AllBot applies its generic
  * transport-independent wrappers.
  *
  * Use this for provider-specific payload/header/model mutations that still run
@@ -793,7 +793,7 @@ export type ProviderFailoverErrorContext = {
  */
 export type ProviderApplyConfigDefaultsContext = {
   provider: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
 };
 
@@ -820,7 +820,7 @@ export type PluginEmbeddingProvider = {
  * plugin instead of the core memory switchboard.
  */
 export type ProviderCreateEmbeddingProviderContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -838,7 +838,7 @@ export type ProviderCreateEmbeddingProviderContext = {
 /**
  * Provider-owned prompt-cache eligibility.
  *
- * Return `true` or `false` to override KaijiBot's built-in provider cache TTL
+ * Return `true` or `false` to override AllBot's built-in provider cache TTL
  * detection for this provider. Return `undefined` to fall back to core rules.
  */
 export type ProviderCacheTtlEligibilityContext = {
@@ -850,12 +850,12 @@ export type ProviderCacheTtlEligibilityContext = {
 /**
  * Provider-owned missing-auth message override.
  *
- * Runs only after KaijiBot exhausts normal env/profile/config auth resolution
+ * Runs only after AllBot exhausts normal env/profile/config auth resolution
  * for the requested provider. Return a custom message to replace the generic
  * "No API key found" error.
  */
 export type ProviderBuildMissingAuthMessageContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -867,11 +867,11 @@ export type ProviderBuildMissingAuthMessageContext = {
  * Provider-owned unknown-model hint override.
  *
  * Runs after catalog/runtime lookup misses for the requested provider. Return a
- * hint suffix that KaijiBot should append to the generic `Unknown model`
+ * hint suffix that AllBot should append to the generic `Unknown model`
  * error.
  */
 export type ProviderBuildUnknownModelHintContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -888,7 +888,7 @@ export type ProviderBuildUnknownModelHintContext = {
  * resolution, model listing, and catalog loading.
  */
 export type ProviderBuiltInModelSuppressionContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -939,13 +939,13 @@ export type ProviderModernModelPolicyContext = {
 /**
  * Final catalog augmentation hook.
  *
- * Runs after KaijiBot loads the discovered model catalog and merges configured
+ * Runs after AllBot loads the discovered model catalog and merges configured
  * opt-in providers. Use this for forward-compat rows or vendor-owned synthetic
  * entries that should appear in `models list` and model pickers even when the
  * upstream registry has not caught up yet.
  */
 export type ProviderAugmentModelCatalogContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -1029,7 +1029,7 @@ export type ProviderOAuthProfileIdRepair = {
   /**
    * Legacy OAuth profile id to migrate away from.
    *
-   * When omitted, KaijiBot falls back to `<provider>:default`.
+   * When omitted, AllBot falls back to `<provider>:default`.
    */
   legacyProfileId?: string;
   /**
@@ -1041,7 +1041,7 @@ export type ProviderOAuthProfileIdRepair = {
 };
 
 export type ProviderModelSelectedContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   model: string;
   prompter: WizardPrompter;
   agentDir?: string;
@@ -1049,7 +1049,7 @@ export type ProviderModelSelectedContext = {
 };
 
 export type ProviderResolveSyntheticAuthContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   provider: string;
   providerConfig?: ModelProviderConfig;
 };
@@ -1061,7 +1061,7 @@ export type ProviderSyntheticAuthResult = {
 };
 
 export type ProviderResolveExternalOAuthProfilesContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
@@ -1078,14 +1078,14 @@ export type ProviderExternalOAuthProfile = {
 export type ProviderExternalAuthProfile = ProviderExternalOAuthProfile;
 
 export type ProviderDeferSyntheticProfileAuthContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   provider: string;
   providerConfig?: ModelProviderConfig;
   resolvedApiKey?: string;
 };
 
 export type ProviderSystemPromptContributionContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   provider: string;
@@ -1147,7 +1147,7 @@ export type ProviderPlugin = {
   /**
    * Optional async prefetch for dynamic model resolution.
    *
-   * KaijiBot calls this only from async model resolution paths. After it
+   * AllBot calls this only from async model resolution paths. After it
    * completes, `resolveDynamicModel` is called again.
    */
   prepareDynamicModel?: (ctx: ProviderPrepareDynamicModelContext) => Promise<void>;
@@ -1235,7 +1235,7 @@ export type ProviderPlugin = {
   /**
    * Provider-owned replay-history sanitization.
    *
-   * Runs after KaijiBot performs generic transcript cleanup. Use this for
+   * Runs after AllBot performs generic transcript cleanup. Use this for
    * provider-specific replay rewrites that should stay with the provider
    * plugin rather than in shared core compaction helpers.
    */
@@ -1255,7 +1255,7 @@ export type ProviderPlugin = {
   /**
    * Provider-owned tool-schema normalization.
    *
-   * Use this for transport-family schema cleanup before KaijiBot registers
+   * Use this for transport-family schema cleanup before AllBot registers
    * tools with the embedded runner.
    */
   normalizeToolSchemas?: (
@@ -1298,7 +1298,7 @@ export type ProviderPlugin = {
    */
   createStreamFn?: (ctx: ProviderCreateStreamFnContext) => StreamFn | null | undefined;
   /**
-   * Provider-owned stream wrapper applied after generic KaijiBot wrappers.
+   * Provider-owned stream wrapper applied after generic AllBot wrappers.
    *
    * Typical uses: provider attribution headers, request-body rewrites, or
    * provider-specific compat payload patches that do not justify a separate
@@ -1341,7 +1341,7 @@ export type ProviderPlugin = {
   /**
    * Runtime auth exchange hook.
    *
-   * Called after KaijiBot resolves the raw configured credential but before the
+   * Called after AllBot resolves the raw configured credential but before the
    * runner stores it in runtime auth storage. This lets plugins exchange a
    * source credential (for example a GitHub token) into a short-lived runtime
    * token plus optional base URL override.
@@ -1399,7 +1399,7 @@ export type ProviderPlugin = {
    * Provider-owned missing-auth message override.
    *
    * Return a custom message when the provider wants a more specific recovery
-   * hint than KaijiBot's generic auth-store guidance.
+   * hint than AllBot's generic auth-store guidance.
    */
   buildMissingAuthMessage?: (
     ctx: ProviderBuildMissingAuthMessageContext,
@@ -1408,7 +1408,7 @@ export type ProviderPlugin = {
    * Provider-owned unknown-model hint override.
    *
    * Return a suffix when the provider wants a more specific recovery hint than
-   * KaijiBot's generic `Unknown model` error after catalog/runtime lookup
+   * AllBot's generic `Unknown model` error after catalog/runtime lookup
    * fails.
    */
   buildUnknownModelHint?: (ctx: ProviderBuildUnknownModelHintContext) => string | null | undefined;
@@ -1416,7 +1416,7 @@ export type ProviderPlugin = {
    * Provider-owned built-in model suppression.
    *
    * Return `{ suppress: true }` to hide a stale upstream row. Include
-   * `errorMessage` when KaijiBot should surface a provider-specific hint for
+   * `errorMessage` when AllBot should surface a provider-specific hint for
    * direct model resolution failures.
    */
   suppressBuiltInModel?: (
@@ -1426,7 +1426,7 @@ export type ProviderPlugin = {
    * Provider-owned final catalog augmentation.
    *
    * Return extra rows to append to the final catalog after discovery/config
-   * merging. KaijiBot deduplicates by `provider/id`, so plugins only need to
+   * merging. AllBot deduplicates by `provider/id`, so plugins only need to
    * describe the desired supplemental rows.
    */
   augmentModelCatalog?: (
@@ -1463,7 +1463,7 @@ export type ProviderPlugin = {
    * Provider-owned system-prompt contribution.
    *
    * Use this when a provider/model family needs cache-aware prompt tuning
-   * without replacing the full KaijiBot-owned system prompt.
+   * without replacing the full AllBot-owned system prompt.
    */
   resolveSystemPromptContribution?: (
     ctx: ProviderSystemPromptContributionContext,
@@ -1476,7 +1476,7 @@ export type ProviderPlugin = {
    */
   applyConfigDefaults?: (
     ctx: ProviderApplyConfigDefaultsContext,
-  ) => KaijiBotConfig | null | undefined;
+  ) => AllBotConfig | null | undefined;
   /**
    * Provider-owned "modern model" matcher used by live profile/smoke filters.
    *
@@ -1488,14 +1488,14 @@ export type ProviderPlugin = {
   /**
    * Provider-owned auth-profile API-key formatter.
    *
-   * KaijiBot uses this when a stored auth profile is already valid and needs to
+   * AllBot uses this when a stored auth profile is already valid and needs to
    * be converted into the runtime `apiKey` string expected by the provider. Use
    * this for providers whose auth profile stores extra metadata alongside the
    * bearer token (for example Gemini CLI's `{ token, projectId }` payload).
    */
   formatApiKey?: (cred: AuthProfileCredential) => string;
   /**
-   * Legacy auth-profile ids that should be retired by `kaijibot doctor`.
+   * Legacy auth-profile ids that should be retired by `allbot doctor`.
    *
    * Use this when a provider plugin replaces an older core-managed profile id
    * and wants cleanup/migration messaging to live with the provider instead of
@@ -1503,7 +1503,7 @@ export type ProviderPlugin = {
    */
   deprecatedProfileIds?: string[];
   /**
-   * Legacy OAuth profile-id migrations that `kaijibot doctor` should offer.
+   * Legacy OAuth profile-id migrations that `allbot doctor` should offer.
    *
    * Use this when a provider moved from a legacy default OAuth profile id to a
    * newer identity-based id and wants doctor to own the config rewrite without
@@ -1513,7 +1513,7 @@ export type ProviderPlugin = {
   /**
    * Provider-owned OAuth refresh.
    *
-   * KaijiBot calls this before falling back to the shared `pi-ai` OAuth
+   * AllBot calls this before falling back to the shared `pi-ai` OAuth
    * refreshers. Use it when the provider has a custom refresh endpoint, or when
    * the provider needs custom refresh-failure behavior that should stay out of
    * core auth-profile code.
@@ -1524,7 +1524,7 @@ export type ProviderPlugin = {
    *
    * Return a multiline repair hint when OAuth refresh fails and the provider
    * wants to steer users toward a specific auth-profile migration or recovery
-   * path. Return nothing to keep KaijiBot's generic error text.
+   * path. Return nothing to keep AllBot's generic error text.
    */
   buildAuthDoctorHint?: (
     ctx: ProviderAuthDoctorHintContext,
@@ -1591,7 +1591,7 @@ export type ProviderPlugin = {
    *
    * Return true when a stored profile API key is only a provider-owned
    * synthetic placeholder and should yield to env/config-backed auth before
-   * KaijiBot falls back to that stored profile.
+   * AllBot falls back to that stored profile.
    */
   shouldDeferSyntheticProfileAuth?: (
     ctx: ProviderDeferSyntheticProfileAuthContext,
@@ -1615,13 +1615,13 @@ export type WebFetchProviderToolDefinition = {
 };
 
 export type WebSearchProviderContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   searchConfig?: Record<string, unknown>;
   runtimeMetadata?: RuntimeWebSearchMetadata;
 };
 
 export type WebFetchProviderContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   fetchConfig?: Record<string, unknown>;
   runtimeMetadata?: RuntimeWebFetchMetadata;
 };
@@ -1629,7 +1629,7 @@ export type WebFetchProviderContext = {
 export type WebSearchCredentialResolutionSource = "config" | "secretRef" | "env" | "missing";
 
 export type WebSearchRuntimeMetadataContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   searchConfig?: Record<string, unknown>;
   runtimeMetadata?: RuntimeWebSearchMetadata;
   resolvedCredential?: {
@@ -1640,7 +1640,7 @@ export type WebSearchRuntimeMetadataContext = {
 };
 
 export type WebSearchProviderSetupContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   runtime: RuntimeEnv;
   prompter: WizardPrompter;
   quickstartDefaults?: boolean;
@@ -1650,7 +1650,7 @@ export type WebSearchProviderSetupContext = {
 export type WebFetchCredentialResolutionSource = "config" | "secretRef" | "env" | "missing";
 
 export type WebFetchRuntimeMetadataContext = {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   fetchConfig?: Record<string, unknown>;
   runtimeMetadata?: RuntimeWebFetchMetadata;
   resolvedCredential?: {
@@ -1666,7 +1666,7 @@ export type WebSearchProviderPlugin = {
   hint: string;
   /**
    * Interactive onboarding surfaces where this search provider should appear
-   * when KaijiBot has no config-aware runtime context yet.
+   * when AllBot has no config-aware runtime context yet.
    *
    * Unlike provider auth, search setup historically exposed only a curated
    * quickstart subset. Keep this plugin-owned so core does not hardcode the
@@ -1684,10 +1684,10 @@ export type WebSearchProviderPlugin = {
   inactiveSecretPaths?: string[];
   getCredentialValue: (searchConfig?: Record<string, unknown>) => unknown;
   setCredentialValue: (searchConfigTarget: Record<string, unknown>, value: unknown) => void;
-  getConfiguredCredentialValue?: (config?: KaijiBotConfig) => unknown;
-  setConfiguredCredentialValue?: (configTarget: KaijiBotConfig, value: unknown) => void;
-  applySelectionConfig?: (config: KaijiBotConfig) => KaijiBotConfig;
-  runSetup?: (ctx: WebSearchProviderSetupContext) => KaijiBotConfig | Promise<KaijiBotConfig>;
+  getConfiguredCredentialValue?: (config?: AllBotConfig) => unknown;
+  setConfiguredCredentialValue?: (configTarget: AllBotConfig, value: unknown) => void;
+  applySelectionConfig?: (config: AllBotConfig) => AllBotConfig;
+  runSetup?: (ctx: WebSearchProviderSetupContext) => AllBotConfig | Promise<AllBotConfig>;
   resolveRuntimeMetadata?: (
     ctx: WebSearchRuntimeMetadataContext,
   ) => Partial<RuntimeWebSearchMetadata> | Promise<Partial<RuntimeWebSearchMetadata>>;
@@ -1719,10 +1719,10 @@ export type WebFetchProviderPlugin = {
   inactiveSecretPaths?: string[];
   getCredentialValue: (fetchConfig?: Record<string, unknown>) => unknown;
   setCredentialValue: (fetchConfigTarget: Record<string, unknown>, value: unknown) => void;
-  getConfiguredCredentialValue?: (config?: KaijiBotConfig) => unknown;
-  setConfiguredCredentialValue?: (configTarget: KaijiBotConfig, value: unknown) => void;
+  getConfiguredCredentialValue?: (config?: AllBotConfig) => unknown;
+  setConfiguredCredentialValue?: (configTarget: AllBotConfig, value: unknown) => void;
   /** Apply the minimal config needed to select this provider without scattering plugin config writes in core. */
-  applySelectionConfig?: (config: KaijiBotConfig) => KaijiBotConfig;
+  applySelectionConfig?: (config: AllBotConfig) => AllBotConfig;
   resolveRuntimeMetadata?: (
     ctx: WebFetchRuntimeMetadataContext,
   ) => Partial<RuntimeWebFetchMetadata> | Promise<Partial<RuntimeWebFetchMetadata>>;
@@ -1796,7 +1796,7 @@ export type ImageGenerationProviderPlugin = ImageGenerationProvider;
 export type VideoGenerationProviderPlugin = VideoGenerationProvider;
 export type MusicGenerationProviderPlugin = MusicGenerationProvider;
 
-export type KaijiBotPluginGatewayMethod = {
+export type AllBotPluginGatewayMethod = {
   method: string;
   handler: GatewayRequestHandler;
 };
@@ -1827,8 +1827,8 @@ export type PluginCommandContext = {
   args?: string;
   /** The full normalized command body */
   commandBody: string;
-  /** Current KaijiBot configuration */
-  config: KaijiBotConfig;
+  /** Current AllBot configuration */
+  config: AllBotConfig;
   /** Raw "From" value (channel-scoped id) */
   from?: string;
   /** Raw "To" value (channel-scoped id) */
@@ -1916,7 +1916,7 @@ export type PluginCommandHandler = (
 /**
  * Definition for a plugin-registered command.
  */
-export type KaijiBotPluginCommandDefinition = {
+export type AllBotPluginCommandDefinition = {
   /** Command name without leading slash (e.g., "tts") */
   name: string;
   /**
@@ -1961,82 +1961,82 @@ export type PluginInteractiveRegistration<
 
 export type PluginInteractiveHandlerRegistration = PluginInteractiveRegistration;
 
-export type KaijiBotPluginHttpRouteAuth = "gateway" | "plugin";
-export type KaijiBotPluginHttpRouteMatch = "exact" | "prefix";
+export type AllBotPluginHttpRouteAuth = "gateway" | "plugin";
+export type AllBotPluginHttpRouteMatch = "exact" | "prefix";
 
-export type KaijiBotPluginHttpRouteHandler = (
+export type AllBotPluginHttpRouteHandler = (
   req: IncomingMessage,
   res: ServerResponse,
 ) => Promise<boolean | void> | boolean | void;
 
-export type KaijiBotPluginHttpRouteParams = {
+export type AllBotPluginHttpRouteParams = {
   path: string;
-  handler: KaijiBotPluginHttpRouteHandler;
-  auth: KaijiBotPluginHttpRouteAuth;
-  match?: KaijiBotPluginHttpRouteMatch;
+  handler: AllBotPluginHttpRouteHandler;
+  auth: AllBotPluginHttpRouteAuth;
+  match?: AllBotPluginHttpRouteMatch;
   replaceExisting?: boolean;
 };
 
-export type KaijiBotPluginCliContext = {
+export type AllBotPluginCliContext = {
   program: Command;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   logger: PluginLogger;
 };
 
-export type KaijiBotPluginCliRegistrar = (ctx: KaijiBotPluginCliContext) => void | Promise<void>;
+export type AllBotPluginCliRegistrar = (ctx: AllBotPluginCliContext) => void | Promise<void>;
 
 /**
  * Top-level CLI metadata for plugin-owned commands.
  *
  * Descriptors are the parse-time contract for lazy plugin CLI registration.
- * If you want KaijiBot to keep a plugin command lazy-loaded while still
+ * If you want AllBot to keep a plugin command lazy-loaded while still
  * advertising it at the root CLI level, provide descriptors that cover every
  * top-level command root registered by that plugin CLI surface.
  */
-export type KaijiBotPluginCliCommandDescriptor = {
+export type AllBotPluginCliCommandDescriptor = {
   name: string;
   description: string;
   hasSubcommands: boolean;
 };
 
-export type KaijiBotPluginReloadRegistration = {
+export type AllBotPluginReloadRegistration = {
   restartPrefixes?: string[];
   hotPrefixes?: string[];
   noopPrefixes?: string[];
 };
 
-export type KaijiBotPluginNodeHostCommand = {
+export type AllBotPluginNodeHostCommand = {
   command: string;
   cap?: string;
   handle: (paramsJSON?: string | null) => Promise<string>;
 };
 
-export type KaijiBotPluginSecurityAuditContext = {
-  config: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+export type AllBotPluginSecurityAuditContext = {
+  config: AllBotConfig;
+  sourceConfig: AllBotConfig;
   env: NodeJS.ProcessEnv;
   stateDir: string;
   configPath: string;
 };
 
-export type KaijiBotPluginSecurityAuditCollector = (
-  ctx: KaijiBotPluginSecurityAuditContext,
+export type AllBotPluginSecurityAuditCollector = (
+  ctx: AllBotPluginSecurityAuditContext,
 ) => SecurityAuditFinding[] | Promise<SecurityAuditFinding[]>;
 
 /** Context passed to long-lived plugin services. */
-export type KaijiBotPluginServiceContext = {
-  config: KaijiBotConfig;
+export type AllBotPluginServiceContext = {
+  config: AllBotConfig;
   workspaceDir?: string;
   stateDir: string;
   logger: PluginLogger;
 };
 
 /** Background service registered by a plugin during `register(api)`. */
-export type KaijiBotPluginService = {
+export type AllBotPluginService = {
   id: string;
-  start: (ctx: KaijiBotPluginServiceContext) => void | Promise<void>;
-  stop?: (ctx: KaijiBotPluginServiceContext) => void | Promise<void>;
+  start: (ctx: AllBotPluginServiceContext) => void | Promise<void>;
+  stop?: (ctx: AllBotPluginServiceContext) => void | Promise<void>;
 };
 
 export type CliBundleMcpMode =
@@ -2066,9 +2066,9 @@ export type CliBackendPlugin = {
     };
   };
   /**
-   * Whether KaijiBot should inject bundle MCP config for this backend.
+   * Whether AllBot should inject bundle MCP config for this backend.
    *
-   * Keep this opt-in. Only backends that explicitly consume KaijiBot's bundle
+   * Keep this opt-in. Only backends that explicitly consume AllBot's bundle
    * MCP bridge should enable it.
    */
   bundleMcp?: boolean;
@@ -2090,41 +2090,41 @@ export type CliBackendPlugin = {
   normalizeConfig?: (config: CliBackendConfig) => CliBackendConfig;
 };
 
-export type KaijiBotPluginChannelRegistration = {
+export type AllBotPluginChannelRegistration = {
   plugin: ChannelPlugin;
 };
 
 /** Module-level plugin definition loaded from a native plugin entry file. */
-export type KaijiBotPluginDefinition = {
+export type AllBotPluginDefinition = {
   id?: string;
   name?: string;
   description?: string;
   version?: string;
   kind?: PluginKind | PluginKind[];
-  configSchema?: KaijiBotPluginConfigSchema;
-  reload?: KaijiBotPluginReloadRegistration;
-  nodeHostCommands?: KaijiBotPluginNodeHostCommand[];
-  securityAuditCollectors?: KaijiBotPluginSecurityAuditCollector[];
-  register?: (api: KaijiBotPluginApi) => void | Promise<void>;
-  activate?: (api: KaijiBotPluginApi) => void | Promise<void>;
+  configSchema?: AllBotPluginConfigSchema;
+  reload?: AllBotPluginReloadRegistration;
+  nodeHostCommands?: AllBotPluginNodeHostCommand[];
+  securityAuditCollectors?: AllBotPluginSecurityAuditCollector[];
+  register?: (api: AllBotPluginApi) => void | Promise<void>;
+  activate?: (api: AllBotPluginApi) => void | Promise<void>;
 };
 
-export type KaijiBotPluginModule =
-  | KaijiBotPluginDefinition
-  | ((api: KaijiBotPluginApi) => void | Promise<void>);
+export type AllBotPluginModule =
+  | AllBotPluginDefinition
+  | ((api: AllBotPluginApi) => void | Promise<void>);
 
 export type PluginRegistrationMode = "full" | "setup-only" | "setup-runtime" | "cli-metadata";
 
-export type PluginConfigMigration = (config: KaijiBotConfig) =>
+export type PluginConfigMigration = (config: AllBotConfig) =>
   | {
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       changes: string[];
     }
   | null
   | undefined;
 
 export type PluginSetupAutoEnableContext = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
 };
 
@@ -2133,7 +2133,7 @@ export type PluginSetupAutoEnableProbe = (
 ) => string | string[] | null | undefined;
 
 /** Main registration API injected into native plugin entry files. */
-export type KaijiBotPluginApi = {
+export type AllBotPluginApi = {
   id: string;
   name: string;
   version?: string;
@@ -2141,7 +2141,7 @@ export type KaijiBotPluginApi = {
   source: string;
   rootDir?: string;
   registrationMode: PluginRegistrationMode;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   pluginConfig?: Record<string, unknown>;
   /**
    * In-process runtime helpers for trusted native plugins.
@@ -2152,17 +2152,17 @@ export type KaijiBotPluginApi = {
   runtime: PluginRuntime;
   logger: PluginLogger;
   registerTool: (
-    tool: AnyAgentTool | KaijiBotPluginToolFactory,
-    opts?: KaijiBotPluginToolOptions,
+    tool: AnyAgentTool | AllBotPluginToolFactory,
+    opts?: AllBotPluginToolOptions,
   ) => void;
   registerHook: (
     events: string | string[],
     handler: InternalHookHandler,
-    opts?: KaijiBotPluginHookOptions,
+    opts?: AllBotPluginHookOptions,
   ) => void;
-  registerHttpRoute: (params: KaijiBotPluginHttpRouteParams) => void;
+  registerHttpRoute: (params: AllBotPluginHttpRouteParams) => void;
   /** Register a native messaging channel plugin (channel capability). */
-  registerChannel: (registration: KaijiBotPluginChannelRegistration | ChannelPlugin) => void;
+  registerChannel: (registration: AllBotPluginChannelRegistration | ChannelPlugin) => void;
   /**
    * Register a gateway RPC method for this plugin.
    *
@@ -2176,24 +2176,24 @@ export type KaijiBotPluginApi = {
     opts?: { scope?: OperatorScope },
   ) => void;
   registerCli: (
-    registrar: KaijiBotPluginCliRegistrar,
+    registrar: AllBotPluginCliRegistrar,
     opts?: {
       /** Explicit top-level command roots owned by this registrar. */
       commands?: string[];
       /**
        * Parse-time command descriptors for lazy root CLI registration.
        *
-       * When descriptors cover every top-level command root, KaijiBot can keep
+       * When descriptors cover every top-level command root, AllBot can keep
        * the plugin registrar lazy in the normal root CLI path. Command-only
        * registrations stay on the eager compatibility path.
        */
-      descriptors?: KaijiBotPluginCliCommandDescriptor[];
+      descriptors?: AllBotPluginCliCommandDescriptor[];
     },
   ) => void;
-  registerReload: (registration: KaijiBotPluginReloadRegistration) => void;
-  registerNodeHostCommand: (command: KaijiBotPluginNodeHostCommand) => void;
-  registerSecurityAuditCollector: (collector: KaijiBotPluginSecurityAuditCollector) => void;
-  registerService: (service: KaijiBotPluginService) => void;
+  registerReload: (registration: AllBotPluginReloadRegistration) => void;
+  registerNodeHostCommand: (command: AllBotPluginNodeHostCommand) => void;
+  registerSecurityAuditCollector: (collector: AllBotPluginSecurityAuditCollector) => void;
+  registerService: (service: AllBotPluginService) => void;
   /** Register a text-only CLI backend used by the local CLI runner. */
   registerCliBackend: (backend: CliBackendPlugin) => void;
   /** Register a lightweight config migration that can run before plugin runtime loads. */
@@ -2229,7 +2229,7 @@ export type KaijiBotPluginApi = {
    * Plugin commands are processed before built-in commands and before agent invocation.
    * Use this for simple state-toggling or status commands that don't need AI reasoning.
    */
-  registerCommand: (command: KaijiBotPluginCommandDefinition) => void;
+  registerCommand: (command: AllBotPluginCommandDefinition) => void;
   /** Register a context engine implementation (exclusive slot - only one active at a time). */
   registerContextEngine: (
     id: string,
@@ -2283,7 +2283,7 @@ export type KaijiBotPluginApi = {
 
 export type PluginOrigin = "bundled" | "global" | "workspace" | "config";
 
-export type PluginFormat = "kaijibot" | "bundle";
+export type PluginFormat = "allbot" | "bundle";
 
 export type PluginBundleFormat = "codex" | "claude" | "cursor";
 
@@ -2655,7 +2655,7 @@ export type PluginHookReplyDispatchEvent = {
 };
 
 export type PluginHookReplyDispatchContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcher: ReplyDispatcher;
   abortSignal?: AbortSignal;
   onReplyStart?: () => Promise<void> | void;
@@ -2751,7 +2751,7 @@ export type PluginHookBeforeToolCallResult = {
     pluginId?: string;
     /**
      * Best-effort callback invoked with the final outcome after approval resolves, times out, or is cancelled.
-     * KaijiBot does not await this callback before allowing or denying the tool call.
+     * AllBot does not await this callback before allowing or denying the tool call.
      */
     onResolution?: (decision: PluginApprovalResolution) => Promise<void> | void;
   };
@@ -2996,7 +2996,7 @@ export type PluginHookBeforeInstallSkill = {
 };
 
 export type PluginHookBeforeInstallPlugin = {
-  /** Canonical plugin id KaijiBot will install under. */
+  /** Canonical plugin id AllBot will install under. */
   pluginId: string;
   /** Normalized installable content shape after source resolution. */
   contentType: "bundle" | "package" | "file";
@@ -3012,7 +3012,7 @@ export type PluginHookBeforeInstallContext = {
   targetType: PluginInstallTargetType;
   /** Original install entrypoint/provenance. */
   requestKind: PluginInstallRequestKind;
-  /** Normalized origin of the install target (e.g. "kaijibot-bundled", "plugin-package"). */
+  /** Normalized origin of the install target (e.g. "allbot-bundled", "plugin-package"). */
   origin?: string;
 };
 
@@ -3025,7 +3025,7 @@ export type PluginHookBeforeInstallEvent = {
   sourcePath: string;
   /** Whether the install target content is a file or directory. */
   sourcePathKind: PluginInstallSourcePathKind;
-  /** Normalized origin of the install target (e.g. "kaijibot-bundled", "plugin-package"). */
+  /** Normalized origin of the install target (e.g. "allbot-bundled", "plugin-package"). */
   origin?: string;
   /** Install request provenance and caller mode. */
   request: PluginHookBeforeInstallRequest;

@@ -2,17 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeProviderId } from "../agents/provider-id.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { buildPluginApi } from "./api-builder.js";
 import { collectPluginConfigContractMatches } from "./config-contracts.js";
-import { discoverKaijiBotPlugins } from "./discovery.js";
+import { discoverAllBotPlugins } from "./discovery.js";
 import { getCachedPluginJitiLoader, type PluginJitiLoaderCache } from "./jiti-loader-cache.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 import { resolvePluginCacheInputs } from "./roots.js";
 import type { PluginRuntime } from "./runtime/types.js";
 import type {
   CliBackendPlugin,
-  KaijiBotPluginModule,
+  AllBotPluginModule,
   PluginConfigMigration,
   PluginLogger,
   PluginSetupAutoEnableProbe,
@@ -148,7 +148,7 @@ function resolveSetupApiPath(rootDir: string): string | null {
   return null;
 }
 
-function collectConfiguredPluginEntryIds(config: KaijiBotConfig): string[] {
+function collectConfiguredPluginEntryIds(config: AllBotConfig): string[] {
   const entries = config.plugins?.entries;
   if (!entries || typeof entries !== "object") {
     return [];
@@ -160,7 +160,7 @@ function collectConfiguredPluginEntryIds(config: KaijiBotConfig): string[] {
 }
 
 function resolveRelevantSetupMigrationPluginIds(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): string[] {
@@ -190,7 +190,7 @@ function resolveRelevantSetupMigrationPluginIds(params: {
   return [...ids].toSorted();
 }
 
-function resolveRegister(mod: KaijiBotPluginModule): {
+function resolveRegister(mod: AllBotPluginModule): {
   definition?: { id?: string };
   register?: (api: ReturnType<typeof buildPluginApi>) => void | Promise<void>;
 } {
@@ -253,7 +253,7 @@ export function resolvePluginSetupRegistry(params?: {
   const providerKeys = new Set<string>();
   const cliBackendKeys = new Set<string>();
 
-  const discovery = discoverKaijiBotPlugins({
+  const discovery = discoverAllBotPlugins({
     workspaceDir: params?.workspaceDir,
     env,
     cache: true,
@@ -275,14 +275,14 @@ export function resolvePluginSetupRegistry(params?: {
       continue;
     }
 
-    let mod: KaijiBotPluginModule;
+    let mod: AllBotPluginModule;
     try {
-      mod = getJiti(setupSource)(setupSource) as KaijiBotPluginModule;
+      mod = getJiti(setupSource)(setupSource) as AllBotPluginModule;
     } catch {
       continue;
     }
 
-    const resolved = resolveRegister((mod as { default?: KaijiBotPluginModule }).default ?? mod);
+    const resolved = resolveRegister((mod as { default?: AllBotPluginModule }).default ?? mod);
     if (!resolved.register) {
       continue;
     }
@@ -298,7 +298,7 @@ export function resolvePluginSetupRegistry(params?: {
       source: setupSource,
       rootDir: record.rootDir,
       registrationMode: "setup-only",
-      config: {} as KaijiBotConfig,
+      config: {} as AllBotConfig,
       runtime: EMPTY_RUNTIME,
       logger: NOOP_LOGGER,
       resolvePath: (input) => input,
@@ -372,7 +372,7 @@ export function resolvePluginSetupProvider(params: {
 
   const env = params.env ?? process.env;
   const normalizedProvider = normalizeProviderId(params.provider);
-  const discovery = discoverKaijiBotPlugins({
+  const discovery = discoverAllBotPlugins({
     workspaceDir: params.workspaceDir,
     env,
     cache: true,
@@ -398,15 +398,15 @@ export function resolvePluginSetupProvider(params: {
     return undefined;
   }
 
-  let mod: KaijiBotPluginModule;
+  let mod: AllBotPluginModule;
   try {
-    mod = getJiti(setupSource)(setupSource) as KaijiBotPluginModule;
+    mod = getJiti(setupSource)(setupSource) as AllBotPluginModule;
   } catch {
     setupProviderCache.set(cacheKey, null);
     return undefined;
   }
 
-  const resolved = resolveRegister((mod as { default?: KaijiBotPluginModule }).default ?? mod);
+  const resolved = resolveRegister((mod as { default?: AllBotPluginModule }).default ?? mod);
   if (!resolved.register) {
     setupProviderCache.set(cacheKey, null);
     return undefined;
@@ -426,7 +426,7 @@ export function resolvePluginSetupProvider(params: {
     source: setupSource,
     rootDir: record.rootDir,
     registrationMode: "setup-only",
-    config: {} as KaijiBotConfig,
+    config: {} as AllBotConfig,
     runtime: EMPTY_RUNTIME,
     logger: NOOP_LOGGER,
     resolvePath: (input) => input,
@@ -474,7 +474,7 @@ export function resolvePluginSetupCliBackend(params: {
   }
 
   const env = params.env ?? process.env;
-  const discovery = discoverKaijiBotPlugins({
+  const discovery = discoverAllBotPlugins({
     workspaceDir: params.workspaceDir,
     env,
     cache: true,
@@ -498,13 +498,13 @@ export function resolvePluginSetupCliBackend(params: {
     return undefined;
   }
 
-  let mod: KaijiBotPluginModule;
+  let mod: AllBotPluginModule;
   try {
-    mod = getJiti(setupSource)(setupSource) as KaijiBotPluginModule;
+    mod = getJiti(setupSource)(setupSource) as AllBotPluginModule;
   } catch {
     return undefined;
   }
-  const resolved = resolveRegister((mod as { default?: KaijiBotPluginModule }).default ?? mod);
+  const resolved = resolveRegister((mod as { default?: AllBotPluginModule }).default ?? mod);
   if (!resolved.register) {
     return undefined;
   }
@@ -522,7 +522,7 @@ export function resolvePluginSetupCliBackend(params: {
     source: setupSource,
     rootDir: record.rootDir,
     registrationMode: "setup-only",
-    config: {} as KaijiBotConfig,
+    config: {} as AllBotConfig,
     runtime: EMPTY_RUNTIME,
     logger: NOOP_LOGGER,
     resolvePath: (input) => input,
@@ -556,11 +556,11 @@ export function resolvePluginSetupCliBackend(params: {
 }
 
 export function runPluginSetupConfigMigrations(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changes: string[];
 } {
   let next = params.config;
@@ -587,7 +587,7 @@ export function runPluginSetupConfigMigrations(params: {
 }
 
 export function resolvePluginSetupAutoEnableReasons(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): SetupAutoEnableReason[] {

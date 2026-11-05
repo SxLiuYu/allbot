@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { collectChannelStatusIssues as collectChannelStatusIssuesFn } from "../infra/channels-status-issues.js";
 import { resolveOsSummary } from "../infra/os-summary.js";
 import type { UpdateCheckResult } from "../infra/update-check.js";
@@ -14,8 +14,8 @@ import type {
 import type { getStatusSummary as getStatusSummaryFn } from "./status.summary.js";
 
 export type StatusScanResult = {
-  cfg: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig: AllBotConfig;
   secretDiagnostics: string[];
   osSummary: ReturnType<typeof resolveOsSummary>;
   tailscaleMode: string;
@@ -43,8 +43,8 @@ export type StatusScanResult = {
 };
 
 export function buildStatusScanResult(params: {
-  cfg: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig: AllBotConfig;
   secretDiagnostics: string[];
   osSummary: ReturnType<typeof resolveOsSummary>;
   tailscaleMode: string;

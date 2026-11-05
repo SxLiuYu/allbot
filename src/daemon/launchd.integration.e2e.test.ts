@@ -92,11 +92,11 @@ describeLaunchdIntegration("launchd integration", () => {
 
   beforeAll(async () => {
     const testId = randomUUID().slice(0, 8);
-    homeDir = await fs.mkdtemp(path.join(os.tmpdir(), `kaijibot-launchd-int-${testId}-`));
+    homeDir = await fs.mkdtemp(path.join(os.tmpdir(), `allbot-launchd-int-${testId}-`));
     env = {
       HOME: homeDir,
-      KAIJIBOT_LAUNCHD_LABEL: `ai.kaijibot.launchd-int-${testId}`,
-      KAIJIBOT_LOG_PREFIX: `gateway-launchd-int-${testId}`,
+      ALLBOT_LAUNCHD_LABEL: `ai.allbot.launchd-int-${testId}`,
+      ALLBOT_LOG_PREFIX: `gateway-launchd-int-${testId}`,
     };
   });
 

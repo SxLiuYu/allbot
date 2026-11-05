@@ -20,7 +20,7 @@ export function parseFrontmatterBool(value: string | undefined, fallback: boolea
   return parsed === undefined ? fallback : parsed;
 }
 
-export function resolveKaijiBotManifestBlock(params: {
+export function resolveAllBotManifestBlock(params: {
   frontmatter: Record<string, unknown>;
   key?: string;
 }): Record<string, unknown> | undefined {
@@ -48,16 +48,16 @@ export function resolveKaijiBotManifestBlock(params: {
   }
 }
 
-export type KaijiBotManifestRequires = {
+export type AllBotManifestRequires = {
   bins: string[];
   anyBins: string[];
   env: string[];
   config: string[];
 };
 
-export function resolveKaijiBotManifestRequires(
+export function resolveAllBotManifestRequires(
   metadataObj: Record<string, unknown>,
-): KaijiBotManifestRequires | undefined {
+): AllBotManifestRequires | undefined {
   const requiresRaw =
     typeof metadataObj.requires === "object" && metadataObj.requires !== null
       ? (metadataObj.requires as Record<string, unknown>)
@@ -73,7 +73,7 @@ export function resolveKaijiBotManifestRequires(
   };
 }
 
-export function resolveKaijiBotManifestInstall<T>(
+export function resolveAllBotManifestInstall<T>(
   metadataObj: Record<string, unknown>,
   parseInstallSpec: (input: unknown) => T | undefined,
 ): T[] {
@@ -83,11 +83,11 @@ export function resolveKaijiBotManifestInstall<T>(
     .filter((entry): entry is T => Boolean(entry));
 }
 
-export function resolveKaijiBotManifestOs(metadataObj: Record<string, unknown>): string[] {
+export function resolveAllBotManifestOs(metadataObj: Record<string, unknown>): string[] {
   return normalizeStringList(metadataObj.os);
 }
 
-export type ParsedKaijiBotManifestInstallBase = {
+export type ParsedAllBotManifestInstallBase = {
   raw: Record<string, unknown>;
   kind: string;
   id?: string;
@@ -95,10 +95,10 @@ export type ParsedKaijiBotManifestInstallBase = {
   bins?: string[];
 };
 
-export function parseKaijiBotManifestInstallBase(
+export function parseAllBotManifestInstallBase(
   input: unknown,
   allowedKinds: readonly string[],
-): ParsedKaijiBotManifestInstallBase | undefined {
+): ParsedAllBotManifestInstallBase | undefined {
   if (!input || typeof input !== "object") {
     return undefined;
   }
@@ -110,7 +110,7 @@ export function parseKaijiBotManifestInstallBase(
     return undefined;
   }
 
-  const spec: ParsedKaijiBotManifestInstallBase = {
+  const spec: ParsedAllBotManifestInstallBase = {
     raw,
     kind,
   };
@@ -127,9 +127,9 @@ export function parseKaijiBotManifestInstallBase(
   return spec;
 }
 
-export function applyKaijiBotManifestInstallCommonFields<
+export function applyAllBotManifestInstallCommonFields<
   T extends { id?: string; label?: string; bins?: string[] },
->(spec: T, parsed: Pick<ParsedKaijiBotManifestInstallBase, "id" | "label" | "bins">): T {
+>(spec: T, parsed: Pick<ParsedAllBotManifestInstallBase, "id" | "label" | "bins">): T {
   if (parsed.id) {
     spec.id = parsed.id;
   }

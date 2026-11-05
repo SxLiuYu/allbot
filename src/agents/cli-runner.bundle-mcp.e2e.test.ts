@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { captureEnv } from "../test-utils/env.js";
 import {
   writeBundleProbeMcpServer,
@@ -34,7 +34,7 @@ describe("runCliAgent bundle MCP e2e", () => {
     async () => {
       const { runCliAgent } = await import("./cli-runner.js");
       const envSnapshot = captureEnv(["HOME"]);
-      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-cli-bundle-mcp-"));
+      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-cli-bundle-mcp-"));
       process.env.HOME = tempHome;
 
       const workspaceDir = path.join(tempHome, "workspace");
@@ -42,13 +42,13 @@ describe("runCliAgent bundle MCP e2e", () => {
       const binDir = path.join(tempHome, "bin");
       const serverScriptPath = path.join(tempHome, "mcp", "bundle-probe.mjs");
       const fakeClaudePath = path.join(binDir, "fake-claude.mjs");
-      const pluginRoot = path.join(tempHome, ".kaijibot", "extensions", "bundle-probe");
+      const pluginRoot = path.join(tempHome, ".allbot", "extensions", "bundle-probe");
       await fs.mkdir(workspaceDir, { recursive: true });
       await writeBundleProbeMcpServer(serverScriptPath);
       await writeFakeClaudeCli(fakeClaudePath);
       await writeClaudeBundle({ pluginRoot, serverScriptPath });
 
-      const config: KaijiBotConfig = {
+      const config: AllBotConfig = {
         agents: {
           defaults: {
             workspace: workspaceDir,

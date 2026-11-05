@@ -1,8 +1,8 @@
 import {
   registerProviderPlugin,
   registerSingleProviderPlugin,
-} from "kaijibot/plugin-sdk/plugin-test-runtime";
-import type { ProviderPlugin } from "kaijibot/plugin-sdk/provider-model-shared";
+} from "allbot/plugin-sdk/plugin-test-runtime";
+import type { ProviderPlugin } from "allbot/plugin-sdk/provider-model-shared";
 import { describe, expect, it, vi } from "vitest";
 import openrouterPlugin from "./index.js";
 import {

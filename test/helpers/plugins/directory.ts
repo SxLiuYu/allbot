@@ -1,4 +1,4 @@
-import type { ChannelDirectoryAdapter } from "kaijibot/plugin-sdk/channel-contract";
+import type { ChannelDirectoryAdapter } from "allbot/plugin-sdk/channel-contract";
 
 type DirectorySurface = {
   listPeers: NonNullable<ChannelDirectoryAdapter["listPeers"]>;

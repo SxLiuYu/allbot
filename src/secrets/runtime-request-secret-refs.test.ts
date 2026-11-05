@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
@@ -15,8 +15,8 @@ vi.mock("../plugins/web-search-providers.runtime.js", () => ({
   resolvePluginWebSearchProviders: resolvePluginWebSearchProvidersMock,
 }));
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function createTestProvider(params: {
@@ -114,7 +114,7 @@ describe("secrets runtime snapshot request secret refs", () => {
   });
 
   it("can skip auth-profile SecretRef resolution when includeAuthStoreRefs is false", async () => {
-    const missingEnvVar = `KAIJIBOT_MISSING_AUTH_PROFILE_SECRET_${Date.now()}`;
+    const missingEnvVar = `ALLBOT_MISSING_AUTH_PROFILE_SECRET_${Date.now()}`;
     delete process.env[missingEnvVar];
 
     const loadAuthStore = () =>
@@ -130,7 +130,7 @@ describe("secrets runtime snapshot request secret refs", () => {
       prepareSecretsRuntimeSnapshot({
         config: asConfig({}),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore,
       }),
     ).rejects.toThrow(`Environment variable "${missingEnvVar}" is missing or empty.`);
@@ -139,7 +139,7 @@ describe("secrets runtime snapshot request secret refs", () => {
       config: asConfig({}),
       env: {},
       includeAuthStoreRefs: false,
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore,
     });
 
@@ -187,7 +187,7 @@ describe("secrets runtime snapshot request secret refs", () => {
         OPENAI_PROVIDER_CERT: "client-cert",
         OPENAI_PROVIDER_KEY: "client-key",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -289,7 +289,7 @@ describe("secrets runtime snapshot request secret refs", () => {
         MEDIA_AUDIO_MODEL_KEY: "model-key", // pragma: allowlist secret
         MEDIA_AUDIO_PROXY_CA: "proxy-ca",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 

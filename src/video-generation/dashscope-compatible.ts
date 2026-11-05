@@ -2,7 +2,7 @@ import {
   assertOkOrThrowHttpError,
   fetchWithTimeout,
   postJsonRequest,
-} from "kaijibot/plugin-sdk/provider-http";
+} from "allbot/plugin-sdk/provider-http";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
 import type {
   GeneratedVideoAsset,

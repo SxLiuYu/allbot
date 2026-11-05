@@ -96,10 +96,10 @@ export function registerGatewayCli(program: Command) {
         "after",
         () =>
           `\n${theme.heading(t("cli.help.heading.examples"))}\n${formatHelpExamples([
-            ["kaijibot gateway run", "Run the gateway in the foreground."],
-            ["kaijibot gateway status", "Show service status and probe reachability."],
-            ["kaijibot gateway discover", "Find local and wide-area gateway beacons."],
-            ["kaijibot gateway call health", "Call a gateway RPC method directly."],
+            ["allbot gateway run", "Run the gateway in the foreground."],
+            ["allbot gateway status", "Show service status and probe reachability."],
+            ["allbot gateway discover", "Find local and wide-area gateway beacons."],
+            ["allbot gateway call health", "Call a gateway RPC method directly."],
           ])}\n\n${theme.muted(t("cli.help.heading.docs"))} ${formatDocsLink("/cli/gateway", "gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/gateway.md")}\n`,
       ),
   );

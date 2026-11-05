@@ -45,8 +45,8 @@ run_linux_ci_mirror() {
   run_step pnpm exec vitest run --config vitest/vitest.extensions.config.ts --maxWorkers=1
   run_step env CI=true pnpm exec vitest run --config vitest/vitest.unit.config.ts --maxWorkers=1
 
-  log_step "KAIJIBOT_VITEST_MAX_WORKERS=${KAIJIBOT_VITEST_MAX_WORKERS:-1} NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=6144} pnpm test"
-  KAIJIBOT_VITEST_MAX_WORKERS="${KAIJIBOT_VITEST_MAX_WORKERS:-1}" \
+  log_step "ALLBOT_VITEST_MAX_WORKERS=${ALLBOT_VITEST_MAX_WORKERS:-1} NODE_OPTIONS=${NODE_OPTIONS:---max-old-space-size=6144} pnpm test"
+  ALLBOT_VITEST_MAX_WORKERS="${ALLBOT_VITEST_MAX_WORKERS:-1}" \
   NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=6144}" \
     pnpm test
 }

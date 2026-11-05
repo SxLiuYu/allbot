@@ -2,7 +2,7 @@ import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 import {
   parseEmbedding,
   type MemoryChunk,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-storage";
+} from "allbot/plugin-sdk/memory-core-host-engine-storage";
 
 type EmbeddingCacheDb = Pick<DatabaseSync, "prepare">;
 

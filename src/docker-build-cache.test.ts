@@ -37,7 +37,7 @@ describe.skip("docker build cache layout", () => {
         dockerfile,
         `${path} should use a shared pnpm store cache under the active user's home`,
       ).toMatch(
-        /--mount=type=cache,id=kaijibot-pnpm-store,target=\/(?:root|home\/appuser)\/\.local\/share\/pnpm\/store,sharing=locked/,
+        /--mount=type=cache,id=allbot-pnpm-store,target=\/(?:root|home\/appuser)\/\.local\/share\/pnpm\/store,sharing=locked/,
       );
     }
   });
@@ -114,7 +114,7 @@ describe.skip("docker build cache layout", () => {
       /^COPY(?:\s+--chown=\S+)?\s+scripts\/postinstall-bundled-plugins\.mjs scripts\/npm-runner\.mjs scripts\/windows-cmd-helpers\.mjs \.\/scripts\/$/m,
     );
     expectPatternAfterInstall(
-      /^COPY(?:\s+--chown=\S+)?\s+tsconfig\.json tsconfig\.plugin-sdk\.dts\.json tsdown\.config\.ts vitest\.config\.ts vitest\.e2e\.config\.ts vitest\.performance-config\.ts vitest\.shared\.config\.ts vitest\.system-load\.ts vitest\.bundled-plugin-paths\.ts kaijibot\.mjs \.\/$/m,
+      /^COPY(?:\s+--chown=\S+)?\s+tsconfig\.json tsconfig\.plugin-sdk\.dts\.json tsdown\.config\.ts vitest\.config\.ts vitest\.e2e\.config\.ts vitest\.performance-config\.ts vitest\.shared\.config\.ts vitest\.system-load\.ts vitest\.bundled-plugin-paths\.ts allbot\.mjs \.\/$/m,
     );
     expectPatternAfterInstall(/^COPY(?:\s+--chown=\S+)?\s+src \.\/src$/m);
     expectPatternAfterInstall(/^COPY(?:\s+--chown=\S+)?\s+test \.\/test$/m);

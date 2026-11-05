@@ -1,5 +1,5 @@
 import { listPotentialConfiguredChannelIds } from "../../../channels/config-presence.js";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import {
   normalizePluginsConfig,
   resolveEffectivePluginActivationState,
@@ -14,7 +14,7 @@ export type ChannelPluginBlockerHit = {
 };
 
 export function scanConfiguredChannelPluginBlockers(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): ChannelPluginBlockerHit[] {
   const configuredChannelIds = new Set(

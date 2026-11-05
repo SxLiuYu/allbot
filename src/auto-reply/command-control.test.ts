@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createOutboundTestPlugin, createTestRegistry } from "../test-utils/channel-plugins.js";
 import { resolveCommandAuthorization } from "./command-auth.js";
@@ -56,7 +56,7 @@ describe("resolveCommandAuthorization", () => {
   }) {
     const cfg = {
       channels: { whatsapp: { allowFrom: params.allowFrom } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const ctx = {
       Provider: "whatsapp",
       Surface: "whatsapp",
@@ -128,7 +128,7 @@ describe("resolveCommandAuthorization", () => {
     const cfg = {
       commands: { ownerAllowFrom: ["whatsapp:+15551234567"] },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const ownerCtx = {
       Provider: "whatsapp",
@@ -163,7 +163,7 @@ describe("resolveCommandAuthorization", () => {
     const cfg = {
       commands: { ownerAllowFrom: ["whatsapp:+15551234567"] },
       channels: { whatsapp: {} },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const ownerAuth = resolveCommandAuthorization({
       ctx: {
@@ -207,7 +207,7 @@ describe("resolveCommandAuthorization", () => {
     );
     const cfg = {
       channels: { discord: {} },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const ctx = {
       Provider: "discord",
@@ -230,7 +230,7 @@ describe("resolveCommandAuthorization", () => {
   it("suppresses inherited owner status when the context forbids it", () => {
     const cfg = {
       channels: { telegram: { allowFrom: ["owner-123"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const auth = resolveCommandAuthorization({
       ctx: {
@@ -251,13 +251,13 @@ describe("resolveCommandAuthorization", () => {
   it("does not infer a provider from channel allowlists for webchat command contexts", () => {
     const cfg = {
       channels: { whatsapp: { allowFrom: ["+15551234567"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const ctx = {
       Provider: "webchat",
       Surface: "webchat",
       OriginatingChannel: "webchat",
-      SenderId: "kaijibot-control-ui",
+      SenderId: "allbot-control-ui",
     } as MsgContext;
 
     const auth = resolveCommandAuthorization({
@@ -274,7 +274,7 @@ describe("resolveCommandAuthorization", () => {
     const cfg = {
       commands: { allowFrom: { whatsapp: ["+15551234567"] } },
       channels: { whatsapp: { allowFrom: ["+15551234567"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const auth = resolveCommandAuthorization({
       ctx: {
@@ -298,7 +298,7 @@ describe("resolveCommandAuthorization", () => {
     );
     const cfg = {
       channels: { telegram: { allowFrom: ["123"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const auth = resolveCommandAuthorization({
       ctx: {
@@ -324,7 +324,7 @@ describe("resolveCommandAuthorization", () => {
         },
       },
       channels: { whatsapp: { allowFrom: ["+different"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     function makeWhatsAppContext(senderId: string): MsgContext {
       return {
@@ -381,7 +381,7 @@ describe("resolveCommandAuthorization", () => {
           },
         },
         channels: { whatsapp: { allowFrom: ["*"] } },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       // User in global list but not in whatsapp-specific list
       const globalUserCtx = {
@@ -420,7 +420,7 @@ describe("resolveCommandAuthorization", () => {
     it("falls back to channel allowFrom when commands.allowFrom not set", () => {
       const cfg = {
         channels: { whatsapp: { allowFrom: ["+15551234567"] } },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const authorizedCtx = {
         Provider: "whatsapp",
@@ -446,7 +446,7 @@ describe("resolveCommandAuthorization", () => {
           },
         },
         channels: { whatsapp: { allowFrom: ["+specific"] } },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const anyUserCtx = {
         Provider: "whatsapp",
@@ -471,7 +471,7 @@ describe("resolveCommandAuthorization", () => {
             discord: ["channel:123456789012345678"],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const auth = resolveCommandAuthorization({
         ctx: {
@@ -495,7 +495,7 @@ describe("resolveCommandAuthorization", () => {
             discord: ["123456789012345678"],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const auth = resolveCommandAuthorization({
         ctx: {
@@ -520,7 +520,7 @@ describe("resolveCommandAuthorization", () => {
             "*": ["120363411111111111@g.us"],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const auth = resolveCommandAuthorization({
         ctx: {
@@ -544,7 +544,7 @@ describe("resolveCommandAuthorization", () => {
             discord: ["user:123", "<@!456>", "pk:member-1"],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const userAuth = resolveCommandAuthorization({
         ctx: makeDiscordContext("123"),
@@ -597,7 +597,7 @@ describe("resolveCommandAuthorization", () => {
             allowFrom: ["123"],
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const auth = resolveCommandAuthorization({
         ctx: {
@@ -632,7 +632,7 @@ describe("resolveCommandAuthorization", () => {
           channels: {
             telegram: {},
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         commandAuthorized: true,
       });
 
@@ -658,7 +658,7 @@ describe("resolveCommandAuthorization", () => {
           channels: {
             slack: {},
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         commandAuthorized: false,
       });
 
@@ -686,7 +686,7 @@ describe("resolveCommandAuthorization", () => {
               allowFrom: ["123"],
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         commandAuthorized: false,
       });
 
@@ -718,7 +718,7 @@ describe("resolveCommandAuthorization", () => {
               },
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         commandAuthorized: true,
       });
 
@@ -739,7 +739,7 @@ describe("resolveCommandAuthorization", () => {
           channels: {
             discord: {},
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         commandAuthorized: true,
       });
 
@@ -763,7 +763,7 @@ describe("resolveCommandAuthorization", () => {
                 allowFrom: ["123"],
               },
             },
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           commandAuthorized: true,
         });
         expect(warn).toHaveBeenCalledTimes(1);
@@ -776,7 +776,7 @@ describe("resolveCommandAuthorization", () => {
   });
 
   it("grants senderIsOwner for internal channel with operator.admin scope", () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const ctx = {
       Provider: "webchat",
       Surface: "webchat",
@@ -791,7 +791,7 @@ describe("resolveCommandAuthorization", () => {
   });
 
   it("does not grant senderIsOwner for internal channel without admin scope", () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const ctx = {
       Provider: "webchat",
       Surface: "webchat",
@@ -806,7 +806,7 @@ describe("resolveCommandAuthorization", () => {
   });
 
   it("does not grant senderIsOwner for external channel even with admin scope", () => {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const ctx = {
       Provider: "telegram",
       Surface: "telegram",
@@ -901,12 +901,12 @@ describe("control command parsing", () => {
   it("ignores telegram commands addressed to other bots", () => {
     expect(
       hasControlCommand("/help@otherbot", undefined, {
-        botUsername: "kaijibot",
+        botUsername: "allbot",
       }),
     ).toBe(false);
     expect(
-      hasControlCommand("/help@kaijibot", undefined, {
-        botUsername: "kaijibot",
+      hasControlCommand("/help@allbot", undefined, {
+        botUsername: "allbot",
       }),
     ).toBe(true);
   });

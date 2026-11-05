@@ -335,7 +335,7 @@ export function assertGatewayAuthConfigured(
       return;
     }
     throw new Error(
-      "gateway auth mode is token, but no token was configured (set gateway.auth.token or KAIJIBOT_GATEWAY_TOKEN)",
+      "gateway auth mode is token, but no token was configured (set gateway.auth.token or ALLBOT_GATEWAY_TOKEN)",
     );
   }
   if (auth.mode === "password" && !auth.password) {
@@ -344,7 +344,7 @@ export function assertGatewayAuthConfigured(
       typeof rawAuthConfig.password !== "string" // pragma: allowlist secret
     ) {
       throw new Error(
-        "gateway auth mode is password, but gateway.auth.password contains a provider reference object instead of a resolved string — bootstrap secrets (gateway.auth.password) must be plaintext strings or set via the KAIJIBOT_GATEWAY_PASSWORD environment variable because the secrets provider system has not initialised yet at gateway startup", // pragma: allowlist secret
+        "gateway auth mode is password, but gateway.auth.password contains a provider reference object instead of a resolved string — bootstrap secrets (gateway.auth.password) must be plaintext strings or set via the ALLBOT_GATEWAY_PASSWORD environment variable because the secrets provider system has not initialised yet at gateway startup", // pragma: allowlist secret
       );
     }
     throw new Error("gateway auth mode is password, but no password was configured");
@@ -362,7 +362,7 @@ export function assertGatewayAuthConfigured(
     }
     if (auth.token) {
       throw new Error(
-        "gateway auth mode is trusted-proxy, but a shared token is also configured; remove gateway.auth.token / KAIJIBOT_GATEWAY_TOKEN because trusted-proxy and token auth are mutually exclusive",
+        "gateway auth mode is trusted-proxy, but a shared token is also configured; remove gateway.auth.token / ALLBOT_GATEWAY_TOKEN because trusted-proxy and token auth are mutually exclusive",
       );
     }
   }

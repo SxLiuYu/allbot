@@ -19,7 +19,7 @@ vi.mock("./node-require.js", () => ({
 }));
 
 let originalTestFileLog: string | undefined;
-let originalKaijiBotLogLevel: string | undefined;
+let originalAllBotLogLevel: string | undefined;
 let logging: typeof import("../logging.js");
 
 beforeAll(async () => {
@@ -27,10 +27,10 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  originalTestFileLog = process.env.KAIJIBOT_TEST_FILE_LOG;
-  originalKaijiBotLogLevel = process.env.KAIJIBOT_LOG_LEVEL;
-  delete process.env.KAIJIBOT_TEST_FILE_LOG;
-  delete process.env.KAIJIBOT_LOG_LEVEL;
+  originalTestFileLog = process.env.ALLBOT_TEST_FILE_LOG;
+  originalAllBotLogLevel = process.env.ALLBOT_LOG_LEVEL;
+  delete process.env.ALLBOT_TEST_FILE_LOG;
+  delete process.env.ALLBOT_LOG_LEVEL;
   readLoggingConfigMock.mockClear();
   shouldSkipMutatingLoggingConfigReadMock.mockReset();
   shouldSkipMutatingLoggingConfigReadMock.mockReturnValue(false);
@@ -41,14 +41,14 @@ beforeEach(() => {
 
 afterEach(() => {
   if (originalTestFileLog === undefined) {
-    delete process.env.KAIJIBOT_TEST_FILE_LOG;
+    delete process.env.ALLBOT_TEST_FILE_LOG;
   } else {
-    process.env.KAIJIBOT_TEST_FILE_LOG = originalTestFileLog;
+    process.env.ALLBOT_TEST_FILE_LOG = originalTestFileLog;
   }
-  if (originalKaijiBotLogLevel === undefined) {
-    delete process.env.KAIJIBOT_LOG_LEVEL;
+  if (originalAllBotLogLevel === undefined) {
+    delete process.env.ALLBOT_LOG_LEVEL;
   } else {
-    process.env.KAIJIBOT_LOG_LEVEL = originalKaijiBotLogLevel;
+    process.env.ALLBOT_LOG_LEVEL = originalAllBotLogLevel;
   }
   logging.resetLogger();
   logging.setLoggerOverride(null);
@@ -64,13 +64,13 @@ describe("getResolvedLoggerSettings", () => {
   });
 
   it("reads logging config when test file logging is explicitly enabled", () => {
-    process.env.KAIJIBOT_TEST_FILE_LOG = "1";
+    process.env.ALLBOT_TEST_FILE_LOG = "1";
     const settings = logging.getResolvedLoggerSettings();
     expect(settings.level).toBe("info");
   });
 
   it("skips fallback config loads for config schema", () => {
-    process.env.KAIJIBOT_TEST_FILE_LOG = "1";
+    process.env.ALLBOT_TEST_FILE_LOG = "1";
     shouldSkipMutatingLoggingConfigReadMock.mockReturnValue(true);
 
     const settings = logging.getResolvedLoggerSettings();

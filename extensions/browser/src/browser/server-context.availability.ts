@@ -14,8 +14,8 @@ import {
 import {
   isChromeCdpReady,
   isChromeReachable,
-  launchKaijiBotChrome,
-  stopKaijiBotChrome,
+  launchAllBotChrome,
+  stopAllBotChrome,
 } from "./chrome.js";
 import type { ResolvedBrowserProfile } from "./config.js";
 import { BrowserProfileUnavailableError } from "./errors.js";
@@ -115,7 +115,7 @@ export function createProfileAvailability({
 
     const previousProfile = reconcile.previousProfile;
     if (profileState.running) {
-      await stopKaijiBotChrome(profileState.running).catch(() => {});
+      await stopAllBotChrome(profileState.running).catch(() => {});
       setProfileRunning(null);
     }
     if (getBrowserProfileCapabilities(previousProfile).usesChromeMcp) {
@@ -128,7 +128,7 @@ export function createProfileAvailability({
   };
 
   const waitForCdpReadyAfterLaunch = async (): Promise<void> => {
-    // launchKaijiBotChrome() can return before Chrome is fully ready to serve /json/version + CDP WS.
+    // launchAllBotChrome() can return before Chrome is fully ready to serve /json/version + CDP WS.
     // If a follow-up call races ahead, we can hit PortInUseError trying to launch again on the same port.
     const deadlineMs = Date.now() + CDP_READY_AFTER_LAUNCH_WINDOW_MS;
     while (Date.now() < deadlineMs) {
@@ -195,7 +195,7 @@ export function createProfileAvailability({
           return;
         }
       }
-      // Browser control service can restart while a loopback KaijiBot browser is still
+      // Browser control service can restart while a loopback AllBot browser is still
       // alive. Give that pre-existing browser one longer probe window before falling
       // back to local executable resolution.
       if (!attachOnly && !remoteCdp && profile.cdpIsLoopback && !profileState.running) {
@@ -213,7 +213,7 @@ export function createProfileAvailability({
             : `Browser attachOnly is enabled and profile "${profile.name}" is not running.`,
         );
       }
-      const launched = await launchKaijiBotChrome(
+      const launched = await launchAllBotChrome(
         ensureOpts?.forceHeaded ? { ...current.resolved, headless: false } : current.resolved,
         profile,
       );
@@ -221,7 +221,7 @@ export function createProfileAvailability({
       try {
         await waitForCdpReadyAfterLaunch();
       } catch (err) {
-        await stopKaijiBotChrome(launched).catch(() => {});
+        await stopAllBotChrome(launched).catch(() => {});
         setProfileRunning(null);
         throw err;
       }
@@ -255,15 +255,15 @@ export function createProfileAvailability({
     // HTTP responds but WebSocket fails - port in use by something else.
     if (!profileState.running) {
       throw new BrowserProfileUnavailableError(
-        `Port ${profile.cdpPort} is in use for profile "${profile.name}" but not by kaijibot. ` +
+        `Port ${profile.cdpPort} is in use for profile "${profile.name}" but not by allbot. ` +
           `Run action=reset-profile profile=${profile.name} to kill the process.`,
       );
     }
 
-    await stopKaijiBotChrome(profileState.running);
+    await stopAllBotChrome(profileState.running);
     setProfileRunning(null);
 
-    const relaunched = await launchKaijiBotChrome(
+    const relaunched = await launchAllBotChrome(
       ensureOpts?.forceHeaded ? { ...current.resolved, headless: false } : current.resolved,
       profile,
     );
@@ -292,7 +292,7 @@ export function createProfileAvailability({
       }
       return { stopped: idleStop.stopped };
     }
-    await stopKaijiBotChrome(profileState.running);
+    await stopAllBotChrome(profileState.running);
     setProfileRunning(null);
     return { stopped: true };
   };

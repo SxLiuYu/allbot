@@ -10,7 +10,7 @@ import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import { prepareSimpleCompletionModel } from "../../agents/simple-completion-runtime.js";
 import { loadSoulPresetContent } from "../../agents/soul-preset.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { resolveConfigDir } from "../../utils.js";
 import {
@@ -167,7 +167,7 @@ export type WebSearchResult = {
 export type LlmInsightDeps = {
   complete: typeof complete;
   prepareModel: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     modelRef?: string,
   ) => Promise<{ model: Model<Api>; auth: ResolvedProviderAuth } | { error: string }>;
   webSearch?: (query: string) => Promise<WebSearchResult[]>;
@@ -266,7 +266,7 @@ function rememberGenerationPrompt(candidates: InsightCandidate[], prompt: string
 export async function generateInsightCandidatesLLM(
   persona: PersonaTree,
   input: InsightEngineInput,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options?: LlmInsightOptions,
 ): Promise<InsightCandidate[]> {
@@ -624,7 +624,7 @@ export async function generateInsightCandidatesLLM(
 async function generateExtendMode(
   persona: PersonaTree,
   input: InsightEngineInput,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options: LlmInsightOptions | undefined,
   maxCandidates: number,
@@ -1340,7 +1340,7 @@ function matchWebResultsToDomains(
 export async function matchWebResultsToDomainsLLM(
   webResults: WebSearchResult[],
   persona: PersonaTree,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   extraTargetDomains: string[] = [],
 ): Promise<Map<string, string[]>> {
@@ -2133,7 +2133,7 @@ function clamp01(value: number): number {
 const PERSONA_WORKSPACE_FILES = ["SOUL.md", "IDENTITY.md", "USER.md"] as const;
 
 export async function loadWorkspacePersonaContext(workspaceDir?: string): Promise<string> {
-  const dir = workspaceDir ?? path.join(os.homedir(), ".kaijibot", "workspace");
+  const dir = workspaceDir ?? path.join(os.homedir(), ".allbot", "workspace");
   const parts: string[] = [];
   for (const filename of PERSONA_WORKSPACE_FILES) {
     try {
@@ -2155,7 +2155,7 @@ export async function loadWorkspacePersonaContext(workspaceDir?: string): Promis
  *   3. `undefined` (prompt stays backward compatible).
  */
 export async function loadSoulContentForInsight(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   workspaceDir?: string;
 }): Promise<string | undefined> {
@@ -2195,7 +2195,7 @@ export async function loadSoulContentForInsight(params: {
  * keeps proactive insights from repeating the same mistakes.
  */
 export async function loadCorrectionContextForInsight(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentId?: string;
   userId?: string;
   locale?: CognitiveLocale;
@@ -2226,7 +2226,7 @@ export async function loadCorrectionContextForInsight(params: {
 export async function loadIdentityContextForInsight(
   workspaceDir?: string,
 ): Promise<string | undefined> {
-  const dir = workspaceDir ?? path.join(os.homedir(), ".kaijibot", "workspace");
+  const dir = workspaceDir ?? path.join(os.homedir(), ".allbot", "workspace");
   const parts: string[] = [];
   for (const filename of ["IDENTITY.md", "USER.md"] as const) {
     try {
@@ -2420,7 +2420,7 @@ Respond with ONLY a JSON array (no markdown, no code fences):
 export async function critiqueInsightWithLLM(
   candidate: InsightCandidate,
   persona: PersonaTree,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options?: LlmInsightOptions,
 ): Promise<LlmCritiqueResult | null> {
@@ -2510,7 +2510,7 @@ export async function refineInsightWithLLM(
   candidate: InsightCandidate,
   critique: LlmCritiqueResult,
   persona: PersonaTree,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options?: RefineInsightOptions,
 ): Promise<InsightCandidate | null> {
@@ -2813,7 +2813,7 @@ export async function judgeInsightWithLLM(
   candidate: InsightCandidate,
   recentInsightContents: string[],
   persona: PersonaTree | undefined,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options?: LlmInsightOptions,
 ): Promise<InsightJudgeResult> {
@@ -2928,7 +2928,7 @@ export async function judgeInsightWithLLM(
 export async function verifyInsightWithLLM(
   candidate: InsightCandidate,
   persona: PersonaTree,
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options?: LlmInsightOptions,
 ): Promise<VerificationOutcome> {
@@ -2960,7 +2960,7 @@ export async function verifyInsightWithLLM(
 export async function checkSemanticNoveltyWithLLM(
   candidate: InsightCandidate,
   recentInsightContents: string[],
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   deps: LlmInsightDeps,
   options?: LlmInsightOptions,
   persona?: PersonaTree,

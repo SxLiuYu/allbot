@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { runHeartbeatOnce, type HeartbeatDeps } from "./heartbeat-runner.js";
 import { installHeartbeatRunnerTestRuntime } from "./heartbeat-runner.test-harness.js";
 import {
@@ -33,7 +33,7 @@ async function runTelegramRelay(params: {
       },
     },
     session: { store: params.storePath },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 
   await seedMainSessionStore(params.storePath, cfg, {
     lastChannel: "telegram",

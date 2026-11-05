@@ -5,8 +5,8 @@ export type BrowserProfileConfig = {
   cdpUrl?: string;
   /** Explicit user data directory for existing-session Chrome MCP attachment. */
   userDataDir?: string;
-  /** Profile driver (default: kaijibot). */
-  driver?: "kaijibot" | "clawd" | "existing-session";
+  /** Profile driver (default: allbot). */
+  driver?: "allbot" | "clawd" | "existing-session";
   /** If true, never launch a browser for this profile; only attach. Falls back to browser.attachOnly. */
   attachOnly?: boolean;
   /** Profile color (hex). Auto-assigned at creation. */
@@ -48,7 +48,7 @@ export type BrowserConfig = {
   remoteCdpTimeoutMs?: number;
   /** Remote CDP WebSocket handshake timeout (ms). Default: max(remoteCdpTimeoutMs * 2, 2000). */
   remoteCdpHandshakeTimeoutMs?: number;
-  /** Accent color for the kaijibot browser profile (hex). Default: #FF4500 */
+  /** Accent color for the allbot browser profile (hex). Default: #FF4500 */
   color?: string;
   /** Override the browser executable path (all platforms). */
   executablePath?: string;

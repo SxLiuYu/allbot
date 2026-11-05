@@ -1,8 +1,8 @@
-import { ensureModelAllowlistEntry } from "kaijibot/plugin-sdk/provider-onboard";
+import { ensureModelAllowlistEntry } from "allbot/plugin-sdk/provider-onboard";
 import {
   applyAgentDefaultModelPrimary,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 
 export const OPENAI_DEFAULT_MODEL = "openai/gpt-5.4";
 export const OPENAI_CODEX_DEFAULT_MODEL = "openai-codex/gpt-5.4";
@@ -12,7 +12,7 @@ export const OPENAI_DEFAULT_TTS_VOICE = "alloy";
 export const OPENAI_DEFAULT_AUDIO_TRANSCRIPTION_MODEL = "gpt-4o-transcribe";
 export const OPENAI_DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small";
 
-export function applyOpenAIProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpenAIProviderConfig(cfg: AllBotConfig): AllBotConfig {
   const next = ensureModelAllowlistEntry({
     cfg,
     modelRef: OPENAI_DEFAULT_MODEL,
@@ -35,6 +35,6 @@ export function applyOpenAIProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
   };
 }
 
-export function applyOpenAIConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyOpenAIConfig(cfg: AllBotConfig): AllBotConfig {
   return applyAgentDefaultModelPrimary(applyOpenAIProviderConfig(cfg), OPENAI_DEFAULT_MODEL);
 }

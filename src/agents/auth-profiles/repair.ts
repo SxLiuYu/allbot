@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { AuthProfileConfig } from "../../config/types.js";
 import { findNormalizedProviderKey, normalizeProviderId } from "../provider-id.js";
 import { resolveAuthProfileMetadata } from "./identity.js";
@@ -22,7 +22,7 @@ function isEmailLike(value: string): boolean {
 }
 
 export function suggestOAuthProfileIdForLegacyDefault(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store: AuthProfileStore;
   provider: string;
   legacyProfileId: string;
@@ -83,7 +83,7 @@ export function suggestOAuthProfileIdForLegacyDefault(params: {
 }
 
 export function repairOAuthProfileIdMismatch(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   store: AuthProfileStore;
   provider: string;
   legacyProfileId?: string;
@@ -148,7 +148,7 @@ export function repairOAuthProfileIdMismatch(params: {
     return { ...order, [resolvedKey]: deduped };
   })();
 
-  const nextCfg: KaijiBotConfig = {
+  const nextCfg: AllBotConfig = {
     ...params.cfg,
     auth: {
       ...params.cfg.auth,

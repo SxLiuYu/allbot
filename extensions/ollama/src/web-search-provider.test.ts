@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createOllamaWebSearchProvider as createContractOllamaWebSearchProvider } from "../web-search-contract-api.js";
 import {
@@ -11,7 +11,7 @@ const { fetchWithSsrFGuardMock } = vi.hoisted(() => ({
   fetchWithSsrFGuardMock: vi.fn(),
 }));
 
-vi.mock("kaijibot/plugin-sdk/ssrf-runtime", () => ({
+vi.mock("allbot/plugin-sdk/ssrf-runtime", () => ({
   fetchWithSsrFGuard: fetchWithSsrFGuardMock,
 }));
 
@@ -20,11 +20,11 @@ type OllamaProviderConfigOverride = Partial<{
   apiKey: string;
   baseUrl: string;
   models: NonNullable<
-    NonNullable<NonNullable<KaijiBotConfig["models"]>["providers"]>[string]
+    NonNullable<NonNullable<AllBotConfig["models"]>["providers"]>[string]
   >["models"];
 }>;
 
-function createOllamaConfig(provider: OllamaProviderConfigOverride = {}): KaijiBotConfig {
+function createOllamaConfig(provider: OllamaProviderConfigOverride = {}): AllBotConfig {
   return {
     models: {
       providers: {
@@ -118,7 +118,7 @@ describe("ollama web search provider", () => {
     if (!tool) {
       throw new Error("Expected tool definition");
     }
-    const result = await tool.execute({ query: "kaijibot docs", count: 3 });
+    const result = await tool.execute({ query: "allbot docs", count: 3 });
 
     expect(fetchWithSsrFGuardMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -137,11 +137,11 @@ describe("ollama web search provider", () => {
         ),
       ),
     ).toEqual({
-      query: "kaijibot docs",
+      query: "allbot docs",
       max_results: 3,
     });
     expect(result).toMatchObject({
-      query: "kaijibot docs",
+      query: "allbot docs",
       provider: "ollama",
       count: 1,
       results: [{ url: "https://example.com/docs" }],
@@ -155,7 +155,7 @@ describe("ollama web search provider", () => {
       release: vi.fn(async () => {}),
     });
 
-    await expect(runOllamaWebSearch({ query: "latest kaijibot release" })).rejects.toThrow(
+    await expect(runOllamaWebSearch({ query: "latest allbot release" })).rejects.toThrow(
       "ollama signin",
     );
   });

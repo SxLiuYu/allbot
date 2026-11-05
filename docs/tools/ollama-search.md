@@ -9,14 +9,14 @@ title: "Ollama Web Search"
 
 # Ollama Web Search
 
-KaijiBot supports **Ollama Web Search** as a bundled `web_search` provider.
+AllBot supports **Ollama Web Search** as a bundled `web_search` provider.
 It uses Ollama's experimental web-search API and returns structured results
 with titles, URLs, and snippets.
 
 Unlike the Ollama model provider, this setup does not need an API key by
 default. It does require:
 
-- an Ollama host that is reachable from KaijiBot
+- an Ollama host that is reachable from AllBot
 - `ollama signin`
 
 ## Setup
@@ -37,7 +37,7 @@ default. It does require:
     Run:
 
     ```bash
-    kaijibot configure --section web
+    allbot configure --section web
     ```
 
     Then select **Ollama Web Search** as the provider.
@@ -76,18 +76,18 @@ Optional Ollama host override:
 }
 ```
 
-If no explicit Ollama base URL is set, KaijiBot uses `http://127.0.0.1:11434`.
+If no explicit Ollama base URL is set, AllBot uses `http://127.0.0.1:11434`.
 
-If your Ollama host expects bearer auth, KaijiBot reuses
+If your Ollama host expects bearer auth, AllBot reuses
 `models.providers.ollama.apiKey` (or the matching env-backed provider auth)
 for web-search requests too.
 
 ## Notes
 
 - No web-search-specific API key field is required for this provider.
-- If the Ollama host is auth-protected, KaijiBot reuses the normal Ollama
+- If the Ollama host is auth-protected, AllBot reuses the normal Ollama
   provider API key when present.
-- KaijiBot warns during setup if Ollama is unreachable or not signed in, but
+- AllBot warns during setup if Ollama is unreachable or not signed in, but
   it does not block selection.
 - Runtime auto-detect can fall back to Ollama Web Search when no higher-priority
   credentialed provider is configured.

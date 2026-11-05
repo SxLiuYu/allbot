@@ -1,13 +1,13 @@
 import type { Api, Model } from "@earendil-works/pi-ai";
 import type { SessionManager } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { getCompactionSafeguardRuntime } from "../pi-hooks/compaction-safeguard-runtime.js";
 import compactionSafeguardExtension from "../pi-hooks/compaction-safeguard.js";
 import contextPruningExtension from "../pi-hooks/context-pruning.js";
 import { buildEmbeddedExtensionFactories } from "./extensions.js";
 
-function buildSafeguardFactories(cfg: KaijiBotConfig) {
+function buildSafeguardFactories(cfg: AllBotConfig) {
   const sessionManager = {} as SessionManager;
   const model = {
     id: "claude-sonnet-4-20250514",
@@ -26,7 +26,7 @@ function buildSafeguardFactories(cfg: KaijiBotConfig) {
 }
 
 function expectSafeguardRuntime(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   expectedRuntime: { qualityGuardEnabled: boolean; qualityGuardMaxRetries?: number },
 ) {
   const { factories, sessionManager } = buildSafeguardFactories(cfg);
@@ -45,7 +45,7 @@ describe("buildEmbeddedExtensionFactories", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expectSafeguardRuntime(cfg, {
       qualityGuardEnabled: false,
     });
@@ -64,7 +64,7 @@ describe("buildEmbeddedExtensionFactories", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     expectSafeguardRuntime(cfg, {
       qualityGuardEnabled: true,
       qualityGuardMaxRetries: 2,
@@ -81,7 +81,7 @@ describe("buildEmbeddedExtensionFactories", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       sessionManager: {} as SessionManager,
       provider: "litellm",
       modelId: "claude-sonnet-4-6",

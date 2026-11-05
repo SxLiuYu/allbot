@@ -2,8 +2,8 @@ export {
   buildPluginConfigSchema,
   definePluginEntry,
   type AnyAgentTool,
-  type KaijiBotConfig,
-  type KaijiBotPluginApi,
-  type KaijiBotPluginConfigSchema,
-} from "kaijibot/plugin-sdk/plugin-entry";
-export { z } from "kaijibot/plugin-sdk/zod";
+  type AllBotConfig,
+  type AllBotPluginApi,
+  type AllBotPluginConfigSchema,
+} from "allbot/plugin-sdk/plugin-entry";
+export { z } from "allbot/plugin-sdk/zod";

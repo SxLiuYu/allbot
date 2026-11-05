@@ -1,6 +1,6 @@
 import path from "node:path";
 import { describe, expect, it, test, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { applyAgentDefaultPrimaryModel } from "../plugins/provider-model-primary.js";
 import type { RuntimeEnv } from "../runtime.js";
 import {
@@ -14,23 +14,23 @@ describe("buildCleanupPlan", () => {
     const tmpRoot = path.join(path.parse(process.cwd()).root, "tmp");
     const cfg = {
       agents: {
-        defaults: { workspace: path.join(tmpRoot, "kaijibot-workspace-1") },
-        list: [{ workspace: path.join(tmpRoot, "kaijibot-workspace-2") }],
+        defaults: { workspace: path.join(tmpRoot, "allbot-workspace-1") },
+        list: [{ workspace: path.join(tmpRoot, "allbot-workspace-2") }],
       },
     };
     const plan = buildCleanupPlan({
-      cfg: cfg as unknown as KaijiBotConfig,
-      stateDir: path.join(tmpRoot, "kaijibot-state"),
-      configPath: path.join(tmpRoot, "kaijibot-state", "kaijibot.json"),
-      oauthDir: path.join(tmpRoot, "kaijibot-oauth"),
+      cfg: cfg as unknown as AllBotConfig,
+      stateDir: path.join(tmpRoot, "allbot-state"),
+      configPath: path.join(tmpRoot, "allbot-state", "allbot.json"),
+      oauthDir: path.join(tmpRoot, "allbot-oauth"),
     });
 
     expect(plan.configInsideState).toBe(true);
     expect(plan.oauthInsideState).toBe(false);
     expect(new Set(plan.workspaceDirs)).toEqual(
       new Set([
-        path.join(tmpRoot, "kaijibot-workspace-1"),
-        path.join(tmpRoot, "kaijibot-workspace-2"),
+        path.join(tmpRoot, "allbot-workspace-1"),
+        path.join(tmpRoot, "allbot-workspace-2"),
       ]),
     );
   });
@@ -38,14 +38,14 @@ describe("buildCleanupPlan", () => {
 
 describe("applyAgentDefaultPrimaryModel", () => {
   it("does not mutate when already set", () => {
-    const cfg = { agents: { defaults: { model: { primary: "a/b" } } } } as KaijiBotConfig;
+    const cfg = { agents: { defaults: { model: { primary: "a/b" } } } } as AllBotConfig;
     const result = applyAgentDefaultPrimaryModel({ cfg, model: "a/b" });
     expect(result.changed).toBe(false);
     expect(result.next).toBe(cfg);
   });
 
   it("normalizes legacy models", () => {
-    const cfg = { agents: { defaults: { model: { primary: "legacy" } } } } as KaijiBotConfig;
+    const cfg = { agents: { defaults: { model: { primary: "legacy" } } } } as AllBotConfig;
     const result = applyAgentDefaultPrimaryModel({
       cfg,
       model: "a/b",
@@ -69,11 +69,11 @@ describe("cleanup path removals", () => {
 
   it("removes state and only linked paths outside state", async () => {
     const runtime = createRuntimeMock();
-    const tmpRoot = path.join(path.parse(process.cwd()).root, "tmp", "kaijibot-cleanup");
+    const tmpRoot = path.join(path.parse(process.cwd()).root, "tmp", "allbot-cleanup");
     await removeStateAndLinkedPaths(
       {
         stateDir: path.join(tmpRoot, "state"),
-        configPath: path.join(tmpRoot, "state", "kaijibot.json"),
+        configPath: path.join(tmpRoot, "state", "allbot.json"),
         oauthDir: path.join(tmpRoot, "oauth"),
         configInsideState: true,
         oauthInsideState: false,
@@ -85,19 +85,19 @@ describe("cleanup path removals", () => {
     const joinedLogs = runtime.log.mock.calls
       .map(([line]) => line.replaceAll("\\", "/"))
       .join("\n");
-    expect(joinedLogs).toContain("/tmp/kaijibot-cleanup/state");
-    expect(joinedLogs).toContain("/tmp/kaijibot-cleanup/oauth");
-    expect(joinedLogs).not.toContain("kaijibot.json");
+    expect(joinedLogs).toContain("/tmp/allbot-cleanup/state");
+    expect(joinedLogs).toContain("/tmp/allbot-cleanup/oauth");
+    expect(joinedLogs).not.toContain("allbot.json");
   });
 
   it("removes every workspace directory", async () => {
     const runtime = createRuntimeMock();
-    const workspaces = ["/tmp/kaijibot-workspace-1", "/tmp/kaijibot-workspace-2"];
+    const workspaces = ["/tmp/allbot-workspace-1", "/tmp/allbot-workspace-2"];
 
     await removeWorkspaceDirs(workspaces, runtime, { dryRun: true });
 
     const logs = runtime.log.mock.calls.map(([line]) => line);
-    expect(logs).toContain("[dry-run] remove /tmp/kaijibot-workspace-1");
-    expect(logs).toContain("[dry-run] remove /tmp/kaijibot-workspace-2");
+    expect(logs).toContain("[dry-run] remove /tmp/allbot-workspace-1");
+    expect(logs).toContain("[dry-run] remove /tmp/allbot-workspace-2");
   });
 });

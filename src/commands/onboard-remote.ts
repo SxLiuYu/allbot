@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SecretInput } from "../config/types.secrets.js";
 import { isSecureWebSocketUrl } from "../gateway/net.js";
 import { discoverGatewayBeacons, type GatewayBonjourBeacon } from "../infra/bonjour-discovery.js";
@@ -34,22 +34,22 @@ function validateGatewayWebSocketUrl(value: string): string | undefined {
   }
   if (
     !isSecureWebSocketUrl(trimmed, {
-      allowPrivateWs: process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS === "1",
+      allowPrivateWs: process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS === "1",
     })
   ) {
     return (
       "Use wss:// for remote hosts, or ws://127.0.0.1/localhost via SSH tunnel. " +
-      "Break-glass: KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS=1 for trusted private networks."
+      "Break-glass: ALLBOT_ALLOW_INSECURE_PRIVATE_WS=1 for trusted private networks."
     );
   }
   return undefined;
 }
 
 export async function promptRemoteGatewayConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   prompter: WizardPrompter,
   options?: { secretInputMode?: SecretInputMode },
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   let selectedBeacon: GatewayBonjourBeacon | null = null;
   let suggestedUrl = cfg.gateway?.remote?.url ?? DEFAULT_GATEWAY_URL;
   let discoveryTlsFingerprint: string | undefined;
@@ -177,7 +177,7 @@ export async function promptRemoteGatewayConfig(
       copy: {
         modeMessage: "How do you want to provide this gateway token?",
         plaintextLabel: "Enter token now",
-        plaintextHint: "Stores the token directly in KaijiBot config",
+        plaintextHint: "Stores the token directly in AllBot config",
       },
     });
     if (selectedMode === "ref") {
@@ -185,10 +185,10 @@ export async function promptRemoteGatewayConfig(
         provider: "gateway-remote-token",
         config: cfg,
         prompter,
-        preferredEnvVar: "KAIJIBOT_GATEWAY_TOKEN",
+        preferredEnvVar: "ALLBOT_GATEWAY_TOKEN",
         copy: {
           sourceMessage: "Where is this gateway token stored?",
-          envVarPlaceholder: "KAIJIBOT_GATEWAY_TOKEN",
+          envVarPlaceholder: "ALLBOT_GATEWAY_TOKEN",
         },
       });
       token = resolved.ref;
@@ -209,7 +209,7 @@ export async function promptRemoteGatewayConfig(
       copy: {
         modeMessage: "How do you want to provide this gateway password?",
         plaintextLabel: "Enter password now",
-        plaintextHint: "Stores the password directly in KaijiBot config",
+        plaintextHint: "Stores the password directly in AllBot config",
       },
     });
     if (selectedMode === "ref") {
@@ -217,10 +217,10 @@ export async function promptRemoteGatewayConfig(
         provider: "gateway-remote-password",
         config: cfg,
         prompter,
-        preferredEnvVar: "KAIJIBOT_GATEWAY_PASSWORD",
+        preferredEnvVar: "ALLBOT_GATEWAY_PASSWORD",
         copy: {
           sourceMessage: "Where is this gateway password stored?",
-          envVarPlaceholder: "KAIJIBOT_GATEWAY_PASSWORD",
+          envVarPlaceholder: "ALLBOT_GATEWAY_PASSWORD",
         },
       });
       password = resolved.ref;

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveSecretInputRef } from "../config/types.secrets.js";
 import { trimToUndefined } from "./credentials.js";
 import {
@@ -10,7 +10,7 @@ export type GatewayAuthTokenResolutionSource = "explicit" | "config" | "secretRe
 export type GatewayAuthTokenEnvFallback = "never" | "no-secret-ref" | "always";
 
 export async function resolveGatewayAuthToken(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   explicitToken?: string;
   envFallback?: GatewayAuthTokenEnvFallback;
@@ -36,7 +36,7 @@ export async function resolveGatewayAuthToken(params: {
     defaults: params.cfg.secrets?.defaults,
   }).ref;
   const envFallback = params.envFallback ?? "always";
-  const envToken = trimToUndefined(params.env.KAIJIBOT_GATEWAY_TOKEN);
+  const envToken = trimToUndefined(params.env.ALLBOT_GATEWAY_TOKEN);
 
   if (!tokenRef) {
     const configToken = trimToUndefined(tokenInput);

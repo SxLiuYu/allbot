@@ -1,4 +1,4 @@
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_LOCAL_MODEL,
@@ -12,7 +12,7 @@ import {
   type MemoryEmbeddingProviderAdapter,
   type MemoryEmbeddingProviderCreateOptions,
   type MemoryEmbeddingProviderRuntime,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
 import { canAutoSelectLocal } from "./provider-adapters.js";
 
 export {
@@ -23,7 +23,7 @@ export {
   DEFAULT_OLLAMA_EMBEDDING_MODEL,
   DEFAULT_OPENAI_EMBEDDING_MODEL,
   DEFAULT_VOYAGE_EMBEDDING_MODEL,
-} from "kaijibot/plugin-sdk/memory-core-host-engine-embeddings";
+} from "allbot/plugin-sdk/memory-core-host-engine-embeddings";
 
 export type EmbeddingProvider = MemoryEmbeddingProvider;
 export type EmbeddingProviderId = string;

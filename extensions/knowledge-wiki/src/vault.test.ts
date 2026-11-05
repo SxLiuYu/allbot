@@ -24,7 +24,7 @@ describe("initializeWikiVault", () => {
       await expect(access(path.join(TMP, "wiki", dir))).resolves.toBeUndefined();
     }
     await expect(
-      access(path.join(TMP, "wiki", ".kaijibot-wiki", "cache")),
+      access(path.join(TMP, "wiki", ".allbot-wiki", "cache")),
     ).resolves.toBeUndefined();
   });
 

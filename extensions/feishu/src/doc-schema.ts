@@ -1,4 +1,4 @@
-import { stringEnum } from "kaijibot/plugin-sdk/core";
+import { stringEnum } from "allbot/plugin-sdk/core";
 import { Type, type Static } from "typebox";
 
 export const FeishuDocSchema = Type.Object({

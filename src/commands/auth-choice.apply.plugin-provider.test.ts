@@ -38,9 +38,9 @@ vi.mock("../agents/workspace.js", () => ({
   resolveDefaultAgentWorkspaceDir,
 }));
 
-const resolveKaijiBotAgentDir = vi.hoisted(() => vi.fn(() => "/tmp/agent"));
+const resolveAllBotAgentDir = vi.hoisted(() => vi.fn(() => "/tmp/agent"));
 vi.mock("../agents/agent-paths.js", () => ({
-  resolveKaijiBotAgentDir,
+  resolveAllBotAgentDir,
 }));
 
 const applyAuthProfileConfig = vi.hoisted(() => vi.fn((config) => config));

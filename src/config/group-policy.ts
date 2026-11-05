@@ -5,7 +5,7 @@ import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalString,
 } from "../shared/string-coerce.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import {
   parseToolsBySenderTypedKey,
   type GroupToolPolicyBySenderConfig,
@@ -117,7 +117,7 @@ function warnLegacyToolsBySenderKey(rawKey: string) {
     `toolsBySender key "${trimmed}" is deprecated. Use explicit prefixes (id:, e164:, username:, name:). Legacy unprefixed keys are matched as id only.`,
     {
       type: "DeprecationWarning",
-      code: "KAIJIBOT_TOOLS_BY_SENDER_UNTYPED_KEY",
+      code: "ALLBOT_TOOLS_BY_SENDER_UNTYPED_KEY",
     },
   );
 }
@@ -287,7 +287,7 @@ export function resolveToolsBySender(
 }
 
 function resolveChannelGroups(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel: GroupPolicyChannel,
   accountId?: string | null,
 ): ChannelGroups | undefined {
@@ -308,7 +308,7 @@ function resolveChannelGroups(
 type ChannelGroupPolicyMode = "open" | "allowlist" | "disabled";
 
 function resolveChannelGroupPolicyMode(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channel: GroupPolicyChannel,
   accountId?: string | null,
 ): ChannelGroupPolicyMode | undefined {
@@ -330,7 +330,7 @@ function resolveChannelGroupPolicyMode(
 }
 
 export function resolveChannelGroupPolicy(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: GroupPolicyChannel;
   groupId?: string | null;
   accountId?: string | null;
@@ -366,7 +366,7 @@ export function resolveChannelGroupPolicy(params: {
 }
 
 export function resolveChannelGroupRequireMention(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: GroupPolicyChannel;
   groupId?: string | null;
   accountId?: string | null;
@@ -397,7 +397,7 @@ export function resolveChannelGroupRequireMention(params: {
 
 export function resolveChannelGroupToolsPolicy(
   params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     channel: GroupPolicyChannel;
     groupId?: string | null;
     accountId?: string | null;

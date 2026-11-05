@@ -1,6 +1,6 @@
 import type { Model } from "@earendil-works/pi-ai";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const createAnthropicVertexStreamFnForModel = vi.fn();
 const ensureCustomApiRegistered = vi.fn();
@@ -64,7 +64,7 @@ describe("prepareModelForSimpleCompletion", () => {
       maxTokens: 4096,
       headers: {},
     };
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       models: {
         providers: {
           ollama: {
@@ -115,12 +115,12 @@ describe("prepareModelForSimpleCompletion", () => {
 
     expect(createAnthropicVertexStreamFnForModel).toHaveBeenCalledWith(model);
     expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-      "kaijibot-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
+      "allbot-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
       "vertex-stream",
     );
     expect(result).toEqual({
       ...model,
-      api: "kaijibot-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
+      api: "allbot-anthropic-vertex-simple:https%3A%2F%2Fus-central1-aiplatform.googleapis.com",
     });
   });
 
@@ -142,7 +142,7 @@ describe("prepareModelForSimpleCompletion", () => {
     buildTransportAwareSimpleStreamFn.mockReturnValueOnce("transport-stream");
     prepareTransportAwareSimpleModel.mockReturnValueOnce({
       ...model,
-      api: "kaijibot-openai-responses-transport",
+      api: "allbot-openai-responses-transport",
     });
 
     const result = prepareModelForSimpleCompletion({ model });
@@ -150,12 +150,12 @@ describe("prepareModelForSimpleCompletion", () => {
     expect(prepareTransportAwareSimpleModel).toHaveBeenCalledWith(model);
     expect(buildTransportAwareSimpleStreamFn).toHaveBeenCalledWith(model);
     expect(ensureCustomApiRegistered).toHaveBeenCalledWith(
-      "kaijibot-openai-responses-transport",
+      "allbot-openai-responses-transport",
       "transport-stream",
     );
     expect(result).toEqual({
       ...model,
-      api: "kaijibot-openai-responses-transport",
+      api: "allbot-openai-responses-transport",
     });
   });
 });

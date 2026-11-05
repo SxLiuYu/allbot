@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import {
   normalizePluginsConfigWithResolver,
@@ -45,7 +45,7 @@ function createRegistryPluginIdNormalizer(
 
 export function resolvePluginSkillDirs(params: {
   workspaceDir: string | undefined;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }): string[] {
   const workspaceDir = (params.workspaceDir ?? "").trim();
   if (!workspaceDir) {

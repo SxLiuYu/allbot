@@ -45,8 +45,8 @@ export type {
   AnyAgentTool,
   CliBackendPlugin,
   MediaUnderstandingProviderPlugin,
-  KaijiBotPluginApi,
-  KaijiBotPluginConfigSchema,
+  AllBotPluginApi,
+  AllBotPluginConfigSchema,
   PluginLogger,
   ProviderAuthContext,
   ProviderAuthResult,
@@ -77,9 +77,9 @@ export type {
   TaskRunDetail,
   TaskRunView,
 } from "../plugins/runtime/task-domain-types.js";
-export type { KaijiBotConfig } from "../config/config.js";
-/** @deprecated Use KaijiBotConfig instead */
-export type { KaijiBotConfig as ClawdbotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
+/** @deprecated Use AllBotConfig instead */
+export type { AllBotConfig as ClawdbotConfig } from "../config/config.js";
 export type {
   MemoryPluginCapability,
   MemoryPluginPublicArtifact,

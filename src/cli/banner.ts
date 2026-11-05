@@ -87,13 +87,13 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
 }
 
 const BANNER_ASCII = [
-  "██╗  ██╗     █████╗     ██╗         ██╗    ██╗    ██████╗      ██████╗     ████████╗",
-  "██║ ██╔╝    ██╔══██╗    ██║         ██║    ██║    ██╔══██╗    ██╔═══██╗    ╚══██╔══╝",
-  "█████╔╝     ███████║    ██║         ██║    ██║    ██████╔╝    ██║   ██║       ██║   ",
-  "██╔═██╗     ██╔══██║    ██║    ██   ██║    ██║    ██╔══██╗    ██║   ██║       ██║   ",
-  "██║  ██╗    ██║  ██║    ██║    ╚█████╔╝    ██║    ██████╔╝    ╚██████╔╝       ██║   ",
-  "╚═╝  ╚═╝    ╚═╝  ╚═╝    ╚═╝     ╚════╝     ╚═╝    ╚═════╝      ╚═════╝        ╚═╝  ",
-  "                                    👾 KAIJIBOT 👾                    ",
+  " █████╗     ██╗         ██╗         ██████╗      ██████╗     ████████╗",
+  "██╔══██╗    ██║         ██║         ██╔══██╗    ██╔═══██╗    ╚══██╔══╝",
+  "███████║    ██║         ██║         ██████╔╝    ██║   ██║       ██║   ",
+  "██╔══██║    ██║         ██║         ██╔══██╗    ██║   ██║       ██║   ",
+  "██║  ██║    ███████╗    ███████╗    ██████╔╝    ╚██████╔╝       ██║   ",
+  "╚═╝  ╚═╝    ╚══════╝    ╚══════╝    ╚═════╝      ╚═════╝        ╚═╝   ",
+  "                                 👾 ALLBOT 👾                ",
   " ",
 ];
 
@@ -114,11 +114,11 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
   };
 
   const colored = BANNER_ASCII.map((line) => {
-    if (line.includes("KAIJIBOT")) {
+    if (line.includes("ALLBOT")) {
       return (
         theme.muted("              ") +
         theme.accent("👾") +
-        theme.info(" KAIJIBOT ") +
+        theme.info(" ALLBOT ") +
         theme.accent("👾")
       );
     }

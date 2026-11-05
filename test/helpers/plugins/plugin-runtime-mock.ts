@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "kaijibot/plugin-sdk/agent-runtime";
+import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "allbot/plugin-sdk/agent-runtime";
 import { vi } from "vitest";
 import {
   removeAckReactionAfterReply,
@@ -379,7 +379,7 @@ export function createPluginRuntimeMock(overrides: DeepPartial<PluginRuntime> = 
       })),
     },
     state: {
-      resolveStateDir: vi.fn(() => "/tmp/kaijibot"),
+      resolveStateDir: vi.fn(() => "/tmp/allbot"),
     },
     tasks: {
       runs: {

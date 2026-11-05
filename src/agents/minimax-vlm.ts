@@ -83,7 +83,7 @@ export async function minimaxUnderstandImage(params: {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "MM-API-Source": "KaijiBot",
+      "MM-API-Source": "AllBot",
     },
     signal: AbortSignal.timeout(60_000),
     body: JSON.stringify({

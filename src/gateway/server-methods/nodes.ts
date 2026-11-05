@@ -448,8 +448,8 @@ export async function maybeSendNodeWakeNudge(nodeId: string): Promise<NodeWakeNu
       result = await sendApnsAlert({
         registration,
         nodeId,
-        title: "KaijiBot needs a quick reopen",
-        body: "Tap to reopen KaijiBot and restore the node connection.",
+        title: "AllBot needs a quick reopen",
+        body: "Tap to reopen AllBot and restore the node connection.",
         relayConfig: relay.relayConfig,
       });
     } else {
@@ -465,8 +465,8 @@ export async function maybeSendNodeWakeNudge(nodeId: string): Promise<NodeWakeNu
       result = await sendApnsAlert({
         registration,
         nodeId,
-        title: "KaijiBot needs a quick reopen",
-        body: "Tap to reopen KaijiBot and restore the node connection.",
+        title: "AllBot needs a quick reopen",
+        body: "Tap to reopen AllBot and restore the node connection.",
         auth: auth.auth,
       });
     }

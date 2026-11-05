@@ -1,6 +1,6 @@
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { createSubsystemLogger, retryAsync } from "kaijibot/plugin-sdk/runtime-env";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { createSubsystemLogger, retryAsync } from "allbot/plugin-sdk/runtime-env";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 
 const log = createSubsystemLogger("venice-models");
 

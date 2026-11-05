@@ -81,11 +81,11 @@ describe("tool display details", () => {
     const detail = formatToolDetail(
       resolveToolDisplay({
         name: "web_search",
-        args: { query: "KaijiBot docs", count: 3 },
+        args: { query: "AllBot docs", count: 3 },
       }),
     );
 
-    expect(detail).toBe('for "KaijiBot docs" (top 3)');
+    expect(detail).toBe('for "AllBot docs" (top 3)');
   });
 
   it("summarizes exec commands with context", () => {
@@ -94,14 +94,14 @@ describe("tool display details", () => {
         name: "exec",
         args: {
           command:
-            "set -euo pipefail\ngit -C /Users/adityasingh/.kaijibot/workspace status --short | head -n 3",
-          workdir: "/Users/adityasingh/.kaijibot/workspace",
+            "set -euo pipefail\ngit -C /Users/adityasingh/.allbot/workspace status --short | head -n 3",
+          workdir: "/Users/adityasingh/.allbot/workspace",
         },
       }),
     );
 
     expect(detail).toContain("check git status -> show first 3 lines");
-    expect(detail).toContain(".kaijibot/workspace)");
+    expect(detail).toContain(".allbot/workspace)");
   });
 
   it("moves cd path to context suffix and appends raw command", () => {
@@ -265,7 +265,7 @@ describe("tool display details", () => {
         name: "exec",
         args: {
           command: "python3 <<PY\nprint('x')\nPY",
-          workdir: "/Users/adityasingh/.kaijibot/workspace",
+          workdir: "/Users/adityasingh/.allbot/workspace",
         },
       }),
     );
@@ -274,7 +274,7 @@ describe("tool display details", () => {
         name: "exec",
         args: {
           command: "node --check /tmp/test.js",
-          workdir: "/Users/adityasingh/.kaijibot/workspace",
+          workdir: "/Users/adityasingh/.allbot/workspace",
         },
       }),
     );
@@ -283,7 +283,7 @@ describe("tool display details", () => {
         name: "exec",
         args: {
           command: "node -c /tmp/test.js",
-          workdir: "/Users/adityasingh/.kaijibot/workspace",
+          workdir: "/Users/adityasingh/.allbot/workspace",
         },
       }),
     );

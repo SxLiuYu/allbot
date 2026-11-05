@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, it, expect, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ReplyDispatcher } from "./reply/reply-dispatcher.js";
 import { buildTestCtx } from "./reply/test-ctx.js";
 
@@ -198,16 +198,16 @@ function createDispatcher(): ReplyDispatcher {
 async function withFeedbackSandbox<T>(
   fn: (ctx: { stateDir: string; agentId: string; userId: string }) => Promise<T>,
 ): Promise<T> {
-  const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-feedback-"));
-  const previous = process.env.KAIJIBOT_STATE_DIR;
-  process.env.KAIJIBOT_STATE_DIR = stateDir;
+  const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-feedback-"));
+  const previous = process.env.ALLBOT_STATE_DIR;
+  process.env.ALLBOT_STATE_DIR = stateDir;
   try {
     return await fn({ stateDir, agentId: "main", userId: "ou_test123" });
   } finally {
     if (previous === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = previous;
+      process.env.ALLBOT_STATE_DIR = previous;
     }
     await fs.rm(stateDir, { recursive: true, force: true });
   }
@@ -296,7 +296,7 @@ describe("detectInsightFollowupFeedback full pipeline", () => {
         To: "bot",
         ChatType: "direct",
       });
-      const cfg = { cognitive: { enabled: true } } as unknown as KaijiBotConfig;
+      const cfg = { cognitive: { enabled: true } } as unknown as AllBotConfig;
 
       await dispatchInboundMessage({ ctx, cfg, dispatcher: createDispatcher() });
 
@@ -323,7 +323,7 @@ describe("detectInsightFollowupFeedback full pipeline", () => {
         To: "bot",
         ChatType: "direct",
       });
-      const cfg = { cognitive: { enabled: true } } as unknown as KaijiBotConfig;
+      const cfg = { cognitive: { enabled: true } } as unknown as AllBotConfig;
 
       await dispatchInboundMessage({ ctx, cfg, dispatcher: createDispatcher() });
 
@@ -350,7 +350,7 @@ describe("detectInsightFollowupFeedback full pipeline", () => {
         To: "bot",
         ChatType: "direct",
       });
-      const cfg = { cognitive: { enabled: true } } as unknown as KaijiBotConfig;
+      const cfg = { cognitive: { enabled: true } } as unknown as AllBotConfig;
 
       await dispatchInboundMessage({ ctx, cfg, dispatcher: createDispatcher() });
 
@@ -377,7 +377,7 @@ describe("detectInsightFollowupFeedback full pipeline", () => {
         To: "bot",
         ChatType: "direct",
       });
-      const cfg = { cognitive: { enabled: true } } as unknown as KaijiBotConfig;
+      const cfg = { cognitive: { enabled: true } } as unknown as AllBotConfig;
 
       await dispatchInboundMessage({ ctx, cfg, dispatcher: createDispatcher() });
 
@@ -403,7 +403,7 @@ describe("detectInsightFollowupFeedback full pipeline", () => {
         To: "bot",
         ChatType: "direct",
       });
-      const cfg = { cognitive: { enabled: false } } as unknown as KaijiBotConfig;
+      const cfg = { cognitive: { enabled: false } } as unknown as AllBotConfig;
 
       await dispatchInboundMessage({ ctx, cfg, dispatcher: createDispatcher() });
 

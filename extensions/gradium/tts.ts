@@ -1,5 +1,5 @@
-import { assertOkOrThrowHttpError } from "kaijibot/plugin-sdk/provider-http";
-import { fetchWithSsrFGuard } from "kaijibot/plugin-sdk/ssrf-runtime";
+import { assertOkOrThrowHttpError } from "allbot/plugin-sdk/provider-http";
+import { fetchWithSsrFGuard } from "allbot/plugin-sdk/ssrf-runtime";
 import { normalizeGradiumBaseUrl } from "./shared.js";
 
 export async function gradiumTTS(params: {

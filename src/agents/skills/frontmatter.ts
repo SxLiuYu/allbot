@@ -1,20 +1,20 @@
 import { validateRegistryNpmSpec } from "../../infra/npm-registry-spec.js";
 import { parseFrontmatterBlock } from "../../markdown/frontmatter.js";
 import {
-  applyKaijiBotManifestInstallCommonFields,
+  applyAllBotManifestInstallCommonFields,
   getFrontmatterString,
   normalizeStringList,
-  parseKaijiBotManifestInstallBase,
+  parseAllBotManifestInstallBase,
   parseFrontmatterBool,
-  resolveKaijiBotManifestBlock,
-  resolveKaijiBotManifestInstall,
-  resolveKaijiBotManifestOs,
-  resolveKaijiBotManifestRequires,
+  resolveAllBotManifestBlock,
+  resolveAllBotManifestInstall,
+  resolveAllBotManifestOs,
+  resolveAllBotManifestRequires,
 } from "../../shared/frontmatter.js";
 import { readStringValue } from "../../shared/string-coerce.js";
 import type { Skill } from "./skill-contract.js";
 import type {
-  KaijiBotSkillMetadata,
+  AllBotSkillMetadata,
   ParsedSkillFrontmatter,
   SkillEntry,
   SkillInstallSpec,
@@ -110,12 +110,12 @@ function normalizeSafeDownloadUrl(raw: unknown): string | undefined {
 }
 
 function parseInstallSpec(input: unknown): SkillInstallSpec | undefined {
-  const parsed = parseKaijiBotManifestInstallBase(input, ["brew", "node", "go", "uv", "download"]);
+  const parsed = parseAllBotManifestInstallBase(input, ["brew", "node", "go", "uv", "download"]);
   if (!parsed) {
     return undefined;
   }
   const { raw } = parsed;
-  const spec = applyKaijiBotManifestInstallCommonFields<SkillInstallSpec>(
+  const spec = applyAllBotManifestInstallCommonFields<SkillInstallSpec>(
     {
       kind: parsed.kind as SkillInstallSpec["kind"],
     },
@@ -184,16 +184,16 @@ function parseInstallSpec(input: unknown): SkillInstallSpec | undefined {
   return spec;
 }
 
-export function resolveKaijiBotMetadata(
+export function resolveAllBotMetadata(
   frontmatter: ParsedSkillFrontmatter,
-): KaijiBotSkillMetadata | undefined {
-  const metadataObj = resolveKaijiBotManifestBlock({ frontmatter });
+): AllBotSkillMetadata | undefined {
+  const metadataObj = resolveAllBotManifestBlock({ frontmatter });
   if (!metadataObj) {
     return undefined;
   }
-  const requires = resolveKaijiBotManifestRequires(metadataObj);
-  const install = resolveKaijiBotManifestInstall(metadataObj, parseInstallSpec);
-  const osRaw = resolveKaijiBotManifestOs(metadataObj);
+  const requires = resolveAllBotManifestRequires(metadataObj);
+  const install = resolveAllBotManifestInstall(metadataObj, parseInstallSpec);
+  const osRaw = resolveAllBotManifestOs(metadataObj);
   return {
     always: typeof metadataObj.always === "boolean" ? metadataObj.always : undefined,
     emoji: readStringValue(metadataObj.emoji),

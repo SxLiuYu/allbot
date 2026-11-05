@@ -1,11 +1,11 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
 import {
   readConfiguredProviderCatalogEntries,
   type ProviderCatalogContext,
-} from "kaijibot/plugin-sdk/provider-catalog-shared";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/provider-onboard";
+} from "allbot/plugin-sdk/provider-catalog-shared";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import type { AllBotConfig } from "allbot/plugin-sdk/provider-onboard";
 import {
   applyArceeConfig,
   applyArceeOpenRouterConfig,
@@ -73,7 +73,7 @@ function buildArceeAuthMethods() {
   ];
 }
 
-function readConfiguredArceeCatalogEntries(config: KaijiBotConfig | undefined) {
+function readConfiguredArceeCatalogEntries(config: AllBotConfig | undefined) {
   return readConfiguredProviderCatalogEntries({
     config,
     providerId: PROVIDER_ID,

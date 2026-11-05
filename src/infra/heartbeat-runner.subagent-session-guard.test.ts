@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveMainSessionKey } from "../config/sessions.js";
 import { runHeartbeatOnce } from "./heartbeat-runner.js";
 import { installHeartbeatRunnerTestRuntime } from "./heartbeat-runner.test-harness.js";
@@ -12,7 +12,7 @@ installHeartbeatRunnerTestRuntime();
 describe.skipIf(process.env.CI)("runHeartbeatOnce", () => {
   it("falls back to the main session when a subagent session key is forced", async () => {
     await withTempHeartbeatSandbox(async ({ tmpDir, storePath, replySpy }) => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           defaults: {
             workspace: tmpDir,

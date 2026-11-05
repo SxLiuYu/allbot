@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { runPluginSetupConfigMigrations } from "../../../plugins/setup-registry.js";
 import { collectChannelDoctorCompatibilityMutations } from "./channel-doctor.js";
 import {
@@ -14,8 +14,8 @@ import { migrateLegacyWebFetchConfig } from "./legacy-web-fetch-migrate.js";
 import { migrateLegacyWebSearchConfig } from "./legacy-web-search-migrate.js";
 import { migrateLegacyXSearchConfig } from "./legacy-x-search-migrate.js";
 
-export function normalizeCompatibilityConfigValues(cfg: KaijiBotConfig): {
-  config: KaijiBotConfig;
+export function normalizeCompatibilityConfigValues(cfg: AllBotConfig): {
+  config: AllBotConfig;
   changes: string[];
 } {
   const changes: string[] = [];

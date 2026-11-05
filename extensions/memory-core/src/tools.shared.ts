@@ -5,9 +5,9 @@ import {
   type MemoryCorpusGetResult,
   type MemoryCorpusSearchResult,
   type AnyAgentTool,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-runtime-core";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { Type } from "typebox";
 
 type MemoryToolRuntime = typeof import("./tools.runtime.js");
@@ -41,7 +41,7 @@ export const MemoryGetSchema = Type.Object({
 });
 
 export function resolveMemoryToolContext(options: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentSessionKey?: string;
 }) {
   const cfg = options.config;
@@ -59,7 +59,7 @@ export function resolveMemoryToolContext(options: {
 }
 
 export async function getMemoryManagerContext(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
 }): Promise<
   | {
@@ -73,7 +73,7 @@ export async function getMemoryManagerContext(params: {
 }
 
 export async function getMemoryManagerContextWithPurpose(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
   purpose?: "default" | "status";
 }): Promise<
@@ -95,14 +95,14 @@ export async function getMemoryManagerContextWithPurpose(params: {
 
 export function createMemoryTool(params: {
   options: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     agentSessionKey?: string;
   };
   label: string;
   name: string;
   description: string;
   parameters: typeof MemorySearchSchema | typeof MemoryGetSchema;
-  execute: (ctx: { cfg: KaijiBotConfig; agentId: string }) => AnyAgentTool["execute"];
+  execute: (ctx: { cfg: AllBotConfig; agentId: string }) => AnyAgentTool["execute"];
 }): AnyAgentTool | null {
   const ctx = resolveMemoryToolContext(params.options);
   if (!ctx) {

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import { runCapability } from "./runner.js";
 import { withAudioFixture } from "./runner.test-utils.js";
@@ -48,7 +48,7 @@ function createOpenAiAudioProvider(
   });
 }
 
-function createOpenAiAudioCfg(extra?: Partial<KaijiBotConfig>): KaijiBotConfig {
+function createOpenAiAudioCfg(extra?: Partial<AllBotConfig>): AllBotConfig {
   return {
     models: {
       providers: {
@@ -59,15 +59,15 @@ function createOpenAiAudioCfg(extra?: Partial<KaijiBotConfig>): KaijiBotConfig {
       },
     },
     ...extra,
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 async function runAutoAudioCase(params: {
   transcribeAudio: (req: AudioTranscriptionRequest) => Promise<{ text: string; model: string }>;
-  cfgExtra?: Partial<KaijiBotConfig>;
+  cfgExtra?: Partial<AllBotConfig>;
 }) {
   let runResult: Awaited<ReturnType<typeof runCapability>> | undefined;
-  await withAudioFixture("kaijibot-auto-audio", async ({ ctx, media, cache }) => {
+  await withAudioFixture("allbot-auto-audio", async ({ ctx, media, cache }) => {
     const providerRegistry = createOpenAiAudioProvider(params.transcribeAudio);
     const cfg = createOpenAiAudioCfg(params.cfgExtra);
     runResult = await runCapability({
@@ -170,7 +170,7 @@ describe("runCapability auto audio entries", () => {
             },
           },
         },
-      } as Partial<KaijiBotConfig>,
+      } as Partial<AllBotConfig>,
     });
 
     expect(result.outputs[0]?.text).toBe("ok");
@@ -179,7 +179,7 @@ describe("runCapability auto audio entries", () => {
   });
 
   it("uses mistral when only mistral key is configured", async () => {
-    const isolatedAgentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-audio-agent-"));
+    const isolatedAgentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-audio-agent-"));
     let runResult: Awaited<ReturnType<typeof runCapability>> | undefined;
     try {
       await withEnvAsync(
@@ -190,11 +190,11 @@ describe("runCapability auto audio entries", () => {
           GEMINI_API_KEY: undefined,
           GOOGLE_API_KEY: undefined,
           MISTRAL_API_KEY: "mistral-test-key", // pragma: allowlist secret
-          KAIJIBOT_AGENT_DIR: isolatedAgentDir,
+          ALLBOT_AGENT_DIR: isolatedAgentDir,
           PI_CODING_AGENT_DIR: isolatedAgentDir,
         },
         async () => {
-          await withAudioFixture("kaijibot-auto-audio-mistral", async ({ ctx, media, cache }) => {
+          await withAudioFixture("allbot-auto-audio-mistral", async ({ ctx, media, cache }) => {
             const providerRegistry = createProviderRegistry({
               openai: {
                 id: "openai",
@@ -229,7 +229,7 @@ describe("runCapability auto audio entries", () => {
                   },
                 },
               },
-            } as unknown as KaijiBotConfig;
+            } as unknown as AllBotConfig;
 
             runResult = await runCapability({
               capability: "audio",

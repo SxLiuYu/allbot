@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   buildCliRespawnPlan,
   EXPERIMENTAL_WARNING_FLAG,
-  KAIJIBOT_NODE_EXTRA_CA_CERTS_READY,
-  KAIJIBOT_NODE_OPTIONS_READY,
+  ALLBOT_NODE_EXTRA_CA_CERTS_READY,
+  ALLBOT_NODE_OPTIONS_READY,
 } from "./entry.respawn.js";
 
 const shouldSkipRespawnForArgvMock = vi.hoisted(() => vi.fn(() => false));
@@ -26,7 +26,7 @@ vi.mock("./infra/env.js", () => ({
 
     expect(
       buildCliRespawnPlan({
-        argv: ["node", "kaijibot", "status"],
+        argv: ["node", "allbot", "status"],
         env: {},
         execArgv: [],
         autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -36,7 +36,7 @@ vi.mock("./infra/env.js", () => ({
 
   it("adds NODE_EXTRA_CA_CERTS and warning suppression in one respawn", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["node", "kaijibot", "gateway", "run"],
+      argv: ["node", "allbot", "gateway", "run"],
       env: {},
       execArgv: [],
       autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -45,13 +45,13 @@ vi.mock("./infra/env.js", () => ({
     expect(plan).not.toBeNull();
     expect(plan?.argv[0]).toBe(EXPERIMENTAL_WARNING_FLAG);
     expect(plan?.env.NODE_EXTRA_CA_CERTS).toBe("/etc/ssl/certs/ca-certificates.crt");
-    expect(plan?.env[KAIJIBOT_NODE_EXTRA_CA_CERTS_READY]).toBe("1");
-    expect(plan?.env[KAIJIBOT_NODE_OPTIONS_READY]).toBe("1");
+    expect(plan?.env[ALLBOT_NODE_EXTRA_CA_CERTS_READY]).toBe("1");
+    expect(plan?.env[ALLBOT_NODE_OPTIONS_READY]).toBe("1");
   });
 
   it("does not overwrite an existing NODE_EXTRA_CA_CERTS value", () => {
     const plan = buildCliRespawnPlan({
-      argv: ["node", "kaijibot", "gateway", "run"],
+      argv: ["node", "allbot", "gateway", "run"],
       env: { NODE_EXTRA_CA_CERTS: "/custom/ca.pem" },
       execArgv: [],
       autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",
@@ -63,10 +63,10 @@ vi.mock("./infra/env.js", () => ({
   it("returns null when both respawn guards are already satisfied", () => {
     expect(
       buildCliRespawnPlan({
-        argv: ["node", "kaijibot", "gateway", "run"],
+        argv: ["node", "allbot", "gateway", "run"],
         env: {
-          [KAIJIBOT_NODE_EXTRA_CA_CERTS_READY]: "1",
-          [KAIJIBOT_NODE_OPTIONS_READY]: "1",
+          [ALLBOT_NODE_EXTRA_CA_CERTS_READY]: "1",
+          [ALLBOT_NODE_OPTIONS_READY]: "1",
         },
         execArgv: [EXPERIMENTAL_WARNING_FLAG],
         autoNodeExtraCaCerts: "/etc/ssl/certs/ca-certificates.crt",

@@ -2,7 +2,7 @@ import fsPromises from "node:fs/promises";
 import nodePath from "node:path";
 import { formatCliCommand } from "../cli/command-format.js";
 import { t } from "../cli/i18n/translate.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { readConfigFileSnapshot, replaceConfigFile, resolveGatewayPort } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { ensureControlUiAssetsBuilt } from "../infra/control-ui-assets.js";
@@ -50,7 +50,7 @@ import { setupSkills } from "./onboard-skills.js";
 type ConfigureSectionChoice = WizardSection | "__continue";
 
 async function resolveGatewaySecretInputForWizard(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   value: unknown;
   path: string;
 }): Promise<string | undefined> {
@@ -67,7 +67,7 @@ async function resolveGatewaySecretInputForWizard(params: {
 }
 
 async function runGatewayHealthCheck(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runtime: RuntimeEnv;
   port: number;
 }): Promise<void> {
@@ -89,8 +89,8 @@ async function runGatewayHealthCheck(params: {
     value: params.cfg.gateway?.auth?.password,
     path: "gateway.auth.password",
   });
-  const token = process.env.KAIJIBOT_GATEWAY_TOKEN ?? configuredToken;
-  const password = process.env.KAIJIBOT_GATEWAY_PASSWORD ?? configuredPassword;
+  const token = process.env.ALLBOT_GATEWAY_TOKEN ?? configuredToken;
+  const password = process.env.ALLBOT_GATEWAY_PASSWORD ?? configuredPassword;
 
   await waitForGatewayReachable({
     url: wsUrl,
@@ -150,7 +150,7 @@ async function promptChannelMode(runtime: RuntimeEnv): Promise<ChannelsWizardMod
         {
           value: "remove",
           label: t("cli.configure.channels.removeLabel"),
-          hint: "Delete channel tokens/settings from kaijibot.json",
+          hint: "Delete channel tokens/settings from allbot.json",
         },
       ],
       initialValue: "configure",
@@ -160,11 +160,11 @@ async function promptChannelMode(runtime: RuntimeEnv): Promise<ChannelsWizardMod
 }
 
 async function promptWebToolsConfig(
-  nextConfig: KaijiBotConfig,
+  nextConfig: AllBotConfig,
   runtime: RuntimeEnv,
   prompter: ReturnType<typeof createClackPrompter>,
-): Promise<KaijiBotConfig> {
-  type WebSearchConfig = NonNullable<NonNullable<KaijiBotConfig["tools"]>["web"]>["search"];
+): Promise<AllBotConfig> {
+  type WebSearchConfig = NonNullable<NonNullable<AllBotConfig["tools"]>["web"]>["search"];
   const existingSearch = nextConfig.tools?.web?.search;
   const existingFetch = nextConfig.tools?.web?.fetch;
   const { resolveSearchProviderOptions, setupSearch } = await import("./onboard-search.js");
@@ -336,7 +336,7 @@ export async function runConfigureWizard(
 
     const snapshot = await readConfigFileSnapshot();
     let currentBaseHash = snapshot.hash;
-    const baseConfig: KaijiBotConfig = snapshot.valid
+    const baseConfig: AllBotConfig = snapshot.valid
       ? (snapshot.sourceConfig ?? snapshot.config)
       : {};
 
@@ -356,7 +356,7 @@ export async function runConfigureWizard(
       if (!snapshot.valid) {
         outro(
           t("cli.configure.invalidConfigOutro", {
-            doctorCmd: formatCliCommand("kaijibot doctor"),
+            doctorCmd: formatCliCommand("allbot doctor"),
           }),
         );
         runtime.exit(1);
@@ -377,8 +377,8 @@ export async function runConfigureWizard(
     });
     const localProbe = await probeGatewayReachable({
       url: localUrl,
-      token: process.env.KAIJIBOT_GATEWAY_TOKEN ?? baseLocalProbeToken,
-      password: process.env.KAIJIBOT_GATEWAY_PASSWORD ?? baseLocalProbePassword,
+      token: process.env.ALLBOT_GATEWAY_TOKEN ?? baseLocalProbeToken,
+      password: process.env.ALLBOT_GATEWAY_PASSWORD ?? baseLocalProbePassword,
     });
     const remoteUrl = normalizeOptionalString(baseConfig.gateway?.remote?.url) ?? "";
     const baseRemoteProbeToken = await resolveGatewaySecretInputForWizard({
@@ -692,21 +692,21 @@ export async function runConfigureWizard(
       basePath: nextConfig.gateway?.controlUi?.basePath,
     });
     const newPassword =
-      process.env.KAIJIBOT_GATEWAY_PASSWORD ??
+      process.env.ALLBOT_GATEWAY_PASSWORD ??
       (await resolveGatewaySecretInputForWizard({
         cfg: nextConfig,
         value: nextConfig.gateway?.auth?.password,
         path: "gateway.auth.password",
       }));
     const oldPassword =
-      process.env.KAIJIBOT_GATEWAY_PASSWORD ??
+      process.env.ALLBOT_GATEWAY_PASSWORD ??
       (await resolveGatewaySecretInputForWizard({
         cfg: baseConfig,
         value: baseConfig.gateway?.auth?.password,
         path: "gateway.auth.password",
       }));
     const token =
-      process.env.KAIJIBOT_GATEWAY_TOKEN ??
+      process.env.ALLBOT_GATEWAY_TOKEN ??
       (await resolveGatewaySecretInputForWizard({
         cfg: nextConfig,
         value: nextConfig.gateway?.auth?.token,

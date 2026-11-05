@@ -1,5 +1,5 @@
 import type { SecretInputMode } from "../commands/onboard-types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   DEFAULT_SECRET_PROVIDER_ALIAS,
   type SecretInput,
@@ -18,9 +18,9 @@ import type { FlowContribution, FlowOption } from "./types.js";
 import { sortFlowContributionsByLabel } from "./types.js";
 
 export type SearchProvider = NonNullable<
-  NonNullable<NonNullable<NonNullable<KaijiBotConfig["tools"]>["web"]>["search"]>["provider"]
+  NonNullable<NonNullable<NonNullable<AllBotConfig["tools"]>["web"]>["search"]>["provider"]
 >;
-type SearchConfig = NonNullable<NonNullable<NonNullable<KaijiBotConfig["tools"]>["web"]>["search"]>;
+type SearchConfig = NonNullable<NonNullable<NonNullable<AllBotConfig["tools"]>["web"]>["search"]>;
 type MutableSearchConfig = SearchConfig & Record<string, unknown>;
 
 export type SearchProviderSetupOption = FlowOption & {
@@ -45,7 +45,7 @@ function resolveSearchProviderCredentialLabel(
 }
 
 export function listSearchProviderOptions(
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
 ): readonly PluginWebSearchProviderEntry[] {
   return resolveSearchProviderOptions(config);
 }
@@ -57,7 +57,7 @@ function showsSearchProviderInSetup(
 }
 
 export function resolveSearchProviderOptions(
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
 ): readonly PluginWebSearchProviderEntry[] {
   return resolveSearchProviderSetupContributions(config).map(
     (contribution) => contribution.provider,
@@ -84,7 +84,7 @@ function buildSearchProviderSetupContribution(params: {
 }
 
 export function resolveSearchProviderSetupContributions(
-  config?: KaijiBotConfig,
+  config?: AllBotConfig,
 ): SearchProviderSetupContribution[] {
   const providers = sortWebSearchProviders(
     resolvePluginWebSearchProviders({
@@ -101,7 +101,7 @@ export function resolveSearchProviderSetupContributions(
 }
 
 function resolveSearchProviderEntry(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   provider: SearchProvider,
 ): PluginWebSearchProviderEntry | undefined {
   return resolveSearchProviderOptions(config).find((entry) => entry.id === provider);
@@ -118,7 +118,7 @@ function providerNeedsCredential(
 }
 
 function providerIsReady(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   entry: Pick<PluginWebSearchProviderEntry, "id" | "envVars" | "requiresCredential">,
 ): boolean {
   if (!providerNeedsCredential(entry)) {
@@ -127,7 +127,7 @@ function providerIsReady(
   return hasExistingKey(config, entry.id) || hasKeyInEnv(entry);
 }
 
-function rawKeyValue(config: KaijiBotConfig, provider: SearchProvider): unknown {
+function rawKeyValue(config: AllBotConfig, provider: SearchProvider): unknown {
   const search = config.tools?.web?.search;
   const entry = resolveSearchProviderEntry(config, provider);
   const configuredValue = entry?.getConfiguredCredentialValue?.(config);
@@ -140,17 +140,17 @@ function rawKeyValue(config: KaijiBotConfig, provider: SearchProvider): unknown 
 }
 
 export function resolveExistingKey(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   provider: SearchProvider,
 ): string | undefined {
   return normalizeSecretInputString(rawKeyValue(config, provider));
 }
 
-export function hasExistingKey(config: KaijiBotConfig, provider: SearchProvider): boolean {
+export function hasExistingKey(config: AllBotConfig, provider: SearchProvider): boolean {
   return hasConfiguredSecretInput(rawKeyValue(config, provider));
 }
 
-function buildSearchEnvRef(config: KaijiBotConfig, provider: SearchProvider): SecretRef {
+function buildSearchEnvRef(config: AllBotConfig, provider: SearchProvider): SecretRef {
   const entry =
     resolveSearchProviderEntry(config, provider) ??
     listSearchProviderOptions(config).find((candidate) => candidate.id === provider) ??
@@ -167,7 +167,7 @@ function buildSearchEnvRef(config: KaijiBotConfig, provider: SearchProvider): Se
 }
 
 function resolveSearchSecretInput(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   provider: SearchProvider,
   key: string,
   secretInputMode?: SecretInputMode,
@@ -180,10 +180,10 @@ function resolveSearchSecretInput(
 }
 
 export function applySearchKey(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   provider: SearchProvider,
   key: SecretInput,
-): KaijiBotConfig {
+): AllBotConfig {
   const providerEntry = resolveSearchProviderEntry(config, provider);
   if (!providerEntry) {
     return config;
@@ -192,7 +192,7 @@ export function applySearchKey(
   if (!providerEntry.setConfiguredCredentialValue) {
     providerEntry.setCredentialValue(search, key);
   }
-  const nextBase: KaijiBotConfig = {
+  const nextBase: AllBotConfig = {
     ...config,
     tools: {
       ...config.tools,
@@ -205,9 +205,9 @@ export function applySearchKey(
 }
 
 function applySearchProviderSelectionConfig(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   providerEntry: Pick<PluginWebSearchProviderEntry, "pluginId" | "applySelectionConfig">,
-): KaijiBotConfig {
+): AllBotConfig {
   if (providerEntry.applySelectionConfig) {
     return providerEntry.applySelectionConfig(config);
   }
@@ -218,9 +218,9 @@ function applySearchProviderSelectionConfig(
 }
 
 export function applySearchProviderSelection(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   provider: SearchProvider,
-): KaijiBotConfig {
+): AllBotConfig {
   const providerEntry = resolveSearchProviderEntry(config, provider);
   if (!providerEntry) {
     return config;
@@ -230,7 +230,7 @@ export function applySearchProviderSelection(
     provider,
     enabled: true,
   };
-  const nextBase: KaijiBotConfig = {
+  const nextBase: AllBotConfig = {
     ...config,
     tools: {
       ...config.tools,
@@ -243,12 +243,12 @@ export function applySearchProviderSelection(
   return applySearchProviderSelectionConfig(nextBase, providerEntry);
 }
 
-function preserveDisabledState(original: KaijiBotConfig, result: KaijiBotConfig): KaijiBotConfig {
+function preserveDisabledState(original: AllBotConfig, result: AllBotConfig): AllBotConfig {
   if (original.tools?.web?.search?.enabled !== false) {
     return result;
   }
 
-  const next: KaijiBotConfig = {
+  const next: AllBotConfig = {
     ...result,
     tools: {
       ...result.tools,
@@ -297,7 +297,7 @@ function preserveDisabledState(original: KaijiBotConfig, result: KaijiBotConfig)
 
   return {
     ...next,
-    plugins: nextPlugins as KaijiBotConfig["plugins"],
+    plugins: nextPlugins as AllBotConfig["plugins"],
   };
 }
 
@@ -307,13 +307,13 @@ export type SetupSearchOptions = {
 };
 
 async function finalizeSearchProviderSetup(params: {
-  originalConfig: KaijiBotConfig;
-  nextConfig: KaijiBotConfig;
+  originalConfig: AllBotConfig;
+  nextConfig: AllBotConfig;
   entry: PluginWebSearchProviderEntry;
   runtime: RuntimeEnv;
   prompter: WizardPrompter;
   opts?: SetupSearchOptions;
-}): Promise<KaijiBotConfig> {
+}): Promise<AllBotConfig> {
   let next = preserveDisabledState(params.originalConfig, params.nextConfig);
   if (!params.entry.runSetup) {
     return next;
@@ -329,11 +329,11 @@ async function finalizeSearchProviderSetup(params: {
 }
 
 export async function runSearchSetupFlow(
-  config: KaijiBotConfig,
+  config: AllBotConfig,
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
   opts?: SetupSearchOptions,
-): Promise<KaijiBotConfig> {
+): Promise<AllBotConfig> {
   const providerOptions = resolveSearchProviderOptions(config);
   if (providerOptions.length === 0) {
     await prompter.note(
@@ -386,7 +386,7 @@ export async function runSearchSetupFlow(
       {
         value: "__skip__" as const,
         label: "Skip for now",
-        hint: "Configure later with kaijibot configure --section web",
+        hint: "Configure later with allbot configure --section web",
       },
     ],
     initialValue: defaultProvider,
@@ -425,7 +425,7 @@ export async function runSearchSetupFlow(
     await prompter.note(
       [
         `${entry.label} works without an API key.`,
-        "KaijiBot will enable the plugin and use it as your web_search provider.",
+        "AllBot will enable the plugin and use it as your web_search provider.",
         `Docs: ${entry.docsUrl ?? "https://gitee.com/kaiji1126/kaijibot/blob/main/docs/tools/web.md"}`,
       ].join("\n"),
       "Web search",
@@ -455,7 +455,7 @@ export async function runSearchSetupFlow(
     const ref = buildSearchEnvRef(config, choice);
     await prompter.note(
       [
-        "Secret references enabled — KaijiBot will store a reference instead of the API key.",
+        "Secret references enabled — AllBot will store a reference instead of the API key.",
         `Env var: ${ref.id}${envAvailable ? " (detected)" : ""}.`,
         ...(envAvailable ? [] : [`Set ${ref.id} in the Gateway environment.`]),
         "Docs: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/tools/web.md",

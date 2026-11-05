@@ -1,6 +1,6 @@
 import path from "node:path";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import { asNullableRecord } from "../shared/record-coerce.js";
 import {
   lowercasePreservingWhitespace,
@@ -107,7 +107,7 @@ function normalizePathForComparison(input: string): string {
 
 export function resolveConsolidationConfig(params: {
   pluginConfig?: Record<string, unknown>;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
 }): ConsolidationConfig {
   const consolidation = asNullableRecord(params.pluginConfig?.consolidation);
   const cron = normalizeTrimmedString(consolidation?.cron) ?? DEFAULT_MEMORY_CONSOLIDATION_CRON;
@@ -154,7 +154,7 @@ export function resolveConsolidationConfig(params: {
   };
 }
 
-export function resolveConsolidationWorkspaces(cfg: KaijiBotConfig): ConsolidationWorkspace[] {
+export function resolveConsolidationWorkspaces(cfg: AllBotConfig): ConsolidationWorkspace[] {
   const configured = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];
   const agentIds: string[] = [];
   const seenAgents = new Set<string>();

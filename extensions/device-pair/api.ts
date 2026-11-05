@@ -6,15 +6,15 @@ export {
   listDevicePairing,
   revokeDeviceBootstrapToken,
   type DeviceBootstrapProfile,
-} from "kaijibot/plugin-sdk/device-bootstrap";
-export { definePluginEntry, type KaijiBotPluginApi } from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/device-bootstrap";
+export { definePluginEntry, type AllBotPluginApi } from "allbot/plugin-sdk/plugin-entry";
 export {
   resolveGatewayBindUrl,
   resolveGatewayPort,
   resolveTailnetHostWithRunner,
-} from "kaijibot/plugin-sdk/core";
+} from "allbot/plugin-sdk/core";
 export {
-  resolvePreferredKaijiBotTmpDir,
+  resolvePreferredAllBotTmpDir,
   runPluginCommandWithTimeout,
-} from "kaijibot/plugin-sdk/sandbox";
+} from "allbot/plugin-sdk/sandbox";
 export { renderQrPngBase64 } from "./qr-image.js";

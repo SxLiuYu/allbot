@@ -1,5 +1,5 @@
-import { defineSingleProviderPluginEntry } from "kaijibot/plugin-sdk/provider-entry";
-import { PROVIDER_LABELS } from "kaijibot/plugin-sdk/provider-usage";
+import { defineSingleProviderPluginEntry } from "allbot/plugin-sdk/provider-entry";
+import { PROVIDER_LABELS } from "allbot/plugin-sdk/provider-usage";
 import { applyXiaomiConfig, XIAOMI_DEFAULT_MODEL_REF } from "./onboard.js";
 import { buildXiaomiProvider } from "./provider-catalog.js";
 

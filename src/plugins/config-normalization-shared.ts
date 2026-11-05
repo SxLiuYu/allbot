@@ -1,5 +1,5 @@
 import { normalizeChatChannelId } from "../channels/ids.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
@@ -131,7 +131,7 @@ function normalizePluginEntries(
 }
 
 export function normalizePluginsConfigWithResolver(
-  config?: KaijiBotConfig["plugins"],
+  config?: AllBotConfig["plugins"],
   normalizePluginId: NormalizePluginId = identityNormalizePluginId,
 ): NormalizedPluginsConfig {
   const memorySlot = normalizeSlotValue(config?.slots?.memory);
@@ -147,7 +147,7 @@ export function normalizePluginsConfigWithResolver(
   };
 }
 
-export function hasExplicitPluginConfig(plugins?: KaijiBotConfig["plugins"]): boolean {
+export function hasExplicitPluginConfig(plugins?: AllBotConfig["plugins"]): boolean {
   if (!plugins) {
     return false;
   }
@@ -173,7 +173,7 @@ export function hasExplicitPluginConfig(plugins?: KaijiBotConfig["plugins"]): bo
 }
 
 export function isBundledChannelEnabledByChannelConfig(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   pluginId: string,
 ): boolean {
   if (!cfg) {

@@ -18,7 +18,7 @@ import type {
 } from "../commands/channel-setup/types.js";
 import type { ChannelChoice } from "../commands/onboard-types.js";
 import { isChannelConfigured } from "../config/channel-configured.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { formatDocsLink } from "../terminal/links.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import type { FlowContribution } from "./types.js";
@@ -59,7 +59,7 @@ function buildChannelSetupSelectionContribution(params: {
 }
 
 export async function collectChannelStatus(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   options?: SetupChannelsOptions;
   accountOverrides: Partial<Record<ChannelChoice, string>>;
   installedPlugins?: ChannelSetupPlugin[];
@@ -155,7 +155,7 @@ export async function collectChannelStatus(params: {
 }
 
 export async function noteChannelStatus(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   options?: SetupChannelsOptions;
   accountOverrides?: Partial<Record<ChannelChoice, string>>;
@@ -190,10 +190,10 @@ export async function noteChannelPrimer(
   await prompter.note(
     [
       "DM security: default is open; all DMs are accepted.",
-      `Approve with: ${formatCliCommand("kaijibot pairing approve <channel> <code>")}`,
+      `Approve with: ${formatCliCommand("allbot pairing approve <channel> <code>")}`,
       'Public DMs require dmPolicy="open" + allowFrom=["*"].',
       "Multi-user DMs: run: " +
-        formatCliCommand('kaijibot config set session.dmScope "per-channel-peer"') +
+        formatCliCommand('allbot config set session.dmScope "per-channel-peer"') +
         ' (or "per-account-channel-peer" for multi-account channels) to isolate sessions.',
       `Docs: ${formatDocsLink("/channels/pairing", "channels/pairing")}`,
       "",
@@ -219,7 +219,7 @@ export function resolveQuickstartDefault(
 }
 
 export function resolveChannelSelectionNoteLines(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   installedPlugins: ChannelSetupPlugin[];
   selection: ChannelChoice[];
 }): string[] {

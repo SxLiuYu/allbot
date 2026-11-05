@@ -1,10 +1,10 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createOperatorApprovalsGatewayClient } from "../gateway/operator-approvals-client.js";
 import { isApprovalNotFoundError } from "./approval-errors.js";
 import type { ExecApprovalDecision } from "./exec-approvals.js";
 
 export type ResolveApprovalOverGatewayParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   approvalId: string;
   decision: ExecApprovalDecision;
   senderId?: string | null;

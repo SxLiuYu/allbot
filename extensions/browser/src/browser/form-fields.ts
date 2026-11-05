@@ -1,4 +1,4 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import type { BrowserFormField } from "./client-actions-core.js";
 
 export const DEFAULT_FILL_FIELD_TYPE = "text";

@@ -29,13 +29,13 @@ import type {
 
 const log = createSubsystemLogger("plugins/binding");
 
-const APPROVALS_PATH = "~/.kaijibot/plugin-binding-approvals.json";
+const APPROVALS_PATH = "~/.allbot/plugin-binding-approvals.json";
 const PLUGIN_BINDING_CUSTOM_ID_PREFIX = "pluginbind";
 const PLUGIN_BINDING_OWNER = "plugin";
 const PLUGIN_BINDING_SESSION_PREFIX = "plugin-binding";
 const LEGACY_CODEX_PLUGIN_SESSION_PREFIXES = [
-  "kaijibot-app-server:thread:",
-  "kaijibot-codex-app-server:thread:",
+  "allbot-app-server:thread:",
+  "allbot-codex-app-server:thread:",
 ] as const;
 
 // Runtime plugin conversation bindings are approval-driven and distinct from
@@ -111,7 +111,7 @@ type PluginBindingResolveResult =
       status: "expired";
     };
 
-const PLUGIN_BINDING_PENDING_REQUESTS_KEY = Symbol.for("kaijibot.pluginBindingPendingRequests");
+const PLUGIN_BINDING_PENDING_REQUESTS_KEY = Symbol.for("allbot.pluginBindingPendingRequests");
 
 const pendingRequests = resolveGlobalMap<string, PendingPluginBindingRequest>(
   PLUGIN_BINDING_PENDING_REQUESTS_KEY,
@@ -139,7 +139,7 @@ type PluginConversationBindingState = {
   isLegacyForeignBinding: boolean;
 };
 
-const pluginBindingGlobalStateKey = Symbol.for("kaijibot.plugins.binding.global-state");
+const pluginBindingGlobalStateKey = Symbol.for("allbot.plugins.binding.global-state");
 const pluginBindingGlobalState = resolveGlobalSingleton<PluginBindingGlobalState>(
   pluginBindingGlobalStateKey,
   () => ({
@@ -633,7 +633,7 @@ function buildDetachHintSuffix(detachHint?: string): string {
 }
 
 export function buildPluginBindingUnavailableText(binding: PluginConversationBinding): string {
-  return `The bound plugin ${resolvePluginBindingDisplayName(binding)} is not currently loaded. Routing this message to KaijiBot instead.${buildDetachHintSuffix(binding.detachHint)}`;
+  return `The bound plugin ${resolvePluginBindingDisplayName(binding)} is not currently loaded. Routing this message to AllBot instead.${buildDetachHintSuffix(binding.detachHint)}`;
 }
 
 export function buildPluginBindingDeclinedText(binding: PluginConversationBinding): string {

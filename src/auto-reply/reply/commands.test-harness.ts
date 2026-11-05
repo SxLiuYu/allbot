@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import { buildCommandContext } from "./commands-context.js";
 import type { HandleCommandsParams } from "./commands-types.js";
@@ -6,7 +6,7 @@ import { parseInlineDirectives } from "./directive-handling.js";
 
 export function buildCommandTestParams(
   commandBody: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   ctxOverrides?: Partial<MsgContext>,
   options?: {
     workspaceDir?: string;

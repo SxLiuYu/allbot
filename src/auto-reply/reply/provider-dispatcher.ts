@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { DispatchInboundResult } from "../dispatch.js";
 import {
   dispatchInboundMessageWithBufferedDispatcher,
@@ -13,7 +13,7 @@ import type {
 
 export async function dispatchReplyWithBufferedBlockDispatcher(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcherOptions: ReplyDispatcherWithTypingOptions;
   replyOptions?: Omit<GetReplyOptions, "onToolResult" | "onBlockReply">;
   replyResolver?: typeof import("../reply.js").getReplyFromConfig;
@@ -29,7 +29,7 @@ export async function dispatchReplyWithBufferedBlockDispatcher(params: {
 
 export async function dispatchReplyWithDispatcher(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcherOptions: ReplyDispatcherOptions;
   replyOptions?: Omit<GetReplyOptions, "onToolResult" | "onBlockReply">;
   replyResolver?: typeof import("../reply.js").getReplyFromConfig;

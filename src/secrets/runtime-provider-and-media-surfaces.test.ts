@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import type { PluginWebSearchProviderEntry } from "../plugins/types.js";
@@ -17,8 +17,8 @@ vi.mock("../plugins/web-search-providers.runtime.js", () => ({
   resolvePluginWebSearchProviders: resolvePluginWebSearchProvidersMock,
 }));
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function createTestProvider(params: {
@@ -85,7 +85,7 @@ function buildTestWebSearchProviders(): PluginWebSearchProviderEntry[] {
   ];
 }
 
-function createOpenAiFileModelsConfig(): NonNullable<KaijiBotConfig["models"]> {
+function createOpenAiFileModelsConfig(): NonNullable<AllBotConfig["models"]> {
   return {
     providers: {
       openai: {
@@ -124,7 +124,7 @@ describe("secrets runtime provider and media surfaces", () => {
     if (process.platform === "win32") {
       return;
     }
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-secrets-file-provider-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-secrets-file-provider-"));
     const secretsPath = path.join(root, "secrets.json");
     try {
       await fs.writeFile(
@@ -170,7 +170,7 @@ describe("secrets runtime provider and media surfaces", () => {
 
       const snapshot = await prepareSecretsRuntimeSnapshot({
         config,
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => ({ version: 1, profiles: {} }),
       });
 
@@ -184,7 +184,7 @@ describe("secrets runtime provider and media surfaces", () => {
     if (process.platform === "win32") {
       return;
     }
-    const root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-secrets-file-provider-bad-"));
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-secrets-file-provider-bad-"));
     const secretsPath = path.join(root, "secrets.json");
     try {
       await fs.writeFile(secretsPath, JSON.stringify(["not-an-object"]), "utf8");
@@ -206,7 +206,7 @@ describe("secrets runtime provider and media surfaces", () => {
               ...createOpenAiFileModelsConfig(),
             },
           }),
-          agentDirs: ["/tmp/kaijibot-agent-main"],
+          agentDirs: ["/tmp/allbot-agent-main"],
           loadAuthStore: () => ({ version: 1, profiles: {} }),
         }),
       ).rejects.toThrow("payload is not a JSON object");
@@ -243,7 +243,7 @@ describe("secrets runtime provider and media surfaces", () => {
       env: {
         MEDIA_SHARED_AUDIO_TOKEN: "shared-audio-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -286,7 +286,7 @@ describe("secrets runtime provider and media surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -337,7 +337,7 @@ describe("secrets runtime provider and media surfaces", () => {
       env: {
         MEDIA_INFERRED_AUDIO_TOKEN: "inferred-audio-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -390,7 +390,7 @@ describe("secrets runtime provider and media surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -432,7 +432,7 @@ describe("secrets runtime provider and media surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 
@@ -471,7 +471,7 @@ describe("secrets runtime provider and media surfaces", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => ({ version: 1, profiles: {} }),
     });
 

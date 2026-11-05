@@ -1,13 +1,13 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
-import { isVoiceCompatibleAudio } from "kaijibot/plugin-sdk/media-runtime";
+import { isVoiceCompatibleAudio } from "allbot/plugin-sdk/media-runtime";
 import type {
   SpeechProviderConfig,
   SpeechProviderPlugin,
   SpeechVoiceOption,
-} from "kaijibot/plugin-sdk/speech";
-import { asBoolean, asFiniteNumber, asObject, trimToUndefined } from "kaijibot/plugin-sdk/speech";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/temp-path";
+} from "allbot/plugin-sdk/speech";
+import { asBoolean, asFiniteNumber, asObject, trimToUndefined } from "allbot/plugin-sdk/speech";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/temp-path";
 import {
   CHROMIUM_FULL_VERSION,
   TRUSTED_CLIENT_TOKEN,
@@ -207,7 +207,7 @@ export function buildMicrosoftSpeechProvider(): SpeechProviderPlugin {
     isConfigured: ({ providerConfig }) => readMicrosoftProviderConfig(providerConfig).enabled,
     synthesize: async (req) => {
       const config = readMicrosoftProviderConfig(req.providerConfig);
-      const tempRoot = resolvePreferredKaijiBotTmpDir();
+      const tempRoot = resolvePreferredAllBotTmpDir();
       mkdirSync(tempRoot, { recursive: true, mode: 0o700 });
       const tempDir = mkdtempSync(path.join(tempRoot, "tts-microsoft-"));
       const overrideVoice = trimToUndefined(req.providerOverrides?.voice);

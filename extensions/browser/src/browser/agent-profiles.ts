@@ -5,10 +5,10 @@
  * Naming convention: an agent's dedicated profile is `agent-<sanitized-id>`.
  * The profile is a normal `browser.profiles` entry with an allocated CDP
  * port; its user-data-dir (`CONFIG_DIR/browser/<name>/user-data` via
- * resolveKaijiBotUserDataDir) persists across restarts, which is what keeps
+ * resolveAllBotUserDataDir) persists across restarts, which is what keeps
  * manually established logins alive between sessions.
  */
-import type { BrowserConfig, BrowserProfileConfig, KaijiBotConfig } from "../config/config.js";
+import type { BrowserConfig, BrowserProfileConfig, AllBotConfig } from "../config/config.js";
 import { loadConfig, writeConfigFile } from "../config/config.js";
 import { resolveBrowserConfig, type ResolvedBrowserConfig } from "./config.js";
 import {
@@ -19,7 +19,7 @@ import {
   isValidProfileName,
 } from "./profiles.js";
 
-/** Prefix that keeps agent profiles clear of the reserved defaults ("kaijibot", "user"). */
+/** Prefix that keeps agent profiles clear of the reserved defaults ("allbot", "user"). */
 const AGENT_PROFILE_PREFIX = "agent-";
 /** Keeps `agent-<slug>` under the 64-char profile-name cap with margin. */
 const MAX_AGENT_SLUG_CHARS = 48;
@@ -37,7 +37,7 @@ export function agentBrowserProfileName(agentId: string): string {
 }
 
 /** Read-only: the agent's persistent profile name when it already exists in config. */
-export function findAgentBrowserProfile(cfg: KaijiBotConfig, agentId: string): string | null {
+export function findAgentBrowserProfile(cfg: AllBotConfig, agentId: string): string | null {
   const name = agentBrowserProfileName(agentId);
   return cfg.browser?.profiles?.[name] ? name : null;
 }
@@ -48,11 +48,11 @@ export type EnsureAgentProfileResult = {
 };
 
 export type EnsureAgentProfileDeps = {
-  loadConfig?: () => KaijiBotConfig;
-  writeConfigFile?: (cfg: KaijiBotConfig) => Promise<void>;
+  loadConfig?: () => AllBotConfig;
+  writeConfigFile?: (cfg: AllBotConfig) => Promise<void>;
   resolveBrowserConfig?: (
     browser: BrowserConfig | undefined,
-    rootConfig: KaijiBotConfig,
+    rootConfig: AllBotConfig,
   ) => ResolvedBrowserConfig;
 };
 

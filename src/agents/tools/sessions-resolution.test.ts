@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 const callGatewayMock = vi.fn();
 vi.mock("../../gateway/call.js", () => ({
   callGateway: (opts: unknown) => callGatewayMock(opts),
@@ -36,7 +36,7 @@ describe("resolveMainSessionAlias", () => {
   it("uses normalized main key and global alias for global scope", () => {
     const cfg = {
       session: { mainKey: " Primary ", scope: "global" },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(resolveMainSessionAlias(cfg)).toEqual({
       mainKey: "primary",
@@ -46,7 +46,7 @@ describe("resolveMainSessionAlias", () => {
   });
 
   it("falls back to per-sender defaults", () => {
-    expect(resolveMainSessionAlias({} as KaijiBotConfig)).toEqual({
+    expect(resolveMainSessionAlias({} as AllBotConfig)).toEqual({
       mainKey: "main",
       alias: "main",
       scope: "per-sender",
@@ -57,7 +57,7 @@ describe("resolveMainSessionAlias", () => {
     const cfg = {
       session: { mainKey: "  work ", scope: "per-sender" },
       routing: { sessions: { mainKey: "legacy-main" } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(resolveMainSessionAlias(cfg)).toEqual({
       mainKey: "work",

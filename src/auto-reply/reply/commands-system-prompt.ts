@@ -4,7 +4,7 @@ import { resolveBootstrapContextForRun } from "../../agents/bootstrap-files.js";
 import { canExecRequestNode } from "../../agents/exec-defaults.js";
 import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import type { EmbeddedContextFile } from "../../agents/pi-embedded-helpers.js";
-import { createKaijiBotCodingTools } from "../../agents/pi-tools.js";
+import { createAllBotCodingTools } from "../../agents/pi-tools.js";
 import { resolveSandboxRuntimeStatus } from "../../agents/sandbox.js";
 import { buildWorkspaceSkillSnapshot } from "../../agents/skills.js";
 import { getSkillsSnapshotVersion } from "../../agents/skills/refresh.js";
@@ -67,7 +67,7 @@ export async function resolveCommandsSystemPromptBundle(
   const skillsPrompt = skillsSnapshot.prompt ?? "";
   const tools = (() => {
     try {
-      return createKaijiBotCodingTools({
+      return createAllBotCodingTools({
         config: params.cfg,
         agentId: params.agentId,
         workspaceDir,

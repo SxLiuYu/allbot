@@ -24,7 +24,7 @@ describe("resolveSnapshotPlan", () => {
 
   it("keeps ai snapshots for managed browsers when Playwright is available", () => {
     const resolved = resolveBrowserConfig({});
-    const profile = resolveProfile(resolved, "kaijibot");
+    const profile = resolveProfile(resolved, "allbot");
     expect(profile).toBeTruthy();
 
     const plan = resolveSnapshotPlan({

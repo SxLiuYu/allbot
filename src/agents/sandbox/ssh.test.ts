@@ -40,7 +40,7 @@ describe("sandbox ssh helpers", () => {
     sessions.push(session);
 
     const config = await fs.readFile(session.configPath, "utf8");
-    expect(config).toContain("Host kaijibot-sandbox");
+    expect(config).toContain("Host allbot-sandbox");
     expect(config).toContain("HostName example.com");
     expect(config).toContain("User peter");
     expect(config).toContain("Port 2222");
@@ -113,7 +113,7 @@ describe("sandbox ssh helpers", () => {
   it.runIf(process.platform !== "win32")(
     "rejects upload trees with symlinks that escape the local workspace",
     async () => {
-      const localDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ssh-upload-"));
+      const localDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ssh-upload-"));
       tempDirs.push(localDir);
       await fs.symlink("/etc", path.join(localDir, "escape"));
 
@@ -121,8 +121,8 @@ describe("sandbox ssh helpers", () => {
         uploadDirectoryToSshTarget({
           session: {
             command: "ssh",
-            configPath: "/tmp/kaijibot-test-ssh-config",
-            host: "kaijibot-sandbox",
+            configPath: "/tmp/allbot-test-ssh-config",
+            host: "allbot-sandbox",
           },
           localDir,
           remoteDir: "/remote/workspace",
@@ -134,7 +134,7 @@ describe("sandbox ssh helpers", () => {
   it.runIf(process.platform !== "win32")(
     "allows in-workspace symlinks that point to hardlinked files",
     async () => {
-      const localDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-ssh-upload-safe-"));
+      const localDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-ssh-upload-safe-"));
       tempDirs.push(localDir);
       const fakeSsh = path.join(localDir, "fake-ssh.sh");
       await fs.writeFile(fakeSsh, "#!/bin/sh\ncat >/dev/null\n", { mode: 0o755 });
@@ -146,8 +146,8 @@ describe("sandbox ssh helpers", () => {
         uploadDirectoryToSshTarget({
           session: {
             command: fakeSsh,
-            configPath: "/tmp/kaijibot-test-ssh-config",
-            host: "kaijibot-sandbox",
+            configPath: "/tmp/allbot-test-ssh-config",
+            host: "allbot-sandbox",
           },
           localDir,
           remoteDir: "/remote/workspace",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../../config/types.js";
+import type { AllBotConfig } from "../../../config/types.js";
 import {
   validateConfigObjectRawWithPlugins,
   validateConfigObjectWithPlugins,
@@ -8,8 +8,8 @@ import { applyLegacyDoctorMigrations, migrateLegacyConfig } from "./legacy-confi
 
 function asMigratedConfig(
   migrated: ReturnType<typeof applyLegacyDoctorMigrations>,
-): KaijiBotConfig | null {
-  return migrated.next as KaijiBotConfig | null;
+): AllBotConfig | null {
+  return migrated.next as AllBotConfig | null;
 }
 
 describe("legacy migrate audio transcription", () => {

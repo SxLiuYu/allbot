@@ -50,8 +50,8 @@ describe("resolveProviderHttpRequestConfig", () => {
     expect(resolved.allowPrivateNetwork).toBe(false);
     expect(resolved.headers.get("authorization")).toBe("Bearer override");
     expect(resolved.headers.get("x-default")).toBe("1");
-    expect(resolved.headers.get("user-agent")).toMatch(/^kaijibot\//);
-    expect(resolved.headers.get("originator")).toBe("kaijibot");
+    expect(resolved.headers.get("user-agent")).toMatch(/^allbot\//);
+    expect(resolved.headers.get("originator")).toBe("allbot");
     expect(resolved.headers.get("version")).toBeTruthy();
   });
 

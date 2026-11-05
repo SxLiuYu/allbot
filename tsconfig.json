@@ -18,13 +18,13 @@
     "target": "es2023",
     "useDefineForClassFields": false,
     "paths": {
-      "kaijibot/extension-api": ["./src/extensionAPI.ts"],
-      "kaijibot/plugin-sdk": ["./src/plugin-sdk/index.ts"],
-      "kaijibot/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
-      "@kaijibot/plugin-sdk": ["./src/plugin-sdk/index.ts"],
-      "@kaijibot/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
-      "kaijibot/plugin-sdk/account-id": ["./src/plugin-sdk/account-id.ts"],
-      "@kaijibot/*": ["./extensions/*"]
+      "allbot/extension-api": ["./src/extensionAPI.ts"],
+      "allbot/plugin-sdk": ["./src/plugin-sdk/index.ts"],
+      "allbot/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
+      "@allbot/plugin-sdk": ["./src/plugin-sdk/index.ts"],
+      "@allbot/plugin-sdk/*": ["./src/plugin-sdk/*.ts"],
+      "allbot/plugin-sdk/account-id": ["./src/plugin-sdk/account-id.ts"],
+      "@allbot/*": ["./extensions/*"]
     }
   },
   "include": ["src/**/*", "ui/**/*", "extensions/**/*", "packages/**/*"],

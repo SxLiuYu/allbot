@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withAudioFixture, withVideoFixture } from "./runner.test-utils.js";
 import type { AudioTranscriptionRequest, VideoDescriptionRequest } from "./types.js";
 
@@ -79,7 +79,7 @@ async function runAudioCapabilityWithFetchCapture(params: {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     const result = await runCapability({
       capability: "audio",
@@ -111,7 +111,7 @@ describe("runCapability proxy fetch passthrough", () => {
   it("passes fetchFn to audio provider when HTTPS_PROXY is set", async () => {
     vi.stubEnv("HTTPS_PROXY", "http://proxy.test:8080");
     const seenFetchFn = await runAudioCapabilityWithFetchCapture({
-      fixturePrefix: "kaijibot-audio-proxy",
+      fixturePrefix: "allbot-audio-proxy",
       outputText: "transcribed",
     });
     expect(seenFetchFn).toBe(proxyFetchMocks.proxyFetch);
@@ -120,7 +120,7 @@ describe("runCapability proxy fetch passthrough", () => {
   it("passes fetchFn to video provider when HTTPS_PROXY is set", async () => {
     vi.stubEnv("HTTPS_PROXY", "http://proxy.test:8080");
 
-    await withVideoFixture("kaijibot-video-proxy", async ({ ctx, media, cache }) => {
+    await withVideoFixture("allbot-video-proxy", async ({ ctx, media, cache }) => {
       let seenFetchFn: typeof fetch | undefined;
 
       const result = await runCapability({
@@ -142,7 +142,7 @@ describe("runCapability proxy fetch passthrough", () => {
               },
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         ctx,
         attachments: cache,
         media,
@@ -173,7 +173,7 @@ describe("runCapability proxy fetch passthrough", () => {
     vi.stubEnv("http_proxy", "");
 
     const seenFetchFn = await runAudioCapabilityWithFetchCapture({
-      fixturePrefix: "kaijibot-audio-no-proxy",
+      fixturePrefix: "allbot-audio-no-proxy",
       outputText: "ok",
     });
     expect(seenFetchFn).toBeUndefined();

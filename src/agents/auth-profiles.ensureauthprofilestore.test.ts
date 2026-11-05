@@ -61,7 +61,7 @@ describe("ensureAuthProfileStore", () => {
   }
 
   it("migrates legacy auth.json and deletes it (PR #368)", () => {
-    const agentDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-auth-profiles-"));
+    const agentDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-auth-profiles-"));
     try {
       const legacyPath = path.join(agentDir, "auth.json");
       fs.writeFileSync(
@@ -102,8 +102,8 @@ describe("ensureAuthProfileStore", () => {
   });
 
   it("merges main auth profiles into agent store and keeps agent overrides", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-auth-merge-"));
-    const previousAgentDir = process.env.KAIJIBOT_AGENT_DIR;
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-auth-merge-"));
+    const previousAgentDir = process.env.ALLBOT_AGENT_DIR;
     const previousPiAgentDir = process.env.PI_CODING_AGENT_DIR;
     try {
       const mainDir = path.join(root, "main-agent");
@@ -111,7 +111,7 @@ describe("ensureAuthProfileStore", () => {
       fs.mkdirSync(mainDir, { recursive: true });
       fs.mkdirSync(agentDir, { recursive: true });
 
-      process.env.KAIJIBOT_AGENT_DIR = mainDir;
+      process.env.ALLBOT_AGENT_DIR = mainDir;
       process.env.PI_CODING_AGENT_DIR = mainDir;
 
       const mainStore = {
@@ -164,9 +164,9 @@ describe("ensureAuthProfileStore", () => {
       });
     } finally {
       if (previousAgentDir === undefined) {
-        delete process.env.KAIJIBOT_AGENT_DIR;
+        delete process.env.ALLBOT_AGENT_DIR;
       } else {
-        process.env.KAIJIBOT_AGENT_DIR = previousAgentDir;
+        process.env.ALLBOT_AGENT_DIR = previousAgentDir;
       }
       if (previousPiAgentDir === undefined) {
         delete process.env.PI_CODING_AGENT_DIR;
@@ -231,7 +231,7 @@ describe("ensureAuthProfileStore", () => {
   ] as const)(
     "normalizes auth-profiles credential aliases with canonical-field precedence: $name",
     ({ name, profile, expected }) => {
-      withTempAgentDir("kaijibot-auth-alias-", (agentDir) => {
+      withTempAgentDir("allbot-auth-alias-", (agentDir) => {
         const storeData = {
           version: AUTH_STORE_VERSION,
           profiles: {
@@ -251,7 +251,7 @@ describe("ensureAuthProfileStore", () => {
   );
 
   it("normalizes mode/apiKey aliases while migrating legacy auth.json", () => {
-    withTempAgentDir("kaijibot-auth-legacy-alias-", (agentDir) => {
+    withTempAgentDir("allbot-auth-legacy-alias-", (agentDir) => {
       fs.writeFileSync(
         path.join(agentDir, "auth.json"),
         `${JSON.stringify(
@@ -278,9 +278,9 @@ describe("ensureAuthProfileStore", () => {
   });
 
   it("merges legacy oauth.json into auth-profiles.json", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-oauth-migrate-"));
-    const previousStateDir = process.env.KAIJIBOT_STATE_DIR;
-    const previousAgentDir = process.env.KAIJIBOT_AGENT_DIR;
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-oauth-migrate-"));
+    const previousStateDir = process.env.ALLBOT_STATE_DIR;
+    const previousAgentDir = process.env.ALLBOT_AGENT_DIR;
     const previousPiAgentDir = process.env.PI_CODING_AGENT_DIR;
     try {
       const agentDir = path.join(root, "agent");
@@ -304,8 +304,8 @@ describe("ensureAuthProfileStore", () => {
         "utf8",
       );
 
-      process.env.KAIJIBOT_STATE_DIR = root;
-      process.env.KAIJIBOT_AGENT_DIR = agentDir;
+      process.env.ALLBOT_STATE_DIR = root;
+      process.env.ALLBOT_AGENT_DIR = agentDir;
       process.env.PI_CODING_AGENT_DIR = agentDir;
       clearRuntimeAuthProfileStoreSnapshots();
 
@@ -331,14 +331,14 @@ describe("ensureAuthProfileStore", () => {
     } finally {
       clearRuntimeAuthProfileStoreSnapshots();
       if (previousStateDir === undefined) {
-        delete process.env.KAIJIBOT_STATE_DIR;
+        delete process.env.ALLBOT_STATE_DIR;
       } else {
-        process.env.KAIJIBOT_STATE_DIR = previousStateDir;
+        process.env.ALLBOT_STATE_DIR = previousStateDir;
       }
       if (previousAgentDir === undefined) {
-        delete process.env.KAIJIBOT_AGENT_DIR;
+        delete process.env.ALLBOT_AGENT_DIR;
       } else {
-        process.env.KAIJIBOT_AGENT_DIR = previousAgentDir;
+        process.env.ALLBOT_AGENT_DIR = previousAgentDir;
       }
       if (previousPiAgentDir === undefined) {
         delete process.env.PI_CODING_AGENT_DIR;
@@ -350,9 +350,9 @@ describe("ensureAuthProfileStore", () => {
   });
 
   it("exposes Codex CLI auth without persisting copied tokens into auth-profiles.json", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-codex-external-sync-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-codex-external-sync-"));
     const previousCodexHome = process.env.CODEX_HOME;
-    const previousAgentDir = process.env.KAIJIBOT_AGENT_DIR;
+    const previousAgentDir = process.env.ALLBOT_AGENT_DIR;
     const previousPiAgentDir = process.env.PI_CODING_AGENT_DIR;
     try {
       const agentDir = path.join(root, "agent");
@@ -378,7 +378,7 @@ describe("ensureAuthProfileStore", () => {
       );
 
       process.env.CODEX_HOME = codexHome;
-      process.env.KAIJIBOT_AGENT_DIR = agentDir;
+      process.env.ALLBOT_AGENT_DIR = agentDir;
       process.env.PI_CODING_AGENT_DIR = agentDir;
       clearRuntimeAuthProfileStoreSnapshots();
 
@@ -399,9 +399,9 @@ describe("ensureAuthProfileStore", () => {
         process.env.CODEX_HOME = previousCodexHome;
       }
       if (previousAgentDir === undefined) {
-        delete process.env.KAIJIBOT_AGENT_DIR;
+        delete process.env.ALLBOT_AGENT_DIR;
       } else {
-        process.env.KAIJIBOT_AGENT_DIR = previousAgentDir;
+        process.env.ALLBOT_AGENT_DIR = previousAgentDir;
       }
       if (previousPiAgentDir === undefined) {
         delete process.env.PI_CODING_AGENT_DIR;
@@ -413,10 +413,10 @@ describe("ensureAuthProfileStore", () => {
   });
 
   it("does not write inherited auth stores during secrets runtime reads", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-secrets-runtime-"));
-    const previousStateDir = process.env.KAIJIBOT_STATE_DIR;
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-secrets-runtime-"));
+    const previousStateDir = process.env.ALLBOT_STATE_DIR;
     try {
-      const stateDir = path.join(root, ".kaijibot");
+      const stateDir = path.join(root, ".allbot");
       const mainAgentDir = path.join(stateDir, "agents", "main", "agent");
       const workerAgentDir = path.join(stateDir, "agents", "worker", "agent");
       const workerStorePath = path.join(workerAgentDir, "auth-profiles.json");
@@ -439,7 +439,7 @@ describe("ensureAuthProfileStore", () => {
         )}\n`,
         "utf8",
       );
-      process.env.KAIJIBOT_STATE_DIR = stateDir;
+      process.env.ALLBOT_STATE_DIR = stateDir;
       clearRuntimeAuthProfileStoreSnapshots();
 
       const store = loadAuthProfileStoreForRuntime(workerAgentDir, { readOnly: true });
@@ -452,9 +452,9 @@ describe("ensureAuthProfileStore", () => {
     } finally {
       clearRuntimeAuthProfileStoreSnapshots();
       if (previousStateDir === undefined) {
-        delete process.env.KAIJIBOT_STATE_DIR;
+        delete process.env.ALLBOT_STATE_DIR;
       } else {
-        process.env.KAIJIBOT_STATE_DIR = previousStateDir;
+        process.env.ALLBOT_STATE_DIR = previousStateDir;
       }
       fs.rmSync(root, { recursive: true, force: true });
     }
@@ -463,7 +463,7 @@ describe("ensureAuthProfileStore", () => {
   it("logs one warning with aggregated reasons for rejected auth-profiles entries", () => {
     const warnSpy = vi.spyOn(log, "warn").mockImplementation(() => undefined);
     try {
-      withTempAgentDir("kaijibot-auth-invalid-", (agentDir) => {
+      withTempAgentDir("allbot-auth-invalid-", (agentDir) => {
         const invalidStore = {
           version: AUTH_STORE_VERSION,
           profiles: {
@@ -507,7 +507,7 @@ describe("ensureAuthProfileStore", () => {
   it.each([
     {
       name: "migrates SecretRef object in `key` to `keyRef` and clears `key`",
-      prefix: "kaijibot-nonstr-key-ref-",
+      prefix: "allbot-nonstr-key-ref-",
       profileId: "openai:default",
       profile: {
         type: "api_key",
@@ -526,7 +526,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "deletes non-string non-SecretRef `key` without setting keyRef",
-      prefix: "kaijibot-nonstr-key-num-",
+      prefix: "allbot-nonstr-key-num-",
       profileId: "openai:default",
       profile: {
         type: "api_key",
@@ -541,7 +541,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "does not overwrite existing `keyRef` when `key` contains a SecretRef",
-      prefix: "kaijibot-nonstr-key-dup-",
+      prefix: "allbot-nonstr-key-dup-",
       profileId: "openai:default",
       profile: {
         type: "api_key",
@@ -561,7 +561,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "overwrites malformed `keyRef` with migrated ref from `key`",
-      prefix: "kaijibot-nonstr-key-malformed-ref-",
+      prefix: "allbot-nonstr-key-malformed-ref-",
       profileId: "openai:default",
       profile: {
         type: "api_key",
@@ -581,7 +581,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "preserves valid string `key` values unchanged",
-      prefix: "kaijibot-str-key-",
+      prefix: "allbot-str-key-",
       profileId: "openai:default",
       profile: {
         type: "api_key",
@@ -595,7 +595,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "migrates SecretRef object in `token` to `tokenRef` and clears `token`",
-      prefix: "kaijibot-nonstr-token-ref-",
+      prefix: "allbot-nonstr-token-ref-",
       profileId: "anthropic:default",
       profile: {
         type: "token",
@@ -614,7 +614,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "deletes non-string non-SecretRef `token` without setting tokenRef",
-      prefix: "kaijibot-nonstr-token-num-",
+      prefix: "allbot-nonstr-token-num-",
       profileId: "anthropic:default",
       profile: {
         type: "token",
@@ -629,7 +629,7 @@ describe("ensureAuthProfileStore", () => {
     },
     {
       name: "preserves valid string `token` values unchanged",
-      prefix: "kaijibot-str-token-",
+      prefix: "allbot-str-token-",
       profileId: "anthropic:default",
       profile: {
         type: "token",

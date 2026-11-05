@@ -3,4 +3,4 @@ export {
   hasConfiguredSecretInput,
   normalizeResolvedSecretInputString,
   normalizeSecretInputString,
-} from "kaijibot/plugin-sdk/secret-input";
+} from "allbot/plugin-sdk/secret-input";

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   expectedIntegrityForUpdate,
   readInstalledPackageVersion,
@@ -32,7 +32,7 @@ export type PluginUpdateOutcome = {
 };
 
 export type PluginUpdateSummary = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changed: boolean;
   outcomes: PluginUpdateOutcome[];
 };
@@ -55,7 +55,7 @@ export type PluginChannelSyncSummary = {
 };
 
 export type PluginChannelSyncResult = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changed: boolean;
   summary: PluginChannelSyncSummary;
 };
@@ -171,7 +171,7 @@ function replacePluginIdInList(
   return next;
 }
 
-function migratePluginConfigId(cfg: KaijiBotConfig, fromId: string, toId: string): KaijiBotConfig {
+function migratePluginConfigId(cfg: AllBotConfig, fromId: string, toId: string): AllBotConfig {
   if (fromId === toId) {
     return cfg;
   }
@@ -253,7 +253,7 @@ function createPluginUpdateIntegrityDriftHandler(params: {
 }
 
 export async function updateNpmInstalledPlugins(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   logger?: PluginUpdateLogger;
   pluginIds?: string[];
   skipIds?: Set<string>;
@@ -601,7 +601,7 @@ export async function updateNpmInstalledPlugins(params: {
 }
 
 export async function syncPluginsForUpdateChannel(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   channel: UpdateChannel;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;

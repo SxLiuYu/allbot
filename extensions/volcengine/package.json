@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/volcengine-provider",
+  "name": "@allbot/volcengine-provider",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Volcengine provider plugin",
+  "description": "AllBot Volcengine provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

@@ -12,7 +12,7 @@ title: "Authentication"
 This page covers **model provider** authentication (API keys, OAuth, Claude CLI reuse, and Anthropic setup-token). For **gateway connection** authentication (token, password, trusted-proxy), see [Configuration](/gateway/configuration) and [Trusted Proxy Auth](/gateway/trusted-proxy-auth).
 </Note>
 
-KaijiBot supports OAuth and API keys for model providers. For always-on gateway
+AllBot supports OAuth and API keys for model providers. For always-on gateway
 hosts, API keys are usually the most predictable option. Subscription/OAuth
 flows are also supported when they match your provider account model.
 
@@ -27,21 +27,21 @@ For credential eligibility/reason-code rules used by `models status --probe`, se
 If you’re running a long-lived gateway, start with an API key for your chosen
 provider.
 For Anthropic specifically, API key auth is still the most predictable server
-setup, but KaijiBot also supports reusing a local Claude CLI login.
+setup, but AllBot also supports reusing a local Claude CLI login.
 
 1. Create an API key in your provider console.
-2. Put it on the **gateway host** (the machine running `kaijibot gateway`).
+2. Put it on the **gateway host** (the machine running `allbot gateway`).
 
 ```bash
 export <PROVIDER>_API_KEY="..."
-kaijibot models status
+allbot models status
 ```
 
 3. If the Gateway runs under systemd/launchd, prefer putting the key in
-   `~/.kaijibot/.env` so the daemon can read it:
+   `~/.allbot/.env` so the daemon can read it:
 
 ```bash
-cat >> ~/.kaijibot/.env <<'EOF'
+cat >> ~/.allbot/.env <<'EOF'
 <PROVIDER>_API_KEY=...
 EOF
 ```
@@ -49,21 +49,21 @@ EOF
 Then restart the daemon (or restart your Gateway process) and re-check:
 
 ```bash
-kaijibot models status
-kaijibot doctor
+allbot models status
+allbot doctor
 ```
 
 If you’d rather not manage env vars yourself, onboarding can store
-API keys for daemon use: `kaijibot onboard`.
+API keys for daemon use: `allbot onboard`.
 
 See [Help](/help) for details on env inheritance (`env.shellEnv`,
-`~/.kaijibot/.env`, systemd/launchd).
+`~/.allbot/.env`, systemd/launchd).
 
 ## Anthropic: Claude CLI and token compatibility
 
-Anthropic setup-token auth is still available in KaijiBot as a supported token
-path. Anthropic staff has since told us that KaijiBot-style Claude CLI usage is
-allowed again, so KaijiBot treats Claude CLI reuse and `claude -p` usage as
+Anthropic setup-token auth is still available in AllBot as a supported token
+path. Anthropic staff has since told us that AllBot-style Claude CLI usage is
+allowed again, so AllBot treats Claude CLI reuse and `claude -p` usage as
 sanctioned for this integration unless Anthropic publishes a new policy. When
 Claude CLI reuse is available on the host, that is now the preferred path.
 
@@ -74,7 +74,7 @@ Anthropic Claude CLI path in onboarding/configure.
 Manual token entry (any provider; writes `auth-profiles.json` + updates config):
 
 ```bash
-kaijibot models auth paste-token --provider openrouter
+allbot models auth paste-token --provider openrouter
 ```
 
 Auth profile refs are also supported for static credentials:
@@ -86,13 +86,13 @@ Auth profile refs are also supported for static credentials:
 Automation-friendly check (exit `1` when expired/missing, `2` when expiring):
 
 ```bash
-kaijibot models status --check
+allbot models status --check
 ```
 
 Live auth probes:
 
 ```bash
-kaijibot models status --probe
+allbot models status --probe
 ```
 
 Notes:
@@ -100,7 +100,7 @@ Notes:
 - Probe rows can come from auth profiles, env credentials, or `models.json`.
 - If explicit `auth.order.<provider>` omits a stored profile, probe reports
   `excluded_by_auth_order` for that profile instead of trying it.
-- If auth exists but KaijiBot cannot resolve a probeable model candidate for
+- If auth exists but AllBot cannot resolve a probeable model candidate for
   that provider, probe reports `status: no_model`.
 - Rate-limit cooldowns can be model-scoped. A profile cooling down for one
   model can still be usable for a sibling model on the same provider.
@@ -112,8 +112,8 @@ Optional ops scripts (systemd/Termux) are documented here:
 
 The Anthropic `claude-cli` backend is supported again.
 
-- Anthropic staff told us this KaijiBot integration path is allowed again.
-- KaijiBot therefore treats Claude CLI reuse and `claude -p` usage as sanctioned
+- Anthropic staff told us this AllBot integration path is allowed again.
+- AllBot therefore treats Claude CLI reuse and `claude -p` usage as sanctioned
   for Anthropic-backed runs unless Anthropic publishes a new policy.
 - Anthropic API keys remain the most predictable choice for long-lived gateway
   hosts and explicit server-side billing control.
@@ -121,8 +121,8 @@ The Anthropic `claude-cli` backend is supported again.
 ## Checking model auth status
 
 ```bash
-kaijibot models status
-kaijibot doctor
+allbot models status
+allbot doctor
 ```
 
 ## API key rotation behavior (gateway)
@@ -131,13 +131,13 @@ Some providers support retrying a request with alternative keys when an API call
 hits a provider rate limit.
 
 - Priority order:
-  - `KAIJIBOT_LIVE_<PROVIDER>_KEY` (single override)
+  - `ALLBOT_LIVE_<PROVIDER>_KEY` (single override)
   - `<PROVIDER>_API_KEYS`
   - `<PROVIDER>_API_KEY`
   - `<PROVIDER>_API_KEY_*`
 - Google providers also include `GOOGLE_API_KEY` as an additional fallback.
 - The same key list is deduplicated before use.
-- KaijiBot retries with the next key only for rate-limit errors (for example
+- AllBot retries with the next key only for rate-limit errors (for example
   `429`, `rate_limit`, `quota`, `resource exhausted`, `Too many concurrent
 requests`, `ThrottlingException`, `concurrency limit reached`, or
   `workers_ai ... quota limit exceeded`).
@@ -157,13 +157,13 @@ Use `/model` (or `/model list`) for a compact picker; use `/model status` for th
 Set an explicit auth profile order override for an agent (stored in that agent’s `auth-state.json`):
 
 ```bash
-kaijibot models auth order get --provider anthropic
-kaijibot models auth order set --provider anthropic anthropic:default
-kaijibot models auth order clear --provider anthropic
+allbot models auth order get --provider anthropic
+allbot models auth order set --provider anthropic anthropic:default
+allbot models auth order clear --provider anthropic
 ```
 
 Use `--agent <id>` to target a specific agent; omit it to use the configured default agent.
-When you debug order issues, `kaijibot models status --probe` shows omitted
+When you debug order issues, `allbot models status --probe` shows omitted
 stored profiles as `excluded_by_auth_order` instead of silently skipping them.
 When you debug cooldown issues, remember that rate-limit cooldowns can be tied
 to one model id rather than the whole provider profile.
@@ -176,11 +176,11 @@ If the Anthropic profile is missing, configure an Anthropic API key on the
 **gateway host** or set up the Anthropic setup-token path, then re-check:
 
 ```bash
-kaijibot models status
+allbot models status
 ```
 
 ### Token expiring/expired
 
-Run `kaijibot models status` to confirm which profile is expiring. If an
+Run `allbot models status` to confirm which profile is expiring. If an
 Anthropic token profile is missing or expired, refresh that setup via
 setup-token or migrate to an Anthropic API key.

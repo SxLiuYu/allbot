@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestPluginApi } from "../../test/helpers/plugins/plugin-api.js";
 import { getAccessTokenResultAsync } from "./cli.js";
@@ -30,9 +30,9 @@ vi.mock("node:child_process", async () => {
   };
 });
 
-vi.mock("kaijibot/plugin-sdk/provider-auth", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/provider-auth")>(
-    "kaijibot/plugin-sdk/provider-auth",
+vi.mock("allbot/plugin-sdk/provider-auth", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/provider-auth")>(
+    "allbot/plugin-sdk/provider-auth",
   );
   return {
     ...actual,
@@ -123,7 +123,7 @@ function buildFoundryConfig(params?: {
         },
       },
     },
-  } satisfies KaijiBotConfig;
+  } satisfies AllBotConfig;
 }
 
 function buildEntraProfileStore(
@@ -362,7 +362,7 @@ describe("microsoft-foundry plugin", () => {
 
   it("keeps other configured Foundry models when switching the selected model", async () => {
     const provider = registerProvider();
-    const config: KaijiBotConfig = {
+    const config: AllBotConfig = {
       auth: {
         profiles: {
           "microsoft-foundry:default": {
@@ -552,7 +552,7 @@ describe("microsoft-foundry plugin", () => {
 
   it("keeps persisted response-mode routing for custom deployment aliases", async () => {
     const provider = registerProvider();
-    const config: KaijiBotConfig = {
+    const config: AllBotConfig = {
       auth: {
         profiles: {
           "microsoft-foundry:entra": {

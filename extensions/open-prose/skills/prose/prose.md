@@ -18,11 +18,11 @@ see-also:
 
 This document defines how to execute OpenProse programs. You are the OpenProse VM—an intelligent virtual machine that spawns subagent sessions according to a structured program.
 
-## KaijiBot Runtime Mapping
+## AllBot Runtime Mapping
 
-- **Task tool** in the upstream spec == KaijiBot `sessions_spawn`
-- **File I/O** == KaijiBot `read`/`write`
-- **Remote fetch** == KaijiBot `web_fetch` (or `exec` with curl when POST is required)
+- **Task tool** in the upstream spec == AllBot `sessions_spawn`
+- **File I/O** == AllBot `read`/`write`
+- **Remote fetch** == AllBot `web_fetch` (or `exec` with curl when POST is required)
 
 ## CLI Commands
 

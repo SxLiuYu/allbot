@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { MemoryCitationsMode } from "../config/types.memory.js";
 import type { MemorySearchManager } from "../memory-host-sdk/runtime-files.js";
 
@@ -76,7 +76,7 @@ export type MemoryFlushPlan = {
 };
 
 export type MemoryFlushPlanResolver = (params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   nowMs?: number;
 }) => MemoryFlushPlan | null;
 
@@ -97,7 +97,7 @@ export type MemoryRuntimeBackendConfig =
 
 export type MemoryPluginRuntime = {
   getMemorySearchManager(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
     purpose?: "default" | "status";
   }): Promise<{
@@ -105,7 +105,7 @@ export type MemoryPluginRuntime = {
     error?: string;
   }>;
   resolveMemoryBackendConfig(params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     agentId: string;
   }): MemoryRuntimeBackendConfig;
   closeAllMemorySearchManagers?(): Promise<void>;
@@ -123,7 +123,7 @@ export type MemoryPluginPublicArtifact = {
 };
 
 export type MemoryPluginPublicArtifactsProvider = {
-  listArtifacts(params: { cfg: KaijiBotConfig }): Promise<MemoryPluginPublicArtifact[]>;
+  listArtifacts(params: { cfg: AllBotConfig }): Promise<MemoryPluginPublicArtifact[]>;
 };
 
 export type MemoryPluginCapability = {
@@ -236,7 +236,7 @@ export function registerMemoryFlushPlanResolver(resolver: MemoryFlushPlanResolve
 }
 
 export function resolveMemoryFlushPlan(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   nowMs?: number;
 }): MemoryFlushPlan | null {
   return (
@@ -276,7 +276,7 @@ function cloneMemoryPublicArtifact(
 }
 
 export async function listActiveMemoryPublicArtifacts(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<MemoryPluginPublicArtifact[]> {
   const artifacts =
     (await memoryPluginState.capability?.capability.publicArtifacts?.listArtifacts(params)) ?? [];

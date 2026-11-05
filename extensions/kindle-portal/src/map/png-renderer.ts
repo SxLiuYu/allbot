@@ -241,7 +241,7 @@ function buildOnboardingSvg(width: number, height: number): string {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`,
     `<rect width="100%" height="100%" fill="white"/>`,
     `<text x="${cx}" y="500" text-anchor="middle" font-family="serif" font-size="20" fill="black">No persona yet.</text>`,
-    `<text x="${cx}" y="540" text-anchor="middle" font-family="serif" font-size="16" fill="gray">Chat with KaijiBot to build your cognitive map.</text>`,
+    `<text x="${cx}" y="540" text-anchor="middle" font-family="serif" font-size="16" fill="gray">Chat with AllBot to build your cognitive map.</text>`,
     `</svg>`,
   ].join("\n");
 }

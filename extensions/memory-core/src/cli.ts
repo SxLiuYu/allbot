@@ -3,7 +3,7 @@ import {
   formatDocsLink,
   formatHelpExamples,
   theme,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-cli";
+} from "allbot/plugin-sdk/memory-core-host-runtime-cli";
 import type {
   MemoryCommandOptions,
   MemoryPromoteCommandOptions,
@@ -61,31 +61,31 @@ export function registerMemoryCli(program: Command) {
       "after",
       () =>
         `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-          ["kaijibot memory status", "Show index and provider status."],
+          ["allbot memory status", "Show index and provider status."],
           [
-            "kaijibot memory status --fix",
+            "allbot memory status --fix",
             "Repair stale recall locks and normalize promotion metadata.",
           ],
-          ["kaijibot memory status --deep", "Probe embedding provider readiness."],
-          ["kaijibot memory index --force", "Force a full reindex."],
-          ['kaijibot memory search "meeting notes"', "Quick search using positional query."],
+          ["allbot memory status --deep", "Probe embedding provider readiness."],
+          ["allbot memory index --force", "Force a full reindex."],
+          ['allbot memory search "meeting notes"', "Quick search using positional query."],
           [
-            'kaijibot memory search --query "deployment" --max-results 20',
+            'allbot memory search --query "deployment" --max-results 20',
             "Limit results for focused troubleshooting.",
           ],
           [
-            `kaijibot memory promote --limit 10 --min-score ${DEFAULT_PROMOTION_MIN_SCORE}`,
+            `allbot memory promote --limit 10 --min-score ${DEFAULT_PROMOTION_MIN_SCORE}`,
             "Review weighted short-term candidates for long-term memory.",
           ],
           [
-            "kaijibot memory promote --apply",
+            "allbot memory promote --apply",
             "Append top-ranked short-term candidates into MEMORY.md.",
           ],
           [
-            'kaijibot memory promote-explain "router vlan"',
+            'allbot memory promote-explain "router vlan"',
             "Explain why a specific candidate would or would not promote.",
           ],
-          ["kaijibot memory status --json", "Output machine-readable JSON (good for scripts)."],
+          ["allbot memory status --json", "Output machine-readable JSON (good for scripts)."],
         ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/memory", "gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/memory.md")}\n`,
     );
 

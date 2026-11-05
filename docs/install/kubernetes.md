@@ -1,18 +1,18 @@
 ---
-summary: "Deploy KaijiBot Gateway to a Kubernetes cluster with Kustomize"
+summary: "Deploy AllBot Gateway to a Kubernetes cluster with Kustomize"
 read_when:
-  - You want to run KaijiBot on a Kubernetes cluster
-  - You want to test KaijiBot in a Kubernetes environment
+  - You want to run AllBot on a Kubernetes cluster
+  - You want to test AllBot in a Kubernetes environment
 title: "Kubernetes"
 ---
 
-# KaijiBot on Kubernetes
+# AllBot on Kubernetes
 
-A minimal starting point for running KaijiBot on Kubernetes — not a production-ready deployment. It covers the core resources and is meant to be adapted to your environment.
+A minimal starting point for running AllBot on Kubernetes — not a production-ready deployment. It covers the core resources and is meant to be adapted to your environment.
 
 ## Why not Helm?
 
-KaijiBot is a single container with some config files. The interesting customization is in agent content (markdown files, skills, config overrides), not infrastructure templating. Kustomize handles overlays without the overhead of a Helm chart. If your deployment grows more complex, a Helm chart can be layered on top of these manifests.
+AllBot is a single container with some config files. The interesting customization is in agent content (markdown files, skills, config overrides), not infrastructure templating. Kustomize handles overlays without the overhead of a Helm chart. If your deployment grows more complex, a Helm chart can be layered on top of these manifests.
 
 ## What you need
 
@@ -27,7 +27,7 @@ KaijiBot is a single container with some config files. The interesting customiza
 export <PROVIDER>_API_KEY="..."
 ./scripts/k8s/deploy.sh
 
-kubectl port-forward svc/kaijibot 18789:18789 -n kaijibot
+kubectl port-forward svc/allbot 18789:18789 -n allbot
 open http://localhost:18789
 ```
 
@@ -35,7 +35,7 @@ Retrieve the configured shared secret for the Control UI. This deploy script
 creates token auth by default:
 
 ```bash
-kubectl get secret kaijibot-secrets -n kaijibot -o jsonpath='{.data.KAIJIBOT_GATEWAY_TOKEN}' | base64 -d
+kubectl get secret allbot-secrets -n allbot -o jsonpath='{.data.ALLBOT_GATEWAY_TOKEN}' | base64 -d
 ```
 
 For local debugging, `./scripts/k8s/deploy.sh --show-token` prints the token after deploy.
@@ -78,19 +78,19 @@ Use `--show-token` with either command if you want the token printed to stdout f
 ### 2) Access the gateway
 
 ```bash
-kubectl port-forward svc/kaijibot 18789:18789 -n kaijibot
+kubectl port-forward svc/allbot 18789:18789 -n allbot
 open http://localhost:18789
 ```
 
 ## What gets deployed
 
 ```
-Namespace: kaijibot (configurable via KAIJIBOT_NAMESPACE)
-├── Deployment/kaijibot        # Single pod, init container + gateway
-├── Service/kaijibot           # ClusterIP on port 18789
+Namespace: allbot (configurable via ALLBOT_NAMESPACE)
+├── Deployment/allbot        # Single pod, init container + gateway
+├── Service/allbot           # ClusterIP on port 18789
 ├── PersistentVolumeClaim      # 10Gi for agent state and config
-├── ConfigMap/kaijibot-config  # kaijibot.json + AGENTS.md
-└── Secret/kaijibot-secrets    # Gateway token + API keys
+├── ConfigMap/allbot-config  # allbot.json + AGENTS.md
+└── Secret/allbot-secrets    # Gateway token + API keys
 ```
 
 ## Customization
@@ -105,7 +105,7 @@ Edit the `AGENTS.md` in `scripts/k8s/manifests/configmap.yaml` and redeploy:
 
 ### Gateway config
 
-Edit `kaijibot.json` in `scripts/k8s/manifests/configmap.yaml`. See [Gateway configuration](/gateway/configuration) for the full reference.
+Edit `allbot.json` in `scripts/k8s/manifests/configmap.yaml`. See [Gateway configuration](/gateway/configuration) for the full reference.
 
 ### Add providers
 
@@ -123,15 +123,15 @@ Existing provider keys stay in the Secret unless you overwrite them.
 Or patch the Secret directly:
 
 ```bash
-kubectl patch secret kaijibot-secrets -n kaijibot \
+kubectl patch secret allbot-secrets -n allbot \
   -p '{"stringData":{"<PROVIDER>_API_KEY":"..."}}'
-kubectl rollout restart deployment/kaijibot -n kaijibot
+kubectl rollout restart deployment/allbot -n allbot
 ```
 
 ### Custom namespace
 
 ```bash
-KAIJIBOT_NAMESPACE=my-namespace ./scripts/k8s/deploy.sh
+ALLBOT_NAMESPACE=my-namespace ./scripts/k8s/deploy.sh
 ```
 
 ### Custom image
@@ -139,7 +139,7 @@ KAIJIBOT_NAMESPACE=my-namespace ./scripts/k8s/deploy.sh
 Edit the `image` field in `scripts/k8s/manifests/deployment.yaml`:
 
 ```yaml
-image: ghcr.io/kaijibot/kaijibot:latest # or pin to a specific version from https://github.com/kaijibot/kaijibot/releases
+image: ghcr.io/allbot/allbot:latest # or pin to a specific version from https://github.com/allbot/allbot/releases
 ```
 
 ### Expose beyond port-forward
@@ -185,7 +185,7 @@ scripts/k8s/
 ├── create-kind.sh              # Local Kind cluster (auto-detects docker/podman)
 └── manifests/
     ├── kustomization.yaml      # Kustomize base
-    ├── configmap.yaml          # kaijibot.json + AGENTS.md
+    ├── configmap.yaml          # allbot.json + AGENTS.md
     ├── deployment.yaml         # Pod spec with security hardening
     ├── pvc.yaml                # 10Gi persistent storage
     └── service.yaml            # ClusterIP on 18789

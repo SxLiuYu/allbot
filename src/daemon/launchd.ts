@@ -36,11 +36,11 @@ const LAUNCH_AGENT_DIR_MODE = 0o755;
 const LAUNCH_AGENT_PLIST_MODE = 0o644;
 
 function resolveLaunchAgentLabel(args?: { env?: Record<string, string | undefined> }): string {
-  const envLabel = args?.env?.KAIJIBOT_LAUNCHD_LABEL?.trim();
+  const envLabel = args?.env?.ALLBOT_LAUNCHD_LABEL?.trim();
   if (envLabel) {
     return envLabel;
   }
-  return resolveGatewayLaunchAgentLabel(args?.env?.KAIJIBOT_PROFILE);
+  return resolveGatewayLaunchAgentLabel(args?.env?.ALLBOT_PROFILE);
 }
 
 function resolveLaunchAgentPlistPathForLabel(
@@ -63,7 +63,7 @@ export function resolveGatewayLogPaths(env: GatewayServiceEnv): {
 } {
   const stateDir = resolveGatewayStateDir(env);
   const logDir = path.join(stateDir, "logs");
-  const prefix = env.KAIJIBOT_LOG_PREFIX?.trim() || "gateway";
+  const prefix = env.ALLBOT_LOG_PREFIX?.trim() || "gateway";
   return {
     logDir,
     stdoutPath: path.join(logDir, `${prefix}.log`),
@@ -149,7 +149,7 @@ async function resolveLaunchAgentGatewayPort(env: GatewayServiceEnv): Promise<nu
   if (fromArgs !== null) {
     return fromArgs;
   }
-  const fromEnv = parseStrictPositiveInteger(env.KAIJIBOT_GATEWAY_PORT ?? "");
+  const fromEnv = parseStrictPositiveInteger(env.ALLBOT_GATEWAY_PORT ?? "");
   return fromEnv ?? null;
 }
 
@@ -360,7 +360,7 @@ export type LegacyLaunchAgent = {
 export async function findLegacyLaunchAgents(env: GatewayServiceEnv): Promise<LegacyLaunchAgent[]> {
   const domain = resolveGuiDomain();
   const results: LegacyLaunchAgent[] = [];
-  for (const label of resolveLegacyGatewayLaunchAgentLabels(env.KAIJIBOT_PROFILE)) {
+  for (const label of resolveLegacyGatewayLaunchAgentLabels(env.ALLBOT_PROFILE)) {
     const plistPath = resolveLaunchAgentPlistPathForLabel(env, label);
     const res = await execLaunchctl(["print", `${domain}/${label}`]);
     const loaded = res.code === 0;
@@ -486,7 +486,7 @@ async function writeLaunchAgentPlist({
 
   const domain = resolveGuiDomain();
   const label = resolveLaunchAgentLabel({ env });
-  for (const legacyLabel of resolveLegacyGatewayLaunchAgentLabels(env.KAIJIBOT_PROFILE)) {
+  for (const legacyLabel of resolveLegacyGatewayLaunchAgentLabels(env.ALLBOT_PROFILE)) {
     const legacyPlistPath = resolveLaunchAgentPlistPathForLabel(env, legacyLabel);
     await execLaunchctl(["bootout", domain, legacyPlistPath]);
     await execLaunchctl(["unload", legacyPlistPath]);
@@ -546,7 +546,7 @@ async function activateLaunchAgent(params: { env: GatewayServiceEnv; plistPath: 
     domain,
     serviceTarget: `${domain}/${label}`,
     plistPath: params.plistPath,
-    actionHint: "kaijibot gateway install --force",
+    actionHint: "allbot gateway install --force",
   });
 }
 
@@ -583,7 +583,7 @@ async function ensureLaunchAgentLoadedAfterFailure(params: {
       domain: params.domain,
       serviceTarget: params.serviceTarget,
       plistPath: params.plistPath,
-      actionHint: "kaijibot gateway start",
+      actionHint: "allbot gateway start",
     });
   } catch {
     // Best-effort only. Preserve the original kickstart failure below.
@@ -637,7 +637,7 @@ export async function restartLaunchAgent({
     domain,
     serviceTarget,
     plistPath,
-    actionHint: "kaijibot gateway restart",
+    actionHint: "allbot gateway restart",
   });
 
   const retry = await execLaunchctl(["kickstart", "-k", serviceTarget]);

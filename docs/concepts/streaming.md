@@ -7,11 +7,11 @@ read_when:
 title: "Streaming and Chunking"
 ---
 
-> 💡 **KaijiBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。KaijiBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
+> 💡 **AllBot 说明：** 此页面中的频道示例保留了上游 OpenClaw 的多频道说明。AllBot 仅支持飞书频道，但核心概念（会话、消息格式、路由等）完全适用。
 
 # Streaming + chunking
 
-KaijiBot has two separate streaming layers:
+AllBot has two separate streaming layers:
 
 - **Block streaming (channels):** emit completed **blocks** as the assistant writes. These are normal channel messages (not token deltas).
 - **Preview streaming (Telegram/Discord/Slack):** update a temporary **preview message** while generating.
@@ -69,7 +69,7 @@ Block chunking is implemented by `EmbeddedBlockChunker`:
 
 ## Coalescing (merge streamed blocks)
 
-When block streaming is enabled, KaijiBot can **merge consecutive block chunks**
+When block streaming is enabled, AllBot can **merge consecutive block chunks**
 before sending them out. This reduces “single-line spam” while still providing
 progressive output.
 

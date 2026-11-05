@@ -1,21 +1,21 @@
 ---
-summary: "CLI reference for `kaijibot sessions` (list stored sessions + usage)"
+summary: "CLI reference for `allbot sessions` (list stored sessions + usage)"
 read_when:
   - You want to list stored sessions and see recent activity
 title: "sessions"
 ---
 
-# `kaijibot sessions`
+# `allbot sessions`
 
 List stored conversation sessions.
 
 ```bash
-kaijibot sessions
-kaijibot sessions --agent work
-kaijibot sessions --all-agents
-kaijibot sessions --active 120
-kaijibot sessions --verbose
-kaijibot sessions --json
+allbot sessions
+allbot sessions --agent work
+allbot sessions --all-agents
+allbot sessions --active 120
+allbot sessions --verbose
+allbot sessions --json
 ```
 
 Scope selection:
@@ -26,7 +26,7 @@ Scope selection:
 - `--all-agents`: aggregate all configured agent stores
 - `--store <path>`: explicit store path (cannot be combined with `--agent` or `--all-agents`)
 
-`kaijibot sessions --all-agents` reads configured agent stores. Gateway and ACP
+`allbot sessions --all-agents` reads configured agent stores. Gateway and ACP
 session discovery are broader: they also include disk-only stores found under
 the default `agents/` root or a templated `session.store` root. Those
 discovered stores must resolve to regular `sessions.json` files inside the
@@ -34,14 +34,14 @@ agent root; symlinks and out-of-root paths are skipped.
 
 JSON examples:
 
-`kaijibot sessions --all-agents --json`:
+`allbot sessions --all-agents --json`:
 
 ```json
 {
   "path": null,
   "stores": [
-    { "agentId": "main", "path": "/home/user/.kaijibot/agents/main/sessions/sessions.json" },
-    { "agentId": "work", "path": "/home/user/.kaijibot/agents/work/sessions/sessions.json" }
+    { "agentId": "main", "path": "/home/user/.allbot/agents/main/sessions/sessions.json" },
+    { "agentId": "work", "path": "/home/user/.allbot/agents/work/sessions/sessions.json" }
   ],
   "allAgents": true,
   "count": 2,
@@ -58,17 +58,17 @@ JSON examples:
 Run maintenance now (instead of waiting for the next write cycle):
 
 ```bash
-kaijibot sessions cleanup --dry-run
-kaijibot sessions cleanup --agent work --dry-run
-kaijibot sessions cleanup --all-agents --dry-run
-kaijibot sessions cleanup --enforce
-kaijibot sessions cleanup --enforce --active-key "agent:main:telegram:direct:123"
-kaijibot sessions cleanup --json
+allbot sessions cleanup --dry-run
+allbot sessions cleanup --agent work --dry-run
+allbot sessions cleanup --all-agents --dry-run
+allbot sessions cleanup --enforce
+allbot sessions cleanup --enforce --active-key "agent:main:telegram:direct:123"
+allbot sessions cleanup --json
 ```
 
-`kaijibot sessions cleanup` uses `session.maintenance` settings from config:
+`allbot sessions cleanup` uses `session.maintenance` settings from config:
 
-- Scope note: `kaijibot sessions cleanup` maintains session stores/transcripts only. It does not prune cron run logs (`cron/runs/<jobId>.jsonl`), which are managed by `cron.runLog.maxBytes` and `cron.runLog.keepLines` in [Cron configuration](/automation/cron-jobs#configuration) and explained in [Cron maintenance](/automation/cron-jobs#maintenance).
+- Scope note: `allbot sessions cleanup` maintains session stores/transcripts only. It does not prune cron run logs (`cron/runs/<jobId>.jsonl`), which are managed by `cron.runLog.maxBytes` and `cron.runLog.keepLines` in [Cron configuration](/automation/cron-jobs#configuration) and explained in [Cron maintenance](/automation/cron-jobs#maintenance).
 
 - `--dry-run`: preview how many entries would be pruned/capped without writing.
   - In text mode, dry-run prints a per-session action table (`Action`, `Key`, `Age`, `Model`, `Flags`) so you can see what would be kept vs removed.
@@ -80,7 +80,7 @@ kaijibot sessions cleanup --json
 - `--store <path>`: run against a specific `sessions.json` file.
 - `--json`: print a JSON summary. With `--all-agents`, output includes one summary per store.
 
-`kaijibot sessions cleanup --all-agents --dry-run --json`:
+`allbot sessions cleanup --all-agents --dry-run --json`:
 
 ```json
 {
@@ -90,7 +90,7 @@ kaijibot sessions cleanup --json
   "stores": [
     {
       "agentId": "main",
-      "storePath": "/home/user/.kaijibot/agents/main/sessions/sessions.json",
+      "storePath": "/home/user/.allbot/agents/main/sessions/sessions.json",
       "beforeCount": 120,
       "afterCount": 80,
       "pruned": 40,
@@ -98,7 +98,7 @@ kaijibot sessions cleanup --json
     },
     {
       "agentId": "work",
-      "storePath": "/home/user/.kaijibot/agents/work/sessions/sessions.json",
+      "storePath": "/home/user/.allbot/agents/work/sessions/sessions.json",
       "beforeCount": 18,
       "afterCount": 18,
       "pruned": 0,

@@ -44,7 +44,7 @@ export interface RegisterViaQrOptions {
 export const QR_AUTH_TIMEOUT_MS = 9 * 60 * 1000;
 
 /** Source identifier embedded in the QR URL `from` param for analytics. */
-const SOURCE = "kaijibot";
+const SOURCE = "allbot";
 
 // --- Internal helpers ----------------------------------------------------
 
@@ -147,8 +147,8 @@ export async function registerFeishuAppViaQr(
     const result = await lark.registerApp({
       source: SOURCE,
       appPreset: {
-        name: "KaijiBot",
-        desc: "KaijiBot AI 助手",
+        name: "AllBot",
+        desc: "AllBot AI 助手",
       },
       onQRCodeReady: (info) => {
         renderQr(info.url);

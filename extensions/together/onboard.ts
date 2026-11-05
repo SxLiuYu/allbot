@@ -1,7 +1,7 @@
 import {
   createModelCatalogPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildTogetherModelDefinition,
   TOGETHER_BASE_URL,
@@ -12,7 +12,7 @@ export const TOGETHER_DEFAULT_MODEL_REF = "together/moonshotai/Kimi-K2.5";
 
 const togetherPresetAppliers = createModelCatalogPresetAppliers({
   primaryModelRef: TOGETHER_DEFAULT_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => ({
+  resolveParams: (_cfg: AllBotConfig) => ({
     providerId: "together",
     api: "openai-completions",
     baseUrl: TOGETHER_BASE_URL,
@@ -21,6 +21,6 @@ const togetherPresetAppliers = createModelCatalogPresetAppliers({
   }),
 });
 
-export function applyTogetherConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyTogetherConfig(cfg: AllBotConfig): AllBotConfig {
   return togetherPresetAppliers.applyConfig(cfg);
 }

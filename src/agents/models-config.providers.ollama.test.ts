@@ -2,7 +2,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ModelDefinitionConfig } from "../config/types.models.js";
 import {
   normalizePluginDiscoveryResult,
@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 describe("Ollama provider", () => {
-  const createAgentDir = () => mkdtempSync(join(tmpdir(), "kaijibot-test-"));
+  const createAgentDir = () => mkdtempSync(join(tmpdir(), "allbot-test-"));
 
   const enableDiscoveryEnv = () => {
     vi.stubEnv("VITEST", "");
@@ -65,7 +65,7 @@ describe("Ollama provider", () => {
   }) {
     const env = {
       ...process.env,
-      KAIJIBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama",
+      ALLBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama",
       VITEST: "1",
       NODE_ENV: "test",
       ...params.env,
@@ -82,14 +82,14 @@ describe("Ollama provider", () => {
 
   async function loadOllamaCatalogProvider(): Promise<ProviderPlugin | undefined> {
     ollamaCatalogProviderPromise ??= resolvePluginDiscoveryProviders({
-      env: { ...process.env, KAIJIBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama", VITEST: "1" },
+      env: { ...process.env, ALLBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "ollama", VITEST: "1" },
       onlyPluginIds: ["ollama"],
     }).then((providers) => providers.find((provider) => provider.id === "ollama"));
     return ollamaCatalogProviderPromise;
   }
 
   async function runOllamaCatalog(params: {
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     env?: NodeJS.ProcessEnv;
   }): Promise<ProviderConfig | undefined> {
     const provider = await loadOllamaCatalogProvider();

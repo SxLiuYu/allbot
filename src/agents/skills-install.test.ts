@@ -34,7 +34,7 @@ async function writeInstallableSkill(workspaceDir: string, name: string): Promis
     `---
 name: ${name}
 description: test skill
-metadata: {"kaijibot":{"install":[{"id":"deps","kind":"node","package":"example-package"}]}}
+metadata: {"allbot":{"install":[{"id":"deps","kind":"node","package":"example-package"}]}}
 ---
 
 # ${name}
@@ -45,11 +45,11 @@ metadata: {"kaijibot":{"install":[{"id":"deps","kind":"node","package":"example-
   return skillDir;
 }
 
-const workspaceSuite = createFixtureSuite("kaijibot-skills-install-");
+const workspaceSuite = createFixtureSuite("allbot-skills-install-");
 let tempHome: TempHomeEnv;
 
 beforeAll(async () => {
-  tempHome = await createTempHomeEnv("kaijibot-skills-install-home-");
+  tempHome = await createTempHomeEnv("allbot-skills-install-home-");
   await workspaceSuite.setup();
 });
 
@@ -206,7 +206,7 @@ describe("installSkill code safety scanning", () => {
       expect(handler.mock.calls[0]?.[0]).toMatchObject({
         targetName: "policy-skill",
         targetType: "skill",
-        origin: "kaijibot-workspace",
+        origin: "allbot-workspace",
         sourcePath: expect.stringContaining("policy-skill"),
         sourcePathKind: "directory",
         request: {
@@ -226,7 +226,7 @@ describe("installSkill code safety scanning", () => {
         },
       });
       expect(handler.mock.calls[0]?.[1]).toEqual({
-        origin: "kaijibot-workspace",
+        origin: "allbot-workspace",
         targetType: "skill",
         requestKind: "skill-install",
       });

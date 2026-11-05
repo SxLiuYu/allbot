@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KAIJIBOT_REPO="https://github.com/Kaiji-Z/kaijibot.git"
-KAIJIBOT_DIR="kaijibot"
+ALLBOT_REPO="https://github.com/Kaiji-Z/kaijibot.git"
+ALLBOT_DIR="allbot"
 MIN_NODE_MAJOR=22
 MIN_NODE_MINOR=14
 BOLD='\033[1m'
@@ -30,7 +30,7 @@ version_ge() {
 
 header() {
   printf "\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-  printf "${BOLD}  KaijiBot Installer 👾${NC}\n"
+  printf "${BOLD}  AllBot Installer 👾${NC}\n"
   printf "  ${CYAN}https://github.com/Kaiji-Z/kaijibot${NC}\n"
   printf "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
 }
@@ -68,13 +68,13 @@ check_git() {
 }
 
 clone_repo() {
-  local target="${1:-$KAIJIBOT_DIR}"
+  local target="${1:-$ALLBOT_DIR}"
   if [ -d "$target" ] && [ -d "$target/.git" ]; then
     info "Directory '$target' already exists, pulling latest..."
     git -C "$target" pull --ff-only 2>/dev/null || warn "Pull failed, using existing checkout"
   else
-    info "Cloning KaijiBot into '$target'..."
-    git clone "$KAIJIBOT_REPO" "$target"
+    info "Cloning AllBot into '$target'..."
+    git clone "$ALLBOT_REPO" "$target"
   fi
   ok "Source code ready"
 }
@@ -114,7 +114,7 @@ install_deps() {
 
 build_project() {
   local target="$1"
-  info "Building KaijiBot..."
+  info "Building AllBot..."
   pnpm --dir "$target" build 2>&1 | tail -3
   ok "Build complete"
 }
@@ -122,13 +122,13 @@ build_project() {
 show_next_steps() {
   local target="$1"
   printf "\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-  printf "${GREEN}${BOLD}  ✅ KaijiBot installed successfully!${NC}\n"
+  printf "${GREEN}${BOLD}  ✅ AllBot installed successfully!${NC}\n"
   printf "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
   printf "  ${CYAN}Next steps:${NC}\n\n"
   printf "  ${BOLD}1.${NC} Configure (interactive wizard):\n"
-  printf "     cd %s && npx kaijibot onboard\n\n" "$target"
+  printf "     cd %s && npx allbot onboard\n\n" "$target"
   printf "  ${BOLD}2.${NC} Start the gateway:\n"
-  printf "     npx kaijibot gateway --port 18789 --verbose\n\n"
+  printf "     npx allbot gateway --port 18789 --verbose\n\n"
   printf "  ${BOLD}3.${NC} Or use Docker instead:\n"
   printf "     cp .env.example .env  # edit with your keys\n"
   printf "     docker compose up -d\n\n"
@@ -145,7 +145,7 @@ main() {
   check_node
   check_pnpm
 
-  local target_dir="${1:-$KAIJIBOT_DIR}"
+  local target_dir="${1:-$ALLBOT_DIR}"
 
   clone_repo "$target_dir"
   install_deps "$target_dir"

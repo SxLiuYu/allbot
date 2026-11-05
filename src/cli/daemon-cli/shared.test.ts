@@ -24,62 +24,62 @@ describe("renderGatewayServiceStartHints", () => {
   it("resolves daemon container context from either env key", () => {
     expect(
       resolveDaemonContainerContext({
-        KAIJIBOT_CONTAINER: "kaijibot-demo-container",
+        ALLBOT_CONTAINER: "allbot-demo-container",
       } as NodeJS.ProcessEnv),
-    ).toBe("kaijibot-demo-container");
+    ).toBe("allbot-demo-container");
     expect(
       resolveDaemonContainerContext({
-        KAIJIBOT_CONTAINER_HINT: "kaijibot-demo-container",
+        ALLBOT_CONTAINER_HINT: "allbot-demo-container",
       } as NodeJS.ProcessEnv),
-    ).toBe("kaijibot-demo-container");
+    ).toBe("allbot-demo-container");
   });
 
-  it("prepends a single container restart hint when KAIJIBOT_CONTAINER is set", () => {
+  it("prepends a single container restart hint when ALLBOT_CONTAINER is set", () => {
     expect(
       renderGatewayServiceStartHints({
-        KAIJIBOT_CONTAINER: "kaijibot-demo-container",
+        ALLBOT_CONTAINER: "allbot-demo-container",
       } as NodeJS.ProcessEnv),
     ).toEqual(
       expect.arrayContaining([
-        "Restart the container or the service that manages it for kaijibot-demo-container.",
+        "Restart the container or the service that manages it for allbot-demo-container.",
       ]),
     );
   });
 
-  it("prepends a single container restart hint when KAIJIBOT_CONTAINER_HINT is set", () => {
+  it("prepends a single container restart hint when ALLBOT_CONTAINER_HINT is set", () => {
     expect(
       renderGatewayServiceStartHints({
-        KAIJIBOT_CONTAINER_HINT: "kaijibot-demo-container",
+        ALLBOT_CONTAINER_HINT: "allbot-demo-container",
       } as NodeJS.ProcessEnv),
     ).toEqual(
       expect.arrayContaining([
-        "Restart the container or the service that manages it for kaijibot-demo-container.",
+        "Restart the container or the service that manages it for allbot-demo-container.",
       ]),
     );
   });
 });
 
 describe("filterContainerGenericHints", () => {
-  it("drops the generic container foreground hint when KAIJIBOT_CONTAINER is set", () => {
+  it("drops the generic container foreground hint when ALLBOT_CONTAINER is set", () => {
     expect(
       filterContainerGenericHints(
         [
           "systemd user services are unavailable; install/enable systemd or run the gateway under your supervisor.",
-          "If you're in a container, run the gateway in the foreground instead of `kaijibot gateway`.",
+          "If you're in a container, run the gateway in the foreground instead of `allbot gateway`.",
         ],
-        { KAIJIBOT_CONTAINER: "kaijibot-demo-container" } as NodeJS.ProcessEnv,
+        { ALLBOT_CONTAINER: "allbot-demo-container" } as NodeJS.ProcessEnv,
       ),
     ).toEqual([]);
   });
 
-  it("drops the generic container foreground hint when KAIJIBOT_CONTAINER_HINT is set", () => {
+  it("drops the generic container foreground hint when ALLBOT_CONTAINER_HINT is set", () => {
     expect(
       filterContainerGenericHints(
         [
           "systemd user services are unavailable; install/enable systemd or run the gateway under your supervisor.",
-          "If you're in a container, run the gateway in the foreground instead of `kaijibot gateway`.",
+          "If you're in a container, run the gateway in the foreground instead of `allbot gateway`.",
         ],
-        { KAIJIBOT_CONTAINER_HINT: "kaijibot-demo-container" } as NodeJS.ProcessEnv,
+        { ALLBOT_CONTAINER_HINT: "allbot-demo-container" } as NodeJS.ProcessEnv,
       ),
     ).toEqual([]);
   });

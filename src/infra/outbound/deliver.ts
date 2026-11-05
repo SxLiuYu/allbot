@@ -1,7 +1,7 @@
 import {
   resolveSendableOutboundReplyParts,
   sendMediaWithLeadingCaption,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 import {
   chunkByParagraph,
   chunkMarkdownTextWithMode,
@@ -14,7 +14,7 @@ import type {
   ChannelOutboundAdapter,
   ChannelOutboundContext,
 } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { resolveMirroredTranscriptText } from "../../config/sessions/transcript-mirror.js";
 import { fireAndForgetHook } from "../../hooks/fire-and-forget.js";
 import { createInternalHookEvent, triggerInternalHook } from "../../hooks/internal-hooks.js";
@@ -133,7 +133,7 @@ type ChannelHandler = {
 };
 
 type ChannelHandlerParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: Exclude<OutboundChannel, "none">;
   to: string;
   accountId?: string;
@@ -279,7 +279,7 @@ function createChannelOutboundContextBase(
 const isAbortError = (err: unknown): boolean => err instanceof Error && err.name === "AbortError";
 
 type DeliverOutboundPayloadsCoreParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   channel: Exclude<OutboundChannel, "none">;
   to: string;
   accountId?: string;

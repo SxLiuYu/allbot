@@ -302,7 +302,7 @@ function normalizeSystemdUnit(raw?: string, profile?: string): string {
   return unit.endsWith(".service") ? unit : `${unit}.service`;
 }
 
-export function triggerKaijiBotRestart(): RestartAttempt {
+export function triggerAllBotRestart(): RestartAttempt {
   if (process.env.VITEST || process.env.NODE_ENV === "test") {
     return { ok: true, method: "supervisor", detail: "test mode" };
   }
@@ -312,8 +312,8 @@ export function triggerKaijiBotRestart(): RestartAttempt {
   const tried: string[] = [];
   if (process.platform === "linux") {
     const unit = normalizeSystemdUnit(
-      process.env.KAIJIBOT_SYSTEMD_UNIT,
-      process.env.KAIJIBOT_PROFILE,
+      process.env.ALLBOT_SYSTEMD_UNIT,
+      process.env.ALLBOT_PROFILE,
     );
     const userArgs = ["--user", "restart", unit];
     tried.push(`systemctl ${userArgs.join(" ")}`);
@@ -353,8 +353,8 @@ export function triggerKaijiBotRestart(): RestartAttempt {
   }
 
   const label =
-    process.env.KAIJIBOT_LAUNCHD_LABEL ||
-    resolveGatewayLaunchAgentLabel(process.env.KAIJIBOT_PROFILE);
+    process.env.ALLBOT_LAUNCHD_LABEL ||
+    resolveGatewayLaunchAgentLabel(process.env.ALLBOT_PROFILE);
   const uid = typeof process.getuid === "function" ? process.getuid() : undefined;
   const domain = uid !== undefined ? `gui/${uid}` : "gui/501";
   const target = `${domain}/${label}`;

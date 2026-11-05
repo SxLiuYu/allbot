@@ -11,7 +11,7 @@ import type { PluginRegistry } from "./registry.js";
 import { cleanupTrackedTempDirs, makeTrackedTempDir } from "./test-helpers/fs-fixtures.js";
 
 const tempDirs: string[] = [];
-const tempRoot = makeTrackedTempDir("kaijibot-plugin-binding", tempDirs);
+const tempRoot = makeTrackedTempDir("allbot-plugin-binding", tempDirs);
 const approvalsPath = path.join(tempRoot, "plugin-binding-approvals.json");
 
 const sessionBindingState = vi.hoisted(() => {
@@ -98,7 +98,7 @@ vi.mock("../infra/home-dir.js", async () => {
   return {
     ...actual,
     expandHomePrefix: (value: string) => {
-      if (value === "~/.kaijibot/plugin-binding-approvals.json") {
+      if (value === "~/.allbot/plugin-binding-approvals.json") {
         return approvalsPath;
       }
       return actual.expandHomePrefix(value);
@@ -395,7 +395,7 @@ describe("plugin conversation binding approvals", () => {
       return {
         ...actual,
         expandHomePrefix: (value: string) => {
-          if (value === "~/.kaijibot/plugin-binding-approvals.json") {
+          if (value === "~/.allbot/plugin-binding-approvals.json") {
             return approvalsPath;
           }
           return actual.expandHomePrefix(value);
@@ -872,7 +872,7 @@ describe("plugin conversation binding approvals", () => {
       name: "migrates a legacy codex thread binding session key through the new approval flow",
       existingRecord: {
         bindingId: "binding-legacy-codex-thread",
-        targetSessionKey: "kaijibot-app-server:thread:019ce411-6322-7db2-a821-1a61c530e7d9",
+        targetSessionKey: "allbot-app-server:thread:019ce411-6322-7db2-a821-1a61c530e7d9",
         targetKind: "session" as const,
         conversation: {
           channel: "telegram",
@@ -889,10 +889,10 @@ describe("plugin conversation binding approvals", () => {
         accountId: "default",
         conversationId: "8460800771",
         summary: "Bind this conversation to Codex thread 019ce411-6322-7db2-a821-1a61c530e7d9.",
-        pluginId: "kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
       }),
       expectedBinding: {
-        pluginId: "kaijibot-codex-app-server",
+        pluginId: "allbot-codex-app-server",
         pluginRoot: "/plugins/codex-a",
         conversationId: "8460800771",
       },

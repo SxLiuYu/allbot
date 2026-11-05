@@ -3,4 +3,4 @@ export {
   buildImageResizeSideGrid,
   getImageMetadata,
   resizeToJpeg,
-} from "kaijibot/plugin-sdk/browser-setup-tools";
+} from "allbot/plugin-sdk/browser-setup-tools";

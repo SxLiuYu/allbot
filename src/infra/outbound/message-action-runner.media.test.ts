@@ -4,14 +4,14 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { jsonResult } from "../../agents/tools/common.js";
 import type { ChannelPlugin } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadWebMedia } from "../../media/web-media.js";
 import { getActivePluginRegistry, setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   createChannelTestPluginBase,
   createTestRegistry,
 } from "../../test-utils/channel-plugins.js";
-import { resolvePreferredKaijiBotTmpDir } from "../tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../tmp-allbot-dir.js";
 import { runMessageAction } from "./message-action-runner.js";
 
 const onePixelPng = Buffer.from(
@@ -63,7 +63,7 @@ const slackConfig = {
       appToken: "xapp-test",
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 async function withSandbox(test: (sandboxDir: string) => Promise<void>) {
   const sandboxDir = await fs.mkdtemp(path.join(os.tmpdir(), "msg-sandbox-"));
@@ -75,7 +75,7 @@ async function withSandbox(test: (sandboxDir: string) => Promise<void>) {
 }
 
 const runDrySend = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   actionParams: Record<string, unknown>;
   sandboxRoot?: string;
 }) =>
@@ -212,7 +212,7 @@ describe("runMessageAction media behavior", () => {
           password: "test-password",
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const attachmentPlugin: ChannelPlugin = {
       id: "bluebubbles",
       meta: {
@@ -274,7 +274,7 @@ describe("runMessageAction media behavior", () => {
     }
 
     async function expectRejectsLocalAbsolutePathWithoutSandbox(params: {
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       action: "sendAttachment" | "setGroupIcon";
       target: string;
       mediaField?: "media" | "mediaUrl" | "fileUrl";
@@ -695,8 +695,8 @@ describe("runMessageAction media behavior", () => {
       },
     );
 
-    it("allows media paths under preferred KaijiBot tmp root", async () => {
-      const tmpRoot = resolvePreferredKaijiBotTmpDir();
+    it("allows media paths under preferred AllBot tmp root", async () => {
+      const tmpRoot = resolvePreferredAllBotTmpDir();
       await fs.mkdir(tmpRoot, { recursive: true });
       const sandboxDir = await fs.mkdtemp(path.join(os.tmpdir(), "msg-sandbox-"));
       try {
@@ -719,7 +719,7 @@ describe("runMessageAction media behavior", () => {
           throw new Error("expected send result");
         }
         expect(result.sendResult?.mediaUrl).toBe(path.resolve(tmpFile));
-        const hostTmpOutsideKaijiBot = path.join(os.tmpdir(), "outside-kaijibot", "test-media.png");
+        const hostTmpOutsideAllBot = path.join(os.tmpdir(), "outside-allbot", "test-media.png");
         await expect(
           runMessageAction({
             cfg: slackConfig,
@@ -727,7 +727,7 @@ describe("runMessageAction media behavior", () => {
             params: {
               channel: "slack",
               target: "#C12345678",
-              media: hostTmpOutsideKaijiBot,
+              media: hostTmpOutsideAllBot,
               message: "",
             },
             sandboxRoot: sandboxDir,

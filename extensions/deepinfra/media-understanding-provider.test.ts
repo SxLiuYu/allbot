@@ -1,7 +1,7 @@
 import {
   describeImagesWithModel,
   describeImageWithModel,
-} from "kaijibot/plugin-sdk/media-understanding";
+} from "allbot/plugin-sdk/media-understanding";
 import { afterAll, describe, expect, it, vi } from "vitest";
 import {
   deepinfraMediaUnderstandingProvider,
@@ -12,9 +12,9 @@ const { transcribeOpenAiCompatibleAudioMock } = vi.hoisted(() => ({
   transcribeOpenAiCompatibleAudioMock: vi.fn(async () => ({ text: "hello", model: "whisper" })),
 }));
 
-vi.mock("kaijibot/plugin-sdk/media-understanding", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/media-understanding")>(
-    "kaijibot/plugin-sdk/media-understanding",
+vi.mock("allbot/plugin-sdk/media-understanding", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/media-understanding")>(
+    "allbot/plugin-sdk/media-understanding",
   );
   return {
     ...actual,
@@ -23,7 +23,7 @@ vi.mock("kaijibot/plugin-sdk/media-understanding", async () => {
 });
 
 afterAll(() => {
-  vi.doUnmock("kaijibot/plugin-sdk/media-understanding");
+  vi.doUnmock("allbot/plugin-sdk/media-understanding");
   vi.resetModules();
 });
 

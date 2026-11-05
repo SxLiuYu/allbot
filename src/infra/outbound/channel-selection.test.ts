@@ -52,7 +52,7 @@ async function expectResolvedSelection(
   return await resolveMessageChannelSelection(params);
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("listConfiguredMessageChannels", () => {
   let errorSpy: ReturnType<typeof vi.spyOn>;
 
@@ -128,7 +128,7 @@ describe.skipIf(process.env.CI)("listConfiguredMessageChannels", () => {
   });
 });
 
-// Skip on CI: requires upstream-only channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels not bundled in AllBot
 describe.skipIf(process.env.CI)("resolveMessageChannelSelection", () => {
   beforeEach(() => {
     mocks.listChannelPlugins.mockReset();

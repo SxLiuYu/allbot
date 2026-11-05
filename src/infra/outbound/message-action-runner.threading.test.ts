@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   prepareOutboundMirrorRoute,
   resolveAndApplyOutboundThreadId,
@@ -14,7 +14,7 @@ const slackConfig = {
       botToken: "xoxb-test",
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 const telegramConfig = {
   channels: {
@@ -22,7 +22,7 @@ const telegramConfig = {
       botToken: "telegram-test",
     },
   },
-} as KaijiBotConfig;
+} as AllBotConfig;
 
 const defaultTelegramToolContext = {
   currentChannelId: "telegram:123",

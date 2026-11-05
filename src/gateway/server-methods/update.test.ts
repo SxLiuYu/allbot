@@ -32,13 +32,13 @@ vi.mock("../../config/sessions.js", () => ({
   },
 }));
 
-vi.mock("../../infra/kaijibot-root.js", async () => {
-  const actual = await vi.importActual<typeof import("../../infra/kaijibot-root.js")>(
-    "../../infra/kaijibot-root.js",
+vi.mock("../../infra/allbot-root.js", async () => {
+  const actual = await vi.importActual<typeof import("../../infra/allbot-root.js")>(
+    "../../infra/allbot-root.js",
   );
   return {
     ...actual,
-    resolveKaijiBotPackageRoot: async () => "/tmp/kaijibot",
+    resolveAllBotPackageRoot: async () => "/tmp/allbot",
   };
 });
 

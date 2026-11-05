@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { BrowserConfig, BrowserProfileConfig, KaijiBotConfig } from "../config/config.js";
+import type { BrowserConfig, BrowserProfileConfig, AllBotConfig } from "../config/config.js";
 import { resolveGatewayPort } from "../config/config.js";
 import {
   DEFAULT_BROWSER_CDP_PORT_RANGE_START,
@@ -9,19 +9,19 @@ import {
 } from "../config/port-defaults.js";
 import { isLoopbackHost } from "../gateway/net.js";
 import type { SsrFPolicy } from "../infra/net/ssrf.js";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 import { normalizeOptionalTrimmedStringList } from "../shared/string-normalization.js";
 import { resolveUserPath } from "../utils.js";
 import { parseBrowserHttpUrl } from "./browser-cdp.js";
 
-export const DEFAULT_KAIJIBOT_BROWSER_ENABLED = true;
+export const DEFAULT_ALLBOT_BROWSER_ENABLED = true;
 export const DEFAULT_BROWSER_EVALUATE_ENABLED = true;
-export const DEFAULT_KAIJIBOT_BROWSER_COLOR = "#FF4500";
-export const DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME = "kaijibot";
-export const DEFAULT_BROWSER_DEFAULT_PROFILE_NAME = "kaijibot";
+export const DEFAULT_ALLBOT_BROWSER_COLOR = "#FF4500";
+export const DEFAULT_ALLBOT_BROWSER_PROFILE_NAME = "allbot";
+export const DEFAULT_BROWSER_DEFAULT_PROFILE_NAME = "allbot";
 export const DEFAULT_AI_SNAPSHOT_MAX_CHARS = 80_000;
-export const DEFAULT_UPLOAD_DIR = path.join(resolvePreferredKaijiBotTmpDir(), "uploads");
+export const DEFAULT_UPLOAD_DIR = path.join(resolvePreferredAllBotTmpDir(), "uploads");
 
 export type ResolvedBrowserConfig = {
   enabled: boolean;
@@ -53,18 +53,18 @@ export type ResolvedBrowserProfile = {
   cdpIsLoopback: boolean;
   userDataDir?: string;
   color: string;
-  driver: "kaijibot" | "existing-session";
+  driver: "allbot" | "existing-session";
   attachOnly: boolean;
 };
 
 function normalizeHexColor(raw: string | undefined): string {
   const value = (raw ?? "").trim();
   if (!value) {
-    return DEFAULT_KAIJIBOT_BROWSER_COLOR;
+    return DEFAULT_ALLBOT_BROWSER_COLOR;
   }
   const normalized = value.startsWith("#") ? value : `#${value}`;
   if (!/^#[0-9a-fA-F]{6}$/.test(normalized)) {
-    return DEFAULT_KAIJIBOT_BROWSER_COLOR;
+    return DEFAULT_ALLBOT_BROWSER_COLOR;
   }
   return normalized.toUpperCase();
 }
@@ -134,8 +134,8 @@ function ensureDefaultProfile(
   legacyCdpUrl?: string,
 ): Record<string, BrowserProfileConfig> {
   const result = { ...profiles };
-  if (!result[DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME]) {
-    result[DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME] = {
+  if (!result[DEFAULT_ALLBOT_BROWSER_PROFILE_NAME]) {
+    result[DEFAULT_ALLBOT_BROWSER_PROFILE_NAME] = {
       cdpPort: legacyCdpPort ?? derivedDefaultCdpPort ?? DEFAULT_BROWSER_CDP_PORT_RANGE_START,
       color: defaultColor,
       ...(legacyCdpUrl ? { cdpUrl: legacyCdpUrl } : {}),
@@ -161,9 +161,9 @@ function ensureDefaultUserBrowserProfile(
 
 export function resolveBrowserConfig(
   cfg: BrowserConfig | undefined,
-  rootConfig?: KaijiBotConfig,
+  rootConfig?: AllBotConfig,
 ): ResolvedBrowserConfig {
-  const enabled = cfg?.enabled ?? DEFAULT_KAIJIBOT_BROWSER_ENABLED;
+  const enabled = cfg?.enabled ?? DEFAULT_ALLBOT_BROWSER_ENABLED;
   const evaluateEnabled = cfg?.evaluateEnabled ?? DEFAULT_BROWSER_EVALUATE_ENABLED;
   const gatewayPort = resolveGatewayPort(rootConfig);
   const controlPort = deriveDefaultBrowserControlPort(gatewayPort ?? DEFAULT_BROWSER_CONTROL_PORT);
@@ -232,8 +232,8 @@ export function resolveBrowserConfig(
     defaultProfileFromConfig ??
     (profiles[DEFAULT_BROWSER_DEFAULT_PROFILE_NAME]
       ? DEFAULT_BROWSER_DEFAULT_PROFILE_NAME
-      : profiles[DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME]
-        ? DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME
+      : profiles[DEFAULT_ALLBOT_BROWSER_PROFILE_NAME]
+        ? DEFAULT_ALLBOT_BROWSER_PROFILE_NAME
         : "user");
 
   const extraArgs = Array.isArray(cfg?.extraArgs)
@@ -278,7 +278,7 @@ export function resolveProfile(
   let cdpHost = resolved.cdpHost;
   let cdpPort = profile.cdpPort ?? 0;
   let cdpUrl = "";
-  const driver = profile.driver === "existing-session" ? "existing-session" : "kaijibot";
+  const driver = profile.driver === "existing-session" ? "existing-session" : "allbot";
 
   if (driver === "existing-session") {
     return {

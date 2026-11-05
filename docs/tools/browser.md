@@ -2,30 +2,30 @@
 summary: "Integrated browser control service + action commands"
 read_when:
   - Adding agent-controlled browser automation
-  - Debugging why kaijibot is interfering with your own Chrome
+  - Debugging why allbot is interfering with your own Chrome
   - Implementing browser settings + lifecycle in the macOS app
-title: "Browser (KaijiBot-managed)"
+title: "Browser (AllBot-managed)"
 ---
 
-# Browser (kaijibot-managed)
+# Browser (allbot-managed)
 
-KaijiBot can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
+AllBot can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
 It is isolated from your personal browser and is managed through a small local
 control service inside the Gateway (loopback only).
 
 Beginner view:
 
 - Think of it as a **separate, agent-only browser**.
-- The `kaijibot` profile does **not** touch your personal browser profile.
+- The `allbot` profile does **not** touch your personal browser profile.
 - The agent can **open tabs, read pages, click, and type** in a safe lane.
 - The built-in `user` profile attaches to your real signed-in Chrome session via Chrome MCP.
 
 ## What you get
 
-- A separate browser profile named **kaijibot** (orange accent by default).
+- A separate browser profile named **allbot** (orange accent by default).
 - Deterministic tab control (list/open/focus/close).
 - Agent actions (click/type/drag/select), snapshots, screenshots, PDFs.
-- Optional multi-profile support (`kaijibot`, `work`, `remote`, ...).
+- Optional multi-profile support (`allbot`, `work`, `remote`, ...).
 
 This browser is **not** your daily driver. It is a safe, isolated surface for
 agent automation and verification.
@@ -33,23 +33,23 @@ agent automation and verification.
 ## Quick start
 
 ```bash
-kaijibot browser --browser-profile kaijibot status
-kaijibot browser --browser-profile kaijibot start
-kaijibot browser --browser-profile kaijibot open https://example.com
-kaijibot browser --browser-profile kaijibot snapshot
+allbot browser --browser-profile allbot status
+allbot browser --browser-profile allbot start
+allbot browser --browser-profile allbot open https://example.com
+allbot browser --browser-profile allbot snapshot
 ```
 
 If you get “Browser disabled”, enable it in config (see below) and restart the
 Gateway.
 
-If `kaijibot browser` is missing entirely, or the agent says the browser tool
+If `allbot browser` is missing entirely, or the agent says the browser tool
 is unavailable, jump to [Missing browser command or tool](/tools/browser#missing-browser-command-or-tool).
 
 ## Plugin control
 
 The default `browser` tool is now a bundled plugin that ships enabled by
 default. That means you can disable or replace it without removing the rest of
-KaijiBot's plugin system:
+AllBot's plugin system:
 
 ```json5
 {
@@ -69,7 +69,7 @@ same `browser` tool name. The default browser experience needs both:
 - `plugins.entries.browser.enabled` not disabled
 - `browser.enabled=true`
 
-If you turn off only the plugin, the bundled browser CLI (`kaijibot browser`),
+If you turn off only the plugin, the bundled browser CLI (`allbot browser`),
 gateway method (`browser.request`), agent tool, and default browser control
 service all disappear together. Your `browser.*` config stays intact for a
 replacement plugin to reuse.
@@ -85,7 +85,7 @@ can re-register its browser service with the new settings.
 
 ## Missing browser command or tool
 
-If `kaijibot browser` suddenly becomes an unknown command after an upgrade, or
+If `allbot browser` suddenly becomes an unknown command after an upgrade, or
 the agent reports that the browser tool is missing, the most common cause is a
 restrictive `plugins.allow` list that does not include `browser`.
 
@@ -118,28 +118,28 @@ Important notes:
 
 Typical symptoms:
 
-- `kaijibot browser` is an unknown command.
+- `allbot browser` is an unknown command.
 - `browser.request` is missing.
 - The agent reports the browser tool as unavailable or missing.
 
-## Profiles: `kaijibot` vs `user`
+## Profiles: `allbot` vs `user`
 
-- `kaijibot`: managed, isolated browser (no extension required).
+- `allbot`: managed, isolated browser (no extension required).
 - `user`: built-in Chrome MCP attach profile for your **real signed-in Chrome**
   session.
 
 For agent browser tool calls:
 
-- Default: use the isolated `kaijibot` browser.
+- Default: use the isolated `allbot` browser.
 - Prefer `profile="user"` when existing logged-in sessions matter and the user
   is at the computer to click/approve any attach prompt.
 - `profile` is the explicit override when you want a specific browser mode.
 
-Set `browser.defaultProfile: "kaijibot"` if you want managed mode by default.
+Set `browser.defaultProfile: "allbot"` if you want managed mode by default.
 
 ## Configuration
 
-Browser settings live in `~/.kaijibot/kaijibot.json`.
+Browser settings live in `~/.allbot/allbot.json`.
 
 ```json5
 {
@@ -154,14 +154,14 @@ Browser settings live in `~/.kaijibot/kaijibot.json`.
     // cdpUrl: "http://127.0.0.1:18792", // legacy single-profile override
     remoteCdpTimeoutMs: 1500, // remote CDP HTTP timeout (ms)
     remoteCdpHandshakeTimeoutMs: 3000, // remote CDP WebSocket handshake timeout (ms)
-    defaultProfile: "kaijibot",
+    defaultProfile: "allbot",
     color: "#FF4500",
     headless: false,
     noSandbox: false,
     attachOnly: false,
     executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
     profiles: {
-      kaijibot: { cdpPort: 18800, color: "#FF4500" },
+      allbot: { cdpPort: 18800, color: "#FF4500" },
       work: { cdpPort: 18801, color: "#0066CC" },
       user: {
         driver: "existing-session",
@@ -184,7 +184,7 @@ Notes:
 
 - The browser control service binds to loopback on a port derived from `gateway.port`
   (default: `18791`, which is gateway + 2).
-- If you override the Gateway port (`gateway.port` or `KAIJIBOT_GATEWAY_PORT`),
+- If you override the Gateway port (`gateway.port` or `ALLBOT_GATEWAY_PORT`),
   the derived browser ports shift to stay in the same “family”.
 - `cdpUrl` defaults to the managed local CDP port when unset.
 - `remoteCdpTimeoutMs` applies to remote (non-loopback) CDP reachability checks.
@@ -195,9 +195,9 @@ Notes:
 - `browser.ssrfPolicy.allowPrivateNetwork` remains supported as a legacy alias for compatibility.
 - `attachOnly: true` means “never launch a local browser; only attach if it is already running.”
 - `color` + per-profile `color` tint the browser UI so you can see which profile is active.
-- Default profile is `kaijibot` (KaijiBot-managed standalone browser). Use `defaultProfile: "user"` to opt into the signed-in user browser.
+- Default profile is `allbot` (AllBot-managed standalone browser). Use `defaultProfile: "user"` to opt into the signed-in user browser.
 - Auto-detect order: system default browser if Chromium-based; otherwise Chrome → Brave → Edge → Chromium → Chrome Canary.
-- Local `kaijibot` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
+- Local `allbot` profiles auto-assign `cdpPort`/`cdpUrl` — set those only for remote CDP.
 - `driver: "existing-session"` uses Chrome DevTools MCP instead of raw CDP. Do
   not set `cdpUrl` for that driver.
 - Set `browser.profiles.<name>.userDataDir` when an existing-session profile
@@ -206,13 +206,13 @@ Notes:
 ## Use Brave (or another Chromium-based browser)
 
 If your **system default** browser is Chromium-based (Chrome/Brave/Edge/etc),
-KaijiBot uses it automatically. Set `browser.executablePath` to override
+AllBot uses it automatically. Set `browser.executablePath` to override
 auto-detection:
 
 CLI example:
 
 ```bash
-kaijibot config set browser.executablePath "/usr/bin/google-chrome"
+allbot config set browser.executablePath "/usr/bin/google-chrome"
 ```
 
 ```json5
@@ -243,29 +243,29 @@ kaijibot config set browser.executablePath "/usr/bin/google-chrome"
 - **Local control (default):** the Gateway starts the loopback control service and can launch a local browser.
 - **Remote control (node host):** run a node host on the machine that has the browser; the Gateway proxies browser actions to it.
 - **Remote CDP:** set `browser.profiles.<name>.cdpUrl` (or `browser.cdpUrl`) to
-  attach to a remote Chromium-based browser. In this case, KaijiBot will not launch a local browser.
+  attach to a remote Chromium-based browser. In this case, AllBot will not launch a local browser.
 
 Stopping behavior differs by profile mode:
 
-- local managed profiles: `kaijibot browser stop` stops the browser process that
-  KaijiBot launched
-- attach-only and remote CDP profiles: `kaijibot browser stop` closes the active
+- local managed profiles: `allbot browser stop` stops the browser process that
+  AllBot launched
+- attach-only and remote CDP profiles: `allbot browser stop` closes the active
   control session and releases Playwright/CDP emulation overrides (viewport,
   color scheme, locale, timezone, offline mode, and similar state), even
-  though no browser process was launched by KaijiBot
+  though no browser process was launched by AllBot
 
 Remote CDP URLs can include auth:
 
 - Query tokens (e.g., `https://provider.example?token=<token>`)
 - HTTP Basic auth (e.g., `https://user:pass@provider.example`)
 
-KaijiBot preserves the auth when calling `/json/*` endpoints and when connecting
+AllBot preserves the auth when calling `/json/*` endpoints and when connecting
 to the CDP WebSocket. Prefer environment variables or secrets managers for
 tokens instead of committing them to config files.
 
 ## Node browser proxy (zero-config default)
 
-If you run a **node host** on the machine that has your browser, KaijiBot can
+If you run a **node host** on the machine that has your browser, AllBot can
 auto-route browser tool calls to that node without any extra browser config.
 This is the default path for remote gateways.
 
@@ -274,7 +274,7 @@ Notes:
 - The node host exposes its local browser control server via a **proxy command**.
 - Profiles come from the node’s own `browser.profiles` config (same as local).
 - `nodeHost.browserProxy.allowProfiles` is optional. Leave it empty for the legacy/default behavior: all configured profiles remain reachable through the proxy, including profile create/delete routes.
-- If you set `nodeHost.browserProxy.allowProfiles`, KaijiBot treats it as a least-privilege boundary: only allowlisted profiles can be targeted, and persistent profile create/delete routes are blocked on the proxy surface.
+- If you set `nodeHost.browserProxy.allowProfiles`, AllBot treats it as a least-privilege boundary: only allowlisted profiles can be targeted, and persistent profile create/delete routes are blocked on the proxy surface.
 - Disable if you don’t want it:
   - On the node: `nodeHost.browserProxy.enabled=false`
   - On the gateway: `gateway.nodes.browser.mode="off"`
@@ -282,7 +282,7 @@ Notes:
 ## Browserless (hosted remote CDP)
 
 [Browserless](https://browserless.io) is a hosted Chromium service that exposes
-CDP connection URLs over HTTPS and WebSocket. KaijiBot can use either form, but
+CDP connection URLs over HTTPS and WebSocket. AllBot can use either form, but
 for a remote browser profile the simplest option is the direct WebSocket URL
 from Browserless' connection docs.
 
@@ -310,17 +310,17 @@ Notes:
 - Replace `<BROWSERLESS_API_KEY>` with your real Browserless token.
 - Choose the region endpoint that matches your Browserless account (see their docs).
 - If Browserless gives you an HTTPS base URL, you can either convert it to
-  `wss://` for a direct CDP connection or keep the HTTPS URL and let KaijiBot
+  `wss://` for a direct CDP connection or keep the HTTPS URL and let AllBot
   discover `/json/version`.
 
 ## Direct WebSocket CDP providers
 
 Some hosted browser services expose a **direct WebSocket** endpoint rather than
-the standard HTTP-based CDP discovery (`/json/version`). KaijiBot supports both:
+the standard HTTP-based CDP discovery (`/json/version`). AllBot supports both:
 
-- **HTTP(S) endpoints** — KaijiBot calls `/json/version` to discover the
+- **HTTP(S) endpoints** — AllBot calls `/json/version` to discover the
   WebSocket debugger URL, then connects.
-- **WebSocket endpoints** (`ws://` / `wss://`) — KaijiBot connects directly,
+- **WebSocket endpoints** (`ws://` / `wss://`) — AllBot connects directly,
   skipping `/json/version`. Use this for services like
   [Browserless](https://browserless.io),
   [Browserbase](https://www.browserbase.com), or any provider that hands you a
@@ -367,13 +367,13 @@ Key ideas:
 
 - Browser control is loopback-only; access flows through the Gateway’s auth or node pairing.
 - The standalone loopback browser HTTP API uses **shared-secret auth only**:
-  gateway token bearer auth, `x-kaijibot-password`, or HTTP Basic auth with the
+  gateway token bearer auth, `x-allbot-password`, or HTTP Basic auth with the
   configured gateway password.
 - Tailscale Serve identity headers and `gateway.auth.mode: "trusted-proxy"` do
   **not** authenticate this standalone loopback browser API.
-- If browser control is enabled and no shared-secret auth is configured, KaijiBot
+- If browser control is enabled and no shared-secret auth is configured, AllBot
   auto-generates `gateway.auth.token` on startup and persists it to config.
-- KaijiBot does **not** auto-generate that token when `gateway.auth.mode` is
+- AllBot does **not** auto-generate that token when `gateway.auth.mode` is
   already `password`, `none`, or `trusted-proxy`.
 - Keep the Gateway and any node hosts on a private network (Tailscale); avoid public exposure.
 - Treat remote CDP URLs/tokens as secrets; prefer env vars or a secrets manager.
@@ -385,15 +385,15 @@ Remote CDP tips:
 
 ## Profiles (multi-browser)
 
-KaijiBot supports multiple named profiles (routing configs). Profiles can be:
+AllBot supports multiple named profiles (routing configs). Profiles can be:
 
-- **kaijibot-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
+- **allbot-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
 - **remote**: an explicit CDP URL (Chromium-based browser running elsewhere)
 - **existing session**: your existing Chrome profile via Chrome DevTools MCP auto-connect
 
 Defaults:
 
-- The `kaijibot` profile is auto-created if missing.
+- The `allbot` profile is auto-created if missing.
 - The `user` profile is built-in for Chrome MCP existing-session attach.
 - Existing-session profiles are opt-in beyond `user`; create them with `--driver existing-session`.
 - Local CDP ports allocate from **18800–18899** by default.
@@ -403,7 +403,7 @@ All control endpoints accept `?profile=<name>`; the CLI uses `--browser-profile`
 
 ## Existing-session via Chrome DevTools MCP
 
-KaijiBot can also attach to a running Chromium-based browser profile through the
+AllBot can also attach to a running Chromium-based browser profile through the
 official Chrome DevTools MCP server. This reuses the tabs and login state
 already open in that browser profile.
 
@@ -445,7 +445,7 @@ Then in the matching browser:
 
 1. Open that browser's inspect page for remote debugging.
 2. Enable remote debugging.
-3. Keep the browser running and approve the connection prompt when KaijiBot attaches.
+3. Keep the browser running and approve the connection prompt when AllBot attaches.
 
 Common inspect pages:
 
@@ -456,10 +456,10 @@ Common inspect pages:
 Live attach smoke test:
 
 ```bash
-kaijibot browser --browser-profile user start
-kaijibot browser --browser-profile user status
-kaijibot browser --browser-profile user tabs
-kaijibot browser --browser-profile user snapshot --format ai
+allbot browser --browser-profile user start
+allbot browser --browser-profile user status
+allbot browser --browser-profile user tabs
+allbot browser --browser-profile user snapshot --format ai
 ```
 
 What success looks like:
@@ -475,7 +475,7 @@ What to check if attach does not work:
 - the target Chromium-based browser is version `144+`
 - remote debugging is enabled in that browser's inspect page
 - the browser showed and you accepted the attach consent prompt
-- `kaijibot doctor` migrates old extension-based browser config and checks that
+- `allbot doctor` migrates old extension-based browser config and checks that
   Chrome is installed locally for default auto-connect profiles, but it cannot
   enable browser-side remote debugging for you
 
@@ -489,12 +489,12 @@ Agent use:
 
 Notes:
 
-- This path is higher-risk than the isolated `kaijibot` profile because it can
+- This path is higher-risk than the isolated `allbot` profile because it can
   act inside your signed-in browser session.
-- KaijiBot does not launch the browser for this driver; it attaches to an
+- AllBot does not launch the browser for this driver; it attaches to an
   existing session only.
-- KaijiBot uses the official Chrome DevTools MCP `--autoConnect` flow here. If
-  `userDataDir` is set, KaijiBot passes it through to target that explicit
+- AllBot uses the official Chrome DevTools MCP `--autoConnect` flow here. If
+  `userDataDir` is set, AllBot passes it through to target that explicit
   Chromium user data directory.
 - Existing-session screenshots support page captures and `--ref` element
   captures from snapshots, but not CSS `--element` selectors.
@@ -529,7 +529,7 @@ Notes:
 
 ## Browser selection
 
-When launching locally, KaijiBot picks the first available:
+When launching locally, AllBot picks the first available:
 
 1. Chrome
 2. Brave
@@ -567,7 +567,7 @@ All endpoints accept `?profile=<name>`.
 If shared-secret gateway auth is configured, browser HTTP routes require auth too:
 
 - `Authorization: Bearer <gateway token>`
-- `x-kaijibot-password: <gateway password>` or HTTP Basic auth with that password
+- `x-allbot-password: <gateway password>` or HTTP Basic auth with that password
 
 Notes:
 
@@ -585,7 +585,7 @@ a clear 501 error.
 What still works without Playwright:
 
 - ARIA snapshots
-- Page screenshots for the managed `kaijibot` browser when a per-tab CDP
+- Page screenshots for the managed `allbot` browser when a per-tab CDP
   WebSocket is available
 - Page screenshots for `existing-session` / Chrome MCP profiles
 - `existing-session` ref-based screenshots (`--ref`) from snapshot output
@@ -603,7 +603,7 @@ not supported for element screenshots`.
 
 If you see `Playwright is not available in this gateway build`, install the full
 Playwright package (not `playwright-core`) and restart the gateway, or reinstall
-KaijiBot with browser support.
+AllBot with browser support.
 
 #### Docker Playwright install
 
@@ -611,13 +611,13 @@ If your Gateway runs in Docker, avoid `npx playwright` (npm override conflicts).
 Use the bundled CLI instead:
 
 ```bash
-docker compose run --rm kaijibot-cli \
+docker compose run --rm allbot-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
 To persist browser downloads, set `PLAYWRIGHT_BROWSERS_PATH` (for example,
 `/home/node/.cache/ms-playwright`) and make sure `/home/node` is persisted via
-`KAIJIBOT_HOME_VOLUME` or a bind mount. See [Docker](/install/docker).
+`ALLBOT_HOME_VOLUME` or a bind mount. See [Docker](/install/docker).
 
 ## How it works (internal)
 
@@ -639,96 +639,96 @@ All commands also accept `--json` for machine-readable output (stable payloads).
 
 Basics:
 
-- `kaijibot browser status`
-- `kaijibot browser start`
-- `kaijibot browser stop`
-- `kaijibot browser tabs`
-- `kaijibot browser tab`
-- `kaijibot browser tab new`
-- `kaijibot browser tab select 2`
-- `kaijibot browser tab close 2`
-- `kaijibot browser open https://example.com`
-- `kaijibot browser focus abcd1234`
-- `kaijibot browser close abcd1234`
+- `allbot browser status`
+- `allbot browser start`
+- `allbot browser stop`
+- `allbot browser tabs`
+- `allbot browser tab`
+- `allbot browser tab new`
+- `allbot browser tab select 2`
+- `allbot browser tab close 2`
+- `allbot browser open https://example.com`
+- `allbot browser focus abcd1234`
+- `allbot browser close abcd1234`
 
 Inspection:
 
-- `kaijibot browser screenshot`
-- `kaijibot browser screenshot --full-page`
-- `kaijibot browser screenshot --ref 12`
-- `kaijibot browser screenshot --ref e12`
-- `kaijibot browser snapshot`
-- `kaijibot browser snapshot --format aria --limit 200`
-- `kaijibot browser snapshot --interactive --compact --depth 6`
-- `kaijibot browser snapshot --efficient`
-- `kaijibot browser snapshot --labels`
-- `kaijibot browser snapshot --selector "#main" --interactive`
-- `kaijibot browser snapshot --frame "iframe#main" --interactive`
-- `kaijibot browser console --level error`
+- `allbot browser screenshot`
+- `allbot browser screenshot --full-page`
+- `allbot browser screenshot --ref 12`
+- `allbot browser screenshot --ref e12`
+- `allbot browser snapshot`
+- `allbot browser snapshot --format aria --limit 200`
+- `allbot browser snapshot --interactive --compact --depth 6`
+- `allbot browser snapshot --efficient`
+- `allbot browser snapshot --labels`
+- `allbot browser snapshot --selector "#main" --interactive`
+- `allbot browser snapshot --frame "iframe#main" --interactive`
+- `allbot browser console --level error`
 
 Lifecycle note:
 
-- For attach-only and remote CDP profiles, `kaijibot browser stop` is still the
+- For attach-only and remote CDP profiles, `allbot browser stop` is still the
   right cleanup command after tests. It closes the active control session and
   clears temporary emulation overrides instead of killing the underlying
   browser.
-- `kaijibot browser errors --clear`
-- `kaijibot browser requests --filter api --clear`
-- `kaijibot browser pdf`
-- `kaijibot browser responsebody "**/api" --max-chars 5000`
+- `allbot browser errors --clear`
+- `allbot browser requests --filter api --clear`
+- `allbot browser pdf`
+- `allbot browser responsebody "**/api" --max-chars 5000`
 
 Actions:
 
-- `kaijibot browser navigate https://example.com`
-- `kaijibot browser resize 1280 720`
-- `kaijibot browser click 12 --double`
-- `kaijibot browser click e12 --double`
-- `kaijibot browser type 23 "hello" --submit`
-- `kaijibot browser press Enter`
-- `kaijibot browser hover 44`
-- `kaijibot browser scrollintoview e12`
-- `kaijibot browser drag 10 11`
-- `kaijibot browser select 9 OptionA OptionB`
-- `kaijibot browser download e12 report.pdf`
-- `kaijibot browser waitfordownload report.pdf`
-- `kaijibot browser upload /tmp/kaijibot/uploads/file.pdf`
-- `kaijibot browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'`
-- `kaijibot browser dialog --accept`
-- `kaijibot browser wait --text "Done"`
-- `kaijibot browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"`
-- `kaijibot browser evaluate --fn '(el) => el.textContent' --ref 7`
-- `kaijibot browser highlight e12`
-- `kaijibot browser trace start`
-- `kaijibot browser trace stop`
+- `allbot browser navigate https://example.com`
+- `allbot browser resize 1280 720`
+- `allbot browser click 12 --double`
+- `allbot browser click e12 --double`
+- `allbot browser type 23 "hello" --submit`
+- `allbot browser press Enter`
+- `allbot browser hover 44`
+- `allbot browser scrollintoview e12`
+- `allbot browser drag 10 11`
+- `allbot browser select 9 OptionA OptionB`
+- `allbot browser download e12 report.pdf`
+- `allbot browser waitfordownload report.pdf`
+- `allbot browser upload /tmp/allbot/uploads/file.pdf`
+- `allbot browser fill --fields '[{"ref":"1","type":"text","value":"Ada"}]'`
+- `allbot browser dialog --accept`
+- `allbot browser wait --text "Done"`
+- `allbot browser wait "#main" --url "**/dash" --load networkidle --fn "window.ready===true"`
+- `allbot browser evaluate --fn '(el) => el.textContent' --ref 7`
+- `allbot browser highlight e12`
+- `allbot browser trace start`
+- `allbot browser trace stop`
 
 State:
 
-- `kaijibot browser cookies`
-- `kaijibot browser cookies set session abc123 --url "https://example.com"`
-- `kaijibot browser cookies clear`
-- `kaijibot browser storage local get`
-- `kaijibot browser storage local set theme dark`
-- `kaijibot browser storage session clear`
-- `kaijibot browser set offline on`
-- `kaijibot browser set headers --headers-json '{"X-Debug":"1"}'`
-- `kaijibot browser set credentials user pass`
-- `kaijibot browser set credentials --clear`
-- `kaijibot browser set geo 37.7749 -122.4194 --origin "https://example.com"`
-- `kaijibot browser set geo --clear`
-- `kaijibot browser set media dark`
-- `kaijibot browser set timezone America/New_York`
-- `kaijibot browser set locale en-US`
-- `kaijibot browser set device "iPhone 14"`
+- `allbot browser cookies`
+- `allbot browser cookies set session abc123 --url "https://example.com"`
+- `allbot browser cookies clear`
+- `allbot browser storage local get`
+- `allbot browser storage local set theme dark`
+- `allbot browser storage session clear`
+- `allbot browser set offline on`
+- `allbot browser set headers --headers-json '{"X-Debug":"1"}'`
+- `allbot browser set credentials user pass`
+- `allbot browser set credentials --clear`
+- `allbot browser set geo 37.7749 -122.4194 --origin "https://example.com"`
+- `allbot browser set geo --clear`
+- `allbot browser set media dark`
+- `allbot browser set timezone America/New_York`
+- `allbot browser set locale en-US`
+- `allbot browser set device "iPhone 14"`
 
 Notes:
 
 - `upload` and `dialog` are **arming** calls; run them before the click/press
   that triggers the chooser/dialog.
-- Download and trace output paths are constrained to KaijiBot temp roots:
-  - traces: `/tmp/kaijibot` (fallback: `${os.tmpdir()}/kaijibot`)
-  - downloads: `/tmp/kaijibot/downloads` (fallback: `${os.tmpdir()}/kaijibot/downloads`)
-- Upload paths are constrained to an KaijiBot temp uploads root:
-  - uploads: `/tmp/kaijibot/uploads` (fallback: `${os.tmpdir()}/kaijibot/uploads`)
+- Download and trace output paths are constrained to AllBot temp roots:
+  - traces: `/tmp/allbot` (fallback: `${os.tmpdir()}/allbot`)
+  - downloads: `/tmp/allbot/downloads` (fallback: `${os.tmpdir()}/allbot/downloads`)
+- Upload paths are constrained to an AllBot temp uploads root:
+  - uploads: `/tmp/allbot/uploads` (fallback: `${os.tmpdir()}/allbot/uploads`)
 - `upload` can also set file inputs directly via `--input-ref` or `--element`.
 - `snapshot`:
   - `--format ai` (default when Playwright is installed): returns an AI snapshot with numeric refs (`aria-ref="<n>"`).
@@ -744,16 +744,16 @@ Notes:
 
 ## Snapshots and refs
 
-KaijiBot supports two “snapshot” styles:
+AllBot supports two “snapshot” styles:
 
-- **AI snapshot (numeric refs)**: `kaijibot browser snapshot` (default; `--format ai`)
+- **AI snapshot (numeric refs)**: `allbot browser snapshot` (default; `--format ai`)
   - Output: a text snapshot that includes numeric refs.
-  - Actions: `kaijibot browser click 12`, `kaijibot browser type 23 "hello"`.
+  - Actions: `allbot browser click 12`, `allbot browser type 23 "hello"`.
   - Internally, the ref is resolved via Playwright’s `aria-ref`.
 
-- **Role snapshot (role refs like `e12`)**: `kaijibot browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
+- **Role snapshot (role refs like `e12`)**: `allbot browser snapshot --interactive` (or `--compact`, `--depth`, `--selector`, `--frame`)
   - Output: a role-based list/tree with `[ref=e12]` (and optional `[nth=1]`).
-  - Actions: `kaijibot browser click e12`, `kaijibot browser highlight e12`.
+  - Actions: `allbot browser click e12`, `allbot browser highlight e12`.
   - Internally, the ref is resolved via `getByRole(...)` (plus `nth()` for duplicates).
   - Add `--labels` to include a viewport screenshot with overlayed `e12` labels.
 
@@ -767,18 +767,18 @@ Ref behavior:
 You can wait on more than just time/text:
 
 - Wait for URL (globs supported by Playwright):
-  - `kaijibot browser wait --url "**/dash"`
+  - `allbot browser wait --url "**/dash"`
 - Wait for load state:
-  - `kaijibot browser wait --load networkidle`
+  - `allbot browser wait --load networkidle`
 - Wait for a JS predicate:
-  - `kaijibot browser wait --fn "window.ready===true"`
+  - `allbot browser wait --fn "window.ready===true"`
 - Wait for a selector to become visible:
-  - `kaijibot browser wait "#main"`
+  - `allbot browser wait "#main"`
 
 These can be combined:
 
 ```bash
-kaijibot browser wait "#main" \
+allbot browser wait "#main" \
   --url "**/dash" \
   --load networkidle \
   --fn "window.ready===true" \
@@ -789,16 +789,16 @@ kaijibot browser wait "#main" \
 
 When an action fails (e.g. “not visible”, “strict mode violation”, “covered”):
 
-1. `kaijibot browser snapshot --interactive`
+1. `allbot browser snapshot --interactive`
 2. Use `click <ref>` / `type <ref>` (prefer role refs in interactive mode)
-3. If it still fails: `kaijibot browser highlight <ref>` to see what Playwright is targeting
+3. If it still fails: `allbot browser highlight <ref>` to see what Playwright is targeting
 4. If the page behaves oddly:
-   - `kaijibot browser errors --clear`
-   - `kaijibot browser requests --filter api --clear`
+   - `allbot browser errors --clear`
+   - `allbot browser requests --filter api --clear`
 5. For deep debugging: record a trace:
-   - `kaijibot browser trace start`
+   - `allbot browser trace start`
    - reproduce the issue
-   - `kaijibot browser trace stop` (prints `TRACE:<path>`)
+   - `allbot browser trace stop` (prints `TRACE:<path>`)
 
 ## JSON output
 
@@ -807,10 +807,10 @@ When an action fails (e.g. “not visible”, “strict mode violation”, “co
 Examples:
 
 ```bash
-kaijibot browser status --json
-kaijibot browser snapshot --interactive --json
-kaijibot browser requests --filter api --json
-kaijibot browser cookies --json
+allbot browser status --json
+allbot browser snapshot --interactive --json
+allbot browser requests --filter api --json
+allbot browser cookies --json
 ```
 
 Role snapshots in JSON include `refs` plus a small `stats` block (lines/chars/refs/interactive) so tools can reason about payload size and density.
@@ -833,8 +833,8 @@ These are useful for “make the site behave like X” workflows:
 
 ## Security & privacy
 
-- The kaijibot browser profile may contain logged-in sessions; treat it as sensitive.
-- `browser act kind=evaluate` / `kaijibot browser evaluate` and `wait --fn`
+- The allbot browser profile may contain logged-in sessions; treat it as sensitive.
+- `browser act kind=evaluate` / `allbot browser evaluate` and `wait --fn`
   execute arbitrary JavaScript in the page context. Prompt injection can steer
   this. Disable it with `browser.evaluateEnabled=false` if you do not need it.
 - For logins and anti-bot notes (X/Twitter, etc.), see [Browser login + X/Twitter posting](/tools/browser-login).
@@ -875,7 +875,7 @@ How it maps:
 - `browser act` uses the snapshot `ref` IDs to click/type/drag/select.
 - `browser screenshot` captures pixels (full page or element).
 - `browser` accepts:
-  - `profile` to choose a named browser profile (kaijibot, chrome, or remote CDP).
+  - `profile` to choose a named browser profile (allbot, chrome, or remote CDP).
   - `target` (`sandbox` | `host` | `node`) to select where the browser lives.
   - In sandboxed sessions, `target: "host"` requires `agents.defaults.sandbox.browser.allowHostControl=true`.
   - If `target` is omitted: sandboxed sessions default to `sandbox`, non-sandbox sessions default to `host`.

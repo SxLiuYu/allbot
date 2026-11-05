@@ -78,7 +78,7 @@ export function resolveCliContainerTarget(
   if (!parsed.ok) {
     throw new Error(parsed.error);
   }
-  return parsed.container ?? normalizeOptionalString(env.KAIJIBOT_CONTAINER) ?? null;
+  return parsed.container ?? normalizeOptionalString(env.ALLBOT_CONTAINER) ?? null;
 }
 
 function isContainerRunning(params: {
@@ -158,11 +158,11 @@ function buildContainerExecArgs(params: {
     "exec",
     ...interactiveFlags,
     envFlag,
-    `KAIJIBOT_CONTAINER_HINT=${params.containerName}`,
+    `ALLBOT_CONTAINER_HINT=${params.containerName}`,
     envFlag,
-    "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+    "ALLBOT_CLI_CONTAINER_BYPASS=1",
     params.containerName,
-    "kaijibot",
+    "allbot",
     ...params.argv,
   ];
 }
@@ -171,20 +171,20 @@ function buildContainerExecEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const next = { ...env };
   // Container-targeted CLI invocations should use the container's own profile
   // and gateway auth/runtime state rather than inheriting host overrides.
-  delete next.KAIJIBOT_PROFILE;
-  delete next.KAIJIBOT_GATEWAY_PORT;
-  delete next.KAIJIBOT_GATEWAY_URL;
-  delete next.KAIJIBOT_GATEWAY_TOKEN;
-  delete next.KAIJIBOT_GATEWAY_PASSWORD;
+  delete next.ALLBOT_PROFILE;
+  delete next.ALLBOT_GATEWAY_PORT;
+  delete next.ALLBOT_GATEWAY_URL;
+  delete next.ALLBOT_GATEWAY_TOKEN;
+  delete next.ALLBOT_GATEWAY_PASSWORD;
   // The child CLI should render container-aware follow-up commands via
-  // KAIJIBOT_CONTAINER_HINT, but it should not treat itself as still
+  // ALLBOT_CONTAINER_HINT, but it should not treat itself as still
   // container-targeted for validation/routing.
-  next.KAIJIBOT_CONTAINER = "";
+  next.ALLBOT_CONTAINER = "";
   return next;
 }
 
 function isBlockedContainerCommand(argv: string[]): boolean {
-  if (resolveCliArgvInvocation(["node", "kaijibot", ...argv]).primary === "update") {
+  if (resolveCliArgvInvocation(["node", "allbot", ...argv]).primary === "update") {
     return true;
   }
   for (let i = 0; i < argv.length; i += 1) {
@@ -218,7 +218,7 @@ export function maybeRunCliInContainer(
     stdoutIsTTY: deps?.stdoutIsTTY ?? Boolean(process.stdout.isTTY),
   };
 
-  if (resolvedDeps.env.KAIJIBOT_CLI_CONTAINER_BYPASS === "1") {
+  if (resolvedDeps.env.ALLBOT_CLI_CONTAINER_BYPASS === "1") {
     return { handled: false, argv };
   }
 
@@ -232,7 +232,7 @@ export function maybeRunCliInContainer(
   }
   if (isBlockedContainerCommand(parsed.argv.slice(2))) {
     throw new Error(
-      "kaijibot update is not supported with --container; rebuild or restart the container image instead.",
+      "allbot update is not supported with --container; rebuild or restart the container image instead.",
     );
   }
 

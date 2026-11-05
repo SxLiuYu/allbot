@@ -132,12 +132,12 @@ export function registerPairingCli(program: Command) {
           : codeOrChannel;
       if (!channelRaw || !resolvedCode) {
         throw new Error(
-          `Usage: ${formatCliCommand("kaijibot pairing approve <channel> <code>")} (or: ${formatCliCommand("kaijibot pairing approve --channel <channel> <code>")})`,
+          `Usage: ${formatCliCommand("allbot pairing approve <channel> <code>")} (or: ${formatCliCommand("allbot pairing approve --channel <channel> <code>")})`,
         );
       }
       if (opts.channel && code != null) {
         throw new Error(
-          `Too many arguments. Use: ${formatCliCommand("kaijibot pairing approve --channel <channel> <code>")}`,
+          `Too many arguments. Use: ${formatCliCommand("allbot pairing approve --channel <channel> <code>")}`,
         );
       }
       const channel = parseChannel(channelRaw, channels);

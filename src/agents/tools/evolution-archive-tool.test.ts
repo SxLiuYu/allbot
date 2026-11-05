@@ -20,7 +20,7 @@ function makeDraft(overrides: Partial<SkillDraft> = {}): SkillDraft {
 
 describe("createEvolutionArchiveTool", () => {
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-archive-tool-test-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-archive-tool-test-"));
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe("SkillPersistenceWriter archive recovery", () => {
   let writer: SkillPersistenceWriter;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-archive-recovery-test-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-archive-recovery-test-"));
     writer = new SkillPersistenceWriter(tempDir);
   });
 
@@ -116,7 +116,7 @@ describe("SkillPersistenceWriter remove operations", () => {
   let writer: SkillPersistenceWriter;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-archive-remove-test-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-archive-remove-test-"));
     writer = new SkillPersistenceWriter(tempDir);
   });
 

@@ -6,14 +6,14 @@ import {
   addSubagentRunForTests,
   resetSubagentRegistryForTests,
 } from "../agents/subagent-registry.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { SessionEntry } from "../config/sessions.js";
 import { listSessionsFromStore } from "./session-utils.js";
 
 function createModelDefaultsConfig(params: {
   primary: string;
   models?: Record<string, Record<string, never>>;
-}): KaijiBotConfig {
+}): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -21,12 +21,12 @@ function createModelDefaultsConfig(params: {
         models: params.models,
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function createLegacyRuntimeListConfig(
   models?: Record<string, Record<string, never>>,
-): KaijiBotConfig {
+): AllBotConfig {
   return createModelDefaultsConfig({
     primary: "google-gemini-cli/gemini-3-pro-preview",
     ...(models ? { models } : {}),
@@ -51,7 +51,7 @@ describe("listSessionsFromStore search", () => {
   const baseCfg = {
     session: { mainKey: "main" },
     agents: { list: [{ id: "main", default: true }] },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 
   const makeStore = (): Record<string, SessionEntry> => ({
     "agent:main:work-project": {
@@ -263,7 +263,7 @@ describe("listSessionsFromStore search", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const result = listSessionsFromStore({
       cfg,
       storePath: "/tmp/sessions.json",
@@ -286,7 +286,7 @@ describe("listSessionsFromStore search", () => {
   });
 
   test("prefers persisted estimated session cost from the store", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-session-utils-store-cost-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-session-utils-store-cost-"));
     const storePath = path.join(tmpDir, "sessions.json");
     fs.writeFileSync(
       path.join(tmpDir, "sess-main.jsonl"),
@@ -352,7 +352,7 @@ describe("listSessionsFromStore search", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const result = listSessionsFromStore({
       cfg,
       storePath: "/tmp/sessions.json",
@@ -375,7 +375,7 @@ describe("listSessionsFromStore search", () => {
   });
 
   test("falls back to transcript usage for totalTokens and zero estimatedCostUsd", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-session-utils-zero-cost-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-session-utils-zero-cost-"));
     const storePath = path.join(tmpDir, "sessions.json");
     fs.writeFileSync(
       path.join(tmpDir, "sess-main.jsonl"),
@@ -428,7 +428,7 @@ describe("listSessionsFromStore search", () => {
   });
 
   test("falls back to transcript usage for totalTokens and estimatedCostUsd, and derives contextTokens from the resolved model", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-session-utils-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-session-utils-"));
     const storePath = path.join(tmpDir, "sessions.json");
     const cfg = {
       session: { mainKey: "main" },
@@ -440,7 +440,7 @@ describe("listSessionsFromStore search", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     fs.writeFileSync(
       path.join(tmpDir, "sess-main.jsonl"),
       [
@@ -493,7 +493,7 @@ describe("listSessionsFromStore search", () => {
   });
 
   test("uses subagent run model immediately for child sessions while transcript usage fills live totals", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-session-utils-subagent-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-session-utils-subagent-"));
     const storePath = path.join(tmpDir, "sessions.json");
     const now = Date.now();
     const cfg = {
@@ -506,7 +506,7 @@ describe("listSessionsFromStore search", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     fs.writeFileSync(
       path.join(tmpDir, "sess-child.jsonl"),
       [
@@ -574,7 +574,7 @@ describe("listSessionsFromStore search", () => {
 
   test("keeps a running subagent model when transcript fallback still reflects an older run", () => {
     const tmpDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "kaijibot-session-utils-subagent-stale-model-"),
+      path.join(os.tmpdir(), "allbot-session-utils-subagent-stale-model-"),
     );
     const storePath = path.join(tmpDir, "sessions.json");
     const now = Date.now();
@@ -588,7 +588,7 @@ describe("listSessionsFromStore search", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     fs.writeFileSync(
       path.join(tmpDir, "sess-child-stale.jsonl"),
       [
@@ -654,7 +654,7 @@ describe("listSessionsFromStore search", () => {
 
   test("keeps the selected override model when runtime identity was intentionally cleared", () => {
     const tmpDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "kaijibot-session-utils-cleared-runtime-model-"),
+      path.join(os.tmpdir(), "allbot-session-utils-cleared-runtime-model-"),
     );
     const storePath = path.join(tmpDir, "sessions.json");
     const now = Date.now();
@@ -668,7 +668,7 @@ describe("listSessionsFromStore search", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     fs.writeFileSync(
       path.join(tmpDir, "sess-override.jsonl"),
       [
@@ -720,7 +720,7 @@ describe("listSessionsFromStore search", () => {
   });
 
   test("does not replace the current runtime model when transcript fallback is only for missing pricing", () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-session-utils-pricing-"));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-session-utils-pricing-"));
     const storePath = path.join(tmpDir, "sessions.json");
     const now = Date.now();
     const cfg = {
@@ -728,7 +728,7 @@ describe("listSessionsFromStore search", () => {
       agents: {
         list: [{ id: "main", default: true }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     fs.writeFileSync(
       path.join(tmpDir, "sess-pricing.jsonl"),
       [

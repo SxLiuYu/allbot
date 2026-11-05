@@ -1,14 +1,14 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import { streamSimple } from "@earendil-works/pi-ai";
-import type { ProviderWrapStreamFnContext } from "kaijibot/plugin-sdk/plugin-entry";
+import type { ProviderWrapStreamFnContext } from "allbot/plugin-sdk/plugin-entry";
 import {
   applyAnthropicPayloadPolicyToParams,
   composeProviderStreamWrappers,
   resolveAnthropicPayloadPolicy,
   streamWithPayloadPatch,
-} from "kaijibot/plugin-sdk/provider-stream-shared";
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/runtime-env";
-import { normalizeLowercaseStringOrEmpty, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-stream-shared";
+import { createSubsystemLogger } from "allbot/plugin-sdk/runtime-env";
+import { normalizeLowercaseStringOrEmpty, readStringValue } from "allbot/plugin-sdk/text-runtime";
 
 const log = createSubsystemLogger("anthropic-stream");
 

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   type AuthCredentialReasonCode,
   type AuthProfileCredential,
@@ -100,7 +100,7 @@ function buildProfileHealth(params: {
   profileId: string;
   credential: AuthProfileCredential;
   store: AuthProfileStore;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   now: number;
   warnAfterMs: number;
 }): AuthProfileHealth {
@@ -188,7 +188,7 @@ function buildProfileHealth(params: {
 
 export function buildAuthHealthSummary(params: {
   store: AuthProfileStore;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   warnAfterMs?: number;
   providers?: string[];
 }): AuthHealthSummary {

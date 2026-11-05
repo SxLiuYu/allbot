@@ -1,6 +1,6 @@
 # ACCEPTANCE — Core Workflow Acceptance Criteria
 
-> Frozen happy-path + reverse acceptance for the 5 core KaijiBot workflows.
+> Frozen happy-path + reverse acceptance for the 5 core AllBot workflows.
 > Established by the VERIFICATION.md diagnosis (§8.5). These criteria are the
 > "what counts as correct" that the supervisor (`test/helpers/eval/supervisor.ts`)
 > scores against. Do not infer from existing tests — those are frozen here.
@@ -147,10 +147,10 @@
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Write attempt     | `writeConfigFile(next)` called with a payload smaller than 50% of the last-known-good AND the prior config had `gateway.mode` set AND the new payload lacks `gateway.mode` |
 | Guard             | `ConfigClobberProtectionError` thrown with message naming the shrink % and the env-var bypass                                                                              |
-| Recovery          | Operator sets `KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` OR `allowConfigClobberShrink: true` write option, write succeeds                                                    |
+| Recovery          | Operator sets `ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` OR `allowConfigClobberShrink: true` write option, write succeeds                                                    |
 | Legitimate shrink | A write that keeps `gateway.mode` (even if shrinking) passes without bypass — the guard only blocks the stub pattern                                                       |
 
-**Passes iff**: accidental env-var typo (e.g. `KAIJIBOT_CONFIG_DIR` which is not honored) cannot silently overwrite a real operator config.
+**Passes iff**: accidental env-var typo (e.g. `ALLBOT_CONFIG_DIR` which is not honored) cannot silently overwrite a real operator config.
 
 ### Reverse acceptance (MUST NEVER)
 

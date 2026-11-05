@@ -1,8 +1,8 @@
 import {
   createDefaultModelPresetAppliers,
   type ModelDefinitionConfig,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 
 export const LITELLM_BASE_URL = "http://localhost:4000";
 export const LITELLM_DEFAULT_MODEL_ID = "claude-opus-4-6";
@@ -30,7 +30,7 @@ export function buildLitellmModelDefinition(): ModelDefinitionConfig {
 
 const litellmPresetAppliers = createDefaultModelPresetAppliers({
   primaryModelRef: LITELLM_DEFAULT_MODEL_REF,
-  resolveParams: (cfg: KaijiBotConfig) => {
+  resolveParams: (cfg: AllBotConfig) => {
     const existingProvider = cfg.models?.providers?.litellm as { baseUrl?: unknown } | undefined;
     const resolvedBaseUrl =
       typeof existingProvider?.baseUrl === "string" ? existingProvider.baseUrl.trim() : "";
@@ -46,10 +46,10 @@ const litellmPresetAppliers = createDefaultModelPresetAppliers({
   },
 });
 
-export function applyLitellmProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyLitellmProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return litellmPresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyLitellmConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyLitellmConfig(cfg: AllBotConfig): AllBotConfig {
   return litellmPresetAppliers.applyConfig(cfg);
 }

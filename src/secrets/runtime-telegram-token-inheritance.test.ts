@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createEmptyPluginRegistry } from "../plugins/registry.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { loadBundledChannelSecretContractApi } from "./channel-contract-api.js";
@@ -29,8 +29,8 @@ vi.mock("../channels/plugins/bootstrap-registry.js", () => {
   };
 });
 
-function asConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;
@@ -78,7 +78,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
           },
         }),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => loadAuthStoreWithProfiles({}),
       }),
     ).rejects.toThrow('Environment variable "MISSING_ENABLED_TELEGRAM_TOKEN" is missing or empty.');
@@ -104,7 +104,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
           },
         }),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => loadAuthStoreWithProfiles({}),
       }),
     ).rejects.toThrow('Environment variable "MISSING_ENABLED_TELEGRAM_TOKEN" is missing or empty.');
@@ -139,7 +139,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
       env: {
         TELEGRAM_WORK_TOKEN: "telegram-work-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -176,7 +176,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
           },
         }),
         env: {},
-        agentDirs: ["/tmp/kaijibot-agent-main"],
+        agentDirs: ["/tmp/allbot-agent-main"],
         loadAuthStore: () => loadAuthStoreWithProfiles({}),
       }),
     ).rejects.toThrow(
@@ -206,7 +206,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
       env: {
         TELEGRAM_BASE_TOKEN: "telegram-base-token",
       },
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -236,7 +236,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -265,7 +265,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 
@@ -299,7 +299,7 @@ describe("secrets runtime snapshot telegram token inheritance", () => {
         },
       }),
       env: {},
-      agentDirs: ["/tmp/kaijibot-agent-main"],
+      agentDirs: ["/tmp/allbot-agent-main"],
       loadAuthStore: () => loadAuthStoreWithProfiles({}),
     });
 

@@ -6,7 +6,7 @@ type FetchWithPreconnect = typeof fetch & {
 
 type RequestInitWithDuplex = RequestInit & { duplex?: "half" };
 
-const wrapFetchWithAbortSignalMarker = Symbol.for("kaijibot.fetch.abort-signal-wrapped");
+const wrapFetchWithAbortSignalMarker = Symbol.for("allbot.fetch.abort-signal-wrapped");
 
 type FetchWithAbortSignalMarker = typeof fetch & {
   [wrapFetchWithAbortSignalMarker]?: true;

@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { SsrFBlockedError, type LookupFn } from "../../infra/net/ssrf.js";
 import { logDebug } from "../../logger.js";
 import type { RuntimeWebFetchMetadata } from "../../secrets/runtime-web-tools.types.js";
@@ -68,13 +68,13 @@ const WebFetchSchema = Type.Object({
   ),
 });
 
-type WebFetchConfig = NonNullable<KaijiBotConfig["tools"]>["web"] extends infer Web
+type WebFetchConfig = NonNullable<AllBotConfig["tools"]>["web"] extends infer Web
   ? Web extends { fetch?: infer Fetch }
     ? Fetch
     : undefined
   : undefined;
 
-function resolveFetchConfig(cfg?: KaijiBotConfig): WebFetchConfig {
+function resolveFetchConfig(cfg?: AllBotConfig): WebFetchConfig {
   return resolveWebProviderConfig<"fetch", NonNullable<WebFetchConfig>>(cfg, "fetch");
 }
 
@@ -568,7 +568,7 @@ async function runWebFetch(params: WebFetchRuntimeParams): Promise<Record<string
 }
 
 export function createWebFetchTool(options?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   sandboxed?: boolean;
   runtimeWebFetch?: RuntimeWebFetchMetadata;
   lookupFn?: LookupFn;

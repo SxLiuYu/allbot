@@ -13,7 +13,7 @@ describe("resolveGlobalLane", () => {
   it("maps cron lane to nested lane to prevent deadlocks", () => {
     // When cron jobs trigger nested agent runs, the outer execution holds
     // the cron lane slot. Inner work must use a separate lane to avoid
-    // deadlock. See: https://github.com/kaijibot/kaijibot/issues/44805
+    // deadlock. See: https://github.com/allbot/allbot/issues/44805
     for (const lane of ["cron", "  cron  "]) {
       expect(resolveGlobalLane(lane)).toBe(CommandLane.Nested);
     }

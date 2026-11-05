@@ -3,7 +3,7 @@ import {
   getMediaGenerationRuntimeMocks,
   resetVideoGenerationRuntimeMocks,
 } from "../../test/helpers/media-generation/runtime-module-mocks.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { generateVideo, listRuntimeVideoGenerationProviders } from "./runtime.js";
 import type { VideoGenerationProvider } from "./types.js";
 
@@ -53,7 +53,7 @@ describe("video-generation runtime", () => {
             videoGenerationModel: { primary: "video-plugin/vid-v1" },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       prompt: "animate a cat",
       agentDir: "/tmp/agent",
       authStore,
@@ -120,7 +120,7 @@ describe("video-generation runtime", () => {
     ]);
 
     const result = await generateVideo({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       prompt: "animate a cat",
     });
 
@@ -153,10 +153,10 @@ describe("video-generation runtime", () => {
     ];
     mocks.listVideoGenerationProviders.mockReturnValue(providers);
 
-    expect(listRuntimeVideoGenerationProviders({ config: {} as KaijiBotConfig })).toEqual(
+    expect(listRuntimeVideoGenerationProviders({ config: {} as AllBotConfig })).toEqual(
       providers,
     );
-    expect(mocks.listVideoGenerationProviders).toHaveBeenCalledWith({} as KaijiBotConfig);
+    expect(mocks.listVideoGenerationProviders).toHaveBeenCalledWith({} as AllBotConfig);
   });
 
   it("normalizes requested durations to supported provider values", async () => {
@@ -185,7 +185,7 @@ describe("video-generation runtime", () => {
             videoGenerationModel: { primary: "video-plugin/vid-v1" },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       prompt: "animate a cat",
       durationSeconds: 5,
     });
@@ -246,7 +246,7 @@ describe("video-generation runtime", () => {
             videoGenerationModel: { primary: "openai/sora-2" },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       prompt: "animate a lobster",
       size: "1280x720",
       aspectRatio: "16:9",
@@ -313,7 +313,7 @@ describe("video-generation runtime", () => {
             videoGenerationModel: { primary: "runway/gen4.5" },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       prompt: "animate a lobster",
       size: "1280x720",
       inputImages: [{ buffer: Buffer.from("png"), mimeType: "image/png" }],
@@ -351,7 +351,7 @@ describe("video-generation runtime", () => {
     ]);
     mocks.getProviderEnvVars.mockReturnValue(["MOTION_ONE_API_KEY"]);
 
-    const promise = generateVideo({ cfg: {} as KaijiBotConfig, prompt: "animate a cat" });
+    const promise = generateVideo({ cfg: {} as AllBotConfig, prompt: "animate a cat" });
 
     await expect(promise).rejects.toThrow("No video-generation model configured.");
     await expect(promise).rejects.toThrow(

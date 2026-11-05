@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from "node:util";
-import type { KaijiBotConfig } from "../../../config/types.js";
+import type { AllBotConfig } from "../../../config/types.js";
 import { applyLegacyDoctorMigrations } from "./legacy-config-compat.js";
 import { normalizeCompatibilityConfigValues } from "./legacy-config-core-migrate.js";
 
@@ -13,9 +13,9 @@ export function applyRuntimeLegacyConfigMigrations(raw: unknown): {
 
   const original = raw as Record<string, unknown>;
   const migrated = applyLegacyDoctorMigrations(original);
-  const base = (migrated.next ?? original) as KaijiBotConfig;
+  const base = (migrated.next ?? original) as AllBotConfig;
   const normalized = normalizeCompatibilityConfigValues(base);
-  const next = normalized.config as KaijiBotConfig & Record<string, unknown>;
+  const next = normalized.config as AllBotConfig & Record<string, unknown>;
   const changes = [...migrated.changes, ...normalized.changes];
 
   if (changes.length === 0 || isDeepStrictEqual(next, original)) {

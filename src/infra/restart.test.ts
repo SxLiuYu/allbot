@@ -58,7 +58,7 @@ afterEach(() => {
 });
 
 describe.runIf(process.platform !== "win32")("findGatewayPidsOnPortSync", () => {
-  it("parses lsof output and filters non-kaijibot/current processes", () => {
+  it("parses lsof output and filters non-allbot/current processes", () => {
     const gatewayPidA = process.pid + 1000;
     const gatewayPidB = process.pid + 2000;
     const foreignPid = process.pid + 3000;
@@ -67,13 +67,13 @@ describe.runIf(process.platform !== "win32")("findGatewayPidsOnPortSync", () => 
       status: 0,
       stdout: [
         `p${process.pid}`,
-        "ckaijibot",
+        "callbot",
         `p${gatewayPidA}`,
-        "ckaijibot-gateway",
+        "callbot-gateway",
         `p${foreignPid}`,
         "cnode",
         `p${gatewayPidB}`,
-        "cKaijiBot",
+        "cAllBot",
       ].join("\n"),
     });
 
@@ -107,7 +107,7 @@ describe.runIf(process.platform !== "win32")("cleanStaleGatewayProcessesSync", (
       .mockReturnValueOnce({
         error: undefined,
         status: 0,
-        stdout: [`p${stalePidA}`, "ckaijibot", `p${stalePidB}`, "ckaijibot-gateway"].join("\n"),
+        stdout: [`p${stalePidA}`, "callbot", `p${stalePidB}`, "callbot-gateway"].join("\n"),
       })
       .mockReturnValue({
         error: undefined,
@@ -132,7 +132,7 @@ describe.runIf(process.platform !== "win32")("cleanStaleGatewayProcessesSync", (
       .mockReturnValueOnce({
         error: undefined,
         status: 0,
-        stdout: [`p${stalePid}`, "ckaijibot"].join("\n"),
+        stdout: [`p${stalePid}`, "callbot"].join("\n"),
       })
       .mockReturnValue({
         error: undefined,

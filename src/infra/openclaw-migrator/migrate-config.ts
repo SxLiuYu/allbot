@@ -10,9 +10,9 @@ import type {
   MigrationSource,
 } from "./types.js";
 
-const KAIJIBOT_CONFIG_FILENAME = "kaijibot.json";
+const ALLBOT_CONFIG_FILENAME = "allbot.json";
 
-const KAIJIBOT_CONFIG_DEFAULTS: Record<string, unknown> = {
+const ALLBOT_CONFIG_DEFAULTS: Record<string, unknown> = {
   cognitive: {
     enabled: true,
     proactive: {
@@ -63,7 +63,7 @@ function fileHash(content: string): string {
 
 /**
  * Recursively rewrite path values in a config object:
- * 1. ~/.openclaw/, ~/.clawdbot/, ~/.moltbot/ → ~/.kaijibot/
+ * 1. ~/.openclaw/, ~/.clawdbot/, ~/.moltbot/ → ~/.allbot/
  * 2. Absolute paths starting with sourceDir → same relative path under targetDir
  */
 export function rewriteConfigPaths(
@@ -105,7 +105,7 @@ function rewriteStringValue(
   // 1. Rewrite brand home-dir prefixes
   for (const prefix of BRAND_HOME_PREFIXES) {
     if (value.includes(prefix)) {
-      value = value.replaceAll(prefix, "~/.kaijibot/");
+      value = value.replaceAll(prefix, "~/.allbot/");
     }
   }
 
@@ -156,7 +156,7 @@ function checkMultiAgentBindings(config: Record<string, unknown>, warnings: stri
   warnings.push(
     "Multi-agent config migrated but no bindings found. " +
       "Non-default agents will not receive messages until bindings are configured. " +
-      "Run `kaijibot config edit` to add route bindings for each agent.",
+      "Run `allbot config edit` to add route bindings for each agent.",
   );
 }
 
@@ -212,7 +212,7 @@ export async function migrateConfig(
   const skipped: string[] = [];
   const log = options.log ?? (() => {});
 
-  const targetConfigPath = path.join(targetDir, KAIJIBOT_CONFIG_FILENAME);
+  const targetConfigPath = path.join(targetDir, ALLBOT_CONFIG_FILENAME);
 
   let sourceConfig: Record<string, unknown>;
   try {
@@ -223,7 +223,7 @@ export async function migrateConfig(
     return { source, changes, warnings, skipped };
   }
 
-  const merged = deepMerge(sourceConfig, KAIJIBOT_CONFIG_DEFAULTS);
+  const merged = deepMerge(sourceConfig, ALLBOT_CONFIG_DEFAULTS);
 
   // Rewrite paths in merged config (brand home dirs + absolute source paths)
   const rewritten = rewriteConfigPaths(merged, source.dir, targetDir);
@@ -258,7 +258,7 @@ export async function migrateConfig(
         source: path.relative(source.dir, source.configPath),
         target: path.relative(targetDir, targetConfigPath),
         detail:
-          "Would merge source config with existing KaijiBot config (existing takes precedence)",
+          "Would merge source config with existing AllBot config (existing takes precedence)",
       });
     } else {
       await fs.writeFile(targetConfigPath, JSON.stringify(mergedWithExisting, null, 2), "utf-8");
@@ -266,7 +266,7 @@ export async function migrateConfig(
         kind: "merge",
         source: path.relative(source.dir, source.configPath),
         target: path.relative(targetDir, targetConfigPath),
-        detail: "Merged source config with existing KaijiBot config (existing takes precedence)",
+        detail: "Merged source config with existing AllBot config (existing takes precedence)",
       });
       log(`Merged config: ${targetConfigPath}`);
     }
@@ -276,7 +276,7 @@ export async function migrateConfig(
         kind: "create",
         source: path.relative(source.dir, source.configPath),
         target: path.relative(targetDir, targetConfigPath),
-        detail: "Would create KaijiBot config with defaults",
+        detail: "Would create AllBot config with defaults",
       });
     } else {
       await fs.mkdir(targetDir, { recursive: true });
@@ -285,7 +285,7 @@ export async function migrateConfig(
         kind: "create",
         source: path.relative(source.dir, source.configPath),
         target: path.relative(targetDir, targetConfigPath),
-        detail: "Created KaijiBot config with defaults",
+        detail: "Created AllBot config with defaults",
       });
       log(`Created config: ${targetConfigPath}`);
     }

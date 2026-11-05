@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# KaijiBot Installer for Android/Termux
+# AllBot Installer for Android/Termux
 # Usage: curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install-termux.sh | bash
 
 BOLD='\033[1m'
@@ -57,23 +57,23 @@ case "$TZ_PROP" in
 esac
 
 info "获取最新版本号..."
-KB_VER=$(curl -fsSL --connect-timeout 15 https://registry.npmjs.org/kaijibot/latest 2>/dev/null | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).version" 2>/dev/null || true)
+KB_VER=$(curl -fsSL --connect-timeout 15 https://registry.npmjs.org/allbot/latest 2>/dev/null | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).version" 2>/dev/null || true)
 
 if [ -z "$KB_VER" ]; then
   info "无法获取版本号，直接从 npm 安装..."
-  npm install -g kaijibot@latest --force $NPM_REGISTRY
+  npm install -g allbot@latest --force $NPM_REGISTRY
 else
-  info "安装 KaijiBot v${KB_VER}..."
+  info "安装 AllBot v${KB_VER}..."
   # Priority: npmmirror (China) → npmjs.org (global CDN) → GitHub tarball (last resort)
-  npm install -g "kaijibot@${KB_VER}" --force $NPM_REGISTRY || {
+  npm install -g "allbot@${KB_VER}" --force $NPM_REGISTRY || {
     info "镜像源失败，尝试 npmjs.org..."
-    npm install -g "kaijibot@${KB_VER}" --force --registry=https://registry.npmjs.org || {
+    npm install -g "allbot@${KB_VER}" --force --registry=https://registry.npmjs.org || {
       info "npmjs.org 也失败，尝试 GitHub tarball..."
-      npm install -g "https://github.com/Kaiji-Z/kaijibot/releases/download/v${KB_VER}/kaijibot-${KB_VER}.tgz" --force
+      npm install -g "https://github.com/Kaiji-Z/kaijibot/releases/download/v${KB_VER}/allbot-${KB_VER}.tgz" --force
     }
   }
 fi
-ok "KaijiBot $(kaijibot --version)"
+ok "AllBot $(allbot --version)"
 
 # Optional: local speech engine (voice input + read-aloud). Non-fatal.
 info "安装本地语音引擎 (sherpa-onnx, 可选)..."
@@ -86,4 +86,4 @@ else
 fi
 
 info "启动配置向导，按提示操作..."
-exec kaijibot android-install < /dev/tty
+exec allbot android-install < /dev/tty

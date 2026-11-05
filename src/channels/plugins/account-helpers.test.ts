@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { normalizeAccountId } from "../../routing/session-key.js";
 import {
   createAccountListHelpers,
@@ -14,16 +14,16 @@ import {
 const { listConfiguredAccountIds, listAccountIds, resolveDefaultAccountId } =
   createAccountListHelpers("testchannel");
 
-function cfg(accounts?: Record<string, unknown> | null, defaultAccount?: string): KaijiBotConfig {
+function cfg(accounts?: Record<string, unknown> | null, defaultAccount?: string): AllBotConfig {
   if (accounts === null) {
     return {
       channels: {
         testchannel: defaultAccount ? { defaultAccount } : {},
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
   }
   if (accounts === undefined && !defaultAccount) {
-    return {} as unknown as KaijiBotConfig;
+    return {} as unknown as AllBotConfig;
   }
   return {
     channels: {
@@ -32,18 +32,18 @@ function cfg(accounts?: Record<string, unknown> | null, defaultAccount?: string)
         ...(defaultAccount ? { defaultAccount } : {}),
       },
     },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 function expectResolvedAccountIdsCase(params: {
-  resolve: (cfg: KaijiBotConfig) => string[];
-  input: KaijiBotConfig;
+  resolve: (cfg: AllBotConfig) => string[];
+  input: AllBotConfig;
   expected: string[];
 }) {
   expect(params.resolve(params.input)).toEqual(params.expected);
 }
 
-function expectResolvedDefaultAccountCase(input: KaijiBotConfig, expected: string) {
+function expectResolvedDefaultAccountCase(input: AllBotConfig, expected: string) {
   expect(resolveDefaultAccountId(input)).toBe(expected);
 }
 
@@ -52,7 +52,7 @@ describe("createAccountListHelpers", () => {
     it.each([
       {
         name: "returns empty for missing config",
-        input: {} as KaijiBotConfig,
+        input: {} as AllBotConfig,
       },
       {
         name: "returns empty when no accounts key",
@@ -102,7 +102,7 @@ describe("createAccountListHelpers", () => {
     it.each([
       {
         name: 'returns ["default"] for empty config',
-        input: {} as KaijiBotConfig,
+        input: {} as AllBotConfig,
         expected: ["default"],
       },
       {
@@ -153,7 +153,7 @@ describe("createAccountListHelpers", () => {
       },
       {
         name: 'returns "default" for empty config',
-        input: {} as KaijiBotConfig,
+        input: {} as AllBotConfig,
         expected: "default",
       },
     ])("$name", ({ input, expected }) => {

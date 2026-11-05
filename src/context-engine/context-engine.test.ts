@@ -1,6 +1,6 @@
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/types.kaijibot.js";
+import type { AllBotConfig } from "../config/types.allbot.js";
 import type { MemoryCitationsMode } from "../config/types.memory.js";
 import { clearMemoryPluginState, registerMemoryPromptSection } from "../plugins/memory-state.js";
 // ---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ function installCompactRuntimeSpy() {
 // ---------------------------------------------------------------------------
 
 /** Build a config object with a contextEngine slot for testing. */
-function configWithSlot(engineId: string): KaijiBotConfig {
+function configWithSlot(engineId: string): AllBotConfig {
   return { plugins: { slots: { contextEngine: engineId } } };
 }
 

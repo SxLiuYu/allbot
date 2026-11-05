@@ -41,7 +41,7 @@ vi.mock("../capability-cli.js", () => ({ registerCapabilityCli }));
 
 describe("registerSubCliCommands", () => {
   const originalArgv = process.argv;
-  const originalDisableLazySubcommands = process.env.KAIJIBOT_DISABLE_LAZY_SUBCOMMANDS;
+  const originalDisableLazySubcommands = process.env.ALLBOT_DISABLE_LAZY_SUBCOMMANDS;
 
   const createRegisteredProgram = (argv: string[], name?: string) => {
     process.argv = argv;
@@ -55,9 +55,9 @@ describe("registerSubCliCommands", () => {
 
   beforeEach(() => {
     if (originalDisableLazySubcommands === undefined) {
-      delete process.env.KAIJIBOT_DISABLE_LAZY_SUBCOMMANDS;
+      delete process.env.ALLBOT_DISABLE_LAZY_SUBCOMMANDS;
     } else {
-      process.env.KAIJIBOT_DISABLE_LAZY_SUBCOMMANDS = originalDisableLazySubcommands;
+      process.env.ALLBOT_DISABLE_LAZY_SUBCOMMANDS = originalDisableLazySubcommands;
     }
     registerAcpCli.mockClear();
     acpAction.mockClear();
@@ -70,14 +70,14 @@ describe("registerSubCliCommands", () => {
   afterEach(() => {
     process.argv = originalArgv;
     if (originalDisableLazySubcommands === undefined) {
-      delete process.env.KAIJIBOT_DISABLE_LAZY_SUBCOMMANDS;
+      delete process.env.ALLBOT_DISABLE_LAZY_SUBCOMMANDS;
     } else {
-      process.env.KAIJIBOT_DISABLE_LAZY_SUBCOMMANDS = originalDisableLazySubcommands;
+      process.env.ALLBOT_DISABLE_LAZY_SUBCOMMANDS = originalDisableLazySubcommands;
     }
   });
 
   it("registers only the primary placeholder and dispatches", async () => {
-    const program = createRegisteredProgram(["node", "kaijibot", "acp"]);
+    const program = createRegisteredProgram(["node", "allbot", "acp"]);
 
     expect(program.commands.map((cmd) => cmd.name())).toEqual(["acp"]);
 
@@ -88,7 +88,7 @@ describe("registerSubCliCommands", () => {
   });
 
   it("registers placeholders for all subcommands when no primary", () => {
-    const program = createRegisteredProgram(["node", "kaijibot"]);
+    const program = createRegisteredProgram(["node", "allbot"]);
 
     const names = program.commands.map((cmd) => cmd.name());
     expect(names).toContain("acp");
@@ -98,7 +98,7 @@ describe("registerSubCliCommands", () => {
   });
 
   it("re-parses argv for lazy subcommands", async () => {
-    const program = createRegisteredProgram(["node", "kaijibot", "nodes", "list"], "kaijibot");
+    const program = createRegisteredProgram(["node", "allbot", "nodes", "list"], "allbot");
 
     expect(program.commands.map((cmd) => cmd.name())).toEqual(["nodes"]);
 
@@ -109,7 +109,7 @@ describe("registerSubCliCommands", () => {
   });
 
   it("registers the infer placeholder and dispatches through the capability registrar", async () => {
-    const program = createRegisteredProgram(["node", "kaijibot", "infer"], "kaijibot");
+    const program = createRegisteredProgram(["node", "allbot", "infer"], "allbot");
 
     expect(program.commands.map((cmd) => cmd.name())).toEqual(["infer"]);
 
@@ -120,7 +120,7 @@ describe("registerSubCliCommands", () => {
   });
 
   it("replaces placeholder when registering a subcommand by name", async () => {
-    const program = createRegisteredProgram(["node", "kaijibot", "acp", "--help"], "kaijibot");
+    const program = createRegisteredProgram(["node", "allbot", "acp", "--help"], "allbot");
 
     await registerSubCliByName(program, "acp");
 

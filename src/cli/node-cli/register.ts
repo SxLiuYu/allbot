@@ -29,12 +29,12 @@ export function registerNodeCli(program: Command) {
       () =>
         `\n${theme.heading(t("cli.help.heading.examples"))}\n${formatHelpExamples([
           [
-            "kaijibot node run --host 127.0.0.1 --port 18789",
+            "allbot node run --host 127.0.0.1 --port 18789",
             "Run the node host in the foreground.",
           ],
-          ["kaijibot node status", "Check node host service status."],
-          ["kaijibot node install", "Install the node host service."],
-          ["kaijibot node restart", "Restart the installed node host service."],
+          ["allbot node status", "Check node host service status."],
+          ["allbot node install", "Install the node host service."],
+          ["allbot node restart", "Restart the installed node host service."],
         ])}\n\n${theme.muted(t("cli.help.heading.docs"))} ${formatDocsLink("/cli/node", "gitee.com/kaiji1126/kaijibot/blob/main/docs/cli/node.md")}\n`,
     );
 

@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MemoryIndexManager } from "./manager.js";
 import "./test-runtime-mocks.js";
@@ -18,9 +18,9 @@ vi.mock("./embeddings.js", () => ({
 
 const logWarnMock = vi.fn();
 
-vi.mock("kaijibot/plugin-sdk/memory-core-host-engine-foundation", async (importOriginal) => {
+vi.mock("allbot/plugin-sdk/memory-core-host-engine-foundation", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("kaijibot/plugin-sdk/memory-core-host-engine-foundation")>();
+    await importOriginal<typeof import("allbot/plugin-sdk/memory-core-host-engine-foundation")>();
   return {
     ...actual,
     createSubsystemLogger: () => {
@@ -51,7 +51,7 @@ describe("memory manager meta persistence", () => {
   beforeAll(async () => {
     vi.resetModules();
     ({ getMemorySearchManager, closeAllMemorySearchManagers } = await import("./index.js"));
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-mem-meta-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-mem-meta-"));
   });
 
   beforeEach(async () => {
@@ -100,7 +100,7 @@ describe("memory manager meta persistence", () => {
         },
         list: [{ id: "main", default: true }],
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const result = await getMemorySearchManager({ cfg, agentId: "main" });
     if (!result.manager) {
       throw new Error(result.error ?? "manager missing");

@@ -197,7 +197,7 @@ Mode behavior summary:
 
 ## Plugin defaults
 
-Set plugin-wide defaults in `~/.kaijibot/kaijibot.json`:
+Set plugin-wide defaults in `~/.allbot/allbot.json`:
 
 ```json5
 {
@@ -263,7 +263,7 @@ Example:
       diffs: {
         enabled: true,
         config: {
-          viewerBaseUrl: "https://gateway.example.com/kaijibot",
+          viewerBaseUrl: "https://gateway.example.com/allbot",
         },
       },
     },
@@ -298,7 +298,7 @@ Example:
 
 ## Artifact lifecycle and storage
 
-- Artifacts are stored under the temp subfolder: `$TMPDIR/kaijibot-diffs`.
+- Artifacts are stored under the temp subfolder: `$TMPDIR/allbot-diffs`.
 - Viewer artifact metadata contains:
   - random artifact ID (20 hex chars)
   - random token (48 hex chars)
@@ -362,9 +362,9 @@ File rendering hardening:
 
 Resolution order:
 
-1. `browser.executablePath` in KaijiBot config.
+1. `browser.executablePath` in AllBot config.
 2. Environment variables:
-   - `KAIJIBOT_BROWSER_EXECUTABLE_PATH`
+   - `ALLBOT_BROWSER_EXECUTABLE_PATH`
    - `BROWSER_EXECUTABLE_PATH`
    - `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
 3. Platform command/path discovery fallback.

@@ -110,9 +110,9 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("kaijibot-openai-responses-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("allbot-openai-responses-transport");
     expect(prepared).toMatchObject({
-      api: "kaijibot-openai-responses-transport",
+      api: "allbot-openai-responses-transport",
       provider: "openai",
       id: "gpt-5.4",
     });
@@ -143,9 +143,9 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("kaijibot-openai-responses-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("allbot-openai-responses-transport");
     expect(prepared).toMatchObject({
-      api: "kaijibot-openai-responses-transport",
+      api: "allbot-openai-responses-transport",
       provider: "openai-codex",
       id: "codex-mini-latest",
     });
@@ -176,9 +176,9 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("kaijibot-anthropic-messages-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("allbot-anthropic-messages-transport");
     expect(prepared).toMatchObject({
-      api: "kaijibot-anthropic-messages-transport",
+      api: "allbot-anthropic-messages-transport",
       provider: "anthropic",
       id: "claude-sonnet-4-6",
     });
@@ -210,10 +210,10 @@ describe("openai transport stream", () => {
     const prepared = prepareTransportAwareSimpleModel(model);
 
     expect(resolveTransportAwareSimpleApi(model.api)).toBe(
-      "kaijibot-google-generative-ai-transport",
+      "allbot-google-generative-ai-transport",
     );
     expect(prepared).toMatchObject({
-      api: "kaijibot-google-generative-ai-transport",
+      api: "allbot-google-generative-ai-transport",
       provider: "google",
       id: "gemini-3.1-pro-preview",
     });
@@ -242,9 +242,9 @@ describe("openai transport stream", () => {
       },
     );
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("kaijibot-openai-responses-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("allbot-openai-responses-transport");
     expect(prepareTransportAwareSimpleModel(model)).toMatchObject({
-      api: "kaijibot-openai-responses-transport",
+      api: "allbot-openai-responses-transport",
       provider: "github-copilot",
       id: "gpt-5.4",
     });
@@ -273,9 +273,9 @@ describe("openai transport stream", () => {
       },
     );
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe("kaijibot-anthropic-messages-transport");
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("allbot-anthropic-messages-transport");
     expect(prepareTransportAwareSimpleModel(model)).toMatchObject({
-      api: "kaijibot-anthropic-messages-transport",
+      api: "allbot-anthropic-messages-transport",
       provider: "github-copilot",
       id: "claude-sonnet-4.6",
     });
@@ -383,7 +383,7 @@ describe("openai transport stream", () => {
       {
         id: "anthropic/claude-sonnet-4",
         name: "Claude Sonnet 4",
-        api: "kaijibot-openai-completions-transport",
+        api: "allbot-openai-completions-transport",
         provider: "openrouter",
         baseUrl: "https://proxy.example.com/v1",
         reasoning: true,
@@ -391,7 +391,7 @@ describe("openai transport stream", () => {
         cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
         contextWindow: 200000,
         maxTokens: 8192,
-      } as Model<"kaijibot-openai-completions-transport">,
+      } as Model<"allbot-openai-completions-transport">,
       {
         systemPrompt: "system",
         messages: [],
@@ -451,7 +451,7 @@ describe("openai transport stream", () => {
       {
         id: "anthropic/claude-sonnet-4",
         name: "Claude Sonnet 4",
-        api: "kaijibot-openai-completions-transport",
+        api: "allbot-openai-completions-transport",
         provider: "custom-openrouter",
         baseUrl: "https://openrouter.ai/api/v1",
         reasoning: true,
@@ -459,7 +459,7 @@ describe("openai transport stream", () => {
         cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
         contextWindow: 200000,
         maxTokens: 8192,
-      } as Model<"kaijibot-openai-completions-transport">,
+      } as Model<"allbot-openai-completions-transport">,
       {
         systemPrompt: "system",
         messages: [],
@@ -841,18 +841,18 @@ describe("openai transport stream", () => {
       } as never,
       { sessionId: "session-123" } as never,
       {
-        kaijibot_session_id: "session-123",
-        kaijibot_turn_id: "turn-123",
-        kaijibot_turn_attempt: "1",
-        kaijibot_transport: "stream",
+        allbot_session_id: "session-123",
+        allbot_turn_id: "turn-123",
+        allbot_turn_attempt: "1",
+        allbot_transport: "stream",
       },
     ) as { metadata?: Record<string, string> };
 
     expect(params.metadata).toMatchObject({
-      kaijibot_session_id: "session-123",
-      kaijibot_turn_id: "turn-123",
-      kaijibot_turn_attempt: "1",
-      kaijibot_transport: "stream",
+      allbot_session_id: "session-123",
+      allbot_turn_id: "turn-123",
+      allbot_turn_attempt: "1",
+      allbot_transport: "stream",
     });
   });
 

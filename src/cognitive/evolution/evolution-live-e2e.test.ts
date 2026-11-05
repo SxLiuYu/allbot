@@ -2,7 +2,7 @@
  * Live evolution end-to-end test — verifies the full self-evolution pipeline
  * from hard-trigger signal through skill creation, dedup, and lifecycle.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/evolution/evolution-live-e2e.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/evolution/evolution-live-e2e.test.ts
  *
  * What this tests:
  *   Phase 1: Hard-trigger signal generation (no LLM)
@@ -50,7 +50,7 @@ vi.mock("../../infra/heartbeat-wake.js", async (importOriginal) => {
   };
 });
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5-turbo";
@@ -92,7 +92,7 @@ function makeCandidate(overrides: Partial<EvolutionCandidate> = {}): EvolutionCa
 }
 
 beforeEach(() => {
-  tempDir = mkdtempSync(join(tmpdir(), "kaijibot-evo-e2e-"));
+  tempDir = mkdtempSync(join(tmpdir(), "allbot-evo-e2e-"));
   store = new EvolutionStore(tempDir);
   resetSystemEventsForTest();
   resetHeartbeatWakeStateForTests();
@@ -411,7 +411,7 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
   // dynamic imports use our temp directory. Other modules (engine, store,
   // skill-writer, skill-lifecycle) remain unmocked — we want the real pipeline.
   const { mockResolveConfigDir } = vi.hoisted(() => ({
-    mockResolveConfigDir: vi.fn().mockReturnValue("/tmp/kaijibot-e2e-default"),
+    mockResolveConfigDir: vi.fn().mockReturnValue("/tmp/allbot-e2e-default"),
   }));
   const { mockConsumeToolErrorProfile } = vi.hoisted(() => ({
     mockConsumeToolErrorProfile: vi.fn().mockReturnValue(undefined),
@@ -434,7 +434,7 @@ describe("Phase 3.5: tool entry point — evaluate_skill_evolution", () => {
   });
 
   beforeEach(() => {
-    toolTempDir = mkdtempSync(join(tmpdir(), "kaijibot-evo-tool-"));
+    toolTempDir = mkdtempSync(join(tmpdir(), "allbot-evo-tool-"));
     mockResolveConfigDir.mockReturnValue(toolTempDir);
     mockConsumeToolErrorProfile.mockClear();
     mockConsumeToolErrorProfile.mockReturnValue(undefined);

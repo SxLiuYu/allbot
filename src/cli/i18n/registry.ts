@@ -41,7 +41,7 @@ export function isSupportedCliLocale(value: unknown): value is CliLocale {
 /**
  * Resolve the CLI locale from environment variables. Resolution order:
  *
- * 1. `KAIJIBOT_CLI_LOCALE` — explicit operator override (highest priority).
+ * 1. `ALLBOT_CLI_LOCALE` — explicit operator override (highest priority).
  * 2. `LC_ALL`
  * 3. `LC_MESSAGES`
  * 4. `LANG`
@@ -52,7 +52,7 @@ export function isSupportedCliLocale(value: unknown): value is CliLocale {
  * without touching global state.
  */
 export function resolveCliLocale(env: NodeJS.ProcessEnv | undefined = process.env): CliLocale {
-  const candidates = [env?.KAIJIBOT_CLI_LOCALE, env?.LC_ALL, env?.LC_MESSAGES, env?.LANG];
+  const candidates = [env?.ALLBOT_CLI_LOCALE, env?.LC_ALL, env?.LC_MESSAGES, env?.LANG];
   for (const candidate of candidates) {
     const parsed = parseLocaleString(candidate);
     if (parsed !== null) {

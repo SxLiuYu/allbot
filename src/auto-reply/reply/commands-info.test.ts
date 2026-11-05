@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { MsgContext } from "../templating.js";
 import { handleContextCommand } from "./commands-context-command.js";
 import type { HandleCommandsParams } from "./commands-types.js";
@@ -13,7 +13,7 @@ vi.mock("./commands-context-report.js", () => ({
 
 function buildInfoParams(
   commandBodyNormalized: string,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   ctxOverrides?: Partial<MsgContext>,
 ): HandleCommandsParams {
   return {
@@ -73,7 +73,7 @@ describe("info command handlers", () => {
         {
           commands: { text: true },
           channels: { whatsapp: { allowFrom: ["*"] } },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         {
           SenderId: "12345",
           SenderUsername: "TestUser",
@@ -93,7 +93,7 @@ describe("info command handlers", () => {
     const cfg = {
       commands: { text: true },
       channels: { whatsapp: { allowFrom: ["*"] } },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     const cases = [
       { commandBody: "/context", expectedText: ["/context list", "Inline shortcut"] },
       { commandBody: "/context list", expectedText: ["Injected workspace files:", "AGENTS.md"] },

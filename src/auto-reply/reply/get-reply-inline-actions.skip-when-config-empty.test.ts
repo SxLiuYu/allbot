@@ -9,7 +9,7 @@ import type { TypingController } from "./typing.js";
 
 const handleCommandsMock = vi.fn();
 const getChannelPluginMock = vi.fn();
-const createKaijiBotToolsMock = vi.fn();
+const createAllBotToolsMock = vi.fn();
 const buildStatusReplyMock = vi.fn();
 
 let handleInlineActions: typeof import("./get-reply-inline-actions.js").handleInlineActions;
@@ -23,8 +23,8 @@ async function loadFreshInlineActionsModuleForTest() {
     handleCommands: (...args: unknown[]) => handleCommandsMock(...args),
     buildStatusReply: (...args: unknown[]) => buildStatusReplyMock(...args),
   }));
-  vi.doMock("../../agents/kaijibot-tools.runtime.js", () => ({
-    createKaijiBotTools: (...args: unknown[]) => createKaijiBotToolsMock(...args),
+  vi.doMock("../../agents/allbot-tools.runtime.js", () => ({
+    createAllBotTools: (...args: unknown[]) => createAllBotToolsMock(...args),
   }));
   vi.doMock("../../channels/plugins/index.js", async () => {
     const actual = await vi.importActual<typeof import("../../channels/plugins/index.js")>(
@@ -123,10 +123,10 @@ describe("handleInlineActions", () => {
     handleCommandsMock.mockReset();
     handleCommandsMock.mockResolvedValue({ shouldContinue: true, reply: undefined });
     getChannelPluginMock.mockReset();
-    createKaijiBotToolsMock.mockReset();
+    createAllBotToolsMock.mockReset();
     buildStatusReplyMock.mockReset();
     buildStatusReplyMock.mockResolvedValue({ text: "status" });
-    createKaijiBotToolsMock.mockReturnValue([]);
+    createAllBotToolsMock.mockReturnValue([]);
     getChannelPluginMock.mockImplementation((channelId?: string) =>
       channelId === "whatsapp"
         ? { commands: { skipWhenConfigEmpty: true } }
@@ -381,7 +381,7 @@ describe("handleInlineActions", () => {
   it("passes requesterAgentIdOverride into inline tool runtimes", async () => {
     const typing = createTypingController();
     const toolExecute = vi.fn(async () => ({ text: "spawned" }));
-    createKaijiBotToolsMock.mockReturnValue([
+    createAllBotToolsMock.mockReturnValue([
       {
         name: "sessions_spawn",
         execute: toolExecute,
@@ -429,7 +429,7 @@ describe("handleInlineActions", () => {
     );
 
     expect(result).toEqual({ kind: "reply", reply: { text: "✅ Done." } });
-    expect(createKaijiBotToolsMock).toHaveBeenCalledWith(
+    expect(createAllBotToolsMock).toHaveBeenCalledWith(
       expect.objectContaining({
         requesterAgentIdOverride: "named-worker",
       }),

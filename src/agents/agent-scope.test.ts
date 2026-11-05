@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   hasConfiguredModelFallbacks,
   resolveAgentConfig,
@@ -26,15 +26,15 @@ afterEach(() => {
 
 describe("resolveAgentConfig", () => {
   it("should return undefined when no agents config exists", () => {
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const result = resolveAgentConfig(cfg, "main");
     expect(result).toBeUndefined();
   });
 
   it("should return undefined when agent id does not exist", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
-        list: [{ id: "main", workspace: "~/kaijibot" }],
+        list: [{ id: "main", workspace: "~/allbot" }],
       },
     };
     const result = resolveAgentConfig(cfg, "nonexistent");
@@ -42,14 +42,14 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should return basic agent config", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           {
             id: "main",
             name: "Main Agent",
-            workspace: "~/kaijibot",
-            agentDir: "~/.kaijibot/agents/main",
+            workspace: "~/allbot",
+            agentDir: "~/.allbot/agents/main",
             model: "anthropic/claude-sonnet-4-6",
           },
         ],
@@ -58,8 +58,8 @@ describe("resolveAgentConfig", () => {
     const result = resolveAgentConfig(cfg, "main");
     expect(result).toEqual({
       name: "Main Agent",
-      workspace: "~/kaijibot",
-      agentDir: "~/.kaijibot/agents/main",
+      workspace: "~/allbot",
+      agentDir: "~/.allbot/agents/main",
       model: "anthropic/claude-sonnet-4-6",
       identity: undefined,
       groupChat: undefined,
@@ -70,7 +70,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("prefers per-agent verbose defaults over global defaults", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           verboseDefault: "full",
@@ -94,13 +94,13 @@ describe("resolveAgentConfig", () => {
         },
         list: [{ id: "main" }],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     expect(resolveAgentExplicitModelPrimary(cfgWithStringDefault, "main")).toBeUndefined();
     expect(resolveAgentEffectiveModelPrimary(cfgWithStringDefault, "main")).toBe(
       "anthropic/claude-sonnet-4-6",
     );
 
-    const cfgWithObjectDefault: KaijiBotConfig = {
+    const cfgWithObjectDefault: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -114,7 +114,7 @@ describe("resolveAgentConfig", () => {
     expect(resolveAgentExplicitModelPrimary(cfgWithObjectDefault, "main")).toBeUndefined();
     expect(resolveAgentEffectiveModelPrimary(cfgWithObjectDefault, "main")).toBe("openai/gpt-5.4");
 
-    const cfgNoDefaults: KaijiBotConfig = {
+    const cfgNoDefaults: AllBotConfig = {
       agents: {
         list: [{ id: "main" }],
       },
@@ -124,7 +124,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("supports per-agent model primary+fallbacks", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -150,7 +150,7 @@ describe("resolveAgentConfig", () => {
     expect(resolveAgentModelFallbacksOverride(cfg, "linus")).toEqual(["openai/gpt-5.4"]);
 
     // If fallbacks isn't present, we don't override the global fallbacks.
-    const cfgNoOverride: KaijiBotConfig = {
+    const cfgNoOverride: AllBotConfig = {
       agents: {
         list: [
           {
@@ -165,7 +165,7 @@ describe("resolveAgentConfig", () => {
     expect(resolveAgentModelFallbacksOverride(cfgNoOverride, "linus")).toBe(undefined);
 
     // Explicit empty list disables global fallbacks for that agent.
-    const cfgDisable: KaijiBotConfig = {
+    const cfgDisable: AllBotConfig = {
       agents: {
         list: [
           {
@@ -202,7 +202,7 @@ describe("resolveAgentConfig", () => {
       }),
     ).toEqual([]);
 
-    const cfgInheritDefaults: KaijiBotConfig = {
+    const cfgInheritDefaults: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -253,7 +253,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("resolves run fallback overrides via shared helper", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -288,7 +288,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("computes whether any model fallbacks are configured via shared helper", () => {
-    const cfgDefaultsOnly: KaijiBotConfig = {
+    const cfgDefaultsOnly: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -305,7 +305,7 @@ describe("resolveAgentConfig", () => {
       }),
     ).toBe(true);
 
-    const cfgAgentOverrideOnly: KaijiBotConfig = {
+    const cfgAgentOverrideOnly: AllBotConfig = {
       agents: {
         defaults: {
           model: {
@@ -344,7 +344,7 @@ describe("resolveAgentConfig", () => {
         list: [
           {
             id: "work",
-            workspace: "~/kaijibot-work",
+            workspace: "~/allbot-work",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -355,7 +355,7 @@ describe("resolveAgentConfig", () => {
           },
         ],
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     const result = resolveAgentConfig(cfg, "work");
     expect(result?.sandbox).toEqual({
       mode: "all",
@@ -367,12 +367,12 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should return agent-specific tools config", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           {
             id: "restricted",
-            workspace: "~/kaijibot-restricted",
+            workspace: "~/allbot-restricted",
             tools: {
               allow: ["read"],
               deny: ["exec", "write", "edit"],
@@ -397,12 +397,12 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should return both sandbox and tools config", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           {
             id: "family",
-            workspace: "~/kaijibot-family",
+            workspace: "~/allbot-family",
             sandbox: {
               mode: "all",
               scope: "agent",
@@ -421,37 +421,37 @@ describe("resolveAgentConfig", () => {
   });
 
   it("should normalize agent id", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
-        list: [{ id: "main", workspace: "~/kaijibot" }],
+        list: [{ id: "main", workspace: "~/allbot" }],
       },
     };
     // Should normalize to "main" (default)
     const result = resolveAgentConfig(cfg, "");
     expect(result).toBeDefined();
-    expect(result?.workspace).toBe("~/kaijibot");
+    expect(result?.workspace).toBe("~/allbot");
   });
 
-  it("uses KAIJIBOT_HOME for default agent workspace", () => {
-    const home = path.join(path.sep, "srv", "kaijibot-home");
-    vi.stubEnv("KAIJIBOT_HOME", home);
+  it("uses ALLBOT_HOME for default agent workspace", () => {
+    const home = path.join(path.sep, "srv", "allbot-home");
+    vi.stubEnv("ALLBOT_HOME", home);
 
-    const workspace = resolveAgentWorkspaceDir({} as KaijiBotConfig, "main");
-    expect(workspace).toBe(path.join(path.resolve(home), ".kaijibot", "workspace"));
+    const workspace = resolveAgentWorkspaceDir({} as AllBotConfig, "main");
+    expect(workspace).toBe(path.join(path.resolve(home), ".allbot", "workspace"));
   });
 
-  it("uses KAIJIBOT_HOME for default agentDir", () => {
-    const home = path.join(path.sep, "srv", "kaijibot-home");
-    vi.stubEnv("KAIJIBOT_HOME", home);
-    // Clear state dir so it falls back to KAIJIBOT_HOME
-    vi.stubEnv("KAIJIBOT_STATE_DIR", "");
+  it("uses ALLBOT_HOME for default agentDir", () => {
+    const home = path.join(path.sep, "srv", "allbot-home");
+    vi.stubEnv("ALLBOT_HOME", home);
+    // Clear state dir so it falls back to ALLBOT_HOME
+    vi.stubEnv("ALLBOT_STATE_DIR", "");
 
-    const agentDir = resolveAgentDir({} as KaijiBotConfig, "main");
-    expect(agentDir).toBe(path.join(path.resolve(home), ".kaijibot", "agents", "main", "agent"));
+    const agentDir = resolveAgentDir({} as AllBotConfig, "main");
+    expect(agentDir).toBe(path.join(path.resolve(home), ".allbot", "agents", "main", "agent"));
   });
 
   it("non-default agent uses agents.defaults.workspace as base (#59789)", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: { workspace: "/shared-ws" },
         list: [{ id: "main" }, { id: "work", default: true, workspace: "/work-ws" }],
@@ -462,7 +462,7 @@ describe("resolveAgentConfig", () => {
   });
 
   it("default agent without per-agent workspace uses agents.defaults.workspace directly", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: { workspace: "/shared-ws" },
         list: [{ id: "main" }, { id: "work", default: true }],
@@ -474,8 +474,8 @@ describe("resolveAgentConfig", () => {
 
   it("non-default agent without defaults.workspace falls back to stateDir", () => {
     const stateDir = path.join(path.sep, "tmp", "test-state");
-    vi.stubEnv("KAIJIBOT_STATE_DIR", stateDir);
-    const cfg: KaijiBotConfig = {
+    vi.stubEnv("ALLBOT_STATE_DIR", stateDir);
+    const cfg: AllBotConfig = {
       agents: {
         list: [{ id: "main" }, { id: "work", default: true, workspace: "/work-ws" }],
       },
@@ -487,9 +487,9 @@ describe("resolveAgentConfig", () => {
 
 describe("resolveAgentIdByWorkspacePath", () => {
   it("returns the most specific workspace match for a directory", () => {
-    const workspaceRoot = `/tmp/kaijibot-agent-scope-${Date.now()}-root`;
+    const workspaceRoot = `/tmp/allbot-agent-scope-${Date.now()}-root`;
     const opsWorkspace = `${workspaceRoot}/projects/ops`;
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           { id: "main", workspace: workspaceRoot },
@@ -502,8 +502,8 @@ describe("resolveAgentIdByWorkspacePath", () => {
   });
 
   it("returns undefined when directory has no matching workspace", () => {
-    const workspaceRoot = `/tmp/kaijibot-agent-scope-${Date.now()}-root`;
-    const cfg: KaijiBotConfig = {
+    const workspaceRoot = `/tmp/allbot-agent-scope-${Date.now()}-root`;
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           { id: "main", workspace: workspaceRoot },
@@ -513,12 +513,12 @@ describe("resolveAgentIdByWorkspacePath", () => {
     };
 
     expect(
-      resolveAgentIdByWorkspacePath(cfg, `/tmp/kaijibot-agent-scope-${Date.now()}-unrelated`),
+      resolveAgentIdByWorkspacePath(cfg, `/tmp/allbot-agent-scope-${Date.now()}-unrelated`),
     ).toBeUndefined();
   });
 
   it("matches workspace paths through symlink aliases", () => {
-    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-agent-scope-"));
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-agent-scope-"));
     const realWorkspaceRoot = path.join(tempRoot, "real-root");
     const realOpsWorkspace = path.join(realWorkspaceRoot, "projects", "ops");
     const aliasWorkspaceRoot = path.join(tempRoot, "alias-root");
@@ -530,7 +530,7 @@ describe("resolveAgentIdByWorkspacePath", () => {
         process.platform === "win32" ? "junction" : "dir",
       );
 
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           list: [
             { id: "main", workspace: realWorkspaceRoot },
@@ -553,10 +553,10 @@ describe("resolveAgentIdByWorkspacePath", () => {
 
 describe("resolveAgentIdsByWorkspacePath", () => {
   it("returns matching workspaces ordered by specificity", () => {
-    const workspaceRoot = `/tmp/kaijibot-agent-scope-${Date.now()}-root`;
+    const workspaceRoot = `/tmp/allbot-agent-scope-${Date.now()}-root`;
     const opsWorkspace = `${workspaceRoot}/projects/ops`;
     const opsDevWorkspace = `${opsWorkspace}/dev`;
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         list: [
           { id: "main", workspace: workspaceRoot },
@@ -576,7 +576,7 @@ describe("resolveAgentIdsByWorkspacePath", () => {
 
 describe("resolveAgentSkillsFilter", () => {
   it("inherits agents.defaults.skills when the agent omits skills", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           skills: ["github", "weather"],
@@ -589,7 +589,7 @@ describe("resolveAgentSkillsFilter", () => {
   });
 
   it("uses agents.list[].skills as a full replacement", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           skills: ["github", "weather"],
@@ -602,7 +602,7 @@ describe("resolveAgentSkillsFilter", () => {
   });
 
   it("keeps explicit empty agent skills as no skills", () => {
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       agents: {
         defaults: {
           skills: ["github", "weather"],

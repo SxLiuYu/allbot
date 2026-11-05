@@ -123,7 +123,7 @@ async function clearPairedOperatorApprovalBaseline(baseDir: string) {
   });
 }
 
-const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-device-pairing-" });
+const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-device-pairing-" });
 
 async function makeDevicePairingDir(): Promise<string> {
   return await suiteRootTracker.make("case");

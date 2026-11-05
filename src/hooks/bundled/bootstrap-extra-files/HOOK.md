@@ -4,12 +4,12 @@ description: "Inject additional workspace bootstrap files via glob/path patterns
 homepage: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/automation/hooks.md#bootstrap-extra-files
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "📎",
         "events": ["agent:bootstrap"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with KaijiBot" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with AllBot" }],
       },
   }
 ---

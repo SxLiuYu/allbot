@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { applyNonInteractiveAuthChoice } from "./auth-choice.js";
 
 const applyNonInteractivePluginProviderChoice = vi.hoisted(() => vi.fn(async () => undefined));
@@ -34,7 +34,7 @@ function createRuntime() {
 describe("applyNonInteractiveAuthChoice", () => {
   it("resolves plugin provider auth before builtin custom-provider handling", async () => {
     const runtime = createRuntime();
-    const nextConfig = { agents: { defaults: {} } } as KaijiBotConfig;
+    const nextConfig = { agents: { defaults: {} } } as AllBotConfig;
     const resolvedConfig = { auth: { profiles: { "demo-provider:default": { mode: "api_key" } } } };
     applyNonInteractivePluginProviderChoice.mockResolvedValueOnce(resolvedConfig as never);
 
@@ -52,7 +52,7 @@ describe("applyNonInteractiveAuthChoice", () => {
 
   it("fails with manifest-owned replacement guidance for deprecated auth choices", async () => {
     const runtime = createRuntime();
-    const nextConfig = { agents: { defaults: {} } } as KaijiBotConfig;
+    const nextConfig = { agents: { defaults: {} } } as AllBotConfig;
     resolveManifestDeprecatedProviderAuthChoice.mockReturnValueOnce({
       choiceId: "demo-provider-modern-api",
     } as never);

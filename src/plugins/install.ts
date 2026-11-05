@@ -34,10 +34,10 @@ type PackageManifest = PluginPackageManifest & {
 };
 
 const MISSING_EXTENSIONS_ERROR =
-  'package.json missing kaijibot.extensions; update the plugin package to include kaijibot.extensions (for example ["./dist/index.js"]). See https://gitee.com/kaiji1126/kaijibot/blob/main/docs/help/troubleshooting.md#plugin-install-fails-with-missing-kaijibot-extensions';
+  'package.json missing allbot.extensions; update the plugin package to include allbot.extensions (for example ["./dist/index.js"]). See https://gitee.com/kaiji1126/kaijibot/blob/main/docs/help/troubleshooting.md#plugin-install-fails-with-missing-allbot-extensions';
 const PLUGIN_ARCHIVE_ROOT_MARKERS = [
   "package.json",
-  "kaijibot.plugin.json",
+  "allbot.plugin.json",
   ".codex-plugin/plugin.json",
   ".claude-plugin/plugin.json",
   ".cursor-plugin/plugin.json",
@@ -48,8 +48,8 @@ export const PLUGIN_INSTALL_ERROR_CODE = {
   INVALID_MIN_HOST_VERSION: "invalid_min_host_version",
   UNKNOWN_HOST_VERSION: "unknown_host_version",
   INCOMPATIBLE_HOST_VERSION: "incompatible_host_version",
-  MISSING_KAIJIBOT_EXTENSIONS: "missing_kaijibot_extensions",
-  EMPTY_KAIJIBOT_EXTENSIONS: "empty_kaijibot_extensions",
+  MISSING_ALLBOT_EXTENSIONS: "missing_allbot_extensions",
+  EMPTY_ALLBOT_EXTENSIONS: "empty_allbot_extensions",
   NPM_PACKAGE_NOT_FOUND: "npm_package_not_found",
   PLUGIN_ID_MISMATCH: "plugin_id_mismatch",
   SECURITY_SCAN_BLOCKED: "security_scan_blocked",
@@ -151,7 +151,7 @@ function matchesExpectedPluginId(params: {
   );
 }
 
-function ensureKaijiBotExtensions(params: { manifest: PackageManifest }):
+function ensureAllBotExtensions(params: { manifest: PackageManifest }):
   | {
       ok: true;
       entries: string[];
@@ -166,14 +166,14 @@ function ensureKaijiBotExtensions(params: { manifest: PackageManifest }):
     return {
       ok: false,
       error: MISSING_EXTENSIONS_ERROR,
-      code: PLUGIN_INSTALL_ERROR_CODE.MISSING_KAIJIBOT_EXTENSIONS,
+      code: PLUGIN_INSTALL_ERROR_CODE.MISSING_ALLBOT_EXTENSIONS,
     };
   }
   if (resolved.status === "empty") {
     return {
       ok: false,
-      error: "package.json kaijibot.extensions is empty",
-      code: PLUGIN_INSTALL_ERROR_CODE.EMPTY_KAIJIBOT_EXTENSIONS,
+      error: "package.json allbot.extensions is empty",
+      code: PLUGIN_INSTALL_ERROR_CODE.EMPTY_ALLBOT_EXTENSIONS,
     };
   }
   return {
@@ -337,7 +337,7 @@ async function runInstallSourceScan(params: {
   } catch (err) {
     return {
       ok: false,
-      error: `${params.subject} installation blocked: code safety scan failed (${String(err)}). Run "kaijibot security audit --deep" for details.`,
+      error: `${params.subject} installation blocked: code safety scan failed (${String(err)}). Run "allbot security audit --deep" for details.`,
       code: PLUGIN_INSTALL_ERROR_CODE.SECURITY_SCAN_FAILED,
     };
   }
@@ -584,7 +584,7 @@ async function detectNativePackageInstallSource(packageDir: string): Promise<boo
 
   try {
     const manifest = await runtime.readJsonFile<PackageManifest>(manifestPath);
-    return ensureKaijiBotExtensions({ manifest }).ok;
+    return ensureAllBotExtensions({ manifest }).ok;
   } catch {
     return false;
   }
@@ -613,7 +613,7 @@ async function installPluginFromPackageDir(
     return { ok: false, error: `invalid package.json: ${String(err)}` };
   }
 
-  const extensionsResult = ensureKaijiBotExtensions({
+  const extensionsResult = ensureAllBotExtensions({
     manifest,
   });
   if (!extensionsResult.ok) {
@@ -628,9 +628,9 @@ async function installPluginFromPackageDir(
   const pkgName = normalizeOptionalString(manifest.name) ?? "";
   const npmPluginId = pkgName || "plugin";
 
-  // Prefer the canonical `id` from kaijibot.plugin.json over the npm package name.
+  // Prefer the canonical `id` from allbot.plugin.json over the npm package name.
   // This avoids a latent key-mismatch bug: if the manifest id (e.g. "memory-cognee")
-  // differs from the npm package name (e.g. "cognee-kaijibot"), the plugin registry
+  // differs from the npm package name (e.g. "cognee-allbot"), the plugin registry
   // uses the manifest id as the authoritative key, so the config entry must match it.
   const ocManifestResult = runtime.loadPluginManifest(params.packageDir);
   const manifestPluginId =
@@ -673,20 +673,20 @@ async function installPluginFromPackageDir(
     if (minHostVersionCheck.kind === "invalid") {
       return {
         ok: false,
-        error: `invalid package.json kaijibot.install.minHostVersion: ${minHostVersionCheck.error}`,
+        error: `invalid package.json allbot.install.minHostVersion: ${minHostVersionCheck.error}`,
         code: PLUGIN_INSTALL_ERROR_CODE.INVALID_MIN_HOST_VERSION,
       };
     }
     if (minHostVersionCheck.kind === "unknown_host_version") {
       return {
         ok: false,
-        error: `plugin "${pluginId}" requires KaijiBot >=${minHostVersionCheck.requirement.minimumLabel}, but this host version could not be determined. Re-run from a released build or set KAIJIBOT_VERSION and retry.`,
+        error: `plugin "${pluginId}" requires AllBot >=${minHostVersionCheck.requirement.minimumLabel}, but this host version could not be determined. Re-run from a released build or set ALLBOT_VERSION and retry.`,
         code: PLUGIN_INSTALL_ERROR_CODE.UNKNOWN_HOST_VERSION,
       };
     }
     return {
       ok: false,
-      error: `plugin "${pluginId}" requires KaijiBot >=${minHostVersionCheck.requirement.minimumLabel}, but this host is ${minHostVersionCheck.currentVersion}. Upgrade KaijiBot and retry.`,
+      error: `plugin "${pluginId}" requires AllBot >=${minHostVersionCheck.requirement.minimumLabel}, but this host is ${minHostVersionCheck.currentVersion}. Upgrade AllBot and retry.`,
       code: PLUGIN_INSTALL_ERROR_CODE.INCOMPATIBLE_HOST_VERSION,
     };
   }
@@ -776,7 +776,7 @@ export async function installPluginFromArchive(
 
   return await runtime.withExtractedArchiveRoot({
     archivePath,
-    tempDirPrefix: "kaijibot-plugin-",
+    tempDirPrefix: "allbot-plugin-",
     timeoutMs,
     logger,
     rootMarkers: PLUGIN_ARCHIVE_ROOT_MARKERS,
@@ -945,7 +945,7 @@ export async function installPluginFromNpmSpec(
     requestedSpecifier: spec,
   };
   const flowResult = await runtime.installFromNpmSpecArchiveWithInstaller({
-    tempDirPrefix: "kaijibot-npm-pack-",
+    tempDirPrefix: "allbot-npm-pack-",
     spec,
     timeoutMs,
     expectedIntegrity: params.expectedIntegrity,

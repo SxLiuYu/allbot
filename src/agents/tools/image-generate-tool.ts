@@ -1,5 +1,5 @@
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import { parseImageGenerationModelRef } from "../../image-generation/model-ref.js";
 import {
@@ -79,7 +79,7 @@ const ImageGenerateToolSchema = Type.Object({
   filename: Type.Optional(
     Type.String({
       description:
-        "Optional output filename hint. KaijiBot preserves the basename and saves under its managed media directory.",
+        "Optional output filename hint. AllBot preserves the basename and saves under its managed media directory.",
     }),
   ),
   size: Type.Optional(
@@ -114,7 +114,7 @@ function getImageGenerationProviderAuthEnvVars(providerId: string): string[] {
 }
 
 export function resolveImageGenerationModelConfigForTool(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir?: string;
 }): ToolModelConfig | null {
   return resolveCapabilityModelConfigForTool({
@@ -178,7 +178,7 @@ function normalizeReferenceImages(args: Record<string, unknown>): string[] {
   });
 }
 
-function pickConfiguredMediaMaxBytes(cfg?: KaijiBotConfig): number | undefined {
+function pickConfiguredMediaMaxBytes(cfg?: AllBotConfig): number | undefined {
   const configured = cfg?.agents?.defaults?.mediaMaxMb;
   if (typeof configured === "number" && Number.isFinite(configured) && configured > 0) {
     return Math.floor(configured * 1024 * 1024);
@@ -187,7 +187,7 @@ function pickConfiguredMediaMaxBytes(cfg?: KaijiBotConfig): number | undefined {
 }
 
 function resolveSelectedImageGenerationProvider(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   imageGenerationModelConfig: ToolModelConfig;
   modelOverride?: string;
 }): ImageGenerationProvider | undefined {
@@ -367,7 +367,7 @@ async function inferResolutionFromInputImages(
 }
 
 export function createImageGenerateTool(options?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   sandbox?: ImageGenerateSandboxConfig;

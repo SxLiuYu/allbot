@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { migrateOrphanedSessionKeys } from "../infra/state-migrations.js";
 
 type SessionMigrationLogger = {
@@ -12,10 +12,10 @@ type SessionMigrationLogger = {
  * Idempotent and best-effort: if the migration fails, gateway startup
  * continues normally. This ensures accumulated orphaned session keys
  * (from the write-path bug #29683) are cleaned up automatically on
- * upgrade rather than requiring a manual `kaijibot doctor` run.
+ * upgrade rather than requiring a manual `allbot doctor` run.
  */
 export async function runStartupSessionMigration(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   log: SessionMigrationLogger;
   deps?: {

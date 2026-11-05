@@ -18,9 +18,9 @@ describe("noteSessionLockHealth", () => {
 
   beforeEach(async () => {
     note.mockClear();
-    envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR"]);
-    root = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-doctor-locks-"));
-    process.env.KAIJIBOT_STATE_DIR = root;
+    envSnapshot = captureEnv(["ALLBOT_STATE_DIR"]);
+    root = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-doctor-locks-"));
+    process.env.ALLBOT_STATE_DIR = root;
   });
 
   afterEach(async () => {

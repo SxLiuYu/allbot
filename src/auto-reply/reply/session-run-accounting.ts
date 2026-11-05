@@ -1,5 +1,5 @@
 import { deriveSessionTotalTokens, type NormalizedUsage } from "../../agents/usage.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { incrementCompactionCount } from "./session-updates.js";
 import { persistSessionUsageUpdate } from "./session-usage.js";
 
@@ -10,7 +10,7 @@ type IncrementRunCompactionCountParams = Omit<
   "tokensAfter"
 > & {
   amount?: number;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   lastCallUsage?: NormalizedUsage;
   contextTokensUsed?: number;
   newSessionId?: string;

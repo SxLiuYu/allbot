@@ -10,13 +10,13 @@ import { normalizeWindowsArgv } from "./cli/windows-argv.js";
 import { buildCliRespawnPlan } from "./entry.respawn.js";
 import { isTruthyEnvValue, normalizeEnv } from "./infra/env.js";
 import { isMainModule } from "./infra/is-main.js";
-import { ensureKaijiBotExecMarkerOnProcess } from "./infra/kaijibot-exec-env.js";
+import { ensureAllBotExecMarkerOnProcess } from "./infra/allbot-exec-env.js";
 import { installProcessWarningFilter } from "./infra/warning-filter.js";
 import { attachChildProcessBridge } from "./process/child-process-bridge.js";
 
 const ENTRY_WRAPPER_PAIRS = [
-  { wrapperBasename: "kaijibot.mjs", entryBasename: "entry.js" },
-  { wrapperBasename: "kaijibot.js", entryBasename: "entry.js" },
+  { wrapperBasename: "allbot.mjs", entryBasename: "entry.js" },
+  { wrapperBasename: "allbot.js", entryBasename: "entry.js" },
 ] as const;
 
 function shouldForceReadOnlyAuthStore(argv: string[]): boolean {
@@ -45,8 +45,8 @@ if (
   const { installGaxiosFetchCompat } = await import("./infra/gaxios-fetch-compat.js");
 
   await installGaxiosFetchCompat();
-  process.title = "kaijibot";
-  ensureKaijiBotExecMarkerOnProcess();
+  process.title = "allbot";
+  ensureAllBotExecMarkerOnProcess();
   installProcessWarningFilter();
   normalizeEnv();
   if (!isTruthyEnvValue(process.env.NODE_DISABLE_COMPILE_CACHE)) {
@@ -58,7 +58,7 @@ if (
   }
 
   if (shouldForceReadOnlyAuthStore(process.argv)) {
-    process.env.KAIJIBOT_AUTH_STORE_READONLY = "1";
+    process.env.ALLBOT_AUTH_STORE_READONLY = "1";
   }
 
   if (process.argv.includes("--no-color")) {
@@ -89,7 +89,7 @@ if (
 
     child.once("error", (error) => {
       console.error(
-        "[kaijibot] Failed to respawn CLI:",
+        "[allbot] Failed to respawn CLI:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exit(1);
@@ -109,12 +109,12 @@ if (
     Promise.all([import("./version.js"), import("./infra/git-commit.js")])
       .then(([{ VERSION }, { resolveCommitHash }]) => {
         const commit = resolveCommitHash({ moduleUrl: import.meta.url });
-        console.log(commit ? `KaijiBot ${VERSION} (${commit})` : `KaijiBot ${VERSION}`);
+        console.log(commit ? `AllBot ${VERSION} (${commit})` : `AllBot ${VERSION}`);
         process.exit(0);
       })
       .catch((error) => {
         console.error(
-          "[kaijibot] Failed to resolve version:",
+          "[allbot] Failed to resolve version:",
           error instanceof Error ? (error.stack ?? error.message) : error,
         );
         process.exitCode = 1;
@@ -127,20 +127,20 @@ if (
   if (!ensureCliRespawnReady()) {
     const parsedContainer = parseCliContainerArgs(process.argv);
     if (!parsedContainer.ok) {
-      console.error(`[kaijibot] ${parsedContainer.error}`);
+      console.error(`[allbot] ${parsedContainer.error}`);
       process.exit(2);
     }
 
     const parsed = parseCliProfileArgs(parsedContainer.argv);
     if (!parsed.ok) {
       // Keep it simple; Commander will handle rich help/errors after we strip flags.
-      console.error(`[kaijibot] ${parsed.error}`);
+      console.error(`[allbot] ${parsed.error}`);
       process.exit(2);
     }
 
     const containerTargetName = resolveCliContainerTarget(process.argv);
     if (containerTargetName && parsed.profile) {
-      console.error("[kaijibot] --container cannot be combined with --profile/--dev");
+      console.error("[allbot] --container cannot be combined with --profile/--dev");
       process.exit(2);
     }
 
@@ -174,7 +174,7 @@ export function tryHandleRootHelpFastPath(
     deps.onError ??
     ((error: unknown) => {
       console.error(
-        "[kaijibot] Failed to display help:",
+        "[allbot] Failed to display help:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exitCode = 1;
@@ -205,7 +205,7 @@ function runMainOrRootHelp(argv: string[]): void {
     .then(({ runCli }) => runCli(argv))
     .catch((error) => {
       console.error(
-        "[kaijibot] Failed to start CLI:",
+        "[allbot] Failed to start CLI:",
         error instanceof Error ? (error.stack ?? error.message) : error,
       );
       process.exitCode = 1;

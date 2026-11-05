@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `kaijibot memory` (status/index/search/promote/promote-explain/rem-harness)"
+summary: "CLI reference for `allbot memory` (status/index/search/promote/promote-explain/rem-harness)"
 read_when:
   - You want to index or search semantic memory
   - You’re debugging memory availability or indexing
@@ -7,7 +7,7 @@ read_when:
 title: "memory"
 ---
 
-# `kaijibot memory`
+# `allbot memory`
 
 Manage semantic memory indexing and search.
 Provided by the active memory plugin (default: `memory-core`; set `plugins.slots.memory = "none"` to disable).
@@ -22,24 +22,24 @@ Related:
 ## Examples
 
 ```bash
-kaijibot memory status
-kaijibot memory status --deep
-kaijibot memory status --fix
-kaijibot memory index --force
-kaijibot memory search "meeting notes"
-kaijibot memory search --query "deployment" --max-results 20
-kaijibot memory promote --limit 10 --min-score 0.75
-kaijibot memory promote --apply
-kaijibot memory promote --json --min-recall-count 0 --min-unique-queries 0
-kaijibot memory promote-explain "router vlan"
-kaijibot memory promote-explain "router vlan" --json
-kaijibot memory rem-harness
-kaijibot memory rem-harness --json
-kaijibot memory status --json
-kaijibot memory status --deep --index
-kaijibot memory status --deep --index --verbose
-kaijibot memory status --agent main
-kaijibot memory index --agent main --verbose
+allbot memory status
+allbot memory status --deep
+allbot memory status --fix
+allbot memory index --force
+allbot memory search "meeting notes"
+allbot memory search --query "deployment" --max-results 20
+allbot memory promote --limit 10 --min-score 0.75
+allbot memory promote --apply
+allbot memory promote --json --min-recall-count 0 --min-unique-queries 0
+allbot memory promote-explain "router vlan"
+allbot memory promote-explain "router vlan" --json
+allbot memory rem-harness
+allbot memory rem-harness --json
+allbot memory status --json
+allbot memory status --deep --index
+allbot memory status --deep --index --verbose
+allbot memory status --agent main
+allbot memory index --agent main --verbose
 ```
 
 ## Options
@@ -75,7 +75,7 @@ kaijibot memory index --agent main --verbose
 Preview and apply short-term memory promotions.
 
 ```bash
-kaijibot memory promote [--apply] [--limit <n>] [--include-promoted]
+allbot memory promote [--apply] [--limit <n>] [--include-promoted]
 ```
 
 - `--apply` -- write promotions to `MEMORY.md` (default: preview only).
@@ -86,7 +86,7 @@ Full options:
 
 - Ranks short-term candidates from `memory/YYYY-MM-DD.md` using weighted promotion signals (`frequency`, `relevance`, `query diversity`, `recency`, `consolidation`, `conceptual richness`).
 - Uses short-term signals from both memory recalls and daily-ingestion passes, plus light/REM phase reinforcement signals.
-- When dreaming is enabled, `memory-core` auto-manages one cron job that runs a full sweep (`light -> REM -> deep`) in the background (no manual `kaijibot cron add` required).
+- When dreaming is enabled, `memory-core` auto-manages one cron job that runs a full sweep (`light -> REM -> deep`) in the background (no manual `allbot cron add` required).
 - `--agent <id>`: scope to a single agent (default: the default agent).
 - `--limit <n>`: max candidates to return/apply.
 - `--min-score <n>`: minimum weighted promotion score.
@@ -101,7 +101,7 @@ Full options:
 Explain a specific promotion candidate and its score breakdown.
 
 ```bash
-kaijibot memory promote-explain <selector> [--agent <id>] [--include-promoted] [--json]
+allbot memory promote-explain <selector> [--agent <id>] [--include-promoted] [--json]
 ```
 
 - `<selector>`: candidate key, path fragment, or snippet fragment to look up.
@@ -114,7 +114,7 @@ kaijibot memory promote-explain <selector> [--agent <id>] [--include-promoted] [
 Preview REM reflections, candidate truths, and deep promotion output without writing anything.
 
 ```bash
-kaijibot memory rem-harness [--agent <id>] [--include-promoted] [--json]
+allbot memory rem-harness [--agent <id>] [--include-promoted] [--json]
 ```
 
 - `--agent <id>`: scope to a single agent (default: the default agent).

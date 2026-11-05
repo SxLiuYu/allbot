@@ -1,16 +1,16 @@
 {
-  "name": "@kaijibot/microsoft-speech",
+  "name": "@allbot/microsoft-speech",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Microsoft speech plugin",
+  "description": "AllBot Microsoft speech plugin",
   "type": "module",
   "dependencies": {
     "node-edge-tts": "^1.2.10"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

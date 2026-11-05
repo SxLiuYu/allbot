@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { createDefaultPersona } from "../persona/store.js";
 import type { PersonaTree } from "../types.js";
 import { clearRuntimeConfigSnapshot, setRuntimeConfigSnapshot } from "../../config/runtime-snapshot.js";
-import type { KaijiBotConfig } from "../../config/types.js";
+import type { AllBotConfig } from "../../config/types.js";
 import {
   checkDailyBudget,
   bumpDailySend,
@@ -106,7 +106,7 @@ describe("checkDailyBudget", () => {
   it("honors cognitive.proactive.activeHours.timezone", () => {
     setRuntimeConfigSnapshot({
       cognitive: { proactive: { activeHours: { timezone: "UTC" } } },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
     const p = personaWith();
     const morningUtc = UTC_DAY_START + 10 * HR; // 18:00 Asia/Shanghai
     bumpDailySend(p, morningUtc);

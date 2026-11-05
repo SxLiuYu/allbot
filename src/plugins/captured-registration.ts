@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { buildPluginApi } from "./api-builder.js";
 import type { MemoryEmbeddingProviderAdapter } from "./memory-embedding-providers.js";
 import type { PluginRuntime } from "./runtime/types.js";
@@ -8,9 +8,9 @@ import type {
   ImageGenerationProviderPlugin,
   MediaUnderstandingProviderPlugin,
   MusicGenerationProviderPlugin,
-  KaijiBotPluginApi,
-  KaijiBotPluginCliCommandDescriptor,
-  KaijiBotPluginCliRegistrar,
+  AllBotPluginApi,
+  AllBotPluginCliCommandDescriptor,
+  AllBotPluginCliRegistrar,
   ProviderPlugin,
   RealtimeTranscriptionProviderPlugin,
   RealtimeVoiceProviderPlugin,
@@ -21,13 +21,13 @@ import type {
 } from "./types.js";
 
 type CapturedPluginCliRegistration = {
-  register: KaijiBotPluginCliRegistrar;
+  register: AllBotPluginCliRegistrar;
   commands: string[];
-  descriptors: KaijiBotPluginCliCommandDescriptor[];
+  descriptors: AllBotPluginCliCommandDescriptor[];
 };
 
 export type CapturedPluginRegistration = {
-  api: KaijiBotPluginApi;
+  api: AllBotPluginApi;
   providers: ProviderPlugin[];
   cliRegistrars: CapturedPluginCliRegistration[];
   cliBackends: CliBackendPlugin[];
@@ -45,8 +45,8 @@ export type CapturedPluginRegistration = {
 };
 
 export function createCapturedPluginRegistration(params?: {
-  config?: KaijiBotConfig;
-  registrationMode?: KaijiBotPluginApi["registrationMode"];
+  config?: AllBotConfig;
+  registrationMode?: AllBotPluginApi["registrationMode"];
 }): CapturedPluginRegistration {
   const providers: ProviderPlugin[] = [];
   const cliRegistrars: CapturedPluginCliRegistration[] = [];
@@ -89,7 +89,7 @@ export function createCapturedPluginRegistration(params?: {
       name: "Captured Plugin Registration",
       source: "captured-plugin-registration",
       registrationMode: params?.registrationMode ?? "full",
-      config: params?.config ?? ({} as KaijiBotConfig),
+      config: params?.config ?? ({} as AllBotConfig),
       runtime: {} as PluginRuntime,
       logger: noopLogger,
       resolvePath: (input) => input,
@@ -164,7 +164,7 @@ export function createCapturedPluginRegistration(params?: {
 }
 
 export function capturePluginRegistration(params: {
-  register(api: KaijiBotPluginApi): void;
+  register(api: AllBotPluginApi): void;
 }): CapturedPluginRegistration {
   const captured = createCapturedPluginRegistration();
   params.register(captured.api);

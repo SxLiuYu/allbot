@@ -1,9 +1,9 @@
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createBundledBrowserPluginFixture } from "../../test/helpers/browser-bundled-plugin-fixture.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { clearPluginDiscoveryCache } from "./discovery.js";
-import { clearPluginLoaderCache, loadKaijiBotPlugins } from "./loader.js";
+import { clearPluginLoaderCache, loadAllBotPlugins } from "./loader.js";
 import { clearPluginManifestRegistryCache } from "./manifest-registry.js";
 import { resetPluginRuntimeStateForTest } from "./runtime.js";
 
@@ -19,7 +19,7 @@ describe("registerPluginCliCommands browser plugin integration", () => {
 
   beforeEach(() => {
     bundledFixture = createBundledBrowserPluginFixture();
-    vi.stubEnv("KAIJIBOT_BUNDLED_PLUGINS_DIR", bundledFixture.rootDir);
+    vi.stubEnv("ALLBOT_BUNDLED_PLUGINS_DIR", bundledFixture.rootDir);
     resetPluginState();
   });
 
@@ -31,17 +31,17 @@ describe("registerPluginCliCommands browser plugin integration", () => {
   });
 
   it("registers the browser command from the bundled browser plugin", () => {
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       config: {
         plugins: {
           allow: ["browser"],
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       cache: false,
       env: {
         ...process.env,
-        KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR:
+        ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+        ALLBOT_BUNDLED_PLUGINS_DIR:
           bundledFixture?.rootDir ?? path.join(process.cwd(), "extensions"),
       } as NodeJS.ProcessEnv,
     });
@@ -50,7 +50,7 @@ describe("registerPluginCliCommands browser plugin integration", () => {
   });
 
   it("omits the browser command when the bundled browser plugin is disabled", () => {
-    const registry = loadKaijiBotPlugins({
+    const registry = loadAllBotPlugins({
       config: {
         plugins: {
           allow: ["browser"],
@@ -60,12 +60,12 @@ describe("registerPluginCliCommands browser plugin integration", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       cache: false,
       env: {
         ...process.env,
-        KAIJIBOT_DISABLE_BUNDLED_PLUGINS: undefined,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR:
+        ALLBOT_DISABLE_BUNDLED_PLUGINS: undefined,
+        ALLBOT_BUNDLED_PLUGINS_DIR:
           bundledFixture?.rootDir ?? path.join(process.cwd(), "extensions"),
       } as NodeJS.ProcessEnv,
     });

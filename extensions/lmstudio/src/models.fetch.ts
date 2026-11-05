@@ -1,7 +1,7 @@
-import { createSubsystemLogger } from "kaijibot/plugin-sdk/logging-core";
-import type { ModelDefinitionConfig } from "kaijibot/plugin-sdk/provider-model-shared";
-import { SELF_HOSTED_DEFAULT_COST } from "kaijibot/plugin-sdk/provider-setup";
-import { fetchWithSsrFGuard, type SsrFPolicy } from "kaijibot/plugin-sdk/ssrf-runtime";
+import { createSubsystemLogger } from "allbot/plugin-sdk/logging-core";
+import type { ModelDefinitionConfig } from "allbot/plugin-sdk/provider-model-shared";
+import { SELF_HOSTED_DEFAULT_COST } from "allbot/plugin-sdk/provider-setup";
+import { fetchWithSsrFGuard, type SsrFPolicy } from "allbot/plugin-sdk/ssrf-runtime";
 import { LMSTUDIO_DEFAULT_LOAD_CONTEXT_LENGTH } from "./defaults.js";
 import {
   buildLmstudioModelName,

@@ -23,12 +23,12 @@ describe("withSessionStoreLock", () => {
   });
 
   it("derives session lock hold time from the store lock timeout", async () => {
-    await withSessionStoreLockForTest("/tmp/kaijibot-store.json", async () => {}, {
+    await withSessionStoreLockForTest("/tmp/allbot-store.json", async () => {}, {
       timeoutMs: 10_000,
     });
 
     expect(acquireSessionWriteLockMock).toHaveBeenCalledWith({
-      sessionFile: "/tmp/kaijibot-store.json",
+      sessionFile: "/tmp/allbot-store.json",
       timeoutMs: 10_000,
       staleMs: 30_000,
       maxHoldMs: 15_000,
@@ -36,12 +36,12 @@ describe("withSessionStoreLock", () => {
   });
 
   it("leaves the session lock hold time unset when store locking has no timeout", async () => {
-    await withSessionStoreLockForTest("/tmp/kaijibot-store.json", async () => {}, {
+    await withSessionStoreLockForTest("/tmp/allbot-store.json", async () => {}, {
       timeoutMs: 0,
     });
 
     expect(acquireSessionWriteLockMock).toHaveBeenCalledWith({
-      sessionFile: "/tmp/kaijibot-store.json",
+      sessionFile: "/tmp/allbot-store.json",
       timeoutMs: Number.POSITIVE_INFINITY,
       staleMs: 30_000,
       maxHoldMs: undefined,

@@ -1,5 +1,5 @@
 ---
-summary: "KaijiBot CLI reference for `kaijibot` commands, subcommands, and options"
+summary: "AllBot CLI reference for `allbot` commands, subcommands, and options"
 read_when:
   - Adding or modifying CLI commands or options
   - Documenting new command surfaces
@@ -66,11 +66,11 @@ This page describes the current CLI behavior. If commands change, update this do
 
 ## Global flags
 
-- `--dev`: isolate state under `~/.kaijibot-dev` and shift default ports.
-- `--profile <name>`: isolate state under `~/.kaijibot-<name>`.
+- `--dev`: isolate state under `~/.allbot-dev` and shift default ports.
+- `--profile <name>`: isolate state under `~/.allbot-<name>`.
 - `--container <name>`: target a named container for execution.
 - `--no-color`: disable ANSI colors.
-- `--update`: shorthand for `kaijibot update` (source installs only).
+- `--update`: shorthand for `allbot update` (source installs only).
 - `-V`, `--version`, `-v`: print version and exit.
 
 ## Output styling
@@ -83,7 +83,7 @@ This page describes the current CLI behavior. If commands change, update this do
 
 ## Color palette
 
-KaijiBot uses a lobster palette for CLI output.
+AllBot uses a lobster palette for CLI output.
 
 - `accent` (#FF5A2D): headings, labels, primary highlights.
 - `accentBright` (#FF7A3D): command names, emphasis.
@@ -99,7 +99,7 @@ Palette source of truth: `src/terminal/palette.ts` (the “lobster palette”).
 ## Command tree
 
 ```
-kaijibot [--dev] [--profile <name>] <command>
+allbot [--dev] [--profile <name>] <command>
   setup
   onboard
   configure
@@ -375,13 +375,13 @@ kaijibot [--dev] [--profile <name>] <command>
   tui
 ```
 
-Note: plugins can add additional top-level commands (for example `kaijibot voicecall`).
+Note: plugins can add additional top-level commands (for example `allbot voicecall`).
 
 ## Security
 
-- `kaijibot security audit` — audit config + local state for common security foot-guns.
-- `kaijibot security audit --deep` — best-effort live Gateway probe.
-- `kaijibot security audit --fix` — tighten safe defaults and state/config permissions.
+- `allbot security audit` — audit config + local state for common security foot-guns.
+- `allbot security audit --deep` — best-effort live Gateway probe.
+- `allbot security audit --fix` — tighten safe defaults and state/config permissions.
 
 ## Secrets
 
@@ -433,12 +433,12 @@ Notes:
 
 Manage extensions and their config:
 
-- `kaijibot plugins list` — discover plugins (use `--json` for machine output).
-- `kaijibot plugins inspect <id>` — show details for a plugin (`info` is an alias).
-- `kaijibot plugins install <path|.tgz|npm-spec|plugin@marketplace>` — install a plugin (or add a plugin path to `plugins.load.paths`; use `--force` to overwrite an existing install target).
-- `kaijibot plugins marketplace list <marketplace>` — list marketplace entries before install.
-- `kaijibot plugins enable <id>` / `disable <id>` — toggle `plugins.entries.<id>.enabled`.
-- `kaijibot plugins doctor` — report plugin load errors.
+- `allbot plugins list` — discover plugins (use `--json` for machine output).
+- `allbot plugins inspect <id>` — show details for a plugin (`info` is an alias).
+- `allbot plugins install <path|.tgz|npm-spec|plugin@marketplace>` — install a plugin (or add a plugin path to `plugins.load.paths`; use `--force` to overwrite an existing install target).
+- `allbot plugins marketplace list <marketplace>` — list marketplace entries before install.
+- `allbot plugins enable <id>` / `disable <id>` — toggle `plugins.entries.<id>.enabled`.
+- `allbot plugins doctor` — report plugin load errors.
 
 Most plugin changes require a gateway restart. See [/plugin](/tools/plugin).
 
@@ -446,10 +446,10 @@ Most plugin changes require a gateway restart. See [/plugin](/tools/plugin).
 
 Vector search over `MEMORY.md` + `memory/*.md`:
 
-- `kaijibot memory status` — show index stats; use `--deep` for vector + embedding readiness checks or `--fix` to repair stale recall/promotion artifacts.
-- `kaijibot memory index` — reindex memory files.
-- `kaijibot memory search "<query>"` (or `--query "<query>"`) — semantic search over memory.
-- `kaijibot memory promote` — rank short-term recalls and optionally append top entries into `MEMORY.md`.
+- `allbot memory status` — show index stats; use `--deep` for vector + embedding readiness checks or `--fix` to repair stale recall/promotion artifacts.
+- `allbot memory index` — reindex memory files.
+- `allbot memory search "<query>"` (or `--query "<query>"`) — semantic search over memory.
+- `allbot memory promote` — rank short-term recalls and optionally append top entries into `MEMORY.md`.
 
 ## Sandbox
 
@@ -492,7 +492,7 @@ Options:
 Notes:
 
 - Without `--install` or `--write-state`, `completion` prints the script to stdout.
-- `--install` writes an `KaijiBot Completion` block into your shell profile and points it at the cached script under the KaijiBot state directory.
+- `--install` writes an `AllBot Completion` block into your shell profile and points it at the cached script under the AllBot state directory.
 
 ### `setup`
 
@@ -500,7 +500,7 @@ Initialize config + workspace.
 
 Options:
 
-- `--workspace <dir>`: agent workspace path (default `~/.kaijibot/workspace`).
+- `--workspace <dir>`: agent workspace path (default `~/.allbot/workspace`).
 - `--wizard`: run onboarding.
 - `--non-interactive`: run onboarding without prompts.
 - `--mode <local|remote>`: onboard mode.
@@ -587,7 +587,7 @@ Options:
 
 ### `config`
 
-Non-interactive config helpers (get/set/unset/file/schema/validate). Running `kaijibot config` with no
+Non-interactive config helpers (get/set/unset/file/schema/validate). Running `allbot config` with no
 subcommand launches the wizard.
 
 Subcommands:
@@ -598,13 +598,13 @@ Subcommands:
   - SecretRef builder mode: `config set <path> --ref-provider <provider> --ref-source <source> --ref-id <id>`
   - provider builder mode: `config set secrets.providers.<alias> --provider-source <env|file|exec> ...`
   - batch mode: `config set --batch-json '<json>'` or `config set --batch-file <path>`
-- `config set --dry-run`: validate assignments without writing `kaijibot.json` (exec SecretRef checks are skipped by default).
+- `config set --dry-run`: validate assignments without writing `allbot.json` (exec SecretRef checks are skipped by default).
 - `config set --allow-exec --dry-run`: opt in to exec SecretRef dry-run checks (may execute provider commands).
 - `config set --dry-run --json`: emit machine-readable dry-run output (checks + completeness signal, operations, refs checked/skipped, errors).
 - `config set --strict-json`: require JSON5 parsing for path/value input. `--json` remains a legacy alias for strict parsing outside dry-run output mode.
 - `config unset <path>`: remove a value.
 - `config file`: print the active config file path.
-- `config schema`: print the generated JSON schema for `kaijibot.json`, including propagated field `title` / `description` docs metadata across nested object, wildcard, array-item, and composition branches, plus best-effort live plugin/channel schema metadata.
+- `config schema`: print the generated JSON schema for `allbot.json`, including propagated field `title` / `description` docs metadata across nested object, wildcard, array-item, and composition branches, plus best-effort live plugin/channel schema metadata.
 - `config validate`: validate the current config against the schema without starting the gateway.
 - `config validate --json`: emit machine-readable JSON output.
 
@@ -664,11 +664,11 @@ Subcommands:
 
 Notes:
 
-- `kaijibot --update` rewrites to `kaijibot update`.
+- `allbot --update` rewrites to `allbot update`.
 
 ### `backup`
 
-Create and verify local backup archives for KaijiBot state.
+Create and verify local backup archives for AllBot state.
 
 Subcommands:
 
@@ -697,11 +697,11 @@ Manage chat channel accounts (WhatsApp/Telegram/Discord/Google Chat/Slack/Matter
 Subcommands:
 
 - `channels list`: show configured channels and auth profiles.
-- `channels status`: check gateway reachability and channel health (`--probe` runs live per-account probe/audit checks when the gateway is reachable; if not, it falls back to config-only channel summaries. Use `kaijibot health` or `kaijibot status --deep` for broader gateway health probes).
-- Tip: `channels status` prints warnings with suggested fixes when it can detect common misconfigurations (then points you to `kaijibot doctor`).
+- `channels status`: check gateway reachability and channel health (`--probe` runs live per-account probe/audit checks when the gateway is reachable; if not, it falls back to config-only channel summaries. Use `allbot health` or `allbot status --deep` for broader gateway health probes).
+- Tip: `channels status` prints warnings with suggested fixes when it can detect common misconfigurations (then points you to `allbot doctor`).
 - `channels logs`: show recent channel logs from the gateway log file.
 - `channels add`: wizard-style setup when no flags are passed; flags switch to non-interactive mode.
-  - When adding a non-default account to a channel still using single-account top-level config, KaijiBot promotes account-scoped values into the channel account map before writing the new account. Most channels use `accounts.default`; Matrix can preserve an existing matching named/default target instead.
+  - When adding a non-default account to a channel still using single-account top-level config, AllBot promotes account-scoped values into the channel account map before writing the new account. Most channels use `accounts.default`; Matrix can preserve an existing matching named/default target instead.
   - Non-interactive `channels add` does not auto-create/upgrade bindings; channel-only bindings continue to match the default account.
 - `channels remove`: disable by default; pass `--delete` to remove config entries without prompts.
 - `channels login`: interactive channel login (WhatsApp Web only).
@@ -768,16 +768,16 @@ More detail: [/concepts/oauth](/concepts/oauth)
 Examples:
 
 ```bash
-kaijibot channels add --channel telegram --account alerts --name "Alerts Bot" --token $TELEGRAM_BOT_TOKEN
-kaijibot channels add --channel discord --account work --name "Work Bot" --token $DISCORD_BOT_TOKEN
-kaijibot channels remove --channel discord --account work --delete
-kaijibot channels status --probe
-kaijibot status --deep
+allbot channels add --channel telegram --account alerts --name "Alerts Bot" --token $TELEGRAM_BOT_TOKEN
+allbot channels add --channel discord --account work --name "Work Bot" --token $DISCORD_BOT_TOKEN
+allbot channels remove --channel discord --account work --delete
+allbot channels status --probe
+allbot status --deep
 ```
 
 ### `directory`
 
-Look up self, peer, and group IDs for channels that expose a directory surface. See [`kaijibot directory`](/cli/directory).
+Look up self, peer, and group IDs for channels that expose a directory surface. See [`allbot directory`](/cli/directory).
 
 Common options:
 
@@ -818,7 +818,7 @@ Options:
 - `--json`: output JSON (no styling).
 - `-v`, `--verbose`: include missing requirements detail.
 
-Tip: use `kaijibot skills search`, `kaijibot skills install`, and `kaijibot skills update` for ClawHub-backed skills.
+Tip: use `allbot skills search`, `allbot skills install`, and `allbot skills update` for ClawHub-backed skills.
 
 ### `pairing`
 
@@ -860,7 +860,7 @@ Notes:
 
 ### `qr`
 
-Generate a mobile pairing QR and setup code from the current Gateway config. See [`kaijibot qr`](/cli/qr).
+Generate a mobile pairing QR and setup code from the current Gateway config. See [`allbot qr`](/cli/qr).
 
 Options:
 
@@ -881,11 +881,11 @@ Notes:
 - Any handed-off operator bootstrap token stays bounded to `operator.approvals`, `operator.read`, `operator.talk.secrets`, and `operator.write`.
 - Bootstrap scope checks are role-prefixed, so that operator allowlist only satisfies operator requests; non-operator roles still need scopes under their own role prefix.
 - `--remote` can use `gateway.remote.url` or the active Tailscale Serve/Funnel URL.
-- After scanning, approve the request with `kaijibot devices list` / `kaijibot devices approve <requestId>`.
+- After scanning, approve the request with `allbot devices list` / `allbot devices approve <requestId>`.
 
 ### `clawbot`
 
-Legacy alias namespace. Currently supports `kaijibot clawbot qr`, which maps to [`kaijibot qr`](/cli/qr).
+Legacy alias namespace. Currently supports `allbot clawbot qr`, which maps to [`allbot qr`](/cli/qr).
 
 ### `hooks`
 
@@ -898,8 +898,8 @@ Subcommands:
 - `hooks check`
 - `hooks enable <name>`
 - `hooks disable <name>`
-- `hooks install <path-or-spec>` (deprecated alias for `kaijibot plugins install`)
-- `hooks update [id]` (deprecated alias for `kaijibot plugins update`)
+- `hooks install <path-or-spec>` (deprecated alias for `allbot plugins install`)
+- `hooks update [id]` (deprecated alias for `allbot plugins update`)
 
 Common options:
 
@@ -909,7 +909,7 @@ Common options:
 
 Notes:
 
-- Plugin-managed hooks cannot be enabled or disabled through `kaijibot hooks`; enable or disable the owning plugin instead.
+- Plugin-managed hooks cannot be enabled or disabled through `allbot hooks`; enable or disable the owning plugin instead.
 - `hooks install` and `hooks update` still work as compatibility aliases, but they print deprecation warnings and forward to the plugin commands.
 
 ### `webhooks`
@@ -930,7 +930,7 @@ Subcommands:
 
 Notes:
 
-- `setup` configures the Gmail watch plus the KaijiBot-facing push path.
+- `setup` configures the Gmail watch plus the AllBot-facing push path.
 - `run` starts the local Gmail watcher/renew loop with optional runtime overrides.
 
 ### `dns`
@@ -950,7 +950,7 @@ Options:
 
 Notes:
 
-- Without `--apply`, this is a planning helper that prints the recommended KaijiBot + Tailscale DNS config.
+- Without `--apply`, this is a planning helper that prints the recommended AllBot + Tailscale DNS config.
 - `--apply` currently supports macOS with Homebrew CoreDNS only.
 
 ## Messaging + agent
@@ -975,8 +975,8 @@ Subcommands:
 
 Examples:
 
-- `kaijibot message send --target +15555550123 --message "Hi"`
-- `kaijibot message poll --channel discord --target channel:123 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
+- `allbot message send --target +15555550123 --message "Hi"`
+- `allbot message poll --channel discord --target channel:123 --poll-question "Snack?" --poll-option Pizza --poll-option Sushi`
 
 ### `agent`
 
@@ -1014,7 +1014,7 @@ Notes:
 
 Manage isolated agents (workspaces + auth + routing).
 
-Running `kaijibot agents` with no subcommand is equivalent to `kaijibot agents list`.
+Running `allbot agents` with no subcommand is equivalent to `allbot agents list`.
 
 #### `agents list`
 
@@ -1038,7 +1038,7 @@ Options:
 - `--non-interactive`
 - `--json`
 
-Binding specs use `channel[:accountId]`. When `accountId` is omitted, KaijiBot may resolve account scope via channel defaults/plugin hooks; otherwise it is a channel binding without explicit account scope.
+Binding specs use `channel[:accountId]`. When `accountId` is omitted, AllBot may resolve account scope via channel defaults/plugin hooks; otherwise it is a channel binding without explicit account scope.
 Passing any explicit add flags switches the command into the non-interactive path. `main` is reserved and cannot be used as the new agent id.
 
 #### `agents bindings`
@@ -1143,11 +1143,11 @@ See [`acp`](/cli/acp) for full behavior, security notes, and examples.
 
 ### `mcp`
 
-Manage saved MCP server definitions and expose KaijiBot channels over MCP stdio.
+Manage saved MCP server definitions and expose AllBot channels over MCP stdio.
 
 #### `mcp serve`
 
-Expose routed KaijiBot channel conversations over MCP stdio.
+Expose routed AllBot channel conversations over MCP stdio.
 
 Options:
 
@@ -1196,7 +1196,7 @@ Options:
 - `--node <node>`
 - `--gateway`
 - `--json`
-- node RPC options from `kaijibot nodes`
+- node RPC options from `allbot nodes`
 
 #### `approvals set`
 
@@ -1209,7 +1209,7 @@ Options:
 - `--file <path>`
 - `--stdin`
 - `--json`
-- node RPC options from `kaijibot nodes`
+- node RPC options from `allbot nodes`
 
 #### `approvals allowlist add|remove`
 
@@ -1221,7 +1221,7 @@ Options:
 - `--gateway`
 - `--agent <id>` (defaults to `*`)
 - `--json`
-- node RPC options from `kaijibot nodes`
+- node RPC options from `allbot nodes`
 
 ### `status`
 
@@ -1244,12 +1244,12 @@ Notes:
 
 ### Usage tracking
 
-KaijiBot can surface provider usage/quota when OAuth/API creds are available.
+AllBot can surface provider usage/quota when OAuth/API creds are available.
 
 Surfaces:
 
 - `/status` (adds a short provider usage line when available)
-- `kaijibot status --usage` (prints full provider breakdown)
+- `allbot status --usage` (prints full provider breakdown)
 - macOS menu bar (Usage section under Context)
 
 Notes:
@@ -1257,8 +1257,8 @@ Notes:
 - Data comes directly from provider usage endpoints (no estimates).
 - Human-readable output is normalized to `X% left` across providers.
 - Providers with current usage windows: Anthropic, GitHub Copilot, Gemini CLI, OpenAI Codex, MiniMax, Xiaomi, and z.ai.
-- MiniMax note: raw `usage_percent` / `usagePercent` means remaining quota, so KaijiBot inverts it before display; count-based fields still win when present. `model_remains` responses prefer the chat-model entry, derive the window label from timestamps when needed, and include the model name in the plan label.
-- Usage auth comes from provider-specific hooks when available; otherwise KaijiBot falls back to matching OAuth/API-key credentials from auth profiles, env, or config. If none resolve, usage is hidden.
+- MiniMax note: raw `usage_percent` / `usagePercent` means remaining quota, so AllBot inverts it before display; count-based fields still win when present. `model_remains` responses prefer the chat-model entry, derive the window label from timestamps when needed, and include the model name in the plan label.
+- Usage auth comes from provider-specific hooks when available; otherwise AllBot falls back to matching OAuth/API-key credentials from auth profiles, env, or config. If none resolve, usage is hidden.
 - Details: see [Usage tracking](/concepts/usage-tracking).
 
 ### `health`
@@ -1351,7 +1351,7 @@ List and manage [background task](/automation/tasks) runs across agents.
 
 ### `flows`
 
-Legacy docs shortcut. Flow commands live under `kaijibot tasks flow`:
+Legacy docs shortcut. Flow commands live under `allbot tasks flow`:
 
 - `tasks flow list [--json]`
 - `tasks flow show <lookup>`
@@ -1401,7 +1401,7 @@ Notes:
 
 - `gateway status` probes the Gateway RPC by default using the service’s resolved port/config (override with `--url/--token/--password`).
 - `gateway status` supports `--no-probe`, `--deep`, `--require-rpc`, and `--json` for scripting.
-- `gateway status` also surfaces legacy or extra gateway services when it can detect them (`--deep` adds system-level scans). Profile-named KaijiBot services are treated as first-class and aren't flagged as "extra".
+- `gateway status` also surfaces legacy or extra gateway services when it can detect them (`--deep` adds system-level scans). Profile-named AllBot services are treated as first-class and aren't flagged as "extra".
 - `gateway status` stays available for diagnostics even when the local CLI config is missing or invalid.
 - `gateway status` prints the resolved file log path, the CLI-vs-service config paths/validity snapshot, and the resolved probe target URL.
 - If gateway auth SecretRefs are unresolved in the current command path, `gateway status --json` reports `rpc.authWarning` only when probe connectivity/auth fails (warnings are suppressed when probe succeeds).
@@ -1451,11 +1451,11 @@ Options:
 Examples:
 
 ```bash
-kaijibot logs --follow
-kaijibot logs --limit 200
-kaijibot logs --plain
-kaijibot logs --json
-kaijibot logs --no-color
+allbot logs --follow
+allbot logs --limit 200
+allbot logs --plain
+allbot logs --json
+allbot logs --no-color
 ```
 
 Notes:
@@ -1503,18 +1503,18 @@ Tip: the owner-only `gateway` runtime tool still refuses to rewrite `tools.exec.
 
 See [/concepts/models](/concepts/models) for fallback behavior and scanning strategy.
 
-Anthropic note: Anthropic staff told us KaijiBot-style Claude CLI usage is
-allowed again, so KaijiBot treats Claude CLI reuse and `claude -p` usage as
+Anthropic note: Anthropic staff told us AllBot-style Claude CLI usage is
+allowed again, so AllBot treats Claude CLI reuse and `claude -p` usage as
 sanctioned for this integration unless Anthropic publishes a new policy. For
 production, prefer an Anthropic API key or another supported
 subscription-style provider such as OpenAI Codex, Alibaba Cloud Model Studio
 Coding Plan, MiniMax Coding Plan, or Z.AI / GLM Coding Plan.
 
-Anthropic setup-token remains available as a supported token-auth path, but KaijiBot now prefers Claude CLI reuse and `claude -p` when available.
+Anthropic setup-token remains available as a supported token-auth path, but AllBot now prefers Claude CLI reuse and `claude -p` when available.
 
 ### `models` (root)
 
-`kaijibot models` is an alias for `models status`.
+`allbot models` is an alias for `models status`.
 
 Root options:
 
@@ -1620,7 +1620,7 @@ Notes:
 - `setup-token` and `paste-token` are generic token commands for providers that expose token auth methods.
 - `setup-token` requires an interactive TTY and runs the provider's token-auth method.
 - `paste-token` prompts for the token value and defaults to auth profile id `<provider>:manual` when `--profile-id` is omitted.
-- Anthropic `setup-token` / `paste-token` remain available as a supported KaijiBot token path, but KaijiBot now prefers Claude CLI reuse and `claude -p` when available.
+- Anthropic `setup-token` / `paste-token` remain available as a supported AllBot token path, but AllBot now prefers Claude CLI reuse and `claude -p` when available.
 
 ### `models auth order get|set|clear`
 
@@ -1693,7 +1693,7 @@ agent primary as a hidden extra retry target.
 ### `node`
 
 `node` runs a **headless node host** or manages it as a background service. See
-[`kaijibot node`](/cli/node).
+[`allbot node`](/cli/node).
 
 Subcommands:
 
@@ -1706,8 +1706,8 @@ Subcommands:
 
 Auth notes:
 
-- `node` resolves gateway auth from env/config (no `--token`/`--password` flags): `KAIJIBOT_GATEWAY_TOKEN` / `KAIJIBOT_GATEWAY_PASSWORD`, then `gateway.auth.*`. In local mode, node host intentionally ignores `gateway.remote.*`; in `gateway.mode=remote`, `gateway.remote.*` participates per remote precedence rules.
-- Node-host auth resolution only honors `KAIJIBOT_GATEWAY_*` env vars.
+- `node` resolves gateway auth from env/config (no `--token`/`--password` flags): `ALLBOT_GATEWAY_TOKEN` / `ALLBOT_GATEWAY_PASSWORD`, then `gateway.auth.*`. In local mode, node host intentionally ignores `gateway.remote.*`; in `gateway.mode=remote`, `gateway.remote.*` participates per remote precedence rules.
+- Node-host auth resolution only honors `ALLBOT_GATEWAY_*` env vars.
 
 ## Nodes
 
@@ -1752,7 +1752,7 @@ Location:
 
 ## Browser
 
-Browser control CLI (dedicated Chrome/Brave/Edge/Chromium). See [`kaijibot browser`](/cli/browser) and the [Browser tool](/tools/browser).
+Browser control CLI (dedicated Chrome/Brave/Edge/Chromium). See [`allbot browser`](/cli/browser) and the [Browser tool](/tools/browser).
 
 Common options:
 
@@ -1800,7 +1800,7 @@ Actions:
 
 ### `voicecall`
 
-Plugin-provided voice-call utilities. Only appears when the voice-call plugin is installed and enabled. See [`kaijibot voicecall`](/cli/voicecall).
+Plugin-provided voice-call utilities. Only appears when the voice-call plugin is installed and enabled. See [`allbot voicecall`](/cli/voicecall).
 
 Common commands:
 
@@ -1818,7 +1818,7 @@ Common commands:
 
 ### `docs`
 
-Search the live KaijiBot docs index.
+Search the live AllBot docs index.
 
 ### `docs [query...]`
 

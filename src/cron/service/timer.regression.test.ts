@@ -733,7 +733,7 @@ describe("cron service timer regressions", () => {
     };
     const state = createCronServiceState({
       cronEnabled: true,
-      storePath: "/tmp/kaijibot-cron-abort-test/jobs.json",
+      storePath: "/tmp/allbot-cron-abort-test/jobs.json",
       log: noopLogger,
       nowMs: () => Date.now(),
       enqueueSystemEvent,
@@ -787,7 +787,7 @@ describe("cron service timer regressions", () => {
     };
     const state = createCronServiceState({
       cronEnabled: true,
-      storePath: "/tmp/kaijibot-cron-busy-main-test/jobs.json",
+      storePath: "/tmp/allbot-cron-busy-main-test/jobs.json",
       log: noopLogger,
       nowMs,
       enqueueSystemEvent,

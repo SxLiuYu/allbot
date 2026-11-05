@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/openrouter-provider",
+  "name": "@allbot/openrouter-provider",
   "version": "2026.5.22",
   "private": true,
-  "description": "KaijiBot OpenRouter provider plugin",
+  "description": "AllBot OpenRouter provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

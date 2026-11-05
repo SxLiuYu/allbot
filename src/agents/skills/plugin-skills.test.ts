@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PluginManifestRegistry } from "../../plugins/manifest-registry.js";
 import { createTrackedTempDirs } from "../../test-utils/tracked-temp-dirs.js";
 
@@ -32,7 +32,7 @@ function buildRegistry(params: { acpxRoot: string; helperRoot: string }): Plugin
         origin: "workspace",
         rootDir: params.acpxRoot,
         source: params.acpxRoot,
-        manifestPath: path.join(params.acpxRoot, "kaijibot.plugin.json"),
+        manifestPath: path.join(params.acpxRoot, "allbot.plugin.json"),
       },
       {
         id: "helper",
@@ -45,7 +45,7 @@ function buildRegistry(params: { acpxRoot: string; helperRoot: string }): Plugin
         origin: "workspace",
         rootDir: params.helperRoot,
         source: params.helperRoot,
-        manifestPath: path.join(params.helperRoot, "kaijibot.plugin.json"),
+        manifestPath: path.join(params.helperRoot, "allbot.plugin.json"),
       },
     ],
   };
@@ -54,7 +54,7 @@ function buildRegistry(params: { acpxRoot: string; helperRoot: string }): Plugin
 function createSinglePluginRegistry(params: {
   pluginRoot: string;
   skills: string[];
-  format?: "kaijibot" | "bundle";
+  format?: "allbot" | "bundle";
   legacyPluginIds?: string[];
 }): PluginManifestRegistry {
   return {
@@ -73,16 +73,16 @@ function createSinglePluginRegistry(params: {
         origin: "workspace",
         rootDir: params.pluginRoot,
         source: params.pluginRoot,
-        manifestPath: path.join(params.pluginRoot, "kaijibot.plugin.json"),
+        manifestPath: path.join(params.pluginRoot, "allbot.plugin.json"),
       },
     ],
   };
 }
 
 async function setupAcpxAndHelperRegistry() {
-  const workspaceDir = await tempDirs.make("kaijibot-");
-  const acpxRoot = await tempDirs.make("kaijibot-acpx-plugin-");
-  const helperRoot = await tempDirs.make("kaijibot-helper-plugin-");
+  const workspaceDir = await tempDirs.make("allbot-");
+  const acpxRoot = await tempDirs.make("allbot-acpx-plugin-");
+  const helperRoot = await tempDirs.make("allbot-helper-plugin-");
   await fs.mkdir(path.join(acpxRoot, "skills"), { recursive: true });
   await fs.mkdir(path.join(helperRoot, "skills"), { recursive: true });
   hoisted.loadPluginManifestRegistry.mockReturnValue(buildRegistry({ acpxRoot, helperRoot }));
@@ -90,9 +90,9 @@ async function setupAcpxAndHelperRegistry() {
 }
 
 async function setupPluginOutsideSkills() {
-  const workspaceDir = await tempDirs.make("kaijibot-");
-  const pluginRoot = await tempDirs.make("kaijibot-plugin-");
-  const outsideDir = await tempDirs.make("kaijibot-outside-");
+  const workspaceDir = await tempDirs.make("allbot-");
+  const pluginRoot = await tempDirs.make("allbot-plugin-");
+  const outsideDir = await tempDirs.make("allbot-outside-");
   const outsideSkills = path.join(outsideDir, "skills");
   return { workspaceDir, pluginRoot, outsideSkills };
 }
@@ -140,7 +140,7 @@ describe("resolvePluginSkillDirs", () => {
             helper: { enabled: true },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
     });
 
     expect(dirs).toEqual(expectedDirs({ acpxRoot, helperRoot }));
@@ -167,7 +167,7 @@ describe("resolvePluginSkillDirs", () => {
             helper: { enabled: true },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
     });
 
     expect(dirs).toEqual([path.resolve(pluginRoot, "skills")]);
@@ -198,15 +198,15 @@ describe("resolvePluginSkillDirs", () => {
             helper: { enabled: true },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
     });
 
     expect(dirs).toEqual([]);
   });
 
   it("resolves Claude bundle command roots through the normal plugin skill path", async () => {
-    const workspaceDir = await tempDirs.make("kaijibot-");
-    const pluginRoot = await tempDirs.make("kaijibot-claude-bundle-");
+    const workspaceDir = await tempDirs.make("allbot-");
+    const pluginRoot = await tempDirs.make("allbot-claude-bundle-");
     await fs.mkdir(path.join(pluginRoot, "commands"), { recursive: true });
     await fs.mkdir(path.join(pluginRoot, "skills"), { recursive: true });
 
@@ -226,7 +226,7 @@ describe("resolvePluginSkillDirs", () => {
             helper: { enabled: true },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
     });
 
     expect(dirs).toEqual([
@@ -236,8 +236,8 @@ describe("resolvePluginSkillDirs", () => {
   });
 
   it("resolves enabled plugin skills through legacy manifest aliases", async () => {
-    const workspaceDir = await tempDirs.make("kaijibot-");
-    const pluginRoot = await tempDirs.make("kaijibot-legacy-plugin-");
+    const workspaceDir = await tempDirs.make("allbot-");
+    const pluginRoot = await tempDirs.make("allbot-legacy-plugin-");
     await fs.mkdir(path.join(pluginRoot, "skills"), { recursive: true });
 
     hoisted.loadPluginManifestRegistry.mockReturnValue(
@@ -256,7 +256,7 @@ describe("resolvePluginSkillDirs", () => {
             "helper-legacy": { enabled: true },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
     });
 
     expect(dirs).toEqual([path.resolve(pluginRoot, "skills")]);

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { resolveGatewayClientBootstrap } from "./client-bootstrap.js";
 import { GatewayClient, type GatewayClientOptions } from "./client.js";
@@ -8,7 +8,7 @@ export async function createOperatorApprovalsGatewayClient(
     GatewayClientOptions,
     "clientDisplayName" | "onClose" | "onConnectError" | "onEvent" | "onHelloOk"
   > & {
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     gatewayUrl?: string;
   },
 ): Promise<GatewayClient> {
@@ -35,7 +35,7 @@ export async function createOperatorApprovalsGatewayClient(
 
 export async function withOperatorApprovalsGatewayClient<T>(
   params: {
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     gatewayUrl?: string;
     clientDisplayName: string;
   },

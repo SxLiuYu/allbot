@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveSecretInputRef } from "../config/types.secrets.js";
 import { createLazyRuntimeNamedExport } from "../shared/lazy-runtime.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
@@ -51,8 +51,8 @@ export type RuntimeWebProviderSelectionParams<
   configuredProvider?: string;
   metadata: TMetadata;
   diagnostics: RuntimeWebDiagnostic[];
-  sourceConfig: KaijiBotConfig;
-  resolvedConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  resolvedConfig: AllBotConfig;
   context: ResolverContext;
   defaults: SecretDefaults | undefined;
   deferKeylessFallback: boolean;
@@ -61,7 +61,7 @@ export type RuntimeWebProviderSelectionParams<
   autoDetectSelectedCode: RuntimeWebWarningCode;
   readConfiguredCredential: (params: {
     provider: TProvider;
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     toolConfig: TToolConfig;
   }) => unknown;
   resolveSecretInput: (params: {
@@ -70,7 +70,7 @@ export type RuntimeWebProviderSelectionParams<
     envVars: string[];
   }) => Promise<SecretResolutionResult<TSource>>;
   setResolvedCredential: (params: {
-    resolvedConfig: KaijiBotConfig;
+    resolvedConfig: AllBotConfig;
     provider: TProvider;
     value: string;
   }) => void;
@@ -144,14 +144,14 @@ export type ResolveRuntimeWebProviderSurfaceParams<
   diagnostics: RuntimeWebDiagnostic[];
   metadataDiagnostics: RuntimeWebDiagnostic[];
   invalidAutoDetectCode: RuntimeWebWarningCode;
-  sourceConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
   context: ResolverContext;
   configuredBundledPluginIdHint?: string;
   resolveProviders: (params: { configuredBundledPluginId?: string }) => Promise<TProvider[]>;
   sortProviders: (providers: TProvider[]) => TProvider[];
   readConfiguredCredential: (params: {
     provider: TProvider;
-    config: KaijiBotConfig;
+    config: AllBotConfig;
     toolConfig: TToolConfig;
   }) => unknown;
   ignoreKeylessProvidersForConfiguredSurface?: boolean;

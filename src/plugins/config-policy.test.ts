@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   hasExplicitPluginConfig,
   isBundledChannelEnabledByChannelConfig,
@@ -43,7 +43,7 @@ describe.skipIf(process.env.CI)("isBundledChannelEnabledByChannelConfig", () => 
         feishu: { enabled: true },
         wechat: { enabled: false },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(isBundledChannelEnabledByChannelConfig(cfg, "feishu")).toBe(true);
     expect(isBundledChannelEnabledByChannelConfig(cfg, "wechat")).toBe(false);

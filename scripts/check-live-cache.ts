@@ -2,7 +2,7 @@ import { runLiveCacheRegression } from "../src/agents/live-cache-regression-runn
 import { LIVE_CACHE_TEST_ENABLED, logLiveCache } from "../src/agents/live-cache-test-support.js";
 
 if (!LIVE_CACHE_TEST_ENABLED) {
-  logLiveCache("skipped; set KAIJIBOT_LIVE_TEST=1 and KAIJIBOT_LIVE_CACHE_TEST=1");
+  logLiveCache("skipped; set ALLBOT_LIVE_TEST=1 and ALLBOT_LIVE_CACHE_TEST=1");
   process.exit(0);
 }
 

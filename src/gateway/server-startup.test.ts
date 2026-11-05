@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
-const ensureKaijiBotModelsJsonMock = vi.fn<
+const ensureAllBotModelsJsonMock = vi.fn<
   (config: unknown, agentDir: unknown) => Promise<{ agentDir: string; wrote: boolean }>
 >(async () => ({ agentDir: "/tmp/agent", wrote: false }));
 const resolveModelMock = vi.fn<
@@ -21,12 +21,12 @@ const resolveModelMock = vi.fn<
 }));
 
 vi.mock("../agents/agent-paths.js", () => ({
-  resolveKaijiBotAgentDir: () => "/tmp/agent",
+  resolveAllBotAgentDir: () => "/tmp/agent",
 }));
 
 vi.mock("../agents/models-config.js", () => ({
-  ensureKaijiBotModelsJson: (config: unknown, agentDir: unknown) =>
-    ensureKaijiBotModelsJsonMock(config, agentDir),
+  ensureAllBotModelsJson: (config: unknown, agentDir: unknown) =>
+    ensureAllBotModelsJsonMock(config, agentDir),
 }));
 
 vi.mock("../agents/pi-embedded-runner/model.js", () => ({
@@ -49,7 +49,7 @@ describe("gateway startup primary model warmup", () => {
   });
 
   beforeEach(() => {
-    ensureKaijiBotModelsJsonMock.mockClear();
+    ensureAllBotModelsJsonMock.mockClear();
     resolveModelMock.mockClear();
   });
 
@@ -62,14 +62,14 @@ describe("gateway startup primary model warmup", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     await prewarmConfiguredPrimaryModel({
       cfg,
       log: { warn: vi.fn() },
     });
 
-    expect(ensureKaijiBotModelsJsonMock).toHaveBeenCalledWith(cfg, "/tmp/agent");
+    expect(ensureAllBotModelsJsonMock).toHaveBeenCalledWith(cfg, "/tmp/agent");
     expect(resolveModelMock).toHaveBeenCalledWith("openai-codex", "gpt-5.4", "/tmp/agent", cfg, {
       skipProviderRuntimeHooks: true,
     });
@@ -77,11 +77,11 @@ describe("gateway startup primary model warmup", () => {
 
   it("skips warmup when no explicit primary model is configured", async () => {
     await prewarmConfiguredPrimaryModel({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       log: { warn: vi.fn() },
     });
 
-    expect(ensureKaijiBotModelsJsonMock).not.toHaveBeenCalled();
+    expect(ensureAllBotModelsJsonMock).not.toHaveBeenCalled();
     expect(resolveModelMock).not.toHaveBeenCalled();
   });
 
@@ -101,11 +101,11 @@ describe("gateway startup primary model warmup", () => {
             },
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       log: { warn: vi.fn() },
     });
 
-    expect(ensureKaijiBotModelsJsonMock).not.toHaveBeenCalled();
+    expect(ensureAllBotModelsJsonMock).not.toHaveBeenCalled();
     expect(resolveModelMock).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,5 @@
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { formatCliCommand } from "../cli/command-format.js";
 import { loadConfig } from "../config/config.js";
 import { isLoopbackHost } from "../gateway/net.js";
@@ -45,7 +45,7 @@ function withLoopbackBrowserAuthImpl(
   deps: LoopbackBrowserAuthDeps,
 ): RequestInit & { timeoutMs?: number } {
   const headers = new Headers(init?.headers ?? {});
-  if (headers.has("authorization") || headers.has("x-kaijibot-password")) {
+  if (headers.has("authorization") || headers.has("x-allbot-password")) {
     return { ...init, headers };
   }
   if (!isLoopbackHttpUrl(url)) {
@@ -60,7 +60,7 @@ function withLoopbackBrowserAuthImpl(
       return { ...init, headers };
     }
     if (auth.password) {
-      headers.set("x-kaijibot-password", auth.password);
+      headers.set("x-allbot-password", auth.password);
       return { ...init, headers };
     }
   } catch {
@@ -81,7 +81,7 @@ function withLoopbackBrowserAuthImpl(
     if (bridgeAuth?.token) {
       headers.set("Authorization", `Bearer ${bridgeAuth.token}`);
     } else if (bridgeAuth?.password) {
-      headers.set("x-kaijibot-password", bridgeAuth.password);
+      headers.set("x-allbot-password", bridgeAuth.password);
     }
   } catch {
     // ignore
@@ -112,7 +112,7 @@ function isRateLimitStatus(status: number): boolean {
 function resolveBrowserFetchOperatorHint(url: string): string {
   const isLocal = !isAbsoluteHttp(url);
   return isLocal
-    ? `Restart the KaijiBot gateway (KaijiBot.app menubar, or \`${formatCliCommand("kaijibot gateway")}\`).`
+    ? `Restart the AllBot gateway (AllBot.app menubar, or \`${formatCliCommand("allbot gateway")}\`).`
     : "If this is a sandboxed session, ensure the sandbox browser is running.";
 }
 
@@ -159,13 +159,13 @@ function enhanceBrowserFetchError(url: string, err: unknown, timeoutMs: number):
   if (looksLikeTimeout) {
     return new Error(
       appendBrowserToolModelHint(
-        `Can't reach the KaijiBot browser control service (timed out after ${timeoutMs}ms). ${operatorHint}`,
+        `Can't reach the AllBot browser control service (timed out after ${timeoutMs}ms). ${operatorHint}`,
       ),
     );
   }
   return new Error(
     appendBrowserToolModelHint(
-      `Can't reach the KaijiBot browser control service. ${operatorHint} (${msg})`,
+      `Can't reach the AllBot browser control service. ${operatorHint} (${msg})`,
     ),
   );
 }

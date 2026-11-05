@@ -83,7 +83,7 @@ describe("openai codex provider", () => {
         store: { version: 1, profiles: {} },
       }),
     ).toBe(
-      "Deprecated profile. Run `kaijibot models auth login --provider openai-codex` or `kaijibot configure`.",
+      "Deprecated profile. Run `allbot models auth login --provider openai-codex` or `allbot configure`.",
     );
   });
 

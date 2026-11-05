@@ -1,4 +1,4 @@
-import type { KaijiBotPluginApi } from "../api.js";
+import type { AllBotPluginApi } from "../api.js";
 import type { GenerateTextFn } from "./compiler.js";
 import type { WikiConfig } from "./config.js";
 import { ingestAll } from "./ingest.js";
@@ -14,7 +14,7 @@ export type GatewayDeps = {
   getGenerateText: () => Promise<GenerateTextFn>;
 };
 
-export function registerWikiGatewayMethods(api: KaijiBotPluginApi, deps: GatewayDeps): void {
+export function registerWikiGatewayMethods(api: AllBotPluginApi, deps: GatewayDeps): void {
   const resolveVaultFromParams = (params: Record<string, unknown>) => {
     const workspaceDir =
       typeof params.workspaceDir === "string" ? params.workspaceDir : deps.defaultWorkspaceDir;

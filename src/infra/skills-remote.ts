@@ -2,7 +2,7 @@ import { bumpSkillsSnapshotVersion } from "../agents/skills/refresh-state.js";
 import type { SkillEligibilityContext, SkillEntry } from "../agents/skills/types.js";
 import { loadWorkspaceSkillEntries } from "../agents/skills/workspace.js";
 import { listAgentWorkspaceDirs } from "../agents/workspace-dirs.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { NodeRegistry } from "../gateway/node-registry.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
@@ -251,7 +251,7 @@ export async function refreshRemoteNodeBins(params: {
   platform?: string;
   deviceFamily?: string;
   commands?: string[];
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   timeoutMs?: number;
 }) {
   if (!remoteRegistry) {
@@ -346,7 +346,7 @@ export function getRemoteSkillEligibility(options?: {
   };
 }
 
-export async function refreshRemoteBinsForConnectedNodes(cfg: KaijiBotConfig) {
+export async function refreshRemoteBinsForConnectedNodes(cfg: AllBotConfig) {
   if (!remoteRegistry) {
     return;
   }

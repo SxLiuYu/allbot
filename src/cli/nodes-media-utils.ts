@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { readStringValue } from "../shared/string-coerce.js";
 export { asRecord } from "../shared/record-coerce.js";
 
@@ -19,7 +19,7 @@ export function resolveTempPathParts(opts: { ext: string; tmpDir?: string; id?: 
   tmpDir: string;
   id: string;
 } {
-  const tmpDir = opts.tmpDir ?? resolvePreferredKaijiBotTmpDir();
+  const tmpDir = opts.tmpDir ?? resolvePreferredAllBotTmpDir();
   if (!opts.tmpDir) {
     fs.mkdirSync(tmpDir, { recursive: true, mode: 0o700 });
   }

@@ -69,21 +69,21 @@ import type {
   CliBackendPlugin,
   ImageGenerationProviderPlugin,
   MusicGenerationProviderPlugin,
-  KaijiBotPluginApi,
-  KaijiBotPluginChannelRegistration,
-  KaijiBotPluginCliCommandDescriptor,
-  KaijiBotPluginCliRegistrar,
-  KaijiBotPluginCommandDefinition,
+  AllBotPluginApi,
+  AllBotPluginChannelRegistration,
+  AllBotPluginCliCommandDescriptor,
+  AllBotPluginCliRegistrar,
+  AllBotPluginCommandDefinition,
   PluginConversationBindingResolvedEvent,
-  KaijiBotPluginHttpRouteParams,
-  KaijiBotPluginHookOptions,
-  KaijiBotPluginNodeHostCommand,
-  KaijiBotPluginReloadRegistration,
-  KaijiBotPluginSecurityAuditCollector,
+  AllBotPluginHttpRouteParams,
+  AllBotPluginHookOptions,
+  AllBotPluginNodeHostCommand,
+  AllBotPluginReloadRegistration,
+  AllBotPluginSecurityAuditCollector,
   MediaUnderstandingProviderPlugin,
-  KaijiBotPluginService,
-  KaijiBotPluginToolContext,
-  KaijiBotPluginToolFactory,
+  AllBotPluginService,
+  AllBotPluginToolContext,
+  AllBotPluginToolFactory,
   PluginDiagnostic,
   PluginHookHandlerMap,
   PluginHookName,
@@ -167,13 +167,13 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerTool = (
     record: PluginRecord,
-    tool: AnyAgentTool | KaijiBotPluginToolFactory,
+    tool: AnyAgentTool | AllBotPluginToolFactory,
     opts?: { name?: string; names?: string[]; optional?: boolean },
   ) => {
     const names = opts?.names ?? (opts?.name ? [opts.name] : []);
     const optional = opts?.optional === true;
-    const factory: KaijiBotPluginToolFactory =
-      typeof tool === "function" ? tool : (_ctx: KaijiBotPluginToolContext) => tool;
+    const factory: AllBotPluginToolFactory =
+      typeof tool === "function" ? tool : (_ctx: AllBotPluginToolContext) => tool;
 
     if (typeof tool !== "function") {
       names.push(tool.name);
@@ -198,8 +198,8 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     record: PluginRecord,
     events: string | string[],
     handler: Parameters<typeof registerInternalHook>[1],
-    opts: KaijiBotPluginHookOptions | undefined,
-    config: KaijiBotPluginApi["config"],
+    opts: AllBotPluginHookOptions | undefined,
+    config: AllBotPluginApi["config"],
   ) => {
     const eventList = Array.isArray(events) ? events : [events];
     const normalizedEvents = eventList.map((event) => event.trim()).filter(Boolean);
@@ -233,7 +233,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
             ...entry.hook,
             name,
             description,
-            source: "kaijibot-plugin",
+            source: "allbot-plugin",
             pluginId: record.id,
           },
           metadata: {
@@ -245,7 +245,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
           hook: {
             name,
             description,
-            source: "kaijibot-plugin",
+            source: "allbot-plugin",
             pluginId: record.id,
             filePath: record.source,
             baseDir: path.dirname(record.source),
@@ -321,7 +321,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     return `${plugin} (${source})`;
   };
 
-  const registerHttpRoute = (record: PluginRecord, params: KaijiBotPluginHttpRouteParams) => {
+  const registerHttpRoute = (record: PluginRecord, params: AllBotPluginHttpRouteParams) => {
     const normalizedPath = normalizePluginHttpPath(params.path);
     if (!normalizedPath) {
       pushDiagnostic({
@@ -407,12 +407,12 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerChannel = (
     record: PluginRecord,
-    registration: KaijiBotPluginChannelRegistration | ChannelPlugin,
+    registration: AllBotPluginChannelRegistration | ChannelPlugin,
     mode: PluginRegistrationMode = "full",
   ) => {
     const normalized =
-      typeof (registration as KaijiBotPluginChannelRegistration).plugin === "object"
-        ? (registration as KaijiBotPluginChannelRegistration)
+      typeof (registration as AllBotPluginChannelRegistration).plugin === "object"
+        ? (registration as AllBotPluginChannelRegistration)
         : { plugin: registration as ChannelPlugin };
     const plugin = normalized.plugin;
     const id =
@@ -685,8 +685,8 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerCli = (
     record: PluginRecord,
-    registrar: KaijiBotPluginCliRegistrar,
-    opts?: { commands?: string[]; descriptors?: KaijiBotPluginCliCommandDescriptor[] },
+    registrar: AllBotPluginCliRegistrar,
+    opts?: { commands?: string[]; descriptors?: AllBotPluginCliCommandDescriptor[] },
   ) => {
     const descriptors = (opts?.descriptors ?? [])
       .map((descriptor) => ({
@@ -741,10 +741,10 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     NODE_SYSTEM_NOTIFY_COMMAND,
   ]);
 
-  const registerReload = (record: PluginRecord, registration: KaijiBotPluginReloadRegistration) => {
+  const registerReload = (record: PluginRecord, registration: AllBotPluginReloadRegistration) => {
     const normalize = (values?: string[]) =>
       (values ?? []).map((value) => value.trim()).filter(Boolean);
-    const normalized: KaijiBotPluginReloadRegistration = {
+    const normalized: AllBotPluginReloadRegistration = {
       restartPrefixes: normalize(registration.restartPrefixes),
       hotPrefixes: normalize(registration.hotPrefixes),
       noopPrefixes: normalize(registration.noopPrefixes),
@@ -774,7 +774,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerNodeHostCommand = (
     record: PluginRecord,
-    nodeCommand: KaijiBotPluginNodeHostCommand,
+    nodeCommand: AllBotPluginNodeHostCommand,
   ) => {
     const command = nodeCommand.command.trim();
     if (!command) {
@@ -821,7 +821,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
 
   const registerSecurityAuditCollector = (
     record: PluginRecord,
-    collector: KaijiBotPluginSecurityAuditCollector,
+    collector: AllBotPluginSecurityAuditCollector,
   ) => {
     registry.securityAuditCollectors ??= [];
     registry.securityAuditCollectors.push({
@@ -833,7 +833,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     });
   };
 
-  const registerService = (record: PluginRecord, service: KaijiBotPluginService) => {
+  const registerService = (record: PluginRecord, service: AllBotPluginService) => {
     const id = service.id.trim();
     if (!id) {
       return;
@@ -858,7 +858,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
     });
   };
 
-  const registerCommand = (record: PluginRecord, command: KaijiBotPluginCommandDefinition) => {
+  const registerCommand = (record: PluginRecord, command: AllBotPluginCommandDefinition) => {
     const name = command.name.trim();
     if (!name) {
       pushDiagnostic({
@@ -1016,12 +1016,12 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
   const createApi = (
     record: PluginRecord,
     params: {
-      config: KaijiBotPluginApi["config"];
+      config: AllBotPluginApi["config"];
       pluginConfig?: Record<string, unknown>;
       hookPolicy?: PluginTypedHookPolicy;
       registrationMode?: PluginRegistrationMode;
     },
-  ): KaijiBotPluginApi => {
+  ): AllBotPluginApi => {
     const registrationMode = params.registrationMode ?? "full";
     return buildPluginApi({
       id: record.id,
@@ -1107,7 +1107,7 @@ export function createPluginRegistry(registryParams: PluginRegistryParams) {
                 }
               },
               registerCompactionProvider: (
-                provider: Parameters<KaijiBotPluginApi["registerCompactionProvider"]>[0],
+                provider: Parameters<AllBotPluginApi["registerCompactionProvider"]>[0],
               ) => {
                 const existing = getRegisteredCompactionProvider(provider.id);
                 if (existing) {

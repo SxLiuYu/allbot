@@ -1,6 +1,6 @@
 import type { PluginRegistry } from "./registry.js";
 
-export const PLUGIN_REGISTRY_STATE = Symbol.for("kaijibot.pluginRegistryState");
+export const PLUGIN_REGISTRY_STATE = Symbol.for("allbot.pluginRegistryState");
 
 export type RegistrySurfaceState = {
   registry: PluginRegistry | null;

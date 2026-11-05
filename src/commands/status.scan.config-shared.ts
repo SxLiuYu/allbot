@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { resolveConfigPath } from "../config/paths.js";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 
 export function shouldSkipStatusScanMissingConfigFastPath(
   env: NodeJS.ProcessEnv = process.env,
@@ -20,16 +20,16 @@ export function resolveStatusScanColdStart(params?: {
 
 export async function loadStatusScanCommandConfig(params: {
   commandName: string;
-  readBestEffortConfig: () => Promise<KaijiBotConfig>;
+  readBestEffortConfig: () => Promise<AllBotConfig>;
   resolveConfig: (
-    sourceConfig: KaijiBotConfig,
-  ) => Promise<{ resolvedConfig: KaijiBotConfig; diagnostics: string[] }>;
+    sourceConfig: AllBotConfig,
+  ) => Promise<{ resolvedConfig: AllBotConfig; diagnostics: string[] }>;
   env?: NodeJS.ProcessEnv;
   allowMissingConfigFastPath?: boolean;
 }): Promise<{
   coldStart: boolean;
-  sourceConfig: KaijiBotConfig;
-  resolvedConfig: KaijiBotConfig;
+  sourceConfig: AllBotConfig;
+  resolvedConfig: AllBotConfig;
   secretDiagnostics: string[];
 }> {
   const env = params.env ?? process.env;

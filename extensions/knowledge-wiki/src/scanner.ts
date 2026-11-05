@@ -6,7 +6,7 @@ import type { SourceFile } from "./types.js";
 const HARDCODED_EXCLUDE_DIRS = new Set([
   ".git",
   "node_modules",
-  ".kaijibot",
+  ".allbot",
   "wiki",
   "sessions",
   ".pnpm-store",

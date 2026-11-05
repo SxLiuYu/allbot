@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChannelOutboundAdapter } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { telegramMessagingForTest } from "../../infra/outbound/targets.test-helpers.js";
 import { resetPluginRuntimeStateForTest, setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createOutboundTestPlugin, createTestRegistry } from "../../test-utils/channel-plugins.js";
@@ -110,7 +110,7 @@ beforeEach(() => {
           config: {
             listAccountIds: () => [],
             resolveAccount: () => ({}),
-            resolveAllowFrom: ({ cfg }: { cfg: KaijiBotConfig }) =>
+            resolveAllowFrom: ({ cfg }: { cfg: AllBotConfig }) =>
               (cfg.channels?.whatsapp as { allowFrom?: string[] } | undefined)?.allowFrom,
           },
         },
@@ -124,15 +124,15 @@ afterEach(() => {
   resetPluginRuntimeStateForTest();
 });
 
-function makeCfg(overrides?: Partial<KaijiBotConfig>): KaijiBotConfig {
+function makeCfg(overrides?: Partial<AllBotConfig>): AllBotConfig {
   return {
     bindings: [],
     channels: {},
     ...overrides,
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
-function makeTelegramBoundCfg(accountId = "account-b"): KaijiBotConfig {
+function makeTelegramBoundCfg(accountId = "account-b"): AllBotConfig {
   return makeCfg({
     bindings: [
       {
@@ -182,7 +182,7 @@ function setStoredWhatsAppAllowFrom(allowFrom: string[]) {
 }
 
 async function resolveForAgent(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   target?: { channel?: "last" | "telegram"; to?: string };
 }) {
   const channel = params.target ? params.target.channel : DEFAULT_TARGET.channel;
@@ -193,7 +193,7 @@ async function resolveForAgent(params: {
   });
 }
 
-async function resolveLastTarget(cfg: KaijiBotConfig) {
+async function resolveLastTarget(cfg: AllBotConfig) {
   return resolveForAgent({
     cfg,
     target: { channel: "last", to: undefined },

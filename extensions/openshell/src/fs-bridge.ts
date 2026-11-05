@@ -4,8 +4,8 @@ import type {
   SandboxFsBridge,
   SandboxFsStat,
   SandboxResolvedPath,
-} from "kaijibot/plugin-sdk/sandbox";
-import { createWritableRenameTargetResolver } from "kaijibot/plugin-sdk/sandbox";
+} from "allbot/plugin-sdk/sandbox";
+import { createWritableRenameTargetResolver } from "allbot/plugin-sdk/sandbox";
 import type { OpenShellFsBridgeContext, OpenShellSandboxBackend } from "./backend.types.js";
 import { movePathWithCopyFallback } from "./mirror.js";
 
@@ -84,7 +84,7 @@ class OpenShellFsBridge implements SandboxFsBridge {
     }
     const tempPath = path.join(
       parentDir,
-      `.kaijibot-openshell-write-${path.basename(hostPath)}-${process.pid}-${Date.now()}`,
+      `.allbot-openshell-write-${path.basename(hostPath)}-${process.pid}-${Date.now()}`,
     );
     await fsPromises.writeFile(tempPath, buffer);
     await fsPromises.rename(tempPath, hostPath);

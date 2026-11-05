@@ -1,10 +1,10 @@
-import { logTypingFailure } from "kaijibot/plugin-sdk/channel-feedback";
-import { createChannelReplyPipeline } from "kaijibot/plugin-sdk/channel-reply-pipeline";
+import { logTypingFailure } from "allbot/plugin-sdk/channel-feedback";
+import { createChannelReplyPipeline } from "allbot/plugin-sdk/channel-reply-pipeline";
 import {
   resolveSendableOutboundReplyParts,
   resolveTextChunksWithFallback,
   sendMediaWithLeadingCaption,
-} from "kaijibot/plugin-sdk/reply-payload";
+} from "allbot/plugin-sdk/reply-payload";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
 import { sanitizeTextForCard } from "./card-error.js";
 import { createFeishuClient } from "./client.js";

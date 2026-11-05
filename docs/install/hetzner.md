@@ -1,20 +1,20 @@
 ---
-summary: "Run KaijiBot Gateway 24/7 on a cheap Hetzner VPS (Docker) with durable state and baked-in binaries"
+summary: "Run AllBot Gateway 24/7 on a cheap Hetzner VPS (Docker) with durable state and baked-in binaries"
 read_when:
-  - You want KaijiBot running 24/7 on a cloud VPS (not your laptop)
+  - You want AllBot running 24/7 on a cloud VPS (not your laptop)
   - You want a production-grade, always-on Gateway on your own VPS
   - You want full control over persistence, binaries, and restart behavior
-  - You are running KaijiBot in Docker on Hetzner or a similar provider
+  - You are running AllBot in Docker on Hetzner or a similar provider
 title: "Hetzner"
 ---
 
-# KaijiBot on Hetzner (Docker, Production VPS Guide)
+# AllBot on Hetzner (Docker, Production VPS Guide)
 
 ## Goal
 
-Run a persistent KaijiBot Gateway on a Hetzner VPS using Docker, with durable state, baked-in binaries, and safe restart behavior.
+Run a persistent AllBot Gateway on a Hetzner VPS using Docker, with durable state, baked-in binaries, and safe restart behavior.
 
-If you want “KaijiBot 24/7 for ~$5”, this is the simplest reliable setup.
+If you want “AllBot 24/7 for ~$5”, this is the simplest reliable setup.
 Hetzner pricing changes; pick the smallest Debian/Ubuntu VPS and scale up if you hit OOMs.
 
 Security model reminder:
@@ -29,11 +29,11 @@ See [Security](/gateway/security) and [VPS hosting](/vps).
 
 - Rent a small Linux server (Hetzner VPS)
 - Install Docker (isolated app runtime)
-- Start the KaijiBot Gateway in Docker
-- Persist `~/.kaijibot` + `~/.kaijibot/workspace` on the host (survives restarts/rebuilds)
+- Start the AllBot Gateway in Docker
+- Persist `~/.allbot` + `~/.allbot/workspace` on the host (survives restarts/rebuilds)
 - Access the Control UI from your laptop via an SSH tunnel
 
-That mounted `~/.kaijibot` state includes `kaijibot.json`, per-agent
+That mounted `~/.allbot` state includes `allbot.json`, per-agent
 `agents/<agentId>/agent/auth-profiles.json`, and `.env`.
 
 The Gateway can be accessed via:
@@ -51,7 +51,7 @@ For the generic Docker flow, see [Docker](/install/docker).
 
 1. Provision Hetzner VPS
 2. Install Docker
-3. Clone KaijiBot repository
+3. Clone AllBot repository
 4. Create persistent host directories
 5. Configure `.env` and `docker-compose.yml`
 6. Bake required binaries into the image
@@ -106,10 +106,10 @@ For the generic Docker flow, see [Docker](/install/docker).
 
   </Step>
 
-  <Step title="Clone the KaijiBot repository">
+  <Step title="Clone the AllBot repository">
     ```bash
-    git clone https://github.com/kaijibot/kaijibot.git
-    cd kaijibot
+    git clone https://github.com/allbot/allbot.git
+    cd allbot
     ```
 
     This guide assumes you will build a custom image to guarantee binary persistence.
@@ -121,10 +121,10 @@ For the generic Docker flow, see [Docker](/install/docker).
     All long-lived state must live on the host.
 
     ```bash
-    mkdir -p /root/.kaijibot/workspace
+    mkdir -p /root/.allbot/workspace
 
     # Set ownership to the container user (uid 1000):
-    chown -R 1000:1000 /root/.kaijibot
+    chown -R 1000:1000 /root/.allbot
     ```
 
   </Step>
@@ -133,16 +133,16 @@ For the generic Docker flow, see [Docker](/install/docker).
     Create `.env` in the repository root.
 
     ```bash
-    KAIJIBOT_IMAGE=kaijibot:latest
-    KAIJIBOT_GATEWAY_TOKEN=change-me-now
-    KAIJIBOT_GATEWAY_BIND=lan
-    KAIJIBOT_GATEWAY_PORT=18789
+    ALLBOT_IMAGE=allbot:latest
+    ALLBOT_GATEWAY_TOKEN=change-me-now
+    ALLBOT_GATEWAY_BIND=lan
+    ALLBOT_GATEWAY_PORT=18789
 
-    KAIJIBOT_CONFIG_DIR=/root/.kaijibot
-    KAIJIBOT_WORKSPACE_DIR=/root/.kaijibot/workspace
+    ALLBOT_CONFIG_DIR=/root/.allbot
+    ALLBOT_WORKSPACE_DIR=/root/.allbot/workspace
 
     GOG_KEYRING_PASSWORD=change-me-now
-    XDG_CONFIG_HOME=/home/node/.kaijibot
+    XDG_CONFIG_HOME=/home/node/.allbot
     ```
 
     Generate strong secrets:
@@ -153,9 +153,9 @@ For the generic Docker flow, see [Docker](/install/docker).
 
     **Do not commit this file.**
 
-    This `.env` file is for container/runtime env such as `KAIJIBOT_GATEWAY_TOKEN`.
+    This `.env` file is for container/runtime env such as `ALLBOT_GATEWAY_TOKEN`.
     Stored provider OAuth/API-key auth lives in the mounted
-    `~/.kaijibot/agents/<agentId>/agent/auth-profiles.json`.
+    `~/.allbot/agents/<agentId>/agent/auth-profiles.json`.
 
   </Step>
 
@@ -164,8 +164,8 @@ For the generic Docker flow, see [Docker](/install/docker).
 
     ```yaml
     services:
-      kaijibot-gateway:
-        image: ${KAIJIBOT_IMAGE}
+      allbot-gateway:
+        image: ${ALLBOT_IMAGE}
         build: .
         restart: unless-stopped
         env_file:
@@ -174,28 +174,28 @@ For the generic Docker flow, see [Docker](/install/docker).
           - HOME=/home/node
           - NODE_ENV=production
           - TERM=xterm-256color
-          - KAIJIBOT_GATEWAY_BIND=${KAIJIBOT_GATEWAY_BIND}
-          - KAIJIBOT_GATEWAY_PORT=${KAIJIBOT_GATEWAY_PORT}
-          - KAIJIBOT_GATEWAY_TOKEN=${KAIJIBOT_GATEWAY_TOKEN}
+          - ALLBOT_GATEWAY_BIND=${ALLBOT_GATEWAY_BIND}
+          - ALLBOT_GATEWAY_PORT=${ALLBOT_GATEWAY_PORT}
+          - ALLBOT_GATEWAY_TOKEN=${ALLBOT_GATEWAY_TOKEN}
           - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD}
           - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
           - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         volumes:
-          - ${KAIJIBOT_CONFIG_DIR}:/home/node/.kaijibot
-          - ${KAIJIBOT_WORKSPACE_DIR}:/home/node/.kaijibot/workspace
+          - ${ALLBOT_CONFIG_DIR}:/home/node/.allbot
+          - ${ALLBOT_WORKSPACE_DIR}:/home/node/.allbot/workspace
         ports:
           # Recommended: keep the Gateway loopback-only on the VPS; access via SSH tunnel.
           # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
-          - "127.0.0.1:${KAIJIBOT_GATEWAY_PORT}:18789"
+          - "127.0.0.1:${ALLBOT_GATEWAY_PORT}:18789"
         command:
           [
             "node",
             "dist/index.js",
             "gateway",
             "--bind",
-            "${KAIJIBOT_GATEWAY_BIND}",
+            "${ALLBOT_GATEWAY_BIND}",
             "--port",
-            "${KAIJIBOT_GATEWAY_PORT}",
+            "${ALLBOT_GATEWAY_PORT}",
             "--allow-unconfigured",
           ]
     ```
@@ -245,8 +245,8 @@ For teams preferring infrastructure-as-code workflows, a community-maintained Te
 
 **Repositories:**
 
-- Infrastructure: [kaijibot-terraform-hetzner](https://github.com/andreesg/kaijibot-terraform-hetzner)
-- Docker config: [kaijibot-docker-config](https://github.com/andreesg/kaijibot-docker-config)
+- Infrastructure: [allbot-terraform-hetzner](https://github.com/andreesg/allbot-terraform-hetzner)
+- Docker config: [allbot-docker-config](https://github.com/andreesg/allbot-docker-config)
 
 This approach complements the Docker setup above with reproducible deployments, version-controlled infrastructure, and automated disaster recovery.
 
@@ -256,4 +256,4 @@ This approach complements the Docker setup above with reproducible deployments, 
 
 - Set up messaging channels: [Channels](/channels)
 - Configure the Gateway: [Gateway configuration](/gateway/configuration)
-- Keep KaijiBot up to date: [Updating](/install/updating)
+- Keep AllBot up to date: [Updating](/install/updating)

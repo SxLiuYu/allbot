@@ -70,7 +70,7 @@ describe("command-startup-policy", () => {
     expect(
       shouldHideCliBannerForCommandPath(["status"], {
         ...process.env,
-        KAIJIBOT_HIDE_BANNER: "1",
+        ALLBOT_HIDE_BANNER: "1",
       }),
     ).toBe(true);
     expect(shouldHideCliBannerForCommandPath(["status"], {})).toBe(false);

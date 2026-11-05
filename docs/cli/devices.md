@@ -1,30 +1,30 @@
 ---
-summary: "CLI reference for `kaijibot devices` (device pairing + token rotation/revocation)"
+summary: "CLI reference for `allbot devices` (device pairing + token rotation/revocation)"
 read_when:
   - You are approving device pairing requests
   - You need to rotate or revoke device tokens
 title: "devices"
 ---
 
-# `kaijibot devices`
+# `allbot devices`
 
 Manage device pairing requests and device-scoped tokens.
 
 ## Commands
 
-### `kaijibot devices list`
+### `allbot devices list`
 
 List pending pairing requests and paired devices.
 
 ```
-kaijibot devices list
-kaijibot devices list --json
+allbot devices list
+allbot devices list --json
 ```
 
 Pending request output includes the requested role and scopes so approvals can
 be reviewed before you approve.
 
-### `kaijibot devices remove <deviceId>`
+### `allbot devices remove <deviceId>`
 
 Remove one paired device entry.
 
@@ -33,45 +33,45 @@ remove only **their own** device entry. Removing some other device requires
 `operator.admin`.
 
 ```
-kaijibot devices remove <deviceId>
-kaijibot devices remove <deviceId> --json
+allbot devices remove <deviceId>
+allbot devices remove <deviceId> --json
 ```
 
-### `kaijibot devices clear --yes [--pending]`
+### `allbot devices clear --yes [--pending]`
 
 Clear paired devices in bulk.
 
 ```
-kaijibot devices clear --yes
-kaijibot devices clear --yes --pending
-kaijibot devices clear --yes --pending --json
+allbot devices clear --yes
+allbot devices clear --yes --pending
+allbot devices clear --yes --pending --json
 ```
 
-### `kaijibot devices approve [requestId] [--latest]`
+### `allbot devices approve [requestId] [--latest]`
 
-Approve a pending device pairing request. If `requestId` is omitted, KaijiBot
+Approve a pending device pairing request. If `requestId` is omitted, AllBot
 automatically approves the most recent pending request.
 
 Note: if a device retries pairing with changed auth details (role/scopes/public
-key), KaijiBot supersedes the previous pending entry and issues a new
-`requestId`. Run `kaijibot devices list` right before approval to use the
+key), AllBot supersedes the previous pending entry and issues a new
+`requestId`. Run `allbot devices list` right before approval to use the
 current ID.
 
 ```
-kaijibot devices approve
-kaijibot devices approve <requestId>
-kaijibot devices approve --latest
+allbot devices approve
+allbot devices approve <requestId>
+allbot devices approve --latest
 ```
 
-### `kaijibot devices reject <requestId>`
+### `allbot devices reject <requestId>`
 
 Reject a pending device pairing request.
 
 ```
-kaijibot devices reject <requestId>
+allbot devices reject <requestId>
 ```
 
-### `kaijibot devices rotate --device <id> --role <role> [--scope <scope...>]`
+### `allbot devices rotate --device <id> --role <role> [--scope <scope...>]`
 
 Rotate a device token for a specific role (optionally updating scopes).
 The target role must already exist in that device's approved pairing contract;
@@ -85,12 +85,12 @@ operator scopes; rotation cannot mint a broader operator token than the caller
 already has.
 
 ```
-kaijibot devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
+allbot devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
 ```
 
 Returns the new token payload as JSON.
 
-### `kaijibot devices revoke --device <id> --role <role>`
+### `allbot devices revoke --device <id> --role <role>`
 
 Revoke a device token for a specific role.
 
@@ -98,7 +98,7 @@ Non-admin paired-device callers can revoke only their **own** device token.
 Revoking some other device's token requires `operator.admin`.
 
 ```
-kaijibot devices revoke --device <deviceId> --role node
+allbot devices revoke --device <deviceId> --role node
 ```
 
 Returns the revoke result as JSON.
@@ -135,27 +135,27 @@ Use this when Control UI or other clients keep failing with `AUTH_TOKEN_MISMATCH
 1. Confirm current gateway token source:
 
 ```bash
-kaijibot config get gateway.auth.token
+allbot config get gateway.auth.token
 ```
 
 2. List paired devices and identify the affected device id:
 
 ```bash
-kaijibot devices list
+allbot devices list
 ```
 
 3. Rotate operator token for the affected device:
 
 ```bash
-kaijibot devices rotate --device <deviceId> --role operator
+allbot devices rotate --device <deviceId> --role operator
 ```
 
 4. If rotation is not enough, remove stale pairing and approve again:
 
 ```bash
-kaijibot devices remove <deviceId>
-kaijibot devices list
-kaijibot devices approve <requestId>
+allbot devices remove <deviceId>
+allbot devices list
+allbot devices approve <requestId>
 ```
 
 5. Retry client connection with the current shared token/password.

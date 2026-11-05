@@ -24,7 +24,7 @@ vi.mock("../../commands/status.js", () => ({
   getStatusSummary: vi.fn().mockResolvedValue({ ok: true }),
 }));
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("waitForAgentJob", () => {
   async function runLifecycleScenario(params: {
     runIdPrefix: string;
@@ -112,7 +112,7 @@ describe.skipIf(process.env.CI)("waitForAgentJob", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("injectTimestamp", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -225,7 +225,7 @@ describe.skipIf(process.env.CI)("injectTimestamp", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("timestampOptsFromConfig", () => {
   it.each([
     {
@@ -243,7 +243,7 @@ describe.skipIf(process.env.CI)("timestampOptsFromConfig", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("normalizeRpcAttachmentsToChatAttachments", () => {
   it.each([
     {
@@ -292,7 +292,7 @@ describe.skipIf(process.env.CI)("normalizeRpcAttachmentsToChatAttachments", () =
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("sanitizeChatSendMessageInput", () => {
   it.each([
     {
@@ -315,7 +315,7 @@ describe.skipIf(process.env.CI)("sanitizeChatSendMessageInput", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway chat transcript writes (guardrail)", () => {
   it("routes transcript writes through helper and SessionManager parentId append", () => {
     const chatTs = fileURLToPath(new URL("./chat.ts", import.meta.url));
@@ -332,7 +332,7 @@ describe.skipIf(process.env.CI)("gateway chat transcript writes (guardrail)", ()
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("exec approval handlers", () => {
   const execApprovalNoop = () => false;
   type ExecApprovalHandlers = ReturnType<typeof createExecApprovalHandlers>;
@@ -524,7 +524,7 @@ describe.skipIf(process.env.CI)("exec approval handlers", () => {
     }
   }
 
-  // Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+  // Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
   describe.skipIf(process.env.CI)("ExecApprovalRequestParams validation", () => {
     const baseParams = {
       command: "echo hi",
@@ -1202,7 +1202,7 @@ describe.skipIf(process.env.CI)("exec approval handlers", () => {
     );
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)(
     "forwards turn-source metadata to exec approval forwarding",
     async () => {
@@ -1448,7 +1448,7 @@ describe.skipIf(process.env.CI)("exec approval handlers", () => {
   });
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway healthHandlers.status scope handling", () => {
   let statusModule: typeof import("../../commands/status.js");
   let healthHandlers: typeof import("./health.js").healthHandlers;
@@ -1491,7 +1491,7 @@ describe.skipIf(process.env.CI)("gateway healthHandlers.status scope handling", 
   );
 });
 
-// Skip on CI: requires upstream-only plugins/channels not bundled in KaijiBot
+// Skip on CI: requires upstream-only plugins/channels not bundled in AllBot
 describe.skipIf(process.env.CI)("logs.tail", () => {
   const logsNoop = () => false;
 
@@ -1501,16 +1501,16 @@ describe.skipIf(process.env.CI)("logs.tail", () => {
   });
 
   it("falls back to latest rolling log file when today is missing", async () => {
-    const tempDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "kaijibot-logs-"));
-    const older = path.join(tempDir, "kaijibot-2026-01-20.log");
-    const newer = path.join(tempDir, "kaijibot-2026-01-21.log");
+    const tempDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "allbot-logs-"));
+    const older = path.join(tempDir, "allbot-2026-01-20.log");
+    const newer = path.join(tempDir, "allbot-2026-01-21.log");
 
     await fsPromises.writeFile(older, '{"msg":"old"}\n');
     await fsPromises.writeFile(newer, '{"msg":"new"}\n');
     await fsPromises.utimes(older, new Date(0), new Date(0));
     await fsPromises.utimes(newer, new Date(), new Date());
 
-    setLoggerOverride({ file: path.join(tempDir, "kaijibot-2026-01-22.log") });
+    setLoggerOverride({ file: path.join(tempDir, "allbot-2026-01-22.log") });
 
     const respond = vi.fn();
     await logsHandlers["logs.tail"]({

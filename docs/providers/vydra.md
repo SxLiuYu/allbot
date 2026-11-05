@@ -1,7 +1,7 @@
 ---
-summary: "Use Vydra image, video, and speech in KaijiBot"
+summary: "Use Vydra image, video, and speech in AllBot"
 read_when:
-  - You want Vydra media generation in KaijiBot
+  - You want Vydra media generation in AllBot
   - You need Vydra API key setup guidance
 title: "Vydra"
 ---
@@ -14,7 +14,7 @@ The bundled Vydra plugin adds:
 - video generation via `vydra/veo3` and `vydra/kling`
 - speech synthesis via Vydra's ElevenLabs-backed TTS route
 
-KaijiBot uses the same `VYDRA_API_KEY` for all three capabilities.
+AllBot uses the same `VYDRA_API_KEY` for all three capabilities.
 
 ## Important base URL
 
@@ -27,7 +27,7 @@ Vydra's apex host (`https://vydra.ai/api/v1`) currently redirects to `www`. Some
 Interactive onboarding:
 
 ```bash
-kaijibot onboard --auth-choice vydra-api-key
+allbot onboard --auth-choice vydra-api-key
 ```
 
 Or set the env var directly:
@@ -56,7 +56,7 @@ Set it as the default image provider:
 }
 ```
 
-Current bundled support is text-to-image only. Vydra's hosted edit routes expect remote image URLs, and KaijiBot does not add a Vydra-specific upload bridge in the bundled plugin yet.
+Current bundled support is text-to-image only. Vydra's hosted edit routes expect remote image URLs, and AllBot does not add a Vydra-specific upload bridge in the bundled plugin yet.
 
 See [Image Generation](/tools/image-generation) for shared tool behavior.
 
@@ -91,8 +91,8 @@ Notes:
 Provider-specific live coverage:
 
 ```bash
-KAIJIBOT_LIVE_TEST=1 \
-KAIJIBOT_LIVE_VYDRA_VIDEO=1 \
+ALLBOT_LIVE_TEST=1 \
+ALLBOT_LIVE_VYDRA_VIDEO=1 \
 pnpm test:live -- extensions/vydra/vydra.live.test.ts
 ```
 
@@ -104,7 +104,7 @@ The bundled Vydra live file now covers:
 Override the remote image fixture when needed:
 
 ```bash
-export KAIJIBOT_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
+export ALLBOT_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
 ```
 
 See [Video Generation](/tools/video-generation) for shared tool behavior.

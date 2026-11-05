@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionBindingRecord } from "../../infra/outbound/session-binding-service.js";
 import type {
   PluginHookBeforeDispatchResult,
@@ -55,14 +55,14 @@ const internalHookMocks = vi.hoisted(() => ({
 }));
 const acpMocks = vi.hoisted(() => ({
   listAcpSessionEntries: vi.fn(async () => []),
-  readAcpSessionEntry: vi.fn<(params: { sessionKey: string; cfg?: KaijiBotConfig }) => unknown>(
+  readAcpSessionEntry: vi.fn<(params: { sessionKey: string; cfg?: AllBotConfig }) => unknown>(
     () => null,
   ),
   getAcpRuntimeBackend: vi.fn<() => unknown>(() => null),
   upsertAcpSessionMeta: vi.fn<
     (params: {
       sessionKey: string;
-      cfg?: KaijiBotConfig;
+      cfg?: AllBotConfig;
       mutate: (
         current: Record<string, unknown> | undefined,
         entry: { acp?: Record<string, unknown> } | undefined,
@@ -105,7 +105,7 @@ const ttsMocks = vi.hoisted(() => ({
     return params.payload;
   }),
   normalizeTtsAutoMode: vi.fn((value: unknown) => (typeof value === "string" ? value : undefined)),
-  resolveTtsConfig: vi.fn((_cfg: KaijiBotConfig) => ({ mode: "final" })),
+  resolveTtsConfig: vi.fn((_cfg: AllBotConfig) => ({ mode: "final" })),
 }));
 const threadInfoMocks = vi.hoisted(() => ({
   parseSessionThreadInfo: vi.fn<
@@ -256,7 +256,7 @@ vi.mock("./dispatch-acp-manager.runtime.js", () => ({
 vi.mock("../../tts/tts.js", () => ({
   maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
   normalizeTtsAutoMode: (value: unknown) => ttsMocks.normalizeTtsAutoMode(value),
-  resolveTtsConfig: (cfg: KaijiBotConfig) => ttsMocks.resolveTtsConfig(cfg),
+  resolveTtsConfig: (cfg: AllBotConfig) => ttsMocks.resolveTtsConfig(cfg),
 }));
 vi.mock("../../tts/tts.runtime.js", () => ({
   maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
@@ -273,16 +273,16 @@ vi.mock("./dispatch-acp-tts.runtime.js", () => ({
   maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
 }));
 vi.mock("./dispatch-acp-session.runtime.js", () => ({
-  readAcpSessionEntry: (params: { sessionKey: string; cfg?: KaijiBotConfig }) =>
+  readAcpSessionEntry: (params: { sessionKey: string; cfg?: AllBotConfig }) =>
     acpMocks.readAcpSessionEntry(params),
 }));
 vi.mock("../../tts/tts-config.js", () => ({
   normalizeTtsAutoMode: (value: unknown) => ttsMocks.normalizeTtsAutoMode(value),
-  resolveConfiguredTtsMode: (cfg: KaijiBotConfig) => ttsMocks.resolveTtsConfig(cfg).mode,
+  resolveConfiguredTtsMode: (cfg: AllBotConfig) => ttsMocks.resolveTtsConfig(cfg).mode,
 }));
 
 export const noAbortResult = { handled: false, aborted: false } as const;
-export const emptyConfig = {} as KaijiBotConfig;
+export const emptyConfig = {} as AllBotConfig;
 
 export function createDispatcher(): ReplyDispatcher {
   const acceptReply = () => true;

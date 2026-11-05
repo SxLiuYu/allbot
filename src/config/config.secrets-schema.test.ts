@@ -27,13 +27,13 @@ describe("config secret refs schema", () => {
           default: { source: "env" },
           filemain: {
             source: "file",
-            path: "~/.kaijibot/secrets.json",
+            path: "~/.allbot/secrets.json",
             mode: "json",
             timeoutMs: 10_000,
           },
           vault: {
             source: "exec",
-            command: "/usr/local/bin/kaijibot-secret-resolver",
+            command: "/usr/local/bin/allbot-secret-resolver",
             args: ["resolve"],
             allowSymlinkCommand: true,
           },
@@ -233,7 +233,7 @@ describe("config secret refs schema", () => {
         providers: {
           rawfile: {
             source: "file",
-            path: "~/.kaijibot/token.txt",
+            path: "~/.allbot/token.txt",
             mode: "singleValue",
           },
         },

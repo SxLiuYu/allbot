@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 import { buildCerebrasCatalogModels, CEREBRAS_BASE_URL } from "./models.js";
 
 export function buildCerebrasProvider(): ModelProviderConfig {

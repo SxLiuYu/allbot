@@ -1,5 +1,5 @@
 import type { Command } from "commander";
-import { loadConfig, readConfigFileSnapshot, type KaijiBotConfig } from "../config/config.js";
+import { loadConfig, readConfigFileSnapshot, type AllBotConfig } from "../config/config.js";
 import {
   createPluginCliLogger,
   loadPluginCliDescriptors,
@@ -7,7 +7,7 @@ import {
   type PluginCliLoaderOptions,
 } from "./cli-registry-loader.js";
 import { registerPluginCliCommandGroups } from "./register-plugin-cli-command-groups.js";
-import type { KaijiBotPluginCliCommandDescriptor } from "./types.js";
+import type { AllBotPluginCliCommandDescriptor } from "./types.js";
 
 type PluginCliRegistrationMode = "eager" | "lazy";
 
@@ -19,7 +19,7 @@ type RegisterPluginCliOptions = {
 const logger = createPluginCliLogger();
 
 export const loadValidatedConfigForPluginRegistration =
-  async (): Promise<KaijiBotConfig | null> => {
+  async (): Promise<AllBotConfig | null> => {
     const snapshot = await readConfigFileSnapshot();
     if (!snapshot.valid) {
       return null;
@@ -28,16 +28,16 @@ export const loadValidatedConfigForPluginRegistration =
   };
 
 export async function getPluginCliCommandDescriptors(
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   env?: NodeJS.ProcessEnv,
   loaderOptions?: PluginCliLoaderOptions,
-): Promise<KaijiBotPluginCliCommandDescriptor[]> {
+): Promise<AllBotPluginCliCommandDescriptor[]> {
   return loadPluginCliDescriptors({ cfg, env, loaderOptions });
 }
 
 export async function registerPluginCliCommands(
   program: Command,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
   env?: NodeJS.ProcessEnv,
   loaderOptions?: PluginCliLoaderOptions,
   options?: RegisterPluginCliOptions,
@@ -62,7 +62,7 @@ export async function registerPluginCliCommandsFromValidatedConfig(
   env?: NodeJS.ProcessEnv,
   loaderOptions?: PluginCliLoaderOptions,
   options?: RegisterPluginCliOptions,
-): Promise<KaijiBotConfig | null> {
+): Promise<AllBotConfig | null> {
   const config = await loadValidatedConfigForPluginRegistration();
   if (!config) {
     return null;

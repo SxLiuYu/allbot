@@ -1,7 +1,7 @@
 ---
 summary: "DeepSeek setup (auth + model selection)"
 read_when:
-  - You want to use DeepSeek with KaijiBot
+  - You want to use DeepSeek with AllBot
   - You need the API key env var or CLI auth choice
 ---
 
@@ -19,7 +19,7 @@ read_when:
 Set the API key (recommended: store it for the Gateway):
 
 ```bash
-kaijibot onboard --auth-choice deepseek-api-key
+allbot onboard --auth-choice deepseek-api-key
 ```
 
 This will prompt for your API key and set `deepseek/deepseek-chat` as the default model.
@@ -27,7 +27,7 @@ This will prompt for your API key and set `deepseek/deepseek-chat` as the defaul
 ## Non-interactive example
 
 ```bash
-kaijibot onboard --non-interactive \
+allbot onboard --non-interactive \
   --mode local \
   --auth-choice deepseek-api-key \
   --deepseek-api-key "$DEEPSEEK_API_KEY" \
@@ -38,7 +38,7 @@ kaijibot onboard --non-interactive \
 ## Environment note
 
 If the Gateway runs as a daemon (launchd/systemd), make sure `DEEPSEEK_API_KEY`
-is available to that process (for example, in `~/.kaijibot/.env` or via
+is available to that process (for example, in `~/.allbot/.env` or via
 `env.shellEnv`).
 
 ## Built-in catalog

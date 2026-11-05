@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { jsonResult } from "../../agents/tools/common.js";
 import { dispatchChannelMessageAction } from "../../channels/plugins/message-action-dispatch.js";
 import type { ChannelMessageActionContext, ChannelPlugin } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { getActivePluginRegistry, setActivePluginRegistry } from "../../plugins/runtime.js";
 import { createTestRegistry } from "../../test-utils/channel-plugins.js";
 import { runMessageAction } from "./message-action-runner.js";
@@ -206,7 +206,7 @@ describe("runMessageAction plugin dispatch", () => {
               enabled: true,
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         action: "pin",
         params: {
           channel: "feishu",
@@ -222,7 +222,7 @@ describe("runMessageAction plugin dispatch", () => {
               enabled: true,
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         action: "list-pins",
         params: {
           channel: "feishu",
@@ -252,9 +252,9 @@ describe("runMessageAction plugin dispatch", () => {
     });
 
     it("routes execution context ids into plugin handleAction", async () => {
-      const stateDir = path.join("/tmp", "kaijibot-plugin-dispatch-media-roots");
+      const stateDir = path.join("/tmp", "allbot-plugin-dispatch-media-roots");
       const expectedWorkspaceRoot = path.resolve(stateDir, "workspace-alpha");
-      vi.stubEnv("KAIJIBOT_STATE_DIR", stateDir);
+      vi.stubEnv("ALLBOT_STATE_DIR", stateDir);
 
       await runMessageAction({
         cfg: {
@@ -263,7 +263,7 @@ describe("runMessageAction plugin dispatch", () => {
               enabled: true,
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         action: "pin",
         params: {
           channel: "feishu",
@@ -355,7 +355,7 @@ describe("runMessageAction plugin dispatch", () => {
             enabled: true,
           },
         },
-      } as KaijiBotConfig;
+      } as AllBotConfig;
 
       const card = {
         type: "AdaptiveCard",
@@ -432,7 +432,7 @@ describe("runMessageAction plugin dispatch", () => {
               botToken: "tok",
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         action: "poll",
         params: {
           channel: "telegram",
@@ -523,7 +523,7 @@ describe("runMessageAction plugin dispatch", () => {
               token: "tok",
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         action: "poll",
         params: {
           channel: "discord",
@@ -604,7 +604,7 @@ describe("runMessageAction plugin dispatch", () => {
         buttons: [{ label: "A", customId: "a" }],
       };
       const result = await runMessageAction({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         action: "send",
         params: {
           channel: "discord",
@@ -623,7 +623,7 @@ describe("runMessageAction plugin dispatch", () => {
     it("throws on invalid components JSON strings", async () => {
       await expect(
         runMessageAction({
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           action: "send",
           params: {
             channel: "discord",
@@ -683,7 +683,7 @@ describe("runMessageAction plugin dispatch", () => {
       {
         name: "uses defaultAccountId override",
         args: {
-          cfg: {} as KaijiBotConfig,
+          cfg: {} as AllBotConfig,
           defaultAccountId: "ops",
         },
         expectedAccountId: "ops",
@@ -695,7 +695,7 @@ describe("runMessageAction plugin dispatch", () => {
             bindings: [
               { agentId: "agent-b", match: { channel: "discord", accountId: "account-b" } },
             ],
-          } as KaijiBotConfig,
+          } as AllBotConfig,
           agentId: "agent-b",
         },
         expectedAccountId: "account-b",

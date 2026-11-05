@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const listPotentialConfiguredChannelIds = vi.hoisted(() => vi.fn());
 const loadPluginManifestRegistry = vi.hoisted(() => vi.fn());
@@ -71,8 +71,8 @@ function createManifestRegistryFixture() {
 }
 
 function expectStartupPluginIds(params: {
-  config: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   expected: readonly string[];
 }) {
   expect(
@@ -89,8 +89,8 @@ function expectStartupPluginIds(params: {
 }
 
 function expectStartupPluginIdsCase(params: {
-  config: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   expected: readonly string[];
 }) {
   expectStartupPluginIds(params);
@@ -159,12 +159,12 @@ function createStartupConfig(params: {
           },
         }
       : {}),
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("resolveGatewayStartupPluginIds", () => {
   beforeEach(() => {
-    listPotentialConfiguredChannelIds.mockReset().mockImplementation((config: KaijiBotConfig) => {
+    listPotentialConfiguredChannelIds.mockReset().mockImplementation((config: AllBotConfig) => {
       if (Object.prototype.hasOwnProperty.call(config, "channels")) {
         return Object.keys(config.channels ?? {});
       }
@@ -184,7 +184,7 @@ describe("resolveGatewayStartupPluginIds", () => {
     ],
     [
       "keeps bundled startup sidecars with enabledByDefault at idle startup",
-      {} as KaijiBotConfig,
+      {} as AllBotConfig,
       ["demo-channel", "browser"],
     ],
     [
@@ -234,7 +234,7 @@ describe("resolveGatewayStartupPluginIds", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expectStartupPluginIdsCase({
       config: effectiveConfig,

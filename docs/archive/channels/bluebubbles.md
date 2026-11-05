@@ -7,9 +7,9 @@ read_when:
 title: "BlueBubbles"
 ---
 
-> ⚠️ **此频道在 KaijiBot 中无打包代码。** This channel has **no bundled code** in KaijiBot — the page is preserved as upstream OpenClaw reference only. KaijiBot's first-class channels are Feishu (飞书) and WeChat (微信); see the [channels hub](/channels) for the full list.
+> ⚠️ **此频道在 AllBot 中无打包代码。** This channel has **no bundled code** in AllBot — the page is preserved as upstream OpenClaw reference only. AllBot's first-class channels are Feishu (飞书) and WeChat (微信); see the [channels hub](/channels) for the full list.
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # BlueBubbles (macOS REST)
 
@@ -17,14 +17,14 @@ Status: bundled plugin that talks to the BlueBubbles macOS server over HTTP. **R
 
 ## Bundled plugin
 
-Current KaijiBot releases bundle BlueBubbles, so normal packaged builds do not
-need a separate `kaijibot plugins install` step.
+Current AllBot releases bundle BlueBubbles, so normal packaged builds do not
+need a separate `allbot plugins install` step.
 
 ## Overview
 
 - Runs on macOS via the BlueBubbles helper app ([bluebubbles.app](https://bluebubbles.app)).
 - Recommended/tested: macOS Sequoia (15). macOS Tahoe (26) works; edit is currently broken on Tahoe, and group icon updates may report success but not sync.
-- KaijiBot talks to it through its REST API (`GET /api/v1/ping`, `POST /message/text`, `POST /chat/:id/*`).
+- AllBot talks to it through its REST API (`GET /api/v1/ping`, `POST /message/text`, `POST /chat/:id/*`).
 - Incoming messages arrive via webhooks; outgoing replies, typing indicators, read receipts, and tapbacks are REST calls.
 - Attachments and stickers are ingested as inbound media (and surfaced to the agent when possible).
 - Pairing/allowlist works the same way as other channels (`/channels/pairing` etc) with `channels.bluebubbles.allowFrom` + pairing codes.
@@ -35,7 +35,7 @@ need a separate `kaijibot plugins install` step.
 
 1. Install the BlueBubbles server on your Mac (follow the instructions at [bluebubbles.app/install](https://bluebubbles.app/install)).
 2. In the BlueBubbles config, enable the web API and set a password.
-3. Run `kaijibot onboard` and select BlueBubbles, or configure manually:
+3. Run `allbot onboard` and select BlueBubbles, or configure manually:
 
    ```json5
    {
@@ -56,7 +56,7 @@ need a separate `kaijibot plugins install` step.
 Security note:
 
 - Always set a webhook password.
-- Webhook authentication is always required. KaijiBot rejects BlueBubbles webhook requests unless they include a password/guid that matches `channels.bluebubbles.password` (for example `?password=<password>` or `x-password`), regardless of loopback/proxy topology.
+- Webhook authentication is always required. AllBot rejects BlueBubbles webhook requests unless they include a password/guid that matches `channels.bluebubbles.password` (for example `?password=<password>` or `x-password`), regardless of loopback/proxy topology.
 - Password authentication is checked before reading/parsing full webhook bodies.
 
 ## Keeping Messages.app alive (VM / headless setups)
@@ -138,7 +138,7 @@ launchctl load ~/Library/LaunchAgents/com.user.poke-messages.plist
 BlueBubbles is available in interactive onboarding:
 
 ```
-kaijibot onboard
+allbot onboard
 ```
 
 The wizard prompts for:
@@ -152,7 +152,7 @@ The wizard prompts for:
 You can also add BlueBubbles via CLI:
 
 ```
-kaijibot channels add bluebubbles --http-url http://192.168.1.100:1234 --password <password>
+allbot channels add bluebubbles --http-url http://192.168.1.100:1234 --password <password>
 ```
 
 ## Access control (DMs + groups)
@@ -162,8 +162,8 @@ DMs:
 - Default: `channels.bluebubbles.dmPolicy = "pairing"`.
 - Unknown senders receive a pairing code; messages are ignored until approved (codes expire after 1 hour).
 - Approve via:
-  - `kaijibot pairing list bluebubbles`
-  - `kaijibot pairing approve bluebubbles <CODE>`
+  - `allbot pairing list bluebubbles`
+  - `allbot pairing approve bluebubbles <CODE>`
 - Pairing is the default token exchange. Details: [Pairing](/channels/pairing)
 
 Groups:
@@ -279,7 +279,7 @@ See [ACP Agents](/tools/acp-agents) for shared ACP binding behavior.
 
 - **Typing indicators**: Sent automatically before and during response generation.
 - **Read receipts**: Controlled by `channels.bluebubbles.sendReadReceipts` (default: `true`).
-- **Typing indicators**: KaijiBot sends typing start events; BlueBubbles clears typing automatically on send or timeout (manual stop via DELETE is unreliable).
+- **Typing indicators**: AllBot sends typing start events; BlueBubbles clears typing automatically on send or timeout (manual stop via DELETE is unreliable).
 
 ```json5
 {
@@ -335,7 +335,7 @@ Available actions:
 
 ### Message IDs (short vs full)
 
-KaijiBot may surface _short_ message IDs (e.g., `1`, `2`) to save tokens.
+AllBot may surface _short_ message IDs (e.g., `1`, `2`) to save tokens.
 
 - `MessageSid` / `ReplyToId` can be short IDs.
 - `MessageSidFull` / `ReplyToIdFull` contain the provider full IDs.
@@ -409,7 +409,7 @@ Prefer `chat_guid` for stable routing:
 - `chat_id:123`
 - `chat_identifier:...`
 - Direct handles: `+15555550123`, `user@example.com`
-  - If a direct handle does not have an existing DM chat, KaijiBot will create one via `POST /api/v1/chat/new`. This requires the BlueBubbles Private API to be enabled.
+  - If a direct handle does not have an existing DM chat, AllBot will create one via `POST /api/v1/chat/new`. This requires the BlueBubbles Private API to be enabled.
 
 ## Security
 
@@ -421,12 +421,12 @@ Prefer `chat_guid` for stable routing:
 ## Troubleshooting
 
 - If typing/read events stop working, check the BlueBubbles webhook logs and verify the gateway path matches `channels.bluebubbles.webhookPath`.
-- Pairing codes expire after one hour; use `kaijibot pairing list bluebubbles` and `kaijibot pairing approve bluebubbles <code>`.
+- Pairing codes expire after one hour; use `allbot pairing list bluebubbles` and `allbot pairing approve bluebubbles <code>`.
 - Reactions require the BlueBubbles private API (`POST /api/v1/message/react`); ensure the server version exposes it.
 - Edit/unsend require macOS 13+ and a compatible BlueBubbles server version. On macOS 26 (Tahoe), edit is currently broken due to private API changes.
 - Group icon updates can be flaky on macOS 26 (Tahoe): the API may return success but the new icon does not sync.
-- KaijiBot auto-hides known-broken actions based on the BlueBubbles server's macOS version. If edit still appears on macOS 26 (Tahoe), disable it manually with `channels.bluebubbles.actions.edit=false`.
-- For status/health info: `kaijibot status --all` or `kaijibot status --deep`.
+- AllBot auto-hides known-broken actions based on the BlueBubbles server's macOS version. If edit still appears on macOS 26 (Tahoe), disable it manually with `channels.bluebubbles.actions.edit=false`.
+- For status/health info: `allbot status --all` or `allbot status --deep`.
 
 For general channel workflow reference, see [Channels](/channels) and the [Plugins](/tools/plugin) guide.
 

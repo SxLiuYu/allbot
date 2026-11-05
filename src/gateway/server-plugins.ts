@@ -4,7 +4,7 @@ import type { loadConfig } from "../config/config.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { resolveGatewayStartupPluginIds } from "../plugins/channel-plugin-ids.js";
 import { normalizePluginsConfig } from "../plugins/config-state.js";
-import { loadKaijiBotPlugins } from "../plugins/loader.js";
+import { loadAllBotPlugins } from "../plugins/loader.js";
 import { createEmptyPluginRegistry } from "../plugins/registry-empty.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { getPluginRuntimeGatewayRequestScope } from "../plugins/runtime/gateway-request-scope.js";
@@ -28,7 +28,7 @@ import type {
 // dispatchGatewayMethod can use it as a fallback.
 
 const FALLBACK_GATEWAY_CONTEXT_STATE_KEY: unique symbol = Symbol.for(
-  "kaijibot.fallbackGatewayContextState",
+  "allbot.fallbackGatewayContextState",
 );
 
 type FallbackGatewayContextState = {
@@ -73,7 +73,7 @@ type PluginSubagentPolicyState = {
 };
 
 const PLUGIN_SUBAGENT_POLICY_STATE_KEY: unique symbol = Symbol.for(
-  "kaijibot.pluginSubagentOverridePolicyState",
+  "allbot.pluginSubagentOverridePolicyState",
 );
 
 const getPluginSubagentPolicyState = () =>
@@ -438,7 +438,7 @@ export function loadGatewayPlugins(params: {
       gatewayMethods: [...params.baseMethods],
     };
   }
-  const pluginRegistry = loadKaijiBotPlugins({
+  const pluginRegistry = loadAllBotPlugins({
     config: resolvedConfig,
     activationSourceConfig: params.activationSourceConfig ?? params.cfg,
     autoEnabledReasons: autoEnabled.autoEnabledReasons,

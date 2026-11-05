@@ -130,8 +130,8 @@ export { toText };
 export function resolveMessageId(entry: Record<string, unknown>): string | undefined {
   return (
     toText(entry.id) ??
-    (entry.__kaijibot && typeof entry.__kaijibot === "object"
-      ? toText((entry.__kaijibot as { id?: unknown }).id)
+    (entry.__allbot && typeof entry.__allbot === "object"
+      ? toText((entry.__allbot as { id?: unknown }).id)
       : undefined)
   );
 }

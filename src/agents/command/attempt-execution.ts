@@ -311,7 +311,7 @@ export async function persistAcpTurnTranscript(params: {
       role: "assistant",
       content: [{ type: "text", text: replyText }],
       api: "openai-responses",
-      provider: "kaijibot",
+      provider: "allbot",
       model: "acp-runtime",
       usage: ACP_TRANSCRIPT_USAGE,
       stopReason: "stop",

@@ -2,8 +2,8 @@ import {
   coerceSecretRef,
   ensureAuthProfileStore,
   listProfilesForProvider,
-} from "kaijibot/plugin-sdk/provider-auth";
-import { githubCopilotLoginCommand } from "kaijibot/plugin-sdk/provider-auth-login";
+} from "allbot/plugin-sdk/provider-auth";
+import { githubCopilotLoginCommand } from "allbot/plugin-sdk/provider-auth-login";
 import { PROVIDER_ID, resolveCopilotForwardCompatModel } from "./models.js";
 import { wrapCopilotAnthropicStream, wrapCopilotProviderStream } from "./stream.js";
 import { DEFAULT_COPILOT_API_BASE_URL, resolveCopilotApiToken } from "./token.js";

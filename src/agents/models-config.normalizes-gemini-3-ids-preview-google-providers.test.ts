@@ -33,7 +33,7 @@ function buildGoogleProvider(
 }
 
 function normalizeForTest(providers: Record<string, ProviderConfig>) {
-  const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-models-normalize-"));
+  const agentDir = mkdtempSync(join(tmpdir(), "allbot-models-normalize-"));
   return normalizeProviders({ providers, agentDir }) ?? {};
 }
 

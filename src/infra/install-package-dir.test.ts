@@ -94,7 +94,7 @@ async function withInstallBaseReboundOnRealpathCall<T>(params: {
 
 describe("installPackageDir", () => {
   const fixtureRootTracker = createSuiteTempRootTracker({
-    prefix: "kaijibot-install-package-dir-",
+    prefix: "allbot-install-package-dir-",
   });
 
   afterEach(async () => {
@@ -136,10 +136,10 @@ describe("installPackageDir", () => {
     });
     await expect(fs.readFile(path.join(targetDir, "marker.txt"), "utf8")).resolves.toBe("old");
     await expect(
-      listMatchingDirs(installBaseDir, ".kaijibot-install-stage-"),
+      listMatchingDirs(installBaseDir, ".allbot-install-stage-"),
     ).resolves.toHaveLength(0);
     await expect(
-      listMatchingDirs(installBaseDir, ".kaijibot-install-backups"),
+      listMatchingDirs(installBaseDir, ".allbot-install-backups"),
     ).resolves.toHaveLength(0);
   });
 
@@ -180,9 +180,9 @@ describe("installPackageDir", () => {
     });
     await expect(fs.readFile(path.join(targetDir, "marker.txt"), "utf8")).resolves.toBe("old");
     await expect(
-      listMatchingDirs(installBaseDir, ".kaijibot-install-stage-"),
+      listMatchingDirs(installBaseDir, ".allbot-install-stage-"),
     ).resolves.toHaveLength(0);
-    const backupRoot = path.join(installBaseDir, ".kaijibot-install-backups");
+    const backupRoot = path.join(installBaseDir, ".allbot-install-backups");
     await expect(fs.readdir(backupRoot)).resolves.toHaveLength(0);
   });
 
@@ -277,7 +277,7 @@ describe("installPackageDir", () => {
     ).rejects.toMatchObject({
       code: "ENOENT",
     });
-    const backupRoot = path.join(preservedInstallRoot, ".kaijibot-install-backups");
+    const backupRoot = path.join(preservedInstallRoot, ".allbot-install-backups");
     await expect(fs.readdir(backupRoot)).resolves.toHaveLength(1);
   });
 
@@ -322,7 +322,7 @@ describe("installPackageDir", () => {
     expect(vi.mocked(runCommandWithTimeout)).toHaveBeenCalledWith(
       ["npm", "install", "--omit=dev", "--silent", "--ignore-scripts"],
       expect.objectContaining({
-        cwd: expect.stringContaining(".kaijibot-install-stage-"),
+        cwd: expect.stringContaining(".allbot-install-stage-"),
       }),
     );
   });
@@ -354,7 +354,7 @@ describe("installPackageDir", () => {
         code: "ENOENT",
       });
       await expect(
-        listMatchingEntries(cwd ?? "", ".kaijibot-install-hidden-npmrc-"),
+        listMatchingEntries(cwd ?? "", ".allbot-install-hidden-npmrc-"),
       ).resolves.toHaveLength(1);
       return {
         stdout: "",
@@ -379,7 +379,7 @@ describe("installPackageDir", () => {
     expect(result).toEqual({ ok: true });
     await expect(fs.readFile(path.join(targetDir, ".npmrc"), "utf8")).resolves.toBe(npmrcContent);
     await expect(
-      listMatchingEntries(targetDir, ".kaijibot-install-hidden-npmrc-"),
+      listMatchingEntries(targetDir, ".allbot-install-hidden-npmrc-"),
     ).resolves.toHaveLength(0);
   });
 });

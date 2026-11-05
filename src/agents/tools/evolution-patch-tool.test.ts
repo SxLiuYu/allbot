@@ -21,7 +21,7 @@ vi.mock("../../utils.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../utils.js")>();
   return {
     ...actual,
-    resolveConfigDir: vi.fn().mockReturnValue("/home/test/.kaijibot"),
+    resolveConfigDir: vi.fn().mockReturnValue("/home/test/.allbot"),
   };
 });
 
@@ -30,7 +30,7 @@ vi.mock("../../routing/session-key.js", () => ({
 }));
 
 vi.mock("../../agents/agent-scope.js", () => ({
-  resolveAgentWorkspaceDir: vi.fn().mockReturnValue("/home/test/.kaijibot/workspace"),
+  resolveAgentWorkspaceDir: vi.fn().mockReturnValue("/home/test/.allbot/workspace"),
 }));
 
 describe("createEvolutionPatchTool", () => {
@@ -87,7 +87,7 @@ describe("createEvolutionPatchTool", () => {
     it("returns success when patch applied", async () => {
       mockPatchSkill.mockResolvedValueOnce({
         ok: true,
-        updatedPath: "/home/test/.kaijibot/skills/my-skill/SKILL.md",
+        updatedPath: "/home/test/.allbot/skills/my-skill/SKILL.md",
       });
 
       const tool = createEvolutionPatchTool({})!;
@@ -105,7 +105,7 @@ describe("createEvolutionPatchTool", () => {
     it("passes replacements through", async () => {
       mockPatchSkill.mockResolvedValueOnce({
         ok: true,
-        updatedPath: "/home/test/.kaijibot/skills/rp-skill/SKILL.md",
+        updatedPath: "/home/test/.allbot/skills/rp-skill/SKILL.md",
       });
 
       const tool = createEvolutionPatchTool({})!;
@@ -159,7 +159,7 @@ describe("createEvolutionPatchTool", () => {
 
       mockPatchSkill.mockResolvedValueOnce({
         ok: true,
-        updatedPath: "/home/test/.kaijibot/skills/fallback-skill/SKILL.md",
+        updatedPath: "/home/test/.allbot/skills/fallback-skill/SKILL.md",
       });
 
       const tool = createEvolutionPatchTool({})!;

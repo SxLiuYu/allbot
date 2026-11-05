@@ -21,14 +21,14 @@ const processingClaims = createDedupeCache({
 });
 
 function resolveStateDirFromEnv(env: NodeJS.ProcessEnv = process.env): string {
-  const stateOverride = env.KAIJIBOT_STATE_DIR?.trim();
+  const stateOverride = env.ALLBOT_STATE_DIR?.trim();
   if (stateOverride) {
     return stateOverride;
   }
   if (env.VITEST || env.NODE_ENV === "test") {
-    return path.join(os.tmpdir(), ["kaijibot-vitest", String(process.pid)].join("-"));
+    return path.join(os.tmpdir(), ["allbot-vitest", String(process.pid)].join("-"));
   }
-  return path.join(os.homedir(), ".kaijibot");
+  return path.join(os.homedir(), ".allbot");
 }
 
 function resolveNamespaceFilePath(namespace: string): string {

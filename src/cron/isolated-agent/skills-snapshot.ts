@@ -1,7 +1,7 @@
 import { canExecRequestNode } from "../../agents/exec-defaults.js";
 import type { SkillSnapshot } from "../../agents/skills.js";
 import { matchesSkillFilter } from "../../agents/skills/filter.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   buildWorkspaceSkillSnapshot,
   getRemoteSkillEligibility,
@@ -11,7 +11,7 @@ import {
 
 export function resolveCronSkillsSnapshot(params: {
   workspaceDir: string;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   agentId: string;
   existingSnapshot?: SkillSnapshot;
   isFastTestEnv: boolean;

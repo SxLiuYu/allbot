@@ -1,5 +1,5 @@
 import { normalizeOptionalString } from "../shared/string-coerce.js";
-import { discoverKaijiBotPlugins } from "./discovery.js";
+import { discoverAllBotPlugins } from "./discovery.js";
 import { loadPluginManifest } from "./manifest.js";
 
 export type BundledPluginSource = {
@@ -36,7 +36,7 @@ export function resolveBundledPluginSources(params: {
   /** Use an explicit env when bundled roots should resolve independently from process.env. */
   env?: NodeJS.ProcessEnv;
 }): Map<string, BundledPluginSource> {
-  const discovery = discoverKaijiBotPlugins({
+  const discovery = discoverAllBotPlugins({
     workspaceDir: params.workspaceDir,
     env: params.env,
   });
@@ -100,5 +100,5 @@ export function resolveBundledPluginInstallCommandHint(params: {
   if (!bundledSource?.localPath) {
     return null;
   }
-  return `kaijibot plugins install ${bundledSource.localPath}`;
+  return `allbot plugins install ${bundledSource.localPath}`;
 }

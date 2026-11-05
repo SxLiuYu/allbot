@@ -164,9 +164,9 @@ describe("redactSensitiveText config fast path", () => {
 
   it("honors logging.redactSensitive=off read from the raw config file", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "redact-fast-"));
-    const configPath = path.join(dir, "kaijibot.json");
+    const configPath = path.join(dir, "allbot.json");
     await fsp.writeFile(configPath, JSON.stringify({ logging: { redactSensitive: "off" } }));
-    vi.stubEnv("KAIJIBOT_CONFIG_PATH", configPath);
+    vi.stubEnv("ALLBOT_CONFIG_PATH", configPath);
     const input = "OPENAI_API_KEY=sk-1234567890abcdef";
     expect(redactSensitiveText(input)).toBe(input);
     await fsp.rm(dir, { recursive: true, force: true });
@@ -174,12 +174,12 @@ describe("redactSensitiveText config fast path", () => {
 
   it("applies custom logging.redactPatterns from the raw config file", async () => {
     const dir = await mkdtemp(path.join(os.tmpdir(), "redact-fast-"));
-    const configPath = path.join(dir, "kaijibot.json");
+    const configPath = path.join(dir, "allbot.json");
     await fsp.writeFile(
       configPath,
       JSON.stringify({ logging: { redactPatterns: ["internal-[a-z]{4}-token"] } }),
     );
-    vi.stubEnv("KAIJIBOT_CONFIG_PATH", configPath);
+    vi.stubEnv("ALLBOT_CONFIG_PATH", configPath);
     const output = redactSensitiveText("leak internal-abcd-token now");
     expect(output).toBe("leak intern…oken now");
     await fsp.rm(dir, { recursive: true, force: true });

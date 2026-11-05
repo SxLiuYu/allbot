@@ -9,7 +9,7 @@ import {
 } from "../agents/model-selection.js";
 import { resolveModelAsync } from "../agents/pi-embedded-runner/model.js";
 import { prepareModelForSimpleCompletion } from "../agents/simple-completion-transport.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
@@ -88,7 +88,7 @@ type SummaryModelSelection = {
 };
 
 function resolveSummaryModelRef(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   config: ResolvedTtsConfig,
 ): SummaryModelSelection {
   const defaultRef = resolveDefaultModelForAgent({ cfg });
@@ -117,7 +117,7 @@ export async function summarizeText(
   params: {
     text: string;
     targetLength: number;
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     config: ResolvedTtsConfig;
     timeoutMs: number;
   },

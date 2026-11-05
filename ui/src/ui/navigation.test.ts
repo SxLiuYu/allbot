@@ -73,7 +73,7 @@ describe("normalizeBasePath", () => {
   });
 
   it("handles nested paths", () => {
-    expect(normalizeBasePath("/apps/kaijibot")).toBe("/apps/kaijibot");
+    expect(normalizeBasePath("/apps/allbot")).toBe("/apps/allbot");
   });
 });
 
@@ -100,7 +100,7 @@ describe("pathForTab", () => {
 
   it("prepends base path", () => {
     expect(pathForTab("chat", "/ui")).toBe("/ui/chat");
-    expect(pathForTab("agents", "/apps/kaijibot")).toBe("/apps/kaijibot/agents");
+    expect(pathForTab("agents", "/apps/allbot")).toBe("/apps/allbot/agents");
   });
 });
 
@@ -118,7 +118,7 @@ describe("tabFromPath", () => {
 
   it("handles base paths", () => {
     expect(tabFromPath("/ui/chat", "/ui")).toBe("chat");
-    expect(tabFromPath("/apps/kaijibot/agents", "/apps/kaijibot")).toBe("agents");
+    expect(tabFromPath("/apps/allbot/agents", "/apps/allbot")).toBe("agents");
   });
 
   it("returns null for unknown path", () => {
@@ -143,7 +143,7 @@ describe("inferBasePathFromPathname", () => {
 
   it("infers base path from nested paths", () => {
     expect(inferBasePathFromPathname("/ui/chat")).toBe("/ui");
-    expect(inferBasePathFromPathname("/apps/kaijibot/agents")).toBe("/apps/kaijibot");
+    expect(inferBasePathFromPathname("/apps/allbot/agents")).toBe("/apps/allbot");
   });
 
   it("handles index.html suffix", () => {

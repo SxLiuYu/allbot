@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { isCognitiveEvolutionEnabled } from "./run.js";
 
 describe("isCognitiveEvolutionEnabled", () => {
@@ -8,7 +8,7 @@ describe("isCognitiveEvolutionEnabled", () => {
   });
 
   it("stays enabled when cognitive.evolution.enabled is undefined", () => {
-    expect(isCognitiveEvolutionEnabled({ cognitive: { evolution: {} } } as KaijiBotConfig)).toBe(
+    expect(isCognitiveEvolutionEnabled({ cognitive: { evolution: {} } } as AllBotConfig)).toBe(
       true,
     );
   });
@@ -17,7 +17,7 @@ describe("isCognitiveEvolutionEnabled", () => {
     expect(
       isCognitiveEvolutionEnabled({
         cognitive: { evolution: { enabled: false } },
-      } as KaijiBotConfig),
+      } as AllBotConfig),
     ).toBe(false);
   });
 });

@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resetLogger, setLoggerOverride } from "../logging/logger.js";
 
 type PiSdkModule = typeof import("./pi-model-discovery.js");
@@ -59,10 +59,10 @@ function mockSingleOpenAiCatalogModel() {
 describe("loadModelCatalog", () => {
   beforeAll(async () => {
     vi.doMock("./models-config.js", () => ({
-      ensureKaijiBotModelsJson: vi.fn().mockResolvedValue({ agentDir: "/tmp", wrote: false }),
+      ensureAllBotModelsJson: vi.fn().mockResolvedValue({ agentDir: "/tmp", wrote: false }),
     }));
     vi.doMock("./agent-paths.js", () => ({
-      resolveKaijiBotAgentDir: () => "/tmp/kaijibot",
+      resolveAllBotAgentDir: () => "/tmp/allbot",
     }));
     vi.doMock("../plugins/provider-runtime.runtime.js", () => ({
       augmentModelCatalogWithProviderPlugins: vi.fn().mockResolvedValue([]),
@@ -100,7 +100,7 @@ describe("loadModelCatalog", () => {
     try {
       const getCallCount = mockCatalogImportFailThenRecover();
 
-      const cfg = {} as KaijiBotConfig;
+      const cfg = {} as AllBotConfig;
       const first = await loadModelCatalog({ config: cfg });
       expect(first).toEqual([]);
 
@@ -138,7 +138,7 @@ describe("loadModelCatalog", () => {
           }) as unknown as PiSdkModule,
       );
 
-      const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+      const result = await loadModelCatalog({ config: {} as AllBotConfig });
       expect(result).toEqual([{ id: "gpt-4.1", name: "GPT-4.1", provider: "openai" }]);
     } finally {
       setLoggerOverride(null);
@@ -163,7 +163,7 @@ describe("loadModelCatalog", () => {
       },
     ]);
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
     expect(result).not.toContainEqual(
       expect.objectContaining({
         provider: "openai-codex",
@@ -207,7 +207,7 @@ describe("loadModelCatalog", () => {
       },
     ]);
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
     expect(result).not.toContainEqual(
       expect.objectContaining({
         provider: "openai",
@@ -272,7 +272,7 @@ describe("loadModelCatalog", () => {
       },
     ]);
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
 
     expect(
       result.some((entry) => entry.provider === "openai" && entry.id.startsWith("gpt-5.4")),
@@ -302,7 +302,7 @@ describe("loadModelCatalog", () => {
       },
     ]);
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
 
     expect(result).toContainEqual(
       expect.objectContaining({
@@ -331,7 +331,7 @@ describe("loadModelCatalog", () => {
       },
     ]);
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
 
     expect(result).toContainEqual(
       expect.objectContaining({ provider: "ollama", id: "llama3.2", name: "Llama 3.2" }),
@@ -344,7 +344,7 @@ describe("loadModelCatalog", () => {
   it("does not add unrelated models when provider plugins return nothing", async () => {
     mockSingleOpenAiCatalogModel();
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
 
     expect(
       result.some((entry) => entry.provider === "qianfan" && entry.id === "deepseek-v3.2"),
@@ -370,7 +370,7 @@ describe("loadModelCatalog", () => {
       },
     ]);
 
-    const result = await loadModelCatalog({ config: {} as KaijiBotConfig });
+    const result = await loadModelCatalog({ config: {} as AllBotConfig });
 
     const matches = result.filter(
       (entry) => entry.provider === "kilocode" && entry.id === "kilo/auto",

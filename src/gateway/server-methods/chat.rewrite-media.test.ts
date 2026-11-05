@@ -31,7 +31,7 @@ describe("matchesChatSendUserTurnForMediaRewrite", () => {
     const persisted = [
       "[Wed 2026-10-28 14:22 UTC] Sender (untrusted metadata):",
       "```json",
-      '{"displayName": "Kaiji"}',
+      '{"displayName": "AllBot"}',
       "```",
       "hello",
     ].join("\n");

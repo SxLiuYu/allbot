@@ -9,7 +9,7 @@ import {
 } from "./bundled-compat.js";
 import { resolveBundledPluginRepoEntryPath } from "./bundled-plugin-metadata.js";
 import { createCapturedPluginRegistration } from "./captured-registration.js";
-import { discoverKaijiBotPlugins } from "./discovery.js";
+import { discoverAllBotPlugins } from "./discovery.js";
 import type { PluginLoadOptions } from "./loader.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
 import { createEmptyPluginRegistry } from "./registry-empty.js";
@@ -20,7 +20,7 @@ import {
   shouldPreferNativeJiti,
   type PluginSdkResolutionPreference,
 } from "./sdk-alias.js";
-import type { KaijiBotPluginDefinition, KaijiBotPluginModule } from "./types.js";
+import type { AllBotPluginDefinition, AllBotPluginModule } from "./types.js";
 
 const log = createSubsystemLogger("plugins");
 
@@ -34,8 +34,8 @@ function applyVitestCapabilityAliasOverrides(params: {
   }
 
   const {
-    ["kaijibot/plugin-sdk"]: _ignoredLegacyRootAlias,
-    ["@kaijibot/plugin-sdk"]: _ignoredScopedRootAlias,
+    ["allbot/plugin-sdk"]: _ignoredLegacyRootAlias,
+    ["@allbot/plugin-sdk"]: _ignoredScopedRootAlias,
     ...scopedAliasMap
   } = params.aliasMap;
   return {
@@ -43,34 +43,34 @@ function applyVitestCapabilityAliasOverrides(params: {
     // Capability contract loads only need a narrow SDK slice. Keep those
     // helpers on a tiny source graph so Vitest does not pull the dist chunk
     // bundle that also drags Matrix/WhatsApp code into these tests.
-    "kaijibot/plugin-sdk/llm-task": fileURLToPath(
+    "allbot/plugin-sdk/llm-task": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/llm-task.ts", import.meta.url),
     ),
-    "@kaijibot/plugin-sdk/llm-task": fileURLToPath(
+    "@allbot/plugin-sdk/llm-task": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/llm-task.ts", import.meta.url),
     ),
-    "kaijibot/plugin-sdk/config-runtime": fileURLToPath(
+    "allbot/plugin-sdk/config-runtime": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/config-runtime.ts", import.meta.url),
     ),
-    "@kaijibot/plugin-sdk/config-runtime": fileURLToPath(
+    "@allbot/plugin-sdk/config-runtime": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/config-runtime.ts", import.meta.url),
     ),
-    "kaijibot/plugin-sdk/media-runtime": fileURLToPath(
+    "allbot/plugin-sdk/media-runtime": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/media-runtime.ts", import.meta.url),
     ),
-    "@kaijibot/plugin-sdk/media-runtime": fileURLToPath(
+    "@allbot/plugin-sdk/media-runtime": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/media-runtime.ts", import.meta.url),
     ),
-    "kaijibot/plugin-sdk/provider-onboard": fileURLToPath(
+    "allbot/plugin-sdk/provider-onboard": fileURLToPath(
       new URL("../plugin-sdk/provider-onboard.ts", import.meta.url),
     ),
-    "@kaijibot/plugin-sdk/provider-onboard": fileURLToPath(
+    "@allbot/plugin-sdk/provider-onboard": fileURLToPath(
       new URL("../plugin-sdk/provider-onboard.ts", import.meta.url),
     ),
-    "kaijibot/plugin-sdk/speech-core": fileURLToPath(
+    "allbot/plugin-sdk/speech-core": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/speech-core.ts", import.meta.url),
     ),
-    "@kaijibot/plugin-sdk/speech-core": fileURLToPath(
+    "@allbot/plugin-sdk/speech-core": fileURLToPath(
       new URL("./capability-runtime-vitest-shims/speech-core.ts", import.meta.url),
     ),
   };
@@ -92,8 +92,8 @@ export function buildBundledCapabilityRuntimeConfig(
 }
 
 function resolvePluginModuleExport(moduleExport: unknown): {
-  definition?: KaijiBotPluginDefinition;
-  register?: KaijiBotPluginDefinition["register"];
+  definition?: AllBotPluginDefinition;
+  register?: AllBotPluginDefinition["register"];
 } {
   const resolved =
     moduleExport &&
@@ -103,11 +103,11 @@ function resolvePluginModuleExport(moduleExport: unknown): {
       : moduleExport;
   if (typeof resolved === "function") {
     return {
-      register: resolved as KaijiBotPluginDefinition["register"],
+      register: resolved as AllBotPluginDefinition["register"],
     };
   }
   if (resolved && typeof resolved === "object") {
-    const definition = resolved as KaijiBotPluginDefinition;
+    const definition = resolved as AllBotPluginDefinition;
     return {
       definition,
       register: definition.register ?? definition.activate,
@@ -217,7 +217,7 @@ export function loadBundledCapabilityRuntimeRegistry(params: {
     return loader;
   };
 
-  const discovery = discoverKaijiBotPlugins({
+  const discovery = discoverAllBotPlugins({
     cache: false,
     env,
   });
@@ -282,9 +282,9 @@ export function loadBundledCapabilityRuntimeRegistry(params: {
     const safeSource = opened.path;
     fs.closeSync(opened.fd);
 
-    let mod: KaijiBotPluginModule | null = null;
+    let mod: AllBotPluginModule | null = null;
     try {
-      mod = getJiti(safeSource)(safeSource) as KaijiBotPluginModule;
+      mod = getJiti(safeSource)(safeSource) as AllBotPluginModule;
     } catch (error) {
       recordCapabilityLoadError(registry, record, String(error));
       continue;

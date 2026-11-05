@@ -1,7 +1,7 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/config-runtime";
-import { resolveEnvApiKey } from "kaijibot/plugin-sdk/provider-auth-runtime";
-import { resolveAgentModelPrimaryValue } from "kaijibot/plugin-sdk/provider-onboard";
-import { captureEnv } from "kaijibot/plugin-sdk/testing";
+import type { AllBotConfig } from "allbot/plugin-sdk/config-runtime";
+import { resolveEnvApiKey } from "allbot/plugin-sdk/provider-auth-runtime";
+import { resolveAgentModelPrimaryValue } from "allbot/plugin-sdk/provider-onboard";
+import { captureEnv } from "allbot/plugin-sdk/testing";
 import { describe, expect, it } from "vitest";
 import {
   buildKilocodeModelDefinition,
@@ -17,7 +17,7 @@ import {
   KILOCODE_DEFAULT_MODEL_REF,
 } from "./onboard.js";
 
-const emptyCfg: KaijiBotConfig = {};
+const emptyCfg: AllBotConfig = {};
 const KILOCODE_MODEL_IDS = ["kilo/auto"];
 
 describe("Kilo Gateway provider config", () => {
@@ -101,7 +101,7 @@ describe("Kilo Gateway provider config", () => {
     });
 
     it("preserves existing alias if already set", () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           defaults: {
             models: {
@@ -116,7 +116,7 @@ describe("Kilo Gateway provider config", () => {
     });
 
     it("does not change the default model selection", () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         agents: {
           defaults: {
             model: { primary: "openai/gpt-5" },

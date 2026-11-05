@@ -35,7 +35,7 @@ export const CORE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
 export function formatStaticAuthChoiceChoicesForCli(params?: {
   includeSkip?: boolean;
   includeLegacyAliases?: boolean;
-  config?: import("../config/config.js").KaijiBotConfig;
+  config?: import("../config/config.js").AllBotConfig;
   workspaceDir?: string;
   env?: NodeJS.ProcessEnv;
 }): string {

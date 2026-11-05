@@ -9,8 +9,8 @@ export function createSandboxBrowserConfig(
 ): SandboxBrowserConfig {
   return {
     enabled: false,
-    image: "kaijibot-browser",
-    containerPrefix: "kaijibot-browser-",
+    image: "allbot-browser",
+    containerPrefix: "allbot-browser-",
     network: "bridge",
     cdpPort: 9222,
     vncPort: 5900,

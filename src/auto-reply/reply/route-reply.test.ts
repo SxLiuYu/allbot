@@ -4,7 +4,7 @@ import type {
   ChannelPlugin,
   ChannelThreadingAdapter,
 } from "../../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import {
   createChannelTestPluginBase,
@@ -230,8 +230,8 @@ describe("routeReply", () => {
 
   it("applies responsePrefix when routing", async () => {
     const cfg = {
-      messages: { responsePrefix: "[kaijibot]" },
-    } as unknown as KaijiBotConfig;
+      messages: { responsePrefix: "[allbot]" },
+    } as unknown as AllBotConfig;
     await routeReply({
       payload: { text: "hi" },
       channel: "slack",
@@ -239,7 +239,7 @@ describe("routeReply", () => {
       cfg,
     });
     expectLastDelivery({
-      payloads: [expect.objectContaining({ text: "[kaijibot] hi" })],
+      payloads: [expect.objectContaining({ text: "[allbot] hi" })],
     });
   });
 
@@ -250,7 +250,7 @@ describe("routeReply", () => {
           capabilities: { interactiveReplies: true },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     await routeReply({
       payload: { text: "[[slack_select: Choose one | Alpha:alpha]]" },
       channel: "slack",
@@ -288,7 +288,7 @@ describe("routeReply", () => {
         ],
       },
       messages: {},
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     await routeReply({
       payload: { text: "hi" },
       channel: "slack",
@@ -435,7 +435,7 @@ describe("routeReply", () => {
             baseUrl: "https://chat.example.com",
           },
         },
-      } as unknown as KaijiBotConfig,
+      } as unknown as AllBotConfig,
     });
     expectLastDelivery({
       channel: "mattermost",
@@ -485,7 +485,7 @@ describe("routeReply", () => {
           enabled: true,
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     await routeReply({
       payload: { text: "hi" },
       channel: "msteams",

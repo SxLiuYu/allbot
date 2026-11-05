@@ -17,7 +17,7 @@ import {
 const tempDirs: string[] = [];
 
 function makeTempDir() {
-  return makeTrackedTempDir("kaijibot-bundle-manifest", tempDirs);
+  return makeTrackedTempDir("allbot-bundle-manifest", tempDirs);
 }
 
 const mkdirSafe = mkdirSafeDir;

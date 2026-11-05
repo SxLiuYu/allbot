@@ -1,5 +1,5 @@
 // Manual facade. Keep loader boundary explicit.
-type FacadeModule = typeof import("@kaijibot/speech-core/runtime-api.js");
+type FacadeModule = typeof import("@allbot/speech-core/runtime-api.js");
 import {
   createLazyFacadeObjectValue,
   loadActivatedBundledPluginPublicSurfaceModuleSync,
@@ -61,16 +61,16 @@ export const textToSpeech: FacadeModule["textToSpeech"] = createLazyFacadeValue(
 export const textToSpeechTelephony: FacadeModule["textToSpeechTelephony"] =
   createLazyFacadeValue("textToSpeechTelephony");
 
-export type ResolvedTtsConfig = import("@kaijibot/speech-core/runtime-api.js").ResolvedTtsConfig;
+export type ResolvedTtsConfig = import("@allbot/speech-core/runtime-api.js").ResolvedTtsConfig;
 export type ResolvedTtsModelOverrides =
-  import("@kaijibot/speech-core/runtime-api.js").ResolvedTtsModelOverrides;
+  import("@allbot/speech-core/runtime-api.js").ResolvedTtsModelOverrides;
 export type TtsDirectiveOverrides =
-  import("@kaijibot/speech-core/runtime-api.js").TtsDirectiveOverrides;
+  import("@allbot/speech-core/runtime-api.js").TtsDirectiveOverrides;
 export type TtsDirectiveParseResult =
-  import("@kaijibot/speech-core/runtime-api.js").TtsDirectiveParseResult;
-export type TtsResult = import("@kaijibot/speech-core/runtime-api.js").TtsResult;
-export type TtsSynthesisResult = import("@kaijibot/speech-core/runtime-api.js").TtsSynthesisResult;
-export type TtsTelephonyResult = import("@kaijibot/speech-core/runtime-api.js").TtsTelephonyResult;
+  import("@allbot/speech-core/runtime-api.js").TtsDirectiveParseResult;
+export type TtsResult = import("@allbot/speech-core/runtime-api.js").TtsResult;
+export type TtsSynthesisResult = import("@allbot/speech-core/runtime-api.js").TtsSynthesisResult;
+export type TtsTelephonyResult = import("@allbot/speech-core/runtime-api.js").TtsTelephonyResult;
 
 function createLazyFacadeValue<K extends keyof FacadeModule>(key: K): FacadeModule[K] {
   return ((...args: unknown[]) => {

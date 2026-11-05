@@ -8,7 +8,7 @@ export type VoiceWakeConfig = {
   updatedAtMs: number;
 };
 
-const DEFAULT_TRIGGERS = ["kaijibot", "claude", "computer"];
+const DEFAULT_TRIGGERS = ["allbot", "claude", "computer"];
 
 function resolvePath(baseDir?: string) {
   const root = baseDir ?? resolveStateDir();

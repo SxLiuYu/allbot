@@ -9,7 +9,7 @@ title: "DuckDuckGo Search"
 
 # DuckDuckGo Search
 
-KaijiBot supports DuckDuckGo as a **key-free** `web_search` provider. No API
+AllBot supports DuckDuckGo as a **key-free** `web_search` provider. No API
 key or account is required.
 
 <Warning>
@@ -25,7 +25,7 @@ No API key needed — just set DuckDuckGo as your provider:
 <Steps>
   <Step title="Configure">
     ```bash
-    kaijibot configure --section web
+    allbot configure --section web
     # Select "duckduckgo" as the provider
     ```
   </Step>

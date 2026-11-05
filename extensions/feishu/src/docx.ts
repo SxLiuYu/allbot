@@ -3,10 +3,10 @@ import { homedir } from "node:os";
 import { isAbsolute, resolve } from "node:path";
 import { basename } from "node:path";
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import { formatErrorMessage } from "kaijibot/plugin-sdk/error-runtime";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { Type } from "typebox";
-import type { KaijiBotPluginApi } from "../runtime-api.js";
+import type { AllBotPluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { FeishuDocSchema, type FeishuDocParams } from "./doc-schema.js";
 import { BATCH_SIZE, insertBlocksInBatches } from "./docx-batch-insert.js";
@@ -1395,7 +1395,7 @@ async function listAppScopes(client: Lark.Client) {
 
 // ============ Tool Registration ============
 
-export function registerFeishuDocTools(api: KaijiBotPluginApi) {
+export function registerFeishuDocTools(api: AllBotPluginApi) {
   if (!api.config) {
     api.logger.debug?.("feishu_doc: No config available, skipping doc tools");
     return;

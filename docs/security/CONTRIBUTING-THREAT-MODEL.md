@@ -1,25 +1,25 @@
 ---
 title: "Contributing to the Threat Model"
-summary: "How to contribute to the KaijiBot threat model"
+summary: "How to contribute to the AllBot threat model"
 read_when:
   - You want to contribute security findings or threat scenarios
   - Reviewing or updating the threat model
 ---
 
-# Contributing to the KaijiBot Threat Model
+# Contributing to the AllBot Threat Model
 
-Thanks for helping make KaijiBot more secure. This threat model is a living document and we welcome contributions from anyone - you don't need to be a security expert.
+Thanks for helping make AllBot more secure. This threat model is a living document and we welcome contributions from anyone - you don't need to be a security expert.
 
 ## Ways to Contribute
 
 ### Add a Threat
 
-Spotted an attack vector or risk we haven't covered? Open an issue on [kaijibot/trust](https://github.com/kaijibot/trust/issues) and describe it in your own words. You don't need to know any frameworks or fill in every field - just describe the scenario.
+Spotted an attack vector or risk we haven't covered? Open an issue on [allbot/trust](https://github.com/allbot/trust/issues) and describe it in your own words. You don't need to know any frameworks or fill in every field - just describe the scenario.
 
 **Helpful to include (but not required):**
 
 - The attack scenario and how it could be exploited
-- Which parts of KaijiBot are affected (CLI, gateway, channels, ClawHub, MCP servers, etc.)
+- Which parts of AllBot are affected (CLI, gateway, channels, ClawHub, MCP servers, etc.)
 - How severe you think it is (low / medium / high / critical)
 - Any links to related research, CVEs, or real-world examples
 
@@ -85,14 +85,14 @@ If you're unsure about the risk level, just describe the impact and we'll assess
 - [ATLAS Website](https://atlas.mitre.org/)
 - [ATLAS Techniques](https://atlas.mitre.org/techniques/)
 - [ATLAS Case Studies](https://atlas.mitre.org/studies/)
-- [KaijiBot Threat Model](/security/THREAT-MODEL-ATLAS)
+- [AllBot Threat Model](/security/THREAT-MODEL-ATLAS)
 
 ## Contact
 
 - **Security vulnerabilities:** Please open a private security advisory on GitHub or contact the maintainers directly
-- **Threat model questions:** Open an issue on [kaijibot/trust](https://github.com/kaijibot/trust/issues)
+- **Threat model questions:** Open an issue on [allbot/trust](https://github.com/allbot/trust/issues)
 - **General chat:** Discord #security channel
 
 ## Recognition
 
-Contributors to the threat model are recognized in the threat model acknowledgments, release notes, and the KaijiBot security hall of fame for significant contributions.
+Contributors to the threat model are recognized in the threat model acknowledgments, release notes, and the AllBot security hall of fame for significant contributions.

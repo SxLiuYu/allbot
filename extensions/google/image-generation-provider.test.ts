@@ -1,5 +1,5 @@
-import * as providerAuthRuntime from "kaijibot/plugin-sdk/provider-auth-runtime";
-import * as providerHttp from "kaijibot/plugin-sdk/provider-http";
+import * as providerAuthRuntime from "allbot/plugin-sdk/provider-auth-runtime";
+import * as providerHttp from "allbot/plugin-sdk/provider-http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildGoogleImageGenerationProvider } from "./image-generation-provider.js";
 import { __testing as geminiWebSearchTesting } from "./src/gemini-web-search-provider.js";

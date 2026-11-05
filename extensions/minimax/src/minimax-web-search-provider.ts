@@ -22,8 +22,8 @@ import {
   type SearchConfigRecord,
   type WebSearchProviderPlugin,
   type WebSearchProviderToolDefinition,
-} from "kaijibot/plugin-sdk/provider-web-search";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-web-search";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { Type } from "typebox";
 
 const MINIMAX_SEARCH_ENDPOINT_GLOBAL = "https://api.minimax.io/v1/coding_plan/search";
@@ -192,7 +192,7 @@ const MiniMaxSearchSchema = Type.Object({
 function missingMiniMaxKeyPayload() {
   return {
     error: "missing_minimax_api_key",
-    message: `web_search (minimax) needs a MiniMax Coding Plan key. Run \`${formatCliCommand("kaijibot configure --section web")}\` to store it, or set MINIMAX_CODE_PLAN_KEY, MINIMAX_CODING_API_KEY, or MINIMAX_API_KEY in the Gateway environment.`,
+    message: `web_search (minimax) needs a MiniMax Coding Plan key. Run \`${formatCliCommand("allbot configure --section web")}\` to store it, or set MINIMAX_CODE_PLAN_KEY, MINIMAX_CODING_API_KEY, or MINIMAX_API_KEY in the Gateway environment.`,
     docs: "https://gitee.com/kaiji1126/kaijibot/blob/main/docs/tools/web.md",
   };
 }

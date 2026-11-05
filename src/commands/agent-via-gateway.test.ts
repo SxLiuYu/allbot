@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { agentCliCommand as AgentCliCommand } from "./agent-via-gateway.js";
 import type { agentCommand as AgentCommand } from "./agent.js";
@@ -19,7 +19,7 @@ const runtime: RuntimeEnv = {
   exit: vi.fn(),
 };
 
-function mockConfig(storePath: string, overrides?: Partial<KaijiBotConfig>) {
+function mockConfig(storePath: string, overrides?: Partial<AllBotConfig>) {
   loadConfig.mockReturnValue({
     agents: {
       defaults: {
@@ -38,9 +38,9 @@ function mockConfig(storePath: string, overrides?: Partial<KaijiBotConfig>) {
 
 async function withTempStore(
   fn: (ctx: { dir: string; store: string }) => Promise<void>,
-  overrides?: Partial<KaijiBotConfig>,
+  overrides?: Partial<AllBotConfig>,
 ) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-agent-cli-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-agent-cli-"));
   const store = path.join(dir, "sessions.json");
   mockConfig(store, overrides);
   try {

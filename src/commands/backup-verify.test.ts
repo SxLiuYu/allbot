@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { buildBackupArchiveRoot } from "./backup-shared.js";
 import { backupVerifyCommand } from "./backup-verify.js";
 
-const TEST_ARCHIVE_ROOT = "2026-03-09T00-00-00.000Z-kaijibot-backup";
+const TEST_ARCHIVE_ROOT = "2026-03-09T00-00-00.000Z-allbot-backup";
 
 const createBackupVerifyRuntime = () => ({
   log: vi.fn(),
@@ -25,7 +25,7 @@ function createBackupManifest(assetArchivePath: string, archiveRoot = TEST_ARCHI
     assets: [
       {
         kind: "state",
-        sourcePath: "/tmp/.kaijibot",
+        sourcePath: "/tmp/.allbot",
         archivePath: assetArchivePath,
       },
     ],
@@ -98,7 +98,7 @@ describe("backupVerifyCommand", () => {
   });
 
   it("verifies a valid backup archive", async () => {
-    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-verify-out-"));
+    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-verify-out-"));
     try {
       const runtime = createBackupVerifyRuntime();
       const nowMs = Date.UTC(2026, 2, 9, 0, 0, 0);
@@ -106,7 +106,7 @@ describe("backupVerifyCommand", () => {
       const archivePath = path.join(archiveDir, "backup.tar.gz");
       const manifestPath = path.join(archiveDir, "manifest.json");
       const payloadPath = path.join(archiveDir, "state.txt");
-      const payloadArchivePath = `${archiveRoot}/payload/posix/tmp/.kaijibot/state.txt`;
+      const payloadArchivePath = `${archiveRoot}/payload/posix/tmp/.allbot/state.txt`;
       await fs.writeFile(
         manifestPath,
         `${JSON.stringify(createBackupManifest(payloadArchivePath, archiveRoot), null, 2)}\n`,
@@ -142,7 +142,7 @@ describe("backupVerifyCommand", () => {
   });
 
   it("fails when the archive does not contain a manifest", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-no-manifest-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-no-manifest-"));
     const archivePath = path.join(tempDir, "broken.tar.gz");
     try {
       const root = path.join(tempDir, "root");
@@ -160,10 +160,10 @@ describe("backupVerifyCommand", () => {
   });
 
   it("fails when the manifest references a missing asset payload", async () => {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-missing-asset-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-missing-asset-"));
     const archivePath = path.join(tempDir, "broken.tar.gz");
     try {
-      const rootName = "2026-03-09T00-00-00.000Z-kaijibot-backup";
+      const rootName = "2026-03-09T00-00-00.000Z-allbot-backup";
       const root = path.join(tempDir, rootName);
       await fs.mkdir(root, { recursive: true });
       const manifest = {
@@ -176,8 +176,8 @@ describe("backupVerifyCommand", () => {
         assets: [
           {
             kind: "state",
-            sourcePath: "/tmp/.kaijibot",
-            archivePath: `${rootName}/payload/posix/tmp/.kaijibot`,
+            sourcePath: "/tmp/.allbot",
+            archivePath: `${rootName}/payload/posix/tmp/.allbot`,
           },
         ],
       };
@@ -200,7 +200,7 @@ describe("backupVerifyCommand", () => {
     const traversalPath = `${TEST_ARCHIVE_ROOT}/payload/../escaped.txt`;
     await withBrokenArchiveFixture(
       {
-        tempPrefix: "kaijibot-backup-traversal-",
+        tempPrefix: "allbot-backup-traversal-",
         manifestAssetArchivePath: traversalPath,
         payloads: [{ fileName: "payload.txt", contents: "payload\n", archivePath: traversalPath }],
       },
@@ -217,7 +217,7 @@ describe("backupVerifyCommand", () => {
     const invalidPath = `${TEST_ARCHIVE_ROOT}/payload\\..\\escaped.txt`;
     await withBrokenArchiveFixture(
       {
-        tempPrefix: "kaijibot-backup-backslash-",
+        tempPrefix: "allbot-backup-backslash-",
         manifestAssetArchivePath: invalidPath,
         payloads: [{ fileName: "payload.txt", contents: "payload\n", archivePath: invalidPath }],
       },
@@ -231,7 +231,7 @@ describe("backupVerifyCommand", () => {
   });
 
   it("ignores payload manifest.json files when locating the backup manifest", async () => {
-    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-backup-verify-out-"));
+    const archiveDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-backup-verify-out-"));
     try {
       const runtime = createBackupVerifyRuntime();
       const nowMs = Date.UTC(2026, 2, 9, 2, 0, 0);
@@ -240,7 +240,7 @@ describe("backupVerifyCommand", () => {
       const manifestPath = path.join(archiveDir, "manifest.json");
       const statePayloadPath = path.join(archiveDir, "state.txt");
       const workspaceManifestPayloadPath = path.join(archiveDir, "workspace-manifest.json");
-      const stateArchivePath = `${archiveRoot}/payload/posix/tmp/.kaijibot/state.txt`;
+      const stateArchivePath = `${archiveRoot}/payload/posix/tmp/.allbot/state.txt`;
       const workspaceArchivePath = `${archiveRoot}/payload/posix/tmp/workspace/manifest.json`;
       await fs.writeFile(
         manifestPath,
@@ -250,7 +250,7 @@ describe("backupVerifyCommand", () => {
             assets: [
               {
                 kind: "state",
-                sourcePath: "/tmp/.kaijibot",
+                sourcePath: "/tmp/.allbot",
                 archivePath: stateArchivePath,
               },
               {
@@ -303,10 +303,10 @@ describe("backupVerifyCommand", () => {
   });
 
   it("fails when the archive contains duplicate root manifest entries", async () => {
-    const payloadArchivePath = `${TEST_ARCHIVE_ROOT}/payload/posix/tmp/.kaijibot/payload.txt`;
+    const payloadArchivePath = `${TEST_ARCHIVE_ROOT}/payload/posix/tmp/.allbot/payload.txt`;
     await withBrokenArchiveFixture(
       {
-        tempPrefix: "kaijibot-backup-duplicate-manifest-",
+        tempPrefix: "allbot-backup-duplicate-manifest-",
         manifestAssetArchivePath: payloadArchivePath,
         payloads: [{ fileName: "payload.txt", contents: "payload\n" }],
         buildTarEntries: ({ manifestPath, payloadPaths }) => [
@@ -325,10 +325,10 @@ describe("backupVerifyCommand", () => {
   });
 
   it("fails when the archive contains duplicate payload entries", async () => {
-    const payloadArchivePath = `${TEST_ARCHIVE_ROOT}/payload/posix/tmp/.kaijibot/payload.txt`;
+    const payloadArchivePath = `${TEST_ARCHIVE_ROOT}/payload/posix/tmp/.allbot/payload.txt`;
     await withBrokenArchiveFixture(
       {
-        tempPrefix: "kaijibot-backup-duplicate-payload-",
+        tempPrefix: "allbot-backup-duplicate-payload-",
         manifestAssetArchivePath: payloadArchivePath,
         payloads: [
           { fileName: "payload-a.txt", contents: "payload-a\n", archivePath: payloadArchivePath },

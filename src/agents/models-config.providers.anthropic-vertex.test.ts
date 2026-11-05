@@ -5,12 +5,12 @@ import { describe, expect, it } from "vitest";
 import { resolveImplicitProvidersForTest } from "./models-config.e2e-harness.js";
 
 const ANTHROPIC_VERTEX_DISCOVERY_ENV = {
-  KAIJIBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "anthropic",
+  ALLBOT_TEST_ONLY_PROVIDER_PLUGIN_IDS: "anthropic",
 } satisfies NodeJS.ProcessEnv;
 
 describe("anthropic-vertex implicit provider", () => {
   it("does not auto-enable from GOOGLE_CLOUD_PROJECT_ID alone", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
     const providers = await resolveImplicitProvidersForTest({
       agentDir,
       env: {
@@ -22,8 +22,8 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("accepts ADC credentials when the file includes a project_id", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
-    const adcDir = mkdtempSync(join(tmpdir(), "kaijibot-adc-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
+    const adcDir = mkdtempSync(join(tmpdir(), "allbot-adc-"));
     const credentialsPath = join(adcDir, "application_default_credentials.json");
     writeFileSync(credentialsPath, JSON.stringify({ project_id: "vertex-project" }), "utf8");
 
@@ -49,8 +49,8 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("accepts ADC credentials when the file only includes a quota_project_id", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
-    const adcDir = mkdtempSync(join(tmpdir(), "kaijibot-adc-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
+    const adcDir = mkdtempSync(join(tmpdir(), "allbot-adc-"));
     const credentialsPath = join(adcDir, "application_default_credentials.json");
     writeFileSync(credentialsPath, JSON.stringify({ quota_project_id: "vertex-quota" }), "utf8");
 
@@ -72,8 +72,8 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("accepts ADC credentials when project_id is resolved at runtime", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
-    const adcDir = mkdtempSync(join(tmpdir(), "kaijibot-adc-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
+    const adcDir = mkdtempSync(join(tmpdir(), "allbot-adc-"));
     const credentialsPath = join(adcDir, "application_default_credentials.json");
     writeFileSync(credentialsPath, "{}", "utf8");
 
@@ -95,8 +95,8 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("falls back to the default region when GOOGLE_CLOUD_LOCATION is invalid", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
-    const adcDir = mkdtempSync(join(tmpdir(), "kaijibot-adc-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
+    const adcDir = mkdtempSync(join(tmpdir(), "allbot-adc-"));
     const credentialsPath = join(adcDir, "application_default_credentials.json");
     writeFileSync(credentialsPath, JSON.stringify({ project_id: "vertex-project" }), "utf8");
 
@@ -116,8 +116,8 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("uses the Vertex global endpoint when GOOGLE_CLOUD_LOCATION=global", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
-    const adcDir = mkdtempSync(join(tmpdir(), "kaijibot-adc-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
+    const adcDir = mkdtempSync(join(tmpdir(), "allbot-adc-"));
     const credentialsPath = join(adcDir, "application_default_credentials.json");
     writeFileSync(credentialsPath, JSON.stringify({ project_id: "vertex-project" }), "utf8");
 
@@ -137,7 +137,7 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("accepts explicit metadata auth opt-in without local credential files", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
     const providers = await resolveImplicitProvidersForTest({
       agentDir,
       env: {
@@ -152,7 +152,7 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("merges the bundled catalog into explicit anthropic-vertex provider overrides", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
     const providers = await resolveImplicitProvidersForTest({
       agentDir,
       env: {
@@ -180,7 +180,7 @@ describe("anthropic-vertex implicit provider", () => {
   });
 
   it("does not accept generic Kubernetes env without a GCP ADC signal", async () => {
-    const agentDir = mkdtempSync(join(tmpdir(), "kaijibot-test-"));
+    const agentDir = mkdtempSync(join(tmpdir(), "allbot-test-"));
     const providers = await resolveImplicitProvidersForTest({
       agentDir,
       env: {

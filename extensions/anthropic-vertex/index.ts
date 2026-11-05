@@ -1,5 +1,5 @@
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { buildNativeAnthropicReplayPolicyForModel } from "kaijibot/plugin-sdk/provider-model-shared";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { buildNativeAnthropicReplayPolicyForModel } from "allbot/plugin-sdk/provider-model-shared";
 import {
   mergeImplicitAnthropicVertexProvider,
   resolveAnthropicVertexConfigApiKey,

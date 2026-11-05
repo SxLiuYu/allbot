@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 const note = vi.hoisted(() => vi.fn());
 
@@ -9,7 +9,7 @@ vi.mock("../terminal/note.js", () => ({
 
 import { noteOpenAIOAuthTlsPrerequisites } from "./oauth-tls-preflight.js";
 
-function buildOpenAICodexOAuthConfig(): KaijiBotConfig {
+function buildOpenAICodexOAuthConfig(): AllBotConfig {
   return {
     auth: {
       profiles: {

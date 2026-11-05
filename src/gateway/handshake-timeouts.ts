@@ -12,7 +12,7 @@ export function clampConnectChallengeTimeoutMs(timeoutMs: number): number {
 export function getConnectChallengeTimeoutMsFromEnv(
   env: NodeJS.ProcessEnv = process.env,
 ): number | undefined {
-  const raw = env.KAIJIBOT_CONNECT_CHALLENGE_TIMEOUT_MS;
+  const raw = env.ALLBOT_CONNECT_CHALLENGE_TIMEOUT_MS;
   if (raw) {
     const parsed = Number(raw);
     if (Number.isFinite(parsed) && parsed > 0) {
@@ -35,7 +35,7 @@ export function resolveConnectChallengeTimeoutMs(timeoutMs?: number | null): num
 
 export function getPreauthHandshakeTimeoutMsFromEnv(env: NodeJS.ProcessEnv = process.env): number {
   const configuredTimeout =
-    env.KAIJIBOT_HANDSHAKE_TIMEOUT_MS || (env.VITEST && env.KAIJIBOT_TEST_HANDSHAKE_TIMEOUT_MS);
+    env.ALLBOT_HANDSHAKE_TIMEOUT_MS || (env.VITEST && env.ALLBOT_TEST_HANDSHAKE_TIMEOUT_MS);
   if (configuredTimeout) {
     const parsed = Number(configuredTimeout);
     if (Number.isFinite(parsed) && parsed > 0) {

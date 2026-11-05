@@ -1,14 +1,14 @@
 import { describe, expect, it, test } from "vitest";
 import {
-  applyKaijiBotManifestInstallCommonFields,
+  applyAllBotManifestInstallCommonFields,
   getFrontmatterString,
   normalizeStringList,
   parseFrontmatterBool,
-  parseKaijiBotManifestInstallBase,
-  resolveKaijiBotManifestBlock,
-  resolveKaijiBotManifestInstall,
-  resolveKaijiBotManifestOs,
-  resolveKaijiBotManifestRequires,
+  parseAllBotManifestInstallBase,
+  resolveAllBotManifestBlock,
+  resolveAllBotManifestInstall,
+  resolveAllBotManifestOs,
+  resolveAllBotManifestRequires,
 } from "./frontmatter.js";
 
 describe("shared/frontmatter", () => {
@@ -30,62 +30,62 @@ describe("shared/frontmatter", () => {
     expect(parseFrontmatterBool("maybe", false)).toBe(false);
   });
 
-  test("resolveKaijiBotManifestBlock reads current manifest keys and custom metadata fields", () => {
+  test("resolveAllBotManifestBlock reads current manifest keys and custom metadata fields", () => {
     expect(
-      resolveKaijiBotManifestBlock({
+      resolveAllBotManifestBlock({
         frontmatter: {
-          metadata: "{ kaijibot: { foo: 1, bar: 'baz' } }",
+          metadata: "{ allbot: { foo: 1, bar: 'baz' } }",
         },
       }),
     ).toEqual({ foo: 1, bar: "baz" });
 
     expect(
-      resolveKaijiBotManifestBlock({
+      resolveAllBotManifestBlock({
         frontmatter: {
-          pluginMeta: "{ kaijibot: { foo: 2 } }",
+          pluginMeta: "{ allbot: { foo: 2 } }",
         },
         key: "pluginMeta",
       }),
     ).toEqual({ foo: 2 });
   });
 
-  test("resolveKaijiBotManifestBlock returns undefined for invalid input", () => {
-    expect(resolveKaijiBotManifestBlock({ frontmatter: {} })).toBeUndefined();
+  test("resolveAllBotManifestBlock returns undefined for invalid input", () => {
+    expect(resolveAllBotManifestBlock({ frontmatter: {} })).toBeUndefined();
     expect(
-      resolveKaijiBotManifestBlock({ frontmatter: { metadata: "not-json5" } }),
+      resolveAllBotManifestBlock({ frontmatter: { metadata: "not-json5" } }),
     ).toBeUndefined();
-    expect(resolveKaijiBotManifestBlock({ frontmatter: { metadata: "123" } })).toBeUndefined();
-    expect(resolveKaijiBotManifestBlock({ frontmatter: { metadata: "[]" } })).toBeUndefined();
+    expect(resolveAllBotManifestBlock({ frontmatter: { metadata: "123" } })).toBeUndefined();
+    expect(resolveAllBotManifestBlock({ frontmatter: { metadata: "[]" } })).toBeUndefined();
     expect(
-      resolveKaijiBotManifestBlock({ frontmatter: { metadata: "{ nope: { a: 1 } }" } }),
+      resolveAllBotManifestBlock({ frontmatter: { metadata: "{ nope: { a: 1 } }" } }),
     ).toBeUndefined();
   });
 
   it("normalizes manifest requirement and os lists", () => {
     expect(
-      resolveKaijiBotManifestRequires({
+      resolveAllBotManifestRequires({
         requires: {
           bins: "bun, node",
           anyBins: [" ffmpeg ", ""],
-          env: ["KAIJIBOT_TOKEN", " KAIJIBOT_URL "],
+          env: ["ALLBOT_TOKEN", " ALLBOT_URL "],
           config: null,
         },
       }),
     ).toEqual({
       bins: ["bun", "node"],
       anyBins: ["ffmpeg"],
-      env: ["KAIJIBOT_TOKEN", "KAIJIBOT_URL"],
+      env: ["ALLBOT_TOKEN", "ALLBOT_URL"],
       config: [],
     });
-    expect(resolveKaijiBotManifestRequires({})).toBeUndefined();
-    expect(resolveKaijiBotManifestOs({ os: [" darwin ", "linux", ""] })).toEqual([
+    expect(resolveAllBotManifestRequires({})).toBeUndefined();
+    expect(resolveAllBotManifestOs({ os: [" darwin ", "linux", ""] })).toEqual([
       "darwin",
       "linux",
     ]);
   });
 
   it("parses and applies install common fields", () => {
-    const parsed = parseKaijiBotManifestInstallBase(
+    const parsed = parseAllBotManifestInstallBase(
       {
         type: " Brew ",
         id: "brew.git",
@@ -107,9 +107,9 @@ describe("shared/frontmatter", () => {
       label: "Git",
       bins: ["git", "git"],
     });
-    expect(parseKaijiBotManifestInstallBase({ kind: "bad" }, ["brew"])).toBeUndefined();
+    expect(parseAllBotManifestInstallBase({ kind: "bad" }, ["brew"])).toBeUndefined();
     expect(
-      applyKaijiBotManifestInstallCommonFields<{
+      applyAllBotManifestInstallCommonFields<{
         extra: boolean;
         id?: string;
         label?: string;
@@ -124,7 +124,7 @@ describe("shared/frontmatter", () => {
   });
 
   it("prefers explicit kind, ignores invalid common fields, and leaves missing ones untouched", () => {
-    const parsed = parseKaijiBotManifestInstallBase(
+    const parsed = parseAllBotManifestInstallBase(
       {
         kind: " npm ",
         type: "brew",
@@ -146,7 +146,7 @@ describe("shared/frontmatter", () => {
       kind: "npm",
     });
     expect(
-      applyKaijiBotManifestInstallCommonFields(
+      applyAllBotManifestInstallCommonFields(
         { id: "keep", label: "Keep", bins: ["bun"] },
         parsed!,
       ),
@@ -159,7 +159,7 @@ describe("shared/frontmatter", () => {
 
   it("maps install entries through the parser and filters rejected specs", () => {
     expect(
-      resolveKaijiBotManifestInstall(
+      resolveAllBotManifestInstall(
         {
           install: [{ id: "keep" }, { id: "drop" }, "bad"],
         },

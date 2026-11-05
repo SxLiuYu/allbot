@@ -1,7 +1,7 @@
 /**
  * Channel message adapter surface for plugin-owned messaging.
  *
- * NOTE: KaijiBot has not yet ported the channels/message and channels/turn
+ * NOTE: AllBot has not yet ported the channels/message and channels/turn
  * subsystems from upstream. The types are declared here for compilation
  * compatibility; runtime calls to unported functions will throw.
  */
@@ -176,7 +176,7 @@ export type DurableMessageSendContextParams = unknown;
 
 function throwNotPorted(name: string): never {
   throw new Error(
-    `Channel message subsystem not yet ported to KaijiBot: ${name}. ` +
+    `Channel message subsystem not yet ported to AllBot: ${name}. ` +
       `The channels/message module from upstream has not been ported.`,
   );
 }

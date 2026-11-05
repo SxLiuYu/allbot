@@ -77,33 +77,33 @@ export function buildLiveCronProbeMessage(params: {
   const family = normalizeLiveAgentFamily(params.agent);
   if (params.attempt === 0) {
     return (
-      "Use the KaijiBot MCP tool named cron. " +
+      "Use the AllBot MCP tool named cron. " +
       `Call it with JSON arguments ${params.argsJson}. ` +
-      "Do the actual tool call; I will verify externally with the KaijiBot cron CLI. " +
+      "Do the actual tool call; I will verify externally with the AllBot cron CLI. " +
       `After the cron job is created, reply exactly: ${params.exactReply}`
     );
   }
   if (family === "claude") {
     return (
-      "Return only a tool call for the KaijiBot MCP tool `cron`. " +
+      "Return only a tool call for the AllBot MCP tool `cron`. " +
       `Use these exact JSON arguments: ${params.argsJson}. ` +
-      "No prose. I will verify externally with the KaijiBot cron CLI."
+      "No prose. I will verify externally with the AllBot cron CLI."
     );
   }
   return (
-    "Use the KaijiBot MCP tool named cron. " +
+    "Use the AllBot MCP tool named cron. " +
     `Use these exact JSON arguments: ${params.argsJson}. ` +
-    "No prose before the tool call. I will verify externally with the KaijiBot cron CLI."
+    "No prose before the tool call. I will verify externally with the AllBot cron CLI."
   );
 }
 
-export async function runKaijiBotCliJson<T>(args: string[], env: NodeJS.ProcessEnv): Promise<T> {
+export async function runAllBotCliJson<T>(args: string[], env: NodeJS.ProcessEnv): Promise<T> {
   const childEnv = { ...env };
   delete childEnv.VITEST;
   delete childEnv.VITEST_MODE;
   delete childEnv.VITEST_POOL_ID;
   delete childEnv.VITEST_WORKER_ID;
-  const { stdout, stderr } = await execFileAsync(process.execPath, ["kaijibot.mjs", ...args], {
+  const { stdout, stderr } = await execFileAsync(process.execPath, ["allbot.mjs", ...args], {
     cwd: process.cwd(),
     env: childEnv,
     timeout: 30_000,
@@ -113,7 +113,7 @@ export async function runKaijiBotCliJson<T>(args: string[], env: NodeJS.ProcessE
   if (!trimmed) {
     throw new Error(
       [
-        `kaijibot ${args.join(" ")} produced no JSON stdout`,
+        `allbot ${args.join(" ")} produced no JSON stdout`,
         stderr.trim() ? `stderr: ${stderr.trim()}` : undefined,
       ]
         .filter(Boolean)
@@ -125,7 +125,7 @@ export async function runKaijiBotCliJson<T>(args: string[], env: NodeJS.ProcessE
   } catch (error) {
     throw new Error(
       [
-        `kaijibot ${args.join(" ")} returned invalid JSON`,
+        `allbot ${args.join(" ")} returned invalid JSON`,
         `stdout: ${trimmed}`,
         stderr.trim() ? `stderr: ${stderr.trim()}` : undefined,
         error instanceof Error ? `cause: ${error.message}` : undefined,
@@ -144,7 +144,7 @@ export async function assertCronJobVisibleViaCli(params: {
   expectedName: string;
   expectedMessage: string;
 }): Promise<CronListJob | undefined> {
-  const cronList = await runKaijiBotCliJson<CronListCliResult>(
+  const cronList = await runAllBotCliJson<CronListCliResult>(
     [
       "cron",
       "list",

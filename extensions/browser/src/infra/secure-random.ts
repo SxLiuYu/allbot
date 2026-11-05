@@ -1,1 +1,1 @@
-export { generateSecureToken } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { generateSecureToken } from "allbot/plugin-sdk/browser-security-runtime";

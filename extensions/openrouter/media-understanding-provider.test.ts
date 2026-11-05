@@ -1,7 +1,7 @@
 import {
   describeImageWithModel,
   describeImagesWithModel,
-} from "kaijibot/plugin-sdk/media-understanding";
+} from "allbot/plugin-sdk/media-understanding";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   openrouterMediaUnderstandingProvider,
@@ -20,7 +20,7 @@ const { assertOkOrThrowHttpErrorMock, postJsonRequestMock, resolveProviderHttpRe
     })),
   }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
+vi.mock("allbot/plugin-sdk/provider-http", () => ({
   assertOkOrThrowHttpError: assertOkOrThrowHttpErrorMock,
   postJsonRequest: postJsonRequestMock,
   requireTranscriptionText: (value: string | undefined, message: string) => {

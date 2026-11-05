@@ -1,4 +1,4 @@
-# KaijiBot 👾
+# AllBot 👾
 
 > **你的 AI 助手会主动找你聊天，而不是干等着你提问。**
 
@@ -10,13 +10,13 @@
 
 **README** | [English](./README.en.md) | **简体中文**
 
-## 为什么是 KaijiBot
+## 为什么是 AllBot
 
 你用过的 AI 助手都一个模式：你问，它答。你不问，它就安静地待在那里。
 
-KaijiBot 不一样。你在飞书里跟它聊了几次之后，它会开始**主动**给你发消息。不是广告，不是提醒喝水，而是你真正可能感兴趣的东西。
+AllBot 不一样。你在飞书里跟它聊了几次之后，它会开始**主动**给你发消息。不是广告，不是提醒喝水，而是你真正可能感兴趣的东西。
 
-| 能力         | 普通 chatbot | 典型 memory agent (2026) | **KaijiBot**                                                         |
+| 能力         | 普通 chatbot | 典型 memory agent (2026) | **AllBot**                                                         |
 | ------------ | ------------ | ------------------------ | -------------------------------------------------------------------- |
 | **交互方式** | 你问它才答   | 被动响应 + 长记忆        | **主动推送洞察** + 正常对话                                          |
 | **用户建模** | 无状态       | 向量库 rerank            | **TypedInsight 6 类 + 类别衰减半衰期 + 兴趣生命周期**                |
@@ -25,13 +25,13 @@ KaijiBot 不一样。你在飞书里跟它聊了几次之后，它会开始**主
 | **纠错学习** | 无           | 无                       | **双路径纠错记忆**(同样的错误不犯第二次)                             |
 | **部署形态** | 云端 SaaS    | 云端 SaaS                | **云端 / 本地 / Android 手机本地运行**(Termux,完整 agent,非瘦客户端) |
 
-> 渠道集成方面：只打包 **飞书 + 微信** 两个一等渠道（深度支持）。上游 OpenClaw 的 Telegram/Discord/Slack 等频道在 KaijiBot 中没有打包代码，文档仅作为上游参考归档在 `docs/archive/channels/`，详见 `docs/channels/index.md`。中英文 CLI / 向导 / 认知层 prompt 自动切换，40+ LLM 提供商可插拔。
+> 渠道集成方面：只打包 **飞书 + 微信** 两个一等渠道（深度支持）。上游 OpenClaw 的 Telegram/Discord/Slack 等频道在 AllBot 中没有打包代码，文档仅作为上游参考归档在 `docs/archive/channels/`，详见 `docs/channels/index.md`。中英文 CLI / 向导 / 认知层 prompt 自动切换，40+ LLM 提供商可插拔。
 
 ## ✨ 核心特性
 
 ### 🔮 认知引擎 — 从被动回复到主动洞察
 
-KaijiBot 不是一个被动响应的工具,而是一个**持续运行、对你建模、并在合适时机主动给你洞察**的认知实体。它的主动洞察流水线:
+AllBot 不是一个被动响应的工具,而是一个**持续运行、对你建模、并在合适时机主动给你洞察**的认知实体。它的主动洞察流水线:
 
 ```mermaid
 flowchart LR
@@ -58,23 +58,23 @@ flowchart LR
 
 洞察内容结合你的画像 + LLM 知识 + 实时网络搜索生成。配了搜索 API Key,洞察会紧跟时事。
 
-**💡 真实洞察样例(运营者本人运行 KaijiBot 的实际飞书消息截图)**
+**💡 真实洞察样例(运营者本人运行 AllBot 的实际飞书消息截图)**
 
-以下两条是 KaijiBot 在长期运行中真实推送给运营者的飞书消息。**不是编造,不是 GPT 示例,是系统实际输出。**
+以下两条是 AllBot 在长期运行中真实推送给运营者的飞书消息。**不是编造,不是 GPT 示例,是系统实际输出。**
 
 <table>
 <tr>
 <td width="33%" valign="top">
 <strong>样例 1:行为模式洞察</strong><br>
-<sub>KaijiBot 注意到运营者反复把"风格判断"压在审稿环节,主动建议把判断前移到授权环节(2026-07-07 22:48 推送)</sub>
+<sub>AllBot 注意到运营者反复把"风格判断"压在审稿环节,主动建议把判断前移到授权环节(2026-07-07 22:48 推送)</sub>
 <br><br>
-<img src="./screenshot/ins1.jpg" width="100%" alt="写作流程洞察 — KaijiBot 主动建议把审稿判断前移">
+<img src="./screenshot/ins1.jpg" width="100%" alt="写作流程洞察 — AllBot 主动建议把审稿判断前移">
 </td>
 <td width="33%" valign="top">
 <strong>样例 2:跨域连接</strong><br>
-<sub>KaijiBot 把运营者之前"用 AI 辅助医疗就诊"的行为模式,迁移到"用 AI 辅助解读 Apple Watch 健身数据"上,建立两个领域之间的桥梁(2026-07-11 19:26 推送)</sub>
+<sub>AllBot 把运营者之前"用 AI 辅助医疗就诊"的行为模式,迁移到"用 AI 辅助解读 Apple Watch 健身数据"上,建立两个领域之间的桥梁(2026-07-11 19:26 推送)</sub>
 <br><br>
-<img src="./screenshot/ins2.jpg" width="100%" alt="跨域连接 — KaijiBot 把医疗就诊的 AI 辅助模式映射到健身数据分析">
+<img src="./screenshot/ins2.jpg" width="100%" alt="跨域连接 — AllBot 把医疗就诊的 AI 辅助模式映射到健身数据分析">
 </td>
 <td width="33%"></td>
 </tr>
@@ -84,7 +84,7 @@ flowchart LR
 
 ### 🧬 自我进化 — Agent 自主判断何时学新技能
 
-你跟 KaijiBot 连续做了几次复杂的飞书知识库整理操作——搜索会议记录、提取纪要、创建文档、设置任务。KaijiBot 发现这个流程重复且复杂，主动跟你说：
+你跟 AllBot 连续做了几次复杂的飞书知识库整理操作——搜索会议记录、提取纪要、创建文档、设置任务。AllBot 发现这个流程重复且复杂，主动跟你说：
 
 > "我注意到你最近几次都在做类似的会议纪要归档流程，我给自己写了个技能，以后你说'归档会议'我就自动执行整个流程。"
 
@@ -97,7 +97,7 @@ flowchart LR
 
 **🧬 真实样例 — Agent 自主决策的两种相反结果**
 
-下面两条是运营者真实运行时 Agent 的两种相反决策。大多数"自进化 agent"会无差别地为每个复杂任务创建技能,KaijiBot 的 Agent 会自己判断"这事该不该固化成流程";决定创建后,草稿还要通过 0.7 分阈值的 LLM 质量门。
+下面两条是运营者真实运行时 Agent 的两种相反决策。大多数"自进化 agent"会无差别地为每个复杂任务创建技能,AllBot 的 Agent 会自己判断"这事该不该固化成流程";决定创建后,草稿还要通过 0.7 分阈值的 LLM 质量门。
 
 <table>
 <tr>
@@ -121,7 +121,7 @@ flowchart LR
 
 ### 🔄 纠错自进化 — 同样的错误不犯第二次
 
-AI 助手每次新建会话都犯同样的错？KaijiBot 不会。它有一套纠错记忆系统，保证同样的错误只犯一次。
+AI 助手每次新建会话都犯同样的错？AllBot 不会。它有一套纠错记忆系统，保证同样的错误只犯一次。
 
 - **双路径检测** — Agent 自报错误，或会话结束时系统自动从对话中提取纠错记录。
 - **去重 + 强化** — 重复的错误不会新建记录，而是增加权重，确保高频问题优先被看到。
@@ -131,7 +131,7 @@ AI 助手每次新建会话都犯同样的错？KaijiBot 不会。它有一套�
 
 ### 🔌 可插拔架构
 
-不绑死任何一家。国内国际随意切换，`kaijibot onboard` 向导自动发现已配置的 API Key。
+不绑死任何一家。国内国际随意切换，`allbot onboard` 向导自动发现已配置的 API Key。
 
 | 国内                                              | 国际主流                                        | 聚合 / 自部署                                      |
 | ------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------- |
@@ -140,8 +140,8 @@ AI 助手每次新建会话都犯同样的错？KaijiBot 不会。它有一套�
 切换模型只需一行：
 
 ```bash
-kaijibot config set agent.model "deepseek/deepseek-chat"
-kaijibot config set agent.model "anthropic/claude-sonnet-4-20250514"
+allbot config set agent.model "deepseek/deepseek-chat"
+allbot config set agent.model "anthropic/claude-sonnet-4-20250514"
 ```
 
 ### 🌐 中英自动切换
@@ -156,7 +156,7 @@ CLI 界面、配置向导、认知层 prompt 全部根据系统语言自动切�
 export LANG=zh_CN.UTF-8   # 中文
 export LANG=en_US.UTF-8   # English
 # 或显式指定：
-export KAIJIBOT_CLI_LOCALE=zh-CN
+export ALLBOT_CLI_LOCALE=zh-CN
 ```
 
 ### 🛠️ 完整智能体
@@ -173,20 +173,20 @@ export KAIJIBOT_CLI_LOCALE=zh-CN
 **技能市场**：数十个内置技能（github、weather、summarize、coding-agent、notion、obsidian、taskflow 等），更多从 ClawHub 安装：
 
 ```bash
-kaijibot skills install <skill-name>
+allbot skills install <skill-name>
 ```
 
 ### 📱 Android 手机本地运行 — 把 AI 伙伴装进口袋
 
-大多数 AI 助手要么是云端 SaaS(数据离开你的设备),要么是需要服务器的自部署项目。**KaijiBot 可以直接装进 Android 手机,完整 agent 在本地运行**——不是连回你服务器的瘦客户端,是手机本身就是 agent。
+大多数 AI 助手要么是云端 SaaS(数据离开你的设备),要么是需要服务器的自部署项目。**AllBot 可以直接装进 Android 手机,完整 agent 在本地运行**——不是连回你服务器的瘦客户端,是手机本身就是 agent。
 
-**只需要下载一个 APK,不需要电脑、不需要命令行、不需要 GitHub 账号。** [KaijiBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher)(约 41MB,内置 Termux)会引导你完成所有步骤。
+**只需要下载一个 APK,不需要电脑、不需要命令行、不需要 GitHub 账号。** [AllBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher)(约 41MB,内置 Termux)会引导你完成所有步骤。
 
 **三步搞定:**
 
-1. **下载 `kaijibot-launcher.apk`** —— 从 [GitHub Release](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) 下载到手机
+1. **下载 `allbot-launcher.apk`** —— 从 [GitHub Release](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher) 下载到手机
 2. **安装 APK**(允许"未知来源") —— 打开 Launcher,它会自动安装内置的 Termux
-3. **点击「复制命令并打开 Termux」** —— 在 Termux 里长按粘贴、回车,KaijiBot 自动安装并启动
+3. **点击「复制命令并打开 Termux」** —— 在 Termux 里长按粘贴、回车,AllBot 自动安装并启动
 
 Launcher 主界面、控制面板、实际移动端对话三张截图并排:
 
@@ -194,19 +194,19 @@ Launcher 主界面、控制面板、实际移动端对话三张截图并排:
 <tr>
 <td width="33%" valign="top">
 <strong>Launcher 主界面</strong><br>
-<sub>打开 APK 后看到的第一个画面,展示 KaijiBot 品牌 + 一键安装 Termux 的引导按钮</sub>
+<sub>打开 APK 后看到的第一个画面,展示 AllBot 品牌 + 一键安装 Termux 的引导按钮</sub>
 <br><br>
-<img src="./screenshot/Android1.jpg" width="100%" alt="KaijiBot Launcher APK 主界面">
+<img src="./screenshot/Android1.jpg" width="100%" alt="AllBot Launcher APK 主界面">
 </td>
 <td width="33%" valign="top">
 <strong>控制面板(认知系统全貌)</strong><br>
-<sub>启动后 KaijiBot Control 在手机浏览器里跑起来。左侧导航的每一项都是真实的认知子系统 UI 入口:<strong>聊天 / 代理 / 认知 / 洞察 / 进化 / 纠错 / 技能 / 使用情况 / 历史 / 定时任务 / 设置</strong>。右侧显示当前洞察的来源(<code>Source: Web Search --- LEDGER: Scaling Agentic Document Editing...</code>),证明 knowledge mode 的网络搜索是真实在工作</sub>
+<sub>启动后 AllBot Control 在手机浏览器里跑起来。左侧导航的每一项都是真实的认知子系统 UI 入口:<strong>聊天 / 代理 / 认知 / 洞察 / 进化 / 纠错 / 技能 / 使用情况 / 历史 / 定时任务 / 设置</strong>。右侧显示当前洞察的来源(<code>Source: Web Search --- LEDGER: Scaling Agentic Document Editing...</code>),证明 knowledge mode 的网络搜索是真实在工作</sub>
 <br><br>
-<img src="./screenshot/Android3.jpg" width="100%" alt="KaijiBot Control 移动端 — 认知系统全功能 sidebar 可见">
+<img src="./screenshot/Android3.jpg" width="100%" alt="AllBot Control 移动端 — 认知系统全功能 sidebar 可见">
 </td>
 <td width="33%" valign="top">
 <strong>实际移动端对话</strong><br>
-<sub>KaijiBot 在手机端给你写的实质内容(把 Git commit 类比为依赖图,讨论 Agent 如何辅助哲学写作的一致性检查)。不是 toy demo,是真实运行时产生的深度内容</sub>
+<sub>AllBot 在手机端给你写的实质内容(把 Git commit 类比为依赖图,讨论 Agent 如何辅助哲学写作的一致性检查)。不是 toy demo,是真实运行时产生的深度内容</sub>
 <br><br>
 <img src="./screenshot/Android2.jpg" width="100%" alt="移动端实际对话 — 哲学写作 + Agent 协作">
 </td>
@@ -217,11 +217,11 @@ Launcher 主界面、控制面板、实际移动端对话三张截图并排:
 
 - **数据不出手机** — 对话历史、Persona 画像、纠错记忆、技能全部存在手机本地。没有第三方服务器中转。
 - **离线可用** — 只要 LLM provider 能访问(本机 Ollama / 局域网 vLLM 完全离线),你就有一个随身 AI 伙伴。配云端 LLM 也可,流量走你自己的 API Key。
-- **主动洞察走系统通知** — PRISM 门控 + Android 通知,KaijiBot 在你通勤、午休时主动给你发洞察,和你日常用飞书/微信的体验一致。
+- **主动洞察走系统通知** — PRISM 门控 + Android 通知,AllBot 在你通勤、午休时主动给你发洞察,和你日常用飞书/微信的体验一致。
 
 **📱 完整运行流程(26 秒加速回放)**
 
-从手机桌面启动 KaijiBot → 打开控制面板 → 对话响应(视频已加速,便于快速预览,实际耗时更长):
+从手机桌面启动 AllBot → 打开控制面板 → 对话响应(视频已加速,便于快速预览,实际耗时更长):
 
 <a href="./screenshot/Android5.mp4?raw=true" target="_blank" title="点击在新页面播放 26 秒加速回放">
   <img src="./screenshot/Android5-poster.jpg" width="32%" alt="Android 启动到对话响应 - 点击播放加速回放">
@@ -246,7 +246,7 @@ curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install-termux.
 | 条件            | 说明                     | 获取方式                                                                                                                                                                                                                                  |
 | --------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **LLM API Key** | 至少一个 AI 提供商的密钥 | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [通义千问](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) 任选其一 |
-| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat)（一等渠道，运行 `kaijibot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考  |
+| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat)（一等渠道，运行 `allbot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考  |
 
 ### 安装（推荐方式）
 
@@ -256,7 +256,7 @@ curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install-termux.
 curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.sh | bash
 ```
 
-脚本会自动：检测系统 → 安装 Node.js（如未安装）→ 安装 KaijiBot → 启动配置向导。
+脚本会自动：检测系统 → 安装 Node.js（如未安装）→ 安装 AllBot → 启动配置向导。
 
 **Windows** — PowerShell：
 
@@ -269,12 +269,12 @@ iwr -useb https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install.ps1 | ie
 ### 启动
 
 ```bash
-kaijibot gateway --port 18789 --verbose
+allbot gateway --port 18789 --verbose
 ```
 
-启动后在飞书里找到你的机器人，发一条消息。KaijiBot 自动开始构建你的认知画像。
+启动后在飞书里找到你的机器人，发一条消息。AllBot 自动开始构建你的认知画像。
 
-主动洞察和任务系统默认关闭，需要时在 `~/.kaijibot/kaijibot.json` 里显式开启：
+主动洞察和任务系统默认关闭，需要时在 `~/.allbot/allbot.json` 里显式开启：
 
 ```json
 {
@@ -292,23 +292,23 @@ kaijibot gateway --port 18789 --verbose
 
 #### Android 手机
 
-直接下载 [KaijiBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher),三步搞定 —— 详见上文 [📱 Android 手机本地运行](#-android-手机本地运行--把-ai-伙伴装进口袋) 章节。
+直接下载 [AllBot Launcher APK](https://github.com/Kaiji-Z/kaijibot/releases/tag/launcher),三步搞定 —— 详见上文 [📱 Android 手机本地运行](#-android-手机本地运行--把-ai-伙伴装进口袋) 章节。
 
 #### npm 全局安装（已有 Node.js 22+ 环境）
 
 ```bash
-npm install -g kaijibot
-kaijibot onboard   # 交互式向导，自动配置
+npm install -g allbot
+allbot onboard   # 交互式向导，自动配置
 ```
 
-> ⚠️ **postinstall 行为说明**：`npm install kaijibot` 会运行 postinstall 钩子，
+> ⚠️ **postinstall 行为说明**：`npm install allbot` 会运行 postinstall 钩子，
 > 它会 (1) 拉取捆绑扩展的运行时依赖（如 `@larksuiteoapi/node-sdk`）到包根，
 > (2) 通过 `npx -y skills add larksuite/cli -g --all` 安装 ~28 个 lark-cli skill 到 `~/.agents/skills/`。
 > 这两步都会在安装时拉取第三方 npm 包。如需跳过：
 >
 > ```bash
-> KAIJIBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1 npm install -g kaijibot   # 跳过全部 postinstall
-> KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL=1 npm install -g kaijibot          # 仅跳过 lark-cli skills
+> ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1 npm install -g allbot   # 跳过全部 postinstall
+> ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1 npm install -g allbot          # 仅跳过 lark-cli skills
 > ```
 >
 > 详见 `.env.example`。
@@ -317,7 +317,7 @@ kaijibot onboard   # 交互式向导，自动配置
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 bash scripts/docker/setup.sh   # 一键部署脚本（推荐）
 ```
 
@@ -325,8 +325,8 @@ bash scripts/docker/setup.sh   # 一键部署脚本（推荐）
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
-docker build -t kaijibot:local .
+cd allbot
+docker build -t allbot:local .
 docker compose up -d
 ```
 
@@ -334,7 +334,7 @@ docker compose up -d
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 bash setup-cn.sh
 ```
 
@@ -342,11 +342,11 @@ bash setup-cn.sh
 
 ```bash
 git clone https://gitee.com/kaiji1126/kaijibot.git
-cd kaijibot
+cd allbot
 pnpm install --registry https://registry.npmmirror.com  # 国内镜像加速
 pnpm build
-kaijibot onboard   # 交互式向导
-# 从 OpenClaw 迁移？运行：kaijibot migrate
+allbot onboard   # 交互式向导
+# 从 OpenClaw 迁移？运行：allbot migrate
 ```
 
 </details>
@@ -363,8 +363,8 @@ kaijibot onboard   # 交互式向导
 # export ZAI_API_KEY="your-key"              # 智谱 GLM
 
 # 飞书频道（也可在向导中扫码自动配置）
-kaijibot config set channels.feishu.appId "your-app-id"
-kaijibot config set channels.feishu.appSecret "your-app-secret"
+allbot config set channels.feishu.appId "your-app-id"
+allbot config set channels.feishu.appSecret "your-app-secret"
 ```
 
 **可选**：网络搜索增强洞察时效性。
@@ -374,17 +374,17 @@ export EXA_API_KEY="your-key"
 export TAVILY_API_KEY="your-key"
 ```
 
-配置文件位于 `~/.kaijibot/kaijibot.json`，支持热重载。认知层总开关 `cognitive.enabled` 默认开启；其中主动推送 `cognitive.proactive.enabled` 和任务系统 `cognitive.tasks.enabled` 默认关闭，需要显式设为 `true`。设为 `cognitive.enabled: false` 会关闭整个认知层。详细配置参考 `AGENTS.md`。
+配置文件位于 `~/.allbot/allbot.json`，支持热重载。认知层总开关 `cognitive.enabled` 默认开启；其中主动推送 `cognitive.proactive.enabled` 和任务系统 `cognitive.tasks.enabled` 默认关闭，需要显式设为 `true`。设为 `cognitive.enabled: false` 会关闭整个认知层。详细配置参考 `AGENTS.md`。
 
 ## 与 OpenClaw 的关系
 
-KaijiBot 最初 fork 自 [OpenClaw](https://github.com/openclaw/openclaw) 的 Gateway 架构和 Plugin SDK 边界,在此之上构建了独立的认知层(主动洞察、自我进化、纠错记忆)和重写的记忆整合系统。OpenClaw 提供的地基(Gateway、Agent 循环、工具生态)让我们能专注于差异化部分。
+AllBot 最初 fork 自 [OpenClaw](https://github.com/openclaw/openclaw) 的 Gateway 架构和 Plugin SDK 边界,在此之上构建了独立的认知层(主动洞察、自我进化、纠错记忆)和重写的记忆整合系统。OpenClaw 提供的地基(Gateway、Agent 循环、工具生态)让我们能专注于差异化部分。
 
 基座层面的工程改造(TypeBox 类型迁移、pi-ai SDK 升级、1220 处 lint 修复、Windows/Android bug 修复、Plugin SDK 补完)对使用者基本不可见,详见 commit 历史。
 
-v2026.7.19 起，KaijiBot 在基座之上加固了多项安全机制，这些是 KaijiBot 独有、不向上游贡献的差异化：
+v2026.7.19 起，AllBot 在基座之上加固了多项安全机制，这些是 AllBot 独有、不向上游贡献的差异化：
 
-- **配置覆盖保护**：gateway 拒绝静默写入会让 kaijibot.json 缩水 50% 的 stub 写入（防止 env-var 拼写错误吞掉真实 operator 配置）
+- **配置覆盖保护**：gateway 拒绝静默写入会让 allbot.json 缩水 50% 的 stub 写入（防止 env-var 拼写错误吞掉真实 operator 配置）
 - **认知层并发安全**：persona / correction / fragment 三个 store 全部加 per-user 文件锁，5 个并发 writer 不再互踩
 - **Prompt injection 防御**：web search 结果用 `<untrusted_source>` 包装 + 后过滤拒绝指令性洞察；correction 记录字段做注入短语过滤 + 长度上限
 - **工具 schema LLM 友好化**：所有 17 处 `Type.Union` 改为 `stringEnum` + flat Object，国内中小模型（Qwen / Kimi / MiniMax）调用工具的成功率显著提升
@@ -394,7 +394,7 @@ v2026.7.19 起，KaijiBot 在基座之上加固了多项安全机制，这些是
 
 ## 致谢
 
-KaijiBot 站在 [OpenClaw](https://github.com/openclaw/openclaw)(由 Peter Steinberger 和社区构建)的肩膀上。
+AllBot 站在 [OpenClaw](https://github.com/openclaw/openclaw)(由 Peter Steinberger 和社区构建)的肩膀上。
 
 ### 学术研究
 

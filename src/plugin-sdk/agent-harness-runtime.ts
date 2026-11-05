@@ -3,7 +3,7 @@
 // register quickly inside gateway startup and Docker e2e runs.
 //
 // NOTE: Some upstream exports have been omitted because the corresponding
-// modules have not yet been ported to KaijiBot. They are marked with comments
+// modules have not yet been ported to AllBot. They are marked with comments
 // below. As modules are ported, re-add the exports.
 
 import {
@@ -19,7 +19,7 @@ import { truncateUtf16Safe } from "../utils.js";
 export const TOOL_PROGRESS_OUTPUT_MAX_CHARS = 8_000;
 
 export type { AgentMessage } from "@earendil-works/pi-agent-core";
-// -- Types from existing KaijiBot modules --
+// -- Types from existing AllBot modules --
 
 export type {
   EmbeddedRunAttemptParams,
@@ -70,7 +70,7 @@ export type AgentToolResultMiddlewareHarness = unknown;
 export type AgentToolResultMiddlewareOptions = unknown;
 export type AgentToolResultMiddlewareResult = unknown;
 export type AgentToolResultMiddlewareRuntime = unknown;
-export type KaijiBotAgentToolResult = unknown;
+export type AllBotAgentToolResult = unknown;
 
 // plugins/codex-app-server-extension-types.ts - not yet ported
 export type CodexAppServerExtensionContext = unknown;
@@ -91,7 +91,7 @@ export type LoadCodexBundleMcpThreadConfigParams = unknown;
 
 // -- Exports from existing modules --
 
-export { VERSION as KAIJIBOT_VERSION } from "../version.js";
+export { VERSION as ALLBOT_VERSION } from "../version.js";
 export { formatErrorMessage } from "../infra/errors.js";
 export { emitAgentEvent, onAgentEvent, resetAgentEventsForTest } from "../infra/agent-events.js";
 export { log as embeddedAgentLog } from "../agents/pi-embedded-runner/logger.js";
@@ -130,7 +130,7 @@ export { normalizeProviderToolSchemas } from "../agents/pi-embedded-runner/tool-
 export async function loadCodexBundleMcpThreadConfig(
   _params: LoadCodexBundleMcpThreadConfigParams,
 ): Promise<CodexBundleMcpThreadConfig> {
-  throw new Error("loadCodexBundleMcpThreadConfig: codex-mcp-config not yet ported to KaijiBot");
+  throw new Error("loadCodexBundleMcpThreadConfig: codex-mcp-config not yet ported to AllBot");
 }
 
 export { resolveSandboxContext } from "../agents/sandbox.js";
@@ -203,7 +203,7 @@ export type AgentHarnessTerminalOutcomeClassification =
  * should advance fallback. Deliberate silent replies such as NO_REPLY count as
  * intentional output, while whitespace-only text remains fallback-eligible.
  * This is intentionally SDK-level so plugin harness adapters such as Codex
- * preserve the same KaijiBot-owned fallback signals as the built-in PI path
+ * preserve the same AllBot-owned fallback signals as the built-in PI path
  * without re-implementing terminal-result policy.
  */
 export function classifyAgentHarnessTerminalOutcome(

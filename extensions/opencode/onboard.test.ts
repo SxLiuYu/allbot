@@ -1,7 +1,7 @@
 import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
-} from "kaijibot/plugin-sdk/provider-onboard";
+} from "allbot/plugin-sdk/provider-onboard";
 import { describe, expect, it } from "vitest";
 import {
   createConfigWithFallbacks,

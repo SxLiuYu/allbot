@@ -7,7 +7,7 @@ title: "OpenAI Chat Completions"
 
 # OpenAI Chat Completions (HTTP)
 
-KaijiBot’s Gateway can serve a small OpenAI-compatible Chat Completions endpoint.
+AllBot’s Gateway can serve a small OpenAI-compatible Chat Completions endpoint.
 
 This endpoint is **disabled by default**. Enable it in config first.
 
@@ -21,7 +21,7 @@ When the Gateway’s OpenAI-compatible HTTP surface is enabled, it also serves:
 - `POST /v1/embeddings`
 - `POST /v1/responses`
 
-Under the hood, requests are executed as a normal Gateway agent run (same codepath as `kaijibot agent`), so routing/permissions/config match your Gateway.
+Under the hood, requests are executed as a normal Gateway agent run (same codepath as `allbot agent`), so routing/permissions/config match your Gateway.
 
 ## Authentication
 
@@ -39,8 +39,8 @@ Common HTTP auth paths:
 
 Notes:
 
-- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `KAIJIBOT_GATEWAY_TOKEN`).
-- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `KAIJIBOT_GATEWAY_PASSWORD`).
+- When `gateway.auth.mode="token"`, use `gateway.auth.token` (or `ALLBOT_GATEWAY_TOKEN`).
+- When `gateway.auth.mode="password"`, use `gateway.auth.password` (or `ALLBOT_GATEWAY_PASSWORD`).
 - When `gateway.auth.mode="trusted-proxy"`, the HTTP request must come from a
   configured non-loopback trusted proxy source; same-host loopback proxies do
   not satisfy this mode.
@@ -53,9 +53,9 @@ Treat this endpoint as a **full operator-access** surface for the gateway instan
 - HTTP bearer auth here is not a narrow per-user scope model.
 - A valid Gateway token/password for this endpoint should be treated like an owner/operator credential.
 - Requests run through the same control-plane agent path as trusted operator actions.
-- There is no separate non-owner/per-user tool boundary on this endpoint; once a caller passes Gateway auth here, KaijiBot treats that caller as a trusted operator for this gateway.
-- For shared-secret auth modes (`token` and `password`), the endpoint restores the normal full operator defaults even if the caller sends a narrower `x-kaijibot-scopes` header.
-- Trusted identity-bearing HTTP modes (for example trusted proxy auth or `gateway.auth.mode="none"`) honor `x-kaijibot-scopes` when present and otherwise fall back to the normal operator default scope set.
+- There is no separate non-owner/per-user tool boundary on this endpoint; once a caller passes Gateway auth here, AllBot treats that caller as a trusted operator for this gateway.
+- For shared-secret auth modes (`token` and `password`), the endpoint restores the normal full operator defaults even if the caller sends a narrower `x-allbot-scopes` header.
+- Trusted identity-bearing HTTP modes (for example trusted proxy auth or `gateway.auth.mode="none"`) honor `x-allbot-scopes` when present and otherwise fall back to the normal operator default scope set.
 - If the target agent policy allows sensitive tools, this endpoint can use them.
 - Keep this endpoint on loopback/tailnet/private ingress only; do not expose it directly to the public internet.
 
@@ -63,14 +63,14 @@ Auth matrix:
 
 - `gateway.auth.mode="token"` or `"password"` + `Authorization: Bearer ...`
   - proves possession of the shared gateway operator secret
-  - ignores narrower `x-kaijibot-scopes`
+  - ignores narrower `x-allbot-scopes`
   - restores the full default operator scope set:
     `operator.admin`, `operator.approvals`, `operator.pairing`,
     `operator.read`, `operator.talk.secrets`, `operator.write`
   - treats chat turns on this endpoint as owner-sender turns
 - trusted identity-bearing HTTP modes (for example trusted proxy auth, or `gateway.auth.mode="none"` on private ingress)
   - authenticate some outer trusted identity or deployment boundary
-  - honor `x-kaijibot-scopes` when the header is present
+  - honor `x-allbot-scopes` when the header is present
   - fall back to the normal operator default scope set when the header is absent
   - only lose owner semantics when the caller explicitly narrows scopes and omits `operator.admin`
 
@@ -78,22 +78,22 @@ See [Security](/gateway/security) and [Remote access](/gateway/remote).
 
 ## Agent-first model contract
 
-KaijiBot treats the OpenAI `model` field as an **agent target**, not a raw provider model id.
+AllBot treats the OpenAI `model` field as an **agent target**, not a raw provider model id.
 
-- `model: "kaijibot"` routes to the configured default agent.
-- `model: "kaijibot/default"` also routes to the configured default agent.
-- `model: "kaijibot/<agentId>"` routes to a specific agent.
+- `model: "allbot"` routes to the configured default agent.
+- `model: "allbot/default"` also routes to the configured default agent.
+- `model: "allbot/<agentId>"` routes to a specific agent.
 
 Optional request headers:
 
-- `x-kaijibot-model: <provider/model-or-bare-id>` overrides the backend model for the selected agent.
-- `x-kaijibot-agent-id: <agentId>` remains supported as a compatibility override.
-- `x-kaijibot-session-key: <sessionKey>` fully controls session routing.
-- `x-kaijibot-message-channel: <channel>` sets the synthetic ingress channel context for channel-aware prompts and policies.
+- `x-allbot-model: <provider/model-or-bare-id>` overrides the backend model for the selected agent.
+- `x-allbot-agent-id: <agentId>` remains supported as a compatibility override.
+- `x-allbot-session-key: <sessionKey>` fully controls session routing.
+- `x-allbot-message-channel: <channel>` sets the synthetic ingress channel context for channel-aware prompts and policies.
 
 Compatibility aliases still accepted:
 
-- `model: "kaijibot:<agentId>"`
+- `model: "allbot:<agentId>"`
 - `model: "agent:<agentId>"`
 
 ## Enabling the endpoint
@@ -147,9 +147,9 @@ This is the highest-leverage compatibility set for self-hosted frontends and too
 
 <AccordionGroup>
   <Accordion title="What does `/v1/models` return?">
-    An KaijiBot agent-target list.
+    An AllBot agent-target list.
 
-    The returned ids are `kaijibot`, `kaijibot/default`, and `kaijibot/<agentId>` entries.
+    The returned ids are `allbot`, `allbot/default`, and `allbot/<agentId>` entries.
     Use them directly as OpenAI `model` values.
 
   </Accordion>
@@ -159,18 +159,18 @@ This is the highest-leverage compatibility set for self-hosted frontends and too
     Sub-agents remain internal execution topology. They do not appear as pseudo-models.
 
   </Accordion>
-  <Accordion title="Why is `kaijibot/default` included?">
-    `kaijibot/default` is the stable alias for the configured default agent.
+  <Accordion title="Why is `allbot/default` included?">
+    `allbot/default` is the stable alias for the configured default agent.
 
     That means clients can keep using one predictable id even if the real default agent id changes between environments.
 
   </Accordion>
   <Accordion title="How do I override the backend model?">
-    Use `x-kaijibot-model`.
+    Use `x-allbot-model`.
 
     Examples:
-    `x-kaijibot-model: openai/gpt-5.4`
-    `x-kaijibot-model: gpt-5.4`
+    `x-allbot-model: openai/gpt-5.4`
+    `x-allbot-model: gpt-5.4`
 
     If you omit it, the selected agent runs with its normal configured model choice.
 
@@ -178,8 +178,8 @@ This is the highest-leverage compatibility set for self-hosted frontends and too
   <Accordion title="How do embeddings fit this contract?">
     `/v1/embeddings` uses the same agent-target `model` ids.
 
-    Use `model: "kaijibot/default"` or `model: "kaijibot/<agentId>"`.
-    When you need a specific embedding model, send it in `x-kaijibot-model`.
+    Use `model: "allbot/default"` or `model: "allbot/<agentId>"`.
+    When you need a specific embedding model, send it in `x-allbot-model`.
     Without that header, the request passes through to the selected agent's normal embedding setup.
 
   </Accordion>
@@ -200,13 +200,13 @@ For a basic Open WebUI connection:
 - Base URL: `http://127.0.0.1:18789/v1`
 - Docker on macOS base URL: `http://host.docker.internal:18789/v1`
 - API key: your Gateway bearer token
-- Model: `kaijibot/default`
+- Model: `allbot/default`
 
 Expected behavior:
 
-- `GET /v1/models` should list `kaijibot/default`
-- Open WebUI should use `kaijibot/default` as the chat model id
-- If you want a specific backend provider/model for that agent, set the agent's normal default model or send `x-kaijibot-model`
+- `GET /v1/models` should list `allbot/default`
+- Open WebUI should use `allbot/default` as the chat model id
+- If you want a specific backend provider/model for that agent, set the agent's normal default model or send `x-allbot-model`
 
 Quick smoke:
 
@@ -215,7 +215,7 @@ curl -sS http://127.0.0.1:18789/v1/models \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 
-If that returns `kaijibot/default`, most Open WebUI setups can connect with the same base URL and token.
+If that returns `allbot/default`, most Open WebUI setups can connect with the same base URL and token.
 
 ## Examples
 
@@ -226,7 +226,7 @@ curl -sS http://127.0.0.1:18789/v1/chat/completions \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
-    "model": "kaijibot/default",
+    "model": "allbot/default",
     "messages": [{"role":"user","content":"hi"}]
   }'
 ```
@@ -237,9 +237,9 @@ Streaming:
 curl -N http://127.0.0.1:18789/v1/chat/completions \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -H 'Content-Type: application/json' \
-  -H 'x-kaijibot-model: openai/gpt-5.4' \
+  -H 'x-allbot-model: openai/gpt-5.4' \
   -d '{
-    "model": "kaijibot/research",
+    "model": "allbot/research",
     "stream": true,
     "messages": [{"role":"user","content":"hi"}]
   }'
@@ -255,7 +255,7 @@ curl -sS http://127.0.0.1:18789/v1/models \
 Fetch one model:
 
 ```bash
-curl -sS http://127.0.0.1:18789/v1/models/kaijibot%2Fdefault \
+curl -sS http://127.0.0.1:18789/v1/models/allbot%2Fdefault \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 
@@ -265,16 +265,16 @@ Create embeddings:
 curl -sS http://127.0.0.1:18789/v1/embeddings \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -H 'Content-Type: application/json' \
-  -H 'x-kaijibot-model: openai/text-embedding-3-small' \
+  -H 'x-allbot-model: openai/text-embedding-3-small' \
   -d '{
-    "model": "kaijibot/default",
+    "model": "allbot/default",
     "input": ["alpha", "beta"]
   }'
 ```
 
 Notes:
 
-- `/v1/models` returns KaijiBot agent targets, not raw provider catalogs.
-- `kaijibot/default` is always present so one stable id works across environments.
-- Backend provider/model overrides belong in `x-kaijibot-model`, not the OpenAI `model` field.
+- `/v1/models` returns AllBot agent targets, not raw provider catalogs.
+- `allbot/default` is always present so one stable id works across environments.
+- Backend provider/model overrides belong in `x-allbot-model`, not the OpenAI `model` field.
 - `/v1/embeddings` supports `input` as a string or array of strings.

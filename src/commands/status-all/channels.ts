@@ -17,7 +17,7 @@ import type {
   ChannelPlugin,
 } from "../../channels/plugins/types.js";
 import { inspectReadOnlyChannelAccount } from "../../channels/read-only-account-inspect.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { sha256HexPrefix } from "../../logging/redact-identifier.js";
 import { asRecord } from "../../shared/record-coerce.js";
 import { normalizeOptionalString } from "../../shared/string-coerce.js";
@@ -41,8 +41,8 @@ type ChannelAccountRow = {
 
 type ResolvedChannelAccountRowParams = {
   plugin: ChannelPlugin;
-  cfg: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
+  cfg: AllBotConfig;
+  sourceConfig: AllBotConfig;
   accountId: string;
 };
 
@@ -92,7 +92,7 @@ function formatTokenHint(token: string, opts: { showSecrets: boolean }): string 
 
 async function inspectChannelAccount(
   plugin: ChannelPlugin,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   accountId: string,
 ) {
   return (
@@ -159,7 +159,7 @@ const formatAccountLabel = (params: { accountId: string; name?: string }) => {
 
 const buildAccountNotes = (params: {
   plugin: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   entry: ChannelAccountRow;
 }) => {
   const { plugin, cfg, entry } = params;
@@ -258,7 +258,7 @@ function collectMissingPaths(accounts: ChannelAccountRow[]): string[] {
 
 function summarizeTokenConfig(params: {
   plugin: ChannelPlugin;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accounts: ChannelAccountRow[];
   showSecrets: boolean;
 }): { state: "ok" | "setup" | "warn" | null; detail: string | null } {
@@ -469,8 +469,8 @@ function summarizeTokenConfig(params: {
 // `status --all` channels table.
 // Keep this generic: channel-specific rules belong in the channel plugin.
 export async function buildChannelsTable(
-  cfg: KaijiBotConfig,
-  opts?: { showSecrets?: boolean; sourceConfig?: KaijiBotConfig },
+  cfg: AllBotConfig,
+  opts?: { showSecrets?: boolean; sourceConfig?: AllBotConfig },
 ): Promise<{
   rows: ChannelRow[];
   details: Array<{

@@ -66,7 +66,7 @@ describe("runMemoryFlushIfNeeded", () => {
   let rootDir = "";
 
   beforeEach(async () => {
-    rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-memory-unit-"));
+    rootDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-memory-unit-"));
     registerMemoryFlushPlanResolver(() => ({
       softThresholdTokens: 4_000,
       forceFlushTranscriptBytes: 1_000_000_000,

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   createEmptyProviderRegistryAllowlistFallbackRegistry,
   getProviderRegistryAllowlistMocks,
@@ -18,7 +18,7 @@ describe("media-understanding provider registry allowlist fallback", () => {
   });
 
   it("adds bundled capability plugin ids to plugins.allow before fallback registry load", () => {
-    const cfg = { plugins: { allow: ["custom-plugin"] } } as KaijiBotConfig;
+    const cfg = { plugins: { allow: ["custom-plugin"] } } as AllBotConfig;
     const compatConfig = {
       plugins: {
         allow: ["custom-plugin", "openai"],

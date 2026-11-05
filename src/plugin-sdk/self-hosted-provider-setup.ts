@@ -1,6 +1,6 @@
 // Focused self-hosted provider setup helpers for OpenAI-compatible backends.
 export type {
-  KaijiBotPluginApi,
+  AllBotPluginApi,
   ProviderAuthContext,
   ProviderAuthMethodNonInteractiveContext,
   ProviderAuthResult,

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withFastReplyConfig } from "./reply/get-reply-fast-path.js";
 import { loadGetReplyModuleForTest } from "./reply/get-reply.test-loader.js";
 import { createMockTypingController } from "./reply/reply.test-helpers.js";
@@ -103,7 +103,7 @@ function createTelegramMessage(messageSid: string): MsgContext {
   };
 }
 
-function createReplyConfig(streamMode?: "block"): KaijiBotConfig {
+function createReplyConfig(streamMode?: "block"): AllBotConfig {
   return withFastReplyConfig({
     agents: {
       defaults: {
@@ -118,7 +118,7 @@ function createReplyConfig(streamMode?: "block"): KaijiBotConfig {
       },
     },
     session: { store: "/tmp/sessions.json" },
-  } as KaijiBotConfig);
+  } as AllBotConfig);
 }
 
 function createContinueDirectivesResult() {
@@ -174,7 +174,7 @@ function createContinueDirectivesResult() {
 describe("block streaming", () => {
   beforeEach(async () => {
     await loadFreshGetReplyModuleForTest();
-    vi.stubEnv("KAIJIBOT_TEST_FAST", "1");
+    vi.stubEnv("ALLBOT_TEST_FAST", "1");
     mocks.resolveReplyDirectives.mockReset();
     mocks.handleInlineActions.mockReset();
     mocks.initSessionState.mockReset();

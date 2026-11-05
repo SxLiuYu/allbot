@@ -17,13 +17,13 @@ import {
   resetTaskRegistryForTests,
 } from "./task-registry.js";
 
-const ORIGINAL_STATE_DIR = process.env.KAIJIBOT_STATE_DIR;
+const ORIGINAL_STATE_DIR = process.env.ALLBOT_STATE_DIR;
 
 async function withTaskFlowMaintenanceStateDir(
   run: (root: string) => Promise<void>,
 ): Promise<void> {
-  await withTempDir({ prefix: "kaijibot-task-flow-maintenance-" }, async (root) => {
-    process.env.KAIJIBOT_STATE_DIR = root;
+  await withTempDir({ prefix: "allbot-task-flow-maintenance-" }, async (root) => {
+    process.env.ALLBOT_STATE_DIR = root;
     resetTaskRegistryDeliveryRuntimeForTests();
     resetTaskRegistryForTests();
     resetTaskFlowRegistryForTests();
@@ -40,9 +40,9 @@ async function withTaskFlowMaintenanceStateDir(
 describe("task-flow-registry maintenance", () => {
   afterEach(() => {
     if (ORIGINAL_STATE_DIR === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = ORIGINAL_STATE_DIR;
+      process.env.ALLBOT_STATE_DIR = ORIGINAL_STATE_DIR;
     }
     resetTaskRegistryDeliveryRuntimeForTests();
     resetTaskRegistryForTests();

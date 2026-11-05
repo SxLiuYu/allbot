@@ -2,7 +2,7 @@
 summary: "Task Flow flow orchestration layer above background tasks"
 read_when:
   - You want to understand how Task Flow relates to background tasks
-  - You encounter Task Flow or kaijibot tasks flow in release notes or docs
+  - You encounter Task Flow or allbot tasks flow in release notes or docs
   - You want to inspect or manage durable flow state
 title: "Task Flow"
 ---
@@ -49,34 +49,34 @@ Each flow persists its own state and tracks revisions so progress survives gatew
 
 ## Cancel behavior
 
-`kaijibot tasks flow cancel` sets a sticky cancel intent on the flow. Active tasks within the flow are cancelled, and no new steps are started. The cancel intent persists across restarts, so a cancelled flow stays cancelled even if the gateway restarts before all child tasks have terminated.
+`allbot tasks flow cancel` sets a sticky cancel intent on the flow. Active tasks within the flow are cancelled, and no new steps are started. The cancel intent persists across restarts, so a cancelled flow stays cancelled even if the gateway restarts before all child tasks have terminated.
 
 ## CLI commands
 
 ```bash
 # List active and recent flows
-kaijibot tasks flow list
+allbot tasks flow list
 
 # Show details for a specific flow
-kaijibot tasks flow show <lookup>
+allbot tasks flow show <lookup>
 
 # Cancel a running flow and its active tasks
-kaijibot tasks flow cancel <lookup>
+allbot tasks flow cancel <lookup>
 ```
 
 | Command                           | Description                                   |
 | --------------------------------- | --------------------------------------------- |
-| `kaijibot tasks flow list`        | Shows tracked flows with status and sync mode |
-| `kaijibot tasks flow show <id>`   | Inspect one flow by flow id or lookup key     |
-| `kaijibot tasks flow cancel <id>` | Cancel a running flow and its active tasks    |
+| `allbot tasks flow list`        | Shows tracked flows with status and sync mode |
+| `allbot tasks flow show <id>`   | Inspect one flow by flow id or lookup key     |
+| `allbot tasks flow cancel <id>` | Cancel a running flow and its active tasks    |
 
 ## How flows relate to tasks
 
-Flows coordinate tasks, not replace them. A single flow may drive multiple background tasks over its lifetime. Use `kaijibot tasks` to inspect individual task records and `kaijibot tasks flow` to inspect the orchestrating flow.
+Flows coordinate tasks, not replace them. A single flow may drive multiple background tasks over its lifetime. Use `allbot tasks` to inspect individual task records and `allbot tasks flow` to inspect the orchestrating flow.
 
 ## Related
 
 - [Background Tasks](/automation/tasks) — the detached work ledger that flows coordinate
-- [CLI: tasks](/cli/index#tasks) — CLI command reference for `kaijibot tasks flow`
+- [CLI: tasks](/cli/index#tasks) — CLI command reference for `allbot tasks flow`
 - [Automation Overview](/automation) — all automation mechanisms at a glance
 - [Cron Jobs](/automation/cron-jobs) — scheduled jobs that may feed into flows

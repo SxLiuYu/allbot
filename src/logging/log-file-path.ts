@@ -1,11 +1,11 @@
 import path from "node:path";
-import type { KaijiBotConfig } from "../config/types.js";
+import type { AllBotConfig } from "../config/types.js";
 import {
-  POSIX_KAIJIBOT_TMP_DIR,
-  resolvePreferredKaijiBotTmpDir,
-} from "../infra/tmp-kaijibot-dir.js";
+  POSIX_ALLBOT_TMP_DIR,
+  resolvePreferredAllBotTmpDir,
+} from "../infra/tmp-allbot-dir.js";
 
-const LOG_PREFIX = "kaijibot";
+const LOG_PREFIX = "allbot";
 const LOG_SUFFIX = ".log";
 
 function canUseNodeFs(): boolean {
@@ -32,10 +32,10 @@ function formatLocalDate(date: Date): string {
 }
 
 export function resolveDefaultRollingLogFile(date = new Date()): string {
-  const logDir = canUseNodeFs() ? resolvePreferredKaijiBotTmpDir() : POSIX_KAIJIBOT_TMP_DIR;
+  const logDir = canUseNodeFs() ? resolvePreferredAllBotTmpDir() : POSIX_ALLBOT_TMP_DIR;
   return path.join(logDir, `${LOG_PREFIX}-${formatLocalDate(date)}${LOG_SUFFIX}`);
 }
 
-export function resolveConfiguredLogFilePath(config?: KaijiBotConfig | null): string {
+export function resolveConfiguredLogFilePath(config?: AllBotConfig | null): string {
   return config?.logging?.file ?? resolveDefaultRollingLogFile();
 }

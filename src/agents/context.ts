@@ -3,11 +3,11 @@
 
 import path from "node:path";
 import { loadConfig } from "../config/config.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { computeBackoff, type BackoffPolicy } from "../infra/backoff.js";
 import { consumeRootOptionToken, FLAG_TERMINATOR } from "../infra/cli-root-options.js";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
-import { resolveKaijiBotAgentDir } from "./agent-paths.js";
+import { resolveAllBotAgentDir } from "./agent-paths.js";
 import { lookupCachedContextTokens, MODEL_CONTEXT_TOKEN_CACHE } from "./context-cache.js";
 import { CONTEXT_WINDOW_RUNTIME_STATE } from "./context-runtime-state.js";
 import { normalizeProviderId } from "./model-selection.js";
@@ -92,11 +92,11 @@ function loadModelsConfigRuntime() {
   return CONTEXT_WINDOW_RUNTIME_STATE.modelsConfigRuntimePromise;
 }
 
-function isLikelyKaijiBotCliProcess(argv: string[] = process.argv): boolean {
+function isLikelyAllBotCliProcess(argv: string[] = process.argv): boolean {
   const entryBasename = normalizeLowercaseStringOrEmpty(path.basename(argv[1] ?? ""));
   return (
-    entryBasename === "kaijibot" ||
-    entryBasename === "kaijibot.mjs" ||
+    entryBasename === "allbot" ||
+    entryBasename === "allbot.mjs" ||
     entryBasename === "entry.js" ||
     entryBasename === "entry.mjs"
   );
@@ -146,21 +146,21 @@ const SKIP_EAGER_WARMUP_PRIMARY_COMMANDS = new Set([
 ]);
 
 function shouldEagerWarmContextWindowCache(argv: string[] = process.argv): boolean {
-  // Keep this gate tied to the real KaijiBot CLI entrypoints.
+  // Keep this gate tied to the real AllBot CLI entrypoints.
   //
   // This module can also land inside shared dist chunks that are imported from
   // plugin-sdk/library surfaces during smoke tests and plugin loading. If we do
   // eager warmup for those generic Node script imports, merely importing the
-  // built plugin-sdk can call ensureKaijiBotModelsJson(), which cascades into
+  // built plugin-sdk can call ensureAllBotModelsJson(), which cascades into
   // plugin discovery and breaks dist/source singleton assumptions.
-  if (!isLikelyKaijiBotCliProcess(argv)) {
+  if (!isLikelyAllBotCliProcess(argv)) {
     return false;
   }
   const [primary] = getCommandPathFromArgv(argv);
   return Boolean(primary) && !SKIP_EAGER_WARMUP_PRIMARY_COMMANDS.has(primary);
 }
 
-function primeConfiguredContextWindows(): KaijiBotConfig | undefined {
+function primeConfiguredContextWindows(): AllBotConfig | undefined {
   if (CONTEXT_WINDOW_RUNTIME_STATE.configuredConfig) {
     applyConfiguredContextWindows({
       cache: MODEL_CONTEXT_TOKEN_CACHE,
@@ -207,7 +207,7 @@ export function ensureContextWindowCacheLoaded(): Promise<void> {
 
   CONTEXT_WINDOW_RUNTIME_STATE.loadPromise = (async () => {
     try {
-      await (await loadModelsConfigRuntime()).ensureKaijiBotModelsJson(cfg);
+      await (await loadModelsConfigRuntime()).ensureAllBotModelsJson(cfg);
     } catch {
       // Continue with best-effort discovery/overrides.
     }
@@ -215,7 +215,7 @@ export function ensureContextWindowCacheLoaded(): Promise<void> {
     try {
       const { discoverAuthStorage, discoverModels } =
         await import("./pi-model-discovery-runtime.js");
-      const agentDir = resolveKaijiBotAgentDir();
+      const agentDir = resolveAllBotAgentDir();
       const authStorage = discoverAuthStorage(agentDir);
       const modelRegistry = discoverModels(authStorage, agentDir) as unknown as ModelRegistryLike;
       const models =
@@ -265,7 +265,7 @@ if (shouldEagerWarmContextWindowCache()) {
 }
 
 function resolveConfiguredModelParams(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   provider: string,
   model: string,
 ): Record<string, unknown> | undefined {
@@ -317,7 +317,7 @@ function resolveProviderModelRef(params: {
 // keys overlap with raw slash-containing model IDs (e.g. OpenRouter's
 // "google/gemini-2.5-pro" stored as a raw catalog entry).
 function resolveConfiguredProviderContextTokens(
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   provider: string,
   model: string,
 ): number | undefined {
@@ -382,7 +382,7 @@ function isAnthropic1MModel(provider: string, model: string): boolean {
 }
 
 export function resolveContextTokensForModel(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   provider?: string;
   model?: string;
   contextTokensOverride?: number;

@@ -1,42 +1,42 @@
 ---
 title: "Default AGENTS.md"
-summary: "Default KaijiBot agent instructions and skills roster for the personal assistant setup"
+summary: "Default AllBot agent instructions and skills roster for the personal assistant setup"
 read_when:
-  - Starting a new KaijiBot agent session
+  - Starting a new AllBot agent session
   - Enabling or auditing default skills
 ---
 
-# AGENTS.md - KaijiBot Personal Assistant (default)
+# AGENTS.md - AllBot Personal Assistant (default)
 
 ## First run (recommended)
 
-KaijiBot uses a dedicated workspace directory for the agent. Default: `~/.kaijibot/workspace` (configurable via `agents.defaults.workspace`).
+AllBot uses a dedicated workspace directory for the agent. Default: `~/.allbot/workspace` (configurable via `agents.defaults.workspace`).
 
 1. Create the workspace (if it doesn’t already exist):
 
 ```bash
-mkdir -p ~/.kaijibot/workspace
+mkdir -p ~/.allbot/workspace
 ```
 
 2. Copy the default workspace templates into the workspace:
 
 ```bash
-cp docs/reference/templates/AGENTS.md ~/.kaijibot/workspace/AGENTS.md
-cp docs/reference/templates/SOUL.md ~/.kaijibot/workspace/SOUL.md
-cp docs/reference/templates/TOOLS.md ~/.kaijibot/workspace/TOOLS.md
+cp docs/reference/templates/AGENTS.md ~/.allbot/workspace/AGENTS.md
+cp docs/reference/templates/SOUL.md ~/.allbot/workspace/SOUL.md
+cp docs/reference/templates/TOOLS.md ~/.allbot/workspace/TOOLS.md
 ```
 
 3. Optional: if you want the personal assistant skill roster, replace AGENTS.md with this file:
 
 ```bash
-cp docs/reference/AGENTS.default.md ~/.kaijibot/workspace/AGENTS.md
+cp docs/reference/AGENTS.default.md ~/.allbot/workspace/AGENTS.md
 ```
 
 4. Optional: choose a different workspace by setting `agents.defaults.workspace` (supports `~`):
 
 ```json5
 {
-  agents: { defaults: { workspace: "~/.kaijibot/workspace" } },
+  agents: { defaults: { workspace: "~/.allbot/workspace" } },
 }
 ```
 
@@ -82,17 +82,17 @@ cp docs/reference/AGENTS.default.md ~/.kaijibot/workspace/AGENTS.md
 If you treat this workspace as Clawd’s “memory”, make it a git repo (ideally private) so `AGENTS.md` and your memory files are backed up.
 
 ```bash
-cd ~/.kaijibot/workspace
+cd ~/.allbot/workspace
 git init
 git add AGENTS.md
 git commit -m "Add Clawd workspace"
 # Optional: add a private remote + push
 ```
 
-## What KaijiBot Does
+## What AllBot Does
 
 - Runs WhatsApp gateway + Pi coding agent so the assistant can read/write chats, fetch context, and run skills via the host Mac.
-- macOS app manages permissions (screen recording, notifications, microphone) and exposes the `kaijibot` CLI via its bundled binary.
+- macOS app manages permissions (screen recording, notifications, microphone) and exposes the `allbot` CLI via its bundled binary.
 - Direct chats collapse into the agent's `main` session by default; groups stay isolated as `agent:<agentId>:<channel>:group:<id>` (rooms/channels: `agent:<agentId>:<channel>:channel:<id>`); heartbeats keep background tasks alive.
 
 ## Core Skills (enable in Settings → Skills)
@@ -117,10 +117,10 @@ git commit -m "Add Clawd workspace"
 
 ## Usage Notes
 
-- Prefer the `kaijibot` CLI for scripting; mac app handles permissions.
+- Prefer the `allbot` CLI for scripting; mac app handles permissions.
 - Run installs from the Skills tab; it hides the button if a binary is already present.
 - Keep heartbeats enabled so the assistant can schedule reminders, monitor inboxes, and trigger camera captures.
 - Canvas UI runs full-screen with native overlays. Avoid placing critical controls in the top-left/top-right/bottom edges; add explicit gutters in the layout and don’t rely on safe-area insets.
-- For browser-driven verification, use `kaijibot browser` (tabs/status/screenshot) with the KaijiBot-managed Chrome profile.
-- For DOM inspection, use `kaijibot browser eval|query|dom|snapshot` (and `--json`/`--out` when you need machine output).
-- For interactions, use `kaijibot browser click|type|hover|drag|select|upload|press|wait|navigate|back|evaluate|run` (click/type require snapshot refs; use `evaluate` for CSS selectors).
+- For browser-driven verification, use `allbot browser` (tabs/status/screenshot) with the AllBot-managed Chrome profile.
+- For DOM inspection, use `allbot browser eval|query|dom|snapshot` (and `--json`/`--out` when you need machine output).
+- For interactions, use `allbot browser click|type|hover|drag|select|upload|press|wait|navigate|back|evaluate|run` (click/type require snapshot refs; use `evaluate` for CSS selectors).

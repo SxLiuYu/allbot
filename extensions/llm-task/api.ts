@@ -1,1 +1,1 @@
-export * from "kaijibot/plugin-sdk/llm-task";
+export * from "allbot/plugin-sdk/llm-task";

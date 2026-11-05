@@ -25,7 +25,7 @@ vi.mock("../../agents/agent-scope.js", () => ({
     const match = sessionKey?.match(/^agent:([^:]+)/i);
     return match?.[1] ?? "main";
   },
-  resolveAgentWorkspaceDir: () => "/tmp/kaijibot-test-workspace",
+  resolveAgentWorkspaceDir: () => "/tmp/allbot-test-workspace",
 }));
 
 vi.mock("../../config/plugin-auto-enable.js", () => ({
@@ -50,7 +50,7 @@ import { createTestRegistry } from "../../test-utils/channel-plugins.js";
 let sendMessage: typeof import("./message.js").sendMessage;
 let resetOutboundChannelResolutionStateForTest: typeof import("./channel-resolution.js").resetOutboundChannelResolutionStateForTest;
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("sendMessage", () => {
   beforeAll(async () => {
     ({ sendMessage } = await import("./message.js"));

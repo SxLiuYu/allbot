@@ -10,7 +10,7 @@ import {
 } from "../agents/model-catalog.js";
 import { findNormalizedProviderValue } from "../agents/provider-id.js";
 import type { MsgContext } from "../auto-reply/templating.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
@@ -82,7 +82,7 @@ function providerSupportsCapability(
 }
 
 function resolveConfiguredKeyProviderOrder(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerRegistry: ProviderRegistry;
   capability: MediaUnderstandingCapability;
   fallbackProviders: readonly string[];
@@ -99,7 +99,7 @@ function resolveConfiguredKeyProviderOrder(params: {
 }
 
 function resolveConfiguredImageModelId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerId: string;
 }): string | undefined {
   const providerCfg = findNormalizedProviderValue(
@@ -137,7 +137,7 @@ function resolveCatalogImageModelId(params: {
 }
 
 async function resolveAutoImageModelId(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   providerId: string;
   explicitModel?: string;
 }): Promise<string | undefined> {
@@ -166,13 +166,13 @@ async function resolveAutoImageModelId(params: {
 
 export function buildProviderRegistry(
   overrides?: Record<string, MediaUnderstandingProvider>,
-  cfg?: KaijiBotConfig,
+  cfg?: AllBotConfig,
 ): ProviderRegistry {
   return buildMediaUnderstandingRegistry(overrides, cfg);
 }
 
 export function resolveMediaAttachmentLocalRoots(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
 }): readonly string[] {
   return mergeInboundPathRoots(
@@ -418,7 +418,7 @@ async function resolveGeminiCliEntry(
 }
 
 async function resolveKeyEntry(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   providerRegistry: ProviderRegistry;
   capability: MediaUnderstandingCapability;
@@ -486,7 +486,7 @@ async function resolveKeyEntry(params: {
   return null;
 }
 
-function resolveImageModelFromAgentDefaults(cfg: KaijiBotConfig): MediaUnderstandingModelConfig[] {
+function resolveImageModelFromAgentDefaults(cfg: AllBotConfig): MediaUnderstandingModelConfig[] {
   const refs: string[] = [];
   const primary = resolveAgentModelPrimaryValue(cfg.agents?.defaults?.imageModel);
   if (primary?.trim()) {
@@ -516,7 +516,7 @@ function resolveImageModelFromAgentDefaults(cfg: KaijiBotConfig): MediaUnderstan
 }
 
 async function resolveAutoEntries(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   providerRegistry: ProviderRegistry;
   capability: MediaUnderstandingCapability;
@@ -550,7 +550,7 @@ async function resolveAutoEntries(params: {
 }
 
 export async function resolveAutoImageModel(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   activeModel?: ActiveMediaModel;
 }): Promise<ActiveMediaModel | null> {
@@ -588,7 +588,7 @@ export async function resolveAutoImageModel(params: {
 }
 
 async function resolveActiveModelEntry(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentDir?: string;
   providerRegistry: ProviderRegistry;
   capability: MediaUnderstandingCapability;
@@ -643,7 +643,7 @@ async function resolveActiveModelEntry(params: {
 
 async function runAttachmentEntries(params: {
   capability: MediaUnderstandingCapability;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
   attachmentIndex: number;
   agentDir?: string;
@@ -730,7 +730,7 @@ async function runAttachmentEntries(params: {
 
 export async function runCapability(params: {
   capability: MediaUnderstandingCapability;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   ctx: MsgContext;
   attachments: MediaAttachmentCache;
   media: MediaAttachment[];

@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { safeEqualSecret } from "../security/secret-equal.js";
 
 function firstHeaderValue(value: string | string[] | undefined): string {
@@ -49,7 +49,7 @@ export function isAuthorizedBrowserRequest(
   }
 
   if (auth.password) {
-    const passwordHeader = firstHeaderValue(req.headers["x-kaijibot-password"]).trim();
+    const passwordHeader = firstHeaderValue(req.headers["x-allbot-password"]).trim();
     if (passwordHeader && safeEqualSecret(passwordHeader, auth.password)) {
       return true;
     }

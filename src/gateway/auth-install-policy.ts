@@ -1,9 +1,9 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectDurableServiceEnvVars } from "../config/state-dir-dotenv.js";
 import { hasConfiguredSecretInput } from "../config/types.secrets.js";
 import { normalizeOptionalString } from "../shared/string-coerce.js";
 
-type GatewayInstallAuthMode = NonNullable<NonNullable<KaijiBotConfig["gateway"]>["auth"]>["mode"];
+type GatewayInstallAuthMode = NonNullable<NonNullable<AllBotConfig["gateway"]>["auth"]>["mode"];
 
 function hasExplicitGatewayInstallAuthMode(
   mode: GatewayInstallAuthMode | undefined,
@@ -17,23 +17,23 @@ function hasExplicitGatewayInstallAuthMode(
   return undefined;
 }
 
-function hasConfiguredGatewayPasswordForInstall(cfg: KaijiBotConfig): boolean {
+function hasConfiguredGatewayPasswordForInstall(cfg: AllBotConfig): boolean {
   return hasConfiguredSecretInput(cfg.gateway?.auth?.password, cfg.secrets?.defaults);
 }
 
 function hasDurableGatewayPasswordEnvForInstall(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv,
 ): boolean {
   const durableServiceEnv = collectDurableServiceEnvVars({ env, config: cfg });
   return Boolean(
-    normalizeOptionalString(durableServiceEnv.KAIJIBOT_GATEWAY_PASSWORD) ||
+    normalizeOptionalString(durableServiceEnv.ALLBOT_GATEWAY_PASSWORD) ||
     normalizeOptionalString(durableServiceEnv.CLAWDBOT_GATEWAY_PASSWORD),
   );
 }
 
 export function shouldRequireGatewayTokenForInstall(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv,
 ): boolean {
   const explicitModeDecision = hasExplicitGatewayInstallAuthMode(cfg.gateway?.auth?.mode);

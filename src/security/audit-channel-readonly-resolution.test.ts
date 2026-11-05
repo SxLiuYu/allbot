@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectChannelSecurityFindings } from "./audit-channel.js";
 
 function stubChannelPlugin(params: {
   id: "zalouser";
   label: string;
-  resolveAccount: (cfg: KaijiBotConfig, accountId: string | null | undefined) => unknown;
+  resolveAccount: (cfg: AllBotConfig, accountId: string | null | undefined) => unknown;
 }): ChannelPlugin {
   return {
     id: params.id,
@@ -40,7 +40,7 @@ describe("security audit channel read-only resolution", () => {
       },
     });
 
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       channels: {
         zalouser: {
           enabled: true,

@@ -1,4 +1,4 @@
-import { resolveAgentModelPrimaryValue } from "kaijibot/plugin-sdk/provider-onboard";
+import { resolveAgentModelPrimaryValue } from "allbot/plugin-sdk/provider-onboard";
 import { describe, expect, it } from "vitest";
 import { createLegacyProviderConfig } from "../../test/helpers/plugins/onboard-config.js";
 import { applyXiaomiConfig, applyXiaomiProviderConfig } from "./onboard.js";

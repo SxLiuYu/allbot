@@ -1,6 +1,6 @@
 import { resolve, isAbsolute } from "node:path";
 import { Type } from "typebox";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   resolveAutoMediaKeyProviders,
   resolveDefaultMediaModel,
@@ -102,7 +102,7 @@ function resolveImageToolMaxTokens(modelMaxTokens: number | undefined, requested
  *   - fall back to OpenAI/Anthropic when available
  */
 export function resolveImageModelConfigForTool(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir: string;
 }): ImageModelConfig | null {
   // Note: We intentionally do NOT gate based on primarySupportsImages here.
@@ -159,7 +159,7 @@ export function resolveImageModelConfigForTool(params: {
   });
 }
 
-function pickMaxBytes(cfg?: KaijiBotConfig, maxBytesMb?: number): number | undefined {
+function pickMaxBytes(cfg?: AllBotConfig, maxBytesMb?: number): number | undefined {
   if (typeof maxBytesMb === "number" && Number.isFinite(maxBytesMb) && maxBytesMb > 0) {
     return Math.floor(maxBytesMb * 1024 * 1024);
   }
@@ -176,7 +176,7 @@ type ImageSandboxConfig = {
 };
 
 async function runImagePrompt(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   agentDir: string;
   imageModelConfig: ImageModelConfig;
   modelOverride?: string;
@@ -189,7 +189,7 @@ async function runImagePrompt(params: {
   attempts: Array<{ provider: string; model: string; error: string }>;
 }> {
   const effectiveCfg = applyImageModelConfigDefaults(params.cfg, params.imageModelConfig);
-  const providerCfg: KaijiBotConfig = effectiveCfg ?? {};
+  const providerCfg: AllBotConfig = effectiveCfg ?? {};
   const providerRegistry = imageToolProviderDeps.buildProviderRegistry(undefined, providerCfg);
 
   const result = await runWithImageModelFallback({
@@ -278,7 +278,7 @@ async function runImagePrompt(params: {
 }
 
 export function createImageTool(options?: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentDir?: string;
   workspaceDir?: string;
   sandbox?: ImageSandboxConfig;

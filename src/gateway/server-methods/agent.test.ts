@@ -6,7 +6,7 @@ import { agentHandlers } from "./agent.js";
 import { expectSubagentFollowupReactivation } from "./subagent-followup.test-helpers.js";
 import type { GatewayRequestContext } from "./types.js";
 
-const ORIGINAL_STATE_DIR = process.env.KAIJIBOT_STATE_DIR;
+const ORIGINAL_STATE_DIR = process.env.ALLBOT_STATE_DIR;
 
 const mocks = vi.hoisted(() => ({
   loadSessionEntry: vi.fn(),
@@ -305,13 +305,13 @@ async function invokeAgentIdentityGet(
   return respond;
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway agent handler", () => {
   afterEach(() => {
     if (ORIGINAL_STATE_DIR === undefined) {
-      delete process.env.KAIJIBOT_STATE_DIR;
+      delete process.env.ALLBOT_STATE_DIR;
     } else {
-      process.env.KAIJIBOT_STATE_DIR = ORIGINAL_STATE_DIR;
+      process.env.ALLBOT_STATE_DIR = ORIGINAL_STATE_DIR;
     }
     resetTaskRegistryForTests();
   });
@@ -552,7 +552,7 @@ describe.skipIf(process.env.CI)("gateway agent handler", () => {
     });
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)(
     "includes live session setting metadata in agent send events",
     async () => {
@@ -708,7 +708,7 @@ describe.skipIf(process.env.CI)("gateway agent handler", () => {
     expect(callArgs?.senderIsOwner).toBe(senderIsOwner);
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   it.skipIf(process.env.CI)(
     "respects explicit bestEffortDeliver=false for main session runs",
     async () => {
@@ -848,8 +848,8 @@ describe.skipIf(process.env.CI)("gateway agent handler", () => {
     await invokeAgent(
       {
         message: [
-          "[Mon 2026-04-06 02:42 GMT+1] <<<BEGIN_KAIJIBOT_INTERNAL_CONTEXT>>>",
-          "KaijiBot runtime context (internal):",
+          "[Mon 2026-04-06 02:42 GMT+1] <<<BEGIN_ALLBOT_INTERNAL_CONTEXT>>>",
+          "AllBot runtime context (internal):",
           "This context is runtime-generated, not user-authored. Keep internal details private.",
         ].join("\n"),
         sessionKey: "agent:main:main",
@@ -961,8 +961,8 @@ describe.skipIf(process.env.CI)("gateway agent handler", () => {
   });
 
   it("tracks async gateway agent runs in the shared task registry", async () => {
-    await withTempDir({ prefix: "kaijibot-gateway-agent-task-" }, async (root) => {
-      process.env.KAIJIBOT_STATE_DIR = root;
+    await withTempDir({ prefix: "allbot-gateway-agent-task-" }, async (root) => {
+      process.env.ALLBOT_STATE_DIR = root;
       resetTaskRegistryForTests();
       primeMainAgentRun();
 

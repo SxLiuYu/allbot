@@ -9,8 +9,8 @@ export {
   WEBHOOK_IN_FLIGHT_DEFAULTS,
   WEBHOOK_RATE_LIMIT_DEFAULTS,
   type WebhookInFlightLimiter,
-} from "kaijibot/plugin-sdk/webhook-ingress";
+} from "allbot/plugin-sdk/webhook-ingress";
 export {
   resolveConfiguredSecretInputString,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/config-runtime";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/config-runtime";

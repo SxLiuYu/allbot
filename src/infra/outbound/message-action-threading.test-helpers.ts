@@ -1,8 +1,8 @@
 import { vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 type AutoThreadResolver = (params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string | null;
   to: string;
   toolContext?: Record<string, unknown>;
@@ -10,7 +10,7 @@ type AutoThreadResolver = (params: {
 }) => string | undefined;
 
 type OutboundThreadContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   to: string;
   accountId?: string | null;
   toolContext?: Record<string, unknown>;
@@ -52,7 +52,7 @@ export function createOutboundThreadingMock() {
         resolveAutoThreadId,
       }: {
         actionParams: Record<string, unknown>;
-        cfg: KaijiBotConfig;
+        cfg: AllBotConfig;
         to: string;
         accountId?: string | null;
         toolContext?: Record<string, unknown>;

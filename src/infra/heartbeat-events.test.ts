@@ -12,7 +12,7 @@ import {
   resetHeartbeatEventsForTest,
   resolveIndicatorType,
 } from "./heartbeat-events.js";
-import { resolvePreferredKaijiBotTmpDir } from "./tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "./tmp-allbot-dir.js";
 
 type HeartbeatEventsModule = typeof import("./heartbeat-events.js");
 
@@ -119,7 +119,7 @@ describe("heartbeat event file logging", () => {
       level: "info",
       consoleLevel: "silent",
       file: path.join(
-        resolvePreferredKaijiBotTmpDir(),
+        resolvePreferredAllBotTmpDir(),
         `hb-events-test-${process.pid}-${Date.now()}.log`,
       ),
     });

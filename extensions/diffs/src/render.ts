@@ -185,10 +185,10 @@ function buildRenderVariants(params: { options: DiffRenderOptions; target: DiffR
 
 function renderDiffCard(payload: DiffViewerPayload): string {
   return `<section class="oc-diff-card">
-    <diffs-container class="oc-diff-host" data-kaijibot-diff-host>
+    <diffs-container class="oc-diff-host" data-allbot-diff-host>
       <template shadowrootmode="open">${payload.prerenderedHTML}</template>
     </diffs-container>
-    <script type="application/json" data-kaijibot-diff-payload>${escapeJsonScript(payload)}</script>
+    <script type="application/json" data-allbot-diff-payload>${escapeJsonScript(payload)}</script>
   </section>`;
 }
 
@@ -248,7 +248,7 @@ function buildHtmlDocument(params: {
         max-width: ${Math.max(640, Math.round(params.imageMaxWidth))}px;
       }
 
-      [data-kaijibot-diff-root] {
+      [data-allbot-diff-root] {
         display: grid;
         gap: 18px;
       }
@@ -280,7 +280,7 @@ function buildHtmlDocument(params: {
           padding: 12px;
         }
 
-        [data-kaijibot-diff-root] {
+        [data-allbot-diff-root] {
           gap: 12px;
         }
       }
@@ -288,7 +288,7 @@ function buildHtmlDocument(params: {
   </head>
   <body data-theme="${params.theme}">
     <main class="oc-frame" data-render-mode="${params.runtimeMode}">
-      <div data-kaijibot-diff-root>
+      <div data-allbot-diff-root>
         ${params.bodyHtml}
       </div>
     </main>

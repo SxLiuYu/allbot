@@ -1,8 +1,8 @@
 import {
   applyProviderConfigWithModelCatalogPreset,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import {
   buildZaiCatalogModels,
   resolveZaiBaseUrl,
@@ -11,17 +11,17 @@ import {
 
 export const ZAI_DEFAULT_MODEL_REF = `zai/${ZAI_DEFAULT_MODEL_ID}`;
 
-function resolveZaiPresetBaseUrl(cfg: KaijiBotConfig, endpoint?: string): string {
+function resolveZaiPresetBaseUrl(cfg: AllBotConfig, endpoint?: string): string {
   const existingProvider = cfg.models?.providers?.zai;
   const existingBaseUrl = normalizeOptionalString(existingProvider?.baseUrl) ?? "";
   return endpoint ? resolveZaiBaseUrl(endpoint) : existingBaseUrl || resolveZaiBaseUrl();
 }
 
 function applyZaiPreset(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params?: { endpoint?: string; modelId?: string },
   primaryModelRef?: string,
-): KaijiBotConfig {
+): AllBotConfig {
   const modelId = normalizeOptionalString(params?.modelId) ?? ZAI_DEFAULT_MODEL_ID;
   const modelRef = `zai/${modelId}`;
   return applyProviderConfigWithModelCatalogPreset(cfg, {
@@ -35,16 +35,16 @@ function applyZaiPreset(
 }
 
 export function applyZaiProviderConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params?: { endpoint?: string; modelId?: string },
-): KaijiBotConfig {
+): AllBotConfig {
   return applyZaiPreset(cfg, params);
 }
 
 export function applyZaiConfig(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   params?: { endpoint?: string; modelId?: string },
-): KaijiBotConfig {
+): AllBotConfig {
   const modelId = normalizeOptionalString(params?.modelId) ?? ZAI_DEFAULT_MODEL_ID;
   const modelRef = modelId === ZAI_DEFAULT_MODEL_ID ? ZAI_DEFAULT_MODEL_REF : `zai/${modelId}`;
   return applyZaiPreset(cfg, params, modelRef);

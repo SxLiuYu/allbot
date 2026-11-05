@@ -63,7 +63,7 @@ function defaultSpawnMap(call: { cmd: string; args: SpawnArgs }): {
   if (cmd === "sh" && args[0] === "-c" && probe) {
     return { status: 0, stdout: `/data/data/com.termux/files/usr/bin/${probe[1]}\n` };
   }
-  if (cmd === "kaijibot" && args[0] === "--version") {
+  if (cmd === "allbot" && args[0] === "--version") {
     return { status: 0, stdout: "" };
   }
   if (cmd === "npm") {
@@ -153,22 +153,22 @@ describe("runAndroidInstall - full happy path", () => {
     expect(cmds.some((c) => c.startsWith("node --version"))).toBe(true);
     expect(cmds.some((c) => c.includes('command -v "magick"'))).toBe(true);
     expect(cmds.some((c) => c.includes('command -v "ffmpeg"'))).toBe(true);
-    expect(cmds.some((c) => c.startsWith("kaijibot --version"))).toBe(true);
-    expect(cmds.some((c) => c.startsWith("npm install -g kaijibot"))).toBe(true);
+    expect(cmds.some((c) => c.startsWith("allbot --version"))).toBe(true);
+    expect(cmds.some((c) => c.startsWith("npm install -g allbot"))).toBe(true);
     expect(cmds.some((c) => c.includes("@img/sharp-wasm32"))).toBe(true);
     expect(cmds.some((c) => c.startsWith("pm list packages"))).toBe(true);
     expect(cmds.some((c) => c.startsWith("getprop ro.product.manufacturer"))).toBe(true);
-    expect(cmds.some((c) => c.startsWith("kaijibot onboard"))).toBe(true);
+    expect(cmds.some((c) => c.startsWith("allbot onboard"))).toBe(true);
 
     const bootWrite = hoisted.writeTextAtomic.mock.calls.find((call: unknown) => {
       const [p] = call as [string];
-      return p.endsWith("start-kaijibot.sh");
+      return p.endsWith("start-allbot.sh");
     });
     expect(bootWrite).toBeDefined();
     const [, bootContent, bootOpts] = bootWrite as [string, string, { mode: number }];
     expect(bootContent).toContain("#!/data/data/com.termux/files/usr/bin/bash");
     expect(bootContent).toContain("termux-wake-lock");
-    expect(bootContent).toContain("kaijibot gateway --port 18789");
+    expect(bootContent).toContain("allbot gateway --port 18789");
     expect(bootOpts.mode).toBe(0o755);
   });
 
@@ -182,7 +182,7 @@ describe("runAndroidInstall - full happy path", () => {
 
     expect(hoisted.confirm).not.toHaveBeenCalled();
     const calls = hoisted.spawnSync.mock.calls as unknown as [string, SpawnArgs][];
-    expect(calls.some(([c, a]) => c === "kaijibot" && a?.[0] === "onboard")).toBe(true);
+    expect(calls.some(([c, a]) => c === "allbot" && a?.[0] === "onboard")).toBe(true);
   });
 
   it("skips onboard prompt entirely in non-interactive mode", async () => {
@@ -194,7 +194,7 @@ describe("runAndroidInstall - full happy path", () => {
 
     expect(hoisted.confirm).not.toHaveBeenCalled();
     const calls = hoisted.spawnSync.mock.calls as unknown as [string, SpawnArgs][];
-    expect(calls.some(([c, a]) => c === "kaijibot" && a?.[0] === "onboard")).toBe(false);
+    expect(calls.some(([c, a]) => c === "allbot" && a?.[0] === "onboard")).toBe(false);
   });
 });
 

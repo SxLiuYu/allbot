@@ -24,11 +24,11 @@ describe("resolveLocalVitestMaxWorkers", () => {
     ).toBe(6);
   });
 
-  it("lets KAIJIBOT_VITEST_MAX_WORKERS override the inferred cap", () => {
+  it("lets ALLBOT_VITEST_MAX_WORKERS override the inferred cap", () => {
     expect(
       resolveLocalVitestMaxWorkers(
         {
-          KAIJIBOT_VITEST_MAX_WORKERS: "2",
+          ALLBOT_VITEST_MAX_WORKERS: "2",
         },
         {
           cpuCount: 10,
@@ -40,11 +40,11 @@ describe("resolveLocalVitestMaxWorkers", () => {
     ).toBe(2);
   });
 
-  it("respects the legacy KAIJIBOT_TEST_WORKERS override too", () => {
+  it("respects the legacy ALLBOT_TEST_WORKERS override too", () => {
     expect(
       resolveLocalVitestMaxWorkers(
         {
-          KAIJIBOT_TEST_WORKERS: "3",
+          ALLBOT_TEST_WORKERS: "3",
         },
         {
           cpuCount: 16,
@@ -154,7 +154,7 @@ describe("resolveLocalVitestScheduling", () => {
     expect(
       resolveLocalVitestScheduling(
         {
-          KAIJIBOT_VITEST_DISABLE_SYSTEM_THROTTLE: "1",
+          ALLBOT_VITEST_DISABLE_SYSTEM_THROTTLE: "1",
         },
         {
           cpuCount: 16,
@@ -221,7 +221,7 @@ describe("test scripts", () => {
     };
 
     expect(pkg.scripts?.["test:serial"]).toBe(
-      "KAIJIBOT_VITEST_MAX_WORKERS=1 node scripts/run-vitest.mjs run --config vitest.config.ts",
+      "ALLBOT_VITEST_MAX_WORKERS=1 node scripts/run-vitest.mjs run --config vitest.config.ts",
     );
     expect(pkg.scripts?.["test:fast"]).toBe(
       "node scripts/run-vitest.mjs run --config vitest/vitest.unit.config.ts",

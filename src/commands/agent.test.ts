@@ -11,7 +11,7 @@ import { resolveSession } from "../agents/command/session.js";
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import * as modelSelectionModule from "../agents/model-selection.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import * as configModule from "../config/config.js";
 import { clearSessionStoreCacheForTest } from "../config/sessions.js";
 import * as sessionPathsModule from "../config/sessions/paths.js";
@@ -66,9 +66,9 @@ vi.mock("../agents/auth-profiles/store.js", async () => {
 });
 
 vi.mock("../agents/workspace.js", () => {
-  const resolveDefaultAgentWorkspaceDir = () => "/tmp/kaijibot-workspace";
+  const resolveDefaultAgentWorkspaceDir = () => "/tmp/allbot-workspace";
   return {
-    DEFAULT_AGENT_WORKSPACE_DIR: "/tmp/kaijibot-workspace",
+    DEFAULT_AGENT_WORKSPACE_DIR: "/tmp/allbot-workspace",
     DEFAULT_AGENTS_FILENAME: "AGENTS.md",
     DEFAULT_IDENTITY_FILENAME: "IDENTITY.md",
     resolveDefaultAgentWorkspaceDir,
@@ -107,14 +107,14 @@ const configSpy = vi.spyOn(configModule, "loadConfig");
 const readConfigFileSnapshotForWriteSpy = vi.spyOn(configModule, "readConfigFileSnapshotForWrite");
 
 async function withTempHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
-  return withTempHomeBase(fn, { prefix: "kaijibot-agent-" });
+  return withTempHomeBase(fn, { prefix: "allbot-agent-" });
 }
 
 function mockConfig(
   home: string,
   storePath: string,
-  agentOverrides?: Partial<NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>>,
-  telegramOverrides?: Partial<NonNullable<NonNullable<KaijiBotConfig["channels"]>["telegram"]>>,
+  agentOverrides?: Partial<NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>>,
+  telegramOverrides?: Partial<NonNullable<NonNullable<AllBotConfig["channels"]>["telegram"]>>,
   agentsList?: Array<{ id: string; default?: boolean }>,
 ) {
   const cfg = {
@@ -122,7 +122,7 @@ function mockConfig(
       defaults: {
         model: { primary: "anthropic/claude-opus-4-6" },
         models: { "anthropic/claude-opus-4-6": {} },
-        workspace: path.join(home, "kaijibot"),
+        workspace: path.join(home, "allbot"),
         ...agentOverrides,
       },
       list: agentsList,
@@ -131,7 +131,7 @@ function mockConfig(
     channels: {
       telegram: telegramOverrides ? { ...telegramOverrides } : undefined,
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
   configSpy.mockReturnValue(cfg);
   return cfg;
 }
@@ -149,8 +149,8 @@ async function runWithDefaultAgentConfig(params: {
 
 async function runEmbeddedWithTempConfig(params: {
   args: Parameters<typeof agentCommand>[0];
-  agentOverrides?: Partial<NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>>;
-  telegramOverrides?: Partial<NonNullable<NonNullable<KaijiBotConfig["channels"]>["telegram"]>>;
+  agentOverrides?: Partial<NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>>;
+  telegramOverrides?: Partial<NonNullable<NonNullable<AllBotConfig["channels"]>["telegram"]>>;
   agentsList?: Array<{ id: string; default?: boolean }>;
 }) {
   return withTempHome(async (home) => {
@@ -197,7 +197,7 @@ function readSessionStore<T>(storePath: string): Record<string, T> {
 }
 
 async function withCrossAgentResumeFixture(
-  run: (params: { sessionId: string; sessionKey: string; cfg: KaijiBotConfig }) => Promise<void>,
+  run: (params: { sessionId: string; sessionKey: string; cfg: AllBotConfig }) => Promise<void>,
 ): Promise<void> {
   await withTempHome(async (home) => {
     const storePattern = path.join(home, "sessions", "{agentId}", "sessions.json");
@@ -247,7 +247,7 @@ async function runAgentWithSessionKey(sessionKey: string): Promise<void> {
 }
 
 async function expectDefaultThinkLevel(params: {
-  agentOverrides?: Partial<NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>>;
+  agentOverrides?: Partial<NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>>;
   catalogEntry: Record<string, unknown>;
   expected: string;
 }) {
@@ -311,7 +311,7 @@ beforeEach(() => {
   vi.mocked(loadModelCatalog).mockResolvedValue([]);
   vi.mocked(modelSelectionModule.isCliProvider).mockImplementation(() => false);
   readConfigFileSnapshotForWriteSpy.mockResolvedValue({
-    snapshot: { valid: false, resolved: {} as KaijiBotConfig },
+    snapshot: { valid: false, resolved: {} as AllBotConfig },
     writeOptions: {},
   } as Awaited<ReturnType<typeof configModule.readConfigFileSnapshotForWrite>>);
 });

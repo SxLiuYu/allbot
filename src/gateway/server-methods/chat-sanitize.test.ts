@@ -19,13 +19,13 @@ describe("sanitizeChatHistoryMessages", () => {
       {
         role: "system",
         content: [{ type: "text", text: "Compaction" }],
-        __kaijibot: { kind: "compaction" },
+        __allbot: { kind: "compaction" },
       },
     ];
     const result = sanitizeChatHistoryMessages(messages, 10000);
     const systemMsgs = result.filter((m) => (m as { role?: string }).role === "system");
     expect(systemMsgs).toHaveLength(1);
-    expect((systemMsgs[0] as { __kaijibot?: { kind?: string } }).__kaijibot?.kind).toBe(
+    expect((systemMsgs[0] as { __allbot?: { kind?: string } }).__allbot?.kind).toBe(
       "compaction",
     );
   });

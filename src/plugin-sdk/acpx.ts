@@ -16,10 +16,10 @@ export type {
   AcpSessionUpdateTag,
 } from "../acp/runtime/types.js";
 export type {
-  KaijiBotPluginApi,
-  KaijiBotPluginConfigSchema,
-  KaijiBotPluginService,
-  KaijiBotPluginServiceContext,
+  AllBotPluginApi,
+  AllBotPluginConfigSchema,
+  AllBotPluginService,
+  AllBotPluginServiceContext,
   PluginLogger,
 } from "../plugins/types.js";
 export type {

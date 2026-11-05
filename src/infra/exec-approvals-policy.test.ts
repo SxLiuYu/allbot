@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
 import {
   collectExecPolicyScopeSnapshots,
@@ -232,19 +232,19 @@ describe("exec approvals policy helpers", () => {
       requested: "full",
       host: "allowlist",
       effective: "allowlist",
-      hostSource: "~/.kaijibot/exec-approvals.json defaults.security",
+      hostSource: "~/.allbot/exec-approvals.json defaults.security",
       note: "stricter host security wins",
     });
     expect(summary.ask).toMatchObject({
       requested: "off",
       host: "always",
       effective: "always",
-      hostSource: "~/.kaijibot/exec-approvals.json defaults.ask",
+      hostSource: "~/.allbot/exec-approvals.json defaults.ask",
       note: "more aggressive ask wins",
     });
     expect(summary.askFallback).toEqual({
       effective: "deny",
-      source: "~/.kaijibot/exec-approvals.json defaults.askFallback",
+      source: "~/.allbot/exec-approvals.json defaults.askFallback",
     });
   });
 
@@ -318,7 +318,7 @@ describe("exec approvals policy helpers", () => {
 
     expect(summary.askFallback).toEqual({
       effective: "allowlist",
-      source: "~/.kaijibot/exec-approvals.json defaults.askFallback",
+      source: "~/.allbot/exec-approvals.json defaults.askFallback",
     });
   });
 
@@ -347,7 +347,7 @@ describe("exec approvals policy helpers", () => {
     expect(summary.ask).toMatchObject({
       requested: "off",
       host: "always",
-      hostSource: "~/.kaijibot/exec-approvals.json defaults.ask",
+      hostSource: "~/.allbot/exec-approvals.json defaults.ask",
       effective: "always",
       note: "more aggressive ask wins",
     });
@@ -378,7 +378,7 @@ describe("exec approvals policy helpers", () => {
     expect(summary.ask).toMatchObject({
       requested: "off",
       host: "always",
-      hostSource: "~/.kaijibot/exec-approvals.json defaults.ask",
+      hostSource: "~/.allbot/exec-approvals.json defaults.ask",
       effective: "always",
       note: "more aggressive ask wins",
     });
@@ -409,7 +409,7 @@ describe("exec approvals policy helpers", () => {
     expect(summary.ask).toMatchObject({
       requested: "off",
       host: "always",
-      hostSource: "~/.kaijibot/exec-approvals.json defaults.ask",
+      hostSource: "~/.allbot/exec-approvals.json defaults.ask",
       effective: "always",
       note: "more aggressive ask wins",
     });
@@ -443,15 +443,15 @@ describe("exec approvals policy helpers", () => {
 
     expect(summary.security).toMatchObject({
       host: "allowlist",
-      hostSource: "~/.kaijibot/exec-approvals.json agents.*.security",
+      hostSource: "~/.allbot/exec-approvals.json agents.*.security",
     });
     expect(summary.ask).toMatchObject({
       host: "always",
-      hostSource: "~/.kaijibot/exec-approvals.json agents.*.ask",
+      hostSource: "~/.allbot/exec-approvals.json agents.*.ask",
     });
     expect(summary.askFallback).toEqual({
       effective: "deny",
-      source: "~/.kaijibot/exec-approvals.json agents.*.askFallback",
+      source: "~/.allbot/exec-approvals.json agents.*.askFallback",
     });
   });
 
@@ -489,7 +489,7 @@ describe("exec approvals policy helpers", () => {
     });
   });
 
-  it("reports askFallback from the KaijiBot default when approvals omit it", () => {
+  it("reports askFallback from the AllBot default when approvals omit it", () => {
     const summary = resolveExecPolicyScopeSummary({
       approvals: {
         version: 1,
@@ -501,7 +501,7 @@ describe("exec approvals policy helpers", () => {
 
     expect(summary.askFallback).toEqual({
       effective: "full",
-      source: "KaijiBot default (full)",
+      source: "AllBot default (full)",
     });
   });
 
@@ -517,7 +517,7 @@ describe("exec approvals policy helpers", () => {
         agents: {
           list: [{ id: "runner" }],
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       approvals: {
         version: 1,
         agents: {
@@ -559,7 +559,7 @@ describe("exec approvals policy helpers", () => {
             ask: "off",
           },
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       approvals: {
         version: 1,
         agents: {
@@ -574,11 +574,11 @@ describe("exec approvals policy helpers", () => {
     expect(snapshots.map((snapshot) => snapshot.scopeLabel)).toEqual(["tools.exec"]);
     expect(snapshots[0]?.security).toMatchObject({
       host: "allowlist",
-      hostSource: "~/.kaijibot/exec-approvals.json agents.main.security",
+      hostSource: "~/.allbot/exec-approvals.json agents.main.security",
     });
     expect(snapshots[0]?.ask).toMatchObject({
       host: "always",
-      hostSource: "~/.kaijibot/exec-approvals.json agents.main.ask",
+      hostSource: "~/.allbot/exec-approvals.json agents.main.ask",
     });
   });
 
@@ -603,7 +603,7 @@ describe("exec approvals policy helpers", () => {
             },
           ],
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       approvals: {
         version: 1,
       },

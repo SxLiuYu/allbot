@@ -266,20 +266,20 @@ export function buildServiceEnvironment(params: {
     extraPathDirs,
     params.execPath,
   );
-  const profile = env.KAIJIBOT_PROFILE;
+  const profile = env.ALLBOT_PROFILE;
   const resolvedLaunchdLabel =
     launchdLabel || (platform === "darwin" ? resolveGatewayLaunchAgentLabel(profile) : undefined);
   const systemdUnit = `${resolveGatewaySystemdServiceName(profile)}.service`;
   return {
     ...buildCommonServiceEnvironment(env, sharedEnv),
-    KAIJIBOT_PROFILE: profile,
-    KAIJIBOT_GATEWAY_PORT: String(port),
-    KAIJIBOT_LAUNCHD_LABEL: resolvedLaunchdLabel,
-    KAIJIBOT_SYSTEMD_UNIT: systemdUnit,
-    KAIJIBOT_WINDOWS_TASK_NAME: resolveGatewayWindowsTaskName(profile),
-    KAIJIBOT_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
-    KAIJIBOT_SERVICE_KIND: GATEWAY_SERVICE_KIND,
-    KAIJIBOT_SERVICE_VERSION: VERSION,
+    ALLBOT_PROFILE: profile,
+    ALLBOT_GATEWAY_PORT: String(port),
+    ALLBOT_LAUNCHD_LABEL: resolvedLaunchdLabel,
+    ALLBOT_SYSTEMD_UNIT: systemdUnit,
+    ALLBOT_WINDOWS_TASK_NAME: resolveGatewayWindowsTaskName(profile),
+    ALLBOT_SERVICE_MARKER: GATEWAY_SERVICE_MARKER,
+    ALLBOT_SERVICE_KIND: GATEWAY_SERVICE_KIND,
+    ALLBOT_SERVICE_VERSION: VERSION,
   };
 }
 
@@ -297,18 +297,18 @@ export function buildNodeServiceEnvironment(params: {
     extraPathDirs,
     params.execPath,
   );
-  const gatewayToken = normalizeOptionalString(env.KAIJIBOT_GATEWAY_TOKEN);
+  const gatewayToken = normalizeOptionalString(env.ALLBOT_GATEWAY_TOKEN);
   return {
     ...buildCommonServiceEnvironment(env, sharedEnv),
-    KAIJIBOT_GATEWAY_TOKEN: gatewayToken,
-    KAIJIBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
-    KAIJIBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
-    KAIJIBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
-    KAIJIBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
-    KAIJIBOT_LOG_PREFIX: "node",
-    KAIJIBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
-    KAIJIBOT_SERVICE_KIND: NODE_SERVICE_KIND,
-    KAIJIBOT_SERVICE_VERSION: VERSION,
+    ALLBOT_GATEWAY_TOKEN: gatewayToken,
+    ALLBOT_LAUNCHD_LABEL: resolveNodeLaunchAgentLabel(),
+    ALLBOT_SYSTEMD_UNIT: resolveNodeSystemdServiceName(),
+    ALLBOT_WINDOWS_TASK_NAME: resolveNodeWindowsTaskName(),
+    ALLBOT_TASK_SCRIPT_NAME: NODE_WINDOWS_TASK_SCRIPT_NAME,
+    ALLBOT_LOG_PREFIX: "node",
+    ALLBOT_SERVICE_MARKER: NODE_SERVICE_MARKER,
+    ALLBOT_SERVICE_KIND: NODE_SERVICE_KIND,
+    ALLBOT_SERVICE_VERSION: VERSION,
   };
 }
 
@@ -322,8 +322,8 @@ function buildCommonServiceEnvironment(
     ...sharedEnv.proxyEnv,
     NODE_EXTRA_CA_CERTS: sharedEnv.nodeCaCerts,
     NODE_USE_SYSTEM_CA: sharedEnv.nodeUseSystemCa,
-    KAIJIBOT_STATE_DIR: sharedEnv.stateDir,
-    KAIJIBOT_CONFIG_PATH: sharedEnv.configPath,
+    ALLBOT_STATE_DIR: sharedEnv.stateDir,
+    ALLBOT_CONFIG_PATH: sharedEnv.configPath,
   };
   if (sharedEnv.minimalPath) {
     serviceEnv.PATH = sharedEnv.minimalPath;
@@ -337,8 +337,8 @@ function resolveSharedServiceEnvironmentFields(
   extraPathDirs: string[] | undefined,
   execPath?: string,
 ): SharedServiceEnvironmentFields {
-  const stateDir = env.KAIJIBOT_STATE_DIR;
-  const configPath = env.KAIJIBOT_CONFIG_PATH;
+  const stateDir = env.ALLBOT_STATE_DIR;
+  const configPath = env.ALLBOT_CONFIG_PATH;
   // Keep a usable temp directory for supervised services even when the host env omits TMPDIR.
   const tmpDir = env.TMPDIR?.trim() || os.tmpdir();
   const proxyEnv = readServiceProxyEnvironment(env);

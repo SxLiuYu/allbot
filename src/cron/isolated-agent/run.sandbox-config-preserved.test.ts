@@ -88,10 +88,10 @@ describe("runCronIsolatedAgentTurn sandbox config preserved", () => {
     const runCfg = buildRunCfg("specialist", {
       sandbox: {
         docker: {
-          image: "ghcr.io/kaijibot/sandbox:custom",
+          image: "ghcr.io/allbot/sandbox:custom",
         },
         browser: {
-          image: "ghcr.io/kaijibot/browser:custom",
+          image: "ghcr.io/allbot/browser:custom",
         },
         prune: {
           idleHours: 1,
@@ -104,14 +104,14 @@ describe("runCronIsolatedAgentTurn sandbox config preserved", () => {
     expect(resolvedSandbox.mode).toBe("all");
     expect(resolvedSandbox.workspaceAccess).toBe("rw");
     expect(resolvedSandbox.docker).toMatchObject({
-      image: "ghcr.io/kaijibot/sandbox:custom",
+      image: "ghcr.io/allbot/sandbox:custom",
       network: "none",
       dangerouslyAllowContainerNamespaceJoin: true,
       dangerouslyAllowExternalBindSources: true,
     });
     expect(resolvedSandbox.browser).toMatchObject({
       enabled: true,
-      image: "ghcr.io/kaijibot/browser:custom",
+      image: "ghcr.io/allbot/browser:custom",
       autoStart: false,
     });
     expect(resolvedSandbox.prune).toMatchObject({

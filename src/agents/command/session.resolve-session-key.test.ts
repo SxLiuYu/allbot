@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionEntry } from "../../config/sessions/types.js";
 
 const hoisted = vi.hoisted(() => ({
@@ -57,7 +57,7 @@ describe("resolveSessionKeyForRequest", () => {
         session: {
           store: "/stores/{agentId}.json",
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       sessionId: "sid",
     });
 
@@ -88,7 +88,7 @@ describe("resolveSessionKeyForRequest", () => {
         session: {
           store: "/stores/{agentId}.json",
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       sessionId: "sid",
     });
 
@@ -114,7 +114,7 @@ describe("resolveSessionKeyForRequest", () => {
         session: {
           store: "/stores/{agentId}.json",
         },
-      } satisfies KaijiBotConfig,
+      } satisfies AllBotConfig,
       sessionId: "resume-agent-1",
       agentId: "embedded-agent",
     });

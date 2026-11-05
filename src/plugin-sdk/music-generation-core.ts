@@ -2,7 +2,7 @@
 
 export type { AuthProfileStore } from "../agents/auth-profiles.js";
 export type { FallbackAttempt } from "../agents/model-fallback.types.js";
-export type { KaijiBotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
 export type { MusicGenerationProviderPlugin } from "../plugins/types.js";
 export type {
   GeneratedMusicAsset,

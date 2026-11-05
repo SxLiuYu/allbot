@@ -1,1 +1,1 @@
-export * from "kaijibot/plugin-sdk/speech-core";
+export * from "allbot/plugin-sdk/speech-core";

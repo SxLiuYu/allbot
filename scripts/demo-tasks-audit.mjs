@@ -6,7 +6,7 @@
  * gateway, and prints the execution trail. Reproduction:
  *
  *   1. Ensure the gateway runs with cognitive.tasks.enabled=true
- *      (kaijibot config set cognitive.tasks.enabled true && pnpm gw:deploy).
+ *      (allbot config set cognitive.tasks.enabled true && pnpm gw:deploy).
  *   2. Ask the agent (chat / Feishu) to delegate a multi-step task — e.g.
  *      "帮我建一个任务：调研 X 并写一页摘要" — the task_create tool queues it.
  *   3. Run this script:
@@ -16,8 +16,8 @@
  *                                          [--get <taskId>] [--user <userId>]
  *                                          [--all]
  *
- *      --token defaults to KAIJIBOT_GATEWAY_TOKEN / the token in
- *      ~/.kaijibot/kaijibot.json (gateway.auth.token).
+ *      --token defaults to ALLBOT_GATEWAY_TOKEN / the token in
+ *      ~/.allbot/allbot.json (gateway.auth.token).
  *      --all includes finished tasks; --get prints one task's full steps.
  *
  * Then open the Control UI → 任务 tab to see the same trail rendered.
@@ -30,8 +30,8 @@ import WebSocket from "ws";
 
 function parseArgs(argv) {
   const options = {
-    url: process.env.KAIJIBOT_GATEWAY_URL ?? "ws://127.0.0.1:18789",
-    token: process.env.KAIJIBOT_GATEWAY_TOKEN ?? null,
+    url: process.env.ALLBOT_GATEWAY_URL ?? "ws://127.0.0.1:18789",
+    token: process.env.ALLBOT_GATEWAY_TOKEN ?? null,
     get: null,
     user: null,
     all: false,
@@ -64,8 +64,8 @@ function parseArgs(argv) {
 
 function readTokenFromConfig() {
   for (const candidate of [
-    process.env.KAIJIBOT_CONFIG_PATH,
-    path.join(os.homedir(), ".kaijibot", "kaijibot.json"),
+    process.env.ALLBOT_CONFIG_PATH,
+    path.join(os.homedir(), ".allbot", "allbot.json"),
   ]) {
     if (!candidate || !fs.existsSync(candidate)) {
       continue;
@@ -87,7 +87,7 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const token = options.token ?? readTokenFromConfig();
   if (!token) {
-    console.error("No gateway token: pass --token or set KAIJIBOT_GATEWAY_TOKEN.");
+    console.error("No gateway token: pass --token or set ALLBOT_GATEWAY_TOKEN.");
     process.exit(1);
   }
 

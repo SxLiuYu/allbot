@@ -116,17 +116,17 @@ export function createGatewayReloadHandlers(params: {
         cfg: nextConfig,
         log: params.logHooks,
         onSkipped: () =>
-          params.logHooks.info("skipping gmail watcher restart (KAIJIBOT_SKIP_GMAIL_WATCHER=1)"),
+          params.logHooks.info("skipping gmail watcher restart (ALLBOT_SKIP_GMAIL_WATCHER=1)"),
       });
     }
 
     if (plan.restartChannels.size > 0) {
       if (
-        isTruthyEnvValue(process.env.KAIJIBOT_SKIP_CHANNELS) ||
-        isTruthyEnvValue(process.env.KAIJIBOT_SKIP_PROVIDERS)
+        isTruthyEnvValue(process.env.ALLBOT_SKIP_CHANNELS) ||
+        isTruthyEnvValue(process.env.ALLBOT_SKIP_PROVIDERS)
       ) {
         params.logChannels.info(
-          "skipping channel reload (KAIJIBOT_SKIP_CHANNELS=1 or KAIJIBOT_SKIP_PROVIDERS=1)",
+          "skipping channel reload (ALLBOT_SKIP_CHANNELS=1 or ALLBOT_SKIP_PROVIDERS=1)",
         );
       } else {
         const restartChannel = async (name: ChannelKind) => {

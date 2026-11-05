@@ -1,6 +1,6 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
-export function makeModelFallbackCfg(overrides: Partial<KaijiBotConfig> = {}): KaijiBotConfig {
+export function makeModelFallbackCfg(overrides: Partial<AllBotConfig> = {}): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -11,5 +11,5 @@ export function makeModelFallbackCfg(overrides: Partial<KaijiBotConfig> = {}): K
       },
     },
     ...overrides,
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }

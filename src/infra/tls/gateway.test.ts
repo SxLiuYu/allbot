@@ -7,7 +7,7 @@ import { normalizeFingerprint } from "./fingerprint.js";
 import { loadGatewayTlsRuntime } from "./gateway.js";
 
 const tempDirs = createTrackedTempDirs();
-const createTempDir = () => tempDirs.make("kaijibot-gateway-tls-test-");
+const createTempDir = () => tempDirs.make("allbot-gateway-tls-test-");
 
 const KEY_PEM = [
   "-----BEGIN PRIVATE KEY-----", // pragma: allowlist secret

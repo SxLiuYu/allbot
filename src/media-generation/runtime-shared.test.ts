@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   deriveAspectRatioFromSize,
   normalizeDurationToClosestMax,
@@ -34,7 +34,7 @@ describe.skip("media-generation runtime shared candidates", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const candidates = resolveCapabilityModelCandidates({
       cfg,
@@ -72,7 +72,7 @@ describe.skip("media-generation runtime shared candidates", () => {
 
   it.skip("auto-detects auth-backed provider defaults when no explicit media model is configured", () => {
     const candidates = resolveCapabilityModelCandidates({
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       modelConfig: undefined,
       parseModelRef,
       listProviders: () => [
@@ -103,7 +103,7 @@ describe.skip("media-generation runtime shared candidates", () => {
             mediaGenerationAutoProviderFallback: false,
           },
         },
-      } as KaijiBotConfig,
+      } as AllBotConfig,
       modelConfig: {
         primary: "google/gemini-3.1-flash-image-preview",
       },

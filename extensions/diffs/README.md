@@ -1,6 +1,6 @@
-# @kaijibot/diffs
+# @allbot/diffs
 
-Read-only diff viewer plugin for **KaijiBot** agents.
+Read-only diff viewer plugin for **AllBot** agents.
 
 It gives agents one tool, `diffs`, that can:
 
@@ -82,7 +82,7 @@ Input safety limits:
 
 ## Plugin Defaults
 
-Set plugin-wide defaults in `~/.kaijibot/kaijibot.json`:
+Set plugin-wide defaults in `~/.allbot/allbot.json`:
 
 ```json5
 {
@@ -130,7 +130,7 @@ Example:
       diffs: {
         enabled: true,
         config: {
-          viewerBaseUrl: "https://gateway.example.com/kaijibot",
+          viewerBaseUrl: "https://gateway.example.com/allbot",
         },
       },
     },
@@ -166,10 +166,10 @@ Use the `diffs` tool in `file` mode for this before and after input. After it re
 Path: README.md
 
 Before:
-KaijiBot supports plugins.
+AllBot supports plugins.
 
 After:
-KaijiBot supports plugins and hosted diff views.
+AllBot supports plugins and hosted diff views.
 ```
 
 Do both:
@@ -204,7 +204,7 @@ diff --git a/src/example.ts b/src/example.ts
 ## Notes
 
 - The viewer is hosted locally through the gateway under `/plugins/diffs/...`.
-- Artifacts are ephemeral and stored in the plugin temp subfolder (`$TMPDIR/kaijibot-diffs`).
+- Artifacts are ephemeral and stored in the plugin temp subfolder (`$TMPDIR/allbot-diffs`).
 - Default viewer URLs use loopback (`127.0.0.1`) unless you set plugin `viewerBaseUrl`, pass `baseUrl`, or use `gateway.bind=custom` + `gateway.customBindHost`.
 - If `gateway.trustedProxies` includes loopback for a same-host proxy (for example Tailscale Serve), raw `127.0.0.1` viewer requests without forwarded client-IP headers fail closed by design.
 - In that topology, prefer `mode=file` / `mode=both` for attachments, or intentionally enable remote viewers and set plugin `viewerBaseUrl` (or pass a proxy/public `baseUrl`) when you need a shareable viewer URL.

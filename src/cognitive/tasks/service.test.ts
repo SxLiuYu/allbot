@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import { cancelTask, createTaskSafely, tasksEnabled, type TaskServiceDeps } from "./service.js";
 import { TaskStore } from "./store.js";
@@ -15,8 +15,8 @@ function cfg(tasks?: {
   maxSteps?: number;
   maxTaskDepth?: number;
   maxSubTasks?: number;
-}): KaijiBotConfig {
-  return { cognitive: { enabled: true, tasks } } as unknown as KaijiBotConfig;
+}): AllBotConfig {
+  return { cognitive: { enabled: true, tasks } } as unknown as AllBotConfig;
 }
 
 function personaWithLedger(consecutiveNoResponses: number): PersonaTree {
@@ -46,7 +46,7 @@ describe("createTaskSafely", () => {
   let kicked: string[];
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-task-service-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-task-service-"));
     store = new TaskStore(tempDir);
     kicked = [];
   });
@@ -57,7 +57,7 @@ describe("createTaskSafely", () => {
 
   function deps(
     overrides?: Partial<{
-      config: KaijiBotConfig;
+      config: AllBotConfig;
       persona: PersonaTree | undefined;
     }>,
   ): TaskServiceDeps {
@@ -88,7 +88,7 @@ describe("createTaskSafely", () => {
   it("rejects creation when cognitive master switch is off even if tasks.enabled is true", async () => {
     const master = {
       cognitive: { enabled: false, tasks: { enabled: true } },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
     expect(tasksEnabled(master)).toBe(false);
   });
 

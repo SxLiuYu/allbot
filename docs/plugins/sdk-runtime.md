@@ -117,7 +117,7 @@ await api.runtime.subagent.deleteSession({
 
 ### `api.runtime.taskFlow`
 
-Bind a Task Flow runtime to an existing KaijiBot session key or trusted tool
+Bind a Task Flow runtime to an existing AllBot session key or trusted tool
 context, then create and manage Task Flows without passing an owner on every call.
 
 ```typescript
@@ -146,7 +146,7 @@ const waiting = taskFlow.setWaiting({
 ```
 
 Use `bindSession({ sessionKey, requesterOrigin })` when you already have a
-trusted KaijiBot session key from your own binding layer. Do not bind from raw
+trusted AllBot session key from your own binding layer. Do not bind from raw
 user input.
 
 ### `api.runtime.tts`
@@ -156,13 +156,13 @@ Text-to-speech synthesis.
 ```typescript
 // Standard TTS
 const clip = await api.runtime.tts.textToSpeech({
-  text: "Hello from KaijiBot",
+  text: "Hello from AllBot",
   cfg: api.config,
 });
 
 // Telephony-optimized TTS
 const telephonyClip = await api.runtime.tts.textToSpeechTelephony({
-  text: "Hello from KaijiBot",
+  text: "Hello from AllBot",
   cfg: api.config,
 });
 
@@ -237,7 +237,7 @@ const providers = api.runtime.webSearch.listProviders({ config: api.config });
 
 const result = await api.runtime.webSearch.search({
   config: api.config,
-  args: { query: "KaijiBot plugin SDK", count: 5 },
+  args: { query: "AllBot plugin SDK", count: 5 },
 });
 ```
 
@@ -376,8 +376,8 @@ Use `createPluginRuntimeStore` to store the runtime reference for use outside
 the `register` callback:
 
 ```typescript
-import { createPluginRuntimeStore } from "kaijibot/plugin-sdk/runtime-store";
-import type { PluginRuntime } from "kaijibot/plugin-sdk/runtime-store";
+import { createPluginRuntimeStore } from "allbot/plugin-sdk/runtime-store";
+import type { PluginRuntime } from "allbot/plugin-sdk/runtime-store";
 
 const store = createPluginRuntimeStore<PluginRuntime>("my-plugin runtime not initialized");
 
@@ -408,7 +408,7 @@ Beyond `api.runtime`, the API object also provides:
 | ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
 | `api.id`                 | `string`                  | Plugin id                                                                                   |
 | `api.name`               | `string`                  | Plugin display name                                                                         |
-| `api.config`             | `KaijiBotConfig`          | Current config snapshot (active in-memory runtime snapshot when available)                  |
+| `api.config`             | `AllBotConfig`          | Current config snapshot (active in-memory runtime snapshot when available)                  |
 | `api.pluginConfig`       | `Record<string, unknown>` | Plugin-specific config from `plugins.entries.<id>.config`                                   |
 | `api.logger`             | `PluginLogger`            | Scoped logger (`debug`, `info`, `warn`, `error`)                                            |
 | `api.registrationMode`   | `PluginRegistrationMode`  | Current load mode; `"setup-runtime"` is the lightweight pre-full-entry startup/setup window |

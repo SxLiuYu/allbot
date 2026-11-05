@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { collectSmallModelRiskFindings } from "./audit-extra.summary.js";
 
 describe("security audit small-model risk findings", () => {
   it("scores small-model risk by tool/sandbox exposure", () => {
     const cases: Array<{
       name: string;
-      cfg: KaijiBotConfig;
+      cfg: AllBotConfig;
       expectedSeverity: "info" | "critical";
       detailIncludes: string[];
     }> = [

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { handleBashCommand } from "./commands-bash.js";
 import type { HandleCommandsParams } from "./commands-types.js";
 
@@ -16,7 +16,7 @@ function buildBashParams(commandBodyNormalized: string): HandleCommandsParams {
     cfg: {
       commands: { bash: true, text: true },
       whatsapp: { allowFrom: ["*"] },
-    } as KaijiBotConfig,
+    } as AllBotConfig,
     ctx: {
       Provider: "whatsapp",
       Surface: "whatsapp",

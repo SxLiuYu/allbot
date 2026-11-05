@@ -12,7 +12,7 @@ type TestEntry = {
 };
 
 function createTestCache(): ManagedCache<TestEntry> {
-  return resolveSingletonManagedCache<TestEntry>(Symbol("kaijibot.manager-cache.test"));
+  return resolveSingletonManagedCache<TestEntry>(Symbol("allbot.manager-cache.test"));
 }
 
 function createEntry(id: string): TestEntry {

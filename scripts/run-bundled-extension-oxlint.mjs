@@ -4,6 +4,6 @@ runExtensionOxlint({
   roots: ["extensions"],
   toolName: "oxlint-bundled-extensions",
   lockName: "oxlint-bundled-extensions",
-  tempDirPrefix: "kaijibot-bundled-extension-oxlint-",
+  tempDirPrefix: "allbot-bundled-extension-oxlint-",
   emptyMessage: "No bundled extension files found.",
 });

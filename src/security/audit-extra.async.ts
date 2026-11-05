@@ -20,7 +20,7 @@ import { inspectReadOnlyChannelAccount } from "../channels/read-only-account-ins
 import { formatCliCommand } from "../cli/command-format.js";
 import { MANIFEST_KEY } from "../compat/legacy-names.js";
 import { resolveNativeSkillsEnabled } from "../config/commands.js";
-import type { KaijiBotConfig, ConfigFileSnapshot } from "../config/config.js";
+import type { AllBotConfig, ConfigFileSnapshot } from "../config/config.js";
 import { collectIncludePathsRecursive } from "../config/includes-scan.js";
 import { resolveOAuthDir } from "../config/paths.js";
 import type { AgentToolsConfig } from "../config/types.tools.js";
@@ -125,11 +125,11 @@ function formatCodeSafetyDetails(findings: SkillScanFinding[], rootDir: string):
 }
 
 function readChannelCommandSetting(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   channelId: string,
   key: "native" | "nativeSkills",
 ): unknown {
-  const channelCfg = cfg.channels?.[channelId as keyof NonNullable<KaijiBotConfig["channels"]>];
+  const channelCfg = cfg.channels?.[channelId as keyof NonNullable<AllBotConfig["channels"]>];
   if (!channelCfg || typeof channelCfg !== "object" || Array.isArray(channelCfg)) {
     return undefined;
   }
@@ -141,7 +141,7 @@ function readChannelCommandSetting(
 }
 
 async function isChannelPluginConfigured(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   plugin: ReturnType<typeof listChannelPlugins>[number],
 ): Promise<boolean> {
   const accountIds = plugin.config.listAccountIds(cfg);
@@ -224,7 +224,7 @@ async function listInstalledPluginDirs(params: {
 }
 
 function resolveToolPolicies(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentTools?: AgentToolsConfig;
   sandboxMode?: "off" | "non-main" | "all";
   agentId?: string | null;
@@ -251,7 +251,7 @@ function normalizePluginIdSet(entries: string[]): Set<string> {
 }
 
 function resolveEnabledExtensionPluginIds(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   pluginDirs: string[];
 }): string[] {
   const normalized = normalizePluginsConfig(params.cfg.plugins);
@@ -449,7 +449,7 @@ async function listSandboxBrowserContainers(
 ): Promise<string[] | null> {
   try {
     const result = await execDockerRawFn(
-      ["ps", "-a", "--filter", "label=kaijibot.sandboxBrowser=1", "--format", "{{.Names}}"],
+      ["ps", "-a", "--filter", "label=allbot.sandboxBrowser=1", "--format", "{{.Names}}"],
       { allowFailure: true },
     );
     if (result.code !== 0) {
@@ -474,7 +474,7 @@ async function readSandboxBrowserHashLabels(params: {
       [
         "inspect",
         "-f",
-        '{{ index .Config.Labels "kaijibot.configHash" }}\t{{ index .Config.Labels "kaijibot.browserConfigEpoch" }}',
+        '{{ index .Config.Labels "allbot.configHash" }}\t{{ index .Config.Labels "allbot.browserConfigEpoch" }}',
         params.containerName,
       ],
       { allowFailure: true },
@@ -586,7 +586,7 @@ export async function collectSandboxBrowserHashLabelFindings(params?: {
       detail:
         `Containers: ${missingHash.join(", ")}. ` +
         "These browser containers predate hash-based drift checks and may miss security remediations until recreated.",
-      remediation: `${formatCliCommand("kaijibot sandbox recreate --browser --all")} (add --force to skip prompt).`,
+      remediation: `${formatCliCommand("allbot sandbox recreate --browser --all")} (add --force to skip prompt).`,
     });
   }
 
@@ -597,8 +597,8 @@ export async function collectSandboxBrowserHashLabelFindings(params?: {
       title: "Sandbox browser container hash epoch is stale",
       detail:
         `Containers: ${staleEpoch.join(", ")}. ` +
-        `Expected kaijibot.browserConfigEpoch=${SANDBOX_BROWSER_SECURITY_HASH_EPOCH}.`,
-      remediation: `${formatCliCommand("kaijibot sandbox recreate --browser --all")} (add --force to skip prompt).`,
+        `Expected allbot.browserConfigEpoch=${SANDBOX_BROWSER_SECURITY_HASH_EPOCH}.`,
+      remediation: `${formatCliCommand("allbot sandbox recreate --browser --all")} (add --force to skip prompt).`,
     });
   }
 
@@ -611,7 +611,7 @@ export async function collectSandboxBrowserHashLabelFindings(params?: {
         `Containers: ${nonLoopbackPublished.join(", ")}. ` +
         "Sandbox browser observer/control ports should stay loopback-only to avoid unintended remote access.",
       remediation:
-        `${formatCliCommand("kaijibot sandbox recreate --browser --all")} (add --force to skip prompt), ` +
+        `${formatCliCommand("allbot sandbox recreate --browser --all")} (add --force to skip prompt), ` +
         "then verify published ports are bound to 127.0.0.1.",
     });
   }
@@ -620,7 +620,7 @@ export async function collectSandboxBrowserHashLabelFindings(params?: {
 }
 
 export async function collectPluginsTrustFindings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   stateDir: string;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
@@ -701,7 +701,7 @@ export async function collectPluginsTrustFindings(params: {
           sandboxMode,
           agentId: context.agentId,
         });
-        const broadPolicy = isToolAllowedByPolicies("__kaijibot_plugin_probe__", policies);
+        const broadPolicy = isToolAllowedByPolicies("__allbot_plugin_probe__", policies);
         const explicitPluginAllow =
           !restrictiveProfile &&
           (hasExplicitPluginAllow({
@@ -798,7 +798,7 @@ export async function collectPluginsTrustFindings(params: {
         title: "Plugin install records drift from installed package versions",
         detail: `Detected plugin install metadata drift:\n${pluginVersionDrift.map((entry) => `- ${entry}`).join("\n")}`,
         remediation:
-          "Run `kaijibot plugins update --all` (or reinstall affected plugins) to refresh install metadata.",
+          "Run `allbot plugins update --all` (or reinstall affected plugins) to refresh install metadata.",
       });
     }
   }
@@ -860,7 +860,7 @@ export async function collectPluginsTrustFindings(params: {
         title: "Hook install records drift from installed package versions",
         detail: `Detected hook install metadata drift:\n${hookVersionDrift.map((entry) => `- ${entry}`).join("\n")}`,
         remediation:
-          "Run `kaijibot hooks update --all` (or reinstall affected hooks) to refresh install metadata.",
+          "Run `allbot hooks update --all` (or reinstall affected hooks) to refresh install metadata.",
       });
     }
   }
@@ -869,7 +869,7 @@ export async function collectPluginsTrustFindings(params: {
 }
 
 export async function collectWorkspaceSkillSymlinkEscapeFindings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<SecurityAuditFinding[]> {
   const findings: SecurityAuditFinding[] = [];
   const workspaceDirs = listAgentWorkspaceDirs(params.cfg);
@@ -1018,7 +1018,7 @@ export async function collectIncludeFilePermFindings(params: {
 }
 
 export async function collectStateDeepFilesystemFindings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   stateDir: string;
   platform?: NodeJS.Platform;
@@ -1200,7 +1200,7 @@ export async function collectPluginsCodeSafetyFindings(params: {
         title: "Plugin extensions directory scan failed",
         detail: `Static code scan could not list extensions directory: ${String(err)}`,
         remediation:
-          "Check file permissions and plugin layout, then rerun `kaijibot security audit --deep`.",
+          "Check file permissions and plugin layout, then rerun `allbot security audit --deep`.",
       });
     },
   });
@@ -1236,7 +1236,7 @@ export async function collectPluginsCodeSafetyFindings(params: {
         title: `Plugin "${pluginName}" has extension entry path traversal`,
         detail: `Found extension entries that escape the plugin directory:\n${escapedEntries.map((entry) => `  - ${entry}`).join("\n")}`,
         remediation:
-          "Update the plugin manifest so all kaijibot.extensions entries stay inside the plugin directory.",
+          "Update the plugin manifest so all allbot.extensions entries stay inside the plugin directory.",
       });
     }
 
@@ -1251,7 +1251,7 @@ export async function collectPluginsCodeSafetyFindings(params: {
         title: `Plugin "${pluginName}" code scan failed`,
         detail: `Static code scan could not complete: ${String(err)}`,
         remediation:
-          "Check file permissions and plugin layout, then rerun `kaijibot security audit --deep`.",
+          "Check file permissions and plugin layout, then rerun `allbot security audit --deep`.",
       });
       return null;
     });
@@ -1269,7 +1269,7 @@ export async function collectPluginsCodeSafetyFindings(params: {
         title: `Plugin "${pluginName}" contains dangerous code patterns`,
         detail: `Found ${summary.critical} critical issue(s) in ${summary.scannedFiles} scanned file(s):\n${details}`,
         remediation:
-          "Review the plugin source code carefully before use. If untrusted, remove the plugin from your KaijiBot extensions state directory.",
+          "Review the plugin source code carefully before use. If untrusted, remove the plugin from your AllBot extensions state directory.",
       });
     } else if (summary.warn > 0) {
       const warnFindings = summary.findings.filter((f) => f.severity === "warn");
@@ -1289,7 +1289,7 @@ export async function collectPluginsCodeSafetyFindings(params: {
 }
 
 export async function collectInstalledSkillsCodeSafetyFindings(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   stateDir: string;
   summaryCache?: CodeSafetySummaryCache;
 }): Promise<SecurityAuditFinding[]> {
@@ -1302,7 +1302,7 @@ export async function collectInstalledSkillsCodeSafetyFindings(params: {
   for (const workspaceDir of workspaceDirs) {
     const entries = loadWorkspaceSkillEntries(workspaceDir, { config: params.cfg });
     for (const entry of entries) {
-      if (resolveSkillSource(entry.skill) === "kaijibot-bundled") {
+      if (resolveSkillSource(entry.skill) === "allbot-bundled") {
         continue;
       }
 
@@ -1327,7 +1327,7 @@ export async function collectInstalledSkillsCodeSafetyFindings(params: {
           title: `Skill "${skillName}" code scan failed`,
           detail: `Static code scan could not complete for ${skillDir}: ${String(err)}`,
           remediation:
-            "Check file permissions and skill layout, then rerun `kaijibot security audit --deep`.",
+            "Check file permissions and skill layout, then rerun `allbot security audit --deep`.",
         });
         return null;
       });

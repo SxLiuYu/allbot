@@ -28,7 +28,7 @@ class I18nManager {
       return null;
     }
     try {
-      return storage.getItem("kaijibot.i18n.locale");
+      return storage.getItem("allbot.i18n.locale");
     } catch {
       return null;
     }
@@ -40,7 +40,7 @@ class I18nManager {
       return;
     }
     try {
-      storage.setItem("kaijibot.i18n.locale", locale);
+      storage.setItem("allbot.i18n.locale", locale);
     } catch {
       // Ignore storage write failures in private/blocked contexts.
     }

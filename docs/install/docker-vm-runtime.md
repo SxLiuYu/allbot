@@ -1,7 +1,7 @@
 ---
-summary: "Shared Docker VM runtime steps for long-lived KaijiBot Gateway hosts"
+summary: "Shared Docker VM runtime steps for long-lived AllBot Gateway hosts"
 read_when:
-  - You are deploying KaijiBot on a cloud VM with Docker
+  - You are deploying AllBot on a cloud VM with Docker
   - You need the shared binary bake, persistence, and update flow
 title: "Docker VM Runtime"
 ---
@@ -79,7 +79,7 @@ The download URLs above are for x86_64 (amd64). For ARM-based VMs (e.g. Hetzner 
 
 ```bash
 docker compose build
-docker compose up -d kaijibot-gateway
+docker compose up -d allbot-gateway
 ```
 
 If build fails with `Killed` or `exit code 137` during `pnpm install --frozen-lockfile`, the VM is out of memory.
@@ -88,9 +88,9 @@ Use a larger machine class before retrying.
 Verify binaries:
 
 ```bash
-docker compose exec kaijibot-gateway which gog
-docker compose exec kaijibot-gateway which goplaces
-docker compose exec kaijibot-gateway which wacli
+docker compose exec allbot-gateway which gog
+docker compose exec allbot-gateway which goplaces
+docker compose exec allbot-gateway which wacli
 ```
 
 Expected output:
@@ -104,7 +104,7 @@ Expected output:
 Verify Gateway:
 
 ```bash
-docker compose logs -f kaijibot-gateway
+docker compose logs -f allbot-gateway
 ```
 
 Expected output:
@@ -115,17 +115,17 @@ Expected output:
 
 ## What persists where
 
-KaijiBot runs in Docker, but Docker is not the source of truth.
+AllBot runs in Docker, but Docker is not the source of truth.
 All long-lived state must survive restarts, rebuilds, and reboots.
 
 | Component           | Location                          | Persistence mechanism  | Notes                                                         |
 | ------------------- | --------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| Gateway config      | `/home/node/.kaijibot/`           | Host volume mount      | Includes `kaijibot.json`, `.env`                              |
-| Model auth profiles | `/home/node/.kaijibot/agents/`    | Host volume mount      | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API keys) |
-| Skill configs       | `/home/node/.kaijibot/skills/`    | Host volume mount      | Skill-level state                                             |
-| Agent workspace     | `/home/node/.kaijibot/workspace/` | Host volume mount      | Code and agent artifacts                                      |
-| WhatsApp session    | `/home/node/.kaijibot/`           | Host volume mount      | Preserves QR login                                            |
-| Gmail keyring       | `/home/node/.kaijibot/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD`                               |
+| Gateway config      | `/home/node/.allbot/`           | Host volume mount      | Includes `allbot.json`, `.env`                              |
+| Model auth profiles | `/home/node/.allbot/agents/`    | Host volume mount      | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API keys) |
+| Skill configs       | `/home/node/.allbot/skills/`    | Host volume mount      | Skill-level state                                             |
+| Agent workspace     | `/home/node/.allbot/workspace/` | Host volume mount      | Code and agent artifacts                                      |
+| WhatsApp session    | `/home/node/.allbot/`           | Host volume mount      | Preserves QR login                                            |
+| Gmail keyring       | `/home/node/.allbot/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD`                               |
 | External binaries   | `/usr/local/bin/`                 | Docker image           | Must be baked at build time                                   |
 | Node runtime        | Container filesystem              | Docker image           | Rebuilt every image build                                     |
 | OS packages         | Container filesystem              | Docker image           | Do not install at runtime                                     |
@@ -133,7 +133,7 @@ All long-lived state must survive restarts, rebuilds, and reboots.
 
 ## Updates
 
-To update KaijiBot on the VM:
+To update AllBot on the VM:
 
 ```bash
 git pull

@@ -1,5 +1,5 @@
 import { resolveCognitiveUserId } from "../cognitive/identity.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { DispatchFromConfigResult } from "./reply/dispatch-from-config.js";
 import { dispatchReplyFromConfig } from "./reply/dispatch-from-config.js";
@@ -91,7 +91,7 @@ function extractUserIdFromSessionKey(sessionKey: string, senderId?: string | nul
  */
 async function detectInsightReplyFeedback(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<void> {
   const replyToId = params.ctx.ReplyToId?.trim();
   const sessionKey = params.ctx.SessionKey;
@@ -156,7 +156,7 @@ async function detectInsightReplyFeedback(params: {
 
 async function detectInsightFollowupFeedback(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<void> {
   const sessionKey = params.ctx.SessionKey;
   if (!sessionKey) {
@@ -250,7 +250,7 @@ export async function withReplyDispatcher<T>(params: {
 
 export async function dispatchInboundMessage(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcher: ReplyDispatcher;
   replyOptions?: Omit<GetReplyOptions, "onToolResult" | "onBlockReply">;
   replyResolver?: typeof import("./reply.js").getReplyFromConfig;
@@ -277,7 +277,7 @@ export async function dispatchInboundMessage(params: {
 
 export async function dispatchInboundMessageWithBufferedDispatcher(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcherOptions: ReplyDispatcherWithTypingOptions;
   replyOptions?: Omit<GetReplyOptions, "onToolResult" | "onBlockReply">;
   replyResolver?: typeof import("./reply.js").getReplyFromConfig;
@@ -303,7 +303,7 @@ export async function dispatchInboundMessageWithBufferedDispatcher(params: {
 
 export async function dispatchInboundMessageWithDispatcher(params: {
   ctx: MsgContext | FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   dispatcherOptions: ReplyDispatcherOptions;
   replyOptions?: Omit<GetReplyOptions, "onToolResult" | "onBlockReply">;
   replyResolver?: typeof import("./reply.js").getReplyFromConfig;

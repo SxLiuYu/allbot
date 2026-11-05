@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { AuthProfileStore, OAuthCredential } from "kaijibot/plugin-sdk/provider-auth";
-import { resolveRequiredHomeDir } from "kaijibot/plugin-sdk/provider-auth";
+import type { AuthProfileStore, OAuthCredential } from "allbot/plugin-sdk/provider-auth";
+import { resolveRequiredHomeDir } from "allbot/plugin-sdk/provider-auth";
 import {
   resolveCodexAccessTokenExpiry,
   resolveCodexAuthIdentity,

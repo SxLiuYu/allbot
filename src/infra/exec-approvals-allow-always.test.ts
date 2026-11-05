@@ -183,7 +183,7 @@ describe("resolveAllowAlwaysPatterns", () => {
   }
 
   it("returns direct executable paths for non-shell segments", () => {
-    const exe = path.join("/tmp", "kaijibot-tool");
+    const exe = path.join("/tmp", "allbot-tool");
     const patterns = resolveAllowAlwaysPatterns({
       segments: [
         {
@@ -193,7 +193,7 @@ describe("resolveAllowAlwaysPatterns", () => {
             execution: makeMockExecutableResolution({
               rawExecutable: exe,
               resolvedPath: exe,
-              executableName: "kaijibot-tool",
+              executableName: "allbot-tool",
             }),
           }),
         },

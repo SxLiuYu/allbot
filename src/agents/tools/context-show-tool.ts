@@ -1,6 +1,6 @@
 import { Type } from "typebox";
 import { resolveBootstrapContextForRun } from "../../agents/bootstrap-files.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type { AnyAgentTool } from "./common.js";
 import { textResult } from "./common.js";
@@ -33,7 +33,7 @@ function basename(filePath: string): string {
 }
 
 async function isSoulPresetActive(
-  config: KaijiBotConfig | undefined,
+  config: AllBotConfig | undefined,
   agentId: string,
   sessionKey: string | undefined,
 ): Promise<boolean> {
@@ -51,7 +51,7 @@ async function isSoulPresetActive(
 }
 
 export function createContextShowTool(deps: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   workspaceDir?: string;
   sessionKey?: string;
   agentId?: string;

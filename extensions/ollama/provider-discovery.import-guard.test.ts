@@ -21,8 +21,8 @@ describe("ollama provider discovery import surface", () => {
       "./src/embedding-provider",
       "./src/memory-embedding-adapter",
       "./src/web-search-provider",
-      "kaijibot/plugin-sdk/text-runtime",
-      "kaijibot/plugin-sdk/plugin-entry",
+      "allbot/plugin-sdk/text-runtime",
+      "allbot/plugin-sdk/plugin-entry",
     ]) {
       expect(source, `provider discovery must not import ${forbidden}`).not.toContain(forbidden);
     }

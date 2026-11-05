@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { DmPolicy } from "../../config/types.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { WizardPrompter } from "../../wizard/prompts.js";
@@ -28,11 +28,11 @@ export type SetupChannelsOptions = {
 };
 
 export type PromptAccountIdParams = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   prompter: WizardPrompter;
   label: string;
   currentId?: string;
-  listAccountIds: (cfg: KaijiBotConfig) => string[];
+  listAccountIds: (cfg: AllBotConfig) => string[];
   defaultAccountId: string;
 };
 
@@ -47,13 +47,13 @@ export type ChannelSetupStatus = {
 };
 
 export type ChannelSetupStatusContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   options?: SetupChannelsOptions;
   accountOverrides: Partial<Record<ChannelId, string>>;
 };
 
 export type ChannelSetupConfigureContext = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   runtime: RuntimeEnv;
   prompter: WizardPrompter;
   options?: SetupChannelsOptions;
@@ -63,8 +63,8 @@ export type ChannelSetupConfigureContext = {
 };
 
 export type ChannelOnboardingPostWriteContext = {
-  previousCfg: KaijiBotConfig;
-  cfg: KaijiBotConfig;
+  previousCfg: AllBotConfig;
+  cfg: AllBotConfig;
   accountId: string;
   runtime: RuntimeEnv;
 };
@@ -72,11 +72,11 @@ export type ChannelOnboardingPostWriteContext = {
 export type ChannelOnboardingPostWriteHook = {
   channel: ChannelId;
   accountId: string;
-  run: (ctx: { cfg: KaijiBotConfig; runtime: RuntimeEnv }) => Promise<void> | void;
+  run: (ctx: { cfg: AllBotConfig; runtime: RuntimeEnv }) => Promise<void> | void;
 };
 
 export type ChannelSetupResult = {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   accountId?: string;
 };
 
@@ -93,16 +93,16 @@ export type ChannelSetupDmPolicy = {
   policyKey: string;
   allowFromKey: string;
   resolveConfigKeys?: (
-    cfg: KaijiBotConfig,
+    cfg: AllBotConfig,
     accountId?: string,
   ) => { policyKey: string; allowFromKey: string };
-  getCurrent: (cfg: KaijiBotConfig, accountId?: string) => DmPolicy;
-  setPolicy: (cfg: KaijiBotConfig, policy: DmPolicy, accountId?: string) => KaijiBotConfig;
+  getCurrent: (cfg: AllBotConfig, accountId?: string) => DmPolicy;
+  setPolicy: (cfg: AllBotConfig, policy: DmPolicy, accountId?: string) => AllBotConfig;
   promptAllowFrom?: (params: {
-    cfg: KaijiBotConfig;
+    cfg: AllBotConfig;
     prompter: WizardPrompter;
     accountId?: string;
-  }) => Promise<KaijiBotConfig>;
+  }) => Promise<AllBotConfig>;
 };
 
 export type ChannelSetupWizardAdapter = {
@@ -118,5 +118,5 @@ export type ChannelSetupWizardAdapter = {
   afterConfigWritten?: (ctx: ChannelOnboardingPostWriteContext) => Promise<void> | void;
   dmPolicy?: ChannelSetupDmPolicy;
   onAccountRecorded?: (accountId: string, options?: SetupChannelsOptions) => void;
-  disable?: (cfg: KaijiBotConfig) => KaijiBotConfig;
+  disable?: (cfg: AllBotConfig) => AllBotConfig;
 };

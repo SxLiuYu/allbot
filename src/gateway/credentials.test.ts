@@ -1,22 +1,22 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveGatewayCredentialsFromConfig,
   resolveGatewayCredentialsFromValues,
 } from "./credentials.js";
 
-function cfg(input: Partial<KaijiBotConfig>): KaijiBotConfig {
-  return input as KaijiBotConfig;
+function cfg(input: Partial<AllBotConfig>): AllBotConfig {
+  return input as AllBotConfig;
 }
 
 type ResolveFromConfigInput = Parameters<typeof resolveGatewayCredentialsFromConfig>[0];
-type GatewayConfig = NonNullable<KaijiBotConfig["gateway"]>;
+type GatewayConfig = NonNullable<AllBotConfig["gateway"]>;
 
 const DEFAULT_GATEWAY_AUTH = { token: "config-token", password: "config-password" }; // pragma: allowlist secret
 const DEFAULT_REMOTE_AUTH = { token: "remote-token", password: "remote-password" }; // pragma: allowlist secret
 const DEFAULT_GATEWAY_ENV = {
-  KAIJIBOT_GATEWAY_TOKEN: "env-token",
-  KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+  ALLBOT_GATEWAY_TOKEN: "env-token",
+  ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
 } as NodeJS.ProcessEnv;
 
 function resolveGatewayCredentialsFor(
@@ -65,7 +65,7 @@ function resolveLocalModeWithUnresolvedPassword(mode: "none" | "trusted-proxy") 
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig,
+    } as unknown as AllBotConfig,
     env: {} as NodeJS.ProcessEnv,
   });
 }
@@ -100,7 +100,7 @@ function expectUnresolvedLocalAuthSecretRefFailure(params: {
             default: { source: "env" },
           },
         },
-      } as unknown as KaijiBotConfig,
+      } as unknown as AllBotConfig,
       env: {} as NodeJS.ProcessEnv,
     }),
   ).toThrow(params.errorPath);
@@ -164,9 +164,9 @@ describe("resolveGatewayCredentialsFromConfig", () => {
         },
       }),
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
-        KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
-        KAIJIBOT_SERVICE_KIND: "gateway",
+        ALLBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        ALLBOT_SERVICE_KIND: "gateway",
       } as NodeJS.ProcessEnv,
     });
     expect(resolved).toEqual({
@@ -225,12 +225,12 @@ describe("resolveGatewayCredentialsFromConfig", () => {
           mode: "local",
           auth: {
             mode: "token",
-            token: "${KAIJIBOT_GATEWAY_TOKEN}",
+            token: "${ALLBOT_GATEWAY_TOKEN}",
           },
         },
       }),
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_TOKEN: "env-token",
       } as NodeJS.ProcessEnv,
     });
 
@@ -248,7 +248,7 @@ describe("resolveGatewayCredentialsFromConfig", () => {
             mode: "local",
             auth: {
               mode: "token",
-              token: "${KAIJIBOT_GATEWAY_TOKEN}",
+              token: "${ALLBOT_GATEWAY_TOKEN}",
             },
           },
         }),
@@ -373,7 +373,7 @@ describe("resolveGatewayCredentialsFromConfig", () => {
         },
       }),
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_TOKEN: "env-token",
       } as NodeJS.ProcessEnv,
       remoteTokenFallback: "remote-only",
     });
@@ -397,7 +397,7 @@ describe("resolveGatewayCredentialsFromConfig", () => {
               default: { source: "env" },
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         env: {} as NodeJS.ProcessEnv,
         remoteTokenFallback: "remote-only",
       }),
@@ -421,7 +421,7 @@ describe("resolveGatewayCredentialsFromConfig", () => {
           default: { source: "env" },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
   }
 
   it("ignores unresolved local token ref in remote-only mode when local auth mode is token", () => {
@@ -465,7 +465,7 @@ describe("resolveGatewayCredentialsFromConfig", () => {
             default: { source: "env" },
           },
         },
-      } as unknown as KaijiBotConfig,
+      } as unknown as AllBotConfig,
       env: {} as NodeJS.ProcessEnv,
     });
     expect(resolved).toEqual({
@@ -491,7 +491,7 @@ describe("resolveGatewayCredentialsFromConfig", () => {
               default: { source: "env" },
             },
           },
-        } as unknown as KaijiBotConfig,
+        } as unknown as AllBotConfig,
         env: {} as NodeJS.ProcessEnv,
         remotePasswordFallback: "remote-only", // pragma: allowlist secret
       }),
@@ -505,8 +505,8 @@ describe("resolveGatewayCredentialsFromValues", () => {
       configToken: "config-token",
       configPassword: "config-password", // pragma: allowlist secret
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
-        KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        ALLBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
       } as NodeJS.ProcessEnv,
       tokenPrecedence: "config-first",
       passwordPrecedence: "config-first", // pragma: allowlist secret
@@ -522,8 +522,8 @@ describe("resolveGatewayCredentialsFromValues", () => {
       configToken: "config-token",
       configPassword: "config-password", // pragma: allowlist secret
       env: {
-        KAIJIBOT_GATEWAY_TOKEN: "env-token",
-        KAIJIBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
+        ALLBOT_GATEWAY_TOKEN: "env-token",
+        ALLBOT_GATEWAY_PASSWORD: "env-password", // pragma: allowlist secret
       } as NodeJS.ProcessEnv,
     });
     expect(resolved).toEqual({
@@ -534,8 +534,8 @@ describe("resolveGatewayCredentialsFromValues", () => {
 
   it("rejects unresolved env var placeholders in config credentials", () => {
     const resolved = resolveGatewayCredentialsFromValues({
-      configToken: "${KAIJIBOT_GATEWAY_TOKEN}",
-      configPassword: "${KAIJIBOT_GATEWAY_PASSWORD}",
+      configToken: "${ALLBOT_GATEWAY_TOKEN}",
+      configPassword: "${ALLBOT_GATEWAY_PASSWORD}",
       env: {} as NodeJS.ProcessEnv,
       tokenPrecedence: "config-first",
       passwordPrecedence: "config-first", // pragma: allowlist secret

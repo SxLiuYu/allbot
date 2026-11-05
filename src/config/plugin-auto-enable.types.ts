@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 
 export type PluginAutoEnableCandidate =
   | {
@@ -40,7 +40,7 @@ export type PluginAutoEnableCandidate =
     };
 
 export type PluginAutoEnableResult = {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   changes: string[];
   autoEnabledReasons: Record<string, string[]>;
 };

@@ -18,7 +18,7 @@ function makeSnapshot() {
     valid: true,
     issues: [],
     legacyIssues: [],
-    path: "/tmp/kaijibot.json",
+    path: "/tmp/allbot.json",
   };
 }
 

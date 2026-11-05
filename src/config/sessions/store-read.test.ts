@@ -6,7 +6,7 @@ import { readSessionStoreReadOnly } from "./store-read.js";
 
 describe("readSessionStoreReadOnly", () => {
   it("returns an empty store for malformed or non-object JSON", async () => {
-    await withTempDir({ prefix: "kaijibot-session-store-" }, async (dir) => {
+    await withTempDir({ prefix: "allbot-session-store-" }, async (dir) => {
       const storePath = path.join(dir, "sessions.json");
 
       await fs.writeFile(storePath, '["not-an-object"]\n', "utf8");

@@ -1,13 +1,13 @@
 {
-  "name": "@kaijibot/copilot-proxy",
+  "name": "@allbot/copilot-proxy",
   "version": "2026.4.10",
   "private": true,
-  "description": "KaijiBot Copilot Proxy provider plugin",
+  "description": "AllBot Copilot Proxy provider plugin",
   "type": "module",
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*"
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ]

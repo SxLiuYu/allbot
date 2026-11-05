@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { NON_ENV_SECRETREF_MARKER } from "../agents/model-auth-markers.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { ModelDefinitionConfig } from "../config/types.models.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 
@@ -266,7 +266,7 @@ let resolveProviderAuths: typeof import("./provider-usage.auth.js").resolveProvi
 let clearRuntimeAuthProfileStoreSnapshots: typeof import("../agents/auth-profiles.js").clearRuntimeAuthProfileStoreSnapshots;
 let clearConfigCache: typeof import("../config/config.js").clearConfigCache;
 let clearRuntimeConfigSnapshot: typeof import("../config/config.js").clearRuntimeConfigSnapshot;
-const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-provider-auth-suite-" });
+const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-provider-auth-suite-" });
 
 describe("resolveProviderAuths key normalization", () => {
   const EMPTY_PROVIDER_ENV = {
@@ -304,7 +304,7 @@ describe("resolveProviderAuths key normalization", () => {
 
   async function withSuiteHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
     const base = await suiteRootTracker.make("case");
-    const stateDir = path.join(base, ".kaijibot");
+    const stateDir = path.join(base, ".allbot");
     const agentDir = path.join(stateDir, "agents", "main", "agent");
     nodeFs.mkdirSync(path.join(stateDir, "agents", "main", "sessions"), { recursive: true });
     nodeFs.mkdirSync(agentDir, { recursive: true });
@@ -317,7 +317,7 @@ describe("resolveProviderAuths key normalization", () => {
   }
 
   function agentDirForHome(home: string): string {
-    return path.join(home, ".kaijibot", "agents", "main", "agent");
+    return path.join(home, ".allbot", "agents", "main", "agent");
   }
 
   function buildSuiteEnv(
@@ -328,7 +328,7 @@ describe("resolveProviderAuths key normalization", () => {
       ...EMPTY_PROVIDER_ENV,
       HOME: home,
       USERPROFILE: home,
-      KAIJIBOT_STATE_DIR: path.join(home, ".kaijibot"),
+      ALLBOT_STATE_DIR: path.join(home, ".allbot"),
       ...env,
     };
     const match = home.match(/^([A-Za-z]:)(.*)$/);
@@ -350,10 +350,10 @@ describe("resolveProviderAuths key normalization", () => {
   }
 
   async function writeConfig(home: string, config: Record<string, unknown>) {
-    const stateDir = path.join(home, ".kaijibot");
+    const stateDir = path.join(home, ".allbot");
     await fs.mkdir(stateDir, { recursive: true });
     await fs.writeFile(
-      path.join(stateDir, "kaijibot.json"),
+      path.join(stateDir, "allbot.json"),
       `${JSON.stringify(config, null, 2)}\n`,
       "utf8",
     );
@@ -406,7 +406,7 @@ describe("resolveProviderAuths key normalization", () => {
             },
           },
         },
-      } satisfies KaijiBotConfig;
+      } satisfies AllBotConfig;
       await writeConfig(home, config);
 
       return await resolveProviderAuths({
@@ -422,7 +422,7 @@ describe("resolveProviderAuths key normalization", () => {
     providers: Parameters<typeof resolveProviderAuths>[0]["providers"];
     expected: Awaited<ReturnType<typeof resolveProviderAuths>>;
     env?: Record<string, string | undefined>;
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     setup?: (home: string) => Promise<void>;
   }) {
     await withSuiteHome(async (home) => {
@@ -588,7 +588,7 @@ describe("resolveProviderAuths key normalization", () => {
           },
         },
       },
-    } satisfies KaijiBotConfig;
+    } satisfies AllBotConfig;
     await expectResolvedAuthsFromSuiteHome({
       providers: ["zai", "minimax", "xiaomi"],
       setup: async (home) => {
@@ -640,7 +640,7 @@ describe("resolveProviderAuths key normalization", () => {
             "anthropic:default": { provider: "anthropic", mode: "token" },
           },
         },
-      } satisfies KaijiBotConfig;
+      } satisfies AllBotConfig;
       await writeConfig(home, config);
       await writeAuthProfiles(home, {
         "anthropic:default": {

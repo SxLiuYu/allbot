@@ -8,13 +8,13 @@
  */
 
 import fs from "node:fs/promises";
-import { stringEnum } from "kaijibot/plugin-sdk/core";
+import { stringEnum } from "allbot/plugin-sdk/core";
 import {
   jsonResult,
   readStringParam,
   type AnyAgentTool,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/memory-core-host-runtime-core";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/memory-core-host-runtime-core";
 import { Type } from "typebox";
 import { localDateStr } from "./local-date.js";
 import { MemoryIndexManager, type MemoryIndexDeps } from "./memory-index.js";
@@ -178,7 +178,7 @@ export function deriveEntryTitle(content: string): string {
 // ---------------------------------------------------------------------------
 
 export function createMemorySaveTool(options: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   agentSessionKey?: string;
   llmDecide?: LlmDecideFn;
 }): AnyAgentTool | null {

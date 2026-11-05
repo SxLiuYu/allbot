@@ -1,16 +1,16 @@
 ---
-summary: "CLI reference for `kaijibot hooks` (agent hooks)"
+summary: "CLI reference for `allbot hooks` (agent hooks)"
 read_when:
   - You want to manage agent hooks
   - You want to inspect hook availability or enable workspace hooks
 title: "hooks"
 ---
 
-# `kaijibot hooks`
+# `allbot hooks`
 
 Manage agent hooks (event-driven automations for commands like `/new`, `/reset`, and gateway startup).
 
-Running `kaijibot hooks` with no subcommand is equivalent to `kaijibot hooks list`.
+Running `allbot hooks` with no subcommand is equivalent to `allbot hooks list`.
 
 Related:
 
@@ -20,7 +20,7 @@ Related:
 ## List All Hooks
 
 ```bash
-kaijibot hooks list
+allbot hooks list
 ```
 
 List all discovered hooks from workspace, managed, extra, and bundled directories.
@@ -46,7 +46,7 @@ Ready:
 **Example (verbose):**
 
 ```bash
-kaijibot hooks list --verbose
+allbot hooks list --verbose
 ```
 
 Shows missing requirements for ineligible hooks.
@@ -54,7 +54,7 @@ Shows missing requirements for ineligible hooks.
 **Example (JSON):**
 
 ```bash
-kaijibot hooks list --json
+allbot hooks list --json
 ```
 
 Returns structured JSON for programmatic use.
@@ -62,7 +62,7 @@ Returns structured JSON for programmatic use.
 ## Get Hook Information
 
 ```bash
-kaijibot hooks info <name>
+allbot hooks info <name>
 ```
 
 Show detailed information about a specific hook.
@@ -78,7 +78,7 @@ Show detailed information about a specific hook.
 **Example:**
 
 ```bash
-kaijibot hooks info session-memory
+allbot hooks info session-memory
 ```
 
 **Output:**
@@ -89,9 +89,9 @@ kaijibot hooks info session-memory
 Save session context to memory when /new or /reset command is issued
 
 Details:
-  Source: kaijibot-bundled
-  Path: /path/to/kaijibot/hooks/bundled/session-memory/HOOK.md
-  Handler: /path/to/kaijibot/hooks/bundled/session-memory/handler.ts
+  Source: allbot-bundled
+  Path: /path/to/allbot/hooks/bundled/session-memory/HOOK.md
+  Handler: /path/to/allbot/hooks/bundled/session-memory/handler.ts
   Homepage: /cli/hooks#session-memory
   Events: command:new, command:reset
 
@@ -102,7 +102,7 @@ Requirements:
 ## Check Hooks Eligibility
 
 ```bash
-kaijibot hooks check
+allbot hooks check
 ```
 
 Show summary of hook eligibility status (how many are ready vs. not ready).
@@ -124,12 +124,12 @@ Not ready: 0
 ## Enable a Hook
 
 ```bash
-kaijibot hooks enable <name>
+allbot hooks enable <name>
 ```
 
-Enable a specific hook by adding it to your config (`~/.kaijibot/kaijibot.json` by default).
+Enable a specific hook by adding it to your config (`~/.allbot/allbot.json` by default).
 
-**Note:** Workspace hooks are disabled by default until enabled here or in config. Hooks managed by plugins show `plugin:<id>` in `kaijibot hooks list` and can’t be enabled/disabled here. Enable/disable the plugin instead.
+**Note:** Workspace hooks are disabled by default until enabled here or in config. Hooks managed by plugins show `plugin:<id>` in `allbot hooks list` and can’t be enabled/disabled here. Enable/disable the plugin instead.
 
 **Arguments:**
 
@@ -138,7 +138,7 @@ Enable a specific hook by adding it to your config (`~/.kaijibot/kaijibot.json` 
 **Example:**
 
 ```bash
-kaijibot hooks enable session-memory
+allbot hooks enable session-memory
 ```
 
 **Output:**
@@ -163,7 +163,7 @@ the Gateway will load it.
 ## Disable a Hook
 
 ```bash
-kaijibot hooks disable <name>
+allbot hooks disable <name>
 ```
 
 Disable a specific hook by updating your config.
@@ -175,7 +175,7 @@ Disable a specific hook by updating your config.
 **Example:**
 
 ```bash
-kaijibot hooks disable command-logger
+allbot hooks disable command-logger
 ```
 
 **Output:**
@@ -190,33 +190,33 @@ kaijibot hooks disable command-logger
 
 ## Notes
 
-- `kaijibot hooks list --json`, `info --json`, and `check --json` write structured JSON directly to stdout.
+- `allbot hooks list --json`, `info --json`, and `check --json` write structured JSON directly to stdout.
 - Plugin-managed hooks cannot be enabled or disabled here; enable or disable the owning plugin instead.
 
 ## Install Hook Packs
 
 ```bash
-kaijibot plugins install <package>        # ClawHub first, then npm
-kaijibot plugins install <package> --pin  # pin version
-kaijibot plugins install <path>           # local path
+allbot plugins install <package>        # ClawHub first, then npm
+allbot plugins install <package> --pin  # pin version
+allbot plugins install <path>           # local path
 ```
 
 Install hook packs through the unified plugins installer.
 
-`kaijibot hooks install` still works as a compatibility alias, but it prints a
-deprecation warning and forwards to `kaijibot plugins install`.
+`allbot hooks install` still works as a compatibility alias, but it prints a
+deprecation warning and forwards to `allbot plugins install`.
 
 Npm specs are **registry-only** (package name + optional **exact version** or
 **dist-tag**). Git/URL/file specs and semver ranges are rejected. Dependency
 installs run with `--ignore-scripts` for safety.
 
 Bare specs and `@latest` stay on the stable track. If npm resolves either of
-those to a prerelease, KaijiBot stops and asks you to opt in explicitly with a
+those to a prerelease, AllBot stops and asks you to opt in explicitly with a
 prerelease tag such as `@beta`/`@rc` or an exact prerelease version.
 
 **What it does:**
 
-- Copies the hook pack into `~/.kaijibot/hooks/<id>`
+- Copies the hook pack into `~/.allbot/hooks/<id>`
 - Enables the installed hooks in `hooks.internal.entries.*`
 - Records the install under `hooks.internal.installs`
 
@@ -231,16 +231,16 @@ prerelease tag such as `@beta`/`@rc` or an exact prerelease version.
 
 ```bash
 # Local directory
-kaijibot plugins install ./my-hook-pack
+allbot plugins install ./my-hook-pack
 
 # Local archive
-kaijibot plugins install ./my-hook-pack.zip
+allbot plugins install ./my-hook-pack.zip
 
 # NPM package
-kaijibot plugins install @kaijibot/my-hook-pack
+allbot plugins install @allbot/my-hook-pack
 
 # Link a local directory without copying
-kaijibot plugins install -l ./my-hook-pack
+allbot plugins install -l ./my-hook-pack
 ```
 
 Linked hook packs are treated as managed hooks from an operator-configured
@@ -249,14 +249,14 @@ directory, not as workspace hooks.
 ## Update Hook Packs
 
 ```bash
-kaijibot plugins update <id>
-kaijibot plugins update --all
+allbot plugins update <id>
+allbot plugins update --all
 ```
 
 Update tracked npm-based hook packs through the unified plugins updater.
 
-`kaijibot hooks update` still works as a compatibility alias, but it prints a
-deprecation warning and forwards to `kaijibot plugins update`.
+`allbot hooks update` still works as a compatibility alias, but it prints a
+deprecation warning and forwards to `allbot plugins update`.
 
 **Options:**
 
@@ -264,7 +264,7 @@ deprecation warning and forwards to `kaijibot plugins update`.
 - `--dry-run`: Show what would change without writing
 
 When a stored integrity hash exists and the fetched artifact hash changes,
-KaijiBot prints a warning and asks for confirmation before proceeding. Use
+AllBot prints a warning and asks for confirmation before proceeding. Use
 global `--yes` to bypass prompts in CI/non-interactive runs.
 
 ## Bundled Hooks
@@ -276,10 +276,10 @@ Saves session context to memory when you issue `/new` or `/reset`.
 **Enable:**
 
 ```bash
-kaijibot hooks enable session-memory
+allbot hooks enable session-memory
 ```
 
-**Output:** `~/.kaijibot/workspace/memory/YYYY-MM-DD-slug.md`
+**Output:** `~/.allbot/workspace/memory/YYYY-MM-DD-slug.md`
 
 **See:** [session-memory documentation](/automation/hooks#session-memory)
 
@@ -290,7 +290,7 @@ Injects additional bootstrap files (for example monorepo-local `AGENTS.md` / `TO
 **Enable:**
 
 ```bash
-kaijibot hooks enable bootstrap-extra-files
+allbot hooks enable bootstrap-extra-files
 ```
 
 **See:** [bootstrap-extra-files documentation](/automation/hooks#bootstrap-extra-files)
@@ -302,22 +302,22 @@ Logs all command events to a centralized audit file.
 **Enable:**
 
 ```bash
-kaijibot hooks enable command-logger
+allbot hooks enable command-logger
 ```
 
-**Output:** `~/.kaijibot/logs/commands.log`
+**Output:** `~/.allbot/logs/commands.log`
 
 **View logs:**
 
 ```bash
 # Recent commands
-tail -n 20 ~/.kaijibot/logs/commands.log
+tail -n 20 ~/.allbot/logs/commands.log
 
 # Pretty-print
-cat ~/.kaijibot/logs/commands.log | jq .
+cat ~/.allbot/logs/commands.log | jq .
 
 # Filter by action
-grep '"action":"new"' ~/.kaijibot/logs/commands.log | jq .
+grep '"action":"new"' ~/.allbot/logs/commands.log | jq .
 ```
 
 **See:** [command-logger documentation](/automation/hooks#command-logger)
@@ -331,7 +331,7 @@ Runs `BOOT.md` when the gateway starts (after channels start).
 **Enable**:
 
 ```bash
-kaijibot hooks enable boot-md
+allbot hooks enable boot-md
 ```
 
 **See:** [boot-md documentation](/automation/hooks#boot-md)

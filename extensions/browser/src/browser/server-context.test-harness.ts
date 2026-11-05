@@ -8,13 +8,13 @@ export function makeBrowserProfile(
   overrides: Partial<ResolvedBrowserProfile> = {},
 ): ResolvedBrowserProfile {
   return {
-    name: "kaijibot",
+    name: "allbot",
     cdpUrl: "http://127.0.0.1:18800",
     cdpHost: "127.0.0.1",
     cdpIsLoopback: true,
     cdpPort: 18800,
     color: "#FF4500",
-    driver: "kaijibot",
+    driver: "allbot",
     attachOnly: false,
     ...overrides,
   };
@@ -57,14 +57,14 @@ export function makeBrowserServerState(params?: {
 }
 
 export function mockLaunchedChrome(
-  launchKaijiBotChrome: { mockResolvedValue: (value: RunningChrome) => unknown },
+  launchAllBotChrome: { mockResolvedValue: (value: RunningChrome) => unknown },
   pid: number,
 ) {
   const proc = new EventEmitter() as unknown as ChildProcessWithoutNullStreams;
-  launchKaijiBotChrome.mockResolvedValue({
+  launchAllBotChrome.mockResolvedValue({
     pid,
     exe: { kind: "chromium", path: "/usr/bin/chromium" },
-    userDataDir: "/tmp/kaijibot-test",
+    userDataDir: "/tmp/allbot-test",
     cdpPort: 18800,
     startedAt: Date.now(),
     proc,

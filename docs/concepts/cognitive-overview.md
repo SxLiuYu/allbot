@@ -1,5 +1,5 @@
 ---
-summary: "How KaijiBot's cognitive layer works — persona, insights, scheduling, trust, and feedback"
+summary: "How AllBot's cognitive layer works — persona, insights, scheduling, trust, and feedback"
 read_when:
   - Understanding how proactive insights are generated
   - Configuring cognitive system behavior
@@ -9,7 +9,7 @@ title: "Cognitive Layer Overview"
 
 # Cognitive Layer Overview
 
-The cognitive layer is a self-contained module at `src/cognitive/` that transforms KaijiBot from a passive question-answering bot into a **proactive AI assistant**. It can be disabled via `cognitive.enabled: false` for a pure OpenClaw experience.
+The cognitive layer is a self-contained module at `src/cognitive/` that transforms AllBot from a passive question-answering bot into a **proactive AI assistant**. It can be disabled via `cognitive.enabled: false` for a pure OpenClaw experience.
 
 ## Architecture
 
@@ -48,7 +48,7 @@ Domains classify as **expert** (depth≥4, recurrence≥10), **interest** (depth
 
 ### Persistence
 
-`~/.kaijibot/cognitive/persona/{agentId}/{userId}.json` — atomic writes with Zod validation.
+`~/.allbot/cognitive/persona/{agentId}/{userId}.json` — atomic writes with Zod validation.
 
 ## Insight — "What should I tell them?"
 
@@ -205,9 +205,9 @@ Event source fires (timer / persona_change / info_scan)
 
 | Data         | Path                                                    |
 | ------------ | ------------------------------------------------------- |
-| Persona      | `~/.kaijibot/cognitive/persona/{agentId}/{userId}.json` |
-| Insights     | `~/.kaijibot/cognitive/insights/{userId}/`              |
-| Gateway logs | `/tmp/kaijibot/kaijibot-YYYY-MM-DD.log`                 |
+| Persona      | `~/.allbot/cognitive/persona/{agentId}/{userId}.json` |
+| Insights     | `~/.allbot/cognitive/insights/{userId}/`              |
+| Gateway logs | `/tmp/allbot/allbot-YYYY-MM-DD.log`                 |
 
 ## Related
 

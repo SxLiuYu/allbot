@@ -111,11 +111,11 @@ export function assertSupportedRuntime(
 
   runtime.error(
     [
-      "kaijibot requires Node >=22.14.0.",
+      "allbot requires Node >=22.14.0.",
       `Detected: ${runtimeLabel} (exec: ${execLabel}).`,
       `PATH searched: ${details.pathEnv}`,
       "Install Node: https://nodejs.org/en/download",
-      "Upgrade Node and re-run kaijibot.",
+      "Upgrade Node and re-run allbot.",
     ].join("\n"),
   );
   runtime.exit(1);

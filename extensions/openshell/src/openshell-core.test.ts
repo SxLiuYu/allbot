@@ -91,7 +91,7 @@ describe("openshell backend manager", () => {
     vi.clearAllMocks();
   });
 
-  it("checks runtime status with config override from KaijiBot config", async () => {
+  it("checks runtime status with config override from AllBot config", async () => {
     cliMocks.runOpenShellCli.mockResolvedValue({
       code: 0,
       stdout: "{}",
@@ -101,15 +101,15 @@ describe("openshell backend manager", () => {
     const manager = createOpenShellSandboxBackendManager({
       pluginConfig: resolveOpenShellPluginConfig({
         command: "openshell",
-        from: "kaijibot",
+        from: "allbot",
       }),
     });
 
     const result = await manager.describeRuntime({
       entry: {
-        containerName: "kaijibot-session-1234",
+        containerName: "allbot-session-1234",
         backendId: "openshell",
-        runtimeLabel: "kaijibot-session-1234",
+        runtimeLabel: "allbot-session-1234",
         sessionKey: "agent:main",
         createdAtMs: 1,
         lastUsedAtMs: 1,
@@ -138,12 +138,12 @@ describe("openshell backend manager", () => {
     });
     expect(cliMocks.runOpenShellCli).toHaveBeenCalledWith({
       context: expect.objectContaining({
-        sandboxName: "kaijibot-session-1234",
+        sandboxName: "allbot-session-1234",
         config: expect.objectContaining({
           from: "custom-source",
         }),
       }),
-      args: ["sandbox", "get", "kaijibot-session-1234"],
+      args: ["sandbox", "get", "allbot-session-1234"],
     });
   });
 
@@ -163,13 +163,13 @@ describe("openshell backend manager", () => {
 
     await manager.removeRuntime({
       entry: {
-        containerName: "kaijibot-session-5678",
+        containerName: "allbot-session-5678",
         backendId: "openshell",
-        runtimeLabel: "kaijibot-session-5678",
+        runtimeLabel: "allbot-session-5678",
         sessionKey: "agent:main",
         createdAtMs: 1,
         lastUsedAtMs: 1,
-        image: "kaijibot",
+        image: "allbot",
         configLabelKind: "Source",
       },
       config: {},
@@ -177,13 +177,13 @@ describe("openshell backend manager", () => {
 
     expect(cliMocks.runOpenShellCli).toHaveBeenCalledWith({
       context: expect.objectContaining({
-        sandboxName: "kaijibot-session-5678",
+        sandboxName: "allbot-session-5678",
         config: expect.objectContaining({
           command: "/usr/local/bin/openshell",
           gateway: "lab",
         }),
       }),
-      args: ["sandbox", "delete", "kaijibot-session-5678"],
+      args: ["sandbox", "delete", "allbot-session-5678"],
     });
   });
 });
@@ -222,7 +222,7 @@ function createMirrorBackendMock(): OpenShellSandboxBackend {
 
 describe("openshell fs bridges", () => {
   it("writes locally and syncs the file to the remote workspace", async () => {
-    const workspaceDir = await makeTempDir("kaijibot-openshell-fs-");
+    const workspaceDir = await makeTempDir("allbot-openshell-fs-");
     const backend = createMirrorBackendMock();
     const sandbox = createSandboxTestContext({
       overrides: {
@@ -249,8 +249,8 @@ describe("openshell fs bridges", () => {
   });
 
   it("maps agent mount paths when the sandbox workspace is read-only", async () => {
-    const workspaceDir = await makeTempDir("kaijibot-openshell-fs-");
-    const agentWorkspaceDir = await makeTempDir("kaijibot-openshell-agent-");
+    const workspaceDir = await makeTempDir("allbot-openshell-fs-");
+    const agentWorkspaceDir = await makeTempDir("allbot-openshell-agent-");
     await fs.writeFile(path.join(agentWorkspaceDir, "note.txt"), "agent", "utf8");
     const backend = createMirrorBackendMock();
     const sandbox = createSandboxTestContext({

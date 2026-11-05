@@ -2,7 +2,7 @@ import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../../../src/config/config.js";
+import type { AllBotConfig } from "../../../../src/config/config.js";
 
 const { hasRemoteEmbeddingCredentialSignal, resolveRemoteEmbeddingBearerClient } =
   await import("./embeddings-remote-client.js");
@@ -22,11 +22,11 @@ function stubEnvEmpty(keys: string[]): void {
   }
 }
 
-function minimalConfig(): KaijiBotConfig {
+function minimalConfig(): AllBotConfig {
   return {
     memory: { backend: "builtin" },
     agents: { defaults: {}, list: [{ id: "main", default: true }] },
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 function bearerOptions(
@@ -54,7 +54,7 @@ describe("remote embedding credential signal pre-check", () => {
     mainAgentDir = path.join(fixtureRoot, "main-agent");
     await fsp.mkdir(agentDir, { recursive: true });
     await fsp.mkdir(mainAgentDir, { recursive: true });
-    vi.stubEnv("KAIJIBOT_AGENT_DIR", mainAgentDir);
+    vi.stubEnv("ALLBOT_AGENT_DIR", mainAgentDir);
     vi.stubEnv("PI_CODING_AGENT_DIR", mainAgentDir);
     stubEnvEmpty(EMBEDDING_ENV_KEYS);
   });
@@ -148,7 +148,7 @@ describe("remote embedding credential signal pre-check", () => {
     expect(
       hasRemoteEmbeddingCredentialSignal({
         provider: "openai",
-        config: cfg as unknown as KaijiBotConfig,
+        config: cfg as unknown as AllBotConfig,
         agentDir,
       }),
     ).toBe(true);

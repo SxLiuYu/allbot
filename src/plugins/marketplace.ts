@@ -445,7 +445,7 @@ async function cloneMarketplaceRepo(params: {
     return { ok: false, error: `unsupported marketplace source: ${params.source}` };
   }
 
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-marketplace-"));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-marketplace-"));
   const repoDir = path.join(tmpDir, "repo");
   const argv = ["git", "clone", "--depth", "1"];
   if (normalized.ref) {
@@ -776,7 +776,7 @@ async function downloadUrlToTempFile(
 
       const finalFileName = resolveSafeMarketplaceDownloadFileName(finalUrl, sourceFileName);
       const fileName = resolveArchiveKind(finalFileName) ? finalFileName : sourceFileName;
-      tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-marketplace-download-"));
+      tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-marketplace-download-"));
       const createdTmpDir = tmpDir;
       const targetPath = path.resolve(createdTmpDir, fileName);
       const relativeTargetPath = path.relative(createdTmpDir, targetPath);

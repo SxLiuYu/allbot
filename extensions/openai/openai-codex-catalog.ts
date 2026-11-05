@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-shared";
 
 export const OPENAI_CODEX_BASE_URL = "https://chatgpt.com/backend-api";
 

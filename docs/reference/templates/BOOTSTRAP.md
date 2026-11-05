@@ -64,10 +64,10 @@ Write it down. Make it real.
 
 Ask how they want to reach you:
 
-- **Feishu** — primary channel for KaijiBot (already configured during setup)
+- **Feishu** — primary channel for AllBot (already configured during setup)
 - **Web Chat** — built-in web interface at the gateway address
 
-KaijiBot is a simplified Chinese-focused distribution; only Feishu and Web Chat are bundled channels. Additional channels (Telegram, Discord, WhatsApp, etc.) can be added by installing community channel plugins.
+AllBot is a simplified Chinese-focused distribution; only Feishu and Web Chat are bundled channels. Additional channels (Telegram, Discord, WhatsApp, etc.) can be added by installing community channel plugins.
 
 Guide them through whichever they pick.
 

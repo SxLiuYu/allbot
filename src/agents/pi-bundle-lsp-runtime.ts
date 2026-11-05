@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import type { AgentToolResult } from "@earendil-works/pi-agent-core";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { logDebug, logWarn } from "../logger.js";
 import { normalizeOptionalLowercaseString } from "../shared/string-coerce.js";
 import { loadEmbeddedPiLspConfig } from "./embedded-pi-lsp.js";
@@ -293,7 +293,7 @@ function formatLspResult(
 
 export async function createBundleLspToolRuntime(params: {
   workspaceDir: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   reservedToolNames?: Iterable<string>;
 }): Promise<BundleLspToolRuntime> {
   const loaded = loadEmbeddedPiLspConfig({

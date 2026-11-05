@@ -83,7 +83,7 @@ function expectGatewayTermination(pid: number) {
 async function withPreparedGatewayTask(
   run: (context: { env: Record<string, string>; stdout: PassThrough }) => Promise<void>,
 ) {
-  await withWindowsEnv("kaijibot-win-stop-", async ({ env }) => {
+  await withWindowsEnv("allbot-win-stop-", async ({ env }) => {
     await writeGatewayScript(env, GATEWAY_PORT);
     const stdout = new PassThrough();
     await run({ env, stdout });
@@ -156,7 +156,7 @@ describe("Scheduled Task stop/restart cleanup", () => {
         .mockResolvedValueOnce(
           busyPortUsage(6262, {
             commandLine:
-              '"C:\\Program Files\\nodejs\\node.exe" "C:\\Users\\steipete\\AppData\\Roaming\\npm\\node_modules\\kaijibot\\dist\\index.js" gateway --port 18789',
+              '"C:\\Program Files\\nodejs\\node.exe" "C:\\Users\\steipete\\AppData\\Roaming\\npm\\node_modules\\allbot\\dist\\index.js" gateway --port 18789',
           }),
         )
         .mockResolvedValueOnce(freePortUsage());
@@ -183,7 +183,7 @@ describe("Scheduled Task stop/restart cleanup", () => {
       expect(findVerifiedGatewayListenerPidsOnPortSync).toHaveBeenCalledWith(GATEWAY_PORT);
       expectGatewayTermination(5151);
       expect(inspectPortUsage).toHaveBeenCalledTimes(2);
-      expect(schtasksCalls.at(-1)).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls.at(-1)).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 
@@ -199,7 +199,7 @@ describe("Scheduled Task stop/restart cleanup", () => {
       await expect(restartScheduledTask({ env, stdout })).rejects.toThrow(
         "schtasks run failed: ERROR: Access is denied.",
       );
-      expect(schtasksCalls.at(-1)).toEqual(["/Run", "/TN", "KaijiBot Gateway"]);
+      expect(schtasksCalls.at(-1)).toEqual(["/Run", "/TN", "AllBot Gateway"]);
     });
   });
 });

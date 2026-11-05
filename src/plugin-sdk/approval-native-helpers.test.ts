@@ -3,7 +3,7 @@ import {
   createChannelApproverDmTargetResolver,
   createChannelNativeOriginTargetResolver,
 } from "./approval-native-helpers.js";
-import type { KaijiBotConfig } from "./config-runtime.js";
+import type { AllBotConfig } from "./config-runtime.js";
 
 describe("createChannelNativeOriginTargetResolver", () => {
   it("reuses shared turn-source routing and respects shouldHandle gating", () => {
@@ -23,7 +23,7 @@ describe("createChannelNativeOriginTargetResolver", () => {
 
     expect(
       resolveOriginTarget({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         accountId: "ops",
         request: {
           id: "plugin:req-1",
@@ -46,7 +46,7 @@ describe("createChannelNativeOriginTargetResolver", () => {
 
     expect(
       resolveOriginTarget({
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         accountId: "other",
         request: {
           id: "plugin:req-1",

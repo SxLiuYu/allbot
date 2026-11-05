@@ -130,7 +130,7 @@ describe("buildHandrolledSvg", () => {
   it("onboarding svg when graph has no nodes", () => {
     const svg = buildHandrolledSvg({ nodes: [], edges: [] }, 758);
     expect(svg).toContain("No persona yet.");
-    expect(svg).toContain("Chat with KaijiBot to build your cognitive map.");
+    expect(svg).toContain("Chat with AllBot to build your cognitive map.");
   });
 });
 

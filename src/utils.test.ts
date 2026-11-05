@@ -14,7 +14,7 @@ import {
 
 describe("ensureDir", () => {
   it("creates nested directory", async () => {
-    await withTempDir({ prefix: "kaijibot-test-" }, async (tmp) => {
+    await withTempDir({ prefix: "allbot-test-" }, async (tmp) => {
       const target = path.join(tmp, "nested", "dir");
       await ensureDir(target);
       expect(fs.existsSync(target)).toBe(true);
@@ -33,52 +33,52 @@ describe("sleep", () => {
 });
 
 describe("resolveConfigDir", () => {
-  it("prefers ~/.kaijibot when legacy dir is missing", async () => {
-    await withTempDir({ prefix: "kaijibot-config-dir-" }, async (root) => {
-      const newDir = path.join(root, ".kaijibot");
+  it("prefers ~/.allbot when legacy dir is missing", async () => {
+    await withTempDir({ prefix: "allbot-config-dir-" }, async (root) => {
+      const newDir = path.join(root, ".allbot");
       await fs.promises.mkdir(newDir, { recursive: true });
       const resolved = resolveConfigDir({} as NodeJS.ProcessEnv, () => root);
       expect(resolved).toBe(newDir);
     });
   });
 
-  it("expands KAIJIBOT_STATE_DIR using the provided env", () => {
+  it("expands ALLBOT_STATE_DIR using the provided env", () => {
     const env = {
-      HOME: "/tmp/kaijibot-home",
-      KAIJIBOT_STATE_DIR: "~/state",
+      HOME: "/tmp/allbot-home",
+      ALLBOT_STATE_DIR: "~/state",
     } as NodeJS.ProcessEnv;
 
-    expect(resolveConfigDir(env)).toBe(path.resolve("/tmp/kaijibot-home", "state"));
+    expect(resolveConfigDir(env)).toBe(path.resolve("/tmp/allbot-home", "state"));
   });
 
-  it("falls back to the config file directory when only KAIJIBOT_CONFIG_PATH is set", () => {
+  it("falls back to the config file directory when only ALLBOT_CONFIG_PATH is set", () => {
     const env = {
-      HOME: "/tmp/kaijibot-home",
-      KAIJIBOT_CONFIG_PATH: "~/profiles/dev/kaijibot.json",
+      HOME: "/tmp/allbot-home",
+      ALLBOT_CONFIG_PATH: "~/profiles/dev/allbot.json",
     } as NodeJS.ProcessEnv;
 
-    expect(resolveConfigDir(env)).toBe(path.resolve("/tmp/kaijibot-home", "profiles", "dev"));
+    expect(resolveConfigDir(env)).toBe(path.resolve("/tmp/allbot-home", "profiles", "dev"));
   });
 });
 
 describe("resolveHomeDir", () => {
-  it("prefers KAIJIBOT_HOME over HOME", () => {
-    vi.stubEnv("KAIJIBOT_HOME", "/srv/kaijibot-home");
+  it("prefers ALLBOT_HOME over HOME", () => {
+    vi.stubEnv("ALLBOT_HOME", "/srv/allbot-home");
     vi.stubEnv("HOME", "/home/other");
 
-    expect(resolveHomeDir()).toBe(path.resolve("/srv/kaijibot-home"));
+    expect(resolveHomeDir()).toBe(path.resolve("/srv/allbot-home"));
 
     vi.unstubAllEnvs();
   });
 });
 
 describe("shortenHomePath", () => {
-  it("uses $KAIJIBOT_HOME prefix when KAIJIBOT_HOME is set", () => {
-    vi.stubEnv("KAIJIBOT_HOME", "/srv/kaijibot-home");
+  it("uses $ALLBOT_HOME prefix when ALLBOT_HOME is set", () => {
+    vi.stubEnv("ALLBOT_HOME", "/srv/allbot-home");
     vi.stubEnv("HOME", "/home/other");
 
-    expect(shortenHomePath(`${path.resolve("/srv/kaijibot-home")}/.kaijibot/kaijibot.json`)).toBe(
-      "$KAIJIBOT_HOME/.kaijibot/kaijibot.json",
+    expect(shortenHomePath(`${path.resolve("/srv/allbot-home")}/.allbot/allbot.json`)).toBe(
+      "$ALLBOT_HOME/.allbot/allbot.json",
     );
 
     vi.unstubAllEnvs();
@@ -86,13 +86,13 @@ describe("shortenHomePath", () => {
 });
 
 describe("shortenHomeInString", () => {
-  it("uses $KAIJIBOT_HOME replacement when KAIJIBOT_HOME is set", () => {
-    vi.stubEnv("KAIJIBOT_HOME", "/srv/kaijibot-home");
+  it("uses $ALLBOT_HOME replacement when ALLBOT_HOME is set", () => {
+    vi.stubEnv("ALLBOT_HOME", "/srv/allbot-home");
     vi.stubEnv("HOME", "/home/other");
 
     expect(
-      shortenHomeInString(`config: ${path.resolve("/srv/kaijibot-home")}/.kaijibot/kaijibot.json`),
-    ).toBe("config: $KAIJIBOT_HOME/.kaijibot/kaijibot.json");
+      shortenHomeInString(`config: ${path.resolve("/srv/allbot-home")}/.allbot/allbot.json`),
+    ).toBe("config: $ALLBOT_HOME/.allbot/allbot.json");
 
     vi.unstubAllEnvs();
   });
@@ -104,8 +104,8 @@ describe("resolveUserPath", () => {
   });
 
   it("expands ~/ to home dir", () => {
-    expect(resolveUserPath("~/kaijibot", {}, () => "/Users/thoffman")).toBe(
-      path.resolve("/Users/thoffman", "kaijibot"),
+    expect(resolveUserPath("~/allbot", {}, () => "/Users/thoffman")).toBe(
+      path.resolve("/Users/thoffman", "allbot"),
     );
   });
 
@@ -113,22 +113,22 @@ describe("resolveUserPath", () => {
     expect(resolveUserPath("tmp/dir")).toBe(path.resolve("tmp/dir"));
   });
 
-  it("prefers KAIJIBOT_HOME for tilde expansion", () => {
-    vi.stubEnv("KAIJIBOT_HOME", "/srv/kaijibot-home");
+  it("prefers ALLBOT_HOME for tilde expansion", () => {
+    vi.stubEnv("ALLBOT_HOME", "/srv/allbot-home");
     vi.stubEnv("HOME", "/home/other");
 
-    expect(resolveUserPath("~/kaijibot")).toBe(path.resolve("/srv/kaijibot-home", "kaijibot"));
+    expect(resolveUserPath("~/allbot")).toBe(path.resolve("/srv/allbot-home", "allbot"));
 
     vi.unstubAllEnvs();
   });
 
   it("uses the provided env for tilde expansion", () => {
     const env = {
-      HOME: "/tmp/kaijibot-home",
-      KAIJIBOT_HOME: "/srv/kaijibot-home",
+      HOME: "/tmp/allbot-home",
+      ALLBOT_HOME: "/srv/allbot-home",
     } as NodeJS.ProcessEnv;
 
-    expect(resolveUserPath("~/kaijibot", env)).toBe(path.resolve("/srv/kaijibot-home", "kaijibot"));
+    expect(resolveUserPath("~/allbot", env)).toBe(path.resolve("/srv/allbot-home", "allbot"));
   });
 
   it("keeps blank paths blank", () => {

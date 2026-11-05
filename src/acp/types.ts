@@ -46,7 +46,7 @@ export type AcpServerOptions = {
 };
 
 export const ACP_AGENT_INFO = {
-  name: "kaijibot-acp",
-  title: "KaijiBot ACP Gateway",
+  name: "allbot-acp",
+  title: "AllBot ACP Gateway",
   version: VERSION,
 };

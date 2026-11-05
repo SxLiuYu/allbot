@@ -24,7 +24,7 @@ afterEach(async () => {
 
 function seedRunningProfileState(
   state: ReturnType<typeof makeState>,
-  profileName = "kaijibot",
+  profileName = "allbot",
 ): void {
   (state.profiles as Map<string, unknown>).set(profileName, {
     profile: { name: profileName },
@@ -82,11 +82,11 @@ async function openManagedTabWithRunningProfile(params: {
   url?: string;
 }) {
   global.fetch = withFetchPreconnect(params.fetchMock);
-  const state = makeState("kaijibot");
+  const state = makeState("allbot");
   seedRunningProfileState(state);
   const ctx = createBrowserRouteContext({ getState: () => state });
-  const kaijibot = ctx.forProfile("kaijibot");
-  return await kaijibot.openTab(params.url ?? "http://127.0.0.1:3009");
+  const allbot = ctx.forProfile("allbot");
+  return await allbot.openTab(params.url ?? "http://127.0.0.1:3009");
 }
 
 describe("browser server-context tab selection state", () => {
@@ -115,13 +115,13 @@ describe("browser server-context tab selection state", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
+    const state = makeState("allbot");
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    const opened = await kaijibot.openTab("http://127.0.0.1:8080");
+    const opened = await allbot.openTab("http://127.0.0.1:8080");
     expect(opened.targetId).toBe("CREATED");
-    expect(state.profiles.get("kaijibot")?.lastTargetId).toBe("CREATED");
+    expect(state.profiles.get("allbot")?.lastTargetId).toBe("CREATED");
     expect(createTargetViaCdp).toHaveBeenCalledWith({
       cdpUrl: "http://127.0.0.1:18800",
       url: "http://127.0.0.1:8080",
@@ -181,12 +181,12 @@ describe("browser server-context tab selection state", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
+    const state = makeState("allbot");
     seedRunningProfileState(state);
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    const opened = await kaijibot.openTab("http://127.0.0.1:3009");
+    const opened = await allbot.openTab("http://127.0.0.1:3009");
     expect(opened.targetId).toBe("NEW");
   });
 
@@ -201,12 +201,12 @@ describe("browser server-context tab selection state", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
+    const state = makeState("allbot");
     state.resolved.attachOnly = true;
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    const opened = await kaijibot.openTab("http://127.0.0.1:3009");
+    const opened = await allbot.openTab("http://127.0.0.1:3009");
     expect(opened.targetId).toBe("NEW");
     expect(fetchMock).not.toHaveBeenCalledWith(
       expect.stringContaining("/json/close/"),
@@ -243,11 +243,11 @@ describe("browser server-context tab selection state", () => {
     });
 
     global.fetch = withFetchPreconnect(fetchMock);
-    const state = makeState("kaijibot");
+    const state = makeState("allbot");
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const kaijibot = ctx.forProfile("kaijibot");
+    const allbot = ctx.forProfile("allbot");
 
-    await expect(kaijibot.openTab("file:///etc/passwd")).rejects.toBeInstanceOf(
+    await expect(allbot.openTab("file:///etc/passwd")).rejects.toBeInstanceOf(
       InvalidBrowserNavigationUrlError,
     );
     expect(fetchMock).not.toHaveBeenCalled();

@@ -5,6 +5,6 @@ runExtensionOxlint({
   roots: extensionChannelTestRoots,
   toolName: "oxlint-extension-channels",
   lockName: "oxlint-extension-channels",
-  tempDirPrefix: "kaijibot-extension-channel-oxlint-",
+  tempDirPrefix: "allbot-extension-channel-oxlint-",
   emptyMessage: "No extension channel files found.",
 });

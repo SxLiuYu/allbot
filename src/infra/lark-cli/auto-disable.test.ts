@@ -24,7 +24,7 @@ const mockHomedir = vi.mocked(homedir);
 function makeTempSkillsDir(): string {
   const dir = join(
     tmpdir(),
-    `kaijibot-test-skills-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    `allbot-test-skills-${Date.now()}-${Math.random().toString(36).slice(2)}`,
   );
   mkdirSync(dir, { recursive: true });
   return dir;

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   resolveAccountEntry,
   resolveNormalizedAccountEntry,
@@ -18,7 +18,7 @@ export function createAccountListHelpers(
     allowUnlistedDefaultAccount?: boolean;
   },
 ) {
-  function resolveConfiguredDefaultAccountId(cfg: KaijiBotConfig): string | undefined {
+  function resolveConfiguredDefaultAccountId(cfg: AllBotConfig): string | undefined {
     const channel = cfg.channels?.[channelKey] as Record<string, unknown> | undefined;
     const preferred = normalizeOptionalAccountId(
       typeof channel?.defaultAccount === "string" ? channel.defaultAccount : undefined,
@@ -36,7 +36,7 @@ export function createAccountListHelpers(
     return undefined;
   }
 
-  function listConfiguredAccountIds(cfg: KaijiBotConfig): string[] {
+  function listConfiguredAccountIds(cfg: AllBotConfig): string[] {
     const channel = cfg.channels?.[channelKey];
     const accounts = (channel as Record<string, unknown> | undefined)?.accounts;
     if (!accounts || typeof accounts !== "object") {
@@ -50,14 +50,14 @@ export function createAccountListHelpers(
     return [...new Set(ids.map((id) => normalizeConfiguredAccountId(id)).filter(Boolean))];
   }
 
-  function listAccountIds(cfg: KaijiBotConfig): string[] {
+  function listAccountIds(cfg: AllBotConfig): string[] {
     return listCombinedAccountIds({
       configuredAccountIds: listConfiguredAccountIds(cfg),
       fallbackAccountIdWhenEmpty: DEFAULT_ACCOUNT_ID,
     });
   }
 
-  function resolveDefaultAccountId(cfg: KaijiBotConfig): string {
+  function resolveDefaultAccountId(cfg: AllBotConfig): string {
     return resolveListedDefaultAccountId({
       accountIds: listAccountIds(cfg),
       configuredDefaultAccountId: resolveConfiguredDefaultAccountId(cfg),

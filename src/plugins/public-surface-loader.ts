@@ -14,7 +14,7 @@ import {
   resolveLoaderPackageRoot,
 } from "./sdk-alias.js";
 
-const KAIJIBOT_PACKAGE_ROOT =
+const ALLBOT_PACKAGE_ROOT =
   resolveLoaderPackageRoot({
     modulePath: fileURLToPath(import.meta.url),
     moduleUrl: import.meta.url,
@@ -64,7 +64,7 @@ function resolvePublicSurfaceLocationUncached(params: {
 }): { modulePath: string; boundaryRoot: string } | null {
   const bundledPluginsDir = resolveBundledPluginsDir();
   const modulePath = resolveBundledPluginPublicSurfacePath({
-    rootDir: KAIJIBOT_PACKAGE_ROOT,
+    rootDir: ALLBOT_PACKAGE_ROOT,
     ...(bundledPluginsDir ? { bundledPluginsDir } : {}),
     dirName: params.dirName,
     artifactBasename: params.artifactBasename,
@@ -77,7 +77,7 @@ function resolvePublicSurfaceLocationUncached(params: {
     boundaryRoot:
       bundledPluginsDir && modulePath.startsWith(path.resolve(bundledPluginsDir) + path.sep)
         ? path.resolve(bundledPluginsDir)
-        : KAIJIBOT_PACKAGE_ROOT,
+        : ALLBOT_PACKAGE_ROOT,
   };
 }
 
@@ -138,7 +138,7 @@ function getSharedBundledPublicSurfaceJiti(
   if (
     !isBundledPluginExtensionPath({
       modulePath,
-      kaijiBotPackageRoot: KAIJIBOT_PACKAGE_ROOT,
+      allBotPackageRoot: ALLBOT_PACKAGE_ROOT,
       ...(bundledPluginsDir ? { bundledPluginsDir } : {}),
     })
   ) {
@@ -177,8 +177,8 @@ export function loadBundledPluginPublicArtifactModuleSync<T extends object>(para
     absolutePath: location.modulePath,
     rootPath: location.boundaryRoot,
     boundaryLabel:
-      location.boundaryRoot === KAIJIBOT_PACKAGE_ROOT
-        ? "KaijiBot package root"
+      location.boundaryRoot === ALLBOT_PACKAGE_ROOT
+        ? "AllBot package root"
         : "bundled plugin directory",
     rejectHardlinks: false,
   });

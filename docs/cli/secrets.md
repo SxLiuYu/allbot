@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `kaijibot secrets` (reload, audit, configure, apply)"
+summary: "CLI reference for `allbot secrets` (reload, audit, configure, apply)"
 read_when:
   - Re-resolving secret refs at runtime
   - Auditing plaintext residues and unresolved refs
@@ -7,9 +7,9 @@ read_when:
 title: "secrets"
 ---
 
-# `kaijibot secrets`
+# `allbot secrets`
 
-Use `kaijibot secrets` to manage SecretRefs and keep the active runtime snapshot healthy.
+Use `allbot secrets` to manage SecretRefs and keep the active runtime snapshot healthy.
 
 Command roles:
 
@@ -21,12 +21,12 @@ Command roles:
 Recommended operator loop:
 
 ```bash
-kaijibot secrets audit --check
-kaijibot secrets configure
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --dry-run
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json
-kaijibot secrets audit --check
-kaijibot secrets reload
+allbot secrets audit --check
+allbot secrets configure
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --dry-run
+allbot secrets apply --from /tmp/allbot-secrets-plan.json
+allbot secrets audit --check
+allbot secrets reload
 ```
 
 If your plan includes `exec` SecretRefs/providers, pass `--allow-exec` on both dry-run and write apply commands.
@@ -47,9 +47,9 @@ Related:
 Re-resolve secret refs and atomically swap runtime snapshot.
 
 ```bash
-kaijibot secrets reload
-kaijibot secrets reload --json
-kaijibot secrets reload --url ws://127.0.0.1:18789 --token <token>
+allbot secrets reload
+allbot secrets reload --json
+allbot secrets reload --url ws://127.0.0.1:18789 --token <token>
 ```
 
 Notes:
@@ -67,11 +67,11 @@ Options:
 
 ## Audit
 
-Scan KaijiBot state for:
+Scan AllBot state for:
 
 - plaintext secret storage
 - unresolved refs
-- precedence drift (`auth-profiles.json` credentials shadowing `kaijibot.json` refs)
+- precedence drift (`auth-profiles.json` credentials shadowing `allbot.json` refs)
 - generated `agents/*/agent/models.json` residues (provider `apiKey` values and sensitive provider headers)
 - legacy residues (legacy auth store entries, OAuth reminders)
 
@@ -80,10 +80,10 @@ Header residue note:
 - Sensitive provider header detection is name-heuristic based (common auth/credential header names and fragments such as `authorization`, `x-api-key`, `token`, `secret`, `password`, and `credential`).
 
 ```bash
-kaijibot secrets audit
-kaijibot secrets audit --check
-kaijibot secrets audit --json
-kaijibot secrets audit --allow-exec
+allbot secrets audit
+allbot secrets audit --check
+allbot secrets audit --json
+allbot secrets audit --allow-exec
 ```
 
 Exit behavior:
@@ -107,13 +107,13 @@ Report shape highlights:
 Build provider and SecretRef changes interactively, run preflight, and optionally apply:
 
 ```bash
-kaijibot secrets configure
-kaijibot secrets configure --plan-out /tmp/kaijibot-secrets-plan.json
-kaijibot secrets configure --apply --yes
-kaijibot secrets configure --providers-only
-kaijibot secrets configure --skip-provider-setup
-kaijibot secrets configure --agent ops
-kaijibot secrets configure --json
+allbot secrets configure
+allbot secrets configure --plan-out /tmp/allbot-secrets-plan.json
+allbot secrets configure --apply --yes
+allbot secrets configure --providers-only
+allbot secrets configure --skip-provider-setup
+allbot secrets configure --agent ops
+allbot secrets configure --json
 ```
 
 Flow:
@@ -133,7 +133,7 @@ Notes:
 
 - Requires an interactive TTY.
 - You cannot combine `--providers-only` with `--skip-provider-setup`.
-- `configure` targets secret-bearing fields in `kaijibot.json` plus `auth-profiles.json` for the selected agent scope.
+- `configure` targets secret-bearing fields in `allbot.json` plus `auth-profiles.json` for the selected agent scope.
 - `configure` supports creating new `auth-profiles.json` mappings directly in the picker flow.
 - Canonical supported surface: [SecretRef Credential Surface](/reference/secretref-credential-surface).
 - It performs preflight resolution before apply.
@@ -148,18 +148,18 @@ Exec provider safety note:
 
 - Homebrew installs often expose symlinked binaries under `/opt/homebrew/bin/*`.
 - Set `allowSymlinkCommand: true` only when needed for trusted package-manager paths, and pair it with `trustedDirs` (for example `["/opt/homebrew"]`).
-- On Windows, if ACL verification is unavailable for a provider path, KaijiBot fails closed. For trusted paths only, set `allowInsecurePath: true` on that provider to bypass path security checks.
+- On Windows, if ACL verification is unavailable for a provider path, AllBot fails closed. For trusted paths only, set `allowInsecurePath: true` on that provider to bypass path security checks.
 
 ## Apply a saved plan
 
 Apply or preflight a plan generated previously:
 
 ```bash
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --allow-exec
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --dry-run
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --dry-run --allow-exec
-kaijibot secrets apply --from /tmp/kaijibot-secrets-plan.json --json
+allbot secrets apply --from /tmp/allbot-secrets-plan.json
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --allow-exec
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --dry-run
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --dry-run --allow-exec
+allbot secrets apply --from /tmp/allbot-secrets-plan.json --json
 ```
 
 Exec behavior:
@@ -175,10 +175,10 @@ Plan contract details (allowed target paths, validation rules, and failure seman
 
 What `apply` may update:
 
-- `kaijibot.json` (SecretRef targets + provider upserts/deletes)
+- `allbot.json` (SecretRef targets + provider upserts/deletes)
 - `auth-profiles.json` (provider-target scrubbing)
 - legacy `auth.json` residues
-- `~/.kaijibot/.env` known secret keys whose values were migrated
+- `~/.allbot/.env` known secret keys whose values were migrated
 
 ## Why no rollback backups
 
@@ -189,9 +189,9 @@ Safety comes from strict preflight + atomic-ish apply with best-effort in-memory
 ## Example
 
 ```bash
-kaijibot secrets audit --check
-kaijibot secrets configure
-kaijibot secrets audit --check
+allbot secrets audit --check
+allbot secrets configure
+allbot secrets audit --check
 ```
 
 If `audit --check` still reports plaintext findings, update the remaining reported target paths and rerun audit.

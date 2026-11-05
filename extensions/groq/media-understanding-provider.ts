@@ -1,7 +1,7 @@
 import {
   transcribeOpenAiCompatibleAudio,
   type MediaUnderstandingProvider,
-} from "kaijibot/plugin-sdk/media-understanding";
+} from "allbot/plugin-sdk/media-understanding";
 
 const DEFAULT_GROQ_AUDIO_BASE_URL = "https://api.groq.com/openai/v1";
 const DEFAULT_GROQ_AUDIO_MODEL = "whisper-large-v3-turbo";

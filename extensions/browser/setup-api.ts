@@ -1,6 +1,6 @@
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/plugin-entry";
-import { definePluginEntry } from "kaijibot/plugin-sdk/plugin-entry";
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+import type { AllBotConfig } from "allbot/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "allbot/plugin-sdk/plugin-entry";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 import { isRecord } from "./src/record-shared.js";
 
 function listContainsBrowser(value: unknown): boolean {
@@ -16,7 +16,7 @@ function toolPolicyReferencesBrowser(value: unknown): boolean {
   );
 }
 
-function hasBrowserToolReference(config: KaijiBotConfig): boolean {
+function hasBrowserToolReference(config: AllBotConfig): boolean {
   if (toolPolicyReferencesBrowser(config.tools)) {
     return true;
   }

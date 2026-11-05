@@ -17,7 +17,7 @@ describe("TaskRunner", () => {
   let deliver: (task: TaskRecord, message: string) => Promise<void>;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-task-runner-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-task-runner-"));
     store = new TaskStore(tempDir);
     delivered = [];
     deliver = async (task, message) => {

@@ -1,7 +1,7 @@
 /**
  * Local date/time formatting utilities.
  *
- * All KaijiBot user-visible timestamps (filenames, frontmatter, topic dates)
+ * All AllBot user-visible timestamps (filenames, frontmatter, topic dates)
  * MUST use these functions instead of `toISOString()` to respect the runtime
  * timezone (Asia/Shanghai in production).
  */

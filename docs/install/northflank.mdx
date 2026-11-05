@@ -1,35 +1,35 @@
 ---
-summary: "Deploy KaijiBot on Northflank with one-click template"
+summary: "Deploy AllBot on Northflank with one-click template"
 read_when:
-  - Deploying KaijiBot to Northflank
+  - Deploying AllBot to Northflank
   - You want a one-click cloud deploy with browser-based Control UI
 title: "Northflank"
 ---
 
-Deploy KaijiBot on Northflank with a one-click template and access it through the web Control UI.
+Deploy AllBot on Northflank with a one-click template and access it through the web Control UI.
 This is the easiest "no terminal on the server" path: Northflank runs the Gateway for you.
 
 ## How to get started
 
-1. Click [Deploy KaijiBot](https://northflank.com/stacks/deploy-kaijibot) to open the template.
+1. Click [Deploy AllBot](https://northflank.com/stacks/deploy-allbot) to open the template.
 2. Create an [account on Northflank](https://app.northflank.com/signup) if you don't already have one.
-3. Click **Deploy KaijiBot now**.
-4. Set the required environment variable: `KAIJIBOT_GATEWAY_TOKEN` (use a strong random value).
-5. Click **Deploy stack** to build and run the KaijiBot template.
+3. Click **Deploy AllBot now**.
+4. Set the required environment variable: `ALLBOT_GATEWAY_TOKEN` (use a strong random value).
+5. Click **Deploy stack** to build and run the AllBot template.
 6. Wait for the deployment to complete, then click **View resources**.
-7. Open the KaijiBot service.
-8. Open the public KaijiBot URL at `/kaijibot` and connect using the configured shared secret. This template uses `KAIJIBOT_GATEWAY_TOKEN` by default; if you replace it with password auth, use that password instead.
+7. Open the AllBot service.
+8. Open the public AllBot URL at `/allbot` and connect using the configured shared secret. This template uses `ALLBOT_GATEWAY_TOKEN` by default; if you replace it with password auth, use that password instead.
 
 ## What you get
 
-- Hosted KaijiBot Gateway + Control UI
-- Persistent storage via Northflank Volume (`/data`) so `kaijibot.json`,
+- Hosted AllBot Gateway + Control UI
+- Persistent storage via Northflank Volume (`/data`) so `allbot.json`,
   per-agent `auth-profiles.json`, channel/provider state, sessions, and
   workspace survive redeploys
 
 ## Connect a channel
 
-Use the Control UI at `/kaijibot` or run `kaijibot onboard` via SSH for channel setup instructions:
+Use the Control UI at `/allbot` or run `allbot onboard` via SSH for channel setup instructions:
 
 - [Telegram](/channels/telegram) (fastest — just a bot token)
 - [Discord](/channels/discord)
@@ -39,4 +39,4 @@ Use the Control UI at `/kaijibot` or run `kaijibot onboard` via SSH for channel 
 
 - Set up messaging channels: [Channels](/channels)
 - Configure the Gateway: [Gateway configuration](/gateway/configuration)
-- Keep KaijiBot up to date: [Updating](/install/updating)
+- Keep AllBot up to date: [Updating](/install/updating)

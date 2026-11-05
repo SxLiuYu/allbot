@@ -6,11 +6,11 @@ import { detectMime } from "../media/mime.js";
 import { lowercasePreservingWhitespace } from "../shared/string-coerce.js";
 import { resolveFileWithinRoot } from "./file-resolver.js";
 
-export const A2UI_PATH = "/__kaijibot__/a2ui";
+export const A2UI_PATH = "/__allbot__/a2ui";
 
-export const CANVAS_HOST_PATH = "/__kaijibot__/canvas";
+export const CANVAS_HOST_PATH = "/__allbot__/canvas";
 
-export const CANVAS_WS_PATH = "/__kaijibot__/ws";
+export const CANVAS_WS_PATH = "/__allbot__/ws";
 
 let cachedA2uiRootReal: string | null | undefined;
 let resolvingA2uiRoot: Promise<string | null> | null = null;
@@ -85,9 +85,9 @@ export function injectCanvasLiveReload(html: string): string {
 (() => {
   // Cross-platform action bridge helper.
   // Works on:
-  // - iOS: window.webkit.messageHandlers.kaijibotCanvasA2UIAction.postMessage(...)
-  // - Android: window.kaijibotCanvasA2UIAction.postMessage(...)
-  const handlerNames = ["kaijibotCanvasA2UIAction"];
+  // - iOS: window.webkit.messageHandlers.allbotCanvasA2UIAction.postMessage(...)
+  // - Android: window.allbotCanvasA2UIAction.postMessage(...)
+  const handlerNames = ["allbotCanvasA2UIAction"];
   function postToNode(payload) {
     try {
       const raw = typeof payload === "string" ? payload : JSON.stringify(payload);
@@ -114,11 +114,11 @@ export function injectCanvasLiveReload(html: string): string {
     const action = { ...userAction, id };
     return postToNode({ userAction: action });
   }
-  globalThis.KaijiBot = globalThis.KaijiBot ?? {};
-  globalThis.KaijiBot.postMessage = postToNode;
-  globalThis.KaijiBot.sendUserAction = sendUserAction;
-  globalThis.kaijibotPostMessage = postToNode;
-  globalThis.kaijibotSendUserAction = sendUserAction;
+  globalThis.AllBot = globalThis.AllBot ?? {};
+  globalThis.AllBot.postMessage = postToNode;
+  globalThis.AllBot.sendUserAction = sendUserAction;
+  globalThis.allbotPostMessage = postToNode;
+  globalThis.allbotSendUserAction = sendUserAction;
 
   try {
     const cap = new URLSearchParams(location.search).get("oc_cap");

@@ -6,12 +6,12 @@ import { isTruthyEnvValue } from "../infra/env.js";
 let rawStreamReady = false;
 
 function isRawStreamEnabled(): boolean {
-  return isTruthyEnvValue(process.env.KAIJIBOT_RAW_STREAM);
+  return isTruthyEnvValue(process.env.ALLBOT_RAW_STREAM);
 }
 
 function resolveRawStreamPath(): string {
   return (
-    process.env.KAIJIBOT_RAW_STREAM_PATH?.trim() ||
+    process.env.ALLBOT_RAW_STREAM_PATH?.trim() ||
     path.join(resolveStateDir(), "logs", "raw-stream.jsonl")
   );
 }

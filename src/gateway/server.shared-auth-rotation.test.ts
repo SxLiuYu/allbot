@@ -16,11 +16,11 @@ import {
 installGatewayTestHooks({ scope: "suite" });
 
 const ORIGINAL_GATEWAY_AUTH = testState.gatewayAuth;
-const ORIGINAL_GATEWAY_TOKEN_ENV = process.env.KAIJIBOT_GATEWAY_TOKEN;
+const ORIGINAL_GATEWAY_TOKEN_ENV = process.env.ALLBOT_GATEWAY_TOKEN;
 const OLD_TOKEN = "shared-token-old";
 const NEW_TOKEN = "shared-token-new";
 const DEFERRED_RESTART_DELAY_MS = 1_000;
-const SECRET_REF_TOKEN_ID = "KAIJIBOT_SHARED_AUTH_ROTATION_SECRET_REF";
+const SECRET_REF_TOKEN_ID = "ALLBOT_SHARED_AUTH_ROTATION_SECRET_REF";
 
 let server: Awaited<ReturnType<typeof startGatewayServer>>;
 let port = 0;
@@ -34,9 +34,9 @@ beforeAll(async () => {
 afterAll(async () => {
   testState.gatewayAuth = ORIGINAL_GATEWAY_AUTH;
   if (ORIGINAL_GATEWAY_TOKEN_ENV === undefined) {
-    delete process.env.KAIJIBOT_GATEWAY_TOKEN;
+    delete process.env.ALLBOT_GATEWAY_TOKEN;
   } else {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = ORIGINAL_GATEWAY_TOKEN_ENV;
+    process.env.ALLBOT_GATEWAY_TOKEN = ORIGINAL_GATEWAY_TOKEN_ENV;
   }
   await server.close();
 });
@@ -50,7 +50,7 @@ async function openAuthenticatedWs(token: string): Promise<WebSocket> {
 }
 
 async function openDeviceTokenWs(): Promise<WebSocket> {
-  const identityPath = path.join(os.tmpdir(), `kaijibot-shared-auth-${process.pid}-${port}.json`);
+  const identityPath = path.join(os.tmpdir(), `allbot-shared-auth-${process.pid}-${port}.json`);
   const { loadOrCreateDeviceIdentity, publicKeyRawBase64UrlFromPem } =
     await import("../infra/device-identity.js");
   const { approveDevicePairing, requestDevicePairing, rotateDeviceToken } =
@@ -169,9 +169,9 @@ describe("gateway shared auth rotation with unchanged SecretRefs", () => {
   let secretRefPort = 0;
 
   beforeAll(async () => {
-    const configPath = process.env.KAIJIBOT_CONFIG_PATH;
+    const configPath = process.env.ALLBOT_CONFIG_PATH;
     if (!configPath) {
-      throw new Error("KAIJIBOT_CONFIG_PATH missing in gateway test environment");
+      throw new Error("ALLBOT_CONFIG_PATH missing in gateway test environment");
     }
     secretRefPort = await getFreePort();
     process.env[SECRET_REF_TOKEN_ID] = OLD_TOKEN;

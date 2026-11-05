@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 vi.mock("../../config/sessions/store.js", () => ({
   loadSessionStore: vi.fn(),
@@ -48,7 +48,7 @@ function resolveWithStoredEntry(params?: {
   vi.mocked(evaluateSessionFreshness).mockReturnValue({ fresh: params?.fresh ?? true });
 
   return resolveCronSession({
-    cfg: {} as KaijiBotConfig,
+    cfg: {} as AllBotConfig,
     sessionKey,
     agentId: "main",
     nowMs: NOW_MS,

@@ -39,8 +39,8 @@ const writers = new Map<string, PayloadLogWriter>();
 const log = createSubsystemLogger("agent/anthropic-payload");
 
 function resolvePayloadLogConfig(env: NodeJS.ProcessEnv): PayloadLogConfig {
-  const enabled = parseBooleanValue(env.KAIJIBOT_ANTHROPIC_PAYLOAD_LOG) ?? false;
-  const fileOverride = env.KAIJIBOT_ANTHROPIC_PAYLOAD_LOG_FILE?.trim();
+  const enabled = parseBooleanValue(env.ALLBOT_ANTHROPIC_PAYLOAD_LOG) ?? false;
+  const fileOverride = env.ALLBOT_ANTHROPIC_PAYLOAD_LOG_FILE?.trim();
   const filePath = fileOverride
     ? resolveUserPath(fileOverride)
     : path.join(resolveStateDir(env), "logs", "anthropic-payload.jsonl");

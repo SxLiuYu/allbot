@@ -1,25 +1,25 @@
 {
-  "name": "@kaijibot/wechat",
+  "name": "@allbot/wechat",
   "version": "2026.6.27",
-  "description": "KaijiBot WeChat (iLink Bot) channel plugin — QR login, long-poll inbound, AES-128-ECB CDN media",
+  "description": "AllBot WeChat (iLink Bot) channel plugin — QR login, long-poll inbound, AES-128-ECB CDN media",
   "type": "module",
   "dependencies": {
     "silk-wasm": "^3.7.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@kaijibot/plugin-sdk": "workspace:*",
-    "kaijibot": "workspace:*"
+    "@allbot/plugin-sdk": "workspace:*",
+    "allbot": "workspace:*"
   },
   "peerDependencies": {
-    "kaijibot": ">=2026.6.27"
+    "allbot": ">=2026.6.27"
   },
   "peerDependenciesMeta": {
-    "kaijibot": {
+    "allbot": {
       "optional": true
     }
   },
-  "kaijibot": {
+  "allbot": {
     "extensions": [
       "./index.ts"
     ],
@@ -34,7 +34,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@kaijibot/wechat",
+      "npmSpec": "@allbot/wechat",
       "defaultChoice": "npm",
       "minHostVersion": ">=2026.6.27"
     },

@@ -1,4 +1,4 @@
-import { stopKaijiBotChrome } from "./chrome.js";
+import { stopAllBotChrome } from "./chrome.js";
 import type { ResolvedBrowserConfig } from "./config.js";
 import {
   type BrowserServerState,
@@ -32,7 +32,7 @@ export async function stopKnownBrowserProfiles(params: {
       try {
         const runtime = current.profiles.get(name);
         if (runtime?.running) {
-          await stopKaijiBotChrome(runtime.running);
+          await stopAllBotChrome(runtime.running);
           runtime.running = null;
           continue;
         }
@@ -42,6 +42,6 @@ export async function stopKnownBrowserProfiles(params: {
       }
     }
   } catch (err) {
-    params.onWarn(`kaijibot browser stop failed: ${String(err)}`);
+    params.onWarn(`allbot browser stop failed: ${String(err)}`);
   }
 }

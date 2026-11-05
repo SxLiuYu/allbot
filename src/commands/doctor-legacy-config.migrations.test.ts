@@ -2,13 +2,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 
 let normalizeCompatibilityConfigValues: typeof import("./doctor-legacy-config.js").normalizeCompatibilityConfigValues;
 let clearPluginSetupRegistryCache: typeof import("../plugins/setup-registry.js").clearPluginSetupRegistryCache;
 
-function asLegacyConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asLegacyConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function getLegacyProperty(value: unknown, key: string): unknown {
@@ -37,11 +37,11 @@ describe("normalizeCompatibilityConfigValues", () => {
 
   beforeEach(() => {
     vi.doUnmock("./doctor-legacy-config.js");
-    vi.doUnmock("kaijibot/plugin-sdk/text-runtime");
+    vi.doUnmock("allbot/plugin-sdk/text-runtime");
     vi.resetModules();
-    previousOauthDir = process.env.KAIJIBOT_OAUTH_DIR;
-    tempOauthDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-oauth-"));
-    process.env.KAIJIBOT_OAUTH_DIR = tempOauthDir;
+    previousOauthDir = process.env.ALLBOT_OAUTH_DIR;
+    tempOauthDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-oauth-"));
+    process.env.ALLBOT_OAUTH_DIR = tempOauthDir;
   });
 
   beforeEach(async () => {
@@ -52,9 +52,9 @@ describe("normalizeCompatibilityConfigValues", () => {
 
   afterEach(() => {
     if (previousOauthDir === undefined) {
-      delete process.env.KAIJIBOT_OAUTH_DIR;
+      delete process.env.ALLBOT_OAUTH_DIR;
     } else {
-      process.env.KAIJIBOT_OAUTH_DIR = previousOauthDir;
+      process.env.ALLBOT_OAUTH_DIR = previousOauthDir;
     }
     if (tempOauthDir) {
       fs.rmSync(tempOauthDir, { recursive: true, force: true });
@@ -107,7 +107,7 @@ describe("normalizeCompatibilityConfigValues", () => {
   });
 
   it("leaves legacy ack reaction in place when authDir override exists", () => {
-    const customDir = fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-wa-auth-"));
+    const customDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-wa-auth-"));
     try {
       writeCreds(customDir);
 
@@ -405,7 +405,7 @@ describe("normalizeCompatibilityConfigValues", () => {
           allowedHostnames: ["localhost"],
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     expect(
       (res.config.browser?.ssrfPolicy as Record<string, unknown> | undefined)?.allowPrivateNetwork,
@@ -425,7 +425,7 @@ describe("normalizeCompatibilityConfigValues", () => {
           dangerouslyAllowPrivateNetwork: false,
         },
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     expect(
       (res.config.browser?.ssrfPolicy as Record<string, unknown> | undefined)?.allowPrivateNetwork,
@@ -648,7 +648,7 @@ describe("normalizeCompatibilityConfigValues", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(res.config.tools?.web?.fetch).toEqual({
       provider: "firecrawl",
@@ -696,7 +696,7 @@ describe("normalizeCompatibilityConfigValues", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(res.config.plugins?.entries?.firecrawl).toEqual({
       enabled: true,
@@ -727,7 +727,7 @@ describe("normalizeCompatibilityConfigValues", () => {
         interruptOnSpeech: false,
         silenceTimeoutMs: 1500,
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     expect(res.config.talk).toEqual({
       providers: {
@@ -760,7 +760,7 @@ describe("normalizeCompatibilityConfigValues", () => {
         },
         apiKey: "secret-key",
       },
-    } as unknown as KaijiBotConfig);
+    } as unknown as AllBotConfig);
 
     expect(res.config.talk).toEqual({
       provider: "elevenlabs",

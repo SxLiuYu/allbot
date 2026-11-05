@@ -442,7 +442,7 @@ describe("exec approvals CLI", () => {
           }),
           askFallback: expect.objectContaining({
             effective: "full",
-            source: "KaijiBot default (full)",
+            source: "AllBot default (full)",
           }),
         }),
         expect.objectContaining({
@@ -459,7 +459,7 @@ describe("exec approvals CLI", () => {
           }),
           askFallback: expect.objectContaining({
             effective: "allowlist",
-            source: "KaijiBot default (full)",
+            source: "AllBot default (full)",
           }),
         }),
       ]),

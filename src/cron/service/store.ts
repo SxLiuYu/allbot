@@ -41,7 +41,7 @@ export async function ensureLoaded(
       const resolvedId = typeof raw.id === "string" ? raw.id : undefined;
       state.deps.log.warn(
         { storePath: state.deps.storePath, jobId: resolvedId },
-        "cron: job used legacy jobId field; normalized id in memory (run kaijibot doctor --fix to persist canonical shape)",
+        "cron: job used legacy jobId field; normalized id in memory (run allbot doctor --fix to persist canonical shape)",
       );
     }
     // Persisted legacy jobs may predate the required `enabled` field.

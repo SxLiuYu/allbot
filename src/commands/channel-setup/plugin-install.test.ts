@@ -71,7 +71,7 @@ vi.mock("../../plugins/bundled-sources.js", () => ({
 }));
 
 vi.mock("../../plugins/loader.js", () => ({
-  loadKaijiBotPlugins: vi.fn(),
+  loadAllBotPlugins: vi.fn(),
 }));
 
 const clearPluginDiscoveryCache = vi.fn();
@@ -85,8 +85,8 @@ vi.mock("../../plugins/discovery.js", async (importOriginal) => {
 
 import fs from "node:fs";
 import type { ChannelPluginCatalogEntry } from "../../channels/plugins/catalog.js";
-import type { KaijiBotConfig } from "../../config/config.js";
-import { loadKaijiBotPlugins } from "../../plugins/loader.js";
+import type { AllBotConfig } from "../../config/config.js";
+import { loadAllBotPlugins } from "../../plugins/loader.js";
 import { createEmptyPluginRegistry } from "../../plugins/registry.js";
 import {
   pinActivePluginChannelRegistry,
@@ -115,7 +115,7 @@ const baseEntry: ChannelPluginCatalogEntry = {
     blurb: "Test",
   },
   install: {
-    npmSpec: "@kaijibot/zalo",
+    npmSpec: "@allbot/zalo",
     localPath: bundledPluginRoot("zalo"),
   },
 };
@@ -144,7 +144,7 @@ async function runInitialValueForChannel(channel: "dev" | "beta") {
   const runtime = makeRuntime();
   const select = vi.fn((async <T extends string>() => "skip" as T) as WizardPrompter["select"]);
   const prompter = makePrompter({ select: select as unknown as WizardPrompter["select"] });
-  const cfg: KaijiBotConfig = { update: { channel } };
+  const cfg: AllBotConfig = { update: { channel } };
   mockRepoLocalPathExists();
 
   await ensureChannelSetupPluginInstalled({
@@ -172,7 +172,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
     const prompter = makePrompter({
       select: vi.fn(async () => "npm") as WizardPrompter["select"],
     });
-    const cfg: KaijiBotConfig = { plugins: { allow: ["other"] } };
+    const cfg: AllBotConfig = { plugins: { allow: ["other"] } };
     vi.mocked(fs.existsSync).mockReturnValue(false);
     installPluginFromNpmSpec.mockResolvedValue({
       ok: true,
@@ -192,10 +192,10 @@ describe("ensureChannelSetupPluginInstalled", () => {
     expect(result.cfg.plugins?.entries?.zalo?.enabled).toBe(true);
     expect(result.cfg.plugins?.allow).toContain("zalo");
     expect(result.cfg.plugins?.installs?.zalo?.source).toBe("npm");
-    expect(result.cfg.plugins?.installs?.zalo?.spec).toBe("@kaijibot/zalo");
+    expect(result.cfg.plugins?.installs?.zalo?.spec).toBe("@allbot/zalo");
     expect(result.cfg.plugins?.installs?.zalo?.installPath).toBe("/tmp/zalo");
     expect(installPluginFromNpmSpec).toHaveBeenCalledWith(
-      expect.objectContaining({ spec: "@kaijibot/zalo" }),
+      expect.objectContaining({ spec: "@allbot/zalo" }),
     );
   });
 
@@ -204,7 +204,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
     const prompter = makePrompter({
       select: vi.fn(async () => "local") as WizardPrompter["select"],
     });
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     mockRepoLocalPathExists();
 
     const result = await ensureChannelSetupPluginInstalled({
@@ -223,7 +223,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
     const prompter = makePrompter({
       select: vi.fn(async () => "local") as WizardPrompter["select"],
     });
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     mockRepoLocalPathExists();
 
     const result = await ensureChannelSetupPluginInstalled({
@@ -231,15 +231,15 @@ describe("ensureChannelSetupPluginInstalled", () => {
       entry: {
         ...baseEntry,
         id: "teams",
-        pluginId: "@kaijibot/msteams-plugin",
+        pluginId: "@allbot/msteams-plugin",
       },
       prompter,
       runtime,
     });
 
     expect(result.installed).toBe(true);
-    expect(result.pluginId).toBe("@kaijibot/msteams-plugin");
-    expect(result.cfg.plugins?.entries?.["@kaijibot/msteams-plugin"]?.enabled).toBe(true);
+    expect(result.pluginId).toBe("@allbot/msteams-plugin");
+    expect(result.cfg.plugins?.entries?.["@allbot/msteams-plugin"]?.enabled).toBe(true);
   });
 
   it("defaults to local on dev channel when local path exists", async () => {
@@ -254,7 +254,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
     const runtime = makeRuntime();
     const select = vi.fn((async <T extends string>() => "skip" as T) as WizardPrompter["select"]);
     const prompter = makePrompter({ select: select as unknown as WizardPrompter["select"] });
-    const cfg: KaijiBotConfig = { update: { channel: "beta" } };
+    const cfg: AllBotConfig = { update: { channel: "beta" } };
     vi.mocked(fs.existsSync).mockReturnValue(false);
     resolveBundledPluginSources.mockReturnValue(
       new Map([
@@ -262,8 +262,8 @@ describe("ensureChannelSetupPluginInstalled", () => {
           "zalo",
           {
             pluginId: "zalo",
-            localPath: bundledPluginRootAt("/opt/kaijibot", "zalo"),
-            npmSpec: "@kaijibot/zalo",
+            localPath: bundledPluginRootAt("/opt/allbot", "zalo"),
+            npmSpec: "@allbot/zalo",
           },
         ],
       ]),
@@ -282,7 +282,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
         options: expect.arrayContaining([
           expect.objectContaining({
             value: "local",
-            hint: bundledPluginRootAt("/opt/kaijibot", "zalo"),
+            hint: bundledPluginRootAt("/opt/allbot", "zalo"),
           }),
         ]),
       }),
@@ -293,7 +293,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
     const runtime = makeRuntime();
     const select = vi.fn((async <T extends string>() => "skip" as T) as WizardPrompter["select"]);
     const prompter = makePrompter({ select: select as unknown as WizardPrompter["select"] });
-    const cfg: KaijiBotConfig = { update: { channel: "beta" } };
+    const cfg: AllBotConfig = { update: { channel: "beta" } };
     vi.mocked(fs.existsSync).mockReturnValue(false);
     resolveBundledPluginSources.mockReturnValue(
       new Map([
@@ -301,8 +301,8 @@ describe("ensureChannelSetupPluginInstalled", () => {
           "whatsapp",
           {
             pluginId: "whatsapp",
-            localPath: bundledPluginRootAt("/opt/kaijibot", "whatsapp"),
-            npmSpec: "@kaijibot/whatsapp",
+            localPath: bundledPluginRootAt("/opt/allbot", "whatsapp"),
+            npmSpec: "@allbot/whatsapp",
           },
         ],
       ]),
@@ -352,7 +352,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
       note,
       confirm,
     });
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     mockRepoLocalPathExists();
     installPluginFromNpmSpec.mockResolvedValue({
       ok: false,
@@ -373,33 +373,33 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("clears discovery cache before reloading the setup plugin registry", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
 
     reloadChannelSetupPluginRegistry({
       cfg,
       runtime,
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
     expect(clearPluginDiscoveryCache).toHaveBeenCalledTimes(1);
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: cfg,
         activationSourceConfig: cfg,
         autoEnabledReasons: {},
-        workspaceDir: "/tmp/kaijibot-workspace",
+        workspaceDir: "/tmp/allbot-workspace",
         cache: false,
         includeSetupOnlyChannelPlugins: true,
       }),
     );
     expect(clearPluginDiscoveryCache.mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(loadKaijiBotPlugins).mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
+      vi.mocked(loadAllBotPlugins).mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
     );
   });
 
   it("loads the setup plugin registry from the auto-enabled config snapshot", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {
+    const cfg: AllBotConfig = {
       plugins: {},
       channels: { telegram: { enabled: true } } as never,
     };
@@ -410,7 +410,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
           telegram: { enabled: true },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
     applyPluginAutoEnable.mockReturnValue({
       config: autoEnabledConfig,
       changes: [],
@@ -420,14 +420,14 @@ describe("ensureChannelSetupPluginInstalled", () => {
     reloadChannelSetupPluginRegistry({
       cfg,
       runtime,
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
     expect(applyPluginAutoEnable).toHaveBeenCalledWith({
       config: cfg,
       env: process.env,
     });
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: autoEnabledConfig,
         activationSourceConfig: cfg,
@@ -438,24 +438,24 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("scopes channel reloads when setup starts from an empty registry", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
-    getChannelPluginCatalogEntry.mockReturnValue({ pluginId: "@kaijibot/telegram-plugin" });
+    const cfg: AllBotConfig = {};
+    getChannelPluginCatalogEntry.mockReturnValue({ pluginId: "@allbot/telegram-plugin" });
 
     reloadChannelSetupPluginRegistryForChannel({
       cfg,
       runtime,
       channel: "telegram",
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: cfg,
         activationSourceConfig: cfg,
         autoEnabledReasons: {},
-        workspaceDir: "/tmp/kaijibot-workspace",
+        workspaceDir: "/tmp/allbot-workspace",
         cache: false,
-        onlyPluginIds: ["@kaijibot/telegram-plugin"],
+        onlyPluginIds: ["@allbot/telegram-plugin"],
         includeSetupOnlyChannelPlugins: true,
       }),
     );
@@ -463,7 +463,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("keeps full reloads when the active plugin registry is already populated", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     const registry = createEmptyPluginRegistry();
     registry.plugins.push(
       createPluginRecord({
@@ -480,10 +480,10 @@ describe("ensureChannelSetupPluginInstalled", () => {
       cfg,
       runtime,
       channel: "telegram",
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.not.objectContaining({
         onlyPluginIds: expect.anything(),
       }),
@@ -492,8 +492,8 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("scopes channel reloads when the global registry is populated but the pinned channel registry is empty", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
-    getChannelPluginCatalogEntry.mockReturnValue({ pluginId: "@kaijibot/telegram-plugin" });
+    const cfg: AllBotConfig = {};
+    getChannelPluginCatalogEntry.mockReturnValue({ pluginId: "@allbot/telegram-plugin" });
     const activeRegistry = createEmptyPluginRegistry();
     activeRegistry.plugins.push(
       createPluginRecord({
@@ -512,41 +512,41 @@ describe("ensureChannelSetupPluginInstalled", () => {
         cfg,
         runtime,
         channel: "telegram",
-        workspaceDir: "/tmp/kaijibot-workspace",
+        workspaceDir: "/tmp/allbot-workspace",
       });
     } finally {
       releasePinnedPluginChannelRegistry(pinnedChannelRegistry);
     }
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         activationSourceConfig: cfg,
         autoEnabledReasons: {},
-        onlyPluginIds: ["@kaijibot/telegram-plugin"],
+        onlyPluginIds: ["@allbot/telegram-plugin"],
       }),
     );
   });
 
   it("can load a channel-scoped snapshot without activating the global registry", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
-    getChannelPluginCatalogEntry.mockReturnValue({ pluginId: "@kaijibot/telegram-plugin" });
+    const cfg: AllBotConfig = {};
+    getChannelPluginCatalogEntry.mockReturnValue({ pluginId: "@allbot/telegram-plugin" });
 
     loadChannelSetupPluginRegistrySnapshotForChannel({
       cfg,
       runtime,
       channel: "telegram",
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: cfg,
         activationSourceConfig: cfg,
         autoEnabledReasons: {},
-        workspaceDir: "/tmp/kaijibot-workspace",
+        workspaceDir: "/tmp/allbot-workspace",
         cache: false,
-        onlyPluginIds: ["@kaijibot/telegram-plugin"],
+        onlyPluginIds: ["@allbot/telegram-plugin"],
         includeSetupOnlyChannelPlugins: true,
         activate: false,
       }),
@@ -555,16 +555,16 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("does not scope by raw channel id when no trusted plugin mapping exists", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
 
     loadChannelSetupPluginRegistrySnapshotForChannel({
       cfg,
       runtime,
       channel: "telegram",
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.not.objectContaining({
         onlyPluginIds: expect.anything(),
       }),
@@ -573,7 +573,7 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("scopes snapshots by a unique discovered manifest match when catalog mapping is missing", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
     loadPluginManifestRegistry.mockReturnValue({
       plugins: [{ id: "custom-telegram-plugin", channels: ["telegram"] }],
       diagnostics: [],
@@ -583,15 +583,15 @@ describe("ensureChannelSetupPluginInstalled", () => {
       cfg,
       runtime,
       channel: "telegram",
-      workspaceDir: "/tmp/kaijibot-workspace",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: cfg,
         activationSourceConfig: cfg,
         autoEnabledReasons: {},
-        workspaceDir: "/tmp/kaijibot-workspace",
+        workspaceDir: "/tmp/allbot-workspace",
         cache: false,
         onlyPluginIds: ["custom-telegram-plugin"],
         includeSetupOnlyChannelPlugins: true,
@@ -602,24 +602,24 @@ describe("ensureChannelSetupPluginInstalled", () => {
 
   it("scopes snapshots by plugin id when channel and plugin ids differ", () => {
     const runtime = makeRuntime();
-    const cfg: KaijiBotConfig = {};
+    const cfg: AllBotConfig = {};
 
     loadChannelSetupPluginRegistrySnapshotForChannel({
       cfg,
       runtime,
       channel: "msteams",
-      pluginId: "@kaijibot/msteams-plugin",
-      workspaceDir: "/tmp/kaijibot-workspace",
+      pluginId: "@allbot/msteams-plugin",
+      workspaceDir: "/tmp/allbot-workspace",
     });
 
-    expect(loadKaijiBotPlugins).toHaveBeenCalledWith(
+    expect(loadAllBotPlugins).toHaveBeenCalledWith(
       expect.objectContaining({
         config: cfg,
         activationSourceConfig: cfg,
         autoEnabledReasons: {},
-        workspaceDir: "/tmp/kaijibot-workspace",
+        workspaceDir: "/tmp/allbot-workspace",
         cache: false,
-        onlyPluginIds: ["@kaijibot/msteams-plugin"],
+        onlyPluginIds: ["@allbot/msteams-plugin"],
         includeSetupOnlyChannelPlugins: true,
         activate: false,
       }),

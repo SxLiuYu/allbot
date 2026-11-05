@@ -2,9 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { SafeOpenError, openFileWithinRoot } from "../infra/fs-safe.js";
 import { isNotFoundPathError, isPathInside } from "../infra/path-guards.js";
-import { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 
-const DEFAULT_FALLBACK_BROWSER_TMP_DIR = "/tmp/kaijibot";
+const DEFAULT_FALLBACK_BROWSER_TMP_DIR = "/tmp/allbot";
 
 function canUseNodeFs(): boolean {
   const getBuiltinModule = (
@@ -23,7 +23,7 @@ function canUseNodeFs(): boolean {
 }
 
 export const DEFAULT_BROWSER_TMP_DIR = canUseNodeFs()
-  ? resolvePreferredKaijiBotTmpDir()
+  ? resolvePreferredAllBotTmpDir()
   : DEFAULT_FALLBACK_BROWSER_TMP_DIR;
 export const DEFAULT_TRACE_DIR = DEFAULT_BROWSER_TMP_DIR;
 export const DEFAULT_DOWNLOAD_DIR = path.join(DEFAULT_BROWSER_TMP_DIR, "downloads");

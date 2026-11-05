@@ -1,7 +1,7 @@
-import type { KaijiBotPluginApi } from "kaijibot/plugin-sdk/plugin-entry";
-import { createProviderApiKeyAuthMethod } from "kaijibot/plugin-sdk/provider-auth-api-key";
-import { buildProviderReplayFamilyHooks } from "kaijibot/plugin-sdk/provider-model-shared";
-import { buildProviderStreamFamilyHooks } from "kaijibot/plugin-sdk/provider-stream-family";
+import type { AllBotPluginApi } from "allbot/plugin-sdk/plugin-entry";
+import { createProviderApiKeyAuthMethod } from "allbot/plugin-sdk/provider-auth-api-key";
+import { buildProviderReplayFamilyHooks } from "allbot/plugin-sdk/provider-model-shared";
+import { buildProviderStreamFamilyHooks } from "allbot/plugin-sdk/provider-stream-family";
 import {
   GOOGLE_GEMINI_DEFAULT_MODEL,
   applyGoogleGeminiModelDefault,
@@ -18,7 +18,7 @@ const GOOGLE_GEMINI_PROVIDER_HOOKS = {
   ...buildProviderStreamFamilyHooks("google-thinking"),
 };
 
-export function registerGoogleProvider(api: KaijiBotPluginApi) {
+export function registerGoogleProvider(api: AllBotPluginApi) {
   api.registerProvider({
     id: "google",
     label: "Google AI Studio",

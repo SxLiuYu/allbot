@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.KaijiBot" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.AllBot" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/accent</item>
         <item name="colorOnPrimary">@color/bg_void</item>
         <item name="colorSurface">@color/bg_surface</item>

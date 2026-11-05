@@ -181,7 +181,7 @@ function getGatewayStartGuardErrors(params: {
     return [];
   }
   if (!params.configExists) {
-    return [t("cli.gateway.run.guard.missingConfig", { cmd: formatCliCommand("kaijibot setup") })];
+    return [t("cli.gateway.run.guard.missingConfig", { cmd: formatCliCommand("allbot setup") })];
   }
   if (params.mode === undefined) {
     return [
@@ -189,8 +189,8 @@ function getGatewayStartGuardErrors(params: {
         t("cli.gateway.run.guard.blockedMissingMode"),
         t("cli.gateway.run.guard.blockedMissingModeHint"),
         t("cli.gateway.run.guard.blockedMissingModeAction", {
-          onboard: formatCliCommand("kaijibot onboard --mode local"),
-          setup: formatCliCommand("kaijibot setup"),
+          onboard: formatCliCommand("allbot onboard --mode local"),
+          setup: formatCliCommand("allbot setup"),
         }),
       ].join(" "),
       t("cli.gateway.run.guard.configAudit", { path: params.configAuditPath }),
@@ -241,7 +241,7 @@ function isHealthyGatewayLockError(err: unknown): boolean {
 }
 
 async function runGatewayCommand(opts: GatewayRunOpts) {
-  const isDevProfile = normalizeOptionalLowercaseString(process.env.KAIJIBOT_PROFILE) === "dev";
+  const isDevProfile = normalizeOptionalLowercaseString(process.env.ALLBOT_PROFILE) === "dev";
   const devMode = Boolean(opts.dev) || isDevProfile;
   if (opts.reset && !devMode) {
     defaultRuntime.error(t("cli.gateway.run.resetRequiresDev"));
@@ -252,7 +252,7 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
   setVerbose(Boolean(opts.verbose));
   if (opts.cliBackendLogs || opts.claudeCliLogs) {
     setConsoleSubsystemFilter(["agent/cli-backend"]);
-    process.env.KAIJIBOT_CLI_BACKEND_LOG_OUTPUT = "1";
+    process.env.ALLBOT_CLI_BACKEND_LOG_OUTPUT = "1";
   }
   const wsLogRaw = (opts.compact ? "compact" : opts.wsLog) as string | undefined;
   const wsLogStyle: GatewayWsLogStyle =
@@ -269,11 +269,11 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
   setGatewayWsLogStyle(wsLogStyle);
 
   if (opts.rawStream) {
-    process.env.KAIJIBOT_RAW_STREAM = "1";
+    process.env.ALLBOT_RAW_STREAM = "1";
   }
   const rawStreamPath = toOptionString(opts.rawStreamPath);
   if (rawStreamPath) {
-    process.env.KAIJIBOT_RAW_STREAM_PATH = rawStreamPath;
+    process.env.ALLBOT_RAW_STREAM_PATH = rawStreamPath;
   }
 
   // The heaviest part of gateway startup is loading the server module tree
@@ -316,7 +316,7 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
     return;
   }
   const bindExplicitRaw = bindExplicitRawStr as GatewayBindMode | undefined;
-  if (process.env.KAIJIBOT_SERVICE_MARKER?.trim()) {
+  if (process.env.ALLBOT_SERVICE_MARKER?.trim()) {
     const stale = cleanStaleGatewayProcessesSync(port);
     if (stale.length > 0) {
       gatewayLog.info(
@@ -372,7 +372,7 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
   if (opts.token) {
     const token = toOptionString(opts.token);
     if (token) {
-      process.env.KAIJIBOT_GATEWAY_TOKEN = token;
+      process.env.ALLBOT_GATEWAY_TOKEN = token;
     }
   }
   const authModeRaw = toOptionString(opts.auth);
@@ -565,7 +565,7 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
       defaultRuntime.error(
         t("cli.gateway.run.error.failedToStart", {
           message: errMessage,
-          cmd: formatCliCommand("kaijibot gateway stop"),
+          cmd: formatCliCommand("allbot gateway stop"),
         }),
       );
       try {
@@ -596,7 +596,7 @@ export function addGatewayRunCommand(cmd: Command): Command {
     )
     .option(
       "--token <token>",
-      "Shared token required in connect.params.auth.token (default: KAIJIBOT_GATEWAY_TOKEN env if set)",
+      "Shared token required in connect.params.auth.token (default: ALLBOT_GATEWAY_TOKEN env if set)",
     )
     .option("--auth <mode>", `Gateway auth mode (${formatModeChoices(GATEWAY_AUTH_MODES)})`)
     .option("--password <password>", "Password for auth mode=password")

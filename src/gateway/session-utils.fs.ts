@@ -69,7 +69,7 @@ function setCachedSessionTitleFields(cacheKey: string, stat: fs.Stats, value: Se
   }
 }
 
-export function attachKaijiBotTranscriptMeta(
+export function attachAllBotTranscriptMeta(
   message: unknown,
   meta: Record<string, unknown>,
 ): unknown {
@@ -78,12 +78,12 @@ export function attachKaijiBotTranscriptMeta(
   }
   const record = message as Record<string, unknown>;
   const existing =
-    record.__kaijibot && typeof record.__kaijibot === "object" && !Array.isArray(record.__kaijibot)
-      ? (record.__kaijibot as Record<string, unknown>)
+    record.__allbot && typeof record.__allbot === "object" && !Array.isArray(record.__allbot)
+      ? (record.__allbot as Record<string, unknown>)
       : {};
   return {
     ...record,
-    __kaijibot: {
+    __allbot: {
       ...existing,
       ...meta,
     },
@@ -114,7 +114,7 @@ export function readSessionMessages(
       if (parsed?.message) {
         messageSeq += 1;
         messages.push(
-          attachKaijiBotTranscriptMeta(parsed.message, {
+          attachAllBotTranscriptMeta(parsed.message, {
             ...(typeof parsed.id === "string" ? { id: parsed.id } : {}),
             seq: messageSeq,
           }),
@@ -132,7 +132,7 @@ export function readSessionMessages(
           role: "system",
           content: [{ type: "text", text: "Compaction" }],
           timestamp,
-          __kaijibot: {
+          __allbot: {
             kind: "compaction",
             id: typeof parsed.id === "string" ? parsed.id : undefined,
             seq: messageSeq,
@@ -493,7 +493,7 @@ function extractLatestUsageFromTranscriptChunk(
           : typeof parsed.model === "string"
             ? parsed.model.trim()
             : undefined;
-      const isDeliveryMirror = modelProvider === "kaijibot" && model === "delivery-mirror";
+      const isDeliveryMirror = modelProvider === "allbot" && model === "delivery-mirror";
       const hasMeaningfulUsage =
         hasNonzeroUsage(usage) ||
         typeof totalTokens === "number" ||

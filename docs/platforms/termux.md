@@ -1,7 +1,7 @@
 ---
-summary: "在 Android 手机的 Termux 终端中部署 KaijiBot，实现 24/7 在线"
+summary: "在 Android 手机的 Termux 终端中部署 AllBot，实现 24/7 在线"
 read_when:
-  - 想在 Android 手机上运行 KaijiBot
+  - 想在 Android 手机上运行 AllBot
   - Termux 环境配置或保活问题
   - Android 开机自启设置
 title: "Termux 部署"
@@ -11,9 +11,9 @@ title: "Termux 部署"
 
 ## 概述
 
-KaijiBot 可以在 Android 手机的 Termux 终端模拟器中运行。把一台闲置手机变成 24/7 在线的 AI 助手，不需要额外的服务器。只要手机有网络，KaijiBot 就能通过飞书收发消息、主动推送洞察。
+AllBot 可以在 Android 手机的 Termux 终端模拟器中运行。把一台闲置手机变成 24/7 在线的 AI 助手，不需要额外的服务器。只要手机有网络，AllBot 就能通过飞书收发消息、主动推送洞察。
 
-> **注意**：本文档介绍的是 Termux 方案。`docs/platforms/android.md` 描述的是 KaijiBot 原生 Android 伴侣 App（尚未发布），两者是完全不同的使用方式。
+> **注意**：本文档介绍的是 Termux 方案。`docs/platforms/android.md` 描述的是 AllBot 原生 Android 伴侣 App（尚未发布），两者是完全不同的使用方式。
 
 ## 准备工作
 
@@ -41,7 +41,7 @@ curl -fsSL https://gitee.com/kaiji1126/kaijibot/raw/main/scripts/install-termux.
 如果手动安装后需要配置开机自启和保活，运行：
 
 ```bash
-kaijibot android-install
+allbot android-install
 ```
 
 ## 手动安装步骤
@@ -52,17 +52,17 @@ kaijibot android-install
 # 1. 更新包管理器并安装依赖
 pkg update && pkg install nodejs-lts imagemagick ffmpeg
 
-# 2. 安装 KaijiBot
-npm install -g kaijibot --force
+# 2. 安装 AllBot
+npm install -g allbot --force
 
 # 3. 安装图片处理库（WASM 版，适用于 Termux 的 arm32 环境）
 npm install -g @img/sharp-wasm32 --force
 
 # 4. 运行配置向导，配置飞书机器人和 LLM 提供商
-kaijibot onboard
+allbot onboard
 
 # 5. 配置开机自启和后台保活
-kaijibot android-install
+allbot android-install
 ```
 
 ## 开机自启
@@ -71,15 +71,15 @@ kaijibot android-install
 
 1. **安装 Termux:Boot**：在 F-Droid 搜索 `com.termux.boot` 并安装
 2. **必须打开一次**：安装后先手动打开 Termux:Boot 应用。Android 要求应用至少启动过一次才会注册开机广播接收器，这一步不做的话开机后什么都不会执行
-3. **生成启动脚本**：`kaijibot android-install` 会自动写入 `~/.termux/boot/start-kaijibot.sh`
-4. 重启手机，KaijiBot 自动启动
+3. **生成启动脚本**：`allbot android-install` 会自动写入 `~/.termux/boot/start-allbot.sh`
+4. 重启手机，AllBot 自动启动
 
 启动脚本的内容大致如下：
 
 ```bash
 #!/data/data/com.termux/files/usr/bin/sh
 termux-wake-lock
-kaijibot gateway
+allbot gateway
 ```
 
 ## 后台保活
@@ -92,7 +92,7 @@ Termux 被 Android 系统杀掉是最常见的可靠性问题。以下是多层�
 termux-wake-lock
 ```
 
-获取 CPU 唤醒锁，防止手机休眠时 Termux 进程被暂停。`kaijibot android-install` 生成的启动脚本已自动包含此命令。
+获取 CPU 唤醒锁，防止手机休眠时 Termux 进程被暂停。`allbot android-install` 生成的启动脚本已自动包含此命令。
 
 ### 电池优化白名单
 
@@ -102,7 +102,7 @@ termux-wake-lock
 
 ### 前台服务
 
-Termux 的通知栏必须保持常驻。如果通知栏看不到 Termux 的通知，说明进程已经被杀了。下拉通知栏检查，如果没有就手动重启一次 `kaijibot gateway`。
+Termux 的通知栏必须保持常驻。如果通知栏看不到 Termux 的通知，说明进程已经被杀了。下拉通知栏检查，如果没有就手动重启一次 `allbot gateway`。
 
 ## OEM 电池优化设置（按品牌）
 
@@ -138,25 +138,25 @@ Termux 的通知栏必须保持常驻。如果通知栏看不到 Termux 的通�
 - **设置** → 应用 → Termux → 电池 → **不受限**
 - **设置** → 应用 → Termux:Boot → 电池 → **不受限**
 
-> **提示**：设置完成后，重启一次手机验证所有设置是否生效。如果重启后 KaijiBot 没有自动启动，回到本章逐项排查。
+> **提示**：设置完成后，重启一次手机验证所有设置是否生效。如果重启后 AllBot 没有自动启动，回到本章逐项排查。
 
 ## 日常使用
 
 ```bash
 # 前台启动 gateway（可以在终端看到实时日志）
-kaijibot gateway
+allbot gateway
 
 # 重启 gateway
-kaijibot gateway restart
+allbot gateway restart
 
 # 停止 gateway
-kaijibot gateway stop
+allbot gateway stop
 
-# 更新 KaijiBot 到最新版本
-kaijibot update
+# 更新 AllBot 到最新版本
+allbot update
 ```
 
-日志文件位于 `~/.kaijibot/gateway.log`，排查问题时先看这里。
+日志文件位于 `~/.allbot/gateway.log`，排查问题时先看这里。
 
 ## 浏览器自动化（可选）
 
@@ -166,10 +166,10 @@ kaijibot update
 pkg install x11-repo && pkg install chromium
 ```
 
-KaijiBot 会自动检测 `$PREFIX/bin/chromium-browser`。Termux 环境下需要额外配置：
+AllBot 会自动检测 `$PREFIX/bin/chromium-browser`。Termux 环境下需要额外配置：
 
 ```bash
-kaijibot config set browser.noSandbox true
+allbot config set browser.noSandbox true
 ```
 
 不装 Chromium 也不影响核心功能，飞书消息收发和认知系统都能正常工作。
@@ -199,8 +199,8 @@ Android/Termux 环境下，部分功能会降级：
 
 1. 确认已安装 Termux:Boot（F-Droid 搜索 `com.termux.boot`）
 2. 确认已至少打开过一次 Termux:Boot 应用
-3. 确认 `~/.termux/boot/start-kaijibot.sh` 文件存在且可执行
-4. 手动运行该脚本验证内容是否正确：`bash ~/.termux/boot/start-kaijibot.sh`
+3. 确认 `~/.termux/boot/start-allbot.sh` 文件存在且可执行
+4. 手动运行该脚本验证内容是否正确：`bash ~/.termux/boot/start-allbot.sh`
 
 ### TLS / SSL 错误
 
@@ -221,12 +221,12 @@ echo 'export NODE_EXTRA_CA_CERTS=$PREFIX/etc/tls/ca-bundle.crt' >> ~/.bashrc
 某些包（如 `@lancedb/lancedb`）没有 arm64 预编译包，安装会报平台检查错误。加 `--force` 跳过：
 
 ```bash
-npm install -g kaijibot --force
+npm install -g allbot --force
 ```
 
 ### 内存不足
 
-4GB RAM 的手机在运行 KaijiBot 的同时使用其他应用可能会卡顿。建议：
+4GB RAM 的手机在运行 AllBot 的同时使用其他应用可能会卡顿。建议：
 
 - 关闭不必要的后台应用
 - 在 Termux 中限制 Node.js 内存：`export NODE_OPTIONS="--max-old-space-size=512"`
@@ -234,11 +234,11 @@ npm install -g kaijibot --force
 
 ## 本地语音（语音输入 + 朗读）
 
-KaijiBot 的语音输入（按住说话→转文字）由本地 sherpa-onnx 引擎提供，朗读由 edge-tts 提供；Termux 上 sherpa-onnx 有三种部署方式：
+AllBot 的语音输入（按住说话→转文字）由本地 sherpa-onnx 引擎提供，朗读由 edge-tts 提供；Termux 上 sherpa-onnx 有三种部署方式：
 
 ### 方式一：静态构建（推荐，零编译）
 
-`scripts/install-sherpa-onnx-termux.sh` 会下载官方 **linux-aarch64 静态构建**（完全静态链接，无需编译，Termux 直接运行）到 `~/.kaijibot/sherpa-speech/runtime`：
+`scripts/install-sherpa-onnx-termux.sh` 会下载官方 **linux-aarch64 静态构建**（完全静态链接，无需编译，Termux 直接运行）到 `~/.allbot/sherpa-speech/runtime`：
 
 ```bash
 bash scripts/install-sherpa-onnx-termux.sh
@@ -261,8 +261,8 @@ cmake -B build -DSHERPA_ONNX_ENABLE_BINARY=ON -DSHERPA_ONNX_ENABLE_TTS=ON \
       -DSHERPA_ONNX_ENABLE_CHECK=OFF -DSHERPA_ONNX_ENABLE_PORTAUDIO=OFF \
       -DBUILD_SHARED_LIBS=OFF
 cmake --build build -j "$(nproc)"
-mkdir -p ~/.kaijibot/sherpa-speech/runtime/bin
-cp build/bin/sherpa-onnx-offline ~/.kaijibot/sherpa-speech/runtime/bin/
+mkdir -p ~/.allbot/sherpa-speech/runtime/bin
+cp build/bin/sherpa-onnx-offline ~/.allbot/sherpa-speech/runtime/bin/
 ```
 
 ### 方式三：proot-distro（免编译兜底）

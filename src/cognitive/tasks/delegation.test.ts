@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { TaskRunner } from "./runner.js";
 import { createTaskSafely } from "./service.js";
 import { TaskStore } from "./store.js";
@@ -15,11 +15,11 @@ import { TaskStore } from "./store.js";
  * the runner PAUSES a task that became blocked mid-step (subtasks spawned).
  */
 
-function config(extraAgents: string[] = []): KaijiBotConfig {
+function config(extraAgents: string[] = []): AllBotConfig {
   return {
     cognitive: { enabled: true, tasks: { enabled: true } },
     ...(extraAgents.length > 0 ? { agents: { list: extraAgents.map((id) => ({ id })) } } : {}),
-  } as unknown as KaijiBotConfig;
+  } as unknown as AllBotConfig;
 }
 
 describe("task delegation (M3-R2)", () => {
@@ -27,7 +27,7 @@ describe("task delegation (M3-R2)", () => {
   let store: TaskStore;
 
   beforeEach(() => {
-    storeDir = mkdtempSync(join(tmpdir(), "kaijibot-task-delegation-"));
+    storeDir = mkdtempSync(join(tmpdir(), "allbot-task-delegation-"));
     store = new TaskStore(storeDir);
   });
 

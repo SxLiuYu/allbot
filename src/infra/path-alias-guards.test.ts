@@ -6,7 +6,7 @@ import { assertNoPathAliasEscape } from "./path-alias-guards.js";
 
 async function withAliasRoot(cb: (root: string) => Promise<void>): Promise<void> {
   await withTempDir(
-    { prefix: "kaijibot-path-alias-", parentDir: process.cwd(), subdir: "root" },
+    { prefix: "allbot-path-alias-", parentDir: process.cwd(), subdir: "root" },
     cb,
   );
 }

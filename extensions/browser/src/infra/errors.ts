@@ -1,1 +1,1 @@
-export { extractErrorCode, formatErrorMessage } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { extractErrorCode, formatErrorMessage } from "allbot/plugin-sdk/browser-security-runtime";

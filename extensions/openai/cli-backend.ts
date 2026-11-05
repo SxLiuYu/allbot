@@ -1,8 +1,8 @@
-import type { CliBackendPlugin } from "kaijibot/plugin-sdk/cli-backend";
+import type { CliBackendPlugin } from "allbot/plugin-sdk/cli-backend";
 import {
   CLI_FRESH_WATCHDOG_DEFAULTS,
   CLI_RESUME_WATCHDOG_DEFAULTS,
-} from "kaijibot/plugin-sdk/cli-backend";
+} from "allbot/plugin-sdk/cli-backend";
 
 const CODEX_CLI_DEFAULT_MODEL_REF = "codex-cli/gpt-5.4";
 

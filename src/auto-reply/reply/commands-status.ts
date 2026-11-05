@@ -13,7 +13,7 @@ import {
   resolveInternalSessionKey,
   resolveMainSessionAlias,
 } from "../../agents/tools/sessions-helpers.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { toAgentModelListLike } from "../../config/model-input.js";
 import type { SessionEntry, SessionScope } from "../../config/sessions.js";
 import { logVerbose } from "../../globals.js";
@@ -92,7 +92,7 @@ function formatAgentTaskCountsLine(agentId: string): string | undefined {
 }
 
 export async function buildStatusReply(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   command: CommandContext;
   sessionEntry?: SessionEntry;
   sessionKey: string;
@@ -129,7 +129,7 @@ export async function buildStatusReply(params: {
 }
 
 export async function buildStatusText(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   sessionEntry?: SessionEntry;
   sessionKey: string;
   parentSessionKey?: string;

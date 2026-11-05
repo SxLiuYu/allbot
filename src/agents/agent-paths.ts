@@ -3,8 +3,8 @@ import { resolveStateDir } from "../config/paths.js";
 import { DEFAULT_AGENT_ID } from "../routing/session-key.js";
 import { resolveUserPath } from "../utils.js";
 
-export function resolveKaijiBotAgentDir(env: NodeJS.ProcessEnv = process.env): string {
-  const override = env.KAIJIBOT_AGENT_DIR?.trim() || env.PI_CODING_AGENT_DIR?.trim();
+export function resolveAllBotAgentDir(env: NodeJS.ProcessEnv = process.env): string {
+  const override = env.ALLBOT_AGENT_DIR?.trim() || env.PI_CODING_AGENT_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env);
   }
@@ -12,10 +12,10 @@ export function resolveKaijiBotAgentDir(env: NodeJS.ProcessEnv = process.env): s
   return resolveUserPath(defaultAgentDir, env);
 }
 
-export function ensureKaijiBotAgentEnv(): string {
-  const dir = resolveKaijiBotAgentDir();
-  if (!process.env.KAIJIBOT_AGENT_DIR) {
-    process.env.KAIJIBOT_AGENT_DIR = dir;
+export function ensureAllBotAgentEnv(): string {
+  const dir = resolveAllBotAgentDir();
+  if (!process.env.ALLBOT_AGENT_DIR) {
+    process.env.ALLBOT_AGENT_DIR = dir;
   }
   if (!process.env.PI_CODING_AGENT_DIR) {
     process.env.PI_CODING_AGENT_DIR = dir;

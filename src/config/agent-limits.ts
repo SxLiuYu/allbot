@@ -1,11 +1,11 @@
-import type { KaijiBotConfig } from "./types.js";
+import type { AllBotConfig } from "./types.js";
 
 export const DEFAULT_AGENT_MAX_CONCURRENT = 4;
 export const DEFAULT_SUBAGENT_MAX_CONCURRENT = 8;
 // Keep depth-1 subagents as leaves unless config explicitly opts into nesting.
 export const DEFAULT_SUBAGENT_MAX_SPAWN_DEPTH = 1;
 
-export function resolveAgentMaxConcurrent(cfg?: KaijiBotConfig): number {
+export function resolveAgentMaxConcurrent(cfg?: AllBotConfig): number {
   const raw = cfg?.agents?.defaults?.maxConcurrent;
   if (typeof raw === "number" && Number.isFinite(raw)) {
     return Math.max(1, Math.floor(raw));
@@ -13,7 +13,7 @@ export function resolveAgentMaxConcurrent(cfg?: KaijiBotConfig): number {
   return DEFAULT_AGENT_MAX_CONCURRENT;
 }
 
-export function resolveSubagentMaxConcurrent(cfg?: KaijiBotConfig): number {
+export function resolveSubagentMaxConcurrent(cfg?: AllBotConfig): number {
   const raw = cfg?.agents?.defaults?.subagents?.maxConcurrent;
   if (typeof raw === "number" && Number.isFinite(raw)) {
     return Math.max(1, Math.floor(raw));

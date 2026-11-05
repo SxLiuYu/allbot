@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import { createPluginRegistry, type PluginRecord } from "../../../src/plugins/registry.js";
 import type { PluginRuntime } from "../../../src/plugins/runtime/types.js";
 import { createPluginRecord } from "../../../src/plugins/status.test-helpers.js";
-import type { KaijiBotPluginApi } from "../../../src/plugins/types.js";
+import type { AllBotPluginApi } from "../../../src/plugins/types.js";
 
 export {
   registerProviderPlugins as registerProviders,
@@ -53,7 +53,7 @@ export function assertNoImportTimeSideEffects(params: {
   );
 }
 
-export function createPluginRegistryFixture(config = {} as KaijiBotConfig) {
+export function createPluginRegistryFixture(config = {} as AllBotConfig) {
   return {
     config,
     registry: createPluginRegistry({
@@ -70,9 +70,9 @@ export function createPluginRegistryFixture(config = {} as KaijiBotConfig) {
 
 export function registerTestPlugin(params: {
   registry: ReturnType<typeof createPluginRegistry>;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   record: PluginRecord;
-  register(api: KaijiBotPluginApi): void;
+  register(api: AllBotPluginApi): void;
 }) {
   params.registry.registry.plugins.push(params.record);
   params.register(
@@ -84,13 +84,13 @@ export function registerTestPlugin(params: {
 
 export function registerVirtualTestPlugin(params: {
   registry: ReturnType<typeof createPluginRegistry>;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   id: string;
   name: string;
   source?: string;
   kind?: PluginRecord["kind"];
   contracts?: PluginRecord["contracts"];
-  register(this: void, api: KaijiBotPluginApi): void;
+  register(this: void, api: AllBotPluginApi): void;
 }) {
   registerTestPlugin({
     registry: params.registry,

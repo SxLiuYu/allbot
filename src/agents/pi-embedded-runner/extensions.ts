@@ -1,5 +1,5 @@
 import type { ExtensionFactory, SessionManager } from "@earendil-works/pi-coding-agent";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { ProviderRuntimeModel } from "../../plugins/types.js";
 import { resolveContextWindowInfo } from "../context-window-guard.js";
 import { DEFAULT_CONTEXT_TOKENS } from "../defaults.js";
@@ -14,7 +14,7 @@ import { resolveTranscriptPolicy } from "../transcript-policy.js";
 import { isCacheTtlEligibleProvider, readLastCacheTtlTimestamp } from "./cache-ttl.js";
 
 function resolveContextWindowTokens(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   provider: string;
   modelId: string;
   model: ProviderRuntimeModel | undefined;
@@ -30,7 +30,7 @@ function resolveContextWindowTokens(params: {
 }
 
 function buildContextPruningFactory(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   sessionManager: SessionManager;
   provider: string;
   modelId: string;
@@ -68,7 +68,7 @@ function buildContextPruningFactory(params: {
   return contextPruningExtension;
 }
 
-function resolveCompactionMode(cfg?: KaijiBotConfig): "default" | "safeguard" {
+function resolveCompactionMode(cfg?: AllBotConfig): "default" | "safeguard" {
   const compaction = cfg?.agents?.defaults?.compaction;
   // A registered compaction provider requires the safeguard extension path
   if (compaction?.provider) {
@@ -78,7 +78,7 @@ function resolveCompactionMode(cfg?: KaijiBotConfig): "default" | "safeguard" {
 }
 
 export function buildEmbeddedExtensionFactories(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   sessionManager: SessionManager;
   provider: string;
   modelId: string;

@@ -95,7 +95,7 @@ export function resolveMcpRequestContext(
   return {
     sessionKey: resolveScopedSessionKey(cfg, getHeader(req, "x-session-key")),
     messageProvider:
-      normalizeMessageChannel(getHeader(req, "x-kaijibot-message-channel")) ?? undefined,
-    accountId: normalizeOptionalString(getHeader(req, "x-kaijibot-account-id")),
+      normalizeMessageChannel(getHeader(req, "x-allbot-message-channel")) ?? undefined,
+    accountId: normalizeOptionalString(getHeader(req, "x-allbot-account-id")),
   };
 }

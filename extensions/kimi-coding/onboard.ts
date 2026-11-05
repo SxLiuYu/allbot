@@ -1,7 +1,7 @@
 import {
   createDefaultModelPresetAppliers,
-  type KaijiBotConfig,
-} from "kaijibot/plugin-sdk/provider-onboard";
+  type AllBotConfig,
+} from "allbot/plugin-sdk/provider-onboard";
 import {
   buildKimiCodingProvider,
   KIMI_CODING_BASE_URL,
@@ -17,7 +17,7 @@ function resolveKimiCodingDefaultModel() {
 
 const kimiCodingPresetAppliers = createDefaultModelPresetAppliers({
   primaryModelRef: KIMI_MODEL_REF,
-  resolveParams: (_cfg: KaijiBotConfig) => {
+  resolveParams: (_cfg: AllBotConfig) => {
     const defaultModel = resolveKimiCodingDefaultModel();
     if (!defaultModel) {
       return null;
@@ -33,10 +33,10 @@ const kimiCodingPresetAppliers = createDefaultModelPresetAppliers({
   },
 });
 
-export function applyKimiCodeProviderConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyKimiCodeProviderConfig(cfg: AllBotConfig): AllBotConfig {
   return kimiCodingPresetAppliers.applyProviderConfig(cfg);
 }
 
-export function applyKimiCodeConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+export function applyKimiCodeConfig(cfg: AllBotConfig): AllBotConfig {
   return kimiCodingPresetAppliers.applyConfig(cfg);
 }

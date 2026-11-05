@@ -1,7 +1,7 @@
 ---
 summary: "Configuration overview: common tasks, quick setup, and links to the full reference"
 read_when:
-  - Setting up KaijiBot for the first time
+  - Setting up AllBot for the first time
   - Looking for common configuration patterns
   - Navigating to specific config sections
 title: "Configuration"
@@ -9,9 +9,9 @@ title: "Configuration"
 
 # Configuration
 
-KaijiBot reads an optional <Tooltip tip="JSON5 supports comments and trailing commas">**JSON5**</Tooltip> config from `~/.kaijibot/kaijibot.json`.
+AllBot reads an optional <Tooltip tip="JSON5 supports comments and trailing commas">**JSON5**</Tooltip> config from `~/.allbot/allbot.json`.
 
-If the file is missing, KaijiBot uses safe defaults. Common reasons to add a config:
+If the file is missing, AllBot uses safe defaults. Common reasons to add a config:
 
 - Connect channels and control who can message the bot
 - Set models, tools, sandboxing, or automation (cron, hooks)
@@ -20,15 +20,15 @@ If the file is missing, KaijiBot uses safe defaults. Common reasons to add a con
 See the [full reference](/gateway/configuration-reference) for every available field.
 
 <Tip>
-**New to configuration?** Start with `kaijibot onboard` for interactive setup, or check out the [Configuration Examples](/gateway/configuration-examples) guide for complete copy-paste configs.
+**New to configuration?** Start with `allbot onboard` for interactive setup, or check out the [Configuration Examples](/gateway/configuration-examples) guide for complete copy-paste configs.
 </Tip>
 
 ## Minimal config
 
 ```json5
-// ~/.kaijibot/kaijibot.json
+// ~/.allbot/allbot.json
 {
-  agents: { defaults: { workspace: "~/.kaijibot/workspace" } },
+  agents: { defaults: { workspace: "~/.allbot/workspace" } },
   channels: { whatsapp: { allowFrom: ["+15555550123"] } },
 }
 ```
@@ -38,15 +38,15 @@ See the [full reference](/gateway/configuration-reference) for every available f
 <Tabs>
   <Tab title="Interactive wizard">
     ```bash
-    kaijibot onboard       # full onboarding flow
-    kaijibot configure     # config wizard
+    allbot onboard       # full onboarding flow
+    allbot configure     # config wizard
     ```
   </Tab>
   <Tab title="CLI (one-liners)">
     ```bash
-    kaijibot config get agents.defaults.workspace
-    kaijibot config set agents.defaults.heartbeat.every "2h"
-    kaijibot config unset plugins.entries.brave.config.webSearch.apiKey
+    allbot config get agents.defaults.workspace
+    allbot config set agents.defaults.heartbeat.every "2h"
+    allbot config unset plugins.entries.brave.config.webSearch.apiKey
     ```
   </Tab>
   <Tab title="Control UI">
@@ -58,22 +58,22 @@ See the [full reference](/gateway/configuration-reference) for every available f
     fetch one path-scoped schema node plus immediate child summaries.
   </Tab>
   <Tab title="Direct edit">
-    Edit `~/.kaijibot/kaijibot.json` directly. The Gateway watches the file and applies changes automatically (see [hot reload](#config-hot-reload)).
+    Edit `~/.allbot/allbot.json` directly. The Gateway watches the file and applies changes automatically (see [hot reload](#config-hot-reload)).
   </Tab>
 </Tabs>
 
 ## Strict validation
 
 <Warning>
-KaijiBot only accepts configurations that fully match the schema. Unknown keys, malformed types, or invalid values cause the Gateway to **refuse to start**. The only root-level exception is `$schema` (string), so editors can attach JSON Schema metadata.
+AllBot only accepts configurations that fully match the schema. Unknown keys, malformed types, or invalid values cause the Gateway to **refuse to start**. The only root-level exception is `$schema` (string), so editors can attach JSON Schema metadata.
 </Warning>
 
 Schema tooling notes:
 
-- `kaijibot config schema` prints the same JSON Schema family used by Control UI
+- `allbot config schema` prints the same JSON Schema family used by Control UI
   and config validation.
 - Treat that schema output as the canonical machine-readable contract for
-  `kaijibot.json`; this overview and the configuration reference summarize it.
+  `allbot.json`; this overview and the configuration reference summarize it.
 - Field `title` and `description` values are carried into the schema output for
   editor and form tooling.
 - Nested object, wildcard (`*`), and array-item (`[]`) entries inherit the same
@@ -92,9 +92,9 @@ Schema tooling notes:
 When validation fails:
 
 - The Gateway does not boot
-- Only diagnostic commands work (`kaijibot doctor`, `kaijibot logs`, `kaijibot health`, `kaijibot status`)
-- Run `kaijibot doctor` to see exact issues
-- Run `kaijibot doctor --fix` (or `--yes`) to apply repairs
+- Only diagnostic commands work (`allbot doctor`, `allbot logs`, `allbot health`, `allbot status`)
+- Run `allbot doctor` to see exact issues
+- Run `allbot doctor --fix` (or `--yes`) to apply repairs
 
 ## Common tasks
 
@@ -182,7 +182,7 @@ When validation fails:
           {
             id: "main",
             groupChat: {
-              mentionPatterns: ["@kaijibot", "kaijibot"],
+              mentionPatterns: ["@allbot", "allbot"],
             },
           },
         ],
@@ -309,7 +309,7 @@ When validation fails:
   </Accordion>
 
   <Accordion title="Enable relay-backed push for official iOS builds">
-    Relay-backed push is configured in `kaijibot.json`.
+    Relay-backed push is configured in `allbot.json`.
 
     Set this in gateway config:
 
@@ -332,7 +332,7 @@ When validation fails:
     CLI equivalent:
 
     ```bash
-    kaijibot config set gateway.push.apns.relay.baseUrl https://relay.example.com
+    allbot config set gateway.push.apns.relay.baseUrl https://relay.example.com
     ```
 
     What this does:
@@ -358,8 +358,8 @@ When validation fails:
 
     Compatibility note:
 
-    - `KAIJIBOT_APNS_RELAY_BASE_URL` and `KAIJIBOT_APNS_RELAY_TIMEOUT_MS` still work as temporary env overrides.
-    - `KAIJIBOT_APNS_RELAY_ALLOW_HTTP=true` remains a loopback-only development escape hatch; do not persist HTTP relay URLs in config.
+    - `ALLBOT_APNS_RELAY_BASE_URL` and `ALLBOT_APNS_RELAY_TIMEOUT_MS` still work as temporary env overrides.
+    - `ALLBOT_APNS_RELAY_ALLOW_HTTP=true` remains a loopback-only development escape hatch; do not persist HTTP relay URLs in config.
 
     See [iOS App](/platforms/ios#relay-backed-push-for-official-builds) for the end-to-end flow and [Authentication and trust flow](/platforms/ios#authentication-and-trust-flow) for the relay security model.
 
@@ -434,7 +434,7 @@ When validation fails:
     Security note:
     - Treat all hook/webhook payload content as untrusted input.
     - Use a dedicated `hooks.token`; do not reuse the shared Gateway token.
-    - Hook auth is header-only (`Authorization: Bearer ...` or `x-kaijibot-token`); query-string tokens are rejected.
+    - Hook auth is header-only (`Authorization: Bearer ...` or `x-allbot-token`); query-string tokens are rejected.
     - `hooks.path` cannot be `/`; keep webhook ingress on a dedicated subpath such as `/hooks`.
     - Keep unsafe-content bypass flags disabled (`hooks.gmail.allowUnsafeExternalContent`, `hooks.mappings[].allowUnsafeExternalContent`) unless doing tightly scoped debugging.
     - If you enable `hooks.allowRequestSessionKey`, also set `hooks.allowedSessionKeyPrefixes` to bound caller-selected session keys.
@@ -451,8 +451,8 @@ When validation fails:
     {
       agents: {
         list: [
-          { id: "home", default: true, workspace: "~/.kaijibot/workspace-home" },
-          { id: "work", workspace: "~/.kaijibot/workspace-work" },
+          { id: "home", default: true, workspace: "~/.allbot/workspace-home" },
+          { id: "work", workspace: "~/.allbot/workspace-work" },
         ],
       },
       bindings: [
@@ -470,7 +470,7 @@ When validation fails:
     Use `$include` to organize large configs:
 
     ```json5
-    // ~/.kaijibot/kaijibot.json
+    // ~/.allbot/allbot.json
     {
       gateway: { port: 18789 },
       agents: { $include: "./agents.json5" },
@@ -492,7 +492,7 @@ When validation fails:
 
 ## Config hot reload
 
-The Gateway watches `~/.kaijibot/kaijibot.json` and applies changes automatically — no manual restart needed for most settings.
+The Gateway watches `~/.allbot/allbot.json` and applies changes automatically — no manual restart needed for most settings.
 
 ### Reload modes
 
@@ -553,7 +553,7 @@ then `config.patch`.
     Validates + writes the full config and restarts the Gateway in one step.
 
     <Warning>
-    `config.apply` replaces the **entire config**. Use `config.patch` for partial updates, or `kaijibot config set` for single keys.
+    `config.apply` replaces the **entire config**. Use `config.patch` for partial updates, or `allbot config set` for single keys.
     </Warning>
 
     Params:
@@ -567,9 +567,9 @@ then `config.patch`.
     Restart requests are coalesced while one is already pending/in-flight, and a 30-second cooldown applies between restart cycles.
 
     ```bash
-    kaijibot gateway call config.get --params '{}'  # capture payload.hash
-    kaijibot gateway call config.apply --params '{
-      "raw": "{ agents: { defaults: { workspace: \"~/.kaijibot/workspace\" } } }",
+    allbot gateway call config.get --params '{}'  # capture payload.hash
+    allbot gateway call config.apply --params '{
+      "raw": "{ agents: { defaults: { workspace: \"~/.allbot/workspace\" } } }",
       "baseHash": "<hash>",
       "sessionKey": "agent:main:whatsapp:direct:+15555550123"
     }'
@@ -593,7 +593,7 @@ then `config.patch`.
     Restart behavior matches `config.apply`: coalesced pending restarts plus a 30-second cooldown between restart cycles.
 
     ```bash
-    kaijibot gateway call config.patch --params '{
+    allbot gateway call config.patch --params '{
       "raw": "{ channels: { telegram: { groups: { \"*\": { requireMention: false } } } } }",
       "baseHash": "<hash>"
     }'
@@ -604,10 +604,10 @@ then `config.patch`.
 
 ## Environment variables
 
-KaijiBot reads env vars from the parent process plus:
+AllBot reads env vars from the parent process plus:
 
 - `.env` from the current working directory (if present)
-- `~/.kaijibot/.env` (global fallback)
+- `~/.allbot/.env` (global fallback)
 
 Neither file overrides existing env vars. You can also set inline env vars in config:
 
@@ -621,7 +621,7 @@ Neither file overrides existing env vars. You can also set inline env vars in co
 ```
 
 <Accordion title="Shell env import (optional)">
-  If enabled and expected keys aren't set, KaijiBot runs your login shell and imports only the missing keys:
+  If enabled and expected keys aren't set, AllBot runs your login shell and imports only the missing keys:
 
 ```json5
 {
@@ -631,7 +631,7 @@ Neither file overrides existing env vars. You can also set inline env vars in co
 }
 ```
 
-Env var equivalent: `KAIJIBOT_LOAD_SHELL_ENV=1`
+Env var equivalent: `ALLBOT_LOAD_SHELL_ENV=1`
 </Accordion>
 
 <Accordion title="Env var substitution in config values">
@@ -639,7 +639,7 @@ Env var equivalent: `KAIJIBOT_LOAD_SHELL_ENV=1`
 
 ```json5
 {
-  gateway: { auth: { token: "${KAIJIBOT_GATEWAY_TOKEN}" } },
+  gateway: { auth: { token: "${ALLBOT_GATEWAY_TOKEN}" } },
   models: { providers: { custom: { apiKey: "${CUSTOM_API_KEY}" } } },
 }
 ```

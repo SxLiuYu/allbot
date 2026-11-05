@@ -1,14 +1,14 @@
 ---
 summary: "Infer-first CLI for provider-backed model, image, audio, TTS, video, web, and embedding workflows"
 read_when:
-  - Adding or modifying `kaijibot infer` commands
+  - Adding or modifying `allbot infer` commands
   - Designing stable headless capability automation
 title: "Inference CLI"
 ---
 
 # Inference CLI
 
-`kaijibot infer` is the canonical headless surface for provider-backed inference workflows.
+`allbot infer` is the canonical headless surface for provider-backed inference workflows.
 
 It intentionally exposes capability families, not raw gateway RPC names and not raw agent tool ids.
 
@@ -17,7 +17,7 @@ It intentionally exposes capability families, not raw gateway RPC names and not 
 Copy and paste this to an agent:
 
 ```text
-Read the KaijiBot infer documentation (`/cli/infer`), then create a skill that routes my common workflows to `kaijibot infer`.
+Read the AllBot infer documentation (`/cli/infer`), then create a skill that routes my common workflows to `allbot infer`.
 Focus on model runs, image generation, video generation, audio transcription, TTS, web search, and embeddings.
 ```
 
@@ -25,34 +25,34 @@ A good infer-based skill should:
 
 - map common user intents to the correct infer subcommand
 - include a few canonical infer examples for the workflows it covers
-- prefer `kaijibot infer ...` in examples and suggestions
+- prefer `allbot infer ...` in examples and suggestions
 - avoid re-documenting the entire infer surface inside the skill body
 
 Typical infer-focused skill coverage:
 
-- `kaijibot infer model run`
-- `kaijibot infer image generate`
-- `kaijibot infer audio transcribe`
-- `kaijibot infer tts convert`
-- `kaijibot infer web search`
-- `kaijibot infer embedding create`
+- `allbot infer model run`
+- `allbot infer image generate`
+- `allbot infer audio transcribe`
+- `allbot infer tts convert`
+- `allbot infer web search`
+- `allbot infer embedding create`
 
 ## Why use infer
 
-`kaijibot infer` provides one consistent CLI for provider-backed inference tasks inside KaijiBot.
+`allbot infer` provides one consistent CLI for provider-backed inference tasks inside AllBot.
 
 Benefits:
 
-- Use the providers and models already configured in KaijiBot instead of wiring up one-off wrappers for each backend.
+- Use the providers and models already configured in AllBot instead of wiring up one-off wrappers for each backend.
 - Keep model, image, audio transcription, TTS, video, web, and embedding workflows under one command tree.
 - Use a stable `--json` output shape for scripts, automation, and agent-driven workflows.
-- Prefer a first-party KaijiBot surface when the task is fundamentally "run inference."
+- Prefer a first-party AllBot surface when the task is fundamentally "run inference."
 - Use the normal local path without requiring the gateway for most infer commands.
 
 ## Command tree
 
 ```text
- kaijibot infer
+ allbot infer
   list
   inspect
 
@@ -106,20 +106,20 @@ This table maps common inference tasks to the corresponding infer command.
 
 | Task                    | Command                                                                | Notes                                                |
 | ----------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
-| Run a text/model prompt | `kaijibot infer model run --prompt "..." --json`                       | Uses the normal local path by default                |
-| Generate an image       | `kaijibot infer image generate --prompt "..." --json`                  | Use `image edit` when starting from an existing file |
-| Describe an image file  | `kaijibot infer image describe --file ./image.png --json`              | `--model` must be `<provider/model>`                 |
-| Transcribe audio        | `kaijibot infer audio transcribe --file ./memo.m4a --json`             | `--model` must be `<provider/model>`                 |
-| Synthesize speech       | `kaijibot infer tts convert --text "..." --output ./speech.mp3 --json` | `tts status` is gateway-oriented                     |
-| Generate a video        | `kaijibot infer video generate --prompt "..." --json`                  |                                                      |
-| Describe a video file   | `kaijibot infer video describe --file ./clip.mp4 --json`               | `--model` must be `<provider/model>`                 |
-| Search the web          | `kaijibot infer web search --query "..." --json`                       |                                                      |
-| Fetch a web page        | `kaijibot infer web fetch --url https://example.com --json`            |                                                      |
-| Create embeddings       | `kaijibot infer embedding create --text "..." --json`                  |                                                      |
+| Run a text/model prompt | `allbot infer model run --prompt "..." --json`                       | Uses the normal local path by default                |
+| Generate an image       | `allbot infer image generate --prompt "..." --json`                  | Use `image edit` when starting from an existing file |
+| Describe an image file  | `allbot infer image describe --file ./image.png --json`              | `--model` must be `<provider/model>`                 |
+| Transcribe audio        | `allbot infer audio transcribe --file ./memo.m4a --json`             | `--model` must be `<provider/model>`                 |
+| Synthesize speech       | `allbot infer tts convert --text "..." --output ./speech.mp3 --json` | `tts status` is gateway-oriented                     |
+| Generate a video        | `allbot infer video generate --prompt "..." --json`                  |                                                      |
+| Describe a video file   | `allbot infer video describe --file ./clip.mp4 --json`               | `--model` must be `<provider/model>`                 |
+| Search the web          | `allbot infer web search --query "..." --json`                       |                                                      |
+| Fetch a web page        | `allbot infer web fetch --url https://example.com --json`            |                                                      |
+| Create embeddings       | `allbot infer embedding create --text "..." --json`                  |                                                      |
 
 ## Behavior
 
-- `kaijibot infer ...` is the primary CLI surface for these workflows.
+- `allbot infer ...` is the primary CLI surface for these workflows.
 - Use `--json` when the output will be consumed by another command or script.
 - Use `--provider` or `--model provider/model` when a specific backend is required.
 - For `image describe`, `audio transcribe`, and `video describe`, `--model` must use the form `<provider/model>`.
@@ -132,10 +132,10 @@ This table maps common inference tasks to the corresponding infer command.
 Use `model` for provider-backed text inference and model/provider inspection.
 
 ```bash
-kaijibot infer model run --prompt "Reply with exactly: smoke-ok" --json
-kaijibot infer model run --prompt "Summarize this changelog entry" --provider openai --json
-kaijibot infer model providers --json
-kaijibot infer model inspect --name gpt-5.4 --json
+allbot infer model run --prompt "Reply with exactly: smoke-ok" --json
+allbot infer model run --prompt "Summarize this changelog entry" --provider openai --json
+allbot infer model providers --json
+allbot infer model inspect --name gpt-5.4 --json
 ```
 
 Notes:
@@ -148,10 +148,10 @@ Notes:
 Use `image` for generation, edit, and description.
 
 ```bash
-kaijibot infer image generate --prompt "friendly lobster illustration" --json
-kaijibot infer image generate --prompt "cinematic product photo of headphones" --json
-kaijibot infer image describe --file ./photo.jpg --json
-kaijibot infer image describe --file ./ui-screenshot.png --model openai/gpt-4.1-mini --json
+allbot infer image generate --prompt "friendly lobster illustration" --json
+allbot infer image generate --prompt "cinematic product photo of headphones" --json
+allbot infer image describe --file ./photo.jpg --json
+allbot infer image describe --file ./ui-screenshot.png --model openai/gpt-4.1-mini --json
 ```
 
 Notes:
@@ -164,9 +164,9 @@ Notes:
 Use `audio` for file transcription.
 
 ```bash
-kaijibot infer audio transcribe --file ./memo.m4a --json
-kaijibot infer audio transcribe --file ./team-sync.m4a --language en --prompt "Focus on names and action items" --json
-kaijibot infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --json
+allbot infer audio transcribe --file ./memo.m4a --json
+allbot infer audio transcribe --file ./team-sync.m4a --language en --prompt "Focus on names and action items" --json
+allbot infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --json
 ```
 
 Notes:
@@ -179,10 +179,10 @@ Notes:
 Use `tts` for speech synthesis and TTS provider state.
 
 ```bash
-kaijibot infer tts convert --text "hello from kaijibot" --output ./hello.mp3 --json
-kaijibot infer tts convert --text "Your build is complete" --output ./build-complete.mp3 --json
-kaijibot infer tts providers --json
-kaijibot infer tts status --json
+allbot infer tts convert --text "hello from allbot" --output ./hello.mp3 --json
+allbot infer tts convert --text "Your build is complete" --output ./build-complete.mp3 --json
+allbot infer tts providers --json
+allbot infer tts status --json
 ```
 
 Notes:
@@ -195,10 +195,10 @@ Notes:
 Use `video` for generation and description.
 
 ```bash
-kaijibot infer video generate --prompt "cinematic sunset over the ocean" --json
-kaijibot infer video generate --prompt "slow drone shot over a forest lake" --json
-kaijibot infer video describe --file ./clip.mp4 --json
-kaijibot infer video describe --file ./clip.mp4 --model openai/gpt-4.1-mini --json
+allbot infer video generate --prompt "cinematic sunset over the ocean" --json
+allbot infer video generate --prompt "slow drone shot over a forest lake" --json
+allbot infer video describe --file ./clip.mp4 --json
+allbot infer video describe --file ./clip.mp4 --model openai/gpt-4.1-mini --json
 ```
 
 Notes:
@@ -210,10 +210,10 @@ Notes:
 Use `web` for search and fetch workflows.
 
 ```bash
-kaijibot infer web search --query "KaijiBot docs" --json
-kaijibot infer web search --query "KaijiBot infer web providers" --json
-kaijibot infer web fetch --url https://example.com --json
-kaijibot infer web providers --json
+allbot infer web search --query "AllBot docs" --json
+allbot infer web search --query "AllBot infer web providers" --json
+allbot infer web fetch --url https://example.com --json
+allbot infer web providers --json
 ```
 
 Notes:
@@ -225,9 +225,9 @@ Notes:
 Use `embedding` for vector creation and embedding provider inspection.
 
 ```bash
-kaijibot infer embedding create --text "friendly lobster" --json
-kaijibot infer embedding create --text "customer support ticket: delayed shipment" --model openai/text-embedding-3-large --json
-kaijibot infer embedding providers --json
+allbot infer embedding create --text "friendly lobster" --json
+allbot infer embedding create --text "customer support ticket: delayed shipment" --model openai/text-embedding-3-large --json
+allbot infer embedding providers --json
 ```
 
 ## JSON output
@@ -261,20 +261,20 @@ Top-level fields are stable:
 
 ```bash
 # Bad
-kaijibot infer media image generate --prompt "friendly lobster"
+allbot infer media image generate --prompt "friendly lobster"
 
 # Good
-kaijibot infer image generate --prompt "friendly lobster"
+allbot infer image generate --prompt "friendly lobster"
 ```
 
 ```bash
 # Bad
-kaijibot infer audio transcribe --file ./memo.m4a --model whisper-1 --json
+allbot infer audio transcribe --file ./memo.m4a --model whisper-1 --json
 
 # Good
-kaijibot infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --json
+allbot infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --json
 ```
 
 ## Notes
 
-- `kaijibot capability ...` is an alias for `kaijibot infer ...`.
+- `allbot capability ...` is an alias for `allbot infer ...`.

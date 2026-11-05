@@ -50,7 +50,7 @@ type HeartbeatEventState = {
   listeners: Set<(evt: HeartbeatEventPayload) => void>;
 };
 
-const HEARTBEAT_EVENT_STATE_KEY = Symbol.for("kaijibot.heartbeatEvents.state");
+const HEARTBEAT_EVENT_STATE_KEY = Symbol.for("allbot.heartbeatEvents.state");
 
 const state = resolveGlobalSingleton<HeartbeatEventState>(HEARTBEAT_EVENT_STATE_KEY, () => ({
   lastHeartbeat: null,

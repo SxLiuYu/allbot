@@ -18,9 +18,9 @@ afterEach(() => {
   resetPluginAutoEnableTestState();
 });
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
-  // Skip on CI: requires upstream-only channels (slack) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (slack) not bundled in AllBot
   it.skipIf(process.env.CI)("detects typed channel-configured candidates", () => {
     const candidates = detectPluginAutoEnableCandidates({
       config: {
@@ -59,7 +59,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     expect(result.autoEnabledReasons).toEqual({});
   });
 
-  // Skip on CI: requires upstream-only channels (slack) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (slack) not bundled in AllBot
   it.skipIf(process.env.CI)(
     "auto-enables built-in channels without appending to plugins.allow",
     () => {
@@ -81,7 +81,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     },
   );
 
-  // Skip on CI: requires upstream-only channels (slack) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (slack) not bundled in AllBot
   it.skipIf(process.env.CI)("does not create plugins.allow when allowlist is unset", () => {
     const result = applyPluginAutoEnable({
       config: {
@@ -94,7 +94,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     expect(result.config.plugins?.allow).toBeUndefined();
   });
 
-  // Skip on CI: requires upstream-only channels (slack) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (slack) not bundled in AllBot
   it.skipIf(process.env.CI)("stores auto-enable reasons in a null-prototype dictionary", () => {
     const result = applyPluginAutoEnable({
       config: {
@@ -110,7 +110,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     const result = applyPluginAutoEnable({
       config: {
         browser: {
-          defaultProfile: "kaijibot",
+          defaultProfile: "allbot",
         },
         plugins: {
           allow: ["telegram"],
@@ -259,7 +259,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     expect(result.changes).toEqual([]);
   });
 
-  // Skip on CI: requires upstream-only channels (whatsapp) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (whatsapp) not bundled in AllBot
   it.skipIf(process.env.CI)("keeps auto-enabled WhatsApp config schema-valid", () => {
     const result = applyPluginAutoEnable({
       config: {
@@ -276,7 +276,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     expect(validateConfigObject(result.config).ok).toBe(true);
   });
 
-  // Skip on CI: requires upstream-only channels (whatsapp) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (whatsapp) not bundled in AllBot
   it.skipIf(process.env.CI)(
     "does not append built-in WhatsApp to plugins.allow during auto-enable",
     () => {
@@ -300,7 +300,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     },
   );
 
-  // Skip on CI: requires upstream-only channels (whatsapp) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (whatsapp) not bundled in AllBot
   it.skipIf(process.env.CI)(
     "does not re-emit built-in auto-enable changes when rerun with plugins.allow set",
     () => {
@@ -329,7 +329,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     },
   );
 
-  // Skip on CI: requires upstream-only channels (slack) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (slack) not bundled in AllBot
   it.skipIf(process.env.CI)("respects explicit disable", () => {
     const result = applyPluginAutoEnable({
       config: {
@@ -343,7 +343,7 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     expect(result.changes).toEqual([]);
   });
 
-  // Skip on CI: requires upstream-only channels (slack) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (slack) not bundled in AllBot
   it.skipIf(process.env.CI)(
     "respects built-in channel explicit disable via channels.<id>.enabled",
     () => {
@@ -373,14 +373,14 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
     expect(result.changes).toEqual([]);
   });
 
-  // Skip on CI: requires upstream-only channels (irc) not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels (irc) not bundled in AllBot
   it.skipIf(process.env.CI)("auto-enables irc when configured via env", () => {
     const result = applyPluginAutoEnable({
       config: {},
       env: {
         ...makeIsolatedEnv(),
         IRC_HOST: "irc.libera.chat",
-        IRC_NICK: "kaijibot-bot",
+        IRC_NICK: "allbot-bot",
       },
     });
 
@@ -403,9 +403,9 @@ describe.skipIf(process.env.CI)("applyPluginAutoEnable core", () => {
       },
       env: {
         ...makeIsolatedEnv(),
-        KAIJIBOT_HOME: undefined,
-        KAIJIBOT_STATE_DIR: stateDir,
-        KAIJIBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
+        ALLBOT_HOME: undefined,
+        ALLBOT_STATE_DIR: stateDir,
+        ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins",
       },
     });
 

@@ -15,14 +15,14 @@ describe("doctor config mutation state", () => {
         changes: ["enabled signal"],
       },
       shouldRepair: false,
-      fixHint: 'Run "kaijibot doctor --fix" to apply these changes.',
+      fixHint: 'Run "allbot doctor --fix" to apply these changes.',
     });
 
     expect(next).toEqual({
       cfg: { channels: {} },
       candidate: { channels: { signal: { enabled: true } } },
       pendingChanges: true,
-      fixHints: ['Run "kaijibot doctor --fix" to apply these changes.'],
+      fixHints: ['Run "allbot doctor --fix" to apply these changes.'],
     });
   });
 
@@ -39,7 +39,7 @@ describe("doctor config mutation state", () => {
         changes: ["enabled signal"],
       },
       shouldRepair: true,
-      fixHint: 'Run "kaijibot doctor --fix" to apply these changes.',
+      fixHint: 'Run "allbot doctor --fix" to apply these changes.',
     });
 
     expect(next).toEqual({

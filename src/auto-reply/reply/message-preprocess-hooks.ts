@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { fireAndForgetHook } from "../../hooks/fire-and-forget.js";
 import { createInternalHookEvent, triggerInternalHook } from "../../hooks/internal-hooks.js";
 import {
@@ -11,7 +11,7 @@ import type { FinalizedMsgContext } from "../templating.js";
 
 export function emitPreAgentMessageHooks(params: {
   ctx: FinalizedMsgContext;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   isFastTestEnv: boolean;
 }): void {
   if (params.isFastTestEnv) {

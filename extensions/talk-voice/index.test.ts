@@ -1,10 +1,10 @@
-import type { KaijiBotPluginCommandDefinition } from "kaijibot/plugin-sdk/core";
+import type { AllBotPluginCommandDefinition } from "allbot/plugin-sdk/core";
 import { describe, expect, it, vi } from "vitest";
 import type { PluginRuntime } from "./api.js";
 import register from "./index.js";
 
 function createHarness(config: Record<string, unknown>) {
-  let command: KaijiBotPluginCommandDefinition | undefined;
+  let command: AllBotPluginCommandDefinition | undefined;
   const runtime = {
     config: {
       loadConfig: vi.fn(() => config),
@@ -16,7 +16,7 @@ function createHarness(config: Record<string, unknown>) {
   } as unknown as PluginRuntime;
   const api = {
     runtime,
-    registerCommand: vi.fn((definition: KaijiBotPluginCommandDefinition) => {
+    registerCommand: vi.fn((definition: AllBotPluginCommandDefinition) => {
       command = definition;
     }),
   };

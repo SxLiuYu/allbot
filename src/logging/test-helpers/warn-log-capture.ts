@@ -1,5 +1,5 @@
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir } from "../../infra/tmp-kaijibot-dir.js";
+import { resolvePreferredAllBotTmpDir } from "../../infra/tmp-allbot-dir.js";
 import {
   registerLogTransport,
   resetLogger,
@@ -12,7 +12,7 @@ export function createWarnLogCapture(prefix: string) {
   setLoggerOverride({
     level: "warn",
     consoleLevel: "silent",
-    file: path.join(resolvePreferredKaijiBotTmpDir(), `${prefix}-${process.pid}-${Date.now()}.log`),
+    file: path.join(resolvePreferredAllBotTmpDir(), `${prefix}-${process.pid}-${Date.now()}.log`),
   });
   const unregister = registerLogTransport((record) => {
     records.push(record);

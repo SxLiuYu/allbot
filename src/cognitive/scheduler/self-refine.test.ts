@@ -1,6 +1,6 @@
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { KaijiBotConfig } from "../../config/types.kaijibot.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
 import type { Fragment, FragmentCluster } from "../insight/fragment-types.js";
 import type { LlmInsightDeps } from "../insight/llm-engine.js";
 import type { InsightCandidate } from "../insight/types.js";
@@ -92,7 +92,7 @@ const fakeLlmDeps: LlmInsightDeps = {
   prepareModel: vi.fn(),
 };
 
-const fakeBotConfig: KaijiBotConfig = {};
+const fakeBotConfig: AllBotConfig = {};
 
 function makeCandidate(overrides: Partial<InsightCandidate> = {}): InsightCandidate {
   return {
@@ -125,7 +125,7 @@ function makeScheduler(
   overrides?: {
     insightGenerator?: (persona: PersonaTree) => Promise<InsightCandidate[]>;
     llmDeps?: LlmInsightDeps | undefined;
-    botConfig?: KaijiBotConfig | undefined;
+    botConfig?: AllBotConfig | undefined;
     patternVerification?: boolean;
     fragmentStore?: FragmentStore;
   },

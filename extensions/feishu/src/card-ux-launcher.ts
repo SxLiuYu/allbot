@@ -1,4 +1,4 @@
-import { normalizeOptionalLowercaseString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalLowercaseString } from "allbot/plugin-sdk/text-runtime";
 import type { ClawdbotConfig, RuntimeEnv } from "../runtime-api.js";
 import { createFeishuCardInteractionEnvelope } from "./card-interaction.js";
 import { FEISHU_APPROVAL_REQUEST_ACTION } from "./card-ux-approval.js";

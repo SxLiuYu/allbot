@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import { mergeMissing } from "../../../config/legacy.shared.js";
 import {
   cloneRecord,
@@ -147,7 +147,7 @@ function normalizeLegacyWebFetchConfigRecord<T extends JsonRecord>(
 }
 
 export function resolvePluginWebFetchConfig(
-  config: KaijiBotConfig | undefined,
+  config: AllBotConfig | undefined,
   pluginId: string,
 ): Record<string, unknown> | undefined {
   const pluginConfig = config?.plugins?.entries?.[pluginId]?.config;

@@ -1,5 +1,5 @@
-import type * as ConversationRuntime from "kaijibot/plugin-sdk/conversation-runtime";
-import type { ResolvedAgentRoute } from "kaijibot/plugin-sdk/routing";
+import type * as ConversationRuntime from "allbot/plugin-sdk/conversation-runtime";
+import type { ResolvedAgentRoute } from "allbot/plugin-sdk/routing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createRuntimeEnv } from "../../../test/helpers/plugins/runtime-env.js";
 import type { ClawdbotConfig, PluginRuntime } from "../runtime-api.js";
@@ -289,9 +289,9 @@ vi.mock("./client.js", () => ({
   createFeishuClient: mockCreateFeishuClient,
 }));
 
-vi.mock("kaijibot/plugin-sdk/conversation-runtime", async () => {
-  const actual = await vi.importActual<typeof import("kaijibot/plugin-sdk/conversation-runtime")>(
-    "kaijibot/plugin-sdk/conversation-runtime",
+vi.mock("allbot/plugin-sdk/conversation-runtime", async () => {
+  const actual = await vi.importActual<typeof import("allbot/plugin-sdk/conversation-runtime")>(
+    "allbot/plugin-sdk/conversation-runtime",
   );
   return {
     ...actual,

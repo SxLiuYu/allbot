@@ -11,42 +11,42 @@ export type {
   ChannelOutboundAdapter,
   ChannelPlugin,
   HistoryEntry,
-  KaijiBotConfig,
-  KaijiBotPluginApi,
+  AllBotConfig,
+  AllBotPluginApi,
   OutboundIdentity,
   PluginRuntime,
   ReplyPayload,
-} from "kaijibot/plugin-sdk/core";
-export type { KaijiBotConfig as ClawdbotConfig } from "kaijibot/plugin-sdk/core";
-export type { RuntimeEnv } from "kaijibot/plugin-sdk/runtime";
-export type { GroupToolPolicyConfig } from "kaijibot/plugin-sdk/config-runtime";
+} from "allbot/plugin-sdk/core";
+export type { AllBotConfig as ClawdbotConfig } from "allbot/plugin-sdk/core";
+export type { RuntimeEnv } from "allbot/plugin-sdk/runtime";
+export type { GroupToolPolicyConfig } from "allbot/plugin-sdk/config-runtime";
 export {
   DEFAULT_ACCOUNT_ID,
   buildChannelConfigSchema,
   createActionGate,
   createDedupeCache,
-} from "kaijibot/plugin-sdk/core";
+} from "allbot/plugin-sdk/core";
 export {
   PAIRING_APPROVED_MESSAGE,
   buildProbeChannelStatusSummary,
   createDefaultChannelRuntimeState,
-} from "kaijibot/plugin-sdk/channel-status";
-export { buildAgentMediaPayload } from "kaijibot/plugin-sdk/agent-media-payload";
-export { createChannelPairingController } from "kaijibot/plugin-sdk/channel-pairing";
-export { createReplyPrefixContext } from "kaijibot/plugin-sdk/channel-reply-pipeline";
+} from "allbot/plugin-sdk/channel-status";
+export { buildAgentMediaPayload } from "allbot/plugin-sdk/agent-media-payload";
+export { createChannelPairingController } from "allbot/plugin-sdk/channel-pairing";
+export { createReplyPrefixContext } from "allbot/plugin-sdk/channel-reply-pipeline";
 export {
   evaluateSupplementalContextVisibility,
   filterSupplementalContextItems,
   resolveChannelContextVisibilityMode,
-} from "kaijibot/plugin-sdk/config-runtime";
-export { loadSessionStore, resolveSessionStoreEntry } from "kaijibot/plugin-sdk/config-runtime";
-export { readJsonFileWithFallback } from "kaijibot/plugin-sdk/json-store";
-export { createPersistentDedupe } from "kaijibot/plugin-sdk/persistent-dedupe";
-export { normalizeAgentId } from "kaijibot/plugin-sdk/routing";
-export { chunkTextForOutbound } from "kaijibot/plugin-sdk/text-chunking";
+} from "allbot/plugin-sdk/config-runtime";
+export { loadSessionStore, resolveSessionStoreEntry } from "allbot/plugin-sdk/config-runtime";
+export { readJsonFileWithFallback } from "allbot/plugin-sdk/json-store";
+export { createPersistentDedupe } from "allbot/plugin-sdk/persistent-dedupe";
+export { normalizeAgentId } from "allbot/plugin-sdk/routing";
+export { chunkTextForOutbound } from "allbot/plugin-sdk/text-chunking";
 export {
   isRequestBodyLimitError,
   readRequestBodyWithLimit,
   requestBodyErrorToText,
-} from "kaijibot/plugin-sdk/webhook-ingress";
+} from "allbot/plugin-sdk/webhook-ingress";
 export { setFeishuRuntime } from "./src/runtime.js";

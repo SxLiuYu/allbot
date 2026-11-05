@@ -118,7 +118,7 @@ function lazyRender<M>(getter: () => M | null, render: (mod: M) => unknown) {
   return mod ? render(mod) : nothing;
 }
 
-const UPDATE_BANNER_DISMISS_KEY = "kaijibot:control-ui:update-banner-dismissed:v1";
+const UPDATE_BANNER_DISMISS_KEY = "allbot:control-ui:update-banner-dismissed:v1";
 const CRON_THINKING_SUGGESTIONS = ["off", "minimal", "low", "medium", "high"];
 const CRON_TIMEZONE_SUGGESTIONS = [
   "UTC",
@@ -250,7 +250,7 @@ export function renderApp(state: AppViewState) {
         style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;"
       >
         <div style="text-align:center;max-width:420px;">
-          <h3 style="margin:0 0 12px;">KaijiBot Control</h3>
+          <h3 style="margin:0 0 12px;">AllBot Control</h3>
           ${hasToken
             ? html`<p style="color:var(--muted);">${error ?? "Connecting to gateway\u2026"}</p>`
             : error
@@ -263,7 +263,7 @@ export function renderApp(state: AppViewState) {
                     Run
                     <code
                       style="background:var(--surface);padding:2px 6px;border-radius:4px;font-size:0.8rem;"
-                      >kaijibot dashboard</code
+                      >allbot dashboard</code
                     >
                     in your terminal to open the control UI with authentication.
                   </p>
@@ -468,7 +468,7 @@ export function renderApp(state: AppViewState) {
 
       <nav class="shell-nav" aria-label="Main navigation">
         <div class="shell-nav__brand">
-          <pre class="shell-nav__brand-ascii" aria-label="KaijiBot">
+          <pre class="shell-nav__brand-ascii" aria-label="AllBot">
 ██╗  ██╗ █████╗ ██╗     ██╗██╗██████╗  ██████╗ ████████╗
 ██║ ██╔╝██╔══██╗██║     ██║██║██╔══██╗██╔═══██╗╚══██╔══╝
 █████╔╝ ███████║██║     ██║██║██████╔╝██║   ██║   ██║   

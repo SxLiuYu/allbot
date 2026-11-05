@@ -5,7 +5,7 @@ read_when:
 title: "WhatsApp"
 ---
 
-> ⚠️ **此频道在 KaijiBot 中无打包代码。** This channel has **no bundled code** in KaijiBot — the page is preserved as upstream OpenClaw reference only. KaijiBot's first-class channels are Feishu (飞书) and WeChat (微信); see the [channels hub](/channels) for the full list.
+> ⚠️ **此频道在 AllBot 中无打包代码。** This channel has **no bundled code** in AllBot — the page is preserved as upstream OpenClaw reference only. AllBot's first-class channels are Feishu (飞书) and WeChat (微信); see the [channels hub](/channels) for the full list.
 
 # WhatsApp (Web channel)
 
@@ -13,17 +13,17 @@ Status: production-ready via WhatsApp Web (Baileys). Gateway owns linked session
 
 ## Install (on demand)
 
-- Onboarding (`kaijibot onboard`) and `kaijibot channels add --channel whatsapp`
+- Onboarding (`allbot onboard`) and `allbot channels add --channel whatsapp`
   prompt to install the WhatsApp plugin the first time you select it.
-- `kaijibot channels login --channel whatsapp` also offers the install flow when
+- `allbot channels login --channel whatsapp` also offers the install flow when
   the plugin is not present yet.
 - Dev channel + git checkout: defaults to the local plugin path.
-- Stable/Beta: defaults to the npm package `@kaijibot/whatsapp`.
+- Stable/Beta: defaults to the npm package `@allbot/whatsapp`.
 
 Manual install stays available:
 
 ```bash
-kaijibot plugins install @kaijibot/whatsapp
+allbot plugins install @allbot/whatsapp
 ```
 
 <CardGroup cols={3}>
@@ -61,13 +61,13 @@ kaijibot plugins install @kaijibot/whatsapp
   <Step title="Link WhatsApp (QR)">
 
 ```bash
-kaijibot channels login --channel whatsapp
+allbot channels login --channel whatsapp
 ```
 
     For a specific account:
 
 ```bash
-kaijibot channels login --channel whatsapp --account work
+allbot channels login --channel whatsapp --account work
 ```
 
   </Step>
@@ -75,7 +75,7 @@ kaijibot channels login --channel whatsapp --account work
   <Step title="Start the gateway">
 
 ```bash
-kaijibot gateway
+allbot gateway
 ```
 
   </Step>
@@ -83,8 +83,8 @@ kaijibot gateway
   <Step title="Approve first pairing request (if using pairing mode)">
 
 ```bash
-kaijibot pairing list whatsapp
-kaijibot pairing approve whatsapp <CODE>
+allbot pairing list whatsapp
+allbot pairing approve whatsapp <CODE>
 ```
 
     Pairing requests expire after 1 hour. Pending requests are capped at 3 per channel.
@@ -93,7 +93,7 @@ kaijibot pairing approve whatsapp <CODE>
 </Steps>
 
 <Note>
-KaijiBot recommends running WhatsApp on a separate number when possible. (The channel metadata and setup flow are optimized for that setup, but personal-number setups are also supported.)
+AllBot recommends running WhatsApp on a separate number when possible. (The channel metadata and setup flow are optimized for that setup, but personal-number setups are also supported.)
 </Note>
 
 ## Deployment patterns
@@ -102,7 +102,7 @@ KaijiBot recommends running WhatsApp on a separate number when possible. (The ch
   <Accordion title="Dedicated number (recommended)">
     This is the cleanest operational mode:
 
-    - separate WhatsApp identity for KaijiBot
+    - separate WhatsApp identity for AllBot
     - clearer DM allowlists and routing boundaries
     - lower chance of self-chat confusion
 
@@ -133,7 +133,7 @@ KaijiBot recommends running WhatsApp on a separate number when possible. (The ch
   </Accordion>
 
   <Accordion title="WhatsApp Web-only channel scope">
-    The messaging platform channel is WhatsApp Web-based (`Baileys`) in current KaijiBot channel architecture.
+    The messaging platform channel is WhatsApp Web-based (`Baileys`) in current AllBot channel architecture.
 
     There is no separate Twilio WhatsApp messaging channel in the built-in chat-channel registry.
 
@@ -223,7 +223,7 @@ When the linked self number is also present in `allowFrom`, WhatsApp self-chat s
 
 - skip read receipts for self-chat turns
 - ignore mention-JID auto-trigger behavior that would otherwise ping yourself
-- if `messages.responsePrefix` is unset, self-chat replies default to `[{identity.name}]` or `[kaijibot]`
+- if `messages.responsePrefix` is unset, self-chat replies default to `[{identity.name}]` or `[allbot]`
 
 ## Message normalization and context
 
@@ -394,13 +394,13 @@ Behavior notes:
   </Accordion>
 
   <Accordion title="Credential paths and legacy compatibility">
-    - current auth path: `~/.kaijibot/credentials/whatsapp/<accountId>/creds.json`
+    - current auth path: `~/.allbot/credentials/whatsapp/<accountId>/creds.json`
     - backup file: `creds.json.bak`
-    - legacy default auth in `~/.kaijibot/credentials/` is still recognized/migrated for default-account flows
+    - legacy default auth in `~/.allbot/credentials/` is still recognized/migrated for default-account flows
   </Accordion>
 
   <Accordion title="Logout behavior">
-    `kaijibot channels logout --channel whatsapp [--account <id>]` clears WhatsApp auth state for that account.
+    `allbot channels logout --channel whatsapp [--account <id>]` clears WhatsApp auth state for that account.
 
     In legacy auth directories, `oauth.json` is preserved while Baileys auth files are removed.
 
@@ -424,8 +424,8 @@ Behavior notes:
     Fix:
 
     ```bash
-    kaijibot channels login --channel whatsapp
-    kaijibot channels status
+    allbot channels login --channel whatsapp
+    allbot channels status
     ```
 
   </Accordion>
@@ -436,8 +436,8 @@ Behavior notes:
     Fix:
 
     ```bash
-    kaijibot doctor
-    kaijibot logs --follow
+    allbot doctor
+    allbot logs --follow
     ```
 
     If needed, re-link with `channels login`.
@@ -458,7 +458,7 @@ Behavior notes:
     - `groupAllowFrom` / `allowFrom`
     - `groups` allowlist entries
     - mention gating (`requireMention` + mention patterns)
-    - duplicate keys in `kaijibot.json` (JSON5): later entries override earlier ones, so keep a single `groupPolicy` per scope
+    - duplicate keys in `allbot.json` (JSON5): later entries override earlier ones, so keep a single `groupPolicy` per scope
 
   </Accordion>
 

@@ -42,7 +42,7 @@ function browserEvaluateDisabledMessage(action: "wait" | "evaluate"): string {
     action === "wait"
       ? "wait --fn is disabled by config (browser.evaluateEnabled=false)."
       : "act:evaluate is disabled by config (browser.evaluateEnabled=false).",
-    "Docs: /gateway/configuration#browser-kaijibot-managed-browser",
+    "Docs: /gateway/configuration#browser-allbot-managed-browser",
   ].join("\n");
 }
 

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { GatewayBonjourBeacon } from "../infra/bonjour-discovery.js";
 import { captureEnv } from "../test-utils/env.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
@@ -45,14 +45,14 @@ function createSelectPrompter(
 }
 
 describe("promptRemoteGatewayConfig", () => {
-  const envSnapshot = captureEnv(["KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS"]);
+  const envSnapshot = captureEnv(["ALLBOT_ALLOW_INSECURE_PRIVATE_WS"]);
 
   async function runRemotePrompt(params: {
     text: WizardPrompter["text"];
     selectResponses: Partial<Record<string, string>>;
     confirm: boolean;
   }) {
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const prompter = createPrompter({
       confirm: vi.fn(async () => params.confirm),
       select: createSelectPrompter(params.selectResponses),
@@ -65,7 +65,7 @@ describe("promptRemoteGatewayConfig", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     envSnapshot.restore();
-    delete process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS;
+    delete process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS;
     detectBinary.mockResolvedValue(false);
     discoverGatewayBeacons.mockResolvedValue([]);
     resolveWideAreaDiscoveryDomain.mockReturnValue(undefined);
@@ -73,7 +73,7 @@ describe("promptRemoteGatewayConfig", () => {
 
   afterEach(() => {
     envSnapshot.restore();
-    delete process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS;
+    delete process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS;
   });
 
   it("defaults discovered direct remote URLs to wss://", async () => {
@@ -160,7 +160,7 @@ describe("promptRemoteGatewayConfig", () => {
       text,
     });
 
-    const next = await promptRemoteGatewayConfig({} as KaijiBotConfig, prompter);
+    const next = await promptRemoteGatewayConfig({} as AllBotConfig, prompter);
 
     expect(next.gateway?.mode).toBe("remote");
     expect(next.gateway?.remote?.url).toBe(manualUrl);
@@ -267,7 +267,7 @@ describe("promptRemoteGatewayConfig", () => {
       text,
     });
 
-    const next = await promptRemoteGatewayConfig({} as KaijiBotConfig, prompter);
+    const next = await promptRemoteGatewayConfig({} as AllBotConfig, prompter);
 
     expect(next.gateway?.remote?.url).toBe("ws://127.0.0.1:18789");
     expect(select).not.toHaveBeenCalledWith(
@@ -300,13 +300,13 @@ describe("promptRemoteGatewayConfig", () => {
     expect(next.gateway?.remote?.token).toBeUndefined();
   });
 
-  it("allows ws:// hostname remote URLs when KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS=1", async () => {
-    process.env.KAIJIBOT_ALLOW_INSECURE_PRIVATE_WS = "1";
+  it("allows ws:// hostname remote URLs when ALLBOT_ALLOW_INSECURE_PRIVATE_WS=1", async () => {
+    process.env.ALLBOT_ALLOW_INSECURE_PRIVATE_WS = "1";
     const text: WizardPrompter["text"] = vi.fn(async (params) => {
       if (params.message === "Gateway WebSocket URL") {
-        expect(params.validate?.("ws://kaijibot-gateway.ai:18789")).toBeUndefined();
+        expect(params.validate?.("ws://allbot-gateway.ai:18789")).toBeUndefined();
         expect(params.validate?.("ws://1.1.1.1:18789")).toContain("Use wss://");
-        return "ws://kaijibot-gateway.ai:18789";
+        return "ws://allbot-gateway.ai:18789";
       }
       return "";
     }) as WizardPrompter["text"];
@@ -318,17 +318,17 @@ describe("promptRemoteGatewayConfig", () => {
     });
 
     expect(next.gateway?.mode).toBe("remote");
-    expect(next.gateway?.remote?.url).toBe("ws://kaijibot-gateway.ai:18789");
+    expect(next.gateway?.remote?.url).toBe("ws://allbot-gateway.ai:18789");
   });
 
   it("supports storing remote auth as an external env secret ref", async () => {
-    process.env.KAIJIBOT_GATEWAY_TOKEN = "remote-token-value";
+    process.env.ALLBOT_GATEWAY_TOKEN = "remote-token-value";
     const text: WizardPrompter["text"] = vi.fn(async (params) => {
       if (params.message === "Gateway WebSocket URL") {
         return "wss://remote.example.com:18789";
       }
       if (params.message === "Environment variable name") {
-        return "KAIJIBOT_GATEWAY_TOKEN";
+        return "ALLBOT_GATEWAY_TOKEN";
       }
       return "";
     }) as WizardPrompter["text"];
@@ -346,7 +346,7 @@ describe("promptRemoteGatewayConfig", () => {
       return (params.options[0]?.value ?? "") as never;
     });
 
-    const cfg = {} as KaijiBotConfig;
+    const cfg = {} as AllBotConfig;
     const prompter = createPrompter({
       confirm: vi.fn(async () => false),
       select,
@@ -360,7 +360,7 @@ describe("promptRemoteGatewayConfig", () => {
     expect(next.gateway?.remote?.token).toEqual({
       source: "env",
       provider: "default",
-      id: "KAIJIBOT_GATEWAY_TOKEN",
+      id: "ALLBOT_GATEWAY_TOKEN",
     });
   });
 });

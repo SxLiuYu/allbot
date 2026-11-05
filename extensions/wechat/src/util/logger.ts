@@ -1,20 +1,20 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { resolvePreferredKaijiBotTmpDir } from "kaijibot/plugin-sdk/infra-runtime";
+import { resolvePreferredAllBotTmpDir } from "allbot/plugin-sdk/infra-runtime";
 
 /**
- * Plugin logger — writes JSON lines to the main kaijibot log file:
- *   <tmpDir>/kaijibot-YYYY-MM-DD.log
+ * Plugin logger — writes JSON lines to the main allbot log file:
+ *   <tmpDir>/allbot-YYYY-MM-DD.log
  * Same file and format used by all other channels.
  */
 
-const MAIN_LOG_DIR = resolvePreferredKaijiBotTmpDir();
+const MAIN_LOG_DIR = resolvePreferredAllBotTmpDir();
 const SUBSYSTEM = "gateway/channels/wechat";
 const RUNTIME = "node";
 const RUNTIME_VERSION = process.versions.node;
 const HOSTNAME = os.hostname() || "unknown";
-const PARENT_NAMES = ["kaijibot", "node"];
+const PARENT_NAMES = ["allbot", "node"];
 
 /** tslog-compatible level IDs (higher = more severe). */
 const LEVEL_IDS: Record<string, number> = {
@@ -29,7 +29,7 @@ const LEVEL_IDS: Record<string, number> = {
 const DEFAULT_LOG_LEVEL = "INFO";
 
 function resolveMinLevel(): number {
-  const env = process.env.KAIJIBOT_LOG_LEVEL?.toUpperCase();
+  const env = process.env.ALLBOT_LOG_LEVEL?.toUpperCase();
   if (env && env in LEVEL_IDS) {
     return LEVEL_IDS[env];
   }
@@ -64,7 +64,7 @@ function localDateKey(now: Date): string {
 
 function resolveMainLogPath(): string {
   const dateKey = localDateKey(new Date());
-  return path.join(MAIN_LOG_DIR, `kaijibot-${dateKey}.log`);
+  return path.join(MAIN_LOG_DIR, `allbot-${dateKey}.log`);
 }
 
 let logDirEnsured = false;

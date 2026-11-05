@@ -15,7 +15,7 @@ import { getBlockedBindReason } from "../agents/sandbox/validate-sandbox-securit
 import { isToolAllowedByPolicies } from "../agents/tool-policy-match.js";
 import { resolveToolProfilePolicy } from "../agents/tool-policy.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   resolveAgentModelFallbackValues,
   resolveAgentModelPrimaryValue,
@@ -75,7 +75,7 @@ function addModel(models: ModelRef[], raw: unknown, source: string) {
   models.push({ id, source });
 }
 
-function collectModels(cfg: KaijiBotConfig): ModelRef[] {
+function collectModels(cfg: AllBotConfig): ModelRef[] {
   const out: ModelRef[] = [];
   addModel(
     out,
@@ -117,7 +117,7 @@ function collectModels(cfg: KaijiBotConfig): ModelRef[] {
   return out;
 }
 
-function isGatewayRemotelyExposed(cfg: KaijiBotConfig): boolean {
+function isGatewayRemotelyExposed(cfg: AllBotConfig): boolean {
   const bind = typeof cfg.gateway?.bind === "string" ? cfg.gateway.bind : "loopback";
   if (bind !== "loopback") {
     return true;
@@ -172,8 +172,8 @@ function isWildcardEntry(value: unknown): boolean {
   return normalizeStringifiedOptionalString(value) === "*";
 }
 
-function listKnownNodeCommands(cfg: KaijiBotConfig): Set<string> {
-  const baseCfg: KaijiBotConfig = {
+function listKnownNodeCommands(cfg: AllBotConfig): Set<string> {
+  const baseCfg: AllBotConfig = {
     ...cfg,
     gateway: {
       ...cfg.gateway,
@@ -197,7 +197,7 @@ function listKnownNodeCommands(cfg: KaijiBotConfig): Set<string> {
 }
 
 function resolveToolPolicies(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentTools?: AgentToolsConfig;
   sandboxMode?: "off" | "non-main" | "all";
   agentId?: string | null;
@@ -299,7 +299,7 @@ function suggestKnownNodeCommands(unknown: string, known: Set<string>): string[]
     .map((r) => r.cmd);
 }
 
-function listGroupPolicyOpen(cfg: KaijiBotConfig): string[] {
+function listGroupPolicyOpen(cfg: AllBotConfig): string[] {
   const out: string[] = [];
   const channels = cfg.channels as Record<string, unknown> | undefined;
   if (!channels || typeof channels !== "object") {
@@ -337,7 +337,7 @@ function hasConfiguredGroupTargets(section: Record<string, unknown>): boolean {
   });
 }
 
-function listPotentialMultiUserSignals(cfg: KaijiBotConfig): string[] {
+function listPotentialMultiUserSignals(cfg: AllBotConfig): string[] {
   const out = new Set<string>();
   const channels = cfg.channels as Record<string, unknown> | undefined;
   if (!channels || typeof channels !== "object") {
@@ -405,7 +405,7 @@ function listPotentialMultiUserSignals(cfg: KaijiBotConfig): string[] {
   return Array.from(out);
 }
 
-function collectRiskyToolExposureContexts(cfg: KaijiBotConfig): {
+function collectRiskyToolExposureContexts(cfg: AllBotConfig): {
   riskyContexts: string[];
   hasRuntimeRisk: boolean;
 } {
@@ -475,13 +475,13 @@ export function collectSyncedFolderFindings(params: {
       severity: "warn",
       title: "State/config path looks like a synced folder",
       detail: `stateDir=${params.stateDir}, configPath=${params.configPath}. Synced folders (iCloud/Dropbox/OneDrive/Google Drive) can leak tokens and transcripts onto other devices.`,
-      remediation: `Keep KAIJIBOT_STATE_DIR on a local-only volume and re-run "${formatCliCommand("kaijibot security audit --fix")}".`,
+      remediation: `Keep ALLBOT_STATE_DIR on a local-only volume and re-run "${formatCliCommand("allbot security audit --fix")}".`,
     });
   }
   return findings;
 }
 
-export function collectSecretsInConfigFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectSecretsInConfigFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const password = normalizeOptionalString(cfg.gateway?.auth?.password) ?? "";
   if (password && !looksLikeEnvRef(password)) {
@@ -492,7 +492,7 @@ export function collectSecretsInConfigFindings(cfg: KaijiBotConfig): SecurityAud
       detail:
         "gateway.auth.password is set in the config file; prefer environment variables for secrets when possible.",
       remediation:
-        "Prefer KAIJIBOT_GATEWAY_PASSWORD (env) and remove gateway.auth.password from disk.",
+        "Prefer ALLBOT_GATEWAY_PASSWORD (env) and remove gateway.auth.password from disk.",
     });
   }
 
@@ -511,7 +511,7 @@ export function collectSecretsInConfigFindings(cfg: KaijiBotConfig): SecurityAud
 }
 
 export function collectHooksHardeningFindings(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
@@ -534,17 +534,17 @@ export function collectHooksHardeningFindings(
     tailscaleMode: cfg.gateway?.tailscale?.mode ?? "off",
     env,
   });
-  const kaijibotGatewayToken =
-    typeof env.KAIJIBOT_GATEWAY_TOKEN === "string" && env.KAIJIBOT_GATEWAY_TOKEN.trim()
-      ? env.KAIJIBOT_GATEWAY_TOKEN.trim()
+  const allbotGatewayToken =
+    typeof env.ALLBOT_GATEWAY_TOKEN === "string" && env.ALLBOT_GATEWAY_TOKEN.trim()
+      ? env.ALLBOT_GATEWAY_TOKEN.trim()
       : null;
   const gatewayToken =
     gatewayAuth.mode === "token" &&
     typeof gatewayAuth.token === "string" &&
     gatewayAuth.token.trim()
       ? gatewayAuth.token.trim()
-      : kaijibotGatewayToken
-        ? kaijibotGatewayToken
+      : allbotGatewayToken
+        ? allbotGatewayToken
         : null;
   if (token && gatewayToken && token === gatewayToken) {
     findings.push({
@@ -629,7 +629,7 @@ export function collectHooksHardeningFindings(
 }
 
 export function collectGatewayHttpSessionKeyOverrideFindings(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const chatCompletionsEnabled = cfg.gateway?.http?.endpoints?.chatCompletions?.enabled === true;
@@ -648,7 +648,7 @@ export function collectGatewayHttpSessionKeyOverrideFindings(
     severity: "info",
     title: "HTTP API session-key override is enabled",
     detail:
-      `${enabledEndpoints.join(", ")} accept x-kaijibot-session-key for per-request session routing. ` +
+      `${enabledEndpoints.join(", ")} accept x-allbot-session-key for per-request session routing. ` +
       "Treat API credential holders as trusted principals.",
   });
 
@@ -656,7 +656,7 @@ export function collectGatewayHttpSessionKeyOverrideFindings(
 }
 
 export function collectGatewayHttpNoAuthFindings(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   env: NodeJS.ProcessEnv,
 ): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
@@ -689,7 +689,7 @@ export function collectGatewayHttpNoAuthFindings(
   return findings;
 }
 
-export function collectSandboxDockerNoopFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectSandboxDockerNoopFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const configuredPaths: string[] = [];
   const agents = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];
@@ -739,7 +739,7 @@ export function collectSandboxDockerNoopFindings(cfg: KaijiBotConfig): SecurityA
   return findings;
 }
 
-export function collectSandboxDangerousConfigFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectSandboxDangerousConfigFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const agents = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];
 
@@ -879,7 +879,7 @@ export function collectSandboxDangerousConfigFindings(cfg: KaijiBotConfig): Secu
         "These sandbox browser configs use Docker bridge networking with no CDP source restriction:\n" +
         browserExposurePaths.map((entry) => `- ${entry}`).join("\n"),
       remediation:
-        "Set sandbox.browser.network to a dedicated bridge network (recommended default: kaijibot-sandbox-browser), " +
+        "Set sandbox.browser.network to a dedicated bridge network (recommended default: allbot-sandbox-browser), " +
         "or set sandbox.browser.cdpSourceRange (for example 172.21.0.1/32) to restrict container-edge CDP ingress.",
     });
   }
@@ -887,7 +887,7 @@ export function collectSandboxDangerousConfigFindings(cfg: KaijiBotConfig): Secu
   return findings;
 }
 
-export function collectNodeDenyCommandPatternFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectNodeDenyCommandPatternFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const denyListRaw = cfg.gateway?.nodes?.denyCommands;
   if (!Array.isArray(denyListRaw) || denyListRaw.length === 0) {
@@ -945,7 +945,7 @@ export function collectNodeDenyCommandPatternFindings(cfg: KaijiBotConfig): Secu
 }
 
 export function collectNodeDangerousAllowCommandFindings(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
 ): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const allowRaw = cfg.gateway?.nodes?.allowCommands;
@@ -981,7 +981,7 @@ export function collectNodeDangerousAllowCommandFindings(
   return findings;
 }
 
-export function collectMinimalProfileOverrideFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectMinimalProfileOverrideFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   if (cfg.tools?.profile !== "minimal") {
     return findings;
@@ -1017,7 +1017,7 @@ export function collectMinimalProfileOverrideFindings(cfg: KaijiBotConfig): Secu
   return findings;
 }
 
-export function collectModelHygieneFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectModelHygieneFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const models = collectModels(cfg);
   if (models.length === 0) {
@@ -1102,7 +1102,7 @@ export function collectModelHygieneFindings(cfg: KaijiBotConfig): SecurityAuditF
   return findings;
 }
 
-export function collectExposureMatrixFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectExposureMatrixFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const openGroups = listGroupPolicyOpen(cfg);
   if (openGroups.length === 0) {
@@ -1141,7 +1141,7 @@ export function collectExposureMatrixFindings(cfg: KaijiBotConfig): SecurityAudi
   return findings;
 }
 
-export function collectLikelyMultiUserSetupFindings(cfg: KaijiBotConfig): SecurityAuditFinding[] {
+export function collectLikelyMultiUserSetupFindings(cfg: AllBotConfig): SecurityAuditFinding[] {
   const findings: SecurityAuditFinding[] = [];
   const signals = listPotentialMultiUserSignals(cfg);
   if (signals.length === 0) {
@@ -1165,7 +1165,7 @@ export function collectLikelyMultiUserSetupFindings(cfg: KaijiBotConfig): Securi
       "Heuristic signals indicate this gateway may be reachable by multiple users:\n" +
       signals.map((signal) => `- ${signal}`).join("\n") +
       `\n${impactLine}\n${riskyContextsDetail}\n` +
-      "KaijiBot's default security model is personal-assistant (one trusted operator boundary), not hostile multi-tenant isolation on one shared gateway.",
+      "AllBot's default security model is personal-assistant (one trusted operator boundary), not hostile multi-tenant isolation on one shared gateway.",
     remediation:
       'If users may be mutually untrusted, split trust boundaries (separate gateways + credentials, ideally separate OS users/hosts). If you intentionally run shared-user access, set agents.defaults.sandbox.mode="all", keep tools.fs.workspaceOnly=true, deny runtime/fs/web tools unless required, and keep personal/private identities + credentials off that runtime.',
   });

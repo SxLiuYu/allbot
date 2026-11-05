@@ -28,11 +28,11 @@ export const OPERATOR_USER_ID = "operator";
  * here. A test in identity.test.ts verifies they match.
  */
 const OPERATOR_CLIENT_IDS: ReadonlySet<string> = new Set([
-  "kaijibot-control-ui",
-  "kaijibot-tui",
-  "kaijibot-macos",
-  "kaijibot-ios",
-  "kaijibot-android",
+  "allbot-control-ui",
+  "allbot-tui",
+  "allbot-macos",
+  "allbot-ios",
+  "allbot-android",
 ]);
 
 /**

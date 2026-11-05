@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import { isChannelConfigured } from "../config/channel-configured.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { PluginInstallRecord } from "../config/types.plugins.js";
 import type { GatewayRequestHandler } from "../gateway/server-methods/types.js";
 import { openBoundaryFileSync } from "../infra/boundary-file-read.js";
@@ -29,7 +29,7 @@ import {
   type NormalizedPluginsConfig,
   type PluginActivationState,
 } from "./config-state.js";
-import { discoverKaijiBotPlugins } from "./discovery.js";
+import { discoverAllBotPlugins } from "./discovery.js";
 import { initializeGlobalHookRunner } from "./hook-runner-global.js";
 import { clearPluginInteractiveHandlers } from "./interactive-registry.js";
 import { loadPluginManifestRegistry } from "./manifest-registry.js";
@@ -81,8 +81,8 @@ import {
 } from "./sdk-alias.js";
 import { hasKind, kindsEqual } from "./slots.js";
 import type {
-  KaijiBotPluginDefinition,
-  KaijiBotPluginModule,
+  AllBotPluginDefinition,
+  AllBotPluginModule,
   PluginDiagnostic,
   PluginBundleFormat,
   PluginFormat,
@@ -92,8 +92,8 @@ import type {
 export type PluginLoadResult = PluginRegistry;
 
 export type PluginLoadOptions = {
-  config?: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config?: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   autoEnabledReasons?: Readonly<Record<string, string[]>>;
   workspaceDir?: string;
   // Allows callers to resolve plugin roots and load paths against an explicit env
@@ -194,7 +194,7 @@ export function clearPluginLoaderCache(): void {
 const defaultLogger = () => createSubsystemLogger("plugins");
 
 function shouldProfilePluginLoader(): boolean {
-  return process.env.KAIJIBOT_PLUGIN_LOAD_PROFILE === "1";
+  return process.env.ALLBOT_PLUGIN_LOAD_PROFILE === "1";
 }
 
 function profilePluginLoaderSync<T>(params: {
@@ -544,12 +544,12 @@ export function resolveRuntimePluginRegistry(
     return compatible;
   }
   // Helper/runtime callers should not recurse into the same snapshot load while
-  // plugin registration is still in flight. Let direct loadKaijiBotPlugins(...)
+  // plugin registration is still in flight. Let direct loadAllBotPlugins(...)
   // callers surface the hard error instead.
   if (isPluginRegistryLoadInFlight(options)) {
     return undefined;
   }
-  return loadKaijiBotPlugins(options);
+  return loadAllBotPlugins(options);
 }
 
 export function resolvePluginRegistryLoadCacheKey(options: PluginLoadOptions = {}): string {
@@ -592,8 +592,8 @@ function validatePluginConfig(params: {
 }
 
 function resolvePluginModuleExport(moduleExport: unknown): {
-  definition?: KaijiBotPluginDefinition;
-  register?: KaijiBotPluginDefinition["register"];
+  definition?: AllBotPluginDefinition;
+  register?: AllBotPluginDefinition["register"];
 } {
   const resolved =
     moduleExport &&
@@ -603,11 +603,11 @@ function resolvePluginModuleExport(moduleExport: unknown): {
       : moduleExport;
   if (typeof resolved === "function") {
     return {
-      register: resolved as KaijiBotPluginDefinition["register"],
+      register: resolved as AllBotPluginDefinition["register"],
     };
   }
   if (resolved && typeof resolved === "object") {
-    const def = resolved as KaijiBotPluginDefinition;
+    const def = resolved as AllBotPluginDefinition;
     const register = def.register ?? def.activate;
     return { definition: def, register };
   }
@@ -641,7 +641,7 @@ function shouldLoadChannelPluginInSetupRuntime(params: {
   manifestChannels: string[];
   setupSource?: string;
   startupDeferConfiguredChannelFullLoadUntilAfterListen?: boolean;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   env: NodeJS.ProcessEnv;
   preferSetupRuntimeForChannelPlugins?: boolean;
 }): boolean {
@@ -681,7 +681,7 @@ function createPluginRecord(params: {
     name: params.name ?? params.id,
     description: params.description,
     version: params.version,
-    format: params.format ?? "kaijibot",
+    format: params.format ?? "allbot",
     bundleFormat: params.bundleFormat,
     bundleCapabilities: params.bundleCapabilities,
     source: params.source,
@@ -750,7 +750,7 @@ function recordPluginError(params: {
   diagnosticMessagePrefix: string;
 }) {
   const errorText =
-    process.env.KAIJIBOT_PLUGIN_LOADER_DEBUG_STACKS === "1" &&
+    process.env.ALLBOT_PLUGIN_LOADER_DEBUG_STACKS === "1" &&
     params.error instanceof Error &&
     typeof params.error.stack === "string"
       ? params.error.stack
@@ -857,7 +857,7 @@ function matchesPathMatcher(matcher: PathMatcher, sourcePath: string): boolean {
 }
 
 function buildProvenanceIndex(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   normalizedLoadPaths: string[];
   env: NodeJS.ProcessEnv;
 }): PluginProvenanceIndex {
@@ -923,7 +923,7 @@ function matchesExplicitInstallRule(params: {
 }
 
 function resolveCandidateDuplicateRank(params: {
-  candidate: ReturnType<typeof discoverKaijiBotPlugins>["candidates"][number];
+  candidate: ReturnType<typeof discoverAllBotPlugins>["candidates"][number];
   manifestByRoot: Map<string, ReturnType<typeof loadPluginManifestRegistry>["plugins"][number]>;
   provenance: PluginProvenanceIndex;
   env: NodeJS.ProcessEnv;
@@ -957,8 +957,8 @@ function resolveCandidateDuplicateRank(params: {
 }
 
 function compareDuplicateCandidateOrder(params: {
-  left: ReturnType<typeof discoverKaijiBotPlugins>["candidates"][number];
-  right: ReturnType<typeof discoverKaijiBotPlugins>["candidates"][number];
+  left: ReturnType<typeof discoverAllBotPlugins>["candidates"][number];
+  right: ReturnType<typeof discoverAllBotPlugins>["candidates"][number];
   manifestByRoot: Map<string, ReturnType<typeof loadPluginManifestRegistry>["plugins"][number]>;
   provenance: PluginProvenanceIndex;
   env: NodeJS.ProcessEnv;
@@ -1071,12 +1071,12 @@ function activatePluginRegistry(
   initializeGlobalHookRunner(registry);
 }
 
-export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegistry {
+export function loadAllBotPlugins(options: PluginLoadOptions = {}): PluginRegistry {
   // Snapshot (non-activating) loads must disable the cache to avoid storing a registry
   // whose commands were never globally registered.
   if (options.activate === false && options.cache !== false) {
     throw new Error(
-      "loadKaijiBotPlugins: activate:false requires cache:false to prevent command registry divergence",
+      "loadAllBotPlugins: activate:false requires cache:false to prevent command registry divergence",
     );
   }
   const {
@@ -1230,7 +1230,7 @@ export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegi
       activateGlobalSideEffects: shouldActivate,
     });
 
-    const discovery = discoverKaijiBotPlugins({
+    const discovery = discoverAllBotPlugins({
       workspaceDir: options.workspaceDir,
       extraPaths: normalized.loadPaths,
       cache: options.cache,
@@ -1436,7 +1436,7 @@ export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegi
             level: "warn",
             pluginId: record.id,
             source: record.source,
-            message: `bundle capability detected but not wired into KaijiBot yet: ${capability}`,
+            message: `bundle capability detected but not wired into AllBot yet: ${capability}`,
           });
         }
         if (
@@ -1568,7 +1568,7 @@ export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegi
       fs.closeSync(opened.fd);
       const safeImportSource = toSafeImportPath(safeSource);
 
-      let mod: KaijiBotPluginModule | null = null;
+      let mod: AllBotPluginModule | null = null;
       try {
         // Track the plugin as imported once module evaluation begins. Top-level
         // code may have already executed even if evaluation later throws.
@@ -1577,7 +1577,7 @@ export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegi
           phase: registrationMode,
           pluginId: record.id,
           source: safeSource,
-          run: () => getJiti(safeSource)(safeImportSource) as KaijiBotPluginModule,
+          run: () => getJiti(safeSource)(safeImportSource) as AllBotPluginModule,
         });
       } catch (err) {
         recordPluginError({
@@ -1787,7 +1787,7 @@ export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegi
         logger.warn(
           `[plugins] ${failedPlugins.length} plugin(s) failed to initialize (${formatPluginFailureSummary(
             failedPlugins,
-          )}). Run 'kaijibot plugins list' for details.`,
+          )}). Run 'allbot plugins list' for details.`,
         );
       }
     }
@@ -1813,7 +1813,7 @@ export function loadKaijiBotPlugins(options: PluginLoadOptions = {}): PluginRegi
   }
 }
 
-export async function loadKaijiBotPluginCliRegistry(
+export async function loadAllBotPluginCliRegistry(
   options: PluginLoadOptions = {},
 ): Promise<PluginRegistry> {
   const { env, cfg, normalized, activationSource, autoEnabledReasons, onlyPluginIds, cacheKey } =
@@ -1832,7 +1832,7 @@ export async function loadKaijiBotPluginCliRegistry(
     activateGlobalSideEffects: false,
   });
 
-  const discovery = discoverKaijiBotPlugins({
+  const discovery = discoverAllBotPlugins({
     workspaceDir: options.workspaceDir,
     extraPaths: normalized.loadPaths,
     cache: false,
@@ -2032,13 +2032,13 @@ export async function loadKaijiBotPluginCliRegistry(
     fs.closeSync(opened.fd);
     const safeImportSource = toSafeImportPath(safeSource);
 
-    let mod: KaijiBotPluginModule | null = null;
+    let mod: AllBotPluginModule | null = null;
     try {
       mod = profilePluginLoaderSync({
         phase: "cli-metadata",
         pluginId: record.id,
         source: safeSource,
-        run: () => getJiti(safeSource)(safeImportSource) as KaijiBotPluginModule,
+        run: () => getJiti(safeSource)(safeImportSource) as AllBotPluginModule,
       });
     } catch (err) {
       recordPluginError({

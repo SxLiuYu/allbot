@@ -8,7 +8,7 @@ import {
 import { cleanupTempDirs, makeTempRepoRoot, writeJsonFile } from "../../test/helpers/temp-repo.js";
 
 const tempDirs: string[] = [];
-const excludeOptionalEnv = { KAIJIBOT_INCLUDE_OPTIONAL_BUNDLED: "0" } as const;
+const excludeOptionalEnv = { ALLBOT_INCLUDE_OPTIONAL_BUNDLED: "0" } as const;
 const copyBundledPluginMetadataWithEnv = copyBundledPluginMetadata as (params?: {
   repoRoot?: string;
   env?: NodeJS.ProcessEnv;
@@ -28,19 +28,19 @@ function createPlugin(
     id: string;
     packageName: string;
     manifest?: Record<string, unknown>;
-    packageKaijiBot?: Record<string, unknown>;
+    packageAllBot?: Record<string, unknown>;
   },
 ) {
   const pluginDir = path.join(repoRoot, "extensions", params.id);
   fs.mkdirSync(pluginDir, { recursive: true });
-  writeJson(path.join(pluginDir, "kaijibot.plugin.json"), {
+  writeJson(path.join(pluginDir, "allbot.plugin.json"), {
     id: params.id,
     configSchema: { type: "object" },
     ...params.manifest,
   });
   writeJson(path.join(pluginDir, "package.json"), {
     name: params.packageName,
-    ...(params.packageKaijiBot ? { kaijibot: params.packageKaijiBot } : {}),
+    ...(params.packageAllBot ? { allbot: params.packageAllBot } : {}),
   });
   return pluginDir;
 }
@@ -48,7 +48,7 @@ function createPlugin(
 function readBundledManifest(repoRoot: string, pluginId: string) {
   return JSON.parse(
     fs.readFileSync(
-      path.join(repoRoot, "dist", "extensions", pluginId, "kaijibot.plugin.json"),
+      path.join(repoRoot, "dist", "extensions", pluginId, "allbot.plugin.json"),
       "utf8",
     ),
   ) as { skills?: string[] };
@@ -57,7 +57,7 @@ function readBundledManifest(repoRoot: string, pluginId: string) {
 function readBundledPackageJson(repoRoot: string, pluginId: string) {
   return JSON.parse(
     fs.readFileSync(path.join(repoRoot, "dist", "extensions", pluginId, "package.json"), "utf8"),
-  ) as { kaijibot?: { extensions?: string[] } };
+  ) as { allbot?: { extensions?: string[] } };
 }
 
 function bundledPluginDir(repoRoot: string, pluginId: string) {
@@ -75,9 +75,9 @@ function expectBundledSkills(repoRoot: string, pluginId: string, skills: string[
 function createTlonSkillPlugin(repoRoot: string, skillPath = "node_modules/@tloncorp/tlon-skill") {
   return createPlugin(repoRoot, {
     id: "tlon",
-    packageName: "@kaijibot/tlon",
+    packageName: "@allbot/tlon",
     manifest: { skills: [skillPath] },
-    packageKaijiBot: { extensions: ["./index.ts"] },
+    packageAllBot: { extensions: ["./index.ts"] },
   });
 }
 
@@ -96,12 +96,12 @@ describe("rewritePackageExtensions", () => {
 
 describe("copyBundledPluginMetadata", () => {
   it("copies plugin manifests, package metadata, and local skill directories", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-meta-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-meta-");
     const pluginDir = createPlugin(repoRoot, {
       id: "acpx",
-      packageName: "@kaijibot/acpx",
+      packageName: "@allbot/acpx",
       manifest: { skills: ["./skills"] },
-      packageKaijiBot: { extensions: ["./index.ts"] },
+      packageAllBot: { extensions: ["./index.ts"] },
     });
     fs.mkdirSync(path.join(pluginDir, "skills", "acp-router"), { recursive: true });
     fs.writeFileSync(
@@ -113,7 +113,7 @@ describe("copyBundledPluginMetadata", () => {
     copyBundledPluginMetadata({ repoRoot });
 
     expect(
-      fs.existsSync(path.join(repoRoot, "dist", "extensions", "acpx", "kaijibot.plugin.json")),
+      fs.existsSync(path.join(repoRoot, "dist", "extensions", "acpx", "allbot.plugin.json")),
     ).toBe(true);
     expect(
       fs.readFileSync(
@@ -123,11 +123,11 @@ describe("copyBundledPluginMetadata", () => {
     ).toContain("ACP Router");
     expectBundledSkills(repoRoot, "acpx", ["./skills"]);
     const packageJson = readBundledPackageJson(repoRoot, "acpx");
-    expect(packageJson.kaijibot?.extensions).toEqual(["./index.js"]);
+    expect(packageJson.allbot?.extensions).toEqual(["./index.js"]);
   });
 
   it("relocates node_modules-backed skill paths into bundled-skills and rewrites the manifest", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-node-modules-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-node-modules-");
     const pluginDir = createTlonSkillPlugin(repoRoot);
     const storeSkillDir = path.join(
       repoRoot,
@@ -179,7 +179,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("falls back to repo-root hoisted node_modules skill paths", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-hoisted-skill-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-hoisted-skill-");
     const pluginDir = createTlonSkillPlugin(repoRoot);
     const hoistedSkillDir = path.join(repoRoot, "node_modules", "@tloncorp", "tlon-skill");
     fs.mkdirSync(hoistedSkillDir, { recursive: true });
@@ -198,7 +198,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("omits missing declared skill paths and removes stale generated outputs", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-missing-skill-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-missing-skill-");
     createTlonSkillPlugin(repoRoot);
     const staleBundledSkillDir = path.join(
       bundledPluginDir(repoRoot, "tlon"),
@@ -221,12 +221,12 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("retries transient skill copy races from concurrent runtime postbuilds", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-retry-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-retry-");
     const pluginDir = createPlugin(repoRoot, {
       id: "diffs",
-      packageName: "@kaijibot/diffs",
+      packageName: "@allbot/diffs",
       manifest: { skills: ["./skills"] },
-      packageKaijiBot: { extensions: ["./index.ts"] },
+      packageAllBot: { extensions: ["./index.ts"] },
     });
     fs.mkdirSync(path.join(pluginDir, "skills", "diffs"), { recursive: true });
     fs.writeFileSync(path.join(pluginDir, "skills", "diffs", "SKILL.md"), "# Diffs\n", "utf8");
@@ -258,7 +258,7 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("removes generated outputs for plugins no longer present in source", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-removed-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-removed-");
     const staleBundledSkillDir = path.join(
       repoRoot,
       "dist",
@@ -283,13 +283,13 @@ describe("copyBundledPluginMetadata", () => {
       "export default {}\n",
       "utf8",
     );
-    writeJson(path.join(repoRoot, "dist", "extensions", "removed-plugin", "kaijibot.plugin.json"), {
+    writeJson(path.join(repoRoot, "dist", "extensions", "removed-plugin", "allbot.plugin.json"), {
       id: "removed-plugin",
       configSchema: { type: "object" },
       skills: ["./bundled-skills/@scope/skill"],
     });
     writeJson(path.join(repoRoot, "dist", "extensions", "removed-plugin", "package.json"), {
-      name: "@kaijibot/removed-plugin",
+      name: "@allbot/removed-plugin",
     });
     fs.mkdirSync(path.join(repoRoot, "extensions"), { recursive: true });
 
@@ -299,18 +299,18 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("removes stale dist outputs when a source extension directory no longer has a manifest", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-plugin-manifestless-source-");
+    const repoRoot = makeRepoRoot("allbot-bundled-plugin-manifestless-source-");
     const sourcePluginDir = path.join(repoRoot, "extensions", "google-gemini-cli-auth");
     fs.mkdirSync(path.join(sourcePluginDir, "node_modules"), { recursive: true });
     const staleDistDir = path.join(repoRoot, "dist", "extensions", "google-gemini-cli-auth");
     fs.mkdirSync(staleDistDir, { recursive: true });
     fs.writeFileSync(path.join(staleDistDir, "index.js"), "export default {}\n", "utf8");
-    writeJson(path.join(staleDistDir, "kaijibot.plugin.json"), {
+    writeJson(path.join(staleDistDir, "allbot.plugin.json"), {
       id: "google-gemini-cli-auth",
       configSchema: { type: "object" },
     });
     writeJson(path.join(staleDistDir, "package.json"), {
-      name: "@kaijibot/google-gemini-cli-auth",
+      name: "@allbot/google-gemini-cli-auth",
     });
 
     copyBundledPluginMetadata({ repoRoot });
@@ -322,28 +322,28 @@ describe("copyBundledPluginMetadata", () => {
     {
       name: "skips metadata for optional bundled clusters only when explicitly disabled",
       pluginId: "acpx",
-      packageName: "@kaijibot/acpx-plugin",
-      packageKaijiBot: { extensions: ["./index.ts"] },
+      packageName: "@allbot/acpx-plugin",
+      packageAllBot: { extensions: ["./index.ts"] },
       env: excludeOptionalEnv,
       expectedExists: false,
     },
     {
       name: "still bundles previously released optional plugins without the opt-in env",
       pluginId: "whatsapp",
-      packageName: "@kaijibot/whatsapp",
-      packageKaijiBot: {
+      packageName: "@allbot/whatsapp",
+      packageAllBot: {
         extensions: ["./index.ts"],
-        install: { npmSpec: "@kaijibot/whatsapp" },
+        install: { npmSpec: "@allbot/whatsapp" },
       },
       env: {},
       expectedExists: true,
     },
-  ] as const)("$name", ({ pluginId, packageName, packageKaijiBot, env, expectedExists }) => {
-    const repoRoot = makeRepoRoot(`kaijibot-bundled-plugin-${pluginId}-`);
+  ] as const)("$name", ({ pluginId, packageName, packageAllBot, env, expectedExists }) => {
+    const repoRoot = makeRepoRoot(`allbot-bundled-plugin-${pluginId}-`);
     createPlugin(repoRoot, {
       id: pluginId,
       packageName,
-      packageKaijiBot,
+      packageAllBot,
     });
 
     copyBundledPluginMetadataWithEnv({ repoRoot, env });
@@ -352,11 +352,11 @@ describe("copyBundledPluginMetadata", () => {
   });
 
   it("preserves manifest-less runtime support package outputs and copies package metadata", () => {
-    const repoRoot = makeRepoRoot("kaijibot-bundled-runtime-support-");
+    const repoRoot = makeRepoRoot("allbot-bundled-runtime-support-");
     const pluginDir = path.join(repoRoot, "extensions", "image-generation-core");
     fs.mkdirSync(pluginDir, { recursive: true });
     writeJson(path.join(pluginDir, "package.json"), {
-      name: "@kaijibot/image-generation-core",
+      name: "@allbot/image-generation-core",
       version: "0.0.1",
       private: true,
       type: "module",
@@ -383,7 +383,7 @@ describe("copyBundledPluginMetadata", () => {
     ).toBe(true);
     expect(
       fs.existsSync(
-        path.join(repoRoot, "dist", "extensions", "image-generation-core", "kaijibot.plugin.json"),
+        path.join(repoRoot, "dist", "extensions", "image-generation-core", "allbot.plugin.json"),
       ),
     ).toBe(false);
     expect(
@@ -394,7 +394,7 @@ describe("copyBundledPluginMetadata", () => {
         ),
       ),
     ).toMatchObject({
-      name: "@kaijibot/image-generation-core",
+      name: "@allbot/image-generation-core",
       type: "module",
     });
   });

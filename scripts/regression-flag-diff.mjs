@@ -10,7 +10,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
  * results to surface "what silently broke" when the feature is active.
  *
  * Mechanism: toggles the flag path via two temp configs pointed at by
- * `KAIJIBOT_CONFIG_PATH`, leaving the operator's real config untouched. Vitest
+ * `ALLBOT_CONFIG_PATH`, leaving the operator's real config untouched. Vitest
  * is invoked with `--reporter=json` so results are parsed deterministically
  * (no fragile stdout scraping).
  *
@@ -62,14 +62,14 @@ function parseArgs(argv) {
 }
 
 // ---------------------------------------------------------------------------
-// Config resolution (mirrors src/config: KAIJIBOT_CONFIG_PATH > KAIJIBOT_HOME).
+// Config resolution (mirrors src/config: ALLBOT_CONFIG_PATH > ALLBOT_HOME).
 // ---------------------------------------------------------------------------
 function resolveRealConfigPath(env = process.env) {
-  if (env.KAIJIBOT_CONFIG_PATH?.trim()) {
-    return env.KAIJIBOT_CONFIG_PATH.trim();
+  if (env.ALLBOT_CONFIG_PATH?.trim()) {
+    return env.ALLBOT_CONFIG_PATH.trim();
   }
-  const home = env.KAIJIBOT_HOME?.trim() || env.HOME || "";
-  return path.join(home, ".kaijibot", "kaijibot.json");
+  const home = env.ALLBOT_HOME?.trim() || env.HOME || "";
+  return path.join(home, ".allbot", "allbot.json");
 }
 
 async function readJsonMaybe(filePath) {
@@ -114,7 +114,7 @@ function resolveVitestCliEntry() {
 
 function resolveVitestNodeArgs(env = process.env) {
   const enableMaglev = ["1", "true", "yes", "on"].includes(
-    env.KAIJIBOT_VITEST_ENABLE_MAGLEV?.trim().toLowerCase() ?? "",
+    env.ALLBOT_VITEST_ENABLE_MAGLEV?.trim().toLowerCase() ?? "",
   );
   return enableMaglev ? [] : ["--no-maglev"];
 }
@@ -184,7 +184,7 @@ function runVitestWithConfig({ configPath, target, outputFile, env }) {
       ...targetArgs,
     ];
     const child = spawn("pnpm", ["exec", "node", ...args], {
-      env: { ...env, KAIJIBOT_CONFIG_PATH: configPath },
+      env: { ...env, ALLBOT_CONFIG_PATH: configPath },
       stdio: ["inherit", "pipe", "pipe"],
     });
     let stderr = "";
@@ -253,7 +253,7 @@ async function main() {
     console.warn(`⚠️  Real config has ${flagPath}=false; the "off" run will match baseline.`);
   }
 
-  const workDir = await mkdtemp(path.join(tmpdir(), "kaiji-flagdiff-"));
+  const workDir = await mkdtemp(path.join(tmpdir(), "allbot-flagdiff-"));
   const onConfigPath = path.join(workDir, "on.json");
   const offConfigPath = path.join(workDir, "off.json");
   const onOutput = path.join(workDir, "on-results.json");

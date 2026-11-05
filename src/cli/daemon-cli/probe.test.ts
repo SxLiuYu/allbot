@@ -55,7 +55,7 @@ describe("probeGatewayStatus", () => {
       timeoutMs: 5_000,
       json: true,
       requireRpc: true,
-      configPath: "/tmp/kaijibot-daemon/kaijibot.json",
+      configPath: "/tmp/allbot-daemon/allbot.json",
     });
 
     expect(result).toEqual({ ok: true });
@@ -67,7 +67,7 @@ describe("probeGatewayStatus", () => {
       tlsFingerprint: "abc123",
       method: "status",
       timeoutMs: 5_000,
-      configPath: "/tmp/kaijibot-daemon/kaijibot.json",
+      configPath: "/tmp/allbot-daemon/allbot.json",
     });
   });
 

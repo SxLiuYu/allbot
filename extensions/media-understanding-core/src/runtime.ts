@@ -6,4 +6,4 @@ export {
   transcribeAudioFile,
   type RunMediaUnderstandingFileParams,
   type RunMediaUnderstandingFileResult,
-} from "kaijibot/plugin-sdk/media-understanding-runtime";
+} from "allbot/plugin-sdk/media-understanding-runtime";

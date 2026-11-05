@@ -1,29 +1,29 @@
 ---
 summary: "Zalo personal account support via native zca-js (QR login), capabilities, and configuration"
 read_when:
-  - Setting up Zalo Personal for KaijiBot
+  - Setting up Zalo Personal for AllBot
   - Debugging Zalo Personal login or message flow
 title: "Zalo Personal"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Zalo Personal (unofficial)
 
-Status: experimental. This integration automates a **personal Zalo account** via native `zca-js` inside KaijiBot.
+Status: experimental. This integration automates a **personal Zalo account** via native `zca-js` inside AllBot.
 
 > **Warning:** This is an unofficial integration and may result in account suspension/ban. Use at your own risk.
 
 ## Bundled plugin
 
-Zalo Personal ships as a bundled plugin in current KaijiBot releases, so normal
+Zalo Personal ships as a bundled plugin in current AllBot releases, so normal
 packaged builds do not need a separate install.
 
 If you are on an older build or a custom install that excludes Zalo Personal,
 install it manually:
 
-- Install via CLI: `kaijibot plugins install @kaijibot/zalouser`
-- Or from a source checkout: `kaijibot plugins install ./path/to/local/zalouser-plugin`
+- Install via CLI: `allbot plugins install @allbot/zalouser`
+- Or from a source checkout: `allbot plugins install ./path/to/local/zalouser-plugin`
 - Details: [Plugins](/tools/plugin)
 
 No external `zca`/`openzca` CLI binary is required.
@@ -31,10 +31,10 @@ No external `zca`/`openzca` CLI binary is required.
 ## Quick setup (beginner)
 
 1. Ensure the Zalo Personal plugin is available.
-   - Current packaged KaijiBot releases already bundle it.
+   - Current packaged AllBot releases already bundle it.
    - Older/custom installs can add it manually with the commands above.
 2. Login (QR, on the Gateway machine):
-   - `kaijibot channels login --channel zalouser`
+   - `allbot channels login --channel zalouser`
    - Scan the QR code with the Zalo mobile app.
 3. Enable the channel:
 
@@ -68,9 +68,9 @@ Channel id is `zalouser` to make it explicit this automates a **personal Zalo us
 Use the directory CLI to discover peers/groups and their IDs:
 
 ```bash
-kaijibot directory self --channel zalouser
-kaijibot directory peers list --channel zalouser --query "name"
-kaijibot directory groups list --channel zalouser --query "work"
+allbot directory self --channel zalouser
+allbot directory peers list --channel zalouser --query "name"
+allbot directory groups list --channel zalouser --query "work"
 ```
 
 ## Limits
@@ -86,8 +86,8 @@ kaijibot directory groups list --channel zalouser --query "work"
 
 Approve via:
 
-- `kaijibot pairing list zalouser`
-- `kaijibot pairing approve zalouser <code>`
+- `allbot pairing list zalouser`
+- `allbot pairing approve zalouser <code>`
 
 ## Group access (optional)
 
@@ -98,7 +98,7 @@ Approve via:
   - `channels.zalouser.groupAllowFrom` (controls which senders in allowed groups can trigger the bot)
 - Block all groups: `channels.zalouser.groupPolicy = "disabled"`.
 - The configure wizard can prompt for group allowlists.
-- On startup, KaijiBot resolves group/user names in allowlists to IDs and logs the mapping.
+- On startup, AllBot resolves group/user names in allowlists to IDs and logs the mapping.
 - Group allowlist matching is ID-only by default. Unresolved names are ignored for auth unless `channels.zalouser.dangerouslyAllowNameMatching: true` is enabled.
 - `channels.zalouser.dangerouslyAllowNameMatching: true` is a break-glass compatibility mode that re-enables mutable group-name matching.
 - If `groupAllowFrom` is unset, runtime falls back to `allowFrom` for group sender checks.
@@ -128,7 +128,7 @@ Example:
 - This applies both to allowlisted groups and open group mode.
 - Quoting a bot message counts as an implicit mention for group activation.
 - Authorized control commands (for example `/new`) can bypass mention gating.
-- When a group message is skipped because mention is required, KaijiBot stores it as pending group history and includes it on the next processed group message.
+- When a group message is skipped because mention is required, AllBot stores it as pending group history and includes it on the next processed group message.
 - Group history limit defaults to `messages.groupChat.historyLimit` (fallback `50`). You can override per account with `channels.zalouser.historyLimit`.
 
 Example:
@@ -149,7 +149,7 @@ Example:
 
 ## Multi-account
 
-Accounts map to `zalouser` profiles in KaijiBot state. Example:
+Accounts map to `zalouser` profiles in AllBot state. Example:
 
 ```json5
 {
@@ -167,18 +167,18 @@ Accounts map to `zalouser` profiles in KaijiBot state. Example:
 
 ## Typing, reactions, and delivery acknowledgements
 
-- KaijiBot sends a typing event before dispatching a reply (best-effort).
+- AllBot sends a typing event before dispatching a reply (best-effort).
 - Message reaction action `react` is supported for `zalouser` in channel actions.
   - Use `remove: true` to remove a specific reaction emoji from a message.
   - Reaction semantics: [Reactions](/tools/reactions)
-- For inbound messages that include event metadata, KaijiBot sends delivered + seen acknowledgements (best-effort).
+- For inbound messages that include event metadata, AllBot sends delivered + seen acknowledgements (best-effort).
 
 ## Troubleshooting
 
 **Login doesn't stick:**
 
-- `kaijibot channels status --probe`
-- Re-login: `kaijibot channels logout --channel zalouser && kaijibot channels login --channel zalouser`
+- `allbot channels status --probe`
+- Re-login: `allbot channels logout --channel zalouser && allbot channels login --channel zalouser`
 
 **Allowlist/group name didn't resolve:**
 
@@ -187,7 +187,7 @@ Accounts map to `zalouser` profiles in KaijiBot state. Example:
 **Upgraded from old CLI-based setup:**
 
 - Remove any old external `zca` process assumptions.
-- The channel now runs fully in KaijiBot without external CLI binaries.
+- The channel now runs fully in AllBot without external CLI binaries.
 
 ## Related
 

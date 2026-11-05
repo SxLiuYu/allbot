@@ -26,9 +26,9 @@ How to see whether the linked channel is healthy from the menu bar app.
 
 ## How the probe works
 
-- App runs `kaijibot health --json` via `ShellExecutor` every ~60s and on demand. The probe loads creds and reports status without sending messages.
+- App runs `allbot health --json` via `ShellExecutor` every ~60s and on demand. The probe loads creds and reports status without sending messages.
 - Cache the last good snapshot and the last error separately to avoid flicker; show the timestamp of each.
 
 ## When in doubt
 
-- You can still use the CLI flow in [Gateway health](/gateway/health) (`kaijibot status`, `kaijibot status --deep`, `kaijibot health --json`) and tail `/tmp/kaijibot/kaijibot-*.log` for `web-heartbeat` / `web-reconnect`.
+- You can still use the CLI flow in [Gateway health](/gateway/health) (`allbot status`, `allbot status --deep`, `allbot health --json`) and tail `/tmp/allbot/allbot-*.log` for `web-heartbeat` / `web-reconnect`.

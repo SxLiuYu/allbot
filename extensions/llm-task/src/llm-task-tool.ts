@@ -1,15 +1,15 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import Ajv from "ajv";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/text-runtime";
+import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { Type } from "typebox";
 import {
   formatXHighModelHint,
   normalizeThinkLevel,
-  resolvePreferredKaijiBotTmpDir,
+  resolvePreferredAllBotTmpDir,
   supportsXHighThinking,
 } from "../api.js";
-import type { KaijiBotPluginApi } from "../api.js";
+import type { AllBotPluginApi } from "../api.js";
 
 const AjvCtor = Ajv as unknown as typeof import("ajv").default;
 
@@ -63,12 +63,12 @@ type LlmTaskParams = {
 const INVALID_THINKING_LEVELS_HINT =
   "off, minimal, low, medium, high, adaptive, and xhigh where supported";
 
-export function createLlmTaskTool(api: KaijiBotPluginApi) {
+export function createLlmTaskTool(api: AllBotPluginApi) {
   return {
     name: "llm-task",
     label: "LLM Task",
     description:
-      "Run a generic JSON-only LLM task and return schema-validated JSON. Designed for orchestration from Lobster workflows via kaijibot.invoke.",
+      "Run a generic JSON-only LLM task and return schema-validated JSON. Designed for orchestration from Lobster workflows via allbot.invoke.",
     parameters: Type.Object({
       prompt: Type.String({ description: "Task instruction for the LLM." }),
       input: Type.Optional(Type.Unknown({ description: "Optional input payload for the task." })),
@@ -187,7 +187,7 @@ export function createLlmTaskTool(api: KaijiBotPluginApi) {
       let tmpDir: string | null = null;
       try {
         tmpDir = await fs.mkdtemp(
-          path.join(resolvePreferredKaijiBotTmpDir(), "kaijibot-llm-task-"),
+          path.join(resolvePreferredAllBotTmpDir(), "allbot-llm-task-"),
         );
         const sessionId = `llm-task-${Date.now()}`;
         const sessionFile = path.join(tmpDir, "session.json");

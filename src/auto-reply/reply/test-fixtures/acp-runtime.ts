@@ -1,7 +1,7 @@
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import type { SessionAcpMeta } from "../../../config/sessions/types.js";
 
-export function createAcpTestConfig(overrides?: Partial<KaijiBotConfig>): KaijiBotConfig {
+export function createAcpTestConfig(overrides?: Partial<AllBotConfig>): AllBotConfig {
   return {
     acp: {
       enabled: true,
@@ -11,7 +11,7 @@ export function createAcpTestConfig(overrides?: Partial<KaijiBotConfig>): KaijiB
       },
     },
     ...overrides,
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 export function createAcpSessionMeta(overrides?: Partial<SessionAcpMeta>): SessionAcpMeta {

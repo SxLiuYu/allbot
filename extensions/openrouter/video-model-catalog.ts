@@ -2,19 +2,19 @@
 import {
   type UnifiedModelCatalogEntry,
   type UnifiedModelCatalogProviderContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
-import { resolveApiKeyForProvider } from "kaijibot/plugin-sdk/provider-auth-runtime";
-import { getCachedLiveCatalogValue } from "kaijibot/plugin-sdk/provider-catalog-shared";
+} from "allbot/plugin-sdk/plugin-entry";
+import { resolveApiKeyForProvider } from "allbot/plugin-sdk/provider-auth-runtime";
+import { getCachedLiveCatalogValue } from "allbot/plugin-sdk/provider-catalog-shared";
 import {
   assertOkOrThrowHttpError,
   resolveProviderHttpRequestConfig,
-} from "kaijibot/plugin-sdk/provider-http";
-import { normalizeOptionalString } from "kaijibot/plugin-sdk/string-coerce-runtime";
+} from "allbot/plugin-sdk/provider-http";
+import { normalizeOptionalString } from "allbot/plugin-sdk/string-coerce-runtime";
 import type {
   VideoGenerationModelCapabilitiesContext,
   VideoGenerationProviderCapabilities,
   VideoGenerationResolution,
-} from "kaijibot/plugin-sdk/video-generation";
+} from "allbot/plugin-sdk/video-generation";
 import { OPENROUTER_BASE_URL } from "./provider-catalog.js";
 import { fetchOpenRouterVideoGet, type OpenRouterVideoDispatcherPolicy } from "./video-http.js";
 

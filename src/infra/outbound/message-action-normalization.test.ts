@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { normalizeMessageActionInput } from "./message-action-normalization.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("normalizeMessageActionInput", () => {
   type NormalizeMessageActionInputCase = {
     input: Parameters<typeof normalizeMessageActionInput>[0];

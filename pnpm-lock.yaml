@@ -271,73 +271,73 @@ importers:
 
   extensions/alibaba:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/anthropic:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/anthropic-vertex:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/arcee:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/browser:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/byteplus:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/cerebras:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/chutes:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/cloudflare-ai-gateway:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/copilot-proxy:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/deepinfra:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/deepseek:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -356,13 +356,13 @@ importers:
         specifier: ^1.1
         version: 1.2.9
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/exa:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -375,22 +375,22 @@ importers:
         specifier: ^1.1
         version: 1.2.9
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
-      kaijibot:
+      allbot:
         specifier: workspace:*
         version: link:../..
 
   extensions/fireworks:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/github-copilot:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -400,43 +400,43 @@ importers:
         specifier: ^1.48.0
         version: 1.52.0(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/gradium:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/groq:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/huggingface:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/image-generation-core:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/kilocode:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/kimi-coding:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -455,7 +455,7 @@ importers:
         specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -465,16 +465,16 @@ importers:
         specifier: ^2.8.3
         version: 2.9.0
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
-      kaijibot:
+      allbot:
         specifier: workspace:*
         version: link:../..
 
   extensions/litellm:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -487,7 +487,7 @@ importers:
         specifier: ^1.1
         version: 1.2.9
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -495,16 +495,16 @@ importers:
 
   extensions/media-understanding-core:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/memory-core:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
-      kaijibot:
+      allbot:
         specifier: workspace:*
         version: link:../..
 
@@ -520,7 +520,7 @@ importers:
         specifier: ^1.1
         version: 1.2.9
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -530,49 +530,49 @@ importers:
         specifier: ^1.2.10
         version: 1.2.10
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/microsoft-foundry:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/minimax:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/mistral:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/moonshot:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/nvidia:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/ollama:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/open-prose:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -582,121 +582,121 @@ importers:
         specifier: 8.21.1
         version: 8.21.1
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/opencode:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/opencode-go:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/openrouter:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/openshell:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/perplexity:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/qianfan:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/qwen:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/runway:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/sglang:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/sherpa-speech:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/speech-core:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/stepfun:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/tavily:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/together:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/venice:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/vercel-ai-gateway:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/vllm:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/volcengine:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/vydra:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -706,7 +706,7 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
@@ -719,28 +719,28 @@ importers:
         specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
-      kaijibot:
+      allbot:
         specifier: workspace:*
         version: link:../..
 
   extensions/xai:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/xiaomi:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 
   extensions/zai:
     devDependencies:
-      '@kaijibot/plugin-sdk':
+      '@allbot/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
 

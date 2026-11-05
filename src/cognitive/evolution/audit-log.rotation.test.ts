@@ -8,7 +8,7 @@ describe("AuditLog rotation", () => {
   let configDir: string;
 
   beforeEach(async () => {
-    configDir = await mkdtemp(path.join(tmpdir(), "kaijibot-audit-rotation-"));
+    configDir = await mkdtemp(path.join(tmpdir(), "allbot-audit-rotation-"));
   });
 
   afterEach(async () => {

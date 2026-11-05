@@ -1,5 +1,5 @@
 import type { ReasoningLevel, ThinkLevel } from "../../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { ExecElevatedDefaults } from "../bash-tools.js";
 import type { SkillSnapshot } from "../skills.js";
 
@@ -14,7 +14,7 @@ export type EmbeddedCompactionRuntimeContext = {
   authProfileId?: string;
   workspaceDir: string;
   agentDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   skillsSnapshot?: SkillSnapshot;
   senderIsOwner?: boolean;
   senderId?: string;
@@ -32,7 +32,7 @@ export type EmbeddedCompactionRuntimeContext = {
  * caller-supplied provider/model and optionally applying runtime defaults.
  */
 export function resolveEmbeddedCompactionTarget(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   provider?: string | null;
   modelId?: string | null;
   authProfileId?: string | null;
@@ -79,7 +79,7 @@ export function buildEmbeddedCompactionRuntimeContext(params: {
   authProfileId?: string | null;
   workspaceDir: string;
   agentDir: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   skillsSnapshot?: SkillSnapshot;
   senderIsOwner?: boolean;
   senderId?: string | null;

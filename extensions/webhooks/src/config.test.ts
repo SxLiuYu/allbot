@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../runtime-api.js";
+import type { AllBotConfig } from "../runtime-api.js";
 import { resolveWebhooksPluginConfig } from "./config.js";
 
 describe("resolveWebhooksPluginConfig", () => {
@@ -12,14 +12,14 @@ describe("resolveWebhooksPluginConfig", () => {
             secret: {
               source: "env",
               provider: "default",
-              id: "KAIJIBOT_WEBHOOK_SECRET",
+              id: "ALLBOT_WEBHOOK_SECRET",
             },
           },
         },
       },
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       env: {
-        KAIJIBOT_WEBHOOK_SECRET: "shared-secret",
+        ALLBOT_WEBHOOK_SECRET: "shared-secret",
       },
     });
 
@@ -50,7 +50,7 @@ describe("resolveWebhooksPluginConfig", () => {
           },
         },
       },
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       env: {},
       logger: { warn } as never,
     });
@@ -78,7 +78,7 @@ describe("resolveWebhooksPluginConfig", () => {
             },
           },
         },
-        cfg: {} as KaijiBotConfig,
+        cfg: {} as AllBotConfig,
         env: {},
       }),
     ).rejects.toThrow(/conflicts with routes\.first\.path/i);

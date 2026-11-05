@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `kaijibot agents` (list/add/delete/bindings/bind/unbind/set identity)"
+summary: "CLI reference for `allbot agents` (list/add/delete/bindings/bind/unbind/set identity)"
 read_when:
   - You want multiple isolated agents (workspaces + routing + auth)
 title: "agents"
 ---
 
-# `kaijibot agents`
+# `allbot agents`
 
 Manage isolated agents (workspaces + auth + routing).
 
@@ -18,16 +18,16 @@ Related:
 ## Examples
 
 ```bash
-kaijibot agents list
-kaijibot agents list --bindings
-kaijibot agents add work --workspace ~/.kaijibot/workspace-work
-kaijibot agents add ops --workspace ~/.kaijibot/workspace-ops --bind telegram:ops --non-interactive
-kaijibot agents bindings
-kaijibot agents bind --agent work --bind telegram:ops
-kaijibot agents unbind --agent work --bind telegram:ops
-kaijibot agents set-identity --workspace ~/.kaijibot/workspace --from-identity
-kaijibot agents set-identity --agent main --avatar avatars/kaijibot.png
-kaijibot agents delete work
+allbot agents list
+allbot agents list --bindings
+allbot agents add work --workspace ~/.allbot/workspace-work
+allbot agents add ops --workspace ~/.allbot/workspace-ops --bind telegram:ops --non-interactive
+allbot agents bindings
+allbot agents bind --agent work --bind telegram:ops
+allbot agents unbind --agent work --bind telegram:ops
+allbot agents set-identity --workspace ~/.allbot/workspace --from-identity
+allbot agents set-identity --agent main --avatar avatars/allbot.png
+allbot agents delete work
 ```
 
 ## Routing bindings
@@ -35,42 +35,42 @@ kaijibot agents delete work
 Use routing bindings to pin inbound channel traffic to a specific agent.
 
 If you also want different visible skills per agent, configure
-`agents.defaults.skills` and `agents.list[].skills` in `kaijibot.json`. See
+`agents.defaults.skills` and `agents.list[].skills` in `allbot.json`. See
 [Skills config](/tools/skills-config) and
 [Configuration Reference](/gateway/configuration-reference#agentsdefaultsskills).
 
 List bindings:
 
 ```bash
-kaijibot agents bindings
-kaijibot agents bindings --agent work
-kaijibot agents bindings --json
+allbot agents bindings
+allbot agents bindings --agent work
+allbot agents bindings --json
 ```
 
 Add bindings:
 
 ```bash
-kaijibot agents bind --agent work --bind telegram:ops --bind discord:guild-a
+allbot agents bind --agent work --bind telegram:ops --bind discord:guild-a
 ```
 
-If you omit `accountId` (`--bind <channel>`), KaijiBot resolves it from channel defaults and plugin setup hooks when available.
+If you omit `accountId` (`--bind <channel>`), AllBot resolves it from channel defaults and plugin setup hooks when available.
 
-If you omit `--agent` for `bind` or `unbind`, KaijiBot targets the current default agent.
+If you omit `--agent` for `bind` or `unbind`, AllBot targets the current default agent.
 
 ### Binding scope behavior
 
 - A binding without `accountId` matches the channel default account only.
 - `accountId: "*"` is the channel-wide fallback (all accounts) and is less specific than an explicit account binding.
-- If the same agent already has a matching channel binding without `accountId`, and you later bind with an explicit or resolved `accountId`, KaijiBot upgrades that existing binding in place instead of adding a duplicate.
+- If the same agent already has a matching channel binding without `accountId`, and you later bind with an explicit or resolved `accountId`, AllBot upgrades that existing binding in place instead of adding a duplicate.
 
 Example:
 
 ```bash
 # initial channel-only binding
-kaijibot agents bind --agent work --bind telegram
+allbot agents bind --agent work --bind telegram
 
 # later upgrade to account-scoped binding
-kaijibot agents bind --agent work --bind telegram:ops
+allbot agents bind --agent work --bind telegram:ops
 ```
 
 After the upgrade, routing for that binding is scoped to `telegram:ops`. If you also want default-account routing, add it explicitly (for example `--bind telegram:default`).
@@ -78,8 +78,8 @@ After the upgrade, routing for that binding is scoped to `telegram:ops`. If you 
 Remove bindings:
 
 ```bash
-kaijibot agents unbind --agent work --bind telegram:ops
-kaijibot agents unbind --agent work --all
+allbot agents unbind --agent work --bind telegram:ops
+allbot agents unbind --agent work --all
 ```
 
 `unbind` accepts either `--all` or one or more `--bind` values, not both.
@@ -88,7 +88,7 @@ kaijibot agents unbind --agent work --all
 
 ### `agents`
 
-Running `kaijibot agents` with no subcommand is equivalent to `kaijibot agents list`.
+Running `allbot agents` with no subcommand is equivalent to `allbot agents list`.
 
 ### `agents list`
 
@@ -155,7 +155,7 @@ Notes:
 
 Each agent workspace can include an `IDENTITY.md` at the workspace root:
 
-- Example path: `~/.kaijibot/workspace/IDENTITY.md`
+- Example path: `~/.allbot/workspace/IDENTITY.md`
 - `set-identity --from-identity` reads from the workspace root (or an explicit `--identity-file`)
 
 Avatar paths resolve relative to the workspace root.
@@ -190,13 +190,13 @@ Notes:
 Load from `IDENTITY.md`:
 
 ```bash
-kaijibot agents set-identity --workspace ~/.kaijibot/workspace --from-identity
+allbot agents set-identity --workspace ~/.allbot/workspace --from-identity
 ```
 
 Override fields explicitly:
 
 ```bash
-kaijibot agents set-identity --agent main --name "KaijiBot" --emoji "🦞" --avatar avatars/kaijibot.png
+allbot agents set-identity --agent main --name "AllBot" --emoji "🦞" --avatar avatars/allbot.png
 ```
 
 Config sample:
@@ -208,10 +208,10 @@ Config sample:
       {
         id: "main",
         identity: {
-          name: "KaijiBot",
+          name: "AllBot",
           theme: "space lobster",
           emoji: "🦞",
-          avatar: "avatars/kaijibot.png",
+          avatar: "avatars/allbot.png",
         },
       },
     ],

@@ -5,7 +5,7 @@ read_when:
 title: "Discord"
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # Discord (Bot API)
 
@@ -25,13 +25,13 @@ Status: ready for DMs and guild channels via the official Discord gateway.
 
 ## Quick setup
 
-You will need to create a new application with a bot, add the bot to your server, and pair it to KaijiBot. We recommend adding your bot to your own private server. If you don't have one yet, [create one first](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (choose **Create My Own > For me and my friends**).
+You will need to create a new application with a bot, add the bot to your server, and pair it to AllBot. We recommend adding your bot to your own private server. If you don't have one yet, [create one first](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (choose **Create My Own > For me and my friends**).
 
 <Steps>
   <Step title="Create a Discord application and bot">
-    Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application**. Name it something like "KaijiBot".
+    Go to the [Discord Developer Portal](https://discord.com/developers/applications) and click **New Application**. Name it something like "AllBot".
 
-    Click **Bot** on the sidebar. Set the **Username** to whatever you call your KaijiBot agent.
+    Click **Bot** on the sidebar. Set the **Username** to whatever you call your AllBot agent.
 
   </Step>
 
@@ -83,37 +83,37 @@ You will need to create a new application with a bot, add the bot to your server
     2. Right-click your **server icon** in the sidebar → **Copy Server ID**
     3. Right-click your **own avatar** → **Copy User ID**
 
-    Save your **Server ID** and **User ID** alongside your Bot Token — you'll send all three to KaijiBot in the next step.
+    Save your **Server ID** and **User ID** alongside your Bot Token — you'll send all three to AllBot in the next step.
 
   </Step>
 
   <Step title="Allow DMs from server members">
     For pairing to work, Discord needs to allow your bot to DM you. Right-click your **server icon** → **Privacy Settings** → toggle on **Direct Messages**.
 
-    This lets server members (including bots) send you DMs. Keep this enabled if you want to use Discord DMs with KaijiBot. If you only plan to use guild channels, you can disable DMs after pairing.
+    This lets server members (including bots) send you DMs. Keep this enabled if you want to use Discord DMs with AllBot. If you only plan to use guild channels, you can disable DMs after pairing.
 
   </Step>
 
   <Step title="Set your bot token securely (do not send it in chat)">
-    Your Discord bot token is a secret (like a password). Set it on the machine running KaijiBot before messaging your agent.
+    Your Discord bot token is a secret (like a password). Set it on the machine running AllBot before messaging your agent.
 
 ```bash
 export DISCORD_BOT_TOKEN="YOUR_BOT_TOKEN"
-kaijibot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN --dry-run
-kaijibot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN
-kaijibot config set channels.discord.enabled true --strict-json
-kaijibot gateway
+allbot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN --dry-run
+allbot config set channels.discord.token --ref-provider default --ref-source env --ref-id DISCORD_BOT_TOKEN
+allbot config set channels.discord.enabled true --strict-json
+allbot gateway
 ```
 
-    If KaijiBot is already running as a background service, restart it via the KaijiBot Mac app or by stopping and restarting the `kaijibot gateway run` process.
+    If AllBot is already running as a background service, restart it via the AllBot Mac app or by stopping and restarting the `allbot gateway run` process.
 
   </Step>
 
-  <Step title="Configure KaijiBot and pair">
+  <Step title="Configure AllBot and pair">
 
     <Tabs>
       <Tab title="Ask your agent">
-        Chat with your KaijiBot agent on any existing channel (e.g. Telegram) and tell it. If Discord is your first channel, use the CLI / config tab instead.
+        Chat with your AllBot agent on any existing channel (e.g. Telegram) and tell it. If Discord is your first channel, use the CLI / config tab instead.
 
         > "I already set my Discord bot token in config. Please finish Discord setup with User ID `<user_id>` and Server ID `<server_id>`."
       </Tab>
@@ -160,8 +160,8 @@ DISCORD_BOT_TOKEN=...
       <Tab title="CLI">
 
 ```bash
-kaijibot pairing list discord
-kaijibot pairing approve discord <CODE>
+allbot pairing list discord
+allbot pairing approve discord <CODE>
 ```
 
       </Tab>
@@ -271,22 +271,22 @@ Now create some channels on your Discord server and start chatting. Your agent c
 
 ## Forum channels
 
-Discord forum and media channels only accept thread posts. KaijiBot supports two ways to create them:
+Discord forum and media channels only accept thread posts. AllBot supports two ways to create them:
 
 - Send a message to the forum parent (`channel:<forumId>`) to auto-create a thread. The thread title uses the first non-empty line of your message.
-- Use `kaijibot message thread create` to create a thread directly. Do not pass `--message-id` for forum channels.
+- Use `allbot message thread create` to create a thread directly. Do not pass `--message-id` for forum channels.
 
 Example: send to forum parent to create a thread
 
 ```bash
-kaijibot message send --channel discord --target channel:<forumId> \
+allbot message send --channel discord --target channel:<forumId> \
   --message "Topic title\nBody of the post"
 ```
 
 Example: create a forum thread explicitly
 
 ```bash
-kaijibot message thread create --channel discord --target channel:<forumId> \
+allbot message thread create --channel discord --target channel:<forumId> \
   --thread-name "Topic title" --message "Body of the post"
 ```
 
@@ -294,7 +294,7 @@ Forum parents do not accept Discord components. If you need components, send to 
 
 ## Interactive components
 
-KaijiBot supports Discord components v2 containers for agent messages. Use the message tool with a `components` payload. Interaction results are routed back to the agent as normal inbound messages and follow the existing Discord `replyToMode` settings.
+AllBot supports Discord components v2 containers for agent messages. Use the message tool with a `components` payload. Interaction results are routed back to the agent as normal inbound messages and follow the existing Discord `replyToMode` settings.
 
 Supported blocks:
 
@@ -318,7 +318,7 @@ Modal forms:
 
 - Add `components.modal` with up to 5 fields
 - Field types: `text`, `checkbox`, `radio`, `select`, `role-select`, `user-select`
-- KaijiBot adds a trigger button automatically
+- AllBot adds a trigger button automatically
 
 Example:
 
@@ -416,7 +416,7 @@ Example:
     - guild must match `channels.discord.guilds` (`id` preferred, slug accepted)
     - optional sender allowlists: `users` (stable IDs recommended) and `roles` (role IDs only); if either is configured, senders are allowed when they match `users` OR `roles`
     - direct name/tag matching is disabled by default; enable `channels.discord.dangerouslyAllowNameMatching: true` only as break-glass compatibility mode
-    - names/tags are supported for `users`, but IDs are safer; `kaijibot security audit` warns when name/tag entries are used
+    - names/tags are supported for `users`, but IDs are safer; `allbot security audit` warns when name/tag entries are used
     - if a guild has `channels` configured, non-listed channels are denied
     - if a guild has no `channels` block, all channels in that allowlisted guild are allowed
 
@@ -540,7 +540,7 @@ Use `bindings[].match.roles` to route Discord guild members to different agents 
     - channel ID
     - user ID
 
-    Prefer numeric IDs in KaijiBot config for reliable audits and probes.
+    Prefer numeric IDs in AllBot config for reliable audits and probes.
 
   </Accordion>
 </AccordionGroup>
@@ -551,7 +551,7 @@ Use `bindings[].match.roles` to route Discord guild members to different agents 
 - Per-channel override: `channels.discord.commands.native`.
 - `commands.native=false` explicitly clears previously registered Discord native commands.
 - Native command auth uses the same Discord allowlists/policies as normal message handling.
-- Commands may still be visible in Discord UI for users who are not authorized; execution still enforces KaijiBot auth and returns "not authorized".
+- Commands may still be visible in Discord UI for users who are not authorized; execution still enforces AllBot auth and returns "not authorized".
 
 See [Slash commands](/tools/slash-commands) for command catalog and behavior.
 
@@ -587,7 +587,7 @@ Default slash command settings:
   </Accordion>
 
   <Accordion title="Live stream preview">
-    KaijiBot can stream draft replies by sending a temporary message and editing it as text arrives.
+    AllBot can stream draft replies by sending a temporary message and editing it as text arrives.
 
     - `channels.discord.streaming` controls preview streaming (`off` | `partial` | `block` | `progress`, default: `off`).
     - Default stays `off` because Discord preview edits can hit rate limits quickly, especially when multiple bots or gateways share the same account or guild traffic.
@@ -628,7 +628,7 @@ Default slash command settings:
     Preview streaming is text-only; media replies fall back to normal delivery.
 
     Note: preview streaming is separate from block streaming. When block streaming is explicitly
-    enabled for Discord, KaijiBot skips the preview stream to avoid double streaming.
+    enabled for Discord, AllBot skips the preview stream to avoid double streaming.
 
   </Accordion>
 
@@ -724,7 +724,7 @@ Default slash command settings:
             agent: "codex",
             backend: "acpx",
             mode: "persistent",
-            cwd: "/workspace/kaijibot",
+            cwd: "/workspace/allbot",
           },
         },
       },
@@ -766,7 +766,7 @@ Default slash command settings:
     - Thread messages can inherit the parent channel ACP binding.
     - In a bound channel or thread, `/new` and `/reset` reset the same ACP session in place.
     - Temporary thread bindings still work and can override target resolution while active.
-    - `spawnAcpSessions` is only required when KaijiBot needs to create/bind a child thread via `--thread auto|here`. It is not required for `/acp spawn ... --bind here` in the current channel.
+    - `spawnAcpSessions` is only required when AllBot needs to create/bind a child thread via `--thread auto|here`. It is not required for `/acp spawn ... --bind here` in the current channel.
 
     See [ACP Agents](/tools/acp-agents) for binding behavior details.
 
@@ -785,7 +785,7 @@ Default slash command settings:
   </Accordion>
 
   <Accordion title="Ack reactions">
-    `ackReaction` sends an acknowledgement emoji while KaijiBot is processing an inbound message.
+    `ackReaction` sends an acknowledgement emoji while AllBot is processing an inbound message.
 
     Resolution order:
 
@@ -912,7 +912,7 @@ Default slash command settings:
     discord: {
       activity: "Live coding",
       activityType: 1,
-      activityUrl: "https://twitch.tv/kaijibot",
+      activityUrl: "https://twitch.tv/allbot",
     },
   },
 }
@@ -964,16 +964,16 @@ Default slash command settings:
 
     Discord auto-enables native exec approvals when `enabled` is unset or `"auto"` and at least one approver can be resolved, either from `execApprovals.approvers` or from `commands.ownerAllowFrom`. Discord does not infer exec approvers from channel `allowFrom`, legacy `dm.allowFrom`, or direct-message `defaultTo`. Set `enabled: false` to disable Discord as a native approval client explicitly.
 
-    When `target` is `channel` or `both`, the approval prompt is visible in the channel. Only resolved approvers can use the buttons; other users receive an ephemeral denial. Approval prompts include the command text, so only enable channel delivery in trusted channels. If the channel ID cannot be derived from the session key, KaijiBot falls back to DM delivery.
+    When `target` is `channel` or `both`, the approval prompt is visible in the channel. Only resolved approvers can use the buttons; other users receive an ephemeral denial. Approval prompts include the command text, so only enable channel delivery in trusted channels. If the channel ID cannot be derived from the session key, AllBot falls back to DM delivery.
 
     Discord also renders the shared approval buttons used by other chat channels. The native Discord adapter mainly adds approver DM routing and channel fanout.
-    When those buttons are present, they are the primary approval UX; KaijiBot
+    When those buttons are present, they are the primary approval UX; AllBot
     should only include a manual `/approve` command when the tool result says
     chat approvals are unavailable or manual approval is the only path.
 
     Gateway auth for this handler uses the same shared credential resolution contract as other Gateway clients:
 
-    - env-first local auth (`KAIJIBOT_GATEWAY_TOKEN` / `KAIJIBOT_GATEWAY_PASSWORD` then `gateway.auth.*`)
+    - env-first local auth (`ALLBOT_GATEWAY_TOKEN` / `ALLBOT_GATEWAY_PASSWORD` then `gateway.auth.*`)
     - in local mode, `gateway.remote.*` can be used as fallback only when `gateway.auth.*` is unset; configured-but-unresolved local SecretRefs fail closed
     - remote-mode support via `gateway.remote.*` when applicable
     - URL overrides are override-safe: CLI overrides do not reuse implicit credentials, and env overrides use env credentials only
@@ -1020,7 +1020,7 @@ Default gate behavior:
 
 ## Components v2 UI
 
-KaijiBot uses Discord components v2 for exec approvals and cross-context markers. Discord message actions can also accept `components` for custom UI (advanced; requires constructing a component payload via the discord tool), while legacy `embeds` remain available but are not recommended.
+AllBot uses Discord components v2 for exec approvals and cross-context markers. Discord message actions can also accept `components` for custom UI (advanced; requires constructing a component payload via the discord tool), while legacy `embeds` remain available but are not recommended.
 
 - `channels.discord.ui.components.accentColor` sets the accent color used by Discord component containers (hex).
 - Set per account with `channels.discord.accounts.<id>.ui.components.accentColor`.
@@ -1044,7 +1044,7 @@ Example:
 
 ## Voice channels
 
-KaijiBot can join Discord voice channels for realtime, continuous conversations. This is separate from voice message attachments.
+AllBot can join Discord voice channels for realtime, continuous conversations. This is separate from voice message attachments.
 
 Requirements:
 
@@ -1087,18 +1087,18 @@ Notes:
 - Voice is enabled by default; set `channels.discord.voice.enabled=false` to disable it.
 - `voice.daveEncryption` and `voice.decryptionFailureTolerance` pass through to `@discordjs/voice` join options.
 - `@discordjs/voice` defaults are `daveEncryption=true` and `decryptionFailureTolerance=24` if unset.
-- KaijiBot also watches receive decrypt failures and auto-recovers by leaving/rejoining the voice channel after repeated failures in a short window.
+- AllBot also watches receive decrypt failures and auto-recovers by leaving/rejoining the voice channel after repeated failures in a short window.
 - If receive logs repeatedly show `DecryptionFailed(UnencryptedWhenPassthroughDisabled)`, this may be the upstream `@discordjs/voice` receive bug tracked in [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419).
 
 ## Voice messages
 
-Discord voice messages show a waveform preview and require OGG/Opus audio plus metadata. KaijiBot generates the waveform automatically, but it needs `ffmpeg` and `ffprobe` available on the gateway host to inspect and convert audio files.
+Discord voice messages show a waveform preview and require OGG/Opus audio plus metadata. AllBot generates the waveform automatically, but it needs `ffmpeg` and `ffprobe` available on the gateway host to inspect and convert audio files.
 
 Requirements and constraints:
 
 - Provide a **local file path** (URLs are rejected).
 - Omit text content (Discord does not allow text + voice message in the same payload).
-- Any audio format is accepted; KaijiBot converts to OGG/Opus when needed.
+- Any audio format is accepted; AllBot converts to OGG/Opus when needed.
 
 Example:
 
@@ -1127,9 +1127,9 @@ message(action="send", channel="discord", target="channel:123", path="/path/to/a
     Useful checks:
 
 ```bash
-kaijibot doctor
-kaijibot channels status --probe
-kaijibot logs --follow
+allbot doctor
+allbot channels status --probe
+allbot logs --follow
 ```
 
   </Accordion>
@@ -1213,7 +1213,7 @@ kaijibot logs --follow
 
   <Accordion title="Voice STT drops with DecryptionFailed(...)">
 
-    - keep KaijiBot current (`kaijibot update`) so the Discord voice receive recovery logic is present
+    - keep AllBot current (`allbot update`) so the Discord voice receive recovery logic is present
     - confirm `channels.discord.voice.daveEncryption=true` (default)
     - start from `channels.discord.voice.decryptionFailureTolerance=24` (upstream default) and tune only if needed
     - watch logs for:
@@ -1251,7 +1251,7 @@ High-signal Discord fields:
 
 - Treat bot tokens as secrets (`DISCORD_BOT_TOKEN` preferred in supervised environments).
 - Grant least-privilege Discord permissions.
-- If command deploy/state is stale, restart gateway and re-check with `kaijibot channels status --probe`.
+- If command deploy/state is stale, restart gateway and re-check with `allbot channels status --probe`.
 
 ## Related
 

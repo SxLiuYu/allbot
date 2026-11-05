@@ -171,7 +171,7 @@ describe("formatHealthCheckFailure", () => {
         "gateway closed (1006 abnormal closure (no close frame)): no close reason",
         "Gateway target: ws://127.0.0.1:19001",
         "Source: local loopback",
-        "Config: /Users/steipete/.kaijibot-dev/kaijibot.json",
+        "Config: /Users/steipete/.allbot-dev/allbot.json",
         "Bind: loopback",
       ].join("\n"),
     );
@@ -181,7 +181,7 @@ describe("formatHealthCheckFailure", () => {
         "Health check failed: gateway closed (1006 abnormal closure (no close frame)): no close reason",
         "  Gateway target: ws://127.0.0.1:19001",
         "  Source: local loopback",
-        "  Config: /Users/steipete/.kaijibot-dev/kaijibot.json",
+        "  Config: /Users/steipete/.allbot-dev/allbot.json",
         "  Bind: loopback",
       ].join("\n"),
     );

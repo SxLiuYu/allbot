@@ -119,7 +119,7 @@ type AgentEventState = {
   runContextById: Map<string, AgentRunContext>;
 };
 
-const AGENT_EVENT_STATE_KEY = Symbol.for("kaijibot.agentEvents.state");
+const AGENT_EVENT_STATE_KEY = Symbol.for("allbot.agentEvents.state");
 
 function getAgentEventState(): AgentEventState {
   return resolveGlobalSingleton<AgentEventState>(AGENT_EVENT_STATE_KEY, () => ({

@@ -26,35 +26,35 @@ describe("gateway cli backend connect", () => {
     async () => {
       const envSnapshot = captureEnv([
         "HOME",
-        "KAIJIBOT_STATE_DIR",
-        "KAIJIBOT_CONFIG_PATH",
-        "KAIJIBOT_GATEWAY_TOKEN",
-        "KAIJIBOT_SKIP_CHANNELS",
-        "KAIJIBOT_SKIP_PROVIDERS",
-        "KAIJIBOT_SKIP_GMAIL_WATCHER",
-        "KAIJIBOT_SKIP_CRON",
-        "KAIJIBOT_SKIP_CANVAS_HOST",
-        "KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER",
-        "KAIJIBOT_BUNDLED_PLUGINS_DIR",
-        "KAIJIBOT_TEST_MINIMAL_GATEWAY",
+        "ALLBOT_STATE_DIR",
+        "ALLBOT_CONFIG_PATH",
+        "ALLBOT_GATEWAY_TOKEN",
+        "ALLBOT_SKIP_CHANNELS",
+        "ALLBOT_SKIP_PROVIDERS",
+        "ALLBOT_SKIP_GMAIL_WATCHER",
+        "ALLBOT_SKIP_CRON",
+        "ALLBOT_SKIP_CANVAS_HOST",
+        "ALLBOT_SKIP_BROWSER_CONTROL_SERVER",
+        "ALLBOT_BUNDLED_PLUGINS_DIR",
+        "ALLBOT_TEST_MINIMAL_GATEWAY",
       ]);
 
-      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-gateway-connect-home-"));
-      const configPath = path.join(tempHome, ".kaijibot", "kaijibot.json");
-      const bundledPluginsDir = path.join(tempHome, "kaijibot-test-no-bundled-extensions");
+      const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-gateway-connect-home-"));
+      const configPath = path.join(tempHome, ".allbot", "allbot.json");
+      const bundledPluginsDir = path.join(tempHome, "allbot-test-no-bundled-extensions");
       const token = `test-${Date.now()}`;
       process.env.HOME = tempHome;
-      process.env.KAIJIBOT_STATE_DIR = path.join(tempHome, ".kaijibot");
-      process.env.KAIJIBOT_CONFIG_PATH = configPath;
-      process.env.KAIJIBOT_GATEWAY_TOKEN = token;
-      process.env.KAIJIBOT_SKIP_CHANNELS = "1";
-      process.env.KAIJIBOT_SKIP_PROVIDERS = "1";
-      process.env.KAIJIBOT_SKIP_GMAIL_WATCHER = "1";
-      process.env.KAIJIBOT_SKIP_CRON = "1";
-      process.env.KAIJIBOT_SKIP_CANVAS_HOST = "1";
-      process.env.KAIJIBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
-      process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
-      process.env.KAIJIBOT_TEST_MINIMAL_GATEWAY = "1";
+      process.env.ALLBOT_STATE_DIR = path.join(tempHome, ".allbot");
+      process.env.ALLBOT_CONFIG_PATH = configPath;
+      process.env.ALLBOT_GATEWAY_TOKEN = token;
+      process.env.ALLBOT_SKIP_CHANNELS = "1";
+      process.env.ALLBOT_SKIP_PROVIDERS = "1";
+      process.env.ALLBOT_SKIP_GMAIL_WATCHER = "1";
+      process.env.ALLBOT_SKIP_CRON = "1";
+      process.env.ALLBOT_SKIP_CANVAS_HOST = "1";
+      process.env.ALLBOT_SKIP_BROWSER_CONTROL_SERVER = "1";
+      process.env.ALLBOT_BUNDLED_PLUGINS_DIR = bundledPluginsDir;
+      process.env.ALLBOT_TEST_MINIMAL_GATEWAY = "1";
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await fs.mkdir(bundledPluginsDir, { recursive: true });
       await fs.writeFile(

@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `kaijibot system` (system events, heartbeat, presence)"
+summary: "CLI reference for `allbot system` (system events, heartbeat, presence)"
 read_when:
   - You want to enqueue a system event without creating a cron job
   - You need to enable or disable heartbeats
@@ -7,7 +7,7 @@ read_when:
 title: "system"
 ---
 
-# `kaijibot system`
+# `allbot system`
 
 System-level helpers for the Gateway: enqueue system events, control heartbeats,
 and view presence.
@@ -22,11 +22,11 @@ All `system` subcommands use Gateway RPC and accept the shared client flags:
 ## Common commands
 
 ```bash
-kaijibot system event --text "Check for urgent follow-ups" --mode now
-kaijibot system event --text "Check for urgent follow-ups" --url ws://127.0.0.1:18789 --token "$KAIJIBOT_GATEWAY_TOKEN"
-kaijibot system heartbeat enable
-kaijibot system heartbeat last
-kaijibot system presence
+allbot system event --text "Check for urgent follow-ups" --mode now
+allbot system event --text "Check for urgent follow-ups" --url ws://127.0.0.1:18789 --token "$ALLBOT_GATEWAY_TOKEN"
+allbot system heartbeat enable
+allbot system heartbeat last
+allbot system presence
 ```
 
 ## `system event`

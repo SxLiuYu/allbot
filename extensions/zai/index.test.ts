@@ -1,7 +1,7 @@
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type { Context, Model } from "@earendil-works/pi-ai";
-import { registerSingleProviderPlugin } from "kaijibot/plugin-sdk/plugin-test-runtime";
-import { buildOpenAICompletionsParams } from "kaijibot/plugin-sdk/provider-transport-runtime";
+import { registerSingleProviderPlugin } from "allbot/plugin-sdk/plugin-test-runtime";
+import { buildOpenAICompletionsParams } from "allbot/plugin-sdk/provider-transport-runtime";
 import { describe, expect, it } from "vitest";
 import plugin from "./index.js";
 

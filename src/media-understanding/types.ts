@@ -100,7 +100,7 @@ export type ImageDescriptionRequest = {
   profile?: string;
   preferredProfile?: string;
   agentDir: string;
-  cfg: import("../config/config.js").KaijiBotConfig;
+  cfg: import("../config/config.js").AllBotConfig;
   model: string;
   provider: string;
 };
@@ -121,7 +121,7 @@ export type ImagesDescriptionRequest = {
   profile?: string;
   preferredProfile?: string;
   agentDir: string;
-  cfg: import("../config/config.js").KaijiBotConfig;
+  cfg: import("../config/config.js").AllBotConfig;
 };
 
 export type ImageDescriptionResult = {

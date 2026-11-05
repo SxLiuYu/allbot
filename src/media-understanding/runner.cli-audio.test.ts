@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { withAudioFixture } from "./runner.test-utils.js";
 
 const runExecMock = vi.hoisted(() => vi.fn());
@@ -24,7 +24,7 @@ describe("media-understanding CLI audio entry", () => {
   });
 
   it("applies per-request prompt and language overrides to CLI transcription templating", async () => {
-    await withAudioFixture("kaijibot-cli-audio", async ({ ctx, cache }) => {
+    await withAudioFixture("allbot-cli-audio", async ({ ctx, cache }) => {
       await runCliEntry({
         capability: "audio",
         entry: {
@@ -45,7 +45,7 @@ describe("media-understanding CLI audio entry", () => {
               },
             },
           },
-        } as KaijiBotConfig,
+        } as AllBotConfig,
         ctx,
         attachmentIndex: 0,
         cache,

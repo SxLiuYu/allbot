@@ -74,7 +74,7 @@ describe("i18n", () => {
     vi.resetModules();
     vi.stubGlobal("localStorage", createStorageMock());
     vi.stubGlobal("navigator", { language: "en-US" } as Navigator);
-    localStorage.setItem("kaijibot.i18n.locale", "zh-CN");
+    localStorage.setItem("allbot.i18n.locale", "zh-CN");
     const fresh = await import("../lib/translate.ts");
     await vi.waitFor(() => {
       expect(fresh.i18n.getLocale()).toBe("zh-CN");

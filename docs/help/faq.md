@@ -1,5 +1,5 @@
 ---
-summary: "Frequently asked questions about KaijiBot setup, configuration, and usage"
+summary: "Frequently asked questions about AllBot setup, configuration, and usage"
 read_when:
   - Answering common setup, install, onboarding, or runtime support questions
   - Triaging user-reported issues before deeper debugging
@@ -15,7 +15,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 1. **Quick status (first check)**
 
    ```bash
-   kaijibot status
+   allbot status
    ```
 
    Fast local summary: OS + update, gateway/service reachability, agents/sessions, provider config + runtime issues (when gateway is reachable).
@@ -23,7 +23,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 2. **Pasteable report (safe to share)**
 
    ```bash
-   kaijibot status --all
+   allbot status --all
    ```
 
    Read-only diagnosis with log tail (tokens redacted).
@@ -31,7 +31,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 3. **Daemon + port state**
 
    ```bash
-   kaijibot gateway status
+   allbot gateway status
    ```
 
    Shows supervisor runtime vs RPC reachability, the probe target URL, and which config the service likely used.
@@ -39,7 +39,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 4. **Deep probes**
 
    ```bash
-   kaijibot status --deep
+   allbot status --deep
    ```
 
    Runs a live gateway health probe, including channel probes when supported
@@ -48,13 +48,13 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 5. **Tail the latest log**
 
    ```bash
-   kaijibot logs --follow
+   allbot logs --follow
    ```
 
    If RPC is down, fall back to:
 
    ```bash
-   tail -f "$(ls -t /tmp/kaijibot/kaijibot-*.log | head -1)"
+   tail -f "$(ls -t /tmp/allbot/allbot-*.log | head -1)"
    ```
 
    File logs are separate from service logs; see [Logging](/logging) and [Troubleshooting](/gateway/troubleshooting).
@@ -62,7 +62,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 6. **Run the doctor (repairs)**
 
    ```bash
-   kaijibot doctor
+   allbot doctor
    ```
 
    Repairs/migrates config/state + runs health checks. See [Doctor](/gateway/doctor).
@@ -70,8 +70,8 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 7. **Gateway snapshot**
 
    ```bash
-   kaijibot health --json
-   kaijibot health --verbose   # shows the target URL + config path on errors
+   allbot health --json
+   allbot health --verbose   # shows the target URL + config path on errors
    ```
 
    Asks the running gateway for a full snapshot (WS-only). See [Health](/gateway/health).
@@ -92,12 +92,12 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
     ```bash
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install
     pnpm build
     ```
 
-    This installs KaijiBot **from source**, so the agent can read the code + docs and
+    This installs AllBot **from source**, so the agent can read the code + docs and
     reason about the exact version you are running.
 
     Tip: ask the agent to **plan and supervise** the fix (step-by-step), then execute only the
@@ -109,19 +109,19 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     Start with these commands (share outputs when asking for help):
 
     ```bash
-    kaijibot status
-    kaijibot models status
-    kaijibot doctor
+    allbot status
+    allbot models status
+    allbot doctor
     ```
 
     What they do:
 
-    - `kaijibot status`: quick snapshot of gateway/agent health + basic config.
-    - `kaijibot models status`: checks provider auth + model availability.
-    - `kaijibot doctor`: validates and repairs common config/state issues.
+    - `allbot status`: quick snapshot of gateway/agent health + basic config.
+    - `allbot models status`: checks provider auth + model availability.
+    - `allbot doctor`: validates and repairs common config/state issues.
 
-    Other useful CLI checks: `kaijibot status --all`, `kaijibot logs --follow`,
-    `kaijibot gateway status`, `kaijibot health --verbose`.
+    Other useful CLI checks: `allbot status --all`, `allbot logs --follow`,
+    `allbot gateway status`, `allbot health --verbose`.
 
     Quick debug loop: [First 60 seconds if something is broken](#first-60-seconds-if-something-is-broken).
     Install docs: [Install](/install), [Installer flags](/install/installer), [Updating](/install/updating).
@@ -143,15 +143,15 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
   </Accordion>
 
-  <Accordion title="Recommended way to install and set up KaijiBot">
+  <Accordion title="Recommended way to install and set up AllBot">
     Build from source and run onboarding:
 
     ```bash
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install
     pnpm build
-    pnpm kaijibot onboard --install-daemon
+    pnpm allbot onboard --install-daemon
     ```
 
     The wizard can also build UI assets automatically. After onboarding, you typically run the Gateway on port **18789**.
@@ -173,15 +173,15 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
     - Open `http://127.0.0.1:18789/`.
     - If it asks for shared-secret auth, paste the configured token or password into Control UI settings.
-    - Token source: `gateway.auth.token` (or `KAIJIBOT_GATEWAY_TOKEN`).
-    - Password source: `gateway.auth.password` (or `KAIJIBOT_GATEWAY_PASSWORD`).
-    - If no shared secret is configured yet, generate a token with `kaijibot doctor --generate-gateway-token`.
+    - Token source: `gateway.auth.token` (or `ALLBOT_GATEWAY_TOKEN`).
+    - Password source: `gateway.auth.password` (or `ALLBOT_GATEWAY_PASSWORD`).
+    - If no shared secret is configured yet, generate a token with `allbot doctor --generate-gateway-token`.
 
     **Not on localhost:**
 
-    - **Tailscale Serve** (recommended): keep bind loopback, run `kaijibot gateway --tailscale serve`, open `https://<magicdns>/`. If `gateway.auth.allowTailscale` is `true`, identity headers satisfy Control UI/WebSocket auth (no pasted shared secret, assumes trusted gateway host); HTTP APIs still require shared-secret auth unless you deliberately use private-ingress `none` or trusted-proxy HTTP auth.
+    - **Tailscale Serve** (recommended): keep bind loopback, run `allbot gateway --tailscale serve`, open `https://<magicdns>/`. If `gateway.auth.allowTailscale` is `true`, identity headers satisfy Control UI/WebSocket auth (no pasted shared secret, assumes trusted gateway host); HTTP APIs still require shared-secret auth unless you deliberately use private-ingress `none` or trusted-proxy HTTP auth.
       Bad concurrent Serve auth attempts from the same client are serialized before the failed-auth limiter records them, so the second bad retry can already show `retry later`.
-    - **Tailnet bind**: run `kaijibot gateway --bind tailnet --token "<token>"` (or configure password auth), open `http://<tailscale-ip>:18789/`, then paste the matching shared secret in dashboard settings.
+    - **Tailnet bind**: run `allbot gateway --bind tailnet --token "<token>"` (or configure password auth), open `http://<tailscale-ip>:18789/`, then paste the matching shared secret in dashboard settings.
     - **Identity-aware reverse proxy**: keep the Gateway behind a non-loopback trusted proxy, configure `gateway.auth.mode: "trusted-proxy"`, then open the proxy URL.
     - **SSH tunnel**: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`. Shared-secret auth still applies over the tunnel; paste the configured token or password if prompted.
 
@@ -201,7 +201,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     In most setups you do **not** need both:
 
     - If the chat already supports commands and replies, same-chat `/approve` works through the shared path.
-    - If a supported native channel can infer approvers safely, KaijiBot now auto-enables DM-first native approvals when `channels.<channel>.execApprovals.enabled` is unset or `"auto"`.
+    - If a supported native channel can infer approvers safely, AllBot now auto-enables DM-first native approvals when `channels.<channel>.execApprovals.enabled` is unset or `"auto"`.
     - When native approval cards/buttons are available, that native UI is the primary path; the agent should only include a manual `/approve` command if the tool result says chat approvals are unavailable or manual approval is the only path.
     - Use `approvals.exec` only when prompts must also be forwarded to other chats or explicit ops rooms.
     - Use `channels.<channel>.execApprovals.target: "channel"` or `"both"` only when you explicitly want approval prompts posted back into the originating room/topic.
@@ -248,21 +248,21 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     1. Restart the Gateway:
 
     ```bash
-    kaijibot gateway restart
+    allbot gateway restart
     ```
 
     2. Check status + auth:
 
     ```bash
-    kaijibot status
-    kaijibot models status
-    kaijibot logs --follow
+    allbot status
+    allbot models status
+    allbot logs --follow
     ```
 
     3. If it still hangs, run:
 
     ```bash
-    kaijibot doctor
+    allbot doctor
     ```
 
     If the Gateway is remote, ensure the tunnel/Tailscale connection is up and that the UI
@@ -275,17 +275,17 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     keeps your bot "exactly the same" (memory, session history, auth, and channel
     state) as long as you copy **both** locations:
 
-    1. Install KaijiBot on the new machine.
-    2. Copy `$KAIJIBOT_STATE_DIR` (default: `~/.kaijibot`) from the old machine.
-    3. Copy your workspace (default: `~/.kaijibot/workspace`).
-    4. Run `kaijibot doctor` and restart the Gateway service.
+    1. Install AllBot on the new machine.
+    2. Copy `$ALLBOT_STATE_DIR` (default: `~/.allbot`) from the old machine.
+    3. Copy your workspace (default: `~/.allbot/workspace`).
+    4. Run `allbot doctor` and restart the Gateway service.
 
     That preserves config, auth profiles, WhatsApp creds, sessions, and memory. If you're in
     remote mode, remember the gateway host owns the session store and workspace.
 
     **Important:** if you only commit/push your workspace to GitHub, you're backing
     up **memory + bootstrap files**, but **not** session history or auth. Those live
-    under `~/.kaijibot/` (for example `~/.kaijibot/agents/<agentId>/sessions/`).
+    under `~/.allbot/` (for example `~/.allbot/agents/<agentId>/sessions/`).
 
     Related: [Migrating](/install/migrating), [Where things live on disk](#where-things-live-on-disk),
     [Agent workspace](/concepts/agent-workspace), [Doctor](/gateway/doctor),
@@ -307,18 +307,18 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     Pull the latest from the main branch:
 
     ```bash
-    cd kaijibot
+    cd allbot
     git pull
     pnpm install
     pnpm build
-    kaijibot gateway restart
+    allbot gateway restart
     ```
 
     For a clean clone:
 
     ```bash
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install
     pnpm build
     ```
@@ -363,12 +363,12 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     For runtime issues, start the gateway with verbose logging:
 
     ```bash
-    kaijibot gateway --verbose
+    allbot gateway --verbose
     ```
 
   </Accordion>
 
-  <Accordion title="Build says git not found or kaijibot not recognized">
+  <Accordion title="Build says git not found or allbot not recognized">
     Common issues:
 
     **1) git not found**
@@ -376,10 +376,10 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     - Install **Git** and make sure `git` is on your PATH.
     - Close and reopen your terminal, then retry the clone.
 
-    **2) kaijibot is not recognized after build**
+    **2) allbot is not recognized after build**
 
-    - The `kaijibot` CLI is available via `pnpm kaijibot` from the project root.
-    - Alternatively, run `pnpm link --global` from the project root to make `kaijibot` available system-wide.
+    - The `allbot` CLI is available via `pnpm allbot` from the project root.
+    - Alternatively, run `pnpm link --global` from the project root to make `allbot` available system-wide.
     - Close and reopen your terminal after linking.
 
     Docs: [Getting started](/start/getting-started).
@@ -406,10 +406,10 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     Then restart the Gateway and retry your command:
 
     ```powershell
-    kaijibot gateway restart
+    allbot gateway restart
     ```
 
-    If you still reproduce this on latest KaijiBot, track/report it in:
+    If you still reproduce this on latest AllBot, track/report it in:
 
     - [Issue #30640](https://gitee.com/kaiji1126/kaijibot/issues/30640)
 
@@ -421,7 +421,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
     ```bash
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install
     pnpm build
     ```
@@ -430,7 +430,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
   </Accordion>
 
-  <Accordion title="How do I install KaijiBot on Linux?">
+  <Accordion title="How do I install AllBot on Linux?">
     Short answer: follow the Linux guide, then run onboarding.
 
     - Linux quick path + service install: [Linux](/platforms/linux).
@@ -439,7 +439,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
   </Accordion>
 
-  <Accordion title="How do I install KaijiBot on a VPS?">
+  <Accordion title="How do I install AllBot on a VPS?">
     Any Linux VPS works. Install on the server, then use SSH/Tailscale to reach the Gateway.
 
     Guides: [exe.dev](/install/exe-dev), [Hetzner](/install/hetzner), [Fly.io](/install/fly).
@@ -468,7 +468,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
 
   </Accordion>
 
-  <Accordion title="Can I ask KaijiBot to update itself?">
+  <Accordion title="Can I ask AllBot to update itself?">
     Short answer: **possible, not recommended**. The update flow can restart the
     Gateway (which drops the active session), may need a clean git checkout, and
     can prompt for confirmation. Safer: run updates from a shell as the operator.
@@ -476,18 +476,18 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
     Use the CLI:
 
     ```bash
-    kaijibot update
-    kaijibot update status
-    kaijibot update --channel stable|beta|dev
-    kaijibot update --tag <dist-tag|version>
-    kaijibot update --no-restart
+    allbot update
+    allbot update status
+    allbot update --channel stable|beta|dev
+    allbot update --tag <dist-tag|version>
+    allbot update --no-restart
     ```
 
     If you must automate from an agent:
 
     ```bash
-    kaijibot update --yes --no-restart
-    kaijibot gateway restart
+    allbot update --yes --no-restart
+    allbot gateway restart
     ```
 
     Docs: [Update](/cli/update), [Updating](/install/updating).
@@ -495,7 +495,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   </Accordion>
 
   <Accordion title="What does onboarding actually do?">
-    `kaijibot onboard` is the recommended setup path. In **local mode** it walks you through:
+    `allbot onboard` is the recommended setup path. In **local mode** it walks you through:
 
     - **Model/auth setup** (provider OAuth, API keys, Anthropic setup-token, plus local model options such as LM Studio)
     - **Workspace** location + bootstrap files
@@ -509,23 +509,23 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   </Accordion>
 
   <Accordion title="Do I need a Claude or OpenAI subscription to run this?">
-    No. You can run KaijiBot with **API keys** (Anthropic/OpenAI/others) or with
+    No. You can run AllBot with **API keys** (Anthropic/OpenAI/others) or with
     **local-only models** so your data stays on your device. Subscriptions (Claude
     Pro/Max or OpenAI Codex) are optional ways to authenticate those providers.
 
-    For Anthropic in KaijiBot, the practical split is:
+    For Anthropic in AllBot, the practical split is:
 
     - **Anthropic API key**: normal Anthropic API billing
-    - **Claude CLI / Claude subscription auth in KaijiBot**: Anthropic staff
-      told us this usage is allowed again, and KaijiBot is treating `claude -p`
+    - **Claude CLI / Claude subscription auth in AllBot**: Anthropic staff
+      told us this usage is allowed again, and AllBot is treating `claude -p`
       usage as sanctioned for this integration unless Anthropic publishes a new
       policy
 
     For long-lived gateway hosts, Anthropic API keys are still the more
     predictable setup. OpenAI Codex OAuth is explicitly supported for external
-    tools like KaijiBot.
+    tools like AllBot.
 
-    KaijiBot also supports other hosted subscription-style options including
+    AllBot also supports other hosted subscription-style options including
     **Qwen Cloud Coding Plan**, **MiniMax Coding Plan**, and
     **Z.AI / GLM Coding Plan**.
 
@@ -539,8 +539,8 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   <Accordion title="Can I use Claude Max subscription without an API key?">
     Yes.
 
-    Anthropic staff told us KaijiBot-style Claude CLI usage is allowed again, so
-    KaijiBot treats Claude subscription auth and `claude -p` usage as sanctioned
+    Anthropic staff told us AllBot-style Claude CLI usage is allowed again, so
+    AllBot treats Claude subscription auth and `claude -p` usage as sanctioned
     for this integration unless Anthropic publishes a new policy. If you want
     the most predictable server-side setup, use an Anthropic API key instead.
 
@@ -549,14 +549,14 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   <Accordion title="Do you support Claude subscription auth (Claude Pro or Max)?">
     Yes.
 
-    Anthropic staff told us this usage is allowed again, so KaijiBot treats
+    Anthropic staff told us this usage is allowed again, so AllBot treats
     Claude CLI reuse and `claude -p` usage as sanctioned for this integration
     unless Anthropic publishes a new policy.
 
-    Anthropic setup-token is still available as a supported KaijiBot token path, but KaijiBot now prefers Claude CLI reuse and `claude -p` when available.
+    Anthropic setup-token is still available as a supported AllBot token path, but AllBot now prefers Claude CLI reuse and `claude -p` when available.
     For production or multi-user workloads, Anthropic API key auth is still the
     safer, more predictable choice. If you want other subscription-style hosted
-    options in KaijiBot, see [OpenAI](/providers/openai), [Qwen / Model
+    options in AllBot, see [OpenAI](/providers/openai), [Qwen / Model
     Cloud](/providers/qwen), [MiniMax](/providers/minimax), and [GLM
     Models](/providers/glm).
 
@@ -573,32 +573,32 @@ for usage/billing and raise limits as needed.
     `Extra usage is required for long context requests`, the request is trying to use
     Anthropic's 1M context beta (`context1m: true`). That only works when your
     credential is eligible for long-context billing (API key billing or the
-    KaijiBot Claude-login path with Extra Usage enabled).
+    AllBot Claude-login path with Extra Usage enabled).
 
-    Tip: set a **fallback model** so KaijiBot can keep replying while a provider is rate-limited.
+    Tip: set a **fallback model** so AllBot can keep replying while a provider is rate-limited.
     See [Models](/cli/models), [OAuth](/concepts/oauth), and
     [/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context).
 
   </Accordion>
 
   <Accordion title="Is AWS Bedrock supported?">
-    Yes. KaijiBot has a bundled **Amazon Bedrock (Converse)** provider. With AWS env markers present, KaijiBot can auto-discover the streaming/text Bedrock catalog and merge it as an implicit `amazon-bedrock` provider; otherwise you can explicitly enable `plugins.entries.amazon-bedrock.config.discovery.enabled` or add a manual provider entry. See [Amazon Bedrock](/providers/bedrock) and [Model providers](/providers/models). If you prefer a managed key flow, an OpenAI-compatible proxy in front of Bedrock is still a valid option.
+    Yes. AllBot has a bundled **Amazon Bedrock (Converse)** provider. With AWS env markers present, AllBot can auto-discover the streaming/text Bedrock catalog and merge it as an implicit `amazon-bedrock` provider; otherwise you can explicitly enable `plugins.entries.amazon-bedrock.config.discovery.enabled` or add a manual provider entry. See [Amazon Bedrock](/providers/bedrock) and [Model providers](/providers/models). If you prefer a managed key flow, an OpenAI-compatible proxy in front of Bedrock is still a valid option.
   </Accordion>
 
   <Accordion title="How does Codex auth work?">
-    KaijiBot supports **OpenAI Code (Codex)** via OAuth (ChatGPT sign-in). Onboarding can run the OAuth flow and will set the default model to `openai-codex/gpt-5.4` when appropriate. See [Model providers](/concepts/model-providers) and [Onboarding (CLI)](/start/wizard).
+    AllBot supports **OpenAI Code (Codex)** via OAuth (ChatGPT sign-in). Onboarding can run the OAuth flow and will set the default model to `openai-codex/gpt-5.4` when appropriate. See [Model providers](/concepts/model-providers) and [Onboarding (CLI)](/start/wizard).
   </Accordion>
 
-  <Accordion title="Why does ChatGPT GPT-5.4 not unlock openai/gpt-5.4 in KaijiBot?">
-    KaijiBot treats the two routes separately:
+  <Accordion title="Why does ChatGPT GPT-5.4 not unlock openai/gpt-5.4 in AllBot?">
+    AllBot treats the two routes separately:
 
     - `openai-codex/gpt-5.4` = ChatGPT/Codex OAuth
     - `openai/gpt-5.4` = direct OpenAI Platform API
 
-    In KaijiBot, ChatGPT/Codex sign-in is wired to the `openai-codex/*` route,
+    In AllBot, ChatGPT/Codex sign-in is wired to the `openai-codex/*` route,
     not the direct `openai/*` route. If you want the direct API path in
-    KaijiBot, set `OPENAI_API_KEY` (or the equivalent OpenAI provider config).
-    If you want ChatGPT/Codex sign-in in KaijiBot, use `openai-codex/*`.
+    AllBot, set `OPENAI_API_KEY` (or the equivalent OpenAI provider config).
+    If you want ChatGPT/Codex sign-in in AllBot, use `openai-codex/*`.
 
   </Accordion>
 
@@ -607,32 +607,32 @@ for usage/billing and raise limits as needed.
     OpenAI-managed and plan-dependent. In practice, those limits can differ from
     the ChatGPT website/app experience, even when both are tied to the same account.
 
-    KaijiBot can show the currently visible provider usage/quota windows in
-    `kaijibot models status`, but it does not invent or normalize ChatGPT-web
+    AllBot can show the currently visible provider usage/quota windows in
+    `allbot models status`, but it does not invent or normalize ChatGPT-web
     entitlements into direct API access. If you want the direct OpenAI Platform
     billing/limit path, use `openai/*` with an API key.
 
   </Accordion>
 
   <Accordion title="Do you support OpenAI subscription auth (Codex OAuth)?">
-    Yes. KaijiBot fully supports **OpenAI Code (Codex) subscription OAuth**.
+    Yes. AllBot fully supports **OpenAI Code (Codex) subscription OAuth**.
     OpenAI explicitly allows subscription OAuth usage in external tools/workflows
-    like KaijiBot. Onboarding can run the OAuth flow for you.
+    like AllBot. Onboarding can run the OAuth flow for you.
 
     See [OAuth](/concepts/oauth), [Model providers](/concepts/model-providers), and [Onboarding (CLI)](/start/wizard).
 
   </Accordion>
 
   <Accordion title="How do I set up Gemini CLI OAuth?">
-    Gemini CLI uses a **plugin auth flow**, not a client id or secret in `kaijibot.json`.
+    Gemini CLI uses a **plugin auth flow**, not a client id or secret in `allbot.json`.
 
     Steps:
 
     1. Install Gemini CLI locally so `gemini` is on `PATH`
        - Homebrew: `brew install gemini-cli`
        - npm: `npm install -g @google/gemini-cli`
-    2. Enable the plugin: `kaijibot plugins enable google`
-    3. Login: `kaijibot models auth login --provider google-gemini-cli --set-default`
+    2. Enable the plugin: `allbot plugins enable google`
+    3. Login: `allbot models auth login --provider google-gemini-cli --set-default`
     4. Default model after login: `google-gemini-cli/gemini-3-flash-preview`
     5. If requests fail, set `GOOGLE_CLOUD_PROJECT` or `GOOGLE_CLOUD_PROJECT_ID` on the gateway host
 
@@ -641,7 +641,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="Is a local model OK for casual chats?">
-    Usually no. KaijiBot needs large context + strong safety; small cards truncate and leak. If you must, run the **largest** model build you can locally (LM Studio) and see [/gateway/local-models](/gateway/local-models). Smaller/quantized models increase prompt-injection risk - see [Security](/gateway/security).
+    Usually no. AllBot needs large context + strong safety; small cards truncate and leak. If you must, run the **largest** model build you can locally (LM Studio) and see [/gateway/local-models](/gateway/local-models). Smaller/quantized models increase prompt-injection risk - see [Security](/gateway/security).
   </Accordion>
 
   <Accordion title="How do I keep hosted model traffic in a specific region?">
@@ -649,7 +649,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="Do I have to buy a Mac Mini to install this?">
-    No. KaijiBot runs on macOS or Linux (Windows via WSL2). A Mac mini is optional - some people
+    No. AllBot runs on macOS or Linux (Windows via WSL2). A Mac mini is optional - some people
     buy one as an always-on host, but a small VPS, home server, or Raspberry Pi-class box works too.
 
     You only need a Mac **for macOS-only tools**. For iMessage, use [BlueBubbles](/channels/bluebubbles) (recommended) - the BlueBubbles server runs on any Mac, and the Gateway can run on Linux or elsewhere. If you want other macOS-only tools, run the Gateway on a Mac or pair a macOS node.
@@ -672,7 +672,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="If I buy a Mac mini to run KaijiBot, can I connect it to my MacBook Pro?">
+  <Accordion title="If I buy a Mac mini to run AllBot, can I connect it to my MacBook Pro?">
     Yes. The **Mac mini can run the Gateway**, and your MacBook Pro can connect as a
     **node** (companion device). Nodes don't run the Gateway - they provide extra
     capabilities like screen/camera/canvas and `system.run` on that device.
@@ -681,7 +681,7 @@ for usage/billing and raise limits as needed.
 
     - Gateway on the Mac mini (always-on).
     - MacBook Pro runs the macOS app or a node host and pairs to the Gateway.
-    - Use `kaijibot nodes status` / `kaijibot nodes list` to see it.
+    - Use `allbot nodes status` / `allbot nodes list` to see it.
 
     Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
 
@@ -699,11 +699,11 @@ for usage/billing and raise limits as needed.
   <Accordion title="Telegram: what goes in allowFrom?">
     `channels.telegram.allowFrom` is **the human sender's Telegram user ID** (numeric). It is not the bot username.
 
-    Onboarding accepts `@username` input and resolves it to a numeric ID, but KaijiBot authorization uses numeric IDs only.
+    Onboarding accepts `@username` input and resolves it to a numeric ID, but AllBot authorization uses numeric IDs only.
 
     Safer (no third-party bot):
 
-    - DM your bot, then run `kaijibot logs --follow` and read `from.id`.
+    - DM your bot, then run `allbot logs --follow` and read `from.id`.
 
     Official Bot API:
 
@@ -717,7 +717,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Can multiple people use one WhatsApp number with different KaijiBot instances?">
+  <Accordion title="Can multiple people use one WhatsApp number with different AllBot instances?">
     Yes, via **multi-agent routing**. Bind each sender's WhatsApp **DM** (peer `kind: "direct"`, sender E.164 like `+15551234567`) to a different `agentId`, so each person gets their own workspace and session store. Replies still come from the **same WhatsApp account**, and DM access control (`channels.whatsapp.dmPolicy` / `channels.whatsapp.allowFrom`) is global per WhatsApp account. See [Multi-Agent Routing](/concepts/multi-agent) and [WhatsApp](/channels/whatsapp).
   </Accordion>
 
@@ -735,31 +735,31 @@ for usage/billing and raise limits as needed.
     brew install <formula>
     ```
 
-    If you run KaijiBot via systemd, ensure the service PATH includes `/home/linuxbrew/.linuxbrew/bin` (or your brew prefix) so `brew`-installed tools resolve in non-login shells.
+    If you run AllBot via systemd, ensure the service PATH includes `/home/linuxbrew/.linuxbrew/bin` (or your brew prefix) so `brew`-installed tools resolve in non-login shells.
     Recent builds also prepend common user bin dirs on Linux systemd services (for example `~/.local/bin`, `~/.npm-global/bin`, `~/.local/share/pnpm`, `~/.bun/bin`) and honor `PNPM_HOME`, `NPM_CONFIG_PREFIX`, `BUN_INSTALL`, `VOLTA_HOME`, `ASDF_DATA_DIR`, `NVM_DIR`, and `FNM_DIR` when set.
 
   </Accordion>
 
   <Accordion title="Can I switch machines without losing data?">
-    Yes. Install KaijiBot on the new machine, then copy your state. This
+    Yes. Install AllBot on the new machine, then copy your state. This
     **does not delete your data** - your state
-    (`~/.kaijibot`) and workspace (`~/.kaijibot/workspace`) can be transferred.
+    (`~/.allbot`) and workspace (`~/.allbot/workspace`) can be transferred.
 
     Steps:
 
     ```bash
     # On the new machine
     git clone https://gitee.com/kaiji1126/kaijibot
-    cd kaijibot
+    cd allbot
     pnpm install
     pnpm build
     ```
 
-    Then copy `~/.kaijibot` from the old machine and run:
+    Then copy `~/.allbot` from the old machine and run:
 
     ```bash
-    kaijibot doctor
-    kaijibot gateway restart
+    allbot doctor
+    allbot gateway restart
     ```
 
     Doctor detects mismatches and offers to repair. See [Migrating](/install/migrating) and
@@ -781,13 +781,13 @@ for usage/billing and raise limits as needed.
     - **Pros:** always-on, stable network, no laptop sleep issues, easier to keep running.
     - **Cons:** often run headless (use screenshots), remote file access only, you must SSH for updates.
 
-    **KaijiBot-specific note:** WhatsApp/Telegram/Slack/Mattermost/Discord all work fine from a VPS. The only real trade-off is **headless browser** vs a visible window. See [Browser](/tools/browser).
+    **AllBot-specific note:** WhatsApp/Telegram/Slack/Mattermost/Discord all work fine from a VPS. The only real trade-off is **headless browser** vs a visible window. See [Browser](/tools/browser).
 
     **Recommended default:** VPS if you had gateway disconnects before. Local is great when you're actively using the Mac and want local file access or UI automation with a visible browser.
 
   </Accordion>
 
-  <Accordion title="How important is it to run KaijiBot on a dedicated machine?">
+  <Accordion title="How important is it to run AllBot on a dedicated machine?">
     Not required, but **recommended for reliability and isolation**.
 
     - **Dedicated host (VPS/Mac mini/Pi):** always-on, fewer sleep/reboot interruptions, cleaner permissions, easier to keep running.
@@ -799,7 +799,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="What are the minimum VPS requirements and recommended OS?">
-    KaijiBot is lightweight. For a basic Gateway + one chat channel:
+    AllBot is lightweight. For a basic Gateway + one chat channel:
 
     - **Absolute minimum:** 1 vCPU, 1GB RAM, ~500MB disk.
     - **Recommended:** 1-2 vCPU, 2GB RAM or more for headroom (logs, media, multiple channels). Node tools and browser automation can be resource hungry.
@@ -810,7 +810,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Can I run KaijiBot in a VM and what are the requirements?">
+  <Accordion title="Can I run AllBot in a VM and what are the requirements?">
     Yes. Treat a VM the same as a VPS: it needs to be always on, reachable, and have enough
     RAM for the Gateway and any channels you enable.
 
@@ -827,15 +827,15 @@ for usage/billing and raise limits as needed.
   </Accordion>
 </AccordionGroup>
 
-## What is KaijiBot?
+## What is AllBot?
 
 <AccordionGroup>
-  <Accordion title="What is KaijiBot, in one paragraph?">
-    KaijiBot is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost, Discord, Google Chat, Signal, iMessage, WebChat, and bundled channel plugins such as QQ Bot) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
+  <Accordion title="What is AllBot, in one paragraph?">
+    AllBot is a personal AI assistant you run on your own devices. It replies on the messaging surfaces you already use (WhatsApp, Telegram, Slack, Mattermost, Discord, Google Chat, Signal, iMessage, WebChat, and bundled channel plugins such as QQ Bot) and can also do voice + a live Canvas on supported platforms. The **Gateway** is the always-on control plane; the assistant is the product.
   </Accordion>
 
   <Accordion title="Value proposition">
-    KaijiBot is not "just a Claude wrapper." It's a **local-first control plane** that lets you run a
+    AllBot is not "just a Claude wrapper." It's a **local-first control plane** that lets you run a
     capable assistant on **your own hardware**, reachable from the chat apps you already use, with
     stateful sessions, memory, and tools - without handing control of your workflows to a hosted
     SaaS.
@@ -871,7 +871,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="What are the top five everyday use cases for KaijiBot?">
+  <Accordion title="What are the top five everyday use cases for AllBot?">
     Everyday wins usually look like:
 
     - **Personal briefings:** summaries of inbox, calendar, and news you care about.
@@ -882,21 +882,21 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Can KaijiBot help with lead gen, outreach, ads, and blogs for a SaaS?">
+  <Accordion title="Can AllBot help with lead gen, outreach, ads, and blogs for a SaaS?">
     Yes for **research, qualification, and drafting**. It can scan sites, build shortlists,
     summarize prospects, and write outreach or ad copy drafts.
 
     For **outreach or ad runs**, keep a human in the loop. Avoid spam, follow local laws and
     platform policies, and review anything before it is sent. The safest pattern is to let
-    KaijiBot draft and you approve.
+    AllBot draft and you approve.
 
     Docs: [Security](/gateway/security).
 
   </Accordion>
 
   <Accordion title="What are the advantages vs Claude Code for web development?">
-    KaijiBot is a **personal assistant** and coordination layer, not an IDE replacement. Use
-    Claude Code or Codex for the fastest direct coding loop inside a repo. Use KaijiBot when you
+    AllBot is a **personal assistant** and coordination layer, not an IDE replacement. Use
+    Claude Code or Codex for the fastest direct coding loop inside a repo. Use AllBot when you
     want durable memory, cross-device access, and tool orchestration.
 
     Advantages:
@@ -916,11 +916,11 @@ for usage/billing and raise limits as needed.
 
 <AccordionGroup>
   <Accordion title="How do I customize skills without keeping the repo dirty?">
-    Use managed overrides instead of editing the repo copy. Put your changes in `~/.kaijibot/skills/<name>/SKILL.md` (or add a folder via `skills.load.extraDirs` in `~/.kaijibot/kaijibot.json`). Precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.kaijibot/skills` → bundled → `skills.load.extraDirs`, so managed overrides still win over bundled skills without touching git. If you need the skill installed globally but only visible to some agents, keep the shared copy in `~/.kaijibot/skills` and control visibility with `agents.defaults.skills` and `agents.list[].skills`. Only upstream-worthy edits should live in the repo and go out as PRs.
+    Use managed overrides instead of editing the repo copy. Put your changes in `~/.allbot/skills/<name>/SKILL.md` (or add a folder via `skills.load.extraDirs` in `~/.allbot/allbot.json`). Precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.allbot/skills` → bundled → `skills.load.extraDirs`, so managed overrides still win over bundled skills without touching git. If you need the skill installed globally but only visible to some agents, keep the shared copy in `~/.allbot/skills` and control visibility with `agents.defaults.skills` and `agents.list[].skills`. Only upstream-worthy edits should live in the repo and go out as PRs.
   </Accordion>
 
   <Accordion title="Can I load skills from a custom folder?">
-    Yes. Add extra directories via `skills.load.extraDirs` in `~/.kaijibot/kaijibot.json` (lowest precedence). Default precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.kaijibot/skills` → bundled → `skills.load.extraDirs`. `clawhub` installs into `./skills` by default, which KaijiBot treats as `<workspace>/skills` on the next session. If the skill should only be visible to certain agents, pair that with `agents.defaults.skills` or `agents.list[].skills`.
+    Yes. Add extra directories via `skills.load.extraDirs` in `~/.allbot/allbot.json` (lowest precedence). Default precedence is `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.allbot/skills` → bundled → `skills.load.extraDirs`. `clawhub` installs into `./skills` by default, which AllBot treats as `<workspace>/skills` on the next session. If the skill should only be visible to certain agents, pair that with `agents.defaults.skills` or `agents.list[].skills`.
   </Accordion>
 
   <Accordion title="How can I use different models for different tasks?">
@@ -973,16 +973,16 @@ for usage/billing and raise limits as needed.
     Check the resolved requester route first:
 
     - Completion-mode subagent delivery prefers any bound thread or conversation route when one exists.
-    - If the completion origin only carries a channel, KaijiBot falls back to the requester session's stored route (`lastChannel` / `lastTo` / `lastAccountId`) so direct delivery can still succeed.
+    - If the completion origin only carries a channel, AllBot falls back to the requester session's stored route (`lastChannel` / `lastTo` / `lastAccountId`) so direct delivery can still succeed.
     - If neither a bound route nor a usable stored route exists, direct delivery can fail and the result falls back to queued session delivery instead of posting immediately to chat.
     - Invalid or stale targets can still force queue fallback or final delivery failure.
-    - If the child's last visible assistant reply is the exact silent token `NO_REPLY` / `no_reply`, or exactly `ANNOUNCE_SKIP`, KaijiBot intentionally suppresses the announce instead of posting stale earlier progress.
+    - If the child's last visible assistant reply is the exact silent token `NO_REPLY` / `no_reply`, or exactly `ANNOUNCE_SKIP`, AllBot intentionally suppresses the announce instead of posting stale earlier progress.
     - If the child timed out after only tool calls, the announce can collapse that into a short partial-progress summary instead of replaying raw tool output.
 
     Debug:
 
     ```bash
-    kaijibot tasks show <runId-or-sessionKey>
+    allbot tasks show <runId-or-sessionKey>
     ```
 
     Docs: [Sub-agents](/tools/subagents), [Background Tasks](/automation/tasks), [Session Tools](/concepts/session-tool).
@@ -995,15 +995,15 @@ for usage/billing and raise limits as needed.
 
     Checklist:
 
-    - Confirm cron is enabled (`cron.enabled`) and `KAIJIBOT_SKIP_CRON` is not set.
+    - Confirm cron is enabled (`cron.enabled`) and `ALLBOT_SKIP_CRON` is not set.
     - Check the Gateway is running 24/7 (no sleep/restarts).
     - Verify timezone settings for the job (`--tz` vs host timezone).
 
     Debug:
 
     ```bash
-    kaijibot cron run <jobId>
-    kaijibot cron runs --id <jobId> --limit 50
+    allbot cron run <jobId>
+    allbot cron runs --id <jobId> --limit 50
     ```
 
     Docs: [Cron jobs](/automation/cron-jobs), [Automation & Tasks](/automation).
@@ -1026,8 +1026,8 @@ for usage/billing and raise limits as needed.
     Debug:
 
     ```bash
-    kaijibot cron runs --id <jobId> --limit 50
-    kaijibot tasks show <runId-or-sessionKey>
+    allbot cron runs --id <jobId> --limit 50
+    allbot tasks show <runId-or-sessionKey>
     ```
 
     Docs: [Cron jobs](/automation/cron-jobs), [Background Tasks](/automation/tasks).
@@ -1055,8 +1055,8 @@ for usage/billing and raise limits as needed.
     Debug:
 
     ```bash
-    kaijibot cron runs --id <jobId> --limit 50
-    kaijibot tasks show <runId-or-sessionKey>
+    allbot cron runs --id <jobId> --limit 50
+    allbot tasks show <runId-or-sessionKey>
     ```
 
     Docs: [Cron jobs](/automation/cron-jobs), [cron CLI](/cli/cron).
@@ -1064,29 +1064,29 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="How do I install skills on Linux?">
-    Use native `kaijibot skills` commands or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
+    Use native `allbot skills` commands or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
     Browse skills at [https://clawhub.ai](https://clawhub.ai).
 
     ```bash
-    kaijibot skills search "calendar"
-    kaijibot skills search --limit 20
-    kaijibot skills install <skill-slug>
-    kaijibot skills install <skill-slug> --version <version>
-    kaijibot skills install <skill-slug> --force
-    kaijibot skills update --all
-    kaijibot skills list --eligible
-    kaijibot skills check
+    allbot skills search "calendar"
+    allbot skills search --limit 20
+    allbot skills install <skill-slug>
+    allbot skills install <skill-slug> --version <version>
+    allbot skills install <skill-slug> --force
+    allbot skills update --all
+    allbot skills list --eligible
+    allbot skills check
     ```
 
-    Native `kaijibot skills install` writes into the active workspace `skills/`
+    Native `allbot skills install` writes into the active workspace `skills/`
     directory. Install the separate `clawhub` CLI only if you want to publish or
     sync your own skills. For shared installs across agents, put the skill under
-    `~/.kaijibot/skills` and use `agents.defaults.skills` or
+    `~/.allbot/skills` and use `agents.defaults.skills` or
     `agents.list[].skills` if you want to narrow which agents can see it.
 
   </Accordion>
 
-  <Accordion title="Can KaijiBot run tasks on a schedule or continuously in the background?">
+  <Accordion title="Can AllBot run tasks on a schedule or continuously in the background?">
     Yes. Use the Gateway scheduler:
 
     - **Cron jobs** for scheduled or recurring tasks (persist across restarts).
@@ -1099,7 +1099,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="Can I run Apple macOS-only skills from Linux?">
-    Not directly. macOS skills are gated by `metadata.kaijibot.os` plus required binaries, and skills only appear in the system prompt when they are eligible on the **Gateway host**. On Linux, `darwin`-only skills (like `apple-notes`, `apple-reminders`, `things-mac`) will not load unless you override the gating.
+    Not directly. macOS skills are gated by `metadata.allbot.os` plus required binaries, and skills only appear in the system prompt when they are eligible on the **Gateway host**. On Linux, `darwin`-only skills (like `apple-notes`, `apple-reminders`, `things-mac`) will not load unless you override the gating.
 
     You have three supported patterns:
 
@@ -1107,7 +1107,7 @@ for usage/billing and raise limits as needed.
     Run the Gateway where the macOS binaries exist, then connect from Linux in [remote mode](#gateway-ports-already-running-and-remote-mode) or over Tailscale. The skills load normally because the Gateway host is macOS.
 
     **Option B - use a macOS node (no SSH).**
-    Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. KaijiBot can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
+    Run the Gateway on Linux, pair a macOS node (menubar app), and set **Node Run Commands** to "Always Ask" or "Always Allow" on the Mac. AllBot can treat macOS-only skills as eligible when the required binaries exist on the node. The agent runs those skills via the `nodes` tool. If you choose "Always Ask", approving "Always Allow" in the prompt adds that command to the allowlist.
 
     **Option C - proxy macOS binaries over SSH (advanced).**
     Keep the Gateway on Linux, but make the required CLI binaries resolve to SSH wrappers that run on a Mac. Then override the skill to allow Linux so it stays eligible.
@@ -1121,13 +1121,13 @@ for usage/billing and raise limits as needed.
        ```
 
     2. Put the wrapper on `PATH` on the Linux host (for example `~/bin/memo`).
-    3. Override the skill metadata (workspace or `~/.kaijibot/skills`) to allow Linux:
+    3. Override the skill metadata (workspace or `~/.allbot/skills`) to allow Linux:
 
        ```markdown
        ---
        name: apple-notes
        description: Manage Apple Notes via the memo CLI on macOS.
-       metadata: { "kaijibot": { "os": ["darwin", "linux"], "requires": { "bins": ["memo"] } } }
+       metadata: { "allbot": { "os": ["darwin", "linux"], "requires": { "bins": ["memo"] } } }
        ---
        ```
 
@@ -1154,27 +1154,27 @@ for usage/billing and raise limits as needed.
     Install skills:
 
     ```bash
-    kaijibot skills install <skill-slug>
-    kaijibot skills update --all
+    allbot skills install <skill-slug>
+    allbot skills update --all
     ```
 
-    Native installs land in the active workspace `skills/` directory. For shared skills across agents, place them in `~/.kaijibot/skills/<name>/SKILL.md`. If only some agents should see a shared install, configure `agents.defaults.skills` or `agents.list[].skills`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills), [Skills config](/tools/skills-config), and [ClawHub](/tools/clawhub).
+    Native installs land in the active workspace `skills/` directory. For shared skills across agents, place them in `~/.allbot/skills/<name>/SKILL.md`. If only some agents should see a shared install, configure `agents.defaults.skills` or `agents.list[].skills`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills), [Skills config](/tools/skills-config), and [ClawHub](/tools/clawhub).
 
   </Accordion>
 
-  <Accordion title="How do I use my existing signed-in Chrome with KaijiBot?">
+  <Accordion title="How do I use my existing signed-in Chrome with AllBot?">
     Use the built-in `user` browser profile, which attaches through Chrome DevTools MCP:
 
     ```bash
-    kaijibot browser --browser-profile user tabs
-    kaijibot browser --browser-profile user snapshot
+    allbot browser --browser-profile user tabs
+    allbot browser --browser-profile user snapshot
     ```
 
     If you want a custom name, create an explicit MCP profile:
 
     ```bash
-    kaijibot browser create-profile --name chrome-live --driver existing-session
-    kaijibot browser --browser-profile chrome-live tabs
+    allbot browser create-profile --name chrome-live --driver existing-session
+    allbot browser --browser-profile chrome-live tabs
     ```
 
     This path is host-local. If the Gateway runs elsewhere, either run a node host on the browser machine or use remote CDP instead.
@@ -1199,8 +1199,8 @@ for usage/billing and raise limits as needed.
     The default image is security-first and runs as the `node` user, so it does not
     include system packages, Homebrew, or bundled browsers. For a fuller setup:
 
-    - Persist `/home/node` with `KAIJIBOT_HOME_VOLUME` so caches survive.
-    - Bake system deps into the image with `KAIJIBOT_DOCKER_APT_PACKAGES`.
+    - Persist `/home/node` with `ALLBOT_HOME_VOLUME` so caches survive.
+    - Bake system deps into the image with `ALLBOT_DOCKER_APT_PACKAGES`.
     - Install Playwright browsers via the bundled CLI:
       `node /app/node_modules/playwright-core/cli.js install chromium`
     - Set `PLAYWRIGHT_BROWSERS_PATH` and ensure the path is persisted.
@@ -1223,19 +1223,19 @@ for usage/billing and raise limits as needed.
   <Accordion title="How do I bind a host folder into the sandbox?">
     Set `agents.defaults.sandbox.docker.binds` to `["host:path:mode"]` (e.g., `"/home/user/src:/src:ro"`). Global + per-agent binds merge; per-agent binds are ignored when `scope: "shared"`. Use `:ro` for anything sensitive and remember binds bypass the sandbox filesystem walls.
 
-    KaijiBot validates bind sources against both the normalized path and the canonical path resolved through the deepest existing ancestor. That means symlink-parent escapes still fail closed even when the last path segment does not exist yet, and allowed-root checks still apply after symlink resolution.
+    AllBot validates bind sources against both the normalized path and the canonical path resolved through the deepest existing ancestor. That means symlink-parent escapes still fail closed even when the last path segment does not exist yet, and allowed-root checks still apply after symlink resolution.
 
     See [Sandboxing](/gateway/sandboxing#custom-bind-mounts) and [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated#bind-mounts-security-quick-check) for examples and safety notes.
 
   </Accordion>
 
   <Accordion title="How does memory work?">
-    KaijiBot memory is just Markdown files in the agent workspace:
+    AllBot memory is just Markdown files in the agent workspace:
 
     - Daily notes in `memory/YYYY-MM-DD.md`
     - Curated long-term notes in `MEMORY.md` (main/private sessions only)
 
-    KaijiBot also runs a **silent pre-compaction memory flush** to remind the model
+    AllBot also runs a **silent pre-compaction memory flush** to remind the model
     to write durable notes before auto-compaction. This only runs when the workspace
     is writable (read-only sandboxes skip it). See [Memory](/concepts/memory).
 
@@ -1269,12 +1269,12 @@ for usage/billing and raise limits as needed.
     Codex CLI login)** does not help for semantic memory search. OpenAI embeddings
     still need a real API key (`OPENAI_API_KEY` or `models.providers.openai.apiKey`).
 
-    If you don't set a provider explicitly, KaijiBot auto-selects a provider when it
+    If you don't set a provider explicitly, AllBot auto-selects a provider when it
     can resolve an API key (auth profiles, `models.providers.*.apiKey`, or env vars).
     It prefers OpenAI if an OpenAI key resolves, otherwise Gemini if a Gemini key
     resolves, then Voyage, then Mistral. If no remote key is available, memory
     search stays disabled until you configure it. If you have a local model path
-    configured and present, KaijiBot
+    configured and present, AllBot
     prefers `local`. Ollama is supported when you explicitly set
     `memorySearch.provider = "ollama"`.
 
@@ -1290,11 +1290,11 @@ for usage/billing and raise limits as needed.
 ## Where things live on disk
 
 <AccordionGroup>
-  <Accordion title="Is all data used with KaijiBot saved locally?">
-    No - **KaijiBot's state is local**, but **external services still see what you send them**.
+  <Accordion title="Is all data used with AllBot saved locally?">
+    No - **AllBot's state is local**, but **external services still see what you send them**.
 
     - **Local by default:** sessions, memory files, config, and workspace live on the Gateway host
-      (`~/.kaijibot` + your workspace directory).
+      (`~/.allbot` + your workspace directory).
     - **Remote by necessity:** messages you send to model providers (Anthropic/OpenAI/etc.) go to
       their APIs, and chat platforms (WhatsApp/Telegram/Slack/etc.) store message data on their
       servers.
@@ -1305,41 +1305,41 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Where does KaijiBot store its data?">
-    Everything lives under `$KAIJIBOT_STATE_DIR` (default: `~/.kaijibot`):
+  <Accordion title="Where does AllBot store its data?">
+    Everything lives under `$ALLBOT_STATE_DIR` (default: `~/.allbot`):
 
     | Path                                                            | Purpose                                                            |
     | --------------------------------------------------------------- | ------------------------------------------------------------------ |
-    | `$KAIJIBOT_STATE_DIR/kaijibot.json`                             | Main config (JSON5)                                                |
-    | `$KAIJIBOT_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use)       |
-    | `$KAIJIBOT_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth, API keys, and optional `keyRef`/`tokenRef`)  |
-    | `$KAIJIBOT_STATE_DIR/secrets.json`                              | Optional file-backed secret payload for `file` SecretRef providers |
-    | `$KAIJIBOT_STATE_DIR/agents/<agentId>/agent/auth.json`          | Legacy compatibility file (static `api_key` entries scrubbed)      |
-    | `$KAIJIBOT_STATE_DIR/credentials/`                              | Provider state (e.g. `whatsapp/<accountId>/creds.json`)            |
-    | `$KAIJIBOT_STATE_DIR/agents/`                                   | Per-agent state (agentDir + sessions)                              |
-    | `$KAIJIBOT_STATE_DIR/agents/<agentId>/sessions/`                | Conversation history & state (per agent)                           |
-    | `$KAIJIBOT_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Session metadata (per agent)                                       |
+    | `$ALLBOT_STATE_DIR/allbot.json`                             | Main config (JSON5)                                                |
+    | `$ALLBOT_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use)       |
+    | `$ALLBOT_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth, API keys, and optional `keyRef`/`tokenRef`)  |
+    | `$ALLBOT_STATE_DIR/secrets.json`                              | Optional file-backed secret payload for `file` SecretRef providers |
+    | `$ALLBOT_STATE_DIR/agents/<agentId>/agent/auth.json`          | Legacy compatibility file (static `api_key` entries scrubbed)      |
+    | `$ALLBOT_STATE_DIR/credentials/`                              | Provider state (e.g. `whatsapp/<accountId>/creds.json`)            |
+    | `$ALLBOT_STATE_DIR/agents/`                                   | Per-agent state (agentDir + sessions)                              |
+    | `$ALLBOT_STATE_DIR/agents/<agentId>/sessions/`                | Conversation history & state (per agent)                           |
+    | `$ALLBOT_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Session metadata (per agent)                                       |
 
-    Legacy single-agent path: `~/.kaijibot/agent/*` (migrated by `kaijibot doctor`).
+    Legacy single-agent path: `~/.allbot/agent/*` (migrated by `allbot doctor`).
 
-    Your **workspace** (AGENTS.md, memory files, skills, etc.) is separate and configured via `agents.defaults.workspace` (default: `~/.kaijibot/workspace`).
+    Your **workspace** (AGENTS.md, memory files, skills, etc.) is separate and configured via `agents.defaults.workspace` (default: `~/.allbot/workspace`).
 
   </Accordion>
 
   <Accordion title="Where should AGENTS.md / SOUL.md / USER.md / MEMORY.md live?">
-    These files live in the **agent workspace**, not `~/.kaijibot`.
+    These files live in the **agent workspace**, not `~/.allbot`.
 
     - **Workspace (per agent)**: `AGENTS.md`, `SOUL.md`, `IDENTITY.md`, `USER.md`,
       `MEMORY.md` (or legacy fallback `memory.md` when `MEMORY.md` is absent),
       `memory/YYYY-MM-DD.md`, optional `HEARTBEAT.md`.
-    - **State dir (`~/.kaijibot`)**: config, channel/provider state, auth profiles, sessions, logs,
-      and shared skills (`~/.kaijibot/skills`).
+    - **State dir (`~/.allbot`)**: config, channel/provider state, auth profiles, sessions, logs,
+      and shared skills (`~/.allbot/skills`).
 
-    Default workspace is `~/.kaijibot/workspace`, configurable via:
+    Default workspace is `~/.allbot/workspace`, configurable via:
 
     ```json5
     {
-      agents: { defaults: { workspace: "~/.kaijibot/workspace" } },
+      agents: { defaults: { workspace: "~/.allbot/workspace" } },
     }
     ```
 
@@ -1359,7 +1359,7 @@ for usage/billing and raise limits as needed.
     private (for example GitHub private). This captures memory + AGENTS/SOUL/USER
     files, and lets you restore the assistant's "mind" later.
 
-    Do **not** commit anything under `~/.kaijibot` (credentials, sessions, tokens, or encrypted secrets payloads).
+    Do **not** commit anything under `~/.allbot` (credentials, sessions, tokens, or encrypted secrets payloads).
     If you need a full restore, back up both the workspace and the state directory
     separately (see the migration question above).
 
@@ -1367,7 +1367,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="How do I completely uninstall KaijiBot?">
+  <Accordion title="How do I completely uninstall AllBot?">
     See the dedicated guide: [Uninstall](/install/uninstall).
   </Accordion>
 
@@ -1377,7 +1377,7 @@ for usage/billing and raise limits as needed.
     host locations unless sandboxing is enabled. If you need isolation, use
     [`agents.defaults.sandbox`](/gateway/sandboxing) or per-agent sandbox settings. If you
     want a repo to be the default working directory, point that agent's
-    `workspace` to the repo root. The KaijiBot repo is just source code; keep the
+    `workspace` to the repo root. The AllBot repo is just source code; keep the
     workspace separate unless you intentionally want the agent to work inside it.
 
     Example (repo as default cwd):
@@ -1403,13 +1403,13 @@ for usage/billing and raise limits as needed.
 
 <AccordionGroup>
   <Accordion title="What format is the config? Where is it?">
-    KaijiBot reads an optional **JSON5** config from `$KAIJIBOT_CONFIG_PATH` (default: `~/.kaijibot/kaijibot.json`):
+    AllBot reads an optional **JSON5** config from `$ALLBOT_CONFIG_PATH` (default: `~/.allbot/allbot.json`):
 
     ```
-    $KAIJIBOT_CONFIG_PATH
+    $ALLBOT_CONFIG_PATH
     ```
 
-    If the file is missing, it uses safe-ish defaults (including a default workspace of `~/.kaijibot/workspace`).
+    If the file is missing, it uses safe-ish defaults (including a default workspace of `~/.allbot/workspace`).
 
   </Accordion>
 
@@ -1435,7 +1435,7 @@ for usage/billing and raise limits as needed.
 
     - `gateway.remote.token` / `.password` do **not** enable local gateway auth by themselves.
     - Local call paths can use `gateway.remote.*` as fallback only when `gateway.auth.*` is unset.
-    - For password auth, set `gateway.auth.mode: "password"` plus `gateway.auth.password` (or `KAIJIBOT_GATEWAY_PASSWORD`) instead.
+    - For password auth, set `gateway.auth.mode: "password"` plus `gateway.auth.password` (or `ALLBOT_GATEWAY_PASSWORD`) instead.
     - If `gateway.auth.token` / `gateway.auth.password` is explicitly configured via SecretRef and unresolved, resolution fails closed (no remote fallback masking).
     - Shared-secret Control UI setups authenticate via `connect.params.auth.token` or `connect.params.auth.password` (stored in app/UI settings). Identity-bearing modes such as Tailscale Serve or `trusted-proxy` use request headers instead. Avoid putting shared secrets in URLs.
     - With `gateway.auth.mode: "trusted-proxy"`, same-host loopback reverse proxies still do **not** satisfy trusted-proxy auth. The trusted proxy must be a configured non-loopback source.
@@ -1443,9 +1443,9 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="Why do I need a token on localhost now?">
-    KaijiBot enforces gateway auth by default, including loopback. In the normal default path that means token auth: if no explicit auth path is configured, gateway startup resolves to token mode and auto-generates one, saving it to `gateway.auth.token`, so **local WS clients must authenticate**. This blocks other local processes from calling the Gateway.
+    AllBot enforces gateway auth by default, including loopback. In the normal default path that means token auth: if no explicit auth path is configured, gateway startup resolves to token mode and auto-generates one, saving it to `gateway.auth.token`, so **local WS clients must authenticate**. This blocks other local processes from calling the Gateway.
 
-    If you prefer a different auth path, you can explicitly choose password mode (or, for non-loopback identity-aware reverse proxies, `trusted-proxy`). If you **really** want open loopback, set `gateway.auth.mode: "none"` explicitly in your config. Doctor can generate a token for you any time: `kaijibot doctor --generate-gateway-token`.
+    If you prefer a different auth path, you can explicitly choose password mode (or, for non-loopback identity-aware reverse proxies, `trusted-proxy`). If you **really** want open loopback, set `gateway.auth.mode: "none"` explicitly in your config. Doctor can generate a token for you any time: `allbot doctor --generate-gateway-token`.
 
   </Accordion>
 
@@ -1471,9 +1471,9 @@ for usage/billing and raise limits as needed.
     ```
 
     - `off`: hides tagline text but keeps the banner title/version line.
-    - `default`: uses `All your chats, one KaijiBot.` every time.
+    - `default`: uses `All your chats, one AllBot.` every time.
     - `random`: rotating funny/seasonal taglines (default behavior).
-    - If you want no banner at all, set env `KAIJIBOT_HIDE_BANNER=1`.
+    - If you want no banner at all, set env `ALLBOT_HIDE_BANNER=1`.
 
   </Accordion>
 
@@ -1486,7 +1486,7 @@ for usage/billing and raise limits as needed.
     - DuckDuckGo is key-free, but it is an unofficial HTML-based integration.
     - SearXNG is key-free/self-hosted; configure `SEARXNG_BASE_URL` or `plugins.entries.searxng.config.webSearch.baseUrl`.
 
-    **Recommended:** run `kaijibot configure --section web` and choose a provider.
+    **Recommended:** run `allbot configure --section web` and choose a provider.
     Environment alternatives:
 
     - Brave: `BRAVE_API_KEY`
@@ -1537,8 +1537,8 @@ for usage/billing and raise limits as needed.
 
     - If you use allowlists, add `web_search`/`web_fetch`/`x_search` or `group:web`.
     - `web_fetch` is enabled by default (unless explicitly disabled).
-    - If `tools.web.fetch.provider` is omitted, KaijiBot auto-detects the first ready fetch fallback provider from available credentials. Today the bundled provider is Firecrawl.
-    - Daemons read env vars from `~/.kaijibot/.env` (or the service environment).
+    - If `tools.web.fetch.provider` is omitted, AllBot auto-detects the first ready fetch fallback provider from available credentials. Today the bundled provider is Firecrawl.
+    - Daemons read env vars from `~/.allbot/.env` (or the service environment).
 
     Docs: [Web tools](/tools/web).
 
@@ -1550,15 +1550,15 @@ for usage/billing and raise limits as needed.
 
     Recover:
 
-    - Restore from backup (git or a copied `~/.kaijibot/kaijibot.json`).
-    - If you have no backup, re-run `kaijibot doctor` and reconfigure channels/models.
+    - Restore from backup (git or a copied `~/.allbot/allbot.json`).
+    - If you have no backup, re-run `allbot doctor` and reconfigure channels/models.
     - If this was unexpected, file a bug and include your last known config or any backup.
     - A local coding agent can often reconstruct a working config from logs or history.
 
     Avoid it:
 
-    - Use `kaijibot config set` for small changes.
-    - Use `kaijibot configure` for interactive edits.
+    - Use `allbot config set` for small changes.
+    - Use `allbot configure` for interactive edits.
     - Use `config.schema.lookup` first when you are not sure about an exact path or field shape; it returns a shallow schema node plus immediate child summaries for drill-down.
     - Use `config.patch` for partial RPC edits; keep `config.apply` for full-config replacement only.
     - If you are using the owner-only `gateway` tool from an agent run, it will still reject writes to `tools.exec.ask` / `tools.exec.security` (including legacy `tools.bash.*` aliases that normalize to the same protected exec paths).
@@ -1580,7 +1580,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Can the KaijiBot browser run headless?">
+  <Accordion title="Can the AllBot browser run headless?">
     Yes. It's a config option:
 
     ```json5
@@ -1637,8 +1637,8 @@ for usage/billing and raise limits as needed.
     5. Approve the node on the Gateway:
 
        ```bash
-       kaijibot devices list
-       kaijibot devices approve <requestId>
+       allbot devices list
+       allbot devices approve <requestId>
        ```
 
     No separate TCP bridge is required; nodes connect over the Gateway WebSocket.
@@ -1653,9 +1653,9 @@ for usage/billing and raise limits as needed.
   <Accordion title="Tailscale is connected but I get no replies. What now?">
     Check the basics:
 
-    - Gateway is running: `kaijibot gateway status`
-    - Gateway health: `kaijibot status`
-    - Channel health: `kaijibot channels status`
+    - Gateway is running: `allbot gateway status`
+    - Gateway health: `allbot status`
+    - Channel health: `allbot channels status`
 
     Then verify auth and routing:
 
@@ -1667,7 +1667,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Can two KaijiBot instances talk to each other (local + VPS)?">
+  <Accordion title="Can two AllBot instances talk to each other (local + VPS)?">
     Yes. There is no built-in "bot-to-bot" bridge, but you can wire it up in a few
     reliable ways:
 
@@ -1675,14 +1675,14 @@ for usage/billing and raise limits as needed.
     Have Bot A send a message to Bot B, then let Bot B reply as usual.
 
     **CLI bridge (generic):** run a script that calls the other Gateway with
-    `kaijibot agent --message ... --deliver`, targeting a chat where the other bot
+    `allbot agent --message ... --deliver`, targeting a chat where the other bot
     listens. If one bot is on a remote VPS, point your CLI at that remote Gateway
     via SSH/Tailscale (see [Remote access](/gateway/remote)).
 
     Example pattern (run from a machine that can reach the target Gateway):
 
     ```bash
-    kaijibot agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
+    allbot agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
     ```
 
     Tip: add a guardrail so the two bots do not loop endlessly (mention-only, channel
@@ -1744,7 +1744,7 @@ for usage/billing and raise limits as needed.
   <Accordion title="Minimal sane config for a first install">
     ```json5
     {
-      agents: { defaults: { workspace: "~/.kaijibot/workspace" } },
+      agents: { defaults: { workspace: "~/.allbot/workspace" } },
       channels: { whatsapp: { allowFrom: ["+15555550123"] } },
     }
     ```
@@ -1774,7 +1774,7 @@ for usage/billing and raise limits as needed.
     If you want the Control UI without SSH, use Tailscale Serve on the VPS:
 
     ```bash
-    kaijibot gateway --tailscale serve
+    allbot gateway --tailscale serve
     ```
 
     This keeps the gateway bound to loopback and exposes HTTPS via Tailscale. See [Tailscale](/gateway/tailscale).
@@ -1792,8 +1792,8 @@ for usage/billing and raise limits as needed.
     3. **Approve the node** on the gateway:
 
        ```bash
-       kaijibot devices list
-       kaijibot devices approve <requestId>
+       allbot devices list
+       allbot devices approve <requestId>
        ```
 
     Docs: [Gateway protocol](/gateway/protocol), [Discovery](/gateway/discovery), [macOS remote mode](/platforms/mac/remote).
@@ -1815,11 +1815,11 @@ for usage/billing and raise limits as needed.
 ## Env vars and .env loading
 
 <AccordionGroup>
-  <Accordion title="How does KaijiBot load environment variables?">
-    KaijiBot reads env vars from the parent process (shell, launchd/systemd, CI, etc.) and additionally loads:
+  <Accordion title="How does AllBot load environment variables?">
+    AllBot reads env vars from the parent process (shell, launchd/systemd, CI, etc.) and additionally loads:
 
     - `.env` from the current working directory
-    - a global fallback `.env` from `~/.kaijibot/.env` (aka `$KAIJIBOT_STATE_DIR/.env`)
+    - a global fallback `.env` from `~/.allbot/.env` (aka `$ALLBOT_STATE_DIR/.env`)
 
     Neither `.env` file overrides existing env vars.
 
@@ -1841,7 +1841,7 @@ for usage/billing and raise limits as needed.
   <Accordion title="I started the Gateway via the service and my env vars disappeared. What now?">
     Two common fixes:
 
-    1. Put the missing keys in `~/.kaijibot/.env` so they're picked up even when the service doesn't inherit your shell env.
+    1. Put the missing keys in `~/.allbot/.env` so they're picked up even when the service doesn't inherit your shell env.
     2. Enable shell import (opt-in convenience):
 
     ```json5
@@ -1856,19 +1856,19 @@ for usage/billing and raise limits as needed.
     ```
 
     This runs your login shell and imports only missing expected keys (never overrides). Env var equivalents:
-    `KAIJIBOT_LOAD_SHELL_ENV=1`, `KAIJIBOT_SHELL_ENV_TIMEOUT_MS=15000`.
+    `ALLBOT_LOAD_SHELL_ENV=1`, `ALLBOT_SHELL_ENV_TIMEOUT_MS=15000`.
 
   </Accordion>
 
   <Accordion title='I set COPILOT_GITHUB_TOKEN, but models status shows "Shell env: off." Why?'>
-    `kaijibot models status` reports whether **shell env import** is enabled. "Shell env: off"
-    does **not** mean your env vars are missing - it just means KaijiBot won't load
+    `allbot models status` reports whether **shell env import** is enabled. "Shell env: off"
+    does **not** mean your env vars are missing - it just means AllBot won't load
     your login shell automatically.
 
     If the Gateway runs as a service (launchd/systemd), it won't inherit your shell
     environment. Fix by doing one of these:
 
-    1. Put the token in `~/.kaijibot/.env`:
+    1. Put the token in `~/.allbot/.env`:
 
        ```
        COPILOT_GITHUB_TOKEN=...
@@ -1880,7 +1880,7 @@ for usage/billing and raise limits as needed.
     Then restart the gateway and recheck:
 
     ```bash
-    kaijibot models status
+    allbot models status
     ```
 
     Copilot tokens are read from `COPILOT_GITHUB_TOKEN` (also `GH_TOKEN` / `GITHUB_TOKEN`).
@@ -1912,7 +1912,7 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="Is there a way to make a team of KaijiBot instances (one CEO and many agents)?">
+  <Accordion title="Is there a way to make a team of AllBot instances (one CEO and many agents)?">
     Yes, via **multi-agent routing** and **sub-agents**. You can create one coordinator
     agent and several worker agents with their own workspaces and models.
 
@@ -1939,30 +1939,30 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="How do I completely reset KaijiBot but keep it installed?">
+  <Accordion title="How do I completely reset AllBot but keep it installed?">
     Use the reset command:
 
     ```bash
-    kaijibot reset
+    allbot reset
     ```
 
     Non-interactive full reset:
 
     ```bash
-    kaijibot reset --scope full --yes --non-interactive
+    allbot reset --scope full --yes --non-interactive
     ```
 
     Then re-run setup:
 
     ```bash
-    kaijibot onboard --install-daemon
+    allbot onboard --install-daemon
     ```
 
     Notes:
 
     - Onboarding also offers **Reset** if it sees an existing config. See [Onboarding (CLI)](/start/wizard).
-    - If you used profiles (`--profile` / `KAIJIBOT_PROFILE`), reset each state dir (defaults are `~/.kaijibot-<profile>`).
-    - Dev reset: `kaijibot gateway --dev --reset` (dev-only; wipes dev config + credentials + sessions + workspace).
+    - If you used profiles (`--profile` / `ALLBOT_PROFILE`), reset each state dir (defaults are `~/.allbot-<profile>`).
+    - Dev reset: `allbot gateway --dev --reset` (dev-only; wipes dev config + credentials + sessions + workspace).
 
   </Accordion>
 
@@ -2018,7 +2018,7 @@ for usage/billing and raise limits as needed.
     ```
 
     If `HEARTBEAT.md` exists but is effectively empty (only blank lines and markdown
-    headers like `# Heading`), KaijiBot skips the heartbeat run to save API calls.
+    headers like `# Heading`), AllBot skips the heartbeat run to save API calls.
     If the file is missing, the heartbeat still runs and the model decides what to do.
 
     Per-agent overrides use `agents.list[].heartbeat`. Docs: [Heartbeat](/gateway/heartbeat).
@@ -2026,7 +2026,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title='Do I need to add a "bot account" to a WhatsApp group?'>
-    No. KaijiBot runs on **your own account**, so if you're in the group, KaijiBot can see it.
+    No. AllBot runs on **your own account**, so if you're in the group, AllBot can see it.
     By default, group replies are blocked until you allow senders (`groupPolicy: "allowlist"`).
 
     If you want only **you** to be able to trigger group replies:
@@ -2048,7 +2048,7 @@ for usage/billing and raise limits as needed.
     Option 1 (fastest): tail logs and send a test message in the group:
 
     ```bash
-    kaijibot logs --follow --json
+    allbot logs --follow --json
     ```
 
     Look for `chatId` (or `from`) ending in `@g.us`, like:
@@ -2057,14 +2057,14 @@ for usage/billing and raise limits as needed.
     Option 2 (if already configured/allowlisted): list groups from config:
 
     ```bash
-    kaijibot directory groups list --channel whatsapp
+    allbot directory groups list --channel whatsapp
     ```
 
     Docs: [WhatsApp](/channels/whatsapp), [Directory](/cli/directory), [Logs](/cli/logs).
 
   </Accordion>
 
-  <Accordion title="Why does KaijiBot not reply in a group?">
+  <Accordion title="Why does AllBot not reply in a group?">
     Two common causes:
 
     - Mention gating is on (default). You must @mention the bot (or match `mentionPatterns`).
@@ -2081,7 +2081,7 @@ for usage/billing and raise limits as needed.
   <Accordion title="How many workspaces and agents can I create?">
     No hard limits. Dozens (even hundreds) are fine, but watch for:
 
-    - **Disk growth:** sessions + transcripts live under `~/.kaijibot/agents/<agentId>/sessions/`.
+    - **Disk growth:** sessions + transcripts live under `~/.allbot/agents/<agentId>/sessions/`.
     - **Token cost:** more agents means more concurrent model usage.
     - **Ops overhead:** per-agent auth profiles, workspaces, and channel routing.
 
@@ -2089,7 +2089,7 @@ for usage/billing and raise limits as needed.
 
     - Keep one **active** workspace per agent (`agents.defaults.workspace`).
     - Prune old sessions (delete JSONL or store entries) if disk grows.
-    - Use `kaijibot doctor` to spot stray workspaces and profile mismatches.
+    - Use `allbot doctor` to spot stray workspaces and profile mismatches.
 
   </Accordion>
 
@@ -2118,13 +2118,13 @@ for usage/billing and raise limits as needed.
 
 <AccordionGroup>
   <Accordion title='What is the "default model"?'>
-    KaijiBot's default model is whatever you set as:
+    AllBot's default model is whatever you set as:
 
     ```
     agents.defaults.model.primary
     ```
 
-    Models are referenced as `provider/model` (example: `openai/gpt-5.4`). If you omit the provider, KaijiBot first tries an alias, then a unique configured-provider match for that exact model id, and only then falls back to the configured default provider as a deprecated compatibility path. If that provider no longer exposes the configured default model, KaijiBot falls back to the first configured provider/model instead of surfacing a stale removed-provider default. You should still **explicitly** set `provider/model`.
+    Models are referenced as `provider/model` (example: `openai/gpt-5.4`). If you omit the provider, AllBot first tries an alias, then a unique configured-provider match for that exact model id, and only then falls back to the configured default provider as a deprecated compatibility path. If that provider no longer exposes the configured default model, AllBot falls back to the first configured provider/model instead of surfacing a stale removed-provider default. You should still **explicitly** set `provider/model`.
 
   </Accordion>
 
@@ -2154,14 +2154,14 @@ for usage/billing and raise limits as needed.
     Safe options:
 
     - `/model` in chat (quick, per-session)
-    - `kaijibot models set ...` (updates just model config)
-    - `kaijibot configure --section model` (interactive)
-    - edit `agents.defaults.model` in `~/.kaijibot/kaijibot.json`
+    - `allbot models set ...` (updates just model config)
+    - `allbot configure --section model` (interactive)
+    - edit `agents.defaults.model` in `~/.allbot/allbot.json`
 
     Avoid `config.apply` with a partial object unless you intend to replace the whole config.
     For RPC edits, inspect with `config.schema.lookup` first and prefer `config.patch`. The lookup payload gives you the normalized path, shallow schema docs/constraints, and immediate child summaries.
     for partial updates.
-    If you did overwrite config, restore from backup or re-run `kaijibot doctor` to repair.
+    If you did overwrite config, restore from backup or re-run `allbot doctor` to repair.
 
     Docs: [Models](/concepts/models), [Configure](/cli/configure), [Config](/cli/config), [Doctor](/gateway/doctor).
 
@@ -2175,14 +2175,14 @@ for usage/billing and raise limits as needed.
     1. Install Ollama from `https://ollama.com/download`
     2. Pull a local model such as `ollama pull gemma4`
     3. If you want cloud models too, run `ollama signin`
-    4. Run `kaijibot onboard` and choose `Ollama`
+    4. Run `allbot onboard` and choose `Ollama`
     5. Pick `Local` or `Cloud + Local`
 
     Notes:
 
     - `Cloud + Local` gives you cloud models plus your local Ollama models
     - cloud models such as `kimi-k2.5:cloud` do not need a local pull
-    - for manual switching, use `kaijibot models list` and `kaijibot models set ollama/<model>`
+    - for manual switching, use `allbot models list` and `allbot models set ollama/<model>`
 
     Security note: smaller or heavily quantized models are more vulnerable to prompt
     injection. We strongly recommend **large models** for any bot that can use tools.
@@ -2194,9 +2194,9 @@ for usage/billing and raise limits as needed.
 
   </Accordion>
 
-  <Accordion title="What do KaijiBot, Flawd, and Krill use for models?">
+  <Accordion title="What do AllBot, Flawd, and Krill use for models?">
     - These deployments can differ and may change over time; there is no fixed provider recommendation.
-    - Check the current runtime setting on each gateway with `kaijibot models status`.
+    - Check the current runtime setting on each gateway with `allbot models status`.
     - For security-sensitive/tool-enabled agents, use the strongest latest-generation model available.
   </Accordion>
 
@@ -2312,7 +2312,7 @@ for usage/billing and raise limits as needed.
 
     Fix checklist:
 
-    1. Upgrade to a current KaijiBot release (or run from source `main`), then restart the gateway.
+    1. Upgrade to a current AllBot release (or run from source `main`), then restart the gateway.
     2. Make sure MiniMax is configured (wizard or JSON), or that MiniMax auth
        exists in env/auth profiles so the matching provider can be injected
        (`MINIMAX_API_KEY` for `minimax`, `MINIMAX_OAUTH_TOKEN` or stored MiniMax
@@ -2324,7 +2324,7 @@ for usage/billing and raise limits as needed.
     4. Run:
 
        ```bash
-       kaijibot models list
+       allbot models list
        ```
 
        and pick from the list (or `/model list` in chat).
@@ -2371,7 +2371,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="Are opus / sonnet / gpt built-in shortcuts?">
-    Yes. KaijiBot ships a few default shorthands (only applied when the model exists in `agents.defaults.models`):
+    Yes. AllBot ships a few default shorthands (only applied when the model exists in `agents.defaults.models`):
 
     - `opus` → `anthropic/claude-opus-4-6`
     - `sonnet` → `anthropic/claude-sonnet-4-6`
@@ -2445,12 +2445,12 @@ for usage/billing and raise limits as needed.
     stored in:
 
     ```
-    ~/.kaijibot/agents/<agentId>/agent/auth-profiles.json
+    ~/.allbot/agents/<agentId>/agent/auth-profiles.json
     ```
 
     Fix options:
 
-    - Run `kaijibot agents add <id>` and configure auth during the wizard.
+    - Run `allbot agents add <id>` and configure auth during the wizard.
     - Or copy `auth-profiles.json` from the main agent's `agentDir` into the new agent's `agentDir`.
 
     Do **not** reuse `agentDir` across agents; it causes auth/session collisions.
@@ -2467,9 +2467,9 @@ for usage/billing and raise limits as needed.
     1. **Auth profile rotation** within the same provider.
     2. **Model fallback** to the next model in `agents.defaults.model.fallbacks`.
 
-    Cooldowns apply to failing profiles (exponential backoff), so KaijiBot can keep responding even when a provider is rate-limited or temporarily failing.
+    Cooldowns apply to failing profiles (exponential backoff), so AllBot can keep responding even when a provider is rate-limited or temporarily failing.
 
-    The rate-limit bucket includes more than plain `429` responses. KaijiBot
+    The rate-limit bucket includes more than plain `429` responses. AllBot
     also treats messages like `Too many concurrent requests`,
     `ThrottlingException`, `concurrency limit reached`,
     `workers_ai ... quota limit exceeded`, `resource exhausted`, and periodic
@@ -2478,12 +2478,12 @@ for usage/billing and raise limits as needed.
 
     Some billing-looking responses are not `402`, and some HTTP `402`
     responses also stay in that transient bucket. If a provider returns
-    explicit billing text on `401` or `403`, KaijiBot can still keep that in
+    explicit billing text on `401` or `403`, AllBot can still keep that in
     the billing lane, but provider-specific text matchers stay scoped to the
     provider that owns them (for example OpenRouter `Key limit exceeded`). If a `402`
     message instead looks like a retryable usage-window or
     organization/workspace spend limit (`daily limit reached, resets tomorrow`,
-    `organization spending limit exceeded`), KaijiBot treats it as
+    `organization spending limit exceeded`), AllBot treats it as
     `rate_limit`, not a long billing disable.
 
     Context-overflow errors are different: signatures such as
@@ -2494,7 +2494,7 @@ for usage/billing and raise limits as needed.
     fallback.
 
     Generic server-error text is intentionally narrower than "anything with
-    unknown/error in it". KaijiBot does treat provider-scoped transient shapes
+    unknown/error in it". AllBot does treat provider-scoped transient shapes
     such as Anthropic bare `An unknown error occurred`, OpenRouter bare
     `Provider returned error`, stop-reason errors like `Unhandled stop reason:
     error`, JSON `api_error` payloads with transient server text
@@ -2513,14 +2513,14 @@ for usage/billing and raise limits as needed.
     **Fix checklist:**
 
     - **Confirm where auth profiles live** (new vs legacy paths)
-      - Current: `~/.kaijibot/agents/<agentId>/agent/auth-profiles.json`
-      - Legacy: `~/.kaijibot/agent/*` (migrated by `kaijibot doctor`)
+      - Current: `~/.allbot/agents/<agentId>/agent/auth-profiles.json`
+      - Legacy: `~/.allbot/agent/*` (migrated by `allbot doctor`)
     - **Confirm your env var is loaded by the Gateway**
-      - If you set `ANTHROPIC_API_KEY` in your shell but run the Gateway via systemd/launchd, it may not inherit it. Put it in `~/.kaijibot/.env` or enable `env.shellEnv`.
+      - If you set `ANTHROPIC_API_KEY` in your shell but run the Gateway via systemd/launchd, it may not inherit it. Put it in `~/.allbot/.env` or enable `env.shellEnv`.
     - **Make sure you're editing the correct agent**
       - Multi-agent setups mean there can be multiple `auth-profiles.json` files.
     - **Sanity-check model/auth status**
-      - Use `kaijibot models status` to see configured models and whether providers are authenticated.
+      - Use `allbot models status` to see configured models and whether providers are authenticated.
 
     **Fix checklist for "No credentials found for profile anthropic"**
 
@@ -2528,13 +2528,13 @@ for usage/billing and raise limits as needed.
     can't find it in its auth store.
 
     - **Use Claude CLI**
-      - Run `kaijibot models auth login --provider anthropic --method cli --set-default` on the gateway host.
+      - Run `allbot models auth login --provider anthropic --method cli --set-default` on the gateway host.
     - **If you want to use an API key instead**
-      - Put `ANTHROPIC_API_KEY` in `~/.kaijibot/.env` on the **gateway host**.
+      - Put `ANTHROPIC_API_KEY` in `~/.allbot/.env` on the **gateway host**.
       - Clear any pinned order that forces a missing profile:
 
         ```bash
-        kaijibot models auth order clear --provider anthropic
+        allbot models auth order clear --provider anthropic
         ```
 
     - **Confirm you're running commands on the gateway host**
@@ -2543,7 +2543,7 @@ for usage/billing and raise limits as needed.
   </Accordion>
 
   <Accordion title="Why did it also try Google Gemini and fail?">
-    If your model config includes Google Gemini as a fallback (or you switched to a Gemini shorthand), KaijiBot will try it during model fallback. If you haven't configured Google credentials, you'll see `No API key found for provider "google"`.
+    If your model config includes Google Gemini as a fallback (or you switched to a Gemini shorthand), AllBot will try it during model fallback. If you haven't configured Google credentials, you'll see `No API key found for provider "google"`.
 
     Fix: either provide Google auth, or remove/avoid Google models in `agents.defaults.model.fallbacks` / aliases so fallback doesn't route there.
 
@@ -2552,7 +2552,7 @@ for usage/billing and raise limits as needed.
     Cause: the session history contains **thinking blocks without signatures** (often from
     an aborted/partial stream). Google Antigravity requires signatures for thinking blocks.
 
-    Fix: KaijiBot now strips unsigned thinking blocks for Google Antigravity Claude. If it still appears, start a **new session** or set `/thinking off` for that agent.
+    Fix: AllBot now strips unsigned thinking blocks for Google Antigravity Claude. If it still appears, start a **new session** or set `/thinking off` for that agent.
 
   </Accordion>
 </AccordionGroup>
@@ -2566,13 +2566,13 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     An auth profile is a named credential record (OAuth or API key) tied to a provider. Profiles live in:
 
     ```
-    ~/.kaijibot/agents/<agentId>/agent/auth-profiles.json
+    ~/.allbot/agents/<agentId>/agent/auth-profiles.json
     ```
 
   </Accordion>
 
   <Accordion title="What are typical profile IDs?">
-    KaijiBot uses provider-prefixed IDs like:
+    AllBot uses provider-prefixed IDs like:
 
     - `anthropic:default` (common when no email identity exists)
     - `anthropic:<email>` for OAuth identities
@@ -2583,7 +2583,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
   <Accordion title="Can I control which auth profile is tried first?">
     Yes. Config supports optional metadata for profiles and an ordering per provider (`auth.order.<provider>`). This does **not** store secrets; it maps IDs to provider/mode and sets rotation order.
 
-    KaijiBot may temporarily skip a profile if it's in a short **cooldown** (rate limits/timeouts/auth failures) or a longer **disabled** state (billing/insufficient credits). To inspect this, run `kaijibot models status --json` and check `auth.unusableProfiles`. Tuning: `auth.cooldowns.billingBackoffHours*`.
+    AllBot may temporarily skip a profile if it's in a short **cooldown** (rate limits/timeouts/auth failures) or a longer **disabled** state (billing/insufficient credits). To inspect this, run `allbot models status --json` and check `auth.unusableProfiles`. Tuning: `auth.cooldowns.billingBackoffHours*`.
 
     Rate-limit cooldowns can be model-scoped. A profile that is cooling down
     for one model can still be usable for a sibling model on the same provider,
@@ -2593,28 +2593,28 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
     ```bash
     # Defaults to the configured default agent (omit --agent)
-    kaijibot models auth order get --provider anthropic
+    allbot models auth order get --provider anthropic
 
     # Lock rotation to a single profile (only try this one)
-    kaijibot models auth order set --provider anthropic anthropic:default
+    allbot models auth order set --provider anthropic anthropic:default
 
     # Or set an explicit order (fallback within provider)
-    kaijibot models auth order set --provider anthropic anthropic:work anthropic:default
+    allbot models auth order set --provider anthropic anthropic:work anthropic:default
 
     # Clear override (fall back to config auth.order / round-robin)
-    kaijibot models auth order clear --provider anthropic
+    allbot models auth order clear --provider anthropic
     ```
 
     To target a specific agent:
 
     ```bash
-    kaijibot models auth order set --provider anthropic --agent main anthropic:default
+    allbot models auth order set --provider anthropic --agent main anthropic:default
     ```
 
     To verify what will actually be tried, use:
 
     ```bash
-    kaijibot models status --probe
+    allbot models status --probe
     ```
 
     If a stored profile is omitted from the explicit order, probe reports
@@ -2623,7 +2623,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
   </Accordion>
 
   <Accordion title="OAuth vs API key - what is the difference?">
-    KaijiBot supports both:
+    AllBot supports both:
 
     - **OAuth** often leverages subscription access (where applicable).
     - **API keys** use pay-per-token billing.
@@ -2642,15 +2642,15 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Precedence:
 
     ```
-    --port > KAIJIBOT_GATEWAY_PORT > gateway.port > default 18789
+    --port > ALLBOT_GATEWAY_PORT > gateway.port > default 18789
     ```
 
   </Accordion>
 
-  <Accordion title='Why does kaijibot gateway status say "Runtime: running" but "RPC probe: failed"?'>
+  <Accordion title='Why does allbot gateway status say "Runtime: running" but "RPC probe: failed"?'>
     Because "running" is the **supervisor's** view (launchd/systemd/schtasks). The RPC probe is the CLI actually connecting to the gateway WebSocket and calling `status`.
 
-    Use `kaijibot gateway status` and trust these lines:
+    Use `allbot gateway status` and trust these lines:
 
     - `Probe target:` (the URL the probe actually used)
     - `Listening:` (what's actually bound on the port)
@@ -2658,13 +2658,13 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
   </Accordion>
 
-  <Accordion title='Why does kaijibot gateway status show "Config (cli)" and "Config (service)" different?'>
-    You're editing one config file while the service is running another (often a `--profile` / `KAIJIBOT_STATE_DIR` mismatch).
+  <Accordion title='Why does allbot gateway status show "Config (cli)" and "Config (service)" different?'>
+    You're editing one config file while the service is running another (often a `--profile` / `ALLBOT_STATE_DIR` mismatch).
 
     Fix:
 
     ```bash
-    kaijibot gateway install --force
+    allbot gateway install --force
     ```
 
     Run that from the same `--profile` / environment you want the service to use.
@@ -2672,13 +2672,13 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
   </Accordion>
 
   <Accordion title='What does "another gateway instance is already listening" mean?'>
-    KaijiBot enforces a runtime lock by binding the WebSocket listener immediately on startup (default `ws://127.0.0.1:18789`). If the bind fails with `EADDRINUSE`, it throws `GatewayLockError` indicating another instance is already listening.
+    AllBot enforces a runtime lock by binding the WebSocket listener immediately on startup (default `ws://127.0.0.1:18789`). If the bind fails with `EADDRINUSE`, it throws `GatewayLockError` indicating another instance is already listening.
 
-    Fix: stop the other instance, free the port, or run with `kaijibot gateway --port <port>`.
+    Fix: stop the other instance, free the port, or run with `allbot gateway --port <port>`.
 
   </Accordion>
 
-  <Accordion title="How do I run KaijiBot in remote mode (client connects to a Gateway elsewhere)?">
+  <Accordion title="How do I run AllBot in remote mode (client connects to a Gateway elsewhere)?">
     Set `gateway.mode: "remote"` and point to a remote WebSocket URL, optionally with shared-secret remote credentials:
 
     ```json5
@@ -2696,7 +2696,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
     Notes:
 
-    - `kaijibot gateway` only starts when `gateway.mode` is `local` (or you pass the override flag).
+    - `allbot gateway` only starts when `gateway.mode` is `local` (or you pass the override flag).
     - The macOS app watches the config file and switches modes live when these values change.
     - `gateway.remote.token` / `.password` are client-side remote credentials only; they do not enable local gateway auth by themselves.
 
@@ -2715,19 +2715,19 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
     Fix:
 
-    - Fastest: `kaijibot dashboard` (prints + copies the dashboard URL, tries to open; shows SSH hint if headless).
-    - If you don't have a token yet: `kaijibot doctor --generate-gateway-token`.
+    - Fastest: `allbot dashboard` (prints + copies the dashboard URL, tries to open; shows SSH hint if headless).
+    - If you don't have a token yet: `allbot doctor --generate-gateway-token`.
     - If remote, tunnel first: `ssh -N -L 18789:127.0.0.1:18789 user@host` then open `http://127.0.0.1:18789/`.
-    - Shared-secret mode: set `gateway.auth.token` / `KAIJIBOT_GATEWAY_TOKEN` or `gateway.auth.password` / `KAIJIBOT_GATEWAY_PASSWORD`, then paste the matching secret in Control UI settings.
+    - Shared-secret mode: set `gateway.auth.token` / `ALLBOT_GATEWAY_TOKEN` or `gateway.auth.password` / `ALLBOT_GATEWAY_PASSWORD`, then paste the matching secret in Control UI settings.
     - Tailscale Serve mode: make sure `gateway.auth.allowTailscale` is enabled and you are opening the Serve URL, not a raw loopback/tailnet URL that bypasses Tailscale identity headers.
     - Trusted-proxy mode: make sure you are coming through the configured non-loopback identity-aware proxy, not a same-host loopback proxy or raw gateway URL.
     - If mismatch persists after the one retry, rotate/re-approve the paired device token:
-      - `kaijibot devices list`
-      - `kaijibot devices rotate --device <id> --role operator`
+      - `allbot devices list`
+      - `allbot devices rotate --device <id> --role operator`
     - If that rotate call says it was denied, check two things:
       - paired-device sessions can rotate only their **own** device unless they also have `operator.admin`
       - explicit `--scope` values cannot exceed the caller's current operator scopes
-    - Still stuck? Run `kaijibot status --all` and follow [Troubleshooting](/gateway/troubleshooting). See [Dashboard](/web/dashboard) for auth details.
+    - Still stuck? Run `allbot status --all` and follow [Troubleshooting](/gateway/troubleshooting). See [Dashboard](/web/dashboard) for auth details.
 
   </Accordion>
 
@@ -2748,18 +2748,18 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
     Yes, but you must isolate:
 
-    - `KAIJIBOT_CONFIG_PATH` (per-instance config)
-    - `KAIJIBOT_STATE_DIR` (per-instance state)
+    - `ALLBOT_CONFIG_PATH` (per-instance config)
+    - `ALLBOT_STATE_DIR` (per-instance state)
     - `agents.defaults.workspace` (workspace isolation)
     - `gateway.port` (unique ports)
 
     Quick setup (recommended):
 
-    - Use `kaijibot --profile <name> ...` per instance (auto-creates `~/.kaijibot-<name>`).
+    - Use `allbot --profile <name> ...` per instance (auto-creates `~/.allbot-<name>`).
     - Set a unique `gateway.port` in each profile config (or pass `--port` for manual runs).
-    - Install a per-profile service: `kaijibot --profile <name> gateway install`.
+    - Install a per-profile service: `allbot --profile <name> gateway install`.
 
-    Profiles also suffix service names (`ai.kaijibot.<profile>`; legacy `com.kaijibot.*`, `kaijibot-gateway-<profile>.service`, `KaijiBot Gateway (<profile>)`).
+    Profiles also suffix service names (`ai.allbot.<profile>`; legacy `com.allbot.*`, `allbot-gateway-<profile>.service`, `AllBot Gateway (<profile>)`).
     Full guide: [Multiple gateways](/gateway/multiple-gateways).
 
   </Accordion>
@@ -2784,7 +2784,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     If you're using the CLI or TUI, the URL should look like:
 
     ```
-    kaijibot tui --url ws://<host>:18789 --token <token>
+    allbot tui --url ws://<host>:18789 --token <token>
     ```
 
     Protocol details: [Gateway protocol](/gateway/protocol).
@@ -2799,7 +2799,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     File logs (structured):
 
     ```
-    /tmp/kaijibot/kaijibot-YYYY-MM-DD.log
+    /tmp/allbot/allbot-YYYY-MM-DD.log
     ```
 
     You can set a stable path via `logging.file`. File log level is controlled by `logging.level`. Console verbosity is controlled by `--verbose` and `logging.consoleLevel`.
@@ -2807,14 +2807,14 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Fastest log tail:
 
     ```bash
-    kaijibot logs --follow
+    allbot logs --follow
     ```
 
     Service/supervisor logs (when the gateway runs via launchd/systemd):
 
-    - macOS: `$KAIJIBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log` (default: `~/.kaijibot/logs/...`; profiles use `~/.kaijibot-<profile>/logs/...`)
-    - Linux: `journalctl --user -u kaijibot-gateway[-<profile>].service -n 200 --no-pager`
-    - Windows: `schtasks /Query /TN "KaijiBot Gateway (<profile>)" /V /FO LIST`
+    - macOS: `$ALLBOT_STATE_DIR/logs/gateway.log` and `gateway.err.log` (default: `~/.allbot/logs/...`; profiles use `~/.allbot-<profile>/logs/...`)
+    - Linux: `journalctl --user -u allbot-gateway[-<profile>].service -n 200 --no-pager`
+    - Windows: `schtasks /Query /TN "AllBot Gateway (<profile>)" /V /FO LIST`
 
     See [Troubleshooting](/gateway/troubleshooting) for more.
 
@@ -2824,15 +2824,15 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Use the gateway helpers:
 
     ```bash
-    kaijibot gateway status
-    kaijibot gateway restart
+    allbot gateway status
+    allbot gateway restart
     ```
 
-    If you run the gateway manually, `kaijibot gateway --force` can reclaim the port. See [Gateway](/gateway).
+    If you run the gateway manually, `allbot gateway --force` can reclaim the port. See [Gateway](/gateway).
 
   </Accordion>
 
-  <Accordion title="I closed my terminal on Windows - how do I restart KaijiBot?">
+  <Accordion title="I closed my terminal on Windows - how do I restart AllBot?">
     There are **two Windows install modes**:
 
     **1) WSL2 (recommended):** the Gateway runs inside Linux.
@@ -2841,14 +2841,14 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
     ```powershell
     wsl
-    kaijibot gateway status
-    kaijibot gateway restart
+    allbot gateway status
+    allbot gateway restart
     ```
 
     If you never installed the service, start it in the foreground:
 
     ```bash
-    kaijibot gateway run
+    allbot gateway run
     ```
 
     **2) Native Windows (not recommended):** the Gateway runs directly in Windows.
@@ -2856,14 +2856,14 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Open PowerShell and run:
 
     ```powershell
-    kaijibot gateway status
-    kaijibot gateway restart
+    allbot gateway status
+    allbot gateway restart
     ```
 
     If you run it manually (no service), use:
 
     ```powershell
-    kaijibot gateway run
+    allbot gateway run
     ```
 
     Docs: [Windows (WSL2)](/platforms/windows), [Gateway service runbook](/gateway).
@@ -2874,10 +2874,10 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Start with a quick health sweep:
 
     ```bash
-    kaijibot status
-    kaijibot models status
-    kaijibot channels status
-    kaijibot logs --follow
+    allbot status
+    allbot models status
+    allbot channels status
+    allbot logs --follow
     ```
 
     Common causes:
@@ -2896,15 +2896,15 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
   <Accordion title='"Disconnected from gateway: no reason" - what now?'>
     This usually means the UI lost the WebSocket connection. Check:
 
-    1. Is the Gateway running? `kaijibot gateway status`
-    2. Is the Gateway healthy? `kaijibot status`
-    3. Does the UI have the right token? `kaijibot dashboard`
+    1. Is the Gateway running? `allbot gateway status`
+    2. Is the Gateway healthy? `allbot status`
+    3. Does the UI have the right token? `allbot dashboard`
     4. If remote, is the tunnel/Tailscale link up?
 
     Then tail logs:
 
     ```bash
-    kaijibot logs --follow
+    allbot logs --follow
     ```
 
     Docs: [Dashboard](/web/dashboard), [Remote access](/gateway/remote), [Troubleshooting](/gateway/troubleshooting).
@@ -2915,13 +2915,13 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Start with logs and channel status:
 
     ```bash
-    kaijibot channels status
-    kaijibot channels logs --channel telegram
+    allbot channels status
+    allbot channels logs --channel telegram
     ```
 
     Then match the error:
 
-    - `BOT_COMMANDS_TOO_MUCH`: the Telegram menu has too many entries. KaijiBot already trims to the Telegram limit and retries with fewer commands, but some menu entries still need to be dropped. Reduce plugin/skill/custom commands, or disable `channels.telegram.commands.native` if you do not need the menu.
+    - `BOT_COMMANDS_TOO_MUCH`: the Telegram menu has too many entries. AllBot already trims to the Telegram limit and retries with fewer commands, but some menu entries still need to be dropped. Reduce plugin/skill/custom commands, or disable `channels.telegram.commands.native` if you do not need the menu.
     - `TypeError: fetch failed`, `Network request for 'setMyCommands' failed!`, or similar network errors: if you are on a VPS or behind a proxy, confirm outbound HTTPS is allowed and DNS works for `api.telegram.org`.
 
     If the Gateway is remote, make sure you are looking at logs on the Gateway host.
@@ -2934,9 +2934,9 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     First confirm the Gateway is reachable and the agent can run:
 
     ```bash
-    kaijibot status
-    kaijibot models status
-    kaijibot logs --follow
+    allbot status
+    allbot models status
+    allbot logs --follow
     ```
 
     In the TUI, use `/status` to see the current state. If you expect replies in a chat
@@ -2950,8 +2950,8 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     If you installed the service:
 
     ```bash
-    kaijibot gateway stop
-    kaijibot gateway start
+    allbot gateway stop
+    allbot gateway start
     ```
 
     This stops/starts the **supervised service** (launchd on macOS, systemd on Linux).
@@ -2960,18 +2960,18 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     If you're running in the foreground, stop with Ctrl-C, then:
 
     ```bash
-    kaijibot gateway run
+    allbot gateway run
     ```
 
     Docs: [Gateway service runbook](/gateway).
 
   </Accordion>
 
-  <Accordion title="ELI5: kaijibot gateway restart vs kaijibot gateway">
-    - `kaijibot gateway restart`: restarts the **background service** (launchd/systemd).
-    - `kaijibot gateway`: runs the gateway **in the foreground** for this terminal session.
+  <Accordion title="ELI5: allbot gateway restart vs allbot gateway">
+    - `allbot gateway restart`: restarts the **background service** (launchd/systemd).
+    - `allbot gateway`: runs the gateway **in the foreground** for this terminal session.
 
-    If you installed the service, use the gateway commands. Use `kaijibot gateway` when
+    If you installed the service, use the gateway commands. Use `allbot gateway` when
     you want a one-off, foreground run.
 
   </Accordion>
@@ -2985,12 +2985,12 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
 <AccordionGroup>
   <Accordion title="My skill generated an image/PDF, but nothing was sent">
-    Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (on its own line). See [KaijiBot assistant setup](/start/kaijibot) and [Agent send](/tools/agent-send).
+    Outbound attachments from the agent must include a `MEDIA:<path-or-url>` line (on its own line). See [AllBot assistant setup](/start/allbot) and [Agent send](/tools/agent-send).
 
     CLI sending:
 
     ```bash
-    kaijibot message send --target +15555550123 --message "Here you go" --media /path/to/file.png
+    allbot message send --target +15555550123 --message "Here you go" --media /path/to/file.png
     ```
 
     Also check:
@@ -3008,16 +3008,16 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 ## Security and access control
 
 <AccordionGroup>
-  <Accordion title="Is it safe to expose KaijiBot to inbound DMs?">
+  <Accordion title="Is it safe to expose AllBot to inbound DMs?">
     Treat inbound DMs as untrusted input. Defaults are designed to reduce risk:
 
     - Default behavior on DM-capable channels is **pairing**:
       - Unknown senders receive a pairing code; the bot does not process their message.
-      - Approve with: `kaijibot pairing approve --channel <channel> [--account <id>] <code>`
-      - Pending requests are capped at **3 per channel**; check `kaijibot pairing list --channel <channel> [--account <id>]` if a code didn't arrive.
+      - Approve with: `allbot pairing approve --channel <channel> [--account <id>] <code>`
+      - Pending requests are capped at **3 per channel**; check `allbot pairing list --channel <channel> [--account <id>]` if a code didn't arrive.
     - Opening DMs publicly requires explicit opt-in (`dmPolicy: "open"` and allowlist `"*"`).
 
-    Run `kaijibot doctor` to surface risky DM policies.
+    Run `allbot doctor` to surface risky DM policies.
 
   </Accordion>
 
@@ -3079,7 +3079,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     Check pending requests:
 
     ```bash
-    kaijibot pairing list telegram
+    allbot pairing list telegram
     ```
 
     If you want immediate access, allowlist your sender id or set `dmPolicy: "open"`
@@ -3088,18 +3088,18 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
   </Accordion>
 
   <Accordion title="WhatsApp: will it message my contacts? How does pairing work?">
-    No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. KaijiBot only replies to chats it receives or to explicit sends you trigger.
+    No. Default WhatsApp DM policy is **pairing**. Unknown senders only get a pairing code and their message is **not processed**. AllBot only replies to chats it receives or to explicit sends you trigger.
 
     Approve pairing with:
 
     ```bash
-    kaijibot pairing approve whatsapp <code>
+    allbot pairing approve whatsapp <code>
     ```
 
     List pending requests:
 
     ```bash
-    kaijibot pairing list whatsapp
+    allbot pairing list whatsapp
     ```
 
     Wizard phone number prompt: it's used to set your **allowlist/owner** so your own DMs are permitted. It's not used for auto-sending. If you run on your personal WhatsApp number, use that number and enable `channels.whatsapp.selfChatMode`.
@@ -3140,8 +3140,8 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
     stop current run
     stop agent
     stop the agent
-    stop kaijibot
-    kaijibot stop
+    stop allbot
+    allbot stop
     stop don't do anything
     stop do not do anything
     stop doing anything
@@ -3169,7 +3169,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
   </Accordion>
 
   <Accordion title='How do I send a Discord message from Telegram? ("Cross-context messaging denied")'>
-    KaijiBot blocks **cross-provider** messaging by default. If a tool call is bound
+    AllBot blocks **cross-provider** messaging by default. If a tool call is bound
     to Telegram, it won't send to Discord unless you explicitly allow it.
 
     Enable cross-provider messaging for the agent:
@@ -3209,7 +3209,7 @@ Related: [/concepts/oauth](/concepts/oauth) (OAuth flows, token storage, multi-a
 
 <AccordionGroup>
   <Accordion title='What is the default model for Anthropic with an API key?'>
-    In KaijiBot, credentials and model selection are separate. Setting `ANTHROPIC_API_KEY` (or storing an Anthropic API key in auth profiles) enables authentication, but the actual default model is whatever you configure in `agents.defaults.model.primary` (for example, `anthropic/claude-sonnet-4-6` or `anthropic/claude-opus-4-6`). If you see `No credentials found for profile "anthropic:default"`, it means the Gateway couldn't find Anthropic credentials in the expected `auth-profiles.json` for the agent that's running.
+    In AllBot, credentials and model selection are separate. Setting `ANTHROPIC_API_KEY` (or storing an Anthropic API key in auth profiles) enables authentication, but the actual default model is whatever you configure in `agents.defaults.model.primary` (for example, `anthropic/claude-sonnet-4-6` or `anthropic/claude-opus-4-6`). If you see `No credentials found for profile "anthropic:default"`, it means the Gateway couldn't find Anthropic credentials in the expected `auth-profiles.json` for the agent that's running.
   </Accordion>
 </AccordionGroup>
 

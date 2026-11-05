@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { safeEqualSecret } from "kaijibot/plugin-sdk/browser-security-runtime";
-import { normalizeLowercaseStringOrEmpty } from "kaijibot/plugin-sdk/text-runtime";
+import { safeEqualSecret } from "allbot/plugin-sdk/browser-security-runtime";
+import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
 import { z } from "zod";
 import type { PluginRuntime } from "../api.js";
 import {
@@ -12,7 +12,7 @@ import {
   withResolvedWebhookRequestPipeline,
   WEBHOOK_IN_FLIGHT_DEFAULTS,
   WEBHOOK_RATE_LIMIT_DEFAULTS,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type WebhookInFlightLimiter,
 } from "../runtime-api.js";
 
@@ -313,7 +313,7 @@ function extractSharedSecret(req: IncomingMessage): string {
   if (normalizeLowercaseStringOrEmpty(authHeader).startsWith("bearer ")) {
     return authHeader.slice("bearer ".length).trim();
   }
-  const sharedHeader = req.headers["x-kaijibot-webhook-secret"];
+  const sharedHeader = req.headers["x-allbot-webhook-secret"];
   return Array.isArray(sharedHeader)
     ? String(sharedHeader[0] ?? "").trim()
     : String(sharedHeader ?? "").trim();
@@ -533,7 +533,7 @@ function describeWebhookOutcome(params: { action: WebhookAction; result: unknown
 async function executeWebhookAction(params: {
   action: WebhookAction;
   target: TaskFlowWebhookTarget;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
 }): Promise<unknown> {
   const { action, target } = params;
   switch (action.action) {
@@ -661,7 +661,7 @@ async function executeWebhookAction(params: {
 }
 
 export function createTaskFlowWebhookRequestHandler(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   targetsByPath: Map<string, TaskFlowWebhookTarget[]>;
   inFlightLimiter?: WebhookInFlightLimiter;
 }): (req: IncomingMessage, res: ServerResponse) => Promise<boolean> {

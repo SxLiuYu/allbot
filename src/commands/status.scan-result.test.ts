@@ -11,7 +11,7 @@ describe("buildStatusScanResult", () => {
       label: "linux 6.8.0 (x64)",
     };
     const update = {
-      root: "/tmp/kaijibot",
+      root: "/tmp/allbot",
       installKind: "package" as const,
       packageManager: "npm" as const,
     };

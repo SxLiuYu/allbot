@@ -1,5 +1,5 @@
 /**
- * KaijiBot WeChat channel plugin — public barrel.
+ * AllBot WeChat channel plugin — public barrel.
  *
  * Re-exports the channel plugin object produced by `src/channel.ts`.
  * Entry point (`index.ts`) references this via `defineBundledChannelEntry`.

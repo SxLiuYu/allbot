@@ -1,27 +1,27 @@
-# KaijiBot docs i18n assets
+# AllBot docs i18n assets
 
 This folder stores translation config for the source docs repo.
 
 Generated locale trees and live translation memory now live in the publish repo:
 
-- repo: `kaijibot/docs`
-- local checkout: `~/Projects/kaijibot-docs`
+- repo: `allbot/docs`
+- local checkout: `~/Projects/allbot-docs`
 
 ## Source of truth
 
-- English docs are authored in `kaijibot/kaijibot`.
+- English docs are authored in `allbot/allbot`.
 - The source docs tree lives under `docs/`.
 - The source repo no longer keeps committed generated locale trees such as `docs/zh-CN/**`, `docs/ja-JP/**`, `docs/es/**`, `docs/pt-BR/**`, `docs/ko/**`, `docs/de/**`, `docs/fr/**`, `docs/ar/**`, `docs/it/**`, `docs/tr/**`, `docs/uk/**`, `docs/id/**`, or `docs/pl/**`.
 
 ## End-to-end flow
 
-1. Edit English docs in `kaijibot/kaijibot`.
+1. Edit English docs in `allbot/allbot`.
 2. Push to `main`.
-3. `kaijibot/kaijibot/.github/workflows/docs-sync-publish.yml` mirrors the docs tree into `kaijibot/docs`.
+3. `allbot/allbot/.github/workflows/docs-sync-publish.yml` mirrors the docs tree into `allbot/docs`.
 4. The sync script rewrites the publish `docs/docs.json` so the generated locale picker blocks exist there even though they are no longer committed in the source repo.
-5. `kaijibot/docs/.github/workflows/translate-zh-cn.yml` refreshes `docs/zh-CN/**` once a day, on demand, and after source-repo release dispatches.
-6. `kaijibot/docs/.github/workflows/translate-ja-jp.yml` does the same for `docs/ja-JP/**`.
-7. `kaijibot/docs/.github/workflows/translate-es.yml`, `translate-pt-br.yml`, `translate-ko.yml`, `translate-de.yml`, `translate-fr.yml`, `translate-ar.yml`, `translate-it.yml`, `translate-tr.yml`, `translate-uk.yml`, `translate-id.yml`, and `translate-pl.yml` do the same for `docs/es/**`, `docs/pt-BR/**`, `docs/ko/**`, `docs/de/**`, `docs/fr/**`, `docs/ar/**`, `docs/it/**`, `docs/tr/**`, `docs/uk/**`, `docs/id/**`, and `docs/pl/**`.
+5. `allbot/docs/.github/workflows/translate-zh-cn.yml` refreshes `docs/zh-CN/**` once a day, on demand, and after source-repo release dispatches.
+6. `allbot/docs/.github/workflows/translate-ja-jp.yml` does the same for `docs/ja-JP/**`.
+7. `allbot/docs/.github/workflows/translate-es.yml`, `translate-pt-br.yml`, `translate-ko.yml`, `translate-de.yml`, `translate-fr.yml`, `translate-ar.yml`, `translate-it.yml`, `translate-tr.yml`, `translate-uk.yml`, `translate-id.yml`, and `translate-pl.yml` do the same for `docs/es/**`, `docs/pt-BR/**`, `docs/ko/**`, `docs/de/**`, `docs/fr/**`, `docs/ar/**`, `docs/it/**`, `docs/tr/**`, `docs/uk/**`, `docs/id/**`, and `docs/pl/**`.
 
 ## Why the split exists
 
@@ -66,7 +66,7 @@ Fields:
 
 ## Operational notes
 
-- Sync metadata is written to `.kaijibot-sync/source.json` in the publish repo.
-- Source repo secret: `KAIJIBOT_DOCS_SYNC_TOKEN`
-- Publish repo secret: `KAIJIBOT_DOCS_I18N_OPENAI_API_KEY`
-- If locale output looks stale, check the matching `Translate <locale>` workflow in `kaijibot/docs` first.
+- Sync metadata is written to `.allbot-sync/source.json` in the publish repo.
+- Source repo secret: `ALLBOT_DOCS_SYNC_TOKEN`
+- Publish repo secret: `ALLBOT_DOCS_I18N_OPENAI_API_KEY`
+- If locale output looks stale, check the matching `Translate <locale>` workflow in `allbot/docs` first.

@@ -83,8 +83,8 @@ async function assertUnmanagedGatewayRestartEnabled(port: number): Promise<void>
   const probe = await probeGateway({
     url: `${scheme}://127.0.0.1:${port}`,
     auth: {
-      token: normalizeOptionalString(process.env.KAIJIBOT_GATEWAY_TOKEN),
-      password: normalizeOptionalString(process.env.KAIJIBOT_GATEWAY_PASSWORD),
+      token: normalizeOptionalString(process.env.ALLBOT_GATEWAY_TOKEN),
+      password: normalizeOptionalString(process.env.ALLBOT_GATEWAY_PASSWORD),
     },
     timeoutMs: 1_000,
   }).catch(() => null);
@@ -127,7 +127,7 @@ async function restartGatewayWithoutServiceManager(port: number) {
   }
   if (pids.length > 1) {
     throw new Error(
-      `multiple gateway processes are listening on port ${port}: ${formatGatewayPidList(pids)}; use "kaijibot gateway status --deep" before retrying restart`,
+      `multiple gateway processes are listening on port ${port}: ${formatGatewayPidList(pids)}; use "allbot gateway status --deep" before retrying restart`,
     );
   }
   signalVerifiedGatewayPidSync(pids[0], "SIGUSR1");
@@ -159,7 +159,7 @@ export async function runDaemonStart(opts: DaemonLifecycleOptions = {}) {
       theme.warn(
         t("cli.daemon.start.noServiceManager", {
           platform: process.platform,
-          cmd: formatCliCommand("kaijibot gateway"),
+          cmd: formatCliCommand("allbot gateway"),
         }),
       ),
     );
@@ -224,7 +224,7 @@ export async function runDaemonRestart(opts: DaemonLifecycleOptions = {}): Promi
           theme.warn(
             t("cli.daemon.restart.noProcess", {
               port: restartPort,
-              cmd: formatCliCommand("kaijibot gateway"),
+              cmd: formatCliCommand("allbot gateway"),
             }),
           ),
         );
@@ -304,8 +304,8 @@ export async function runDaemonRestart(opts: DaemonLifecycleOptions = {}): Promi
         }
 
         fail(`Gateway restart timed out after ${restartWaitSeconds}s waiting for health checks.`, [
-          formatCliCommand("kaijibot gateway status --deep"),
-          formatCliCommand("kaijibot doctor"),
+          formatCliCommand("allbot gateway status --deep"),
+          formatCliCommand("allbot doctor"),
         ]);
       }
 
@@ -370,8 +370,8 @@ export async function runDaemonRestart(opts: DaemonLifecycleOptions = {}): Promi
       }
 
       fail(failure.failMessage, [
-        formatCliCommand("kaijibot gateway status --deep"),
-        formatCliCommand("kaijibot doctor"),
+        formatCliCommand("allbot gateway status --deep"),
+        formatCliCommand("allbot doctor"),
       ]);
     },
   });

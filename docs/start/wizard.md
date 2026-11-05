@@ -9,25 +9,25 @@ sidebarTitle: "Onboarding: CLI"
 
 # Onboarding (CLI)
 
-CLI onboarding is the **recommended** way to set up KaijiBot on macOS,
+CLI onboarding is the **recommended** way to set up AllBot on macOS,
 Linux, or Windows (via WSL2; strongly recommended).
 It configures a local Gateway or a remote Gateway connection, plus channels, skills,
 and workspace defaults in one guided flow.
 
 ```bash
-kaijibot onboard
+allbot onboard
 ```
 
 <Info>
 Fastest first chat: open the Control UI (no channel setup needed). Run
-`kaijibot dashboard` and chat in the browser. Docs: [Dashboard](/web/dashboard).
+`allbot dashboard` and chat in the browser. Docs: [Dashboard](/web/dashboard).
 </Info>
 
 To reconfigure later:
 
 ```bash
-kaijibot configure
-kaijibot agents add <name>
+allbot configure
+allbot agents add <name>
 ```
 
 <Note>
@@ -39,7 +39,7 @@ CLI onboarding includes a web search step where you can pick a provider
 such as Brave, DuckDuckGo, Exa, Firecrawl, Gemini, Grok, Kimi, MiniMax Search,
 Ollama Web Search, Perplexity, SearXNG, or Tavily. Some providers require an
 API key, while others are key-free. You can also configure this later with
-`kaijibot configure --section web`. Docs: [Web tools](/tools/web).
+`allbot configure --section web`. Docs: [Web tools](/tools/web).
 </Tip>
 
 ## QuickStart vs Advanced
@@ -73,7 +73,7 @@ Onboarding starts with **QuickStart** (defaults) vs **Advanced** (full control).
    In non-interactive `ref` mode, the provider env var must be set; passing inline key flags without that env var fails fast.
    In interactive runs, choosing secret reference mode lets you point at either an environment variable or a configured provider ref (`file` or `exec`), with a fast preflight validation before saving.
    For Anthropic, interactive onboarding/configure offers **Anthropic Claude CLI** as the preferred local path and **Anthropic API key** as the recommended production path. Anthropic setup-token also remains available as a supported token-auth path.
-2. **Workspace** — Location for agent files (default `~/.kaijibot/workspace`). Seeds bootstrap files.
+2. **Workspace** — Location for agent files (default `~/.allbot/workspace`). Seeds bootstrap files.
 3. **Gateway** — Port, bind address, auth mode, Tailscale exposure.
    In interactive token mode, choose default plaintext token storage or opt into SecretRef.
    Non-interactive token SecretRef path: `--gateway-token-ref-env <ENV_VAR>`.
@@ -88,7 +88,7 @@ Onboarding starts with **QuickStart** (defaults) vs **Advanced** (full control).
 <Note>
 Re-running onboarding does **not** wipe anything unless you explicitly choose **Reset** (or pass `--reset`).
 CLI `--reset` defaults to config, credentials, and sessions; use `--reset-scope full` to include workspace.
-If the config is invalid or contains legacy keys, onboarding asks you to run `kaijibot doctor` first.
+If the config is invalid or contains legacy keys, onboarding asks you to run `allbot doctor` first.
 </Note>
 
 **Remote mode** only configures the local client to connect to a Gateway elsewhere.
@@ -96,7 +96,7 @@ It does **not** install or change anything on the remote host.
 
 ## Add another agent
 
-Use `kaijibot agents add <name>` to create a separate agent with its own workspace,
+Use `allbot agents add <name>` to create a separate agent with its own workspace,
 sessions, and auth profiles. Running without `--workspace` launches onboarding.
 
 What it sets:
@@ -107,7 +107,7 @@ What it sets:
 
 Notes:
 
-- Default workspaces follow `~/.kaijibot/workspace-<agentId>`.
+- Default workspaces follow `~/.allbot/workspace-<agentId>`.
 - Add `bindings` to route inbound messages (onboarding can do this).
 - Non-interactive flags: `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
 
@@ -121,6 +121,6 @@ For the deeper technical reference, including RPC details, see
 
 ## Related docs
 
-- CLI command reference: [`kaijibot onboard`](/cli/onboard)
+- CLI command reference: [`allbot onboard`](/cli/onboard)
 - Onboarding overview: [Onboarding Overview](/start/onboarding-overview)
 - Agent first-run ritual: [Agent Bootstrapping](/start/bootstrapping)

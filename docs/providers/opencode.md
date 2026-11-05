@@ -1,5 +1,5 @@
 ---
-summary: "Use OpenCode Zen and Go catalogs with KaijiBot"
+summary: "Use OpenCode Zen and Go catalogs with AllBot"
 read_when:
   - You want OpenCode-hosted model access
   - You want to pick between the Zen and Go catalogs
@@ -8,12 +8,12 @@ title: "OpenCode"
 
 # OpenCode
 
-OpenCode exposes two hosted catalogs in KaijiBot:
+OpenCode exposes two hosted catalogs in AllBot:
 
 - `opencode/...` for the **Zen** catalog
 - `opencode-go/...` for the **Go** catalog
 
-Both catalogs use the same OpenCode API key. KaijiBot keeps the runtime provider ids
+Both catalogs use the same OpenCode API key. AllBot keeps the runtime provider ids
 split so upstream per-model routing stays correct, but onboarding and docs treat them
 as one OpenCode setup.
 
@@ -22,15 +22,15 @@ as one OpenCode setup.
 ### Zen catalog
 
 ```bash
-kaijibot onboard --auth-choice opencode-zen
-kaijibot onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
+allbot onboard --auth-choice opencode-zen
+allbot onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
 ```
 
 ### Go catalog
 
 ```bash
-kaijibot onboard --auth-choice opencode-go
-kaijibot onboard --opencode-go-api-key "$OPENCODE_API_KEY"
+allbot onboard --auth-choice opencode-go
+allbot onboard --opencode-go-api-key "$OPENCODE_API_KEY"
 ```
 
 ## Config snippet
@@ -62,7 +62,7 @@ kaijibot onboard --opencode-go-api-key "$OPENCODE_API_KEY"
 - Entering one OpenCode key during setup stores credentials for both runtime providers.
 - You sign in to OpenCode, add billing details, and copy your API key.
 - Billing and catalog availability are managed from the OpenCode dashboard.
-- Gemini-backed OpenCode refs stay on the proxy-Gemini path, so KaijiBot keeps
+- Gemini-backed OpenCode refs stay on the proxy-Gemini path, so AllBot keeps
   Gemini thought-signature sanitation there without enabling native Gemini
   replay validation or bootstrap rewrites.
 - Non-Gemini OpenCode refs keep the minimal OpenAI-compatible replay policy.

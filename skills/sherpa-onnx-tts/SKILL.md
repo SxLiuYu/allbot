@@ -3,7 +3,7 @@ name: sherpa-onnx-tts
 description: Local text-to-speech via sherpa-onnx (offline, no cloud)
 metadata:
   {
-    "kaijibot":
+    "allbot":
       {
         "emoji": "🔉",
         "os": ["darwin", "linux", "win32"],
@@ -63,16 +63,16 @@ Local TTS using the sherpa-onnx offline CLI.
 
 ## Install
 
-1. Download the runtime for your OS (extracts into `$KAIJIBOT_STATE_DIR/tools/sherpa-onnx-tts/runtime`, default `~/.kaijibot/tools/sherpa-onnx-tts/runtime`)
-2. Download a voice model (extracts into `$KAIJIBOT_STATE_DIR/tools/sherpa-onnx-tts/models`, default `~/.kaijibot/tools/sherpa-onnx-tts/models`)
+1. Download the runtime for your OS (extracts into `$ALLBOT_STATE_DIR/tools/sherpa-onnx-tts/runtime`, default `~/.allbot/tools/sherpa-onnx-tts/runtime`)
+2. Download a voice model (extracts into `$ALLBOT_STATE_DIR/tools/sherpa-onnx-tts/models`, default `~/.allbot/tools/sherpa-onnx-tts/models`)
 
 Resolve the active state directory first:
 
 ```bash
-STATE_DIR="${KAIJIBOT_STATE_DIR:-$HOME/.kaijibot}"
+STATE_DIR="${ALLBOT_STATE_DIR:-$HOME/.allbot}"
 ```
 
-Then write those resolved paths into the active KaijiBot config file (`$KAIJIBOT_CONFIG_PATH`, default `~/.kaijibot/kaijibot.json`):
+Then write those resolved paths into the active AllBot config file (`$ALLBOT_CONFIG_PATH`, default `~/.allbot/allbot.json`):
 
 ```json5
 {

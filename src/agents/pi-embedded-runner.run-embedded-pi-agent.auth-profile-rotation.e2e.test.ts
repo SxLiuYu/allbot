@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { redactIdentifier } from "../logging/redact-identifier.js";
 import type { AuthProfileFailureReason } from "./auth-profiles.js";
 import { buildAttemptReplayMetadata } from "./pi-embedded-runner/run/incomplete-turn.js";
@@ -98,7 +98,7 @@ const installRunEmbeddedMocks = () => {
     const mod = await vi.importActual<typeof import("./models-config.js")>("./models-config.js");
     return {
       ...mod,
-      ensureKaijiBotModelsJson: vi.fn(async () => ({ wrote: false })),
+      ensureAllBotModelsJson: vi.fn(async () => ({ wrote: false })),
     };
   });
 };
@@ -216,7 +216,7 @@ const makeConfig = (opts?: {
   apiKey?: string;
   overloadedBackoffMs?: number;
   overloadedProfileRotations?: number;
-}): KaijiBotConfig =>
+}): AllBotConfig =>
   ({
     auth:
       opts?.overloadedBackoffMs != null || opts?.overloadedProfileRotations != null
@@ -258,9 +258,9 @@ const makeConfig = (opts?: {
         },
       },
     },
-  }) satisfies KaijiBotConfig;
+  }) satisfies AllBotConfig;
 
-const makeAgentOverrideOnlyFallbackConfig = (agentId: string): KaijiBotConfig =>
+const makeAgentOverrideOnlyFallbackConfig = (agentId: string): AllBotConfig =>
   ({
     agents: {
       defaults: {
@@ -297,11 +297,11 @@ const makeAgentOverrideOnlyFallbackConfig = (agentId: string): KaijiBotConfig =>
         },
       },
     },
-  }) satisfies KaijiBotConfig;
+  }) satisfies AllBotConfig;
 
 const copilotModelId = "gpt-4o";
 
-const makeCopilotConfig = (): KaijiBotConfig =>
+const makeCopilotConfig = (): AllBotConfig =>
   ({
     models: {
       providers: {
@@ -322,7 +322,7 @@ const makeCopilotConfig = (): KaijiBotConfig =>
         },
       },
     },
-  }) satisfies KaijiBotConfig;
+  }) satisfies AllBotConfig;
 
 const writeAuthStore = async (
   agentDir: string,
@@ -427,7 +427,7 @@ async function runAutoPinnedOpenAiTurn(params: {
   sessionKey: string;
   runId: string;
   authProfileId?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }) {
   await runEmbeddedPiAgentInline({
     sessionId: "session:test",
@@ -470,7 +470,7 @@ async function runAutoPinnedRotationCase(params: {
   errorMessage: string;
   sessionKey: string;
   runId: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }) {
   runEmbeddedAttemptMock.mockReset();
   return withAgentWorkspace(async ({ agentDir, workspaceDir }) => {
@@ -494,7 +494,7 @@ async function runAutoPinnedPromptErrorRotationCase(params: {
   errorMessage: string;
   sessionKey: string;
   runId: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
 }) {
   runEmbeddedAttemptMock.mockReset();
   return withAgentWorkspace(async ({ agentDir, workspaceDir }) => {
@@ -549,8 +549,8 @@ async function withTimedAgentWorkspace<T>(
 ) {
   vi.useFakeTimers();
   try {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-"));
     const now = Date.now();
     vi.setSystemTime(now);
 
@@ -568,8 +568,8 @@ async function withTimedAgentWorkspace<T>(
 async function withAgentWorkspace<T>(
   run: (ctx: { agentDir: string; workspaceDir: string }) => Promise<T>,
 ) {
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
-  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
+  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-"));
   try {
     return await run({ agentDir, workspaceDir });
   } finally {
@@ -616,8 +616,8 @@ async function runTurnWithCooldownSeed(params: {
 
 describe("runEmbeddedPiAgent auth profile rotation", () => {
   it("refreshes copilot token after auth error and retries once", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-"));
     try {
       await writeCopilotAuthStore(agentDir);
       const now = Date.now();
@@ -682,8 +682,8 @@ describe("runEmbeddedPiAgent auth profile rotation", () => {
   });
 
   it("allows another auth refresh after a successful retry", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-"));
     try {
       await writeCopilotAuthStore(agentDir);
       const now = Date.now();
@@ -766,8 +766,8 @@ describe("runEmbeddedPiAgent auth profile rotation", () => {
   });
 
   it("does not reschedule copilot refresh after shutdown", async () => {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-workspace-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-workspace-"));
     vi.useFakeTimers();
     try {
       await writeCopilotAuthStore(agentDir);
@@ -846,7 +846,7 @@ describe("runEmbeddedPiAgent auth profile rotation", () => {
     setLoggerOverrideFn({
       level: "trace",
       consoleLevel: "silent",
-      file: path.join(os.tmpdir(), `kaijibot-auth-rotation-${Date.now()}.log`),
+      file: path.join(os.tmpdir(), `allbot-auth-rotation-${Date.now()}.log`),
     });
     unregisterLogTransport = registerLogTransportFn((record) => {
       records.push(record);

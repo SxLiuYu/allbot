@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { findNormalizedProviderValue, normalizeProviderId } from "../model-selection.js";
 import { resolveProviderIdForAuth } from "../provider-auth-aliases.js";
 import {
@@ -25,7 +25,7 @@ export type AuthProfileEligibility = {
 };
 
 export function resolveAuthProfileEligibility(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store: AuthProfileStore;
   provider: string;
   profileId: string;
@@ -64,7 +64,7 @@ export function resolveAuthProfileEligibility(params: {
 }
 
 export function resolveAuthProfileOrder(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store: AuthProfileStore;
   provider: string;
   preferredProfile?: string;

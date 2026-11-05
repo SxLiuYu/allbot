@@ -91,8 +91,8 @@ function looksLikeAuthClose(code: number | undefined, reason: string | undefined
 }
 
 async function confirmGatewayReachable(port: number): Promise<boolean> {
-  const token = normalizeOptionalString(process.env.KAIJIBOT_GATEWAY_TOKEN);
-  const password = normalizeOptionalString(process.env.KAIJIBOT_GATEWAY_PASSWORD);
+  const token = normalizeOptionalString(process.env.ALLBOT_GATEWAY_TOKEN);
+  const password = normalizeOptionalString(process.env.ALLBOT_GATEWAY_PASSWORD);
   const probe = await probeGateway({
     url: `ws://127.0.0.1:${port}`,
     auth: token || password ? { token, password } : undefined,

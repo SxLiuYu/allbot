@@ -1,6 +1,6 @@
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import type { MessagingToolSend } from "../../agents/pi-embedded-runner.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { stripHeartbeatToken } from "../heartbeat.js";
 import type { OriginatingChannelType } from "../templating.js";
 import type { ReplyPayload } from "../types.js";
@@ -18,7 +18,7 @@ import {
 import { resolveReplyToMode } from "./reply-threading.js";
 
 export function resolveFollowupDeliveryPayloads(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   payloads: ReplyPayload[];
   messageProvider?: string;
   originatingAccountId?: string;

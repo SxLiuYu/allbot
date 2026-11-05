@@ -206,7 +206,7 @@ export async function runServiceStart(params: {
     const configError = await getConfigValidationError();
     if (configError) {
       fail(
-        `${params.serviceNoun} aborted: config is invalid.\n${configError}\nFix the config and retry, or run "kaijibot doctor" to repair.`,
+        `${params.serviceNoun} aborted: config is invalid.\n${configError}\nFix the config and retry, or run "allbot doctor" to repair.`,
       );
       return;
     }
@@ -389,7 +389,7 @@ export async function runServiceRestart(params: {
     const configError = await getConfigValidationError();
     if (configError) {
       fail(
-        `${params.serviceNoun} aborted: config is invalid.\n${configError}\nFix the config and retry, or run "kaijibot doctor" to repair.`,
+        `${params.serviceNoun} aborted: config is invalid.\n${configError}\nFix the config and retry, or run "allbot doctor" to repair.`,
       );
       return false;
     }
@@ -423,7 +423,7 @@ export async function runServiceRestart(params: {
     // Check for token drift before restart (service token vs config token)
     try {
       const command = await params.service.readCommand(process.env);
-      const serviceToken = command?.environment?.KAIJIBOT_GATEWAY_TOKEN;
+      const serviceToken = command?.environment?.ALLBOT_GATEWAY_TOKEN;
       const cfg = await readBestEffortConfig();
       const driftEnv = {
         ...process.env,

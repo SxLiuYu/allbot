@@ -1,15 +1,15 @@
 {
-  "name": "@myorg/kaijibot-my-plugin",
+  "name": "@myorg/allbot-my-plugin",
   "version": "1.0.0",
   "type": "module",
-  "kaijibot": {
+  "allbot": {
     "extensions": ["./index.ts"],
     "compat": {
       "pluginApi": ">=2026.3.24-beta.2",
       "minGatewayVersion": "2026.3.24-beta.2"
     },
     "build": {
-      "kaijibotVersion": "2026.3.24-beta.2",
+      "allbotVersion": "2026.3.24-beta.2",
       "pluginSdkVersion": "2026.3.24-beta.2"
     }
   }

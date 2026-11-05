@@ -1,5 +1,5 @@
 import type * as Lark from "@larksuiteoapi/node-sdk";
-import type { KaijiBotPluginApi } from "../runtime-api.js";
+import type { AllBotPluginApi } from "../runtime-api.js";
 import { listEnabledFeishuAccounts } from "./accounts.js";
 import { createFeishuToolClient, resolveAnyEnabledFeishuToolsConfig } from "./tool-account.js";
 import {
@@ -215,7 +215,7 @@ async function getMeetingDetail(
 
 // ============ Tool Registration ============
 
-export function registerFeishuVcTools(api: KaijiBotPluginApi) {
+export function registerFeishuVcTools(api: AllBotPluginApi) {
   if (!api.config) {
     api.logger.debug?.("feishu_vc: No config available, skipping vc tools");
     return;

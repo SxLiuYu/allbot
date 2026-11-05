@@ -1,8 +1,8 @@
-import { hasControlCommand } from "kaijibot/plugin-sdk/command-auth";
+import { hasControlCommand } from "allbot/plugin-sdk/command-auth";
 import {
   createInboundDebouncer,
   resolveInboundDebounceMs,
-} from "kaijibot/plugin-sdk/reply-runtime";
+} from "allbot/plugin-sdk/reply-runtime";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createNonExitingTypedRuntimeEnv } from "../../../test/helpers/plugins/runtime-env.js";
 import type { ClawdbotConfig, PluginRuntime, RuntimeEnv } from "../runtime-api.js";

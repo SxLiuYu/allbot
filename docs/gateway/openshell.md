@@ -1,6 +1,6 @@
 ---
 title: OpenShell
-summary: "Use OpenShell as a managed sandbox backend for KaijiBot agents"
+summary: "Use OpenShell as a managed sandbox backend for AllBot agents"
 read_when:
   - You want cloud-managed sandboxes instead of local Docker
   - You are setting up the OpenShell plugin
@@ -9,8 +9,8 @@ read_when:
 
 # OpenShell
 
-OpenShell is a managed sandbox backend for KaijiBot. Instead of running Docker
-containers locally, KaijiBot delegates sandbox lifecycle to the `openshell` CLI,
+OpenShell is a managed sandbox backend for AllBot. Instead of running Docker
+containers locally, AllBot delegates sandbox lifecycle to the `openshell` CLI,
 which provisions remote environments with SSH-based command execution.
 
 The OpenShell plugin reuses the same core SSH transport and remote filesystem
@@ -23,7 +23,7 @@ and an optional `mirror` workspace mode.
 - The `openshell` CLI installed and on `PATH` (or set a custom path via
   `plugins.entries.openshell.config.command`)
 - An OpenShell account with sandbox access
-- KaijiBot Gateway running on the host
+- AllBot Gateway running on the host
 
 ## Quick start
 
@@ -46,7 +46,7 @@ and an optional `mirror` workspace mode.
       openshell: {
         enabled: true,
         config: {
-          from: "kaijibot",
+          from: "allbot",
           mode: "remote",
         },
       },
@@ -55,14 +55,14 @@ and an optional `mirror` workspace mode.
 }
 ```
 
-2. Restart the Gateway. On the next agent turn, KaijiBot creates an OpenShell
+2. Restart the Gateway. On the next agent turn, AllBot creates an OpenShell
    sandbox and routes tool execution through it.
 
 3. Verify:
 
 ```bash
-kaijibot sandbox list
-kaijibot sandbox explain
+allbot sandbox list
+allbot sandbox explain
 ```
 
 ## Workspace modes
@@ -76,14 +76,14 @@ workspace to stay canonical**.
 
 Behavior:
 
-- Before `exec`, KaijiBot syncs the local workspace into the OpenShell sandbox.
-- After `exec`, KaijiBot syncs the remote workspace back to the local workspace.
+- Before `exec`, AllBot syncs the local workspace into the OpenShell sandbox.
+- After `exec`, AllBot syncs the remote workspace back to the local workspace.
 - File tools still operate through the sandbox bridge, but the local workspace
   remains the source of truth between turns.
 
 Best for:
 
-- You edit files locally outside KaijiBot and want those changes visible in the
+- You edit files locally outside AllBot and want those changes visible in the
   sandbox automatically.
 - You want the OpenShell sandbox to behave as much like the Docker backend as
   possible.
@@ -98,11 +98,11 @@ Use `plugins.entries.openshell.config.mode: "remote"` when you want the
 
 Behavior:
 
-- When the sandbox is first created, KaijiBot seeds the remote workspace from
+- When the sandbox is first created, AllBot seeds the remote workspace from
   the local workspace once.
 - After that, `exec`, `read`, `write`, `edit`, and `apply_patch` operate
   directly against the remote OpenShell workspace.
-- KaijiBot does **not** sync remote changes back into the local workspace.
+- AllBot does **not** sync remote changes back into the local workspace.
 - Prompt-time media reads still work because file and media tools read through
   the sandbox bridge.
 
@@ -112,9 +112,9 @@ Best for:
 - You want lower per-turn sync overhead.
 - You do not want host-local edits to silently overwrite remote sandbox state.
 
-Important: if you edit files on the host outside KaijiBot after the initial seed,
+Important: if you edit files on the host outside AllBot after the initial seed,
 the remote sandbox does **not** see those changes. Use
-`kaijibot sandbox recreate` to re-seed.
+`allbot sandbox recreate` to re-seed.
 
 ### Choosing a mode
 
@@ -134,7 +134,7 @@ All OpenShell config lives under `plugins.entries.openshell.config`:
 | ------------------------- | ------------------------ | ------------- | ----------------------------------------------------- |
 | `mode`                    | `"mirror"` or `"remote"` | `"mirror"`    | Workspace sync mode                                   |
 | `command`                 | `string`                 | `"openshell"` | Path or name of the `openshell` CLI                   |
-| `from`                    | `string`                 | `"kaijibot"`  | Sandbox source for first-time create                  |
+| `from`                    | `string`                 | `"allbot"`  | Sandbox source for first-time create                  |
 | `gateway`                 | `string`                 | —             | OpenShell gateway name (`--gateway`)                  |
 | `gatewayEndpoint`         | `string`                 | —             | OpenShell gateway endpoint URL (`--gateway-endpoint`) |
 | `policy`                  | `string`                 | —             | OpenShell policy ID for sandbox creation              |
@@ -168,7 +168,7 @@ Sandbox-level settings (`mode`, `scope`, `workspaceAccess`) are configured under
       openshell: {
         enabled: true,
         config: {
-          from: "kaijibot",
+          from: "allbot",
           mode: "remote",
         },
       },
@@ -196,7 +196,7 @@ Sandbox-level settings (`mode`, `scope`, `workspaceAccess`) are configured under
       openshell: {
         enabled: true,
         config: {
-          from: "kaijibot",
+          from: "allbot",
           mode: "mirror",
           gpu: true,
           providers: ["openai"],
@@ -233,7 +233,7 @@ Sandbox-level settings (`mode`, `scope`, `workspaceAccess`) are configured under
       openshell: {
         enabled: true,
         config: {
-          from: "kaijibot",
+          from: "allbot",
           mode: "remote",
           gateway: "lab",
           gatewayEndpoint: "https://lab.example",
@@ -251,13 +251,13 @@ OpenShell sandboxes are managed through the normal sandbox CLI:
 
 ```bash
 # List all sandbox runtimes (Docker + OpenShell)
-kaijibot sandbox list
+allbot sandbox list
 
 # Inspect effective policy
-kaijibot sandbox explain
+allbot sandbox explain
 
 # Recreate (deletes remote workspace, re-seeds on next use)
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 ```
 
 For `remote` mode, **recreate is especially important**: it deletes the canonical
@@ -277,7 +277,7 @@ Recreate after changing any of these:
 - `plugins.entries.openshell.config.policy`
 
 ```bash
-kaijibot sandbox recreate --all
+allbot sandbox recreate --all
 ```
 
 ## Current limitations
@@ -289,9 +289,9 @@ kaijibot sandbox recreate --all
 
 ## How it works
 
-1. KaijiBot calls `openshell sandbox create` (with `--from`, `--gateway`,
+1. AllBot calls `openshell sandbox create` (with `--from`, `--gateway`,
    `--policy`, `--providers`, `--gpu` flags as configured).
-2. KaijiBot calls `openshell sandbox ssh-config <name>` to get SSH connection
+2. AllBot calls `openshell sandbox ssh-config <name>` to get SSH connection
    details for the sandbox.
 3. Core writes the SSH config to a temp file and opens an SSH session using the
    same remote filesystem bridge as the generic SSH backend.
@@ -304,4 +304,4 @@ kaijibot sandbox recreate --all
 - [Sandboxing](/gateway/sandboxing) -- modes, scopes, and backend comparison
 - [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated) -- debugging blocked tools
 - [Multi-Agent Sandbox and Tools](/tools/multi-agent-sandbox-tools) -- per-agent overrides
-- [Sandbox CLI](/cli/sandbox) -- `kaijibot sandbox` commands
+- [Sandbox CLI](/cli/sandbox) -- `allbot sandbox` commands

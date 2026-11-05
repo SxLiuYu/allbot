@@ -1,4 +1,4 @@
-import type { ModelCompatConfig } from "kaijibot/plugin-sdk/provider-model-shared";
+import type { ModelCompatConfig } from "allbot/plugin-sdk/provider-model-shared";
 
 const GROQ_QWEN3_32B_ID = "qwen/qwen3-32b";
 const GROQ_GPT_OSS_REASONING_IDS = new Set([

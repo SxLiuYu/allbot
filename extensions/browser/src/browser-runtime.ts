@@ -41,8 +41,8 @@ export { resolveBrowserConfig, resolveProfile } from "./browser/config.js";
 export {
   DEFAULT_AI_SNAPSHOT_MAX_CHARS,
   DEFAULT_BROWSER_EVALUATE_ENABLED,
-  DEFAULT_KAIJIBOT_BROWSER_COLOR,
-  DEFAULT_KAIJIBOT_BROWSER_PROFILE_NAME,
+  DEFAULT_ALLBOT_BROWSER_COLOR,
+  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
 } from "./browser/constants.js";
 export {
   parseBrowserMajorVersion,

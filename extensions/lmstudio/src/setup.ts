@@ -3,15 +3,15 @@ import {
   buildApiKeyCredential,
   ensureApiKeyFromEnvOrPrompt,
   normalizeOptionalSecretInput,
-  type KaijiBotConfig,
+  type AllBotConfig,
   type SecretInput,
   type SecretInputMode,
-} from "kaijibot/plugin-sdk/provider-auth";
+} from "allbot/plugin-sdk/provider-auth";
 import type {
   ModelDefinitionConfig,
   ModelProviderConfig,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { withAgentModelAliases } from "kaijibot/plugin-sdk/provider-onboard";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { withAgentModelAliases } from "allbot/plugin-sdk/provider-onboard";
 import {
   applyProviderDefaultModel,
   configureOpenAICompatibleSelfHostedProviderNonInteractive,
@@ -20,8 +20,8 @@ import {
   type ProviderCatalogContext,
   type ProviderPrepareDynamicModelContext,
   type ProviderRuntimeModel,
-} from "kaijibot/plugin-sdk/provider-setup";
-import { WizardCancelledError, type WizardPrompter } from "kaijibot/plugin-sdk/setup";
+} from "allbot/plugin-sdk/provider-setup";
+import { WizardCancelledError, type WizardPrompter } from "allbot/plugin-sdk/setup";
 import {
   LMSTUDIO_DEFAULT_API_KEY_ENV_VAR,
   LMSTUDIO_DEFAULT_INFERENCE_BASE_URL,
@@ -65,7 +65,7 @@ type LmstudioSetupDiscovery = {
   defaultModelId: string | undefined;
 };
 
-function stripLmstudioStoredAuthConfig(cfg: KaijiBotConfig): KaijiBotConfig {
+function stripLmstudioStoredAuthConfig(cfg: AllBotConfig): AllBotConfig {
   const { profiles: _profiles, order: _order, ...restAuth } = cfg.auth ?? {};
   const nextProfiles = Object.fromEntries(
     Object.entries(cfg.auth?.profiles ?? {}).filter(
@@ -304,7 +304,7 @@ function isLmstudioDiscoveryConfigResolutionError(error: unknown): boolean {
 
 /** Preserves existing allowlist metadata and appends discovered LM Studio model refs. */
 function mergeDiscoveredLmstudioAllowlistEntries(params: {
-  existing?: NonNullable<NonNullable<KaijiBotConfig["agents"]>["defaults"]>["models"];
+  existing?: NonNullable<NonNullable<AllBotConfig["agents"]>["defaults"]>["models"];
   discoveredModels: ModelDefinitionConfig[];
 }) {
   return withAgentModelAliases(
@@ -362,7 +362,7 @@ async function discoverLmstudioSetupModels(params: {
 
 /** Interactive LM Studio setup with connectivity and model-availability checks. */
 export async function promptAndConfigureLmstudioInteractive(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   prompter?: WizardPrompter;
   secretInputMode?: SecretInputMode;
   allowSecretRefPrompt?: boolean;
@@ -517,7 +517,7 @@ export async function promptAndConfigureLmstudioInteractive(params: {
 /** Non-interactive setup path backed by the shared self-hosted helper. */
 export async function configureLmstudioNonInteractive(
   ctx: ProviderAuthMethodNonInteractiveContext,
-): Promise<KaijiBotConfig | null> {
+): Promise<AllBotConfig | null> {
   const customBaseUrl = normalizeOptionalSecretInput(ctx.opts.customBaseUrl);
   const baseUrl = resolveLmstudioInferenceBase(
     customBaseUrl || LMSTUDIO_DEFAULT_INFERENCE_BASE_URL,

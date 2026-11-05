@@ -4,7 +4,7 @@ import { listProfilesForProvider } from "../agents/auth-profiles/profiles.js";
 import { ensureAuthProfileStore } from "../agents/auth-profiles/store.js";
 import { resolveEnvApiKey } from "../agents/model-auth-env.js";
 
-export type { KaijiBotConfig } from "../config/config.js";
+export type { AllBotConfig } from "../config/config.js";
 export type { SecretInput } from "../config/types.secrets.js";
 export type { SecretInputMode } from "../plugins/provider-auth-types.js";
 export type { ProviderAuthResult } from "../plugins/types.js";

@@ -31,7 +31,7 @@ describe("proxy stream wrappers", () => {
       {
         headers: {
           "HTTP-Referer": "https://gitee.com/kaiji1126/kaijibot",
-          "X-OpenRouter-Title": "KaijiBot",
+          "X-OpenRouter-Title": "AllBot",
           "X-OpenRouter-Categories": "cli-agent",
           "X-Custom": "1",
         },

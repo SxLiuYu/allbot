@@ -6,8 +6,8 @@ import {
   resolveSubagentMaxConcurrent,
 } from "./agent-limits.js";
 import { loadConfig } from "./config.js";
-import { withTempHome, writeKaijiBotConfig } from "./test-helpers.js";
-import { KaijiBotSchema } from "./zod-schema.js";
+import { withTempHome, writeAllBotConfig } from "./test-helpers.js";
+import { AllBotSchema } from "./zod-schema.js";
 
 describe("agent concurrency defaults", () => {
   it("resolves defaults when unset", () => {
@@ -29,7 +29,7 @@ describe("agent concurrency defaults", () => {
   });
 
   it("accepts subagent spawn depth and per-agent child limits", () => {
-    const parsed = KaijiBotSchema.parse({
+    const parsed = AllBotSchema.parse({
       agents: {
         defaults: {
           subagents: {
@@ -46,7 +46,7 @@ describe("agent concurrency defaults", () => {
 
   it("injects defaults on load", async () => {
     await withTempHome(async (home) => {
-      await writeKaijiBotConfig(home, {});
+      await writeAllBotConfig(home, {});
 
       const cfg = loadConfig();
 

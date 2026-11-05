@@ -40,9 +40,9 @@ Skill files define **how to use** tools. This file records **your environment sp
 - Node version: 22+
 - Package manager: pnpm
 - Gateway port: 18789
-- Config file: check actual path via `kaijibot config path` (default `~/.kaijibot/kaijibot.json`)
-- Workspace: check actual path via `kaijibot status` (default `~/.kaijibot/workspace/`)
-- Session data: `~/.kaijibot/agents/<agentId>/sessions/*.jsonl`
+- Config file: check actual path via `allbot config path` (default `~/.allbot/allbot.json`)
+- Workspace: check actual path via `allbot status` (default `~/.allbot/workspace/`)
+- Session data: `~/.allbot/agents/<agentId>/sessions/*.jsonl`
 
 ## Operational Conventions
 

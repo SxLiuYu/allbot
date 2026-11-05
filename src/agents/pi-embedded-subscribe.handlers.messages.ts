@@ -1,6 +1,6 @@
 import type { AgentEvent, AgentMessage } from "@earendil-works/pi-agent-core";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
-import { resolveSendableOutboundReplyParts } from "kaijibot/plugin-sdk/reply-payload";
+import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
 import { parseReplyDirectives } from "../auto-reply/reply/reply-directives.js";
 import { isSilentReplyText, SILENT_REPLY_TOKEN } from "../auto-reply/tokens.js";
 import { emitAgentEvent } from "../infra/agent-events.js";
@@ -72,13 +72,13 @@ function shouldSuppressAssistantVisibleOutput(message: AgentMessage | undefined)
   return resolveAssistantMessagePhase(message) === "commentary";
 }
 
-function isTranscriptOnlyKaijiBotAssistantMessage(message: AgentMessage | undefined): boolean {
+function isTranscriptOnlyAllBotAssistantMessage(message: AgentMessage | undefined): boolean {
   if (!message || message.role !== "assistant") {
     return false;
   }
   const provider = normalizeOptionalString(message.provider) ?? "";
   const model = normalizeOptionalString(message.model) ?? "";
-  return provider === "kaijibot" && (model === "delivery-mirror" || model === "gateway-injected");
+  return provider === "allbot" && (model === "delivery-mirror" || model === "gateway-injected");
 }
 
 function emitReasoningEnd(ctx: EmbeddedPiSubscribeContext) {
@@ -180,7 +180,7 @@ export function handleMessageStart(
   evt: AgentEvent & { message: AgentMessage },
 ) {
   const msg = evt.message;
-  if (msg?.role !== "assistant" || isTranscriptOnlyKaijiBotAssistantMessage(msg)) {
+  if (msg?.role !== "assistant" || isTranscriptOnlyAllBotAssistantMessage(msg)) {
     return;
   }
 
@@ -199,7 +199,7 @@ export function handleMessageUpdate(
   evt: AgentEvent & { message: AgentMessage; assistantMessageEvent?: unknown },
 ) {
   const msg = evt.message;
-  if (msg?.role !== "assistant" || isTranscriptOnlyKaijiBotAssistantMessage(msg)) {
+  if (msg?.role !== "assistant" || isTranscriptOnlyAllBotAssistantMessage(msg)) {
     return;
   }
 
@@ -435,7 +435,7 @@ export function handleMessageEnd(
   evt: AgentEvent & { message: AgentMessage },
 ) {
   const msg = evt.message;
-  if (msg?.role !== "assistant" || isTranscriptOnlyKaijiBotAssistantMessage(msg)) {
+  if (msg?.role !== "assistant" || isTranscriptOnlyAllBotAssistantMessage(msg)) {
     return;
   }
 

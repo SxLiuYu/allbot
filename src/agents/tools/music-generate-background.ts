@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { MUSIC_GENERATION_TASK_KIND } from "../music-generation-task-status.js";
 import {
   createMediaGenerationTaskLifecycle,
@@ -36,7 +36,7 @@ export const failMusicGenerationTaskRun = (
 ) => musicGenerationTaskLifecycle.failTaskRun(...params);
 
 export async function wakeMusicGenerationTaskCompletion(params: {
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   handle: MusicGenerationTaskHandle | null;
   status: "ok" | "error";
   statusLabel: string;

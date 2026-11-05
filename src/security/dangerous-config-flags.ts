@@ -1,5 +1,5 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   collectPluginConfigContractMatches,
   resolvePluginConfigContractsById,
@@ -10,7 +10,7 @@ function formatDangerousConfigFlagValue(value: string | number | boolean | null)
   return value === null ? "null" : String(value);
 }
 
-export function collectEnabledInsecureOrDangerousFlags(cfg: KaijiBotConfig): string[] {
+export function collectEnabledInsecureOrDangerousFlags(cfg: AllBotConfig): string[] {
   const enabledFlags: string[] = [];
   if (cfg.gateway?.controlUi?.allowInsecureAuth === true) {
     enabledFlags.push("gateway.controlUi.allowInsecureAuth=true");

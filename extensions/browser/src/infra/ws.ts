@@ -1,1 +1,1 @@
-export { rawDataToString } from "kaijibot/plugin-sdk/browser-node-runtime";
+export { rawDataToString } from "allbot/plugin-sdk/browser-node-runtime";

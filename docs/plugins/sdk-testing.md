@@ -1,7 +1,7 @@
 ---
 title: "Plugin Testing"
 sidebarTitle: "Testing"
-summary: "Testing utilities and patterns for KaijiBot plugins"
+summary: "Testing utilities and patterns for AllBot plugins"
 read_when:
   - You are writing tests for a plugin
   - You need test utilities from the plugin SDK
@@ -10,7 +10,7 @@ read_when:
 
 # Plugin Testing
 
-Reference for test utilities, patterns, and lint enforcement for KaijiBot
+Reference for test utilities, patterns, and lint enforcement for AllBot
 plugins.
 
 <Tip>
@@ -21,7 +21,7 @@ plugins.
 
 ## Test utilities
 
-**Import:** `kaijibot/plugin-sdk/testing`
+**Import:** `allbot/plugin-sdk/testing`
 
 The testing subpath exports a narrow set of helpers for plugin authors:
 
@@ -30,7 +30,7 @@ import {
   installCommonResolveTargetErrorCases,
   shouldAckReaction,
   removeAckReactionAfterReply,
-} from "kaijibot/plugin-sdk/testing";
+} from "allbot/plugin-sdk/testing";
 ```
 
 ### Available exports
@@ -49,11 +49,11 @@ The testing subpath also re-exports types useful in test files:
 import type {
   ChannelAccountSnapshot,
   ChannelGatewayContext,
-  KaijiBotConfig,
+  AllBotConfig,
   PluginRuntime,
   RuntimeEnv,
   MockFn,
-} from "kaijibot/plugin-sdk/testing";
+} from "allbot/plugin-sdk/testing";
 ```
 
 ## Testing target resolution
@@ -63,7 +63,7 @@ channel target resolution:
 
 ```typescript
 import { describe } from "vitest";
-import { installCommonResolveTargetErrorCases } from "kaijibot/plugin-sdk/testing";
+import { installCommonResolveTargetErrorCases } from "allbot/plugin-sdk/testing";
 
 describe("my-channel target resolution", () => {
   installCommonResolveTargetErrorCases({
@@ -152,8 +152,8 @@ describe("my-provider plugin", () => {
 For code that uses `createPluginRuntimeStore`, mock the runtime in tests:
 
 ```typescript
-import { createPluginRuntimeStore } from "kaijibot/plugin-sdk/runtime-store";
-import type { PluginRuntime } from "kaijibot/plugin-sdk/runtime-store";
+import { createPluginRuntimeStore } from "allbot/plugin-sdk/runtime-store";
+import type { PluginRuntime } from "allbot/plugin-sdk/runtime-store";
 
 const store = createPluginRuntimeStore<PluginRuntime>("test runtime not set");
 
@@ -224,7 +224,7 @@ pnpm test -- src/plugins/contracts/runtime.contract.test.ts
 
 Three rules are enforced by `pnpm check` for in-repo plugins:
 
-1. **No monolithic root imports** -- `kaijibot/plugin-sdk` root barrel is rejected
+1. **No monolithic root imports** -- `allbot/plugin-sdk` root barrel is rejected
 2. **No direct `src/` imports** -- plugins cannot import `../../src/` directly
 3. **No self-imports** -- plugins cannot import their own `plugin-sdk/<name>` subpath
 
@@ -233,7 +233,7 @@ patterns is recommended.
 
 ## Test configuration
 
-KaijiBot uses Vitest with V8 coverage thresholds. For plugin tests:
+AllBot uses Vitest with V8 coverage thresholds. For plugin tests:
 
 ```bash
 # Run all tests
@@ -252,7 +252,7 @@ pnpm test:coverage
 If local runs cause memory pressure:
 
 ```bash
-KAIJIBOT_VITEST_MAX_WORKERS=1 pnpm test
+ALLBOT_VITEST_MAX_WORKERS=1 pnpm test
 ```
 
 ## Related

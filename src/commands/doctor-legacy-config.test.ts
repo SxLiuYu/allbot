@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { normalizeCompatibilityConfigValues } from "./doctor-legacy-config.js";
 
-function asLegacyConfig(value: unknown): KaijiBotConfig {
-  return value as KaijiBotConfig;
+function asLegacyConfig(value: unknown): AllBotConfig {
+  return value as AllBotConfig;
 }
 
 function getLegacyProperty(value: unknown, key: string): unknown {

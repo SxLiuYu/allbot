@@ -1,4 +1,4 @@
-import { isRecord } from "kaijibot/plugin-sdk/text-runtime";
+import { isRecord } from "allbot/plugin-sdk/text-runtime";
 import { normalizeXaiModelId } from "../model-id.js";
 
 export { isRecord };

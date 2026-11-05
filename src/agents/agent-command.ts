@@ -18,7 +18,7 @@ import {
   loadConfig,
   readConfigFileSnapshotForWrite,
   setRuntimeConfigSnapshot,
-  type KaijiBotConfig,
+  type AllBotConfig,
 } from "../config/config.js";
 import { resolveAgentIdFromSessionKey, type SessionEntry } from "../config/sessions.js";
 import { resolveSessionTranscriptFile } from "../config/sessions/transcript.js";
@@ -134,9 +134,9 @@ async function resolveAgentRuntimeConfig(
   runtime: RuntimeEnv,
   params?: { runtimeTargetsChannelSecrets?: boolean },
 ): Promise<{
-  loadedRaw: KaijiBotConfig;
-  sourceConfig: KaijiBotConfig;
-  cfg: KaijiBotConfig;
+  loadedRaw: AllBotConfig;
+  sourceConfig: AllBotConfig;
+  cfg: AllBotConfig;
 }> {
   const loadedRaw = loadConfig();
   const sourceConfig = await (async () => {
@@ -219,7 +219,7 @@ async function prepareAgentCommandExecution(
     const knownAgents = listAgentIds(cfg);
     if (!knownAgents.includes(agentIdOverride)) {
       throw new Error(
-        `Unknown agent id "${agentIdOverrideRaw}". Use "${formatCliCommand("kaijibot agents list")}" to see configured agents.`,
+        `Unknown agent id "${agentIdOverrideRaw}". Use "${formatCliCommand("allbot agents list")}" to see configured agents.`,
       );
     }
   }

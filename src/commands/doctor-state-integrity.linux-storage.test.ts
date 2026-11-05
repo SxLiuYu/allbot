@@ -20,13 +20,13 @@ describe("detectLinuxSdBackedStateDir", () => {
       "25 24 0:22 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw",
     ].join("\n");
 
-    const result = detectLinuxSdBackedStateDir("/home/pi/.kaijibot", {
+    const result = detectLinuxSdBackedStateDir("/home/pi/.allbot", {
       platform: "linux",
       mountInfo,
     });
 
     expect(result).toEqual({
-      path: "/home/pi/.kaijibot",
+      path: "/home/pi/.allbot",
       mountPoint: "/",
       fsType: "ext4",
       source: "/dev/mmcblk0p2",
@@ -36,7 +36,7 @@ describe("detectLinuxSdBackedStateDir", () => {
   it("returns null for non-mmc devices", () => {
     const mountInfo = "24 19 259:2 / / rw,relatime - ext4 /dev/nvme0n1p2 rw";
 
-    const result = detectLinuxSdBackedStateDir("/home/user/.kaijibot", {
+    const result = detectLinuxSdBackedStateDir("/home/user/.allbot", {
       platform: "linux",
       mountInfo,
     });
@@ -47,7 +47,7 @@ describe("detectLinuxSdBackedStateDir", () => {
   it("resolves /dev/disk aliases to mmc devices", () => {
     const mountInfo = "24 19 179:2 / / rw,relatime - ext4 /dev/disk/by-uuid/abcd-1234 rw";
 
-    const result = detectLinuxSdBackedStateDir("/home/user/.kaijibot", {
+    const result = detectLinuxSdBackedStateDir("/home/user/.allbot", {
       platform: "linux",
       mountInfo,
       resolveDeviceRealPath: (devicePath) => {
@@ -59,7 +59,7 @@ describe("detectLinuxSdBackedStateDir", () => {
     });
 
     expect(result).toEqual({
-      path: "/home/user/.kaijibot",
+      path: "/home/user/.allbot",
       mountPoint: "/",
       fsType: "ext4",
       source: "/dev/disk/by-uuid/abcd-1234",
@@ -72,14 +72,14 @@ describe("detectLinuxSdBackedStateDir", () => {
       "30 24 179:5 / /mnt/slow rw,relatime - ext4 /dev/mmcblk1p1 rw",
     ].join("\n");
 
-    const result = detectLinuxSdBackedStateDir("/tmp/kaijibot-state", {
+    const result = detectLinuxSdBackedStateDir("/tmp/allbot-state", {
       platform: "linux",
       mountInfo,
-      resolveRealPath: () => "/mnt/slow/kaijibot/.kaijibot",
+      resolveRealPath: () => "/mnt/slow/allbot/.allbot",
     });
 
     expect(result).toEqual({
-      path: "/mnt/slow/kaijibot/.kaijibot",
+      path: "/mnt/slow/allbot/.allbot",
       mountPoint: "/mnt/slow",
       fsType: "ext4",
       source: "/dev/mmcblk1p1",
@@ -89,7 +89,7 @@ describe("detectLinuxSdBackedStateDir", () => {
   it("returns null outside linux", () => {
     const mountInfo = "24 19 179:2 / / rw,relatime - ext4 /dev/mmcblk0p2 rw";
 
-    const result = detectLinuxSdBackedStateDir(path.join("/Users", "tester", ".kaijibot"), {
+    const result = detectLinuxSdBackedStateDir(path.join("/Users", "tester", ".allbot"), {
       platform: "darwin",
       mountInfo,
     });
@@ -99,7 +99,7 @@ describe("detectLinuxSdBackedStateDir", () => {
 
   it("escapes decoded mountinfo control characters in warning output", () => {
     const mountRoot = "/home/pi/mnt\nspoofed";
-    const stateDir = `${mountRoot}/.kaijibot`;
+    const stateDir = `${mountRoot}/.allbot`;
     const encodedSource = "/dev/disk/by-uuid/mmc\\012source";
     const mountInfo = `30 24 179:2 / ${encodeMountInfoPath(mountRoot)} rw,relatime - ext4 ${encodedSource} rw`;
 

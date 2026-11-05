@@ -5,7 +5,7 @@ import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import { ConfigClobberProtectionError, createConfigIO } from "./io.js";
 
 describe("config io clobber protection", () => {
-  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-clobber-" });
+  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-clobber-" });
   const silentLogger = { warn: () => {}, error: () => {} };
 
   async function withSuiteHome<T>(fn: (home: string) => Promise<T>): Promise<T> {
@@ -27,7 +27,7 @@ describe("config io clobber protection", () => {
     lastKnownGoodBytes: number;
     lastKnownGoodGatewayMode: string;
   }): Promise<void> {
-    const healthPath = path.join(params.home, ".kaijibot", "logs", "config-health.json");
+    const healthPath = path.join(params.home, ".allbot", "logs", "config-health.json");
     await fs.mkdir(path.dirname(healthPath), { recursive: true });
     const healthState = {
       entries: {
@@ -56,7 +56,7 @@ describe("config io clobber protection", () => {
 
   it("refuses to write a stub that drops gateway.mode and shrinks >50% vs lastKnownGood", async () => {
     await withSuiteHome(async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await seedHealthState({
         home,
@@ -75,14 +75,14 @@ describe("config io clobber protection", () => {
         ConfigClobberProtectionError,
       );
       await expect(io.writeConfigFile({ meta: { lastTouchedAt: "2026-07-18" } })).rejects.toThrow(
-        /Refusing to shrink kaijibot\.json from 5000 bytes/,
+        /Refusing to shrink allbot\.json from 5000 bytes/,
       );
     });
   });
 
   it("allows the same shrink when allowConfigClobberShrink option is true", async () => {
     await withSuiteHome(async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await seedHealthState({
         home,
@@ -106,9 +106,9 @@ describe("config io clobber protection", () => {
     });
   });
 
-  it("allows the same shrink when KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1 is set", async () => {
+  it("allows the same shrink when ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1 is set", async () => {
     await withSuiteHome(async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await seedHealthState({
         home,
@@ -118,7 +118,7 @@ describe("config io clobber protection", () => {
       });
 
       const io = createConfigIO({
-        env: { KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK: "1" } as NodeJS.ProcessEnv,
+        env: { ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK: "1" } as NodeJS.ProcessEnv,
         homedir: () => home,
         logger: silentLogger,
       });
@@ -131,7 +131,7 @@ describe("config io clobber protection", () => {
 
   it("does not trigger when lastKnownGood has no gatewayMode", async () => {
     await withSuiteHome(async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await seedHealthState({
         home,
@@ -154,7 +154,7 @@ describe("config io clobber protection", () => {
 
   it("does not trigger when gateway.mode is preserved in the next payload", async () => {
     await withSuiteHome(async (home) => {
-      const configPath = path.join(home, ".kaijibot", "kaijibot.json");
+      const configPath = path.join(home, ".allbot", "allbot.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });
       await seedHealthState({
         home,

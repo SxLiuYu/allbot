@@ -17,7 +17,7 @@ export {
 export { isNotFoundPathError, isPathInside } from "../infra/path-guards.js";
 export { ensurePortAvailable } from "../infra/ports.js";
 export { generateSecureToken } from "../infra/secure-random.js";
-export { resolvePreferredKaijiBotTmpDir } from "../infra/tmp-kaijibot-dir.js";
+export { resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 export { createSubsystemLogger } from "../logging/subsystem.js";
 export { redactSensitiveText } from "../logging/redact.js";
 export { wrapExternalContent } from "../security/external-content.js";

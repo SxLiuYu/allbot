@@ -12,7 +12,7 @@ export function collectDeepProbeFindings(params: {
       severity: "warn",
       title: "Gateway probe failed (deep)",
       detail: params.deep.gateway.error ?? "gateway unreachable",
-      remediation: `Run "${formatCliCommand("kaijibot status --all")}" to debug connectivity/auth, then re-run "${formatCliCommand("kaijibot security audit --deep")}".`,
+      remediation: `Run "${formatCliCommand("allbot status --all")}" to debug connectivity/auth, then re-run "${formatCliCommand("allbot security audit --deep")}".`,
     });
   }
   if (params.authWarning) {
@@ -21,7 +21,7 @@ export function collectDeepProbeFindings(params: {
       severity: "warn",
       title: "Gateway probe auth SecretRef is unavailable",
       detail: params.authWarning,
-      remediation: `Set KAIJIBOT_GATEWAY_TOKEN/KAIJIBOT_GATEWAY_PASSWORD in this shell or resolve the external secret provider, then re-run "${formatCliCommand("kaijibot security audit --deep")}".`,
+      remediation: `Set ALLBOT_GATEWAY_TOKEN/ALLBOT_GATEWAY_PASSWORD in this shell or resolve the external secret provider, then re-run "${formatCliCommand("allbot security audit --deep")}".`,
     });
   }
   return findings;

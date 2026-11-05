@@ -35,7 +35,7 @@ vi.mock("../../infra/git-commit.js", () => ({
 }));
 
 vi.mock("../cli-name.js", () => ({
-  resolveCliName: () => "kaijibot",
+  resolveCliName: () => "allbot",
   replaceCliName: (cmd: string) => cmd,
 }));
 
@@ -109,7 +109,7 @@ describe("configureProgramHelp", () => {
   }
 
   it("adds root help hint and marks commands with subcommands", () => {
-    process.argv = ["node", "kaijibot", "--help"];
+    process.argv = ["node", "allbot", "--help"];
     const program = makeProgramWithCommands();
     configureProgramHelp(program, testProgramContext);
 
@@ -121,7 +121,7 @@ describe("configureProgramHelp", () => {
   });
 
   it("includes banner and docs/examples in root help output", () => {
-    process.argv = ["node", "kaijibot", "--help"];
+    process.argv = ["node", "allbot", "--help"];
     const program = makeProgramWithCommands();
     configureProgramHelp(program, testProgramContext);
 
@@ -132,13 +132,13 @@ describe("configureProgramHelp", () => {
   });
 
   it("prints version and exits immediately when version flags are present", () => {
-    process.argv = ["node", "kaijibot", "--version"];
-    expectVersionExit({ expectedVersion: "KaijiBot 9.9.9-test (abc1234)" });
+    process.argv = ["node", "allbot", "--version"];
+    expectVersionExit({ expectedVersion: "AllBot 9.9.9-test (abc1234)" });
   });
 
   it("prints version and exits immediately without commit metadata", () => {
-    process.argv = ["node", "kaijibot", "--version"];
+    process.argv = ["node", "allbot", "--version"];
     resolveCommitHashMock.mockReturnValue(null);
-    expectVersionExit({ expectedVersion: "KaijiBot 9.9.9-test" });
+    expectVersionExit({ expectedVersion: "AllBot 9.9.9-test" });
   });
 });

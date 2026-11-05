@@ -1,17 +1,17 @@
 ---
 summary: "LINE Messaging API plugin setup, config, and usage"
 read_when:
-  - You want to connect KaijiBot to LINE
+  - You want to connect AllBot to LINE
   - You need LINE webhook + credential setup
   - You want LINE-specific message options
 title: LINE
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # LINE
 
-LINE connects to KaijiBot via the LINE Messaging API. The plugin runs as a webhook
+LINE connects to AllBot via the LINE Messaging API. The plugin runs as a webhook
 receiver on the gateway and uses your channel access token + channel secret for
 authentication.
 
@@ -21,20 +21,20 @@ are not supported.
 
 ## Bundled plugin
 
-LINE ships as a bundled plugin in current KaijiBot releases, so normal
+LINE ships as a bundled plugin in current AllBot releases, so normal
 packaged builds do not need a separate install.
 
 If you are on an older build or a custom install that excludes LINE, install it
 manually:
 
 ```bash
-kaijibot plugins install @kaijibot/line
+allbot plugins install @allbot/line
 ```
 
 Local checkout (when running from a git repo):
 
 ```bash
-kaijibot plugins install ./path/to/local/line-plugin
+allbot plugins install ./path/to/local/line-plugin
 ```
 
 ## Setup
@@ -56,8 +56,8 @@ If you need a custom path, set `channels.line.webhookPath` or
 
 Security note:
 
-- LINE signature verification is body-dependent (HMAC over the raw body), so KaijiBot applies strict pre-auth body limits and timeout before verification.
-- KaijiBot processes webhook events from the verified raw request bytes. Upstream middleware-transformed `req.body` values are ignored for signature-integrity safety.
+- LINE signature verification is body-dependent (HMAC over the raw body), so AllBot applies strict pre-auth body limits and timeout before verification.
+- AllBot processes webhook events from the verified raw request bytes. Upstream middleware-transformed `req.body` values are ignored for signature-integrity safety.
 
 ## Configure
 
@@ -120,8 +120,8 @@ Direct messages default to pairing. Unknown senders get a pairing code and their
 messages are ignored until approved.
 
 ```bash
-kaijibot pairing list line
-kaijibot pairing approve line <CODE>
+allbot pairing list line
+allbot pairing approve line <CODE>
 ```
 
 Allowlists and policies:

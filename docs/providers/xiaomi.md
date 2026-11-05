@@ -1,14 +1,14 @@
 ---
-summary: "Use Xiaomi MiMo models with KaijiBot"
+summary: "Use Xiaomi MiMo models with AllBot"
 read_when:
-  - You want Xiaomi MiMo models in KaijiBot
+  - You want Xiaomi MiMo models in AllBot
   - You need XIAOMI_API_KEY setup
 title: "Xiaomi MiMo"
 ---
 
 # Xiaomi MiMo
 
-Xiaomi MiMo is the API platform for **MiMo** models. KaijiBot uses the Xiaomi
+Xiaomi MiMo is the API platform for **MiMo** models. AllBot uses the Xiaomi
 OpenAI-compatible endpoint with API-key authentication. Create your API key in the
 [Xiaomi MiMo console](https://platform.xiaomimimo.com/#/console/api-keys), then configure the
 bundled `xiaomi` provider with that key.
@@ -28,9 +28,9 @@ bundled `xiaomi` provider with that key.
 ## CLI setup
 
 ```bash
-kaijibot onboard --auth-choice xiaomi-api-key
+allbot onboard --auth-choice xiaomi-api-key
 # or non-interactive
-kaijibot onboard --auth-choice xiaomi-api-key --xiaomi-api-key "$XIAOMI_API_KEY"
+allbot onboard --auth-choice xiaomi-api-key --xiaomi-api-key "$XIAOMI_API_KEY"
 ```
 
 ## Config snippet

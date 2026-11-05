@@ -1,16 +1,16 @@
 import {
   definePluginEntry,
-  type KaijiBotPluginApi,
+  type AllBotPluginApi,
   type ProviderAuthContext,
   type ProviderAuthMethodNonInteractiveContext,
   type ProviderAuthResult,
   type ProviderDiscoveryContext,
-} from "kaijibot/plugin-sdk/plugin-entry";
+} from "allbot/plugin-sdk/plugin-entry";
 import {
   buildProviderReplayFamilyHooks,
   type ModelProviderConfig,
-} from "kaijibot/plugin-sdk/provider-model-shared";
-import { normalizeOptionalString, readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+} from "allbot/plugin-sdk/provider-model-shared";
+import { normalizeOptionalString, readStringValue } from "allbot/plugin-sdk/text-runtime";
 import {
   buildOllamaProvider,
   configureOllamaNonInteractive,
@@ -101,7 +101,7 @@ export default definePluginEntry({
   id: "ollama",
   name: "Ollama Provider",
   description: "Bundled Ollama provider plugin",
-  register(api: KaijiBotPluginApi) {
+  register(api: AllBotPluginApi) {
     api.registerMemoryEmbeddingProvider(ollamaMemoryEmbeddingProviderAdapter);
     const pluginConfig = (api.pluginConfig ?? {}) as OllamaPluginConfig;
     api.registerWebSearchProvider(createOllamaWebSearchProvider());
@@ -274,7 +274,7 @@ export default definePluginEntry({
         resolvedApiKey?.trim() === DEFAULT_API_KEY,
       buildUnknownModelHint: () =>
         "Ollama requires authentication to be registered as a provider. " +
-        'Set OLLAMA_API_KEY="ollama-local" (any value works) or run "kaijibot configure". ' +
+        'Set OLLAMA_API_KEY="ollama-local" (any value works) or run "allbot configure". ' +
         "See: https://gitee.com/kaiji1126/kaijibot/blob/main/docs/providers/ollama.md",
     });
   },

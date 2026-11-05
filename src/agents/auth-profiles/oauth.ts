@@ -4,7 +4,7 @@ import {
   type OAuthCredentials,
   type OAuthProvider,
 } from "@earendil-works/pi-ai/oauth";
-import { loadConfig, type KaijiBotConfig } from "../../config/config.js";
+import { loadConfig, type AllBotConfig } from "../../config/config.js";
 import { coerceSecretRef } from "../../config/types.secrets.js";
 import { formatErrorMessage } from "../../infra/errors.js";
 import { withFileLock } from "../../infra/file-lock.js";
@@ -76,7 +76,7 @@ const isCompatibleModeType = (mode: string | undefined, type: string | undefined
 };
 
 function isProfileConfigCompatible(params: {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   profileId: string;
   provider: string;
   mode: "api_key" | "token" | "oauth";
@@ -170,13 +170,13 @@ async function loadFreshStoredOAuthCredential(params: {
 }
 
 type ResolveApiKeyForProfileParams = {
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   store: AuthProfileStore;
   profileId: string;
   agentDir?: string;
 };
 
-type SecretDefaults = NonNullable<KaijiBotConfig["secrets"]>["defaults"];
+type SecretDefaults = NonNullable<AllBotConfig["secrets"]>["defaults"];
 
 function adoptNewerMainOAuthCredential(params: {
   store: AuthProfileStore;
@@ -386,7 +386,7 @@ async function resolveProfileSecretString(params: {
   value: string | undefined;
   valueRef: unknown;
   refDefaults: SecretDefaults | undefined;
-  configForRefResolution: KaijiBotConfig;
+  configForRefResolution: AllBotConfig;
   cache: SecretRefResolveCache;
   inlineFailureMessage: string;
   refFailureMessage: string;

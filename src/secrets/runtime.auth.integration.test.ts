@@ -89,9 +89,9 @@ describe("secrets runtime snapshot auth integration", () => {
   });
 
   it("recomputes config-derived agent dirs when refreshing active secrets runtime snapshots", async () => {
-    await withTempHome("kaijibot-secrets-runtime-agent-dirs-", async (home) => {
-      const mainAgentDir = path.join(home, ".kaijibot", "agents", "main", "agent");
-      const opsAgentDir = path.join(home, ".kaijibot", "agents", "ops", "agent");
+    await withTempHome("allbot-secrets-runtime-agent-dirs-", async (home) => {
+      const mainAgentDir = path.join(home, ".allbot", "agents", "main", "agent");
+      const opsAgentDir = path.join(home, ".allbot", "agents", "ops", "agent");
       await fs.mkdir(mainAgentDir, { recursive: true });
       await fs.mkdir(opsAgentDir, { recursive: true });
       await fs.writeFile(

@@ -1,6 +1,6 @@
-import { NON_ENV_SECRETREF_MARKER } from "kaijibot/plugin-sdk/provider-auth-runtime";
-import { createNonExitingRuntime } from "kaijibot/plugin-sdk/runtime-env";
-import { withEnv } from "kaijibot/plugin-sdk/testing";
+import { NON_ENV_SECRETREF_MARKER } from "allbot/plugin-sdk/provider-auth-runtime";
+import { createNonExitingRuntime } from "allbot/plugin-sdk/runtime-env";
+import { withEnv } from "allbot/plugin-sdk/testing";
 import { describe, expect, it, vi } from "vitest";
 import { createWizardPrompter } from "../../test/helpers/wizard-prompter.js";
 import { resolveXaiCatalogEntry } from "./model-definitions.js";
@@ -105,7 +105,7 @@ describe("xai web search config resolution", () => {
         throw new Error("expected xai web search tool");
       }
 
-      await expect(maybeTool.execute({ query: "KaijiBot" })).resolves.toMatchObject({
+      await expect(maybeTool.execute({ query: "AllBot" })).resolves.toMatchObject({
         error: "missing_xai_api_key",
       });
     });

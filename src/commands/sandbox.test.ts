@@ -29,13 +29,13 @@ import { sandboxListCommand, sandboxRecreateCommand } from "./sandbox.js";
 const NOW = Date.now();
 
 function createContainer(overrides: Partial<SandboxContainerInfo> = {}): SandboxContainerInfo {
-  const containerName = overrides.containerName ?? "kaijibot-sandbox-test";
+  const containerName = overrides.containerName ?? "allbot-sandbox-test";
   return {
     containerName,
     backendId: "docker",
     runtimeLabel: containerName,
     sessionKey: "test-session",
-    image: "kaijibot/sandbox:latest",
+    image: "allbot/sandbox:latest",
     configLabelKind: "Image",
     imageMatch: true,
     running: true,
@@ -47,9 +47,9 @@ function createContainer(overrides: Partial<SandboxContainerInfo> = {}): Sandbox
 
 function createBrowser(overrides: Partial<SandboxBrowserInfo> = {}): SandboxBrowserInfo {
   return {
-    containerName: "kaijibot-browser-test",
+    containerName: "allbot-browser-test",
     sessionKey: "test-session",
-    image: "kaijibot/browser:latest",
+    image: "allbot/browser:latest",
     imageMatch: true,
     running: true,
     createdAtMs: NOW - 3600000,

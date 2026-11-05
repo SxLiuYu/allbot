@@ -1,6 +1,6 @@
 import { listBundledChannelPlugins } from "../../../src/channels/plugins/bundled.js";
 import type { ChannelPlugin } from "../../../src/channels/plugins/types.js";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import { channelPluginSurfaceKeys, type ChannelPluginSurface } from "./manifest.js";
 
 type SurfaceContractEntry = {
@@ -29,7 +29,7 @@ type DirectoryContractEntry = {
   id: string;
   plugin: Pick<ChannelPlugin, "id" | "directory">;
   coverage: "lookups" | "presence";
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   accountId?: string;
 };
 

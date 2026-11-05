@@ -202,8 +202,8 @@ async function runScenario(name: ScenarioName, days = 30): Promise<SimResult> {
     {
       insightGenerator: async (_persona, input) => [makeCandidate(input.targetDomains)],
       // Empty temp store: pattern mode finds no clusters and defers to
-      // knowledge-mode candidates; never touches real ~/.kaijibot data.
-      fragmentStore: new FragmentStore("/tmp/opencode/kaiji-sim-fragments"),
+      // knowledge-mode candidates; never touches real ~/.allbot data.
+      fragmentStore: new FragmentStore("/tmp/opencode/allbot-sim-fragments"),
     },
   );
 

@@ -1,6 +1,6 @@
 import type { Api, AssistantMessage, Model } from "@earendil-works/pi-ai";
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { PersonaTree } from "../types.js";
 import {
   buildCritiquePrompt,
@@ -122,10 +122,10 @@ function makeCandidate(overrides?: Partial<InsightCandidate>): InsightCandidate 
   };
 }
 
-function makeConfig(): KaijiBotConfig {
+function makeConfig(): AllBotConfig {
   return {
     cognitive: { insight: { sources: { webSearchProvider: "zai" } } },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function successDeps(responseText: string): LlmInsightDeps {

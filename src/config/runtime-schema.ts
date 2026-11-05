@@ -5,10 +5,10 @@ import {
   collectPluginSchemaMetadata,
 } from "./channel-config-metadata.js";
 import { loadConfig, readConfigFileSnapshot } from "./config.js";
-import type { KaijiBotConfig } from "./config.js";
+import type { AllBotConfig } from "./config.js";
 import { buildConfigSchema, type ConfigSchemaResponse } from "./schema.js";
 
-function loadManifestRegistry(config: KaijiBotConfig, env?: NodeJS.ProcessEnv) {
+function loadManifestRegistry(config: AllBotConfig, env?: NodeJS.ProcessEnv) {
   const workspaceDir = resolveAgentWorkspaceDir(config, resolveDefaultAgentId(config));
   return loadPluginManifestRegistry({
     config,

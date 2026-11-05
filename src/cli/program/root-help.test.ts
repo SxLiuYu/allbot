@@ -43,11 +43,11 @@ describe("root help", () => {
     const config = {
       agents: {
         defaults: {
-          workspace: "/tmp/kaijibot-root-help-workspace",
+          workspace: "/tmp/allbot-root-help-workspace",
         },
       },
     };
-    const env = { KAIJIBOT_STATE_DIR: "/tmp/kaijibot-root-help-state" } as NodeJS.ProcessEnv;
+    const env = { ALLBOT_STATE_DIR: "/tmp/allbot-root-help-state" } as NodeJS.ProcessEnv;
 
     await renderRootHelpText({ config, env, pluginSdkResolution: "src" });
 

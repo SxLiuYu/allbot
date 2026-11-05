@@ -1,8 +1,8 @@
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 export function createPerSenderSessionConfig(
-  overrides: Partial<NonNullable<KaijiBotConfig["session"]>> = {},
-): NonNullable<KaijiBotConfig["session"]> {
+  overrides: Partial<NonNullable<AllBotConfig["session"]>> = {},
+): NonNullable<AllBotConfig["session"]> {
   return {
     mainKey: "main",
     scope: "per-sender",

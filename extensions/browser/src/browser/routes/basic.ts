@@ -184,11 +184,11 @@ export function registerBrowserBasicRoutes(app: BrowserRouteRegistrar, ctx: Brow
     if (!name) {
       return jsonError(res, 400, "name is required");
     }
-    if (driver && driver !== "kaijibot" && driver !== "clawd" && driver !== "existing-session") {
+    if (driver && driver !== "allbot" && driver !== "clawd" && driver !== "existing-session") {
       return jsonError(
         res,
         400,
-        `unsupported profile driver "${driver}"; use "kaijibot", "clawd", or "existing-session"`,
+        `unsupported profile driver "${driver}"; use "allbot", "clawd", or "existing-session"`,
       );
     }
 
@@ -204,8 +204,8 @@ export function registerBrowserBasicRoutes(app: BrowserRouteRegistrar, ctx: Brow
           driver:
             driver === "existing-session"
               ? "existing-session"
-              : driver === "kaijibot" || driver === "clawd"
-                ? "kaijibot"
+              : driver === "allbot" || driver === "clawd"
+                ? "allbot"
                 : undefined,
         }),
     });

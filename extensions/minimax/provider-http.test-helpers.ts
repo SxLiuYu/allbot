@@ -1,4 +1,4 @@
-import type { resolveProviderHttpRequestConfig } from "kaijibot/plugin-sdk/provider-http";
+import type { resolveProviderHttpRequestConfig } from "allbot/plugin-sdk/provider-http";
 import { afterEach, vi } from "vitest";
 
 type ResolveProviderHttpRequestConfigParams = Parameters<
@@ -18,11 +18,11 @@ const minimaxProviderHttpMocks = vi.hoisted(() => ({
   })),
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-auth-runtime", () => ({
+vi.mock("allbot/plugin-sdk/provider-auth-runtime", () => ({
   resolveApiKeyForProvider: minimaxProviderHttpMocks.resolveApiKeyForProviderMock,
 }));
 
-vi.mock("kaijibot/plugin-sdk/provider-http", () => ({
+vi.mock("allbot/plugin-sdk/provider-http", () => ({
   assertOkOrThrowHttpError: minimaxProviderHttpMocks.assertOkOrThrowHttpErrorMock,
   fetchWithTimeout: minimaxProviderHttpMocks.fetchWithTimeoutMock,
   postJsonRequest: minimaxProviderHttpMocks.postJsonRequestMock,

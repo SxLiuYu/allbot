@@ -3,12 +3,12 @@ import {
   normalizeNativeXaiModelId,
   normalizeProviderId,
   resolveProviderEndpoint,
-} from "@kaijibot/plugin-sdk/provider-model-shared";
+} from "@allbot/plugin-sdk/provider-model-shared";
 import {
   applyXaiModelCompat,
   resolveXaiModelCompatPatch,
-} from "@kaijibot/plugin-sdk/provider-tools";
-import { readStringValue } from "kaijibot/plugin-sdk/text-runtime";
+} from "@allbot/plugin-sdk/provider-tools";
+import { readStringValue } from "allbot/plugin-sdk/text-runtime";
 
 export { buildXaiProvider } from "./provider-catalog.js";
 export { applyXaiConfig, applyXaiProviderConfig } from "./onboard.js";
@@ -28,7 +28,7 @@ export {
   HTML_ENTITY_TOOL_CALL_ARGUMENTS_ENCODING,
   XAI_TOOL_SCHEMA_PROFILE,
   resolveXaiModelCompatPatch,
-} from "@kaijibot/plugin-sdk/provider-tools";
+} from "@allbot/plugin-sdk/provider-tools";
 
 function isXaiNativeEndpoint(baseUrl: unknown): boolean {
   return (

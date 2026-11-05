@@ -1,8 +1,8 @@
 # Archived Channel Documentation
 
-These channel documentation pages are **upstream OpenClaw reference only**. They are archived here because the corresponding channels have **no source code, no `package.json`, and no git tracking** in KaijiBot.
+These channel documentation pages are **upstream OpenClaw reference only**. They are archived here because the corresponding channels have **no source code, no `package.json`, and no git tracking** in AllBot.
 
-Each page retains its original "not supported in KaijiBot" warning banner.
+Each page retains its original "not supported in AllBot" warning banner.
 
 For active channel support, see:
 

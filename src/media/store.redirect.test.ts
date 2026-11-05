@@ -8,7 +8,7 @@ import { captureEnv } from "../test-utils/env.js";
 import { saveMediaSource, setMediaStoreNetworkDepsForTest } from "./store.js";
 
 const homeRootTracker = createSuiteTempRootTracker({
-  prefix: "kaijibot-home-redirect-",
+  prefix: "allbot-home-redirect-",
 });
 const mockRequest = vi.fn();
 
@@ -97,10 +97,10 @@ describe("media store redirects", () => {
   let home = "";
 
   beforeAll(async () => {
-    envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR"]);
+    envSnapshot = captureEnv(["ALLBOT_STATE_DIR"]);
     await homeRootTracker.setup();
     home = await homeRootTracker.make("state");
-    process.env.KAIJIBOT_STATE_DIR = home;
+    process.env.ALLBOT_STATE_DIR = home;
   });
 
   beforeEach(() => {
@@ -172,7 +172,7 @@ describe("media store redirects", () => {
       Cookie: "session=abc",
       "X-Api-Key": "custom-secret",
       Accept: "text/plain",
-      "User-Agent": "KaijiBot-Test/1.0",
+      "User-Agent": "AllBot-Test/1.0",
     });
 
     expect(mockRequest).toHaveBeenCalledTimes(2);
@@ -181,7 +181,7 @@ describe("media store redirects", () => {
     expect(secondHeaders.get("cookie")).toBeNull();
     expect(secondHeaders.get("x-api-key")).toBeNull();
     expect(secondHeaders.get("accept")).toBe("text/plain");
-    expect(secondHeaders.get("user-agent")).toBe("KaijiBot-Test/1.0");
+    expect(secondHeaders.get("user-agent")).toBe("AllBot-Test/1.0");
   });
 
   it("keeps headers when a redirect stays on the same origin", async () => {

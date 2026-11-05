@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthProfileStore } from "../../../src/agents/auth-profiles/types.js";
-import type { KaijiBotConfig } from "../../../src/config/config.js";
+import type { AllBotConfig } from "../../../src/config/config.js";
 import type { ModelDefinitionConfig } from "../../../src/config/types.models.js";
 import { registerProviders, requireProvider } from "./contracts-testkit.js";
 
@@ -108,7 +108,7 @@ function runCatalog(
   state: DiscoveryState,
   params: {
     provider: ProviderHandle;
-    config?: KaijiBotConfig;
+    config?: AllBotConfig;
     env?: NodeJS.ProcessEnv;
     resolveProviderApiKey?: () => { apiKey: string | undefined };
     resolveProviderAuth?: (
@@ -149,16 +149,16 @@ function installDiscoveryHooks(
 ) {
   beforeEach(async () => {
     vi.resetModules();
-    vi.doMock("kaijibot/plugin-sdk/agent-runtime", () => {
+    vi.doMock("allbot/plugin-sdk/agent-runtime", () => {
       return {
         ensureAuthProfileStore: ensureAuthProfileStoreMock,
         listProfilesForProvider: listProfilesForProviderMock,
       };
     });
-    vi.doMock("kaijibot/plugin-sdk/provider-auth", () => {
+    vi.doMock("allbot/plugin-sdk/provider-auth", () => {
       return {
         MINIMAX_OAUTH_MARKER: "minimax-oauth",
-        applyAuthProfileConfig: (config: KaijiBotConfig) => config,
+        applyAuthProfileConfig: (config: AllBotConfig) => config,
         buildApiKeyCredential: (
           provider: string,
           key: unknown,

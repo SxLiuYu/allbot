@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { readMemoryHostEvents } from "kaijibot/plugin-sdk/memory-host-events";
+import { readMemoryHostEvents } from "allbot/plugin-sdk/memory-host-events";
 import { describe, expect, it } from "vitest";
 import {
   applyShortTermPromotions,

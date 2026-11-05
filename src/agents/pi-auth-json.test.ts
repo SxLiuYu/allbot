@@ -12,7 +12,7 @@ vi.mock("../plugins/provider-runtime.js", () => ({
 type AuthProfileStore = Parameters<typeof saveAuthProfileStore>[0];
 
 async function createAgentDir() {
-  return fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-agent-"));
+  return fs.mkdtemp(path.join(os.tmpdir(), "allbot-agent-"));
 }
 
 function writeProfiles(agentDir: string, profiles: AuthProfileStore["profiles"]) {

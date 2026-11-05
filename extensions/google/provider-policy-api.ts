@@ -1,4 +1,4 @@
-import type { ModelProviderConfig } from "kaijibot/plugin-sdk/provider-model-types";
+import type { ModelProviderConfig } from "allbot/plugin-sdk/provider-model-types";
 import { normalizeGoogleProviderConfig } from "./provider-policy.js";
 
 export function normalizeConfig(params: { provider: string; providerConfig: ModelProviderConfig }) {

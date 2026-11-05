@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { ensureAuthProfileStore } from "./auth-profiles/store.js";
 import {
   normalizeProviderSpecificConfig,
@@ -14,7 +14,7 @@ import {
 } from "./models-config.providers.secrets.js";
 import { enforceSourceManagedProviderSecrets } from "./models-config.providers.source-managed.js";
 
-type ModelsConfig = NonNullable<KaijiBotConfig["models"]>;
+type ModelsConfig = NonNullable<AllBotConfig["models"]>;
 
 export function normalizeProviders(params: {
   providers: ModelsConfig["providers"];

@@ -13,7 +13,7 @@ describe("TaskStore", () => {
   let store: TaskStore;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "kaijibot-tasks-test-"));
+    tempDir = mkdtempSync(join(tmpdir(), "allbot-tasks-test-"));
     store = new TaskStore(tempDir);
   });
 

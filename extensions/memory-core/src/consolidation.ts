@@ -8,11 +8,11 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core";
 import type {
   ConsolidationConfig,
   ConsolidationWorkspace,
-} from "kaijibot/plugin-sdk/memory-core-host-status";
+} from "allbot/plugin-sdk/memory-core-host-status";
 import {
   extractFromBatch,
   extractEarliestMessageTimestamp,
@@ -42,7 +42,7 @@ export type ConsolidationDeps = {
   listSessionFiles: (agentId: string, lookbackDays: number) => Promise<string[]>;
   readSessionFile: (filePath: string) => Promise<string>;
   generateText: (prompt: string) => Promise<string>;
-  resolveWorkspaces: (cfg: KaijiBotConfig) => ConsolidationWorkspace[];
+  resolveWorkspaces: (cfg: AllBotConfig) => ConsolidationWorkspace[];
   routeDeps: ConsolidationRouteDeps;
   resolveUserIdForFile: (filePath: string) => Promise<string | null>;
   repairDeps?: {
@@ -343,7 +343,7 @@ export async function runConsolidationForAgent(params: {
  */
 export async function runConsolidationAllAgents(params: {
   config: ConsolidationConfig;
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   deps: ConsolidationDeps;
 }): Promise<ConsolidationResult[]> {
   const workspaces = params.deps.resolveWorkspaces(params.cfg);

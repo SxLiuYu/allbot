@@ -4,7 +4,7 @@ import path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AcpRuntimeError } from "../../acp/runtime/errors.js";
 import type { AcpSessionStoreEntry } from "../../acp/runtime/session-meta.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import type { SessionBindingRecord } from "../../infra/outbound/session-binding-service.js";
 import type { MediaUnderstandingSkipError } from "../../media-understanding/errors.js";
 import { withFetchPreconnect } from "../../test-utils/fetch-mock.js";
@@ -23,8 +23,8 @@ const managerMocks = vi.hoisted(() => ({
 }));
 
 const policyMocks = vi.hoisted(() => ({
-  resolveAcpDispatchPolicyError: vi.fn<(cfg: KaijiBotConfig) => AcpRuntimeError | null>(() => null),
-  resolveAcpAgentPolicyError: vi.fn<(cfg: KaijiBotConfig, agent: string) => AcpRuntimeError | null>(
+  resolveAcpDispatchPolicyError: vi.fn<(cfg: AllBotConfig) => AcpRuntimeError | null>(() => null),
+  resolveAcpAgentPolicyError: vi.fn<(cfg: AllBotConfig, agent: string) => AcpRuntimeError | null>(
     () => null,
   ),
 }));
@@ -61,7 +61,7 @@ const ttsMocks = vi.hoisted(() => ({
     const params = paramsUnknown as { payload: unknown };
     return params.payload;
   }),
-  resolveTtsConfig: vi.fn((_cfg: KaijiBotConfig) => ({ mode: "final" })),
+  resolveTtsConfig: vi.fn((_cfg: AllBotConfig) => ({ mode: "final" })),
 }));
 
 const mediaUnderstandingMocks = vi.hoisted(() => ({
@@ -70,7 +70,7 @@ const mediaUnderstandingMocks = vi.hoisted(() => ({
 
 const sessionMetaMocks = vi.hoisted(() => ({
   readAcpSessionEntry: vi.fn<
-    (params: { sessionKey: string; cfg?: KaijiBotConfig }) => AcpSessionStoreEntry | null
+    (params: { sessionKey: string; cfg?: AllBotConfig }) => AcpSessionStoreEntry | null
   >(() => null),
 }));
 
@@ -109,7 +109,7 @@ function setReadyAcpResolution() {
   });
 }
 
-function createAcpConfigWithVisibleToolTags(): KaijiBotConfig {
+function createAcpConfigWithVisibleToolTags(): AllBotConfig {
   return createAcpTestConfig({
     acp: {
       enabled: true,
@@ -125,7 +125,7 @@ function createAcpConfigWithVisibleToolTags(): KaijiBotConfig {
 
 async function runDispatch(params: {
   bodyForAgent: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   dispatcher?: ReplyDispatcher;
   shouldRouteToOriginating?: boolean;
   originatingChannel?: string;
@@ -252,9 +252,9 @@ describe("tryDispatchAcpReply", () => {
       getAcpSessionManager: () => managerMocks,
     }));
     vi.doMock("../../acp/policy.js", () => ({
-      resolveAcpDispatchPolicyError: (cfg: KaijiBotConfig) =>
+      resolveAcpDispatchPolicyError: (cfg: AllBotConfig) =>
         policyMocks.resolveAcpDispatchPolicyError(cfg),
-      resolveAcpAgentPolicyError: (cfg: KaijiBotConfig, agent: string) =>
+      resolveAcpAgentPolicyError: (cfg: AllBotConfig, agent: string) =>
         policyMocks.resolveAcpAgentPolicyError(cfg, agent),
     }));
     vi.doMock("./route-reply.js", () => ({
@@ -272,7 +272,7 @@ describe("tryDispatchAcpReply", () => {
     }));
     vi.doMock("../../tts/tts.js", () => ({
       maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
-      resolveTtsConfig: (cfg: KaijiBotConfig) => ttsMocks.resolveTtsConfig(cfg),
+      resolveTtsConfig: (cfg: AllBotConfig) => ttsMocks.resolveTtsConfig(cfg),
     }));
     vi.doMock("../../tts/tts.runtime.js", () => ({
       maybeApplyTtsToPayload: (params: unknown) => ttsMocks.maybeApplyTtsToPayload(params),
@@ -293,11 +293,11 @@ describe("tryDispatchAcpReply", () => {
         mediaUnderstandingMocks.applyMediaUnderstanding(params),
     }));
     vi.doMock("../../acp/runtime/session-meta.js", () => ({
-      readAcpSessionEntry: (params: { sessionKey: string; cfg?: KaijiBotConfig }) =>
+      readAcpSessionEntry: (params: { sessionKey: string; cfg?: AllBotConfig }) =>
         sessionMetaMocks.readAcpSessionEntry(params),
     }));
     vi.doMock("./dispatch-acp-session.runtime.js", () => ({
-      readAcpSessionEntry: (params: { sessionKey: string; cfg?: KaijiBotConfig }) =>
+      readAcpSessionEntry: (params: { sessionKey: string; cfg?: AllBotConfig }) =>
         sessionMetaMocks.readAcpSessionEntry(params),
     }));
     vi.doMock("../../infra/outbound/session-binding-service.js", () => ({
@@ -854,11 +854,11 @@ describe("tryDispatchAcpReply", () => {
         : [],
     );
     sessionMetaMocks.readAcpSessionEntry.mockImplementation(
-      (params: { sessionKey: string; cfg?: KaijiBotConfig }) =>
+      (params: { sessionKey: string; cfg?: AllBotConfig }) =>
         params.sessionKey === canonicalSessionKey
           ? {
               cfg: params.cfg ?? createAcpTestConfig(),
-              storePath: "/tmp/kaijibot-session-store.json",
+              storePath: "/tmp/allbot-session-store.json",
               sessionKey: canonicalSessionKey,
               storeSessionKey: canonicalSessionKey,
               acp: createAcpSessionMeta({
@@ -927,11 +927,11 @@ describe("tryDispatchAcpReply", () => {
         : [],
     );
     sessionMetaMocks.readAcpSessionEntry.mockImplementation(
-      (params: { sessionKey: string; cfg?: KaijiBotConfig }) =>
+      (params: { sessionKey: string; cfg?: AllBotConfig }) =>
         params.sessionKey === canonicalSessionKey
           ? {
               cfg: params.cfg ?? createAcpTestConfig(),
-              storePath: "/tmp/kaijibot-session-store.json",
+              storePath: "/tmp/allbot-session-store.json",
               sessionKey: canonicalSessionKey,
               storeSessionKey: canonicalSessionKey,
               acp: createAcpSessionMeta({

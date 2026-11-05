@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   createScopedAccountReplyToModeResolver,
   createStaticReplyToModeResolver,
@@ -8,7 +8,7 @@ import {
 
 describe("createStaticReplyToModeResolver", () => {
   it.each(["off", "all"] as const)("always returns the configured mode %s", (mode) => {
-    expect(createStaticReplyToModeResolver(mode)({ cfg: {} as KaijiBotConfig })).toBe(mode);
+    expect(createStaticReplyToModeResolver(mode)({ cfg: {} as AllBotConfig })).toBe(mode);
   });
 });
 
@@ -18,12 +18,12 @@ describe("createTopLevelChannelReplyToModeResolver", () => {
   it.each([
     {
       name: "reads the top-level channel config",
-      cfg: { channels: { "demo-top-level": { replyToMode: "first" } } } as KaijiBotConfig,
+      cfg: { channels: { "demo-top-level": { replyToMode: "first" } } } as AllBotConfig,
       expected: "first",
     },
     {
       name: "falls back to off",
-      cfg: {} as KaijiBotConfig,
+      cfg: {} as AllBotConfig,
       expected: "off",
     },
   ])("$name", ({ cfg, expected }) => {
@@ -61,7 +61,7 @@ describe("createScopedAccountReplyToModeResolver", () => {
           },
         },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     expect(resolver({ cfg, accountId })).toBe(expected);
   });
@@ -76,7 +76,7 @@ describe("createScopedAccountReplyToModeResolver", () => {
       },
     });
 
-    expect(resolver({ cfg: {} as KaijiBotConfig, chatType: "group" })).toBe("first");
+    expect(resolver({ cfg: {} as AllBotConfig, chatType: "group" })).toBe("first");
     expect(seen).toEqual(["group"]);
   });
 });

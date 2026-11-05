@@ -1,12 +1,12 @@
 ---
-summary: "CLI reference for `kaijibot node` (headless node host)"
+summary: "CLI reference for `allbot node` (headless node host)"
 read_when:
   - Running the headless node host
   - Pairing a non-macOS node for system.run
 title: "node"
 ---
 
-# `kaijibot node`
+# `allbot node`
 
 Run a **headless node host** that connects to the Gateway WebSocket and exposes
 `system.run` / `system.which` on this machine.
@@ -51,7 +51,7 @@ Disable it on the node if needed:
 ## Run (foreground)
 
 ```bash
-kaijibot node run --host <gateway-host> --port 18789
+allbot node run --host <gateway-host> --port 18789
 ```
 
 Options:
@@ -65,21 +65,21 @@ Options:
 
 ## Gateway auth for node host
 
-`kaijibot node run` and `kaijibot node install` resolve gateway auth from config/env (no `--token`/`--password` flags on node commands):
+`allbot node run` and `allbot node install` resolve gateway auth from config/env (no `--token`/`--password` flags on node commands):
 
-- `KAIJIBOT_GATEWAY_TOKEN` / `KAIJIBOT_GATEWAY_PASSWORD` are checked first.
+- `ALLBOT_GATEWAY_TOKEN` / `ALLBOT_GATEWAY_PASSWORD` are checked first.
 - Then local config fallback: `gateway.auth.token` / `gateway.auth.password`.
 - In local mode, node host intentionally does not inherit `gateway.remote.token` / `gateway.remote.password`.
 - If `gateway.auth.token` / `gateway.auth.password` is explicitly configured via SecretRef and unresolved, node auth resolution fails closed (no remote fallback masking).
 - In `gateway.mode=remote`, remote client fields (`gateway.remote.token` / `gateway.remote.password`) are also eligible per remote precedence rules.
-- Node host auth resolution only honors `KAIJIBOT_GATEWAY_*` env vars.
+- Node host auth resolution only honors `ALLBOT_GATEWAY_*` env vars.
 
 ## Service (background)
 
 Install a headless node host as a user service.
 
 ```bash
-kaijibot node install --host <gateway-host> --port 18789
+allbot node install --host <gateway-host> --port 18789
 ```
 
 Options:
@@ -96,13 +96,13 @@ Options:
 Manage the service:
 
 ```bash
-kaijibot node status
-kaijibot node stop
-kaijibot node restart
-kaijibot node uninstall
+allbot node status
+allbot node stop
+allbot node restart
+allbot node uninstall
 ```
 
-Use `kaijibot node run` for a foreground node host (no service).
+Use `allbot node run` for a foreground node host (no service).
 
 Service commands accept `--json` for machine-readable output.
 
@@ -112,26 +112,26 @@ The first connection creates a pending device pairing request (`role: node`) on 
 Approve it via:
 
 ```bash
-kaijibot devices list
-kaijibot devices approve <requestId>
+allbot devices list
+allbot devices approve <requestId>
 ```
 
 If the node retries pairing with changed auth details (role/scopes/public key),
 the previous pending request is superseded and a new `requestId` is created.
-Run `kaijibot devices list` again before approval.
+Run `allbot devices list` again before approval.
 
 The node host stores its node id, token, display name, and gateway connection info in
-`~/.kaijibot/node.json`.
+`~/.allbot/node.json`.
 
 ## Exec approvals
 
 `system.run` is gated by local exec approvals:
 
-- `~/.kaijibot/exec-approvals.json`
+- `~/.allbot/exec-approvals.json`
 - [Exec approvals](/tools/exec-approvals)
-- `kaijibot approvals --node <id|name|ip>` (edit from the Gateway)
+- `allbot approvals --node <id|name|ip>` (edit from the Gateway)
 
-For approved async node exec, KaijiBot prepares a canonical `systemRunPlan`
+For approved async node exec, AllBot prepares a canonical `systemRunPlan`
 before prompting. The later approved `system.run` forward reuses that stored
 plan, so edits to command/cwd/session fields after the approval request was
 created are rejected instead of changing what the node executes.

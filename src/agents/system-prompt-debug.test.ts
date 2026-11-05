@@ -183,7 +183,7 @@ describe("emitContextDebugBreakdown", () => {
 
     expect(writeSpy).toHaveBeenCalledOnce();
     const output = writeSpy.mock.calls[0]![0] as string;
-    expect(output).toContain("=== KAIJIBOT CONTEXT BREAKDOWN ===");
+    expect(output).toContain("=== ALLBOT CONTEXT BREAKDOWN ===");
     expect(output).toContain("Total:");
     expect(output).toContain("By layer:");
     expect(output).toContain("[L1] Safety:");

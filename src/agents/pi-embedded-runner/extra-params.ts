@@ -3,7 +3,7 @@ import type { SimpleStreamOptions } from "@earendil-works/pi-ai";
 import { streamSimple } from "@earendil-works/pi-ai";
 import type { SettingsManager } from "@earendil-works/pi-coding-agent";
 import type { ThinkLevel } from "../../auto-reply/thinking.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   prepareProviderExtraParams as prepareProviderExtraParamsRuntime,
   wrapProviderStreamFn as wrapProviderStreamFnRuntime,
@@ -56,7 +56,7 @@ export const __testing = {
  * @internal Exported for testing only
  */
 export function resolveExtraParams(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   provider: string;
   modelId: string;
   agentId?: string;
@@ -122,7 +122,7 @@ function hasExplicitTransportSetting(settings: { transport?: unknown }): boolean
 }
 
 export function resolvePreparedExtraParams(params: {
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   provider: string;
   modelId: string;
   extraParamsOverride?: Record<string, unknown>;
@@ -349,7 +349,7 @@ function createParallelToolCallsWrapper(
 
 type ApplyExtraParamsContext = {
   agent: { streamFn?: StreamFn };
-  cfg: KaijiBotConfig | undefined;
+  cfg: AllBotConfig | undefined;
   provider: string;
   modelId: string;
   agentDir?: string;
@@ -442,7 +442,7 @@ function applyPostPluginStreamWrappers(
  */
 export function applyExtraParamsToAgent(
   agent: { streamFn?: StreamFn },
-  cfg: KaijiBotConfig | undefined,
+  cfg: AllBotConfig | undefined,
   provider: string,
   modelId: string,
   extraParamsOverride?: Record<string, unknown>,

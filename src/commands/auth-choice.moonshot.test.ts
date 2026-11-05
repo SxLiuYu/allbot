@@ -7,7 +7,7 @@ import {
   createExitThrowingRuntime,
   createWizardPrompter,
   readAuthProfilesForAgent,
-  requireKaijiBotAgentDir,
+  requireAllBotAgentDir,
   setupAuthTestEnv,
 } from "./test-wizard-helpers.js";
 
@@ -17,14 +17,14 @@ function createPrompter(overrides: Partial<WizardPrompter>): WizardPrompter {
 
 describe("applyAuthChoice (moonshot)", () => {
   const lifecycle = createAuthTestLifecycle([
-    "KAIJIBOT_STATE_DIR",
-    "KAIJIBOT_AGENT_DIR",
+    "ALLBOT_STATE_DIR",
+    "ALLBOT_AGENT_DIR",
     "PI_CODING_AGENT_DIR",
     "MOONSHOT_API_KEY",
   ]);
 
   async function setupTempState() {
-    const env = await setupAuthTestEnv("kaijibot-auth-");
+    const env = await setupAuthTestEnv("allbot-auth-");
     lifecycle.setStateDir(env.stateDir);
     delete process.env.MOONSHOT_API_KEY;
   }
@@ -32,7 +32,7 @@ describe("applyAuthChoice (moonshot)", () => {
   async function readAuthProfiles() {
     return await readAuthProfilesForAgent<{
       profiles?: Record<string, { key?: string }>;
-    }>(requireKaijiBotAgentDir());
+    }>(requireAllBotAgentDir());
   }
 
   async function runMoonshotCnFlow(params: {

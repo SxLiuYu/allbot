@@ -1,25 +1,25 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveSetupSecretInputString } from "./setup.secret-input.js";
 
-function makeConfig(): KaijiBotConfig {
+function makeConfig(): AllBotConfig {
   return {
     secrets: {
       providers: {
         default: { source: "env" },
       },
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 describe("resolveSetupSecretInputString", () => {
   it("resolves env-template SecretInput strings", async () => {
     const resolved = await resolveSetupSecretInputString({
       config: makeConfig(),
-      value: "${KAIJIBOT_GATEWAY_PASSWORD}",
+      value: "${ALLBOT_GATEWAY_PASSWORD}",
       path: "gateway.auth.password",
       env: {
-        KAIJIBOT_GATEWAY_PASSWORD: "gateway-secret", // pragma: allowlist secret
+        ALLBOT_GATEWAY_PASSWORD: "gateway-secret", // pragma: allowlist secret
       },
     });
 
@@ -40,12 +40,12 @@ describe("resolveSetupSecretInputString", () => {
     await expect(
       resolveSetupSecretInputString({
         config: makeConfig(),
-        value: "${KAIJIBOT_GATEWAY_PASSWORD}",
+        value: "${ALLBOT_GATEWAY_PASSWORD}",
         path: "gateway.auth.password",
         env: {},
       }),
     ).rejects.toThrow(
-      'gateway.auth.password: failed to resolve SecretRef "env:default:KAIJIBOT_GATEWAY_PASSWORD"',
+      'gateway.auth.password: failed to resolve SecretRef "env:default:ALLBOT_GATEWAY_PASSWORD"',
     );
   });
 });

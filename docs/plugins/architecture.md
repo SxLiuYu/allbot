@@ -1,7 +1,7 @@
 ---
 summary: "Plugin internals: capability model, ownership, contracts, load pipeline, and runtime helpers"
 read_when:
-  - Building or debugging native KaijiBot plugins
+  - Building or debugging native AllBot plugins
   - Understanding the plugin capability model or ownership boundaries
   - Working on the plugin load pipeline or registry
   - Implementing provider runtime hooks or channel plugins
@@ -20,12 +20,12 @@ sidebarTitle: "Internals"
   - [SDK Overview](/plugins/sdk-overview) — import map and registration API
 </Info>
 
-This page covers the internal architecture of the KaijiBot plugin system.
+This page covers the internal architecture of the AllBot plugin system.
 
 ## Public capability model
 
-Capabilities are the public **native plugin** model inside KaijiBot. Every
-native KaijiBot plugin registers against one or more capability types:
+Capabilities are the public **native plugin** model inside AllBot. Every
+native AllBot plugin registers against one or more capability types:
 
 | Capability             | Registration method                              | Example plugins                      |
 | ---------------------- | ------------------------------------------------ | ------------------------------------ |
@@ -71,7 +71,7 @@ Practical rule:
 
 ### Plugin shapes
 
-KaijiBot classifies every loaded plugin into a shape based on its actual
+AllBot classifies every loaded plugin into a shape based on its actual
 registration behavior (not just static metadata):
 
 - **plain-capability** -- registers exactly one capability type (for example a
@@ -84,7 +84,7 @@ registration behavior (not just static metadata):
 - **non-capability** -- registers tools, commands, services, or routes but no
   capabilities
 
-Use `kaijibot plugins inspect <id>` to see a plugin's shape and capability
+Use `allbot plugins inspect <id>` to see a plugin's shape and capability
 breakdown. See [CLI reference](/cli/plugins#inspect) for details.
 
 ### Legacy hooks
@@ -102,7 +102,7 @@ Direction:
 
 ### Compatibility signals
 
-When you run `kaijibot doctor` or `kaijibot plugins inspect <id>`, you may see
+When you run `allbot doctor` or `allbot plugins inspect <id>`, you may see
 one of these labels:
 
 | Signal                     | Meaning                                                      |
@@ -114,25 +114,25 @@ one of these labels:
 
 Neither `hook-only` nor `before_agent_start` will break your plugin today --
 `hook-only` is advisory, and `before_agent_start` only triggers a warning. These
-signals also appear in `kaijibot status --all` and `kaijibot plugins doctor`.
+signals also appear in `allbot status --all` and `allbot plugins doctor`.
 
 ## Architecture overview
 
-KaijiBot's plugin system has four layers:
+AllBot's plugin system has four layers:
 
 1. **Manifest + discovery**
-   KaijiBot finds candidate plugins from configured paths, workspace roots,
+   AllBot finds candidate plugins from configured paths, workspace roots,
    global extension roots, and bundled extensions. Discovery reads native
-   `kaijibot.plugin.json` manifests plus supported bundle manifests first.
+   `allbot.plugin.json` manifests plus supported bundle manifests first.
 2. **Enablement + validation**
    Core decides whether a discovered plugin is enabled, disabled, blocked, or
    selected for an exclusive slot such as memory.
 3. **Runtime loading**
-   Native KaijiBot plugins are loaded in-process via jiti and register
+   Native AllBot plugins are loaded in-process via jiti and register
    capabilities into a central registry. Compatible bundles are normalized into
    registry records without importing runtime code.
 4. **Surface consumption**
-   The rest of KaijiBot reads the registry to expose tools, channels, provider
+   The rest of AllBot reads the registry to expose tools, channels, provider
    setup, hooks, HTTP routes, CLI commands, and services.
 
 For plugin CLI specifically, root command discovery is split in two phases:
@@ -140,7 +140,7 @@ For plugin CLI specifically, root command discovery is split in two phases:
 - parse-time metadata comes from `registerCli(..., { descriptors: [...] })`
 - the real plugin CLI module can stay lazy and register on first invocation
 
-That keeps plugin-owned CLI code inside the plugin while still letting KaijiBot
+That keeps plugin-owned CLI code inside the plugin while still letting AllBot
 reserve root command names before parsing.
 
 The important design boundary:
@@ -149,13 +149,13 @@ The important design boundary:
   without executing plugin code
 - native runtime behavior comes from the plugin module's `register(api)` path
 
-That split lets KaijiBot validate config, explain missing/disabled plugins, and
+That split lets AllBot validate config, explain missing/disabled plugins, and
 build UI/schema hints before the full runtime is active.
 
 ### Channel plugins and the shared message tool
 
 Channel plugins do not need to register a separate send/edit/react tool for
-normal chat actions. KaijiBot keeps one shared `message` tool in core, and
+normal chat actions. AllBot keeps one shared `message` tool in core, and
 channel plugins own the channel-specific discovery and execution behind it.
 
 The current boundary is:
@@ -222,12 +222,12 @@ See [Load pipeline](#load-pipeline) for the full startup sequence.
 
 ## Capability ownership model
 
-KaijiBot treats a native plugin as the ownership boundary for a **company** or a
+AllBot treats a native plugin as the ownership boundary for a **company** or a
 **feature**, not as a grab bag of unrelated integrations.
 
 That means:
 
-- a company plugin should usually own all of that company's KaijiBot-facing
+- a company plugin should usually own all of that company's AllBot-facing
   surfaces
 - a feature plugin should usually own the full feature surface it introduces
 - channels should consume shared core capabilities instead of re-implementing
@@ -264,7 +264,7 @@ This is the key distinction:
 - **plugin** = ownership boundary
 - **capability** = core contract that multiple plugins can implement or consume
 
-So if KaijiBot adds a new domain such as video, the first question is not
+So if AllBot adds a new domain such as video, the first question is not
 "which provider should hardcode video handling?" The first question is "what is
 the core video capability contract?" Once that contract exists, vendor plugins
 can register against it and channel/feature plugins can consume it.
@@ -300,19 +300,19 @@ That same pattern should be preferred for future capabilities.
 
 ### Multi-capability company plugin example
 
-A company plugin should feel cohesive from the outside. If KaijiBot has shared
+A company plugin should feel cohesive from the outside. If AllBot has shared
 contracts for models, speech, realtime transcription, realtime voice, media
 understanding, image generation, video generation, web fetch, and web search,
 a vendor can own all of its surfaces in one place:
 
 ```ts
-import type { KaijiBotPluginDefinition } from "kaijibot/plugin-sdk/plugin-entry";
+import type { AllBotPluginDefinition } from "allbot/plugin-sdk/plugin-entry";
 import {
   describeImageWithModel,
   transcribeOpenAiCompatibleAudio,
-} from "kaijibot/plugin-sdk/media-understanding";
+} from "allbot/plugin-sdk/media-understanding";
 
-const plugin: KaijiBotPluginDefinition = {
+const plugin: AllBotPluginDefinition = {
   id: "exampleai",
   name: "ExampleAI",
   register(api) {
@@ -367,7 +367,7 @@ What matters is not the exact helper names. The shape matters:
 
 ### Capability example: video understanding
 
-KaijiBot already treats image/audio/video understanding as one shared
+AllBot already treats image/audio/video understanding as one shared
 capability. The same ownership model applies there:
 
 1. core defines the media-understanding contract
@@ -389,7 +389,7 @@ Need a concrete rollout checklist? See
 ## Contracts and enforcement
 
 The plugin API surface is intentionally typed and centralized in
-`KaijiBotPluginApi`. That contract defines the supported registration points and
+`AllBotPluginApi`. That contract defines the supported registration points and
 the runtime helpers a plugin may rely on.
 
 Why this matters:
@@ -408,11 +408,11 @@ There are two layers of enforcement:
    registrations produce plugin diagnostics instead of undefined behavior.
 2. **contract tests**
    Bundled plugins are captured in contract registries during test runs so
-   KaijiBot can assert ownership explicitly. Today this is used for model
+   AllBot can assert ownership explicitly. Today this is used for model
    providers, speech providers, web search providers, and bundled registration
    ownership.
 
-The practical effect is that KaijiBot knows, up front, which plugin owns which
+The practical effect is that AllBot knows, up front, which plugin owns which
 surface. That lets core and channels compose seamlessly because ownership is
 declared, typed, and testable rather than implicit.
 
@@ -432,7 +432,7 @@ Bad plugin contracts are:
 - vendor-specific policy hidden in core
 - one-off plugin escape hatches that bypass the registry
 - channel code reaching straight into a vendor implementation
-- ad hoc runtime objects that are not part of `KaijiBotPluginApi` or
+- ad hoc runtime objects that are not part of `AllBotPluginApi` or
   `api.runtime`
 
 When in doubt, raise the abstraction level: define the capability first, then
@@ -440,7 +440,7 @@ let plugins plug into it.
 
 ## Execution model
 
-Native KaijiBot plugins run **in-process** with the Gateway. They are not
+Native AllBot plugins run **in-process** with the Gateway. They are not
 sandboxed. A loaded native plugin has the same process-level trust boundary as
 core code.
 
@@ -449,9 +449,9 @@ Implications:
 - a native plugin can register tools, network handlers, hooks, and services
 - a native plugin bug can crash or destabilize the gateway
 - a malicious native plugin is equivalent to arbitrary code execution inside
-  the KaijiBot process
+  the AllBot process
 
-Compatible bundles are safer by default because KaijiBot currently treats them
+Compatible bundles are safer by default because AllBot currently treats them
 as metadata/content packs. In current releases, that mostly means bundled
 skills.
 
@@ -459,7 +459,7 @@ Use allowlists and explicit install/load paths for non-bundled plugins. Treat
 workspace plugins as development-time code, not production defaults.
 
 For bundled workspace package names, keep the plugin id anchored in the npm
-name: `@kaijibot/<id>` by default, or an approved typed suffix such as
+name: `@allbot/<id>` by default, or an approved typed suffix such as
 `-provider`, `-plugin`, `-speech`, `-sandbox`, or `-media-understanding` when
 the package intentionally exposes a narrower plugin role.
 
@@ -472,7 +472,7 @@ Important trust note:
 
 ## Export boundary
 
-KaijiBot exports capabilities, not implementation convenience.
+AllBot exports capabilities, not implementation convenience.
 
 Keep capability registration public. Trim non-contract helper exports:
 
@@ -490,7 +490,7 @@ new third-party plugins.
 
 ## Load pipeline
 
-At startup, KaijiBot does roughly this:
+At startup, AllBot does roughly this:
 
 1. discover candidate plugin roots
 2. read native or compatible bundle manifests and package metadata
@@ -512,7 +512,7 @@ ownership looks suspicious for non-bundled plugins.
 
 ### Manifest-first behavior
 
-The manifest is the control-plane source of truth. KaijiBot uses it to:
+The manifest is the control-plane source of truth. AllBot uses it to:
 
 - identify the plugin
 - discover declared channels/skills/config schema or bundle capabilities
@@ -525,7 +525,7 @@ actual behavior such as hooks, tools, commands, or provider flows.
 
 ### What the loader caches
 
-KaijiBot keeps short in-process caches for:
+AllBot keeps short in-process caches for:
 
 - discovery results
 - manifest registry data
@@ -536,10 +536,10 @@ to think of as short-lived performance caches, not persistence.
 
 Performance note:
 
-- Set `KAIJIBOT_DISABLE_PLUGIN_DISCOVERY_CACHE=1` or
-  `KAIJIBOT_DISABLE_PLUGIN_MANIFEST_CACHE=1` to disable these caches.
-- Tune cache windows with `KAIJIBOT_PLUGIN_DISCOVERY_CACHE_MS` and
-  `KAIJIBOT_PLUGIN_MANIFEST_CACHE_MS`.
+- Set `ALLBOT_DISABLE_PLUGIN_DISCOVERY_CACHE=1` or
+  `ALLBOT_DISABLE_PLUGIN_MANIFEST_CACHE=1` to disable these caches.
+- Tune cache windows with `ALLBOT_PLUGIN_DISCOVERY_CACHE_MS` and
+  `ALLBOT_PLUGIN_MANIFEST_CACHE_MS`.
 
 ## Registry model
 
@@ -635,7 +635,7 @@ Provider plugins now have two layers:
   `buildReplayPolicy`,
   `sanitizeReplayHistory`, `validateReplayTurns`, `onModelSelected`
 
-KaijiBot still owns the generic agent loop, failover, transcript handling, and
+AllBot still owns the generic agent loop, failover, transcript handling, and
 tool policy. These hooks are the extension surface for provider-specific behavior without
 needing a whole custom inference transport.
 
@@ -655,14 +655,14 @@ without loading channel runtime.
 
 ### Hook order and usage
 
-For model/provider plugins, KaijiBot calls hooks in this rough order.
+For model/provider plugins, AllBot calls hooks in this rough order.
 The "When to use" column is the quick decision guide.
 
 | #   | Hook                              | What it does                                                                                                   | When to use                                                                                                                                 |
 | --- | --------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | `catalog`                         | Publish provider config into `models.providers` during `models.json` generation                                | Provider owns a catalog or base URL defaults                                                                                                |
 | 2   | `applyConfigDefaults`             | Apply provider-owned global config defaults during config materialization                                      | Defaults depend on auth mode, env, or provider model-family semantics                                                                       |
-| --  | _(built-in model lookup)_         | KaijiBot tries the normal registry/catalog path first                                                          | _(not a plugin hook)_                                                                                                                       |
+| --  | _(built-in model lookup)_         | AllBot tries the normal registry/catalog path first                                                          | _(not a plugin hook)_                                                                                                                       |
 | 3   | `normalizeModelId`                | Normalize legacy or preview model-id aliases before lookup                                                     | Provider owns alias cleanup before canonical model resolution                                                                               |
 | 4   | `normalizeTransport`              | Normalize provider-family `api` / `baseUrl` before generic model assembly                                      | Provider owns transport cleanup for custom provider ids in the same transport family                                                        |
 | 5   | `normalizeConfig`                 | Normalize `models.providers.<id>` before runtime/provider resolution                                           | Provider needs config cleanup that should live with the plugin; bundled Google-family helpers also backstop supported Google config entries |
@@ -716,7 +716,7 @@ that compatibility cleanup.
 
 If the provider needs a fully custom wire protocol or custom request executor,
 that is a different class of extension. These hooks are for provider behavior
-that still runs on KaijiBot's normal inference loop.
+that still runs on AllBot's normal inference loop.
 
 ### Provider example
 
@@ -800,7 +800,7 @@ api.registerProvider({
   reasoning-compat payload shaping, and Responses context management.
 - OpenRouter uses `catalog` plus `resolveDynamicModel` and
   `prepareDynamicModel` because the provider is pass-through and may expose new
-  model ids before KaijiBot's static catalog updates; it also uses
+  model ids before AllBot's static catalog updates; it also uses
   `capabilities`, `wrapStreamFn`, and `isCacheTtlEligible` to keep
   provider-specific request headers, routing metadata, reasoning patches, and
   prompt-cache policy out of core. Its replay policy comes from the
@@ -890,12 +890,12 @@ Plugins can access selected core helpers via `api.runtime`. For TTS:
 
 ```ts
 const clip = await api.runtime.tts.textToSpeech({
-  text: "Hello from KaijiBot",
+  text: "Hello from AllBot",
   cfg: api.config,
 });
 
 const result = await api.runtime.tts.textToSpeechTelephony({
-  text: "Hello from KaijiBot",
+  text: "Hello from AllBot",
   cfg: api.config,
 });
 
@@ -938,7 +938,7 @@ Notes:
 - Use speech providers for vendor-owned synthesis behavior.
 - Legacy Microsoft `edge` input is normalized to the `microsoft` provider id.
 - The preferred ownership model is company-oriented: one vendor plugin can own
-  text, speech, image, and future media providers as KaijiBot adds those
+  text, speech, image, and future media providers as AllBot adds those
   capability contracts.
 
 For image/audio/video understanding, plugins register one typed
@@ -1015,7 +1015,7 @@ const result = await api.runtime.subagent.run({
 Notes:
 
 - `provider` and `model` are optional per-run overrides, not persistent session changes.
-- KaijiBot only honors those override fields for trusted callers.
+- AllBot only honors those override fields for trusted callers.
 - For plugin-owned fallback runs, operators must opt in with `plugins.entries.<id>.subagent.allowModelOverride: true`.
 - Use `plugins.entries.<id>.subagent.allowedModels` to restrict trusted plugins to specific canonical `provider/model` targets, or `"*"` to allow any target explicitly.
 - Untrusted plugin subagent runs still work, but override requests are rejected instead of silently falling back.
@@ -1031,7 +1031,7 @@ const providers = api.runtime.webSearch.listProviders({
 const result = await api.runtime.webSearch.search({
   config: api.config,
   args: {
-    query: "KaijiBot plugin runtime helpers",
+    query: "AllBot plugin runtime helpers",
     count: 5,
   },
 });
@@ -1095,33 +1095,33 @@ Notes:
 - Overlapping routes with different `auth` levels are rejected. Keep `exact`/`prefix` fallthrough chains on the same auth level only.
 - `auth: "plugin"` routes do **not** receive operator runtime scopes automatically. They are for plugin-managed webhooks/signature verification, not privileged Gateway helper calls.
 - `auth: "gateway"` routes run inside a Gateway request runtime scope, but that scope is intentionally conservative:
-  - shared-secret bearer auth (`gateway.auth.mode = "token"` / `"password"`) keeps plugin-route runtime scopes pinned to `operator.write`, even if the caller sends `x-kaijibot-scopes`
-  - trusted identity-bearing HTTP modes (for example `trusted-proxy` or `gateway.auth.mode = "none"` on a private ingress) honor `x-kaijibot-scopes` only when the header is explicitly present
-  - if `x-kaijibot-scopes` is absent on those identity-bearing plugin-route requests, runtime scope falls back to `operator.write`
-- Practical rule: do not assume a gateway-auth plugin route is an implicit admin surface. If your route needs admin-only behavior, require an identity-bearing auth mode and document the explicit `x-kaijibot-scopes` header contract.
+  - shared-secret bearer auth (`gateway.auth.mode = "token"` / `"password"`) keeps plugin-route runtime scopes pinned to `operator.write`, even if the caller sends `x-allbot-scopes`
+  - trusted identity-bearing HTTP modes (for example `trusted-proxy` or `gateway.auth.mode = "none"` on a private ingress) honor `x-allbot-scopes` only when the header is explicitly present
+  - if `x-allbot-scopes` is absent on those identity-bearing plugin-route requests, runtime scope falls back to `operator.write`
+- Practical rule: do not assume a gateway-auth plugin route is an implicit admin surface. If your route needs admin-only behavior, require an identity-bearing auth mode and document the explicit `x-allbot-scopes` header contract.
 
 ## Plugin SDK import paths
 
-Use SDK subpaths instead of the monolithic `kaijibot/plugin-sdk` import when
+Use SDK subpaths instead of the monolithic `allbot/plugin-sdk` import when
 authoring plugins:
 
-- `kaijibot/plugin-sdk/plugin-entry` for plugin registration primitives.
-- `kaijibot/plugin-sdk/core` for the generic shared plugin-facing contract.
-- `kaijibot/plugin-sdk/config-schema` for the root `kaijibot.json` Zod schema
-  export (`KaijiBotSchema`).
-- Stable channel primitives such as `kaijibot/plugin-sdk/channel-setup`,
-  `kaijibot/plugin-sdk/setup-runtime`,
-  `kaijibot/plugin-sdk/setup-adapter-runtime`,
-  `kaijibot/plugin-sdk/setup-tools`,
-  `kaijibot/plugin-sdk/channel-pairing`,
-  `kaijibot/plugin-sdk/channel-contract`,
-  `kaijibot/plugin-sdk/channel-feedback`,
-  `kaijibot/plugin-sdk/channel-inbound`,
-  `kaijibot/plugin-sdk/channel-lifecycle`,
-  `kaijibot/plugin-sdk/channel-reply-pipeline`,
-  `kaijibot/plugin-sdk/command-auth`,
-  `kaijibot/plugin-sdk/secret-input`, and
-  `kaijibot/plugin-sdk/webhook-ingress` for shared setup/auth/reply/webhook
+- `allbot/plugin-sdk/plugin-entry` for plugin registration primitives.
+- `allbot/plugin-sdk/core` for the generic shared plugin-facing contract.
+- `allbot/plugin-sdk/config-schema` for the root `allbot.json` Zod schema
+  export (`AllBotSchema`).
+- Stable channel primitives such as `allbot/plugin-sdk/channel-setup`,
+  `allbot/plugin-sdk/setup-runtime`,
+  `allbot/plugin-sdk/setup-adapter-runtime`,
+  `allbot/plugin-sdk/setup-tools`,
+  `allbot/plugin-sdk/channel-pairing`,
+  `allbot/plugin-sdk/channel-contract`,
+  `allbot/plugin-sdk/channel-feedback`,
+  `allbot/plugin-sdk/channel-inbound`,
+  `allbot/plugin-sdk/channel-lifecycle`,
+  `allbot/plugin-sdk/channel-reply-pipeline`,
+  `allbot/plugin-sdk/command-auth`,
+  `allbot/plugin-sdk/secret-input`, and
+  `allbot/plugin-sdk/webhook-ingress` for shared setup/auth/reply/webhook
   wiring. `channel-inbound` is the shared home for debounce, mention matching,
   inbound mention-policy helpers, envelope formatting, and inbound envelope
   context helpers.
@@ -1132,25 +1132,25 @@ authoring plugins:
   `setup-tools` is the small CLI/archive/docs helper seam (`formatCliCommand`,
   `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`,
   `CONFIG_DIR`).
-- Domain subpaths such as `kaijibot/plugin-sdk/channel-config-helpers`,
-  `kaijibot/plugin-sdk/allow-from`,
-  `kaijibot/plugin-sdk/channel-config-schema`,
-  `kaijibot/plugin-sdk/telegram-command-config`,
-  `kaijibot/plugin-sdk/channel-policy`,
-  `kaijibot/plugin-sdk/approval-gateway-runtime`,
-  `kaijibot/plugin-sdk/approval-handler-adapter-runtime`,
-  `kaijibot/plugin-sdk/approval-handler-runtime`,
-  `kaijibot/plugin-sdk/approval-runtime`,
-  `kaijibot/plugin-sdk/config-runtime`,
-  `kaijibot/plugin-sdk/infra-runtime`,
-  `kaijibot/plugin-sdk/agent-runtime`,
-  `kaijibot/plugin-sdk/lazy-runtime`,
-  `kaijibot/plugin-sdk/reply-history`,
-  `kaijibot/plugin-sdk/routing`,
-  `kaijibot/plugin-sdk/status-helpers`,
-  `kaijibot/plugin-sdk/text-runtime`,
-  `kaijibot/plugin-sdk/runtime-store`, and
-  `kaijibot/plugin-sdk/directory-runtime` for shared runtime/config helpers.
+- Domain subpaths such as `allbot/plugin-sdk/channel-config-helpers`,
+  `allbot/plugin-sdk/allow-from`,
+  `allbot/plugin-sdk/channel-config-schema`,
+  `allbot/plugin-sdk/telegram-command-config`,
+  `allbot/plugin-sdk/channel-policy`,
+  `allbot/plugin-sdk/approval-gateway-runtime`,
+  `allbot/plugin-sdk/approval-handler-adapter-runtime`,
+  `allbot/plugin-sdk/approval-handler-runtime`,
+  `allbot/plugin-sdk/approval-runtime`,
+  `allbot/plugin-sdk/config-runtime`,
+  `allbot/plugin-sdk/infra-runtime`,
+  `allbot/plugin-sdk/agent-runtime`,
+  `allbot/plugin-sdk/lazy-runtime`,
+  `allbot/plugin-sdk/reply-history`,
+  `allbot/plugin-sdk/routing`,
+  `allbot/plugin-sdk/status-helpers`,
+  `allbot/plugin-sdk/text-runtime`,
+  `allbot/plugin-sdk/runtime-store`, and
+  `allbot/plugin-sdk/directory-runtime` for shared runtime/config helpers.
   `telegram-command-config` is the narrow public seam for Telegram custom
   command normalization/validation and stays available even if the bundled
   Telegram contract surface is temporarily unavailable.
@@ -1161,12 +1161,12 @@ authoring plugins:
   contract on the plugin. Core then reads approval auth, delivery, render,
   native-routing, and lazy native-handler behavior through that one capability
   instead of mixing approval behavior into unrelated plugin fields.
-- `kaijibot/plugin-sdk/channel-runtime` is deprecated and remains only as a
+- `allbot/plugin-sdk/channel-runtime` is deprecated and remains only as a
   compatibility shim for older plugins. New code should import the narrower
   generic primitives instead, and repo code should not add new imports of the
   shim.
 - Bundled extension internals remain private. External plugins should use only
-  `kaijibot/plugin-sdk/*` subpaths. KaijiBot core/test code may use the repo
+  `allbot/plugin-sdk/*` subpaths. AllBot core/test code may use the repo
   public entry points under a plugin package root such as `index.js`, `api.js`,
   `runtime-api.js`, `setup-entry.js`, and narrowly scoped files such as
   `login-qr-api.js`. Never import a plugin package's `src/*` from core or from
@@ -1187,7 +1187,7 @@ authoring plugins:
     `plugin-sdk/provider-stream` helpers for repo-local use.
 - Facade-loaded public entry points prefer the active runtime config snapshot
   when one exists, then fall back to the resolved config file on disk when
-  KaijiBot is not yet serving a runtime snapshot.
+  AllBot is not yet serving a runtime snapshot.
 - Generic shared primitives remain the preferred public SDK contract. A small
   reserved compatibility set of bundled channel-branded helper seams still
   exists. Treat those as bundled-maintenance/compatibility seams, not new
@@ -1197,20 +1197,20 @@ authoring plugins:
 
 Compatibility note:
 
-- Avoid the root `kaijibot/plugin-sdk` barrel for new code.
+- Avoid the root `allbot/plugin-sdk` barrel for new code.
 - Prefer the narrow stable primitives first. The newer setup/pairing/reply/
   feedback/contract/inbound/threading/command/secret-input/webhook/infra/
   allowlist/status/message-tool subpaths are the intended contract for new
   bundled and external plugin work.
-  Target parsing/matching belongs on `kaijibot/plugin-sdk/channel-targets`.
+  Target parsing/matching belongs on `allbot/plugin-sdk/channel-targets`.
   Message action gates and reaction message-id helpers belong on
-  `kaijibot/plugin-sdk/channel-actions`.
+  `allbot/plugin-sdk/channel-actions`.
 - Bundled extension-specific helper barrels are not stable by default. If a
   helper is only needed by a bundled extension, keep it behind the extension's
   local `api.js` or `runtime-api.js` seam instead of promoting it into
-  `kaijibot/plugin-sdk/<extension>`.
+  `allbot/plugin-sdk/<extension>`.
 - New shared helper seams should be generic, not channel-branded. Shared target
-  parsing belongs on `kaijibot/plugin-sdk/channel-targets`; channel-specific
+  parsing belongs on `allbot/plugin-sdk/channel-targets`; channel-specific
   internals stay behind the owning plugin's local `api.js` or `runtime-api.js`
   seam.
 - Capability-specific subpaths such as `image-generation`,
@@ -1224,7 +1224,7 @@ Plugins should own channel-specific `describeMessageTool(...)` schema
 contributions. Keep provider-specific fields in the plugin, not in shared core.
 
 For shared portable schema fragments, reuse the generic helpers exported through
-`kaijibot/plugin-sdk/channel-actions`:
+`allbot/plugin-sdk/channel-actions`:
 
 - `createMessageToolButtonsSchema()` for button-grid style payloads
 - `createMessageToolCardSchema()` for structured card payloads
@@ -1262,7 +1262,7 @@ Recommended split:
 
 Plugins that derive directory entries from config should keep that logic in the
 plugin and reuse the shared helpers from
-`kaijibot/plugin-sdk/directory-runtime`.
+`allbot/plugin-sdk/directory-runtime`.
 
 Use this when a channel needs config-backed peers/groups such as:
 
@@ -1285,7 +1285,7 @@ plugin implementation.
 Provider plugins can define model catalogs for inference with
 `registerProvider({ catalog: { run(...) { ... } } })`.
 
-`catalog.run(...)` returns the same shape KaijiBot writes into
+`catalog.run(...)` returns the same shape AllBot writes into
 `models.providers`:
 
 - `{ provider }` for one provider entry
@@ -1294,7 +1294,7 @@ Provider plugins can define model catalogs for inference with
 Use `catalog` when the plugin owns provider-specific model ids, base URL
 defaults, or auth-gated model metadata.
 
-`catalog.order` controls when a plugin's catalog merges relative to KaijiBot's
+`catalog.order` controls when a plugin's catalog merges relative to AllBot's
 built-in implicit providers:
 
 - `simple`: plain API-key or env-driven providers
@@ -1308,7 +1308,7 @@ built-in provider entry with the same provider id.
 Compatibility:
 
 - `discovery` still works as a legacy alias
-- if both `catalog` and `discovery` are registered, KaijiBot uses `catalog`
+- if both `catalog` and `discovery` are registered, AllBot uses `catalog`
 
 ## Read-only channel inspection
 
@@ -1319,8 +1319,8 @@ Why:
 
 - `resolveAccount(...)` is the runtime path. It is allowed to assume credentials
   are fully materialized and can fail fast when required secrets are missing.
-- Read-only command paths such as `kaijibot status`, `kaijibot status --all`,
-  `kaijibot channels status`, `kaijibot channels resolve`, and doctor/config
+- Read-only command paths such as `allbot status`, `allbot status --all`,
+  `allbot channels status`, `allbot channels resolve`, and doctor/config
   repair flows should not need to materialize runtime credentials just to
   describe configuration.
 
@@ -1344,12 +1344,12 @@ path" instead of crashing or misreporting the account as not configured.
 
 ## Package packs
 
-A plugin directory may include a `package.json` with `kaijibot.extensions`:
+A plugin directory may include a `package.json` with `allbot.extensions`:
 
 ```json
 {
   "name": "my-pack",
-  "kaijibot": {
+  "allbot": {
     "extensions": ["./src/safety.ts", "./src/tools.ts"],
     "setupEntry": "./src/setup-entry.ts"
   }
@@ -1362,22 +1362,22 @@ becomes `name/<fileBase>`.
 If your plugin imports npm deps, install them in that directory so
 `node_modules` is available (`npm install` / `pnpm install`).
 
-Security guardrail: every `kaijibot.extensions` entry must stay inside the plugin
+Security guardrail: every `allbot.extensions` entry must stay inside the plugin
 directory after symlink resolution. Entries that escape the package directory are
 rejected.
 
-Security note: `kaijibot plugins install` installs plugin dependencies with
+Security note: `allbot plugins install` installs plugin dependencies with
 `npm install --omit=dev --ignore-scripts` (no lifecycle scripts, no dev dependencies at runtime). Keep plugin dependency
 trees "pure JS/TS" and avoid packages that require `postinstall` builds.
 
-Optional: `kaijibot.setupEntry` can point at a lightweight setup-only module.
-When KaijiBot needs setup surfaces for a disabled channel plugin, or
+Optional: `allbot.setupEntry` can point at a lightweight setup-only module.
+When AllBot needs setup surfaces for a disabled channel plugin, or
 when a channel plugin is enabled but still unconfigured, it loads `setupEntry`
 instead of the full plugin entry. This keeps startup and setup lighter
 when your main plugin entry also wires tools, hooks, or other runtime-only
 code.
 
-Optional: `kaijibot.startup.deferConfiguredChannelFullLoadUntilAfterListen`
+Optional: `allbot.startup.deferConfiguredChannelFullLoadUntilAfterListen`
 can opt a channel plugin into the same `setupEntry` path during the gateway's
 pre-listen startup phase, even when the channel is already configured.
 
@@ -1390,7 +1390,7 @@ must register every channel-owned capability that startup depends on, such as:
 - any gateway methods, tools, or services that must exist during that same window
 
 If your full entry still owns any required startup capability, do not enable
-this flag. Keep the plugin on the default behavior and let KaijiBot load the
+this flag. Keep the plugin on the default behavior and let AllBot load the
 full entry during startup.
 
 Bundled channels can also publish setup-only contract-surface helpers that core
@@ -1422,7 +1422,7 @@ Example:
 ```json
 {
   "name": "@scope/my-channel",
-  "kaijibot": {
+  "allbot": {
     "extensions": ["./index.ts"],
     "setupEntry": "./setup-entry.ts",
     "startup": {
@@ -1434,15 +1434,15 @@ Example:
 
 ### Channel catalog metadata
 
-Channel plugins can advertise setup/discovery metadata via `kaijibot.channel` and
-install hints via `kaijibot.install`. This keeps the core catalog data-free.
+Channel plugins can advertise setup/discovery metadata via `allbot.channel` and
+install hints via `allbot.install`. This keeps the core catalog data-free.
 
 Example:
 
 ```json
 {
-  "name": "@kaijibot/nextcloud-talk",
-  "kaijibot": {
+  "name": "@allbot/nextcloud-talk",
+  "allbot": {
     "extensions": ["./index.ts"],
     "channel": {
       "id": "nextcloud-talk",
@@ -1455,7 +1455,7 @@ Example:
       "aliases": ["nc-talk", "nc"]
     },
     "install": {
-      "npmSpec": "@kaijibot/nextcloud-talk",
+      "npmSpec": "@allbot/nextcloud-talk",
       "localPath": "<bundled-plugin-local-path>",
       "defaultChoice": "npm"
     }
@@ -1463,7 +1463,7 @@ Example:
 }
 ```
 
-Useful `kaijibot.channel` fields beyond the minimal example:
+Useful `allbot.channel` fields beyond the minimal example:
 
 - `detailLabel`: secondary label for richer catalog/status surfaces
 - `docsLabel`: override link text for the docs link
@@ -1478,16 +1478,16 @@ Useful `kaijibot.channel` fields beyond the minimal example:
 - `forceAccountBinding`: require explicit account binding even when only one account exists
 - `preferSessionLookupForAnnounceTarget`: prefer session lookup when resolving announce targets
 
-KaijiBot can also merge **external channel catalogs** (for example, an MPM
+AllBot can also merge **external channel catalogs** (for example, an MPM
 registry export). Drop a JSON file at one of:
 
-- `~/.kaijibot/mpm/plugins.json`
-- `~/.kaijibot/mpm/catalog.json`
-- `~/.kaijibot/plugins/catalog.json`
+- `~/.allbot/mpm/plugins.json`
+- `~/.allbot/mpm/catalog.json`
+- `~/.allbot/plugins/catalog.json`
 
-Or point `KAIJIBOT_PLUGIN_CATALOG_PATHS` (or `KAIJIBOT_MPM_CATALOG_PATHS`) at
+Or point `ALLBOT_PLUGIN_CATALOG_PATHS` (or `ALLBOT_MPM_CATALOG_PATHS`) at
 one or more JSON files (comma/semicolon/`PATH`-delimited). Each file should
-contain `{ "entries": [ { "name": "@scope/pkg", "kaijibot": { "channel": {...}, "install": {...} } } ] }`. The parser also accepts `"packages"` or `"plugins"` as legacy aliases for the `"entries"` key.
+contain `{ "entries": [ { "name": "@scope/pkg", "allbot": { "channel": {...}, "install": {...} } } ] }`. The parser also accepts `"packages"` or `"plugins"` as legacy aliases for the `"entries"` key.
 
 ## Context engine plugins
 
@@ -1500,7 +1500,7 @@ Use this when your plugin needs to replace or extend the default context
 pipeline rather than just add memory search or hooks.
 
 ```ts
-import { buildMemorySystemPromptAddition } from "kaijibot/plugin-sdk/core";
+import { buildMemorySystemPromptAddition } from "allbot/plugin-sdk/core";
 
 export default function (api) {
   api.registerContextEngine("lossless-claw", () => ({
@@ -1532,7 +1532,7 @@ implemented and delegate it explicitly:
 import {
   buildMemorySystemPromptAddition,
   delegateCompactionToRuntime,
-} from "kaijibot/plugin-sdk/core";
+} from "allbot/plugin-sdk/core";
 
 export default function (api) {
   api.registerContextEngine("my-memory-engine", () => ({
@@ -1572,7 +1572,7 @@ Recommended sequence:
    Decide what shared behavior core should own: policy, fallback, config merge,
    lifecycle, channel-facing semantics, and runtime helper shape.
 2. add typed plugin registration/runtime surfaces
-   Extend `KaijiBotPluginApi` and/or `api.runtime` with the smallest useful
+   Extend `AllBotPluginApi` and/or `api.runtime` with the smallest useful
    typed capability surface.
 3. wire core + channel/feature consumers
    Channels and feature plugins should consume the new capability through core,
@@ -1582,7 +1582,7 @@ Recommended sequence:
 5. add contract coverage
    Add tests so ownership and registration shape stay explicit over time.
 
-This is how KaijiBot stays opinionated without becoming hardcoded to one
+This is how AllBot stays opinionated without becoming hardcoded to one
 provider's worldview. See the [Capability Cookbook](/tools/capability-cookbook)
 for a concrete file checklist and worked example.
 

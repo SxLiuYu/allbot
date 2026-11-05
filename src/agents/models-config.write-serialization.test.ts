@@ -8,21 +8,21 @@ import {
 } from "./models-config.e2e-harness.js";
 import { readGeneratedModelsJson } from "./models-config.test-utils.js";
 
-const planKaijiBotModelsJsonMock = vi.fn();
+const planAllBotModelsJsonMock = vi.fn();
 
 installModelsConfigTestHooks();
 
-let ensureKaijiBotModelsJson: typeof import("./models-config.js").ensureKaijiBotModelsJson;
+let ensureAllBotModelsJson: typeof import("./models-config.js").ensureAllBotModelsJson;
 
 beforeAll(async () => {
   vi.doMock("./models-config.plan.js", () => ({
-    planKaijiBotModelsJson: (...args: unknown[]) => planKaijiBotModelsJsonMock(...args),
+    planAllBotModelsJson: (...args: unknown[]) => planAllBotModelsJsonMock(...args),
   }));
-  ({ ensureKaijiBotModelsJson } = await import("./models-config.js"));
+  ({ ensureAllBotModelsJson } = await import("./models-config.js"));
 });
 
 beforeEach(() => {
-  planKaijiBotModelsJsonMock
+  planAllBotModelsJsonMock
     .mockReset()
     .mockImplementation(async (params: { cfg?: typeof CUSTOM_PROXY_MODELS_CONFIG }) => ({
       action: "write",
@@ -75,7 +75,7 @@ describe("models-config write serialization", () => {
       });
 
       try {
-        await Promise.all([ensureKaijiBotModelsJson(first), ensureKaijiBotModelsJson(second)]);
+        await Promise.all([ensureAllBotModelsJson(first), ensureAllBotModelsJson(second)]);
       } finally {
         writeSpy.mockRestore();
       }

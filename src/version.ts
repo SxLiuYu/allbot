@@ -1,8 +1,8 @@
 import { createRequire } from "node:module";
 import { normalizeOptionalString } from "./shared/string-coerce.js";
 
-declare const __KAIJIBOT_VERSION__: string | undefined;
-const CORE_PACKAGE_NAME = "kaijibot";
+declare const __ALLBOT_VERSION__: string | undefined;
+const CORE_PACKAGE_NAME = "allbot";
 
 const PACKAGE_JSON_CANDIDATES = [
   "../package.json",
@@ -112,12 +112,12 @@ function resolveVersionFromRuntimeSources(params: {
 }): string {
   const preferredCandidates =
     params.preference === "env-first"
-      ? [params.env["KAIJIBOT_VERSION"], params.runtimeVersion]
-      : [params.runtimeVersion, params.env["KAIJIBOT_VERSION"]];
+      ? [params.env["ALLBOT_VERSION"], params.runtimeVersion]
+      : [params.runtimeVersion, params.env["ALLBOT_VERSION"]];
   return (
     firstNonEmpty(
       ...preferredCandidates,
-      params.env["KAIJIBOT_SERVICE_VERSION"],
+      params.env["ALLBOT_SERVICE_VERSION"],
       params.env["npm_package_version"],
     ) ?? params.fallback
   );
@@ -139,7 +139,7 @@ export function resolveCompatibilityHostVersion(
   env: RuntimeVersionEnv = process.env as RuntimeVersionEnv,
   fallback = RUNTIME_SERVICE_VERSION_FALLBACK,
 ): string {
-  const explicitCompatibilityVersion = firstNonEmpty(env.KAIJIBOT_COMPATIBILITY_HOST_VERSION);
+  const explicitCompatibilityVersion = firstNonEmpty(env.ALLBOT_COMPATIBILITY_HOST_VERSION);
   if (explicitCompatibilityVersion) {
     return explicitCompatibilityVersion;
   }
@@ -151,11 +151,11 @@ export function resolveCompatibilityHostVersion(
   });
 }
 
-// Single source of truth for the current KaijiBot version.
+// Single source of truth for the current AllBot version.
 // - Embedded/bundled builds: injected define or env var.
 // - Dev/npm builds: package.json.
 export const VERSION = resolveBinaryVersion({
   moduleUrl: import.meta.url,
-  injectedVersion: typeof __KAIJIBOT_VERSION__ === "string" ? __KAIJIBOT_VERSION__ : undefined,
-  bundledVersion: process.env.KAIJIBOT_BUNDLED_VERSION,
+  injectedVersion: typeof __ALLBOT_VERSION__ === "string" ? __ALLBOT_VERSION__ : undefined,
+  bundledVersion: process.env.ALLBOT_BUNDLED_VERSION,
 });

@@ -1,4 +1,4 @@
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
   cancelTaskById,
@@ -630,7 +630,7 @@ export function runTaskInFlowForOwner(params: {
 }
 
 export async function cancelFlowById(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   flowId: string;
 }): Promise<CancelFlowResult> {
   const flow = getTaskFlowById(params.flowId);
@@ -712,7 +712,7 @@ export async function cancelFlowById(params: {
 }
 
 export async function cancelFlowByIdForOwner(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   flowId: string;
   callerOwnerKey: string;
 }): Promise<CancelFlowResult> {
@@ -733,6 +733,6 @@ export async function cancelFlowByIdForOwner(params: {
   });
 }
 
-export async function cancelDetachedTaskRunById(params: { cfg: KaijiBotConfig; taskId: string }) {
+export async function cancelDetachedTaskRunById(params: { cfg: AllBotConfig; taskId: string }) {
   return cancelTaskById(params);
 }

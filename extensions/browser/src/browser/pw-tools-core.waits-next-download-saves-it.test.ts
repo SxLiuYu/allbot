@@ -37,7 +37,7 @@ const sessionMocks = vi.hoisted(() => ({
   rememberRoleRefsForTarget: vi.fn(() => {}),
 }));
 const tmpDirMocks = vi.hoisted(() => ({
-  resolvePreferredKaijiBotTmpDir: vi.fn(() => "/tmp/kaijibot"),
+  resolvePreferredAllBotTmpDir: vi.fn(() => "/tmp/allbot"),
 }));
 const chromeMocks = vi.hoisted(() => ({
   getChromeWebSocketUrl: vi.fn(async () => "ws://127.0.0.1/devtools/browser/mock"),
@@ -53,15 +53,15 @@ let mod: Pick<
   "downloadViaPlaywright" | "waitForDownloadViaPlaywright"
 > &
   Pick<typeof import("./pw-tools-core.responses.js"), "responseBodyViaPlaywright">;
-let tmpDirModule: typeof import("../infra/tmp-kaijibot-dir.js");
+let tmpDirModule: typeof import("../infra/tmp-allbot-dir.js");
 
 describe("pw-tools-core", () => {
   beforeAll(async () => {
     vi.doMock("./pw-session.js", () => sessionMocks);
     vi.doMock("./chrome.js", () => chromeMocks);
-    tmpDirModule = await import("../infra/tmp-kaijibot-dir.js");
-    vi.spyOn(tmpDirModule, "resolvePreferredKaijiBotTmpDir").mockImplementation(
-      tmpDirMocks.resolvePreferredKaijiBotTmpDir,
+    tmpDirModule = await import("../infra/tmp-allbot-dir.js");
+    vi.spyOn(tmpDirModule, "resolvePreferredAllBotTmpDir").mockImplementation(
+      tmpDirMocks.resolvePreferredAllBotTmpDir,
     );
     const [downloads, responses] = await Promise.all([
       import("./pw-tools-core.downloads.js"),
@@ -96,11 +96,11 @@ describe("pw-tools-core", () => {
     for (const fn of Object.values(clientFetchMocks)) {
       fn.mockClear();
     }
-    tmpDirMocks.resolvePreferredKaijiBotTmpDir.mockReturnValue("/tmp/kaijibot");
+    tmpDirMocks.resolvePreferredAllBotTmpDir.mockReturnValue("/tmp/allbot");
   });
 
   async function withTempDir<T>(run: (tempDir: string) => Promise<T>): Promise<T> {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-browser-download-test-"));
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-browser-download-test-"));
     try {
       return await run(tempDir);
     } finally {
@@ -166,7 +166,7 @@ describe("pw-tools-core", () => {
       fs.realpath(params.tempDir).catch(() => params.tempDir),
     ]);
     expect(savedDirReal).toBe(tempDirReal);
-    expect(path.basename(String(savedPath))).toContain(".kaijibot-output-");
+    expect(path.basename(String(savedPath))).toContain(".allbot-output-");
     expect(path.basename(String(savedPath))).toContain(".part");
     expect(await fs.readFile(params.targetPath, "utf8")).toBe(params.content);
   }
@@ -274,35 +274,35 @@ describe("pw-tools-core", () => {
   );
 
   it("uses preferred tmp dir when waiting for download without explicit path", async () => {
-    tmpDirMocks.resolvePreferredKaijiBotTmpDir.mockReturnValue("/tmp/kaijibot-preferred");
+    tmpDirMocks.resolvePreferredAllBotTmpDir.mockReturnValue("/tmp/allbot-preferred");
     const { res, outPath } = await waitForImplicitDownloadOutput({
       downloadUrl: "https://example.com/file.bin",
       suggestedFilename: "file.bin",
     });
     expect(typeof outPath).toBe("string");
     const expectedRootedDownloadsDir = path.resolve(
-      path.join(path.sep, "tmp", "kaijibot-preferred", "downloads"),
+      path.join(path.sep, "tmp", "allbot-preferred", "downloads"),
     );
-    const expectedDownloadsTail = `${path.join("tmp", "kaijibot-preferred", "downloads")}${path.sep}`;
+    const expectedDownloadsTail = `${path.join("tmp", "allbot-preferred", "downloads")}${path.sep}`;
     expect(path.dirname(String(outPath))).toBe(expectedRootedDownloadsDir);
     expect(path.basename(String(outPath))).toMatch(/-file\.bin$/);
     expect(path.normalize(res.path)).toContain(path.normalize(expectedDownloadsTail));
-    expect(tmpDirMocks.resolvePreferredKaijiBotTmpDir).toHaveBeenCalled();
+    expect(tmpDirMocks.resolvePreferredAllBotTmpDir).toHaveBeenCalled();
   });
 
   it("sanitizes suggested download filenames to prevent traversal escapes", async () => {
-    tmpDirMocks.resolvePreferredKaijiBotTmpDir.mockReturnValue("/tmp/kaijibot-preferred");
+    tmpDirMocks.resolvePreferredAllBotTmpDir.mockReturnValue("/tmp/allbot-preferred");
     const { res, outPath } = await waitForImplicitDownloadOutput({
       downloadUrl: "https://example.com/evil",
       suggestedFilename: "../../../../etc/passwd",
     });
     expect(typeof outPath).toBe("string");
     expect(path.dirname(String(outPath))).toBe(
-      path.resolve(path.join(path.sep, "tmp", "kaijibot-preferred", "downloads")),
+      path.resolve(path.join(path.sep, "tmp", "allbot-preferred", "downloads")),
     );
     expect(path.basename(String(outPath))).toMatch(/-passwd$/);
     expect(path.normalize(res.path)).toContain(
-      path.normalize(`${path.join("tmp", "kaijibot-preferred", "downloads")}${path.sep}`),
+      path.normalize(`${path.join("tmp", "allbot-preferred", "downloads")}${path.sep}`),
     );
   });
   it("waits for a matching response and returns its body", async () => {

@@ -11,7 +11,7 @@ import {
 const dirs: string[] = [];
 
 async function makeTmpDir(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-mirror-test-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-mirror-test-"));
   dirs.push(dir);
   return dir;
 }

@@ -130,7 +130,7 @@ function resolveHighWaterBytes(
 }
 
 /**
- * Resolve maintenance settings from kaijibot.json (`session.maintenance`).
+ * Resolve maintenance settings from allbot.json (`session.maintenance`).
  * Falls back to built-in defaults when config is missing or unset.
  */
 export function resolveMaintenanceConfig(): ResolvedSessionMaintenanceConfig {

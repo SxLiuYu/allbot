@@ -16,13 +16,13 @@ provider mixes reasoning into normal text.
 
 Use `/debug` in chat to set **runtime-only** config overrides (memory, not disk).
 `/debug` is disabled by default; enable with `commands.debug: true`.
-This is handy when you need to toggle obscure settings without editing `kaijibot.json`.
+This is handy when you need to toggle obscure settings without editing `allbot.json`.
 
 Examples:
 
 ```
 /debug show
-/debug set messages.responsePrefix="[kaijibot]"
+/debug set messages.responsePrefix="[allbot]"
 /debug unset messages.responsePrefix
 /debug reset
 ```
@@ -44,7 +44,7 @@ node scripts/watch-node.mjs gateway --force
 ```
 
 The watcher restarts on build-relevant files under `src/`, extension source files,
-extension `package.json` and `kaijibot.plugin.json` metadata, `tsconfig.json`,
+extension `package.json` and `allbot.plugin.json` metadata, `tsconfig.json`,
 `package.json`, and `tsdown.config.ts`. Extension metadata changes restart the
 gateway without forcing a `tsdown` rebuild; source and config changes still
 rebuild `dist` first.
@@ -58,7 +58,7 @@ replaces the older watcher instead of leaving duplicate watcher parents behind.
 Use the dev profile to isolate state and spin up a safe, disposable setup for
 debugging. There are **two** `--dev` flags:
 
-- **Global `--dev` (profile):** isolates state under `~/.kaijibot-dev` and
+- **Global `--dev` (profile):** isolates state under `~/.allbot-dev` and
   defaults the gateway port to `19001` (derived ports shift with it).
 - **`gateway --dev`: tells the Gateway to auto-create a default config +
   workspace** when missing (and skip BOOTSTRAP.md).
@@ -67,18 +67,18 @@ Recommended flow (dev profile + dev bootstrap):
 
 ```bash
 pnpm gateway:dev
-KAIJIBOT_PROFILE=dev kaijibot tui
+ALLBOT_PROFILE=dev allbot tui
 ```
 
-If you don’t have a global install yet, run the CLI via `pnpm kaijibot ...`.
+If you don’t have a global install yet, run the CLI via `pnpm allbot ...`.
 
 What this does:
 
 1. **Profile isolation** (global `--dev`)
-   - `KAIJIBOT_PROFILE=dev`
-   - `KAIJIBOT_STATE_DIR=~/.kaijibot-dev`
-   - `KAIJIBOT_CONFIG_PATH=~/.kaijibot-dev/kaijibot.json`
-   - `KAIJIBOT_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
+   - `ALLBOT_PROFILE=dev`
+   - `ALLBOT_STATE_DIR=~/.allbot-dev`
+   - `ALLBOT_CONFIG_PATH=~/.allbot-dev/allbot.json`
+   - `ALLBOT_GATEWAY_PORT=19001` (browser/canvas shift accordingly)
 
 2. **Dev bootstrap** (`gateway --dev`)
    - Writes a minimal config if missing (`gateway.mode=local`, bind loopback).
@@ -87,7 +87,7 @@ What this does:
    - Seeds the workspace files if missing:
      `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`.
    - Default identity: **C3‑PO** (protocol droid).
-   - Skips channel providers in dev mode (`KAIJIBOT_SKIP_CHANNELS=1`).
+   - Skips channel providers in dev mode (`ALLBOT_SKIP_CHANNELS=1`).
 
 Reset flow (fresh start):
 
@@ -99,7 +99,7 @@ Note: `--dev` is a **global** profile flag and gets eaten by some runners.
 If you need to spell it out, use the env var form:
 
 ```bash
-KAIJIBOT_PROFILE=dev kaijibot gateway --dev --reset
+ALLBOT_PROFILE=dev allbot gateway --dev --reset
 ```
 
 `--reset` wipes config, credentials, sessions, and the dev workspace (using
@@ -108,12 +108,12 @@ KAIJIBOT_PROFILE=dev kaijibot gateway --dev --reset
 Tip: if a non‑dev gateway is already running (launchd/systemd), stop it first:
 
 ```bash
-kaijibot gateway stop
+allbot gateway stop
 ```
 
-## Raw stream logging (KaijiBot)
+## Raw stream logging (AllBot)
 
-KaijiBot can log the **raw assistant stream** before any filtering/formatting.
+AllBot can log the **raw assistant stream** before any filtering/formatting.
 This is the best way to see whether reasoning is arriving as plain text deltas
 (or as separate thinking blocks).
 
@@ -126,19 +126,19 @@ pnpm gateway:watch --raw-stream
 Optional path override:
 
 ```bash
-pnpm gateway:watch --raw-stream --raw-stream-path ~/.kaijibot/logs/raw-stream.jsonl
+pnpm gateway:watch --raw-stream --raw-stream-path ~/.allbot/logs/raw-stream.jsonl
 ```
 
 Equivalent env vars:
 
 ```bash
-KAIJIBOT_RAW_STREAM=1
-KAIJIBOT_RAW_STREAM_PATH=~/.kaijibot/logs/raw-stream.jsonl
+ALLBOT_RAW_STREAM=1
+ALLBOT_RAW_STREAM_PATH=~/.allbot/logs/raw-stream.jsonl
 ```
 
 Default file:
 
-`~/.kaijibot/logs/raw-stream.jsonl`
+`~/.allbot/logs/raw-stream.jsonl`
 
 ## Raw chunk logging (pi-mono)
 

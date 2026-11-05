@@ -2,20 +2,20 @@
 title: IRC
 summary: "IRC plugin setup, access controls, and troubleshooting"
 read_when:
-  - You want to connect KaijiBot to IRC channels or DMs
+  - You want to connect AllBot to IRC channels or DMs
   - You are configuring IRC allowlists, group policy, or mention gating
 ---
 
-> ⚠️ **此频道 KaijiBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in KaijiBot. KaijiBot currently supports Feishu (飞书) only.
+> ⚠️ **此频道 AllBot 暂不支持。** This channel is available in the upstream OpenClaw project but is not included in AllBot. AllBot currently supports Feishu (飞书) only.
 
 # IRC
 
-Use IRC when you want KaijiBot in classic channels (`#room`) and direct messages.
+Use IRC when you want AllBot in classic channels (`#room`) and direct messages.
 IRC ships as an extension plugin, but it is configured in the main config under `channels.irc`.
 
 ## Quick start
 
-1. Enable IRC config in `~/.kaijibot/kaijibot.json`.
+1. Enable IRC config in `~/.allbot/allbot.json`.
 2. Set at least:
 
 ```json5
@@ -26,8 +26,8 @@ IRC ships as an extension plugin, but it is configured in the main config under 
       host: "irc.example.com",
       port: 6697,
       tls: true,
-      nick: "kaijibot-bot",
-      channels: ["#kaijibot"],
+      nick: "allbot-bot",
+      channels: ["#allbot"],
     },
   },
 }
@@ -38,7 +38,7 @@ Prefer a private IRC server for bot coordination. If you intentionally use a pub
 3. Start/restart gateway:
 
 ```bash
-kaijibot gateway run
+allbot gateway run
 ```
 
 ## Security defaults
@@ -93,7 +93,7 @@ Example (allow anyone in `#tuirc-dev` to talk to the bot):
 
 ## Reply triggering (mentions)
 
-Even if a channel is allowed (via `groupPolicy` + `groups`) and the sender is allowed, KaijiBot defaults to **mention-gating** in group contexts.
+Even if a channel is allowed (via `groupPolicy` + `groups`) and the sender is allowed, AllBot defaults to **mention-gating** in group contexts.
 
 That means you may see logs like `drop channel … (missing-mention)` unless the message includes a mention pattern that matches the bot.
 

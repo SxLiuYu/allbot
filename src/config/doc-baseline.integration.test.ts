@@ -9,7 +9,7 @@ import {
   writeConfigDocBaselineArtifacts,
 } from "./doc-baseline.js";
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("config doc baseline integration", () => {
   let sharedRenderedPromise: Promise<
     Awaited<ReturnType<typeof renderConfigDocBaselineArtifacts>>
@@ -88,7 +88,7 @@ describe.skipIf(process.env.CI)("config doc baseline integration", () => {
       label: "Matrix",
       help: "open protocol; install the plugin to enable.",
     });
-    expect(byPath.get("channels.msteams")?.label).not.toContain("@kaijibot/");
+    expect(byPath.get("channels.msteams")?.label).not.toContain("@allbot/");
     expect(byPath.get("channels.matrix")?.help).not.toContain("homeserver");
   });
 
@@ -113,7 +113,7 @@ describe.skipIf(process.env.CI)("config doc baseline integration", () => {
   });
 
   it("supports check mode for stale hash files", async () => {
-    await withTempDir({ prefix: "kaijibot-config-doc-baseline-" }, async (tempRoot) => {
+    await withTempDir({ prefix: "allbot-config-doc-baseline-" }, async (tempRoot) => {
       const rendered = getSharedRendered();
 
       const initial = await writeConfigDocBaselineArtifacts({

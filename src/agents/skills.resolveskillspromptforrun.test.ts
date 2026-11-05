@@ -7,7 +7,7 @@ describe("resolveSkillsPromptForRun", () => {
   it("prefers snapshot prompt when available", () => {
     const prompt = resolveSkillsPromptForRun({
       skillsSnapshot: { prompt: "SNAPSHOT", skills: [] },
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
     expect(prompt).toBe("SNAPSHOT");
   });
@@ -18,13 +18,13 @@ describe("resolveSkillsPromptForRun", () => {
         description: "Demo",
         filePath: "/app/skills/demo-skill/SKILL.md",
         baseDir: "/app/skills/demo-skill",
-        source: "kaijibot-bundled",
+        source: "allbot-bundled",
       }),
       frontmatter: {},
     };
     const prompt = resolveSkillsPromptForRun({
       entries: [entry],
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
     expect(prompt).toContain("<available_skills>");
     expect(prompt).toContain("/app/skills/demo-skill/SKILL.md");
@@ -37,7 +37,7 @@ describe("resolveSkillsPromptForRun", () => {
         description: "Hidden",
         filePath: "/app/skills/hidden-skill/SKILL.md",
         baseDir: "/app/skills/hidden-skill",
-        source: "kaijibot-workspace",
+        source: "allbot-workspace",
         disableModelInvocation: true,
       }),
       frontmatter: {},
@@ -45,7 +45,7 @@ describe("resolveSkillsPromptForRun", () => {
 
     const prompt = resolveSkillsPromptForRun({
       entries: [hidden],
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
     });
 
     expect(prompt).not.toContain("/app/skills/hidden-skill/SKILL.md");
@@ -58,7 +58,7 @@ describe("resolveSkillsPromptForRun", () => {
         description: "GitHub",
         filePath: "/app/skills/github/SKILL.md",
         baseDir: "/app/skills/github",
-        source: "kaijibot-workspace",
+        source: "allbot-workspace",
       }),
       frontmatter: {},
     };
@@ -68,7 +68,7 @@ describe("resolveSkillsPromptForRun", () => {
         description: "Hidden",
         filePath: "/app/skills/hidden-skill/SKILL.md",
         baseDir: "/app/skills/hidden-skill",
-        source: "kaijibot-workspace",
+        source: "allbot-workspace",
       }),
       frontmatter: {},
     };
@@ -83,7 +83,7 @@ describe("resolveSkillsPromptForRun", () => {
           list: [{ id: "writer" }],
         },
       },
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       agentId: "writer",
     });
 
@@ -98,7 +98,7 @@ describe("resolveSkillsPromptForRun", () => {
         description: "Weather",
         filePath: "/app/skills/weather/SKILL.md",
         baseDir: "/app/skills/weather",
-        source: "kaijibot-workspace",
+        source: "allbot-workspace",
       }),
       frontmatter: {},
     };
@@ -108,7 +108,7 @@ describe("resolveSkillsPromptForRun", () => {
         description: "Docs",
         filePath: "/app/skills/docs-search/SKILL.md",
         baseDir: "/app/skills/docs-search",
-        source: "kaijibot-workspace",
+        source: "allbot-workspace",
       }),
       frontmatter: {},
     };
@@ -123,7 +123,7 @@ describe("resolveSkillsPromptForRun", () => {
           list: [{ id: "writer", skills: ["docs-search"] }],
         },
       },
-      workspaceDir: "/tmp/kaijibot",
+      workspaceDir: "/tmp/allbot",
       agentId: "writer",
     });
 

@@ -8,24 +8,24 @@ import {
 describe("parseCliContainerArgs", () => {
   it("extracts a root --container flag before the command", () => {
     expect(
-      parseCliContainerArgs(["node", "kaijibot", "--container", "demo", "status", "--deep"]),
+      parseCliContainerArgs(["node", "allbot", "--container", "demo", "status", "--deep"]),
     ).toEqual({
       ok: true,
       container: "demo",
-      argv: ["node", "kaijibot", "status", "--deep"],
+      argv: ["node", "allbot", "status", "--deep"],
     });
   });
 
   it("accepts the equals form", () => {
-    expect(parseCliContainerArgs(["node", "kaijibot", "--container=demo", "health"])).toEqual({
+    expect(parseCliContainerArgs(["node", "allbot", "--container=demo", "health"])).toEqual({
       ok: true,
       container: "demo",
-      argv: ["node", "kaijibot", "health"],
+      argv: ["node", "allbot", "health"],
     });
   });
 
   it("rejects a missing container value", () => {
-    expect(parseCliContainerArgs(["node", "kaijibot", "--container"])).toEqual({
+    expect(parseCliContainerArgs(["node", "allbot", "--container"])).toEqual({
       ok: false,
       error: "--container requires a value",
     });
@@ -33,7 +33,7 @@ describe("parseCliContainerArgs", () => {
 
   it("does not consume an adjacent flag as the container value", () => {
     expect(
-      parseCliContainerArgs(["node", "kaijibot", "--container", "--no-color", "status"]),
+      parseCliContainerArgs(["node", "allbot", "--container", "--no-color", "status"]),
     ).toEqual({
       ok: false,
       error: "--container requires a value",
@@ -41,20 +41,20 @@ describe("parseCliContainerArgs", () => {
   });
 
   it("leaves argv unchanged when the flag is absent", () => {
-    expect(parseCliContainerArgs(["node", "kaijibot", "status"])).toEqual({
+    expect(parseCliContainerArgs(["node", "allbot", "status"])).toEqual({
       ok: true,
       container: null,
-      argv: ["node", "kaijibot", "status"],
+      argv: ["node", "allbot", "status"],
     });
   });
 
   it("extracts --container after the command like other root options", () => {
     expect(
-      parseCliContainerArgs(["node", "kaijibot", "status", "--container", "demo", "--deep"]),
+      parseCliContainerArgs(["node", "allbot", "status", "--container", "demo", "--deep"]),
     ).toEqual({
       ok: true,
       container: "demo",
-      argv: ["node", "kaijibot", "status", "--deep"],
+      argv: ["node", "allbot", "status", "--deep"],
     });
   });
 
@@ -62,7 +62,7 @@ describe("parseCliContainerArgs", () => {
     expect(
       parseCliContainerArgs([
         "node",
-        "kaijibot",
+        "allbot",
         "nodes",
         "run",
         "--",
@@ -77,7 +77,7 @@ describe("parseCliContainerArgs", () => {
       container: null,
       argv: [
         "node",
-        "kaijibot",
+        "allbot",
         "nodes",
         "run",
         "--",
@@ -92,14 +92,14 @@ describe("parseCliContainerArgs", () => {
 });
 
 describe("resolveCliContainerTarget", () => {
-  it("uses argv first and falls back to KAIJIBOT_CONTAINER", () => {
+  it("uses argv first and falls back to ALLBOT_CONTAINER", () => {
     expect(
-      resolveCliContainerTarget(["node", "kaijibot", "--container", "demo", "status"], {}),
+      resolveCliContainerTarget(["node", "allbot", "--container", "demo", "status"], {}),
     ).toBe("demo");
-    expect(resolveCliContainerTarget(["node", "kaijibot", "status"], {})).toBeNull();
+    expect(resolveCliContainerTarget(["node", "allbot", "status"], {})).toBeNull();
     expect(
-      resolveCliContainerTarget(["node", "kaijibot", "status"], {
-        KAIJIBOT_CONTAINER: "demo",
+      resolveCliContainerTarget(["node", "allbot", "status"], {
+        ALLBOT_CONTAINER: "demo",
       } as NodeJS.ProcessEnv),
     ).toBe("demo");
   });
@@ -107,13 +107,13 @@ describe("resolveCliContainerTarget", () => {
 
 describe("maybeRunCliInContainer", () => {
   it("passes through when no container target is provided", () => {
-    expect(maybeRunCliInContainer(["node", "kaijibot", "status"], { env: {} })).toEqual({
+    expect(maybeRunCliInContainer(["node", "allbot", "status"], { env: {} })).toEqual({
       handled: false,
-      argv: ["node", "kaijibot", "status"],
+      argv: ["node", "allbot", "status"],
     });
   });
 
-  it("uses KAIJIBOT_CONTAINER when the flag is absent", () => {
+  it("uses ALLBOT_CONTAINER when the flag is absent", () => {
     const spawnSync = vi
       .fn()
       .mockReturnValueOnce({
@@ -130,8 +130,8 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(
-      maybeRunCliInContainer(["node", "kaijibot", "status"], {
-        env: { KAIJIBOT_CONTAINER: "demo" } as NodeJS.ProcessEnv,
+      maybeRunCliInContainer(["node", "allbot", "status"], {
+        env: { ALLBOT_CONTAINER: "demo" } as NodeJS.ProcessEnv,
         spawnSync,
       }),
     ).toEqual({
@@ -146,17 +146,17 @@ describe("maybeRunCliInContainer", () => {
         "exec",
         "-i",
         "--env",
-        "KAIJIBOT_CONTAINER_HINT=demo",
+        "ALLBOT_CONTAINER_HINT=demo",
         "--env",
-        "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+        "ALLBOT_CLI_CONTAINER_BYPASS=1",
         "demo",
-        "kaijibot",
+        "allbot",
         "status",
       ],
       {
         stdio: "inherit",
         env: {
-          KAIJIBOT_CONTAINER: "",
+          ALLBOT_CONTAINER: "",
         },
       },
     );
@@ -178,14 +178,14 @@ describe("maybeRunCliInContainer", () => {
         stdout: "",
       });
 
-    maybeRunCliInContainer(["node", "kaijibot", "status"], {
+    maybeRunCliInContainer(["node", "allbot", "status"], {
       env: {
-        KAIJIBOT_CONTAINER: "demo",
-        KAIJIBOT_PROFILE: "work",
-        KAIJIBOT_GATEWAY_PORT: "19001",
-        KAIJIBOT_GATEWAY_URL: "ws://127.0.0.1:18789",
-        KAIJIBOT_GATEWAY_TOKEN: "token",
-        KAIJIBOT_GATEWAY_PASSWORD: "password",
+        ALLBOT_CONTAINER: "demo",
+        ALLBOT_PROFILE: "work",
+        ALLBOT_GATEWAY_PORT: "19001",
+        ALLBOT_GATEWAY_URL: "ws://127.0.0.1:18789",
+        ALLBOT_GATEWAY_TOKEN: "token",
+        ALLBOT_GATEWAY_PASSWORD: "password",
       } as NodeJS.ProcessEnv,
       spawnSync,
     });
@@ -197,17 +197,17 @@ describe("maybeRunCliInContainer", () => {
         "exec",
         "-i",
         "--env",
-        "KAIJIBOT_CONTAINER_HINT=demo",
+        "ALLBOT_CONTAINER_HINT=demo",
         "--env",
-        "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+        "ALLBOT_CLI_CONTAINER_BYPASS=1",
         "demo",
-        "kaijibot",
+        "allbot",
         "status",
       ],
       {
         stdio: "inherit",
         env: {
-          KAIJIBOT_CONTAINER: "",
+          ALLBOT_CONTAINER: "",
         },
       },
     );
@@ -230,7 +230,7 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "status"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "status"], {
         env: {},
         spawnSync,
       }),
@@ -252,16 +252,16 @@ describe("maybeRunCliInContainer", () => {
         "exec",
         "-i",
         "--env",
-        "KAIJIBOT_CONTAINER_HINT=demo",
+        "ALLBOT_CONTAINER_HINT=demo",
         "--env",
-        "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+        "ALLBOT_CLI_CONTAINER_BYPASS=1",
         "demo",
-        "kaijibot",
+        "allbot",
         "status",
       ],
       {
         stdio: "inherit",
-        env: { KAIJIBOT_CONTAINER: "" },
+        env: { ALLBOT_CONTAINER: "" },
       },
     );
   });
@@ -283,8 +283,8 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "health"], {
-        env: { USER: "kaijibot" } as NodeJS.ProcessEnv,
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "health"], {
+        env: { USER: "allbot" } as NodeJS.ProcessEnv,
         spawnSync,
       }),
     ).toEqual({
@@ -305,16 +305,16 @@ describe("maybeRunCliInContainer", () => {
         "exec",
         "-i",
         "-e",
-        "KAIJIBOT_CONTAINER_HINT=demo",
+        "ALLBOT_CONTAINER_HINT=demo",
         "-e",
-        "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+        "ALLBOT_CLI_CONTAINER_BYPASS=1",
         "demo",
-        "kaijibot",
+        "allbot",
         "health",
       ],
       {
         stdio: "inherit",
-        env: { USER: "kaijibot", KAIJIBOT_CONTAINER: "" },
+        env: { USER: "allbot", ALLBOT_CONTAINER: "" },
       },
     );
   });
@@ -340,7 +340,7 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "status"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "status"], {
         env: { USER: "somalley" } as NodeJS.ProcessEnv,
         spawnSync,
       }),
@@ -368,16 +368,16 @@ describe("maybeRunCliInContainer", () => {
         "exec",
         "-i",
         "-e",
-        "KAIJIBOT_CONTAINER_HINT=demo",
+        "ALLBOT_CONTAINER_HINT=demo",
         "-e",
-        "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+        "ALLBOT_CLI_CONTAINER_BYPASS=1",
         "demo",
-        "kaijibot",
+        "allbot",
         "status",
       ],
       {
         stdio: "inherit",
-        env: { USER: "somalley", KAIJIBOT_CONTAINER: "" },
+        env: { USER: "somalley", ALLBOT_CONTAINER: "" },
       },
     );
     expect(spawnSync).toHaveBeenCalledTimes(3);
@@ -396,7 +396,7 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(() =>
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "status"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "status"], {
         env: { USER: "somalley" } as NodeJS.ProcessEnv,
         spawnSync,
       }),
@@ -434,7 +434,7 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(() =>
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "status"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "status"], {
         env: { USER: "somalley" } as NodeJS.ProcessEnv,
         spawnSync,
       }),
@@ -459,7 +459,7 @@ describe("maybeRunCliInContainer", () => {
         stdout: "",
       });
 
-    maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "setup"], {
+    maybeRunCliInContainer(["node", "allbot", "--container", "demo", "setup"], {
       env: {},
       spawnSync,
       stdinIsTTY: true,
@@ -474,21 +474,21 @@ describe("maybeRunCliInContainer", () => {
         "-i",
         "-t",
         "--env",
-        "KAIJIBOT_CONTAINER_HINT=demo",
+        "ALLBOT_CONTAINER_HINT=demo",
         "--env",
-        "KAIJIBOT_CLI_CONTAINER_BYPASS=1",
+        "ALLBOT_CLI_CONTAINER_BYPASS=1",
         "demo",
-        "kaijibot",
+        "allbot",
         "setup",
       ],
       {
         stdio: "inherit",
-        env: { KAIJIBOT_CONTAINER: "" },
+        env: { ALLBOT_CONTAINER: "" },
       },
     );
   });
 
-  it("prefers --container over KAIJIBOT_CONTAINER", () => {
+  it("prefers --container over ALLBOT_CONTAINER", () => {
     const spawnSync = vi
       .fn()
       .mockReturnValueOnce({
@@ -505,8 +505,8 @@ describe("maybeRunCliInContainer", () => {
       });
 
     expect(
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "flag-demo", "health"], {
-        env: { KAIJIBOT_CONTAINER: "env-demo" } as NodeJS.ProcessEnv,
+      maybeRunCliInContainer(["node", "allbot", "--container", "flag-demo", "health"], {
+        env: { ALLBOT_CONTAINER: "env-demo" } as NodeJS.ProcessEnv,
         spawnSync,
       }),
     ).toEqual({
@@ -529,7 +529,7 @@ describe("maybeRunCliInContainer", () => {
     });
 
     expect(() =>
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "status"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "status"], {
         env: {},
         spawnSync,
       }),
@@ -538,12 +538,12 @@ describe("maybeRunCliInContainer", () => {
 
   it("skips recursion when the bypass env is set", () => {
     expect(
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "status"], {
-        env: { KAIJIBOT_CLI_CONTAINER_BYPASS: "1" } as NodeJS.ProcessEnv,
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "status"], {
+        env: { ALLBOT_CLI_CONTAINER_BYPASS: "1" } as NodeJS.ProcessEnv,
       }),
     ).toEqual({
       handled: false,
-      argv: ["node", "kaijibot", "--container", "demo", "status"],
+      argv: ["node", "allbot", "--container", "demo", "status"],
     });
   });
 
@@ -554,12 +554,12 @@ describe("maybeRunCliInContainer", () => {
     });
 
     expect(() =>
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "update"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "update"], {
         env: {},
         spawnSync,
       }),
     ).toThrow(
-      "kaijibot update is not supported with --container; rebuild or restart the container image instead.",
+      "allbot update is not supported with --container; rebuild or restart the container image instead.",
     );
     expect(spawnSync).not.toHaveBeenCalled();
   });
@@ -571,12 +571,12 @@ describe("maybeRunCliInContainer", () => {
     });
 
     expect(() =>
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "--no-color", "update"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "--no-color", "update"], {
         env: {},
         spawnSync,
       }),
     ).toThrow(
-      "kaijibot update is not supported with --container; rebuild or restart the container image instead.",
+      "allbot update is not supported with --container; rebuild or restart the container image instead.",
     );
     expect(spawnSync).not.toHaveBeenCalled();
   });
@@ -588,12 +588,12 @@ describe("maybeRunCliInContainer", () => {
     });
 
     expect(() =>
-      maybeRunCliInContainer(["node", "kaijibot", "--container", "demo", "--update"], {
+      maybeRunCliInContainer(["node", "allbot", "--container", "demo", "--update"], {
         env: {},
         spawnSync,
       }),
     ).toThrow(
-      "kaijibot update is not supported with --container; rebuild or restart the container image instead.",
+      "allbot update is not supported with --container; rebuild or restart the container image instead.",
     );
     expect(spawnSync).not.toHaveBeenCalled();
   });

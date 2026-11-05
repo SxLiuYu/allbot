@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { KaijiBotConfig } from "kaijibot/plugin-sdk/memory-core-host-engine-foundation";
-import type { checkQmdBinaryAvailability as checkQmdBinaryAvailabilityFn } from "kaijibot/plugin-sdk/memory-core-host-engine-qmd";
+import type { AllBotConfig } from "allbot/plugin-sdk/memory-core-host-engine-foundation";
+import type { checkQmdBinaryAvailability as checkQmdBinaryAvailabilityFn } from "allbot/plugin-sdk/memory-core-host-engine-qmd";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type CheckQmdBinaryAvailability = typeof checkQmdBinaryAvailabilityFn;
@@ -111,7 +111,7 @@ vi.mock("./qmd-manager.js", () => ({
   },
 }));
 
-vi.mock("kaijibot/plugin-sdk/memory-core-host-engine-qmd", () => ({
+vi.mock("allbot/plugin-sdk/memory-core-host-engine-qmd", () => ({
   checkQmdBinaryAvailability,
 }));
 
@@ -129,14 +129,14 @@ const createQmdManagerMock = vi.mocked(QmdMemoryManager.create);
 type SearchManagerResult = Awaited<ReturnType<typeof getMemorySearchManager>>;
 type SearchManager = NonNullable<SearchManagerResult["manager"]>;
 
-function createQmdCfg(agentId: string): KaijiBotConfig {
+function createQmdCfg(agentId: string): AllBotConfig {
   return {
     memory: { backend: "qmd", qmd: {} },
     agents: { list: [{ id: agentId, default: true, workspace: "/tmp/workspace" }] },
   };
 }
 
-function createBuiltinCfg(agentId: string): KaijiBotConfig {
+function createBuiltinCfg(agentId: string): AllBotConfig {
   return {
     agents: {
       defaults: {
@@ -156,7 +156,7 @@ function createBuiltinCfg(agentId: string): KaijiBotConfig {
       },
       list: [{ id: agentId, default: true, workspace: "/tmp/workspace" }],
     },
-  } as KaijiBotConfig;
+  } as AllBotConfig;
 }
 
 function requireManager(result: SearchManagerResult): SearchManager {
@@ -260,13 +260,13 @@ describe("getMemorySearchManager caching", () => {
   });
 
   it("creates a missing agent workspace before probing qmd availability", async () => {
-    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "kaijibot-qmd-workspace-"));
+    const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), "allbot-qmd-workspace-"));
     const workspace = path.join(tempRoot, "missing", "workspace");
     const agentId = "missing-workspace";
     const cfg = {
       memory: { backend: "qmd", qmd: {} },
       agents: { list: [{ id: agentId, default: true, workspace }] },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     try {
       await getMemorySearchManager({ cfg, agentId });

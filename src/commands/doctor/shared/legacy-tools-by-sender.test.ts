@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../../config/config.js";
+import type { AllBotConfig } from "../../../config/config.js";
 import {
   collectLegacyToolsBySenderWarnings,
   maybeRepairLegacyToolsBySenderKeys,
@@ -22,7 +22,7 @@ describe("doctor legacy toolsBySender helpers", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(hits).toEqual([
       {
@@ -49,7 +49,7 @@ describe("doctor legacy toolsBySender helpers", () => {
           },
         },
       },
-    } as KaijiBotConfig);
+    } as AllBotConfig);
 
     expect(result.changes).toEqual([
       expect.stringContaining("migrated 1 legacy key to typed id: entries"),
@@ -71,13 +71,13 @@ describe("doctor legacy toolsBySender helpers", () => {
           targetKey: "id:owner",
         },
       ],
-      doctorFixCommand: "kaijibot doctor --fix",
+      doctorFixCommand: "allbot doctor --fix",
     });
 
     expect(warnings).toEqual([
       expect.stringContaining("legacy untyped toolsBySender key"),
       expect.stringContaining("explicit prefixes"),
-      expect.stringContaining('Run "kaijibot doctor --fix"'),
+      expect.stringContaining('Run "allbot doctor --fix"'),
     ]);
   });
 });

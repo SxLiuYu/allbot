@@ -35,7 +35,7 @@ describe("ClawHub plugin docs", () => {
     ) as unknown;
     const pluginManifest = JSON.parse(
       await fs.readFile(
-        path.join(DOCS_ROOT, "snippets", "plugin-publish", "minimal-kaijibot.plugin.json"),
+        path.join(DOCS_ROOT, "snippets", "plugin-publish", "minimal-allbot.plugin.json"),
         "utf8",
       ),
     ) as { id?: unknown; configSchema?: unknown };
@@ -66,6 +66,6 @@ describe("ClawHub plugin docs", () => {
     const sdkSetup = await fs.readFile(path.join(DOCS_ROOT, "plugins", "sdk-setup.md"), "utf8");
 
     expect(extractNamedJsonBlock(buildingPlugins, "package.json")).toEqual(snippet);
-    expect(extractNamedJsonBlock(sdkSetup, "kaijibot-clawhub-package.json")).toEqual(snippet);
+    expect(extractNamedJsonBlock(sdkSetup, "allbot-clawhub-package.json")).toEqual(snippet);
   });
 });

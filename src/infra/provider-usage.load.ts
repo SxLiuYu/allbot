@@ -1,4 +1,4 @@
-import { loadConfig, type KaijiBotConfig } from "../config/config.js";
+import { loadConfig, type AllBotConfig } from "../config/config.js";
 import { resolveProviderUsageSnapshotWithPlugin } from "../plugins/provider-runtime.js";
 import { resolveFetch } from "./fetch.js";
 import { type ProviderAuth, resolveProviderAuths } from "./provider-usage.auth.js";
@@ -37,14 +37,14 @@ type UsageSummaryOptions = {
   auth?: ProviderAuth[];
   agentDir?: string;
   workspaceDir?: string;
-  config?: KaijiBotConfig;
+  config?: AllBotConfig;
   env?: NodeJS.ProcessEnv;
   fetch?: typeof fetch;
 };
 
 async function fetchProviderUsageSnapshot(params: {
   auth: ProviderAuth;
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   env: NodeJS.ProcessEnv;
   agentDir?: string;
   workspaceDir?: string;

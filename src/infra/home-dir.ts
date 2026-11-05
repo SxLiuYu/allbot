@@ -30,7 +30,7 @@ export function resolveOsHomeDir(
 }
 
 function resolveRawHomeDir(env: NodeJS.ProcessEnv, homedir: () => string): string | undefined {
-  const explicitHome = normalize(env.KAIJIBOT_HOME);
+  const explicitHome = normalize(env.ALLBOT_HOME);
   if (explicitHome) {
     if (explicitHome === "~" || explicitHome.startsWith("~/") || explicitHome.startsWith("~\\")) {
       const fallbackHome = resolveRawOsHomeDir(env, homedir);

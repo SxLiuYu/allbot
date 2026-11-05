@@ -1,11 +1,11 @@
 ---
-summary: "CLI reference for `kaijibot pairing` (approve/list pairing requests)"
+summary: "CLI reference for `allbot pairing` (approve/list pairing requests)"
 read_when:
   - You’re using pairing-mode DMs and need to approve senders
 title: "pairing"
 ---
 
-# `kaijibot pairing`
+# `allbot pairing`
 
 Approve or inspect DM pairing requests (for channels that support pairing).
 
@@ -16,13 +16,13 @@ Related:
 ## Commands
 
 ```bash
-kaijibot pairing list telegram
-kaijibot pairing list --channel telegram --account work
-kaijibot pairing list telegram --json
+allbot pairing list telegram
+allbot pairing list --channel telegram --account work
+allbot pairing list telegram --json
 
-kaijibot pairing approve <code>
-kaijibot pairing approve telegram <code>
-kaijibot pairing approve --channel telegram --account work <code> --notify
+allbot pairing approve <code>
+allbot pairing approve telegram <code>
+allbot pairing approve --channel telegram --account work <code> --notify
 ```
 
 ## `pairing list`
@@ -47,9 +47,9 @@ Approve a pending pairing code and allow that sender.
 
 Usage:
 
-- `kaijibot pairing approve <channel> <code>`
-- `kaijibot pairing approve --channel <channel> <code>`
-- `kaijibot pairing approve <code>` when exactly one pairing-capable channel is configured
+- `allbot pairing approve <channel> <code>`
+- `allbot pairing approve --channel <channel> <code>`
+- `allbot pairing approve <code>` when exactly one pairing-capable channel is configured
 
 Options:
 

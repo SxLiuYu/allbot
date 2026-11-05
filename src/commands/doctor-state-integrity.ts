@@ -5,7 +5,7 @@ import { resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { listBundledChannelPluginIds } from "../channels/plugins/bundled-ids.js";
 import { hasBundledChannelPersistedAuthState } from "../channels/plugins/persisted-auth-state.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { resolveOAuthDir, resolveStateDir } from "../config/paths.js";
 import {
   formatSessionArchiveTimestamp,
@@ -139,7 +139,7 @@ function findOtherStateDirs(stateDir: string): string[] {
       if (entry.name.startsWith(".")) {
         continue;
       }
-      const candidates = [".kaijibot"].map((dir) => path.resolve(root, entry.name, dir));
+      const candidates = [".allbot"].map((dir) => path.resolve(root, entry.name, dir));
       for (const candidate of candidates) {
         if (candidate === resolvedState) {
           continue;
@@ -372,7 +372,7 @@ export function formatLinuxSdBackedStateDirWarning(
   return [
     `- State directory appears to be on SD/eMMC storage (${displayStateDir}; device ${safeSource}, fs ${safeFsType}, mount ${safeMountPoint}).`,
     "- SD/eMMC media can be slower for random I/O and wear faster under session/log churn.",
-    "- For better startup and state durability, prefer SSD/NVMe (or USB SSD on Raspberry Pi) for KAIJIBOT_STATE_DIR.",
+    "- For better startup and state durability, prefer SSD/NVMe (or USB SSD on Raspberry Pi) for ALLBOT_STATE_DIR.",
   ].join("\n");
 }
 
@@ -393,7 +393,7 @@ export function detectMacCloudSyncedStateDir(
   }
 
   // Cloud-sync roots should always be anchored to the OS account home on macOS.
-  // KAIJIBOT_HOME can relocate app data defaults, but iCloud/CloudStorage remain under the OS home.
+  // ALLBOT_HOME can relocate app data defaults, but iCloud/CloudStorage remain under the OS home.
   const homedir = deps?.homedir ?? os.homedir();
   const roots = [
     {
@@ -458,8 +458,8 @@ function isSlashRoutingSessionKey(sessionKey: string): boolean {
   return /^[^:]+:slash:[^:]+(?:$|:)/.test(scoped);
 }
 
-function shouldRequireOAuthDir(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): boolean {
-  if (env.KAIJIBOT_OAUTH_DIR?.trim()) {
+function shouldRequireOAuthDir(cfg: AllBotConfig, env: NodeJS.ProcessEnv): boolean {
+  if (env.ALLBOT_OAUTH_DIR?.trim()) {
     return true;
   }
   const channels = asNullableObjectRecord(cfg.channels);
@@ -483,13 +483,13 @@ function shouldRequireOAuthDir(cfg: KaijiBotConfig, env: NodeJS.ProcessEnv): boo
   return false;
 }
 
-function shouldSuppressOrphanTranscriptWarning(cfg: KaijiBotConfig, agentId: string): boolean {
+function shouldSuppressOrphanTranscriptWarning(cfg: AllBotConfig, agentId: string): boolean {
   const backendConfig = resolveMemoryBackendConfig({ cfg, agentId });
   return backendConfig?.backend === "qmd" && backendConfig.qmd?.sessions.enabled === true;
 }
 
 export async function noteStateIntegrity(
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   prompter: DoctorPrompterLike,
   configPath?: string,
 ) {
@@ -499,7 +499,7 @@ export async function noteStateIntegrity(
   const env = process.env;
   const homedir = () => resolveRequiredHomeDir(env, os.homedir);
   const stateDir = resolveStateDir(env, homedir);
-  const defaultStateDir = path.join(homedir(), ".kaijibot");
+  const defaultStateDir = path.join(homedir(), ".allbot");
   const oauthDir = resolveOAuthDir(env, stateDir);
   const agentId = resolveDefaultAgentId(cfg);
   const sessionsDir = resolveSessionTranscriptsDirForAgent(agentId, env, homedir);
@@ -521,8 +521,8 @@ export async function noteStateIntegrity(
       [
         `- State directory is under macOS cloud-synced storage (${displayStateDir}; ${cloudSyncedStateDir.storage}).`,
         "- This can cause slow I/O and sync/lock races for sessions and credentials.",
-        "- Prefer a local non-synced state dir (for example: ~/.kaijibot).",
-        `  Set locally: KAIJIBOT_STATE_DIR=~/.kaijibot ${formatCliCommand("kaijibot doctor")}`,
+        "- Prefer a local non-synced state dir (for example: ~/.allbot).",
+        `  Set locally: ALLBOT_STATE_DIR=~/.allbot ${formatCliCommand("allbot doctor")}`,
       ].join("\n"),
     );
   }
@@ -743,9 +743,9 @@ export async function noteStateIntegrity(
       warnings.push(
         [
           `- ${missing.length}/${recentTranscriptCandidates.length} recent sessions are missing transcripts.`,
-          `  Verify sessions in store: ${formatCliCommand(`kaijibot sessions --store "${absoluteStorePath}"`)}`,
-          `  Preview cleanup impact: ${formatCliCommand(`kaijibot sessions cleanup --store "${absoluteStorePath}" --dry-run`)}`,
-          `  Prune missing entries: ${formatCliCommand(`kaijibot sessions cleanup --store "${absoluteStorePath}" --enforce --fix-missing`)}`,
+          `  Verify sessions in store: ${formatCliCommand(`allbot sessions --store "${absoluteStorePath}"`)}`,
+          `  Preview cleanup impact: ${formatCliCommand(`allbot sessions cleanup --store "${absoluteStorePath}" --dry-run`)}`,
+          `  Prune missing entries: ${formatCliCommand(`allbot sessions cleanup --store "${absoluteStorePath}" --enforce --fix-missing`)}`,
         ].join("\n"),
       );
     }
@@ -849,7 +849,7 @@ export function noteWorkspaceBackupTip(workspaceDir: string) {
   note(
     [
       "- Tip: back up the workspace in a private git repo (GitHub or GitLab).",
-      "- Keep ~/.kaijibot out of git; it contains credentials and session history.",
+      "- Keep ~/.allbot out of git; it contains credentials and session history.",
       "- Details: /concepts/agent-workspace#git-backup-recommended",
     ].join("\n"),
     "Workspace",

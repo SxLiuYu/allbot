@@ -350,7 +350,7 @@ describe("before_tool_call requireApproval handling", () => {
     mockGetGlobalHookRunner.mockReturnValue(hookRunner as any);
     // Keep the global singleton aligned as a fallback in case another setup path
     // preloads hook-runner-global before this test's module reset/mocks take effect.
-    const hookRunnerGlobalStateKey = Symbol.for("kaijibot.plugins.hook-runner-global-state");
+    const hookRunnerGlobalStateKey = Symbol.for("allbot.plugins.hook-runner-global-state");
     const hookRunnerGlobalState = globalThis as Record<
       symbol,
       { hookRunner: unknown; registry?: unknown } | undefined

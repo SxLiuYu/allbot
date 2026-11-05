@@ -1,6 +1,6 @@
-# KaijiBot — Repository Guidelines
+# AllBot — Repository Guidelines
 
-KaijiBot is an independent project — a proactive cognitive AI assistant with a pluggable provider/channel architecture. Supports any LLM provider (35+ bundled) and extensible messaging channels. Originally forked from [OpenClaw](https://github.com/openclaw/openclaw), now developed independently with its own cognitive layer, architecture, and direction.
+AllBot is an independent project — a proactive cognitive AI assistant with a pluggable provider/channel architecture. Supports any LLM provider (35+ bundled) and extensible messaging channels. Originally forked from [OpenClaw](https://github.com/openclaw/openclaw), now developed independently with its own cognitive layer, architecture, and direction.
 
 - Repo: independent project, originally forked from [OpenClaw](https://github.com/openclaw/openclaw)
   - Main (GitHub): `https://github.com/Kaiji-Z/kaijibot`
@@ -16,20 +16,20 @@ Before developing any feature or changing any code, read and follow `VERIFICATIO
 ## Project Structure
 
 - **`src/`** — core engine: CLI (`src/cli`), commands (`src/commands`), gateway (`src/gateway`), agents (`src/agents`), config (`src/config`), plugin system (`src/plugins`, `src/plugin-sdk`), channels (`src/channels`), media pipeline (`src/media`), **cognitive layer (`src/cognitive`)**
-- **`src/cognitive/`** — KaijiBot's proactive AI system (unique to this fork, not in upstream OpenClaw):
-  - `persona/` — per-user cognitive model (identity, domains, interests, trust). LLM-driven extraction with structured `TypedInsight` (6 categories: domain_knowledge, behavioral_pattern, stated_preference, tool_config, contextual_fact, goal_or_aspiration). Dynamic domain discovery via LLM (no hardcoded keywords). Interest lifecycle tracking (emergent/stable/declining/dormant/revived). Category-aware decay (`HALF_LIFE_BY_CATEGORY`). Persistence at `~/.kaijibot/cognitive/persona/`
+- **`src/cognitive/`** — AllBot's proactive AI system (unique to this fork, not in upstream OpenClaw):
+  - `persona/` — per-user cognitive model (identity, domains, interests, trust). LLM-driven extraction with structured `TypedInsight` (6 categories: domain_knowledge, behavioral_pattern, stated_preference, tool_config, contextual_fact, goal_or_aspiration). Dynamic domain discovery via LLM (no hardcoded keywords). Interest lifecycle tracking (emergent/stable/declining/dormant/revived). Category-aware decay (`HALF_LIFE_BY_CATEGORY`). Persistence at `~/.allbot/cognitive/persona/`
   - `insight/` — proactive insight generation (cross-domain connections, domain depth, exploration). Unified pipeline with contrastive dedup, LLM self-refine loop (critique→rewrite), LLM-as-judge verification, semantic freshness check. Knowledge mode consumes TypedInsights (filtered by category) + cognitive fragments. Pattern mode uses dialog fragment clusters. Web search results serve as supporting evidence (not primary content). `FragmentStore` for behavioral pattern mining
-  - `evolution/` — agent-driven self-evolution: hard-trigger detects complex tasks (≥3 tool calls), enqueues system event for agent to evaluate; LLM skill draft generator (with embedded skill-creator spec), skill writer (`~/.kaijibot/skills/`), lifecycle manager (dedup via Levenshtein+Jaccard, 30-day expiry), preference adapter (Thompson Sampling), safety gate, audit log, ClawHub publisher/catalog
+  - `evolution/` — agent-driven self-evolution: hard-trigger detects complex tasks (≥3 tool calls), enqueues system event for agent to evaluate; LLM skill draft generator (with embedded skill-creator spec), skill writer (`~/.allbot/skills/`), lifecycle manager (dedup via Levenshtein+Jaccard, 30-day expiry), preference adapter (Thompson Sampling), safety gate, audit log, ClawHub publisher/catalog
   - `scheduler/` — proactive timing (lexicographic decision: social-ledger veto → re-engagement budget → delivery pacing (daily cap + stochastic hazard) → PRISM gate; SIRI search-identify-resolve loop, timer/persona-change/info-scan/evolution-scan event sources)
   - `feedback/` — feedback collection (explicit + implicit), Thompson Sampling preference learner, trust/rapport calculator (SARA framework)
-  - `correction/` — error-correction self-evolution: dual-path detection (agent self-report via `record_correction` tool + post-session LLM extraction on `/new`/`/reset`), `CorrectionStore` with Jaccard-based dedup and reinforcement (TTL=90d, MAX=50, threshold=0.6), system prompt injection via `context-writer.ts` (top 15 corrections sorted by reinforcement count). Persistence at `~/.kaijibot/cognitive/corrections/{agentId}/{userId}.json`
+  - `correction/` — error-correction self-evolution: dual-path detection (agent self-report via `record_correction` tool + post-session LLM extraction on `/new`/`/reset`), `CorrectionStore` with Jaccard-based dedup and reinforcement (TTL=90d, MAX=50, threshold=0.6), system prompt injection via `context-writer.ts` (top 15 corrections sorted by reinforcement count). Persistence at `~/.allbot/cognitive/corrections/{agentId}/{userId}.json`
   - `mode-router.ts` — classifies turns into task/insight/hybrid/proactive modes (Chinese + English pattern matching)
   - `context-writer.ts` — builds cognitive mode prompt sections for system prompt injection
-- **`src/infra/openclaw-migrator/`** — OpenClaw → KaijiBot migration: auto-detect OpenClaw installation, import agents/workspace/skills/config with dry-run support, onboard wizard integration
-- **`src/commands/migrate.ts`** — `kaijibot migrate` CLI command
+- **`src/infra/openclaw-migrator/`** — OpenClaw → AllBot migration: auto-detect OpenClaw installation, import agents/workspace/skills/config with dry-run support, onboard wizard integration
+- **`src/commands/migrate.ts`** — `allbot migrate` CLI command
 - **`extensions/`** — bundled plugins. Ground-truth categories as of the current tree:
   - **Channels — first-class** (own package, project focus, China-oriented): **feishu**, **wechat**. These are the ONLY two channels with source code in this repo.
-  - **Channels — upstream reference only (NO bundled code)**: discord, googlechat, irc, line, matrix, mattermost, nextcloud-talk, nostr, qa-matrix, qqbot, signal, slack, synology-chat, telegram, tlon, twitch, zalo, zalouser, bluebubbles, imessage, msteams, whatsapp. These channels exist in the upstream OpenClaw project but have **no source code, no package.json, and no git tracking** in KaijiBot. Their `docs/channels/*.md` pages are preserved as upstream-reference only (each carries an explicit "not supported" banner) and archived under `docs/archive/channels/`.
+  - **Channels — upstream reference only (NO bundled code)**: discord, googlechat, irc, line, matrix, mattermost, nextcloud-talk, nostr, qa-matrix, qqbot, signal, slack, synology-chat, telegram, tlon, twitch, zalo, zalouser, bluebubbles, imessage, msteams, whatsapp. These channels exist in the upstream OpenClaw project but have **no source code, no package.json, and no git tracking** in AllBot. Their `docs/channels/*.md` pages are preserved as upstream-reference only (each carries an explicit "not supported" banner) and archived under `docs/archive/channels/`.
   - **LLM providers (~47)**: **zai** (default/recommended), deepseek, qwen, moonshot, minimax, alibaba (qianfan), anthropic, anthropic-vertex, google, openai, openrouter, mistral, groq, together, fireworks, stepfun, volcengine/byteplus, xai, ollama, lmstudio, vllm, sglang, litellm, huggingface, nvidia, cerebras, runway, venice, chutes, kilocode, kimi-coding, gradium, vydra, opencode, opencode-go, microsoft-foundry, copilot-proxy, github-copilot, arcee, cloudflare-ai-gateway, vercel-ai-gateway, qianfan, xiaomi, open-prose
   - **Web search**: exa, tavily, perplexity
   - **Core/media/memory/other**: browser, memory-core, memory-lancedb, knowledge-wiki, speech-core, talk-voice, media-understanding-core, image-generation-core, diffs, llm-task, webhooks, kindle-portal, openshell, device-pair, sherpa-speech
@@ -51,19 +51,19 @@ Before developing any feature or changing any code, read and follow `VERIFICATIO
 - Format fix: `pnpm format` (oxfmt --write)
 - Tests: `pnpm test` (vitest); coverage: `pnpm test:coverage`
 - Scoped test: `pnpm test <path-or-filter>` (e.g. `pnpm test src/cognitive/persona/store.test.ts`)
-- Run CLI in dev: `pnpm kaijibot ...` or `pnpm dev`
+- Run CLI in dev: `pnpm allbot ...` or `pnpm dev`
 - **Deploy gateway (build + restart)**: `pnpm gw:deploy` — builds latest code, stops old gateway, starts new gateway in tmux session `gw`. Use this after any code change that needs to take effect in the running gateway.
-- Live tests (real keys): `KAIJIBOT_LIVE_TEST=1 pnpm test:live` (KaijiBot-only) or `LIVE=1 pnpm test:live`
+- Live tests (real keys): `ALLBOT_LIVE_TEST=1 pnpm test:live` (AllBot-only) or `LIVE=1 pnpm test:live`
 - Pre-commit hooks: `prek install`. The hook runs `pnpm check`. Use `FAST_COMMIT=1` to skip format+check in the hook.
 - Prefer Bun for script execution: `bun <file.ts>` / `bunx <tool>`.
 
 ## Docker
 
-- `docker-compose.yml` runs the kaijibot-gateway service
+- `docker-compose.yml` runs the allbot-gateway service
 - Default ports: 18789 (gateway), 18790 (bridge)
 - Build: `docker build .`
-- Config via env: `ZAI_API_KEY`, `KAIJIBOT_GATEWAY_TOKEN`, `KAIJIBOT_GATEWAY_PORT`, `KAIJIBOT_GATEWAY_BIND`
-- Config dir mounted at `/home/node/.kaijibot`
+- Config via env: `ZAI_API_KEY`, `ALLBOT_GATEWAY_TOKEN`, `ALLBOT_GATEWAY_PORT`, `ALLBOT_GATEWAY_BIND`
+- Config dir mounted at `/home/node/.allbot`
 
 ## Architecture Boundaries
 
@@ -74,14 +74,14 @@ Before developing any feature or changing any code, read and follow `VERIFICATIO
 - **Provider boundary**: provider plugins own provider-specific behavior. Core owns the generic inference loop.
 - **Gateway protocol** (`src/gateway/protocol/*`): protocol changes are contract changes; prefer additive evolution.
 - Core must stay extension-agnostic. No hardcoded extension/provider/channel IDs in core.
-- Extension code imports from `kaijibot/plugin-sdk/*` plus local barrels (`./api.ts`, `./runtime-api.ts`).
+- Extension code imports from `allbot/plugin-sdk/*` plus local barrels (`./api.ts`, `./runtime-api.ts`).
 - No relative imports that escape the current extension package root.
 - See progressive disclosure in: `extensions/AGENTS.md`, `src/plugin-sdk/AGENTS.md`, `src/channels/AGENTS.md`, `src/plugins/AGENTS.md`, `src/gateway/protocol/AGENTS.md`
-- **Plugin loading** has three registration modes (`KaijiBotPluginApi.registrationMode`):
+- **Plugin loading** has three registration modes (`AllBotPluginApi.registrationMode`):
   - `"cli-metadata"` — only CLI command descriptors are registered; no runtime side-effects. Used for fast CLI boot.
   - `"light"` — registration runs but lazy surfaces stay deferred.
   - `"full"` — full runtime registration including tools, gateway methods, hooks.
-- **Plugin SDK** (`src/plugin-sdk/*`) exposes 237 subpath entrypoints (`kaijibot/plugin-sdk/*`). API baseline (`src/plugin-sdk/api-baseline.ts`) locks the public export set; CI fails if unauthorized exports leak. The SDK alias map (`src/plugins/sdk-alias.ts`) resolves `kaijibot/plugin-sdk/*` to source TS (dev) or built `dist/plugin-sdk/*` artifacts (prod).
+- **Plugin SDK** (`src/plugin-sdk/*`) exposes 237 subpath entrypoints (`allbot/plugin-sdk/*`). API baseline (`src/plugin-sdk/api-baseline.ts`) locks the public export set; CI fails if unauthorized exports leak. The SDK alias map (`src/plugins/sdk-alias.ts`) resolves `allbot/plugin-sdk/*` to source TS (dev) or built `dist/plugin-sdk/*` artifacts (prod).
 
 ## Atomic File Writes
 
@@ -285,7 +285,7 @@ Path A: Agent self-report          Path B: Post-session extraction
 - `findSimilar(userId, domain, text)` — token-level Jaccard similarity
 - `listActive(userId)` — returns records within TTL, sorted by `reinforcedCount` desc
 - `removeStale()` — deletes records older than TTL
-- Atomic file write to `~/.kaijibot/cognitive/corrections/{agentId}/{userId}.json`
+- Atomic file write to `~/.allbot/cognitive/corrections/{agentId}/{userId}.json`
 
 **Agent tool**: `record_correction` — called when agent recognizes it made a mistake; returns `saved` or `reinforced` status
 
@@ -369,12 +369,12 @@ Correction (system prompt injection):
 - Prefer `Result<T, E>`-style outcomes and closed error-code unions for runtime decisions.
 - Avoid `?? 0`, empty-string, empty-object, or magic-string sentinels.
 - Dynamic import guardrail: do not mix `await import("x")` and static `import ... from "x"` for the same module. Use dedicated `*.runtime.ts` boundaries for lazy loading.
-- Extension SDK self-import: inside an extension, do not import via `kaijibot/plugin-sdk/<extension>`. Use local barrels (`./api.ts`).
+- Extension SDK self-import: inside an extension, do not import via `allbot/plugin-sdk/<extension>`. Use local barrels (`./api.ts`).
 - Never share class behavior via prototype mutation. Use explicit inheritance/composition.
 - Keep files under ~700 LOC (guideline). Extract helpers instead of "V2" copies.
 - Use `createDefaultDeps` pattern for dependency injection.
 - Written English: American spelling in code, comments, docs, UI strings.
-- Naming: **KaijiBot** for product headings; `kaijibot` for CLI/package/paths/config keys.
+- Naming: **AllBot** for product headings; `allbot` for CLI/package/paths/config keys.
 - Nomenclature: use "plugin" / "plugins" in docs, UI, changelogs.
 
 ## Testing Guidelines
@@ -386,15 +386,15 @@ Correction (system prompt injection):
 - Test performance: avoid `vi.resetModules()` + `await import(...)` in `beforeEach` for heavy modules. Use `beforeAll` + mock resets.
 - Prefer per-instance stubs over prototype mutation in tests.
 - For scoped debugging: `pnpm test <path-or-filter>` (not raw `pnpm vitest run ...`).
-- `KAIJIBOT_VITEST_MAX_WORKERS=1 pnpm test` for memory-constrained runs.
+- `ALLBOT_VITEST_MAX_WORKERS=1 pnpm test` for memory-constrained runs.
 - Do not modify baseline, snapshot, or expected-failure files to silence failing checks without explicit approval.
 - **Cognitive layer live tests** — after modifying `src/cognitive/evolution/` or `src/cognitive/insight/`, run the live quality tests to verify real LLM output. **Local-only by design — do NOT add CI workflows that require `ZAI_API_KEY`/`TAVILY_API_KEY` repo secrets (operator decision 2026.8.22):**
-  - Evolution: `KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/evolution/evolution-live-quality.test.ts`
-  - Evolution E2E: `KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/evolution/evolution-live-e2e.test.ts`
-  - Insight: `KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY pnpm test src/cognitive/insight/insight-live-quality.test.ts`
-  - Pipeline eval (5-round dual pipeline): `KAIJIBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY pnpm test src/cognitive/insight/insight-pipeline-live-eval.test.ts`
+  - Evolution: `ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/evolution/evolution-live-quality.test.ts`
+  - Evolution E2E: `ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY pnpm test src/cognitive/evolution/evolution-live-e2e.test.ts`
+  - Insight: `ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY pnpm test src/cognitive/insight/insight-live-quality.test.ts`
+  - Pipeline eval (5-round dual pipeline): `ALLBOT_LIVE_TEST=1 ZAI_API_KEY=$ZAI_API_KEY TAVILY_API_KEY=$TAVILY_API_KEY pnpm test src/cognitive/insight/insight-pipeline-live-eval.test.ts`
   - These tests are excluded from normal `pnpm test` (`**/*.live.test.ts` in vitest exclude). They call real LLM and web search APIs. Skip if API keys are unavailable.
-  - Correction: `KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/correction/` (38 tests, unit only — no live LLM tests currently)
+  - Correction: `ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/correction/` (38 tests, unit only — no live LLM tests currently)
 - `pnpm test` (full suite) uses a custom runner (`scripts/test-projects.mjs`) that spawns vitest as child processes. **stdout is empty except for the pnpm header**; test output goes to stderr. Judge success by exit code only — do not wait for stdout feedback. For targeted output, use `pnpm test <path-or-filter>`.
 - Known gaps: `src/process/**` (12 test files) is excluded from all vitest projects; some paths under `src/infra/` remain outside the configured projects — use `pnpm tsgo` for type verification, or create a temporary vitest config to run tests locally. `src/gateway/**` tests run via `corepack pnpm vitest run --config vitest/vitest.gateway.config.ts <path>`. The former `src/commands/**` gap is closed: `vitest/vitest.commands.config.ts` exists (isolation forced — these tests mutate registries/env and false-fail non-isolated), is wired into `rootVitestProjects` and `fullSuiteVitestShards`, and `pnpm test` with a path under `src/commands` routes to it.
 - Control UI tests: `pnpm test` with any path under `ui/` routes to `vitest/vitest.ui.config.ts` (jsdom/node lanes, isolated). Browser-mode tests (`ui/src/**/*.browser.test.ts`) are excluded from this lane — run them via `pnpm test` inside `ui/` (needs Playwright browser binaries). jsdom requires undici 7 while the repo pins undici 8 globally, so `pnpm.overrides` carries a scoped `"jsdom>undici": "7.24.5"` — keep it when touching overrides. Known pre-existing failures in this lane (never runnable before the lane existed; also fail under `ui/`'s own config): `ui/src/ui/app-gateway.node.test.ts` (3 reconnect/event-filtering tests drifted from implementation) and `ui/src/i18n/test/translate.test.ts` (de locale missing ~151 keys vs en).
@@ -414,8 +414,8 @@ Correction (system prompt injection):
 - **Versioning**: `YYYY.M.DD` format (e.g. `2026.6.27`). Multiple releases on the same date append `-1`, `-2`, `-3` (e.g. `2026.6.27-1`, `2026.6.27-2`). Do NOT use future dates.
 - **One command**: `bash scripts/release.sh <version>` (e.g. `bash scripts/release.sh 2026.6.27-1`)
 - The script: bumps version → `pnpm build` (sanity gate) → `git commit` + `git tag` + `git push` (both remotes). It does NOT publish to npm itself.
-- **npm publishing runs in CI via trusted publishing (OIDC)**: `.github/workflows/publish-tarball.yml` triggers on tag push (`v*`) and runs two parallel jobs — `publish-npm` (Node 24 / npm ≥ 11.5.1, `id-token: write`, `npm publish --ignore-scripts`) and `upload-tarball` (`npm pack`, uploads `kaijibot-<version>.tgz` to the corresponding GitHub Release). No npm token lives on the machine or in repo secrets.
-- Prerequisite (one-time, completed 2026-08-15): trusted publisher registered on npmjs.com for `kaijibot` — org `Kaiji-Z`, repo `kaijibot`, workflow filename `publish-tarball.yml`, allowed action `npm publish`. First verified release: `v2026.8.15-3` (publish-npm job green, provenance signed and logged at sigstore logIndex 2477083775). Re-publishing an already-published version fails with E403 (versions are immutable) — same-date `-N` suffixes already handle this.
+- **npm publishing runs in CI via trusted publishing (OIDC)**: `.github/workflows/publish-tarball.yml` triggers on tag push (`v*`) and runs two parallel jobs — `publish-npm` (Node 24 / npm ≥ 11.5.1, `id-token: write`, `npm publish --ignore-scripts`) and `upload-tarball` (`npm pack`, uploads `allbot-<version>.tgz` to the corresponding GitHub Release). No npm token lives on the machine or in repo secrets.
+- Prerequisite (one-time, completed 2026-08-15): trusted publisher registered on npmjs.com for `allbot` — org `Kaiji-Z`, repo `allbot`, workflow filename `publish-tarball.yml`, allowed action `npm publish`. First verified release: `v2026.8.15-3` (publish-npm job green, provenance signed and logged at sigstore logIndex 2477083775). Re-publishing an already-published version fails with E403 (versions are immutable) — same-date `-N` suffixes already handle this.
 - Tarball is required for Android/Termux install (the install script downloads it from GitHub Releases instead of npmjs.org for China network reliability)
 - Launcher APK: `.github/workflows/android-build.yml` triggers on `android/**` changes, builds APK with bundled Termux, uploads to `launcher` release tag
 - Release guardrails: do not change version numbers without operator's explicit consent.
@@ -427,7 +427,7 @@ These gotchas are handled by `release.sh` automatically. If doing manual steps:
 1. **`pnpm build` is mandatory before publishing** — `dist/` is not committed to git; npm package includes it. Without rebuild, published package has stale code.
 2. **`npm publish --ignore-scripts` is mandatory** — the `prepack` script fails on Control UI build (non-fatal error exits with code 1). `--ignore-scripts` skips prepack.
 3. **Prefer letting CI publish** (push the tag; trusted publishing handles auth). The package requires 2FA and disallows tokens (verified 2026-08-15: token publish is rejected with E403 at the auth layer), so local publish only works from an interactive `npm login` 2FA session.
-4. **GitHub push uses SSH** — `git push github main` (remote `github` = `git@github.com:Kaiji-Z/kaijibot.git`). Never use HTTPS to github.com (port 443 unreachable from this machine).
+4. **GitHub push uses SSH** — `git push github main` (remote `github` = `git@github.com:Kaiji-Z/allbot.git`). Never use HTTPS to github.com (port 443 unreachable from this machine).
 5. **Gitee push uses HTTPS** — `git push origin main` (remote `origin` = Gitee).
 6. **GitHub Release tarball is uploaded by CI**; if manually publishing, also run `npm pack --ignore-scripts` and upload the `.tgz` to the Release for that tag. Android install script depends on it.
 
@@ -439,8 +439,8 @@ These gotchas are handled by `release.sh` automatically. If doing manual steps:
 
 ## Config and Environment
 
-- Config lives in `~/.kaijibot/kaijibot.json`. CLI: `kaijibot config set <key> <value>`.
-- Set model via `kaijibot config set agents.defaults.model.primary "<provider>/<model>"` (per-agent overrides under `agents.list.<id>.model`).
+- Config lives in `~/.allbot/allbot.json`. CLI: `allbot config set <key> <value>`.
+- Set model via `allbot config set agents.defaults.model.primary "<provider>/<model>"` (per-agent overrides under `agents.list.<id>.model`).
 - Feishu channel config: `channels.feishu.appId`, `channels.feishu.appSecret`.
 - Cognitive config: `cognitive.enabled`, `cognitive.proactive.enabled`, `cognitive.proactive.minIntervalHours`, `cognitive.proactive.maxDailyInsights` (default 2, daily self-restraint cap), `cognitive.proactive.activeHours`
 - Insight config: `cognitive.insight.engine` ("knowledge"/"pattern"/"unified", default "unified"; legacy aliases "v1"→"knowledge", "v2"→"pattern", "dual"→"unified"), `cognitive.proactive.epsilonGreedy` (0-1, default 0.2; probability of promoting exploration candidates to front of resolve loop; set to 0 to disable)
@@ -449,21 +449,21 @@ These gotchas are handled by `release.sh` automatically. If doing manual steps:
 - Correction config: enabled by default when `cognitive.enabled` is true; no separate config key
 - dmScope adaptive: `session.dmScope` defaults to `"main"`, but automatically promotes to `"per-peer"` when any channel has credentials configured (feishu, wechat, etc.). Explicit settings are always respected.
 - Consolidation config: `memory.consolidation.enabled` (default `true`), `memory.consolidation.cron` (default `0 3 * * *`), `memory.consolidation.concurrency` (default 2), `memory.consolidation.batchSize` (default 4000), `memory.consolidation.lookbackDays` (default 7), `memory.consolidation.timezone`
-- Correction data stored at `~/.kaijibot/cognitive/corrections/{agentId}/{userId}.json`. Schema: CorrectionStoreData with records array, each CorrectionRecord has id, domain, trigger, mistake, correction, provenance, reinforcedCount, createdAt, lastReinforced.
+- Correction data stored at `~/.allbot/cognitive/corrections/{agentId}/{userId}.json`. Schema: CorrectionStoreData with records array, each CorrectionRecord has id, domain, trigger, mistake, correction, provenance, reinforcedCount, createdAt, lastReinforced.
 - Web search: `EXA_API_KEY` / `TAVILY_API_KEY` env vars or scoped credentials in config
-- Local speech (sherpa-speech extension): runtime + models live in `~/.kaijibot/sherpa-speech/` (auto-downloaded at gateway boot; set `SHERPA_ONNX_AUTO_DOWNLOAD=0` to opt out, `SHERPA_ONNX_ASR_MODEL=sense-voice|whisper-turbo` to pick the ASR model, `SHERPA_ONNX_RUNTIME_DIR` to point at an existing sherpa-onnx install, `SHERPA_ONNX_DOWNLOAD_MIRROR=<url-prefix>` for GitHub-release mirrors). Gateway RPC: `stt.transcribe` (base64 audio → text), `tts.convert` accepts `includeAudio: true` to inline base64 audio for the Control UI read-aloud. Termux install: `scripts/install-sherpa-onnx-termux.sh`.
-- Env-source precedence: process env → `./.env` → `~/.kaijibot/.env` → `kaijibot.json` env block.
-- Credentials stored at `~/.kaijibot/credentials/`.
-- Persona data stored at `~/.kaijibot/cognitive/persona/{agentId}/{userId}.json` (per-agent subdirectory). Schema includes TypedInsights with category-aware decay and InterestPhase lifecycle per domain.
-- Evolution records stored at `~/.kaijibot/cognitive/evolution/{agentId}/{userId}.json`; skills at `~/.kaijibot/skills/{name}/SKILL.md`.
-- Evolution audit log at `~/.kaijibot/cognitive/evolution/audit.jsonl` (rotates at 5MB, keeps last 5 `audit-*.jsonl.rotated` archives).
-- Config clobber protection: writes to `kaijibot.json` that would shrink the file by >50% vs the last-known-good snapshot (when prior config had `gateway.mode` set) are refused with `ConfigClobberProtectionError`. Bypass via `KAIJIBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` env or `allowConfigClobberShrink: true` write option.
-- Postinstall kill switches: `KAIJIBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1` (skip all npm postinstall) and `KAIJIBOT_DISABLE_LARK_SKILLS_INSTALL=1` (skip lark-cli skills only).
+- Local speech (sherpa-speech extension): runtime + models live in `~/.allbot/sherpa-speech/` (auto-downloaded at gateway boot; set `SHERPA_ONNX_AUTO_DOWNLOAD=0` to opt out, `SHERPA_ONNX_ASR_MODEL=sense-voice|whisper-turbo` to pick the ASR model, `SHERPA_ONNX_RUNTIME_DIR` to point at an existing sherpa-onnx install, `SHERPA_ONNX_DOWNLOAD_MIRROR=<url-prefix>` for GitHub-release mirrors). Gateway RPC: `stt.transcribe` (base64 audio → text), `tts.convert` accepts `includeAudio: true` to inline base64 audio for the Control UI read-aloud. Termux install: `scripts/install-sherpa-onnx-termux.sh`.
+- Env-source precedence: process env → `./.env` → `~/.allbot/.env` → `allbot.json` env block.
+- Credentials stored at `~/.allbot/credentials/`.
+- Persona data stored at `~/.allbot/cognitive/persona/{agentId}/{userId}.json` (per-agent subdirectory). Schema includes TypedInsights with category-aware decay and InterestPhase lifecycle per domain.
+- Evolution records stored at `~/.allbot/cognitive/evolution/{agentId}/{userId}.json`; skills at `~/.allbot/skills/{name}/SKILL.md`.
+- Evolution audit log at `~/.allbot/cognitive/evolution/audit.jsonl` (rotates at 5MB, keeps last 5 `audit-*.jsonl.rotated` archives).
+- Config clobber protection: writes to `allbot.json` that would shrink the file by >50% vs the last-known-good snapshot (when prior config had `gateway.mode` set) are refused with `ConfigClobberProtectionError`. Bypass via `ALLBOT_ALLOW_CONFIG_CLOBBER_SHRINK=1` env or `allowConfigClobberShrink: true` write option.
+- Postinstall kill switches: `ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1` (skip all npm postinstall) and `ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1` (skip lark-cli skills only).
 - Never commit real phone numbers, API keys, or live config values.
 
 ## Upstream Relationship (Independent)
 
-KaijiBot forked from [OpenClaw](https://github.com/openclaw/openclaw) in April 2026 and now **develops independently**. We no longer merge upstream automatically — the cognitive layer, memory rewrite, and China/Feishu focus have taken the project in a different direction.
+AllBot forked from [OpenClaw](https://github.com/openclaw/openclaw) in April 2026 and now **develops independently**. We no longer merge upstream automatically — the cognitive layer, memory rewrite, and China/Feishu focus have taken the project in a different direction.
 
 **When (rarely) to look upstream:** only to research how a specific upstream bug was fixed, or to hand-port a concrete improvement. This is a manual, selective judgment call — never a blanket merge. There is no expectation that upstream changes flow in.
 
@@ -475,7 +475,7 @@ git remote add upstream https://github.com/openclaw/openclaw      # GitHub
 git remote add openclaw  https://gitee.com/kaiji1126/openclaw      # Gitee mirror (squash history)
 ```
 
-If you do selectively port a fix, attribute it in the commit message (e.g. `port: <fix> from OpenClaw`). The cognitive layer (`src/cognitive/`) is unique to KaijiBot and never has an upstream counterpart.
+If you do selectively port a fix, attribute it in the commit message (e.g. `port: <fix> from OpenClaw`). The cognitive layer (`src/cognitive/`) is unique to AllBot and never has an upstream counterpart.
 
 ## Collaboration / Safety Notes
 
@@ -488,7 +488,7 @@ If you do selectively port a fix, attribute it in the commit message (e.g. `port
 - Lint/format churn: if staged+unstaged diffs are formatting-only, auto-resolve without asking.
 - Release guardrails: do not change version numbers without operator's explicit consent.
 - Never send streaming/partial replies to external messaging surfaces; only final replies.
-- Tool schema guardrails: avoid `Type.Union` / `anyOf` / `oneOf` / `allOf` in tool input schemas. Use `stringEnum` / `optionalStringEnum` from `src/agents/schema/typebox.ts` (or `kaijibot/plugin-sdk/core` for extensions). Avoid raw `format` property names. For action-based tools, flatten to `Type.Object({ action: stringEnum([...]), ...allFieldsOptional })` and enforce per-action required fields at runtime via a `requiredParam()` helper (see `extensions/feishu/src/wiki.ts` for the pattern).
+- Tool schema guardrails: avoid `Type.Union` / `anyOf` / `oneOf` / `allOf` in tool input schemas. Use `stringEnum` / `optionalStringEnum` from `src/agents/schema/typebox.ts` (or `allbot/plugin-sdk/core` for extensions). Avoid raw `format` property names. For action-based tools, flatten to `Type.Object({ action: stringEnum([...]), ...allFieldsOptional })` and enforce per-action required fields at runtime via a `requiredParam()` helper (see `extensions/feishu/src/wiki.ts` for the pattern).
 
 ## Verification System
 
@@ -498,7 +498,7 @@ Established by `VERIFICATION.md` diagnosis pipeline. This section is the live au
 
 | Criterion                      | Verdict | Evidence                                                                                                                                                                                                                                                                                         |
 | ------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| §2.1 Runs without the UI       | ✅ PASS | `kaijibot gateway --port 18789` (registered in `src/cli/gateway-cli/register.ts`, guarded at `src/cli/program/config-guard.ts:79`); `POST /v1/chat/completions` (`src/gateway/openai-http.ts:431`); gateway RPC `chat` (`src/gateway/server-methods/chat.ts`); 29 `*.e2e.test.ts` headless files |
+| §2.1 Runs without the UI       | ✅ PASS | `allbot gateway --port 18789` (registered in `src/cli/gateway-cli/register.ts`, guarded at `src/cli/program/config-guard.ts:79`); `POST /v1/chat/completions` (`src/gateway/openai-http.ts:431`); gateway RPC `chat` (`src/gateway/server-methods/chat.ts`); 29 `*.e2e.test.ts` headless files |
 | §2.2 Intermediate state logged | ✅ PASS | Session JSONL transcripts (`src/gateway/session-transcript-files.fs.ts:70` `resolveSessionTranscriptCandidates`); evolution audit log (`src/cognitive/evolution/audit-log.ts:20` `AuditLog`); `getRecentSessionContent` (`src/hooks/bundled/session-memory/transcript.ts:250`)                   |
 | §2.3 Programmatic interface    | ✅ PASS | `GET /api/status` (`src/gateway/status-http.ts:58`); gateway RPC `sessions.list` (`src/gateway/server-methods/sessions.ts:555`), `chat.history` (`src/gateway/server.impl.ts:2338`); backend/frontend split (no MCP-web-sim)                                                                     |
 
@@ -512,16 +512,16 @@ Architecture is sound. Gaps are in the verification _layers_, not the runtime.
 | Regression set                 | Colocated `*.test.ts` (unit), `*.e2e.test.ts` (e2e, 29 files), `*.live.test.ts` (live, excluded by default). 12 vitest configs incl. `vitest.cognitive.config.ts`. ✅ present                                                                                                                                                                                                                                                                    |
 | Assertion framework            | vitest native `expect`/`assert`. ✅ present (Layer 1 deterministic)                                                                                                                                                                                                                                                                                                                                                                              |
 | Supervisor (Layer 2 LLM judge) | ✅ wired 2026.8.22 — `test/helpers/eval/supervisor.ts` (clean-context, fail-closed) is imported by `insight-live-quality.test.ts` + `evolution-live-quality.test.ts`; `expected` frozen from `docs/ACCEPTANCE.md`; `assert(r.passed)` gates every live artifact. Verified against real LLM (evolution suite 5/5 passed, 2026.8.22). Ad-hoc judges still serve in-pipeline (`verifyInsightWithLLM`, `skill-quality-gate.ts`, `skill-reviewer.ts`) |
-| Flag-based regression (§4)     | ✅ remediated 2026.7.19 — `scripts/regression-flag-diff.mjs` toggles `cognitive.enabled` via temp `KAIJIBOT_CONFIG_PATH` + weekly CI (`.github/workflows/regression-flag-diff.yml`). Scope note: only `cognitive.enabled` is toggled — per-feature flags (`evolution.enabled`, `correction.enabled`, `insight.engine`) have no on/off comparison (**P1**)                                                                                        |
+| Flag-based regression (§4)     | ✅ remediated 2026.7.19 — `scripts/regression-flag-diff.mjs` toggles `cognitive.enabled` via temp `ALLBOT_CONFIG_PATH` + weekly CI (`.github/workflows/regression-flag-diff.yml`). Scope note: only `cognitive.enabled` is toggled — per-feature flags (`evolution.enabled`, `correction.enabled`, `insight.engine`) have no on/off comparison (**P1**)                                                                                        |
 | Contract drift checks (CI)     | ✅ CI runs `pnpm format:check`, `pnpm plugin-sdk:check-exports`, `NODE_OPTIONS=--max-old-space-size=8192 pnpm plugin-sdk:api:check` on every PR. Remediated 2026.7.19.                                                                                                                                                                                                                                                                           |
 
 ### Project Parameters (§8) — Filled
 
 | Item                    | Category    | Value                                                                                                                                                                                                                                                                                              |
 | ----------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 8.1 Backend start       | auto-fill   | `kaijibot gateway --port 18789`                                                                                                                                                                                                                                                                    |
-| 8.1 Workflow trigger    | auto-fill   | `POST /v1/chat/completions`; gateway RPC `chat`; `kaijibot infer`/`send` CLI                                                                                                                                                                                                                       |
-| 8.1 Trace fetch         | auto-fill   | `GET /api/status`; `kaijibot sessions list`; session JSONL at `~/.kaijibot/`                                                                                                                                                                                                                       |
+| 8.1 Backend start       | auto-fill   | `allbot gateway --port 18789`                                                                                                                                                                                                                                                                    |
+| 8.1 Workflow trigger    | auto-fill   | `POST /v1/chat/completions`; gateway RPC `chat`; `allbot infer`/`send` CLI                                                                                                                                                                                                                       |
+| 8.1 Trace fetch         | auto-fill   | `GET /api/status`; `allbot sessions list`; session JSONL at `~/.allbot/`                                                                                                                                                                                                                       |
 | 8.2 Regression run      | auto-fill   | `pnpm test`; scoped `pnpm test <path>`                                                                                                                                                                                                                                                             |
 | 8.2 Regression set      | auto-fill   | colocated `*.test.ts`; e2e `*.e2e.test.ts`; live `*.live.test.ts`                                                                                                                                                                                                                                  |
 | 8.2 Assertion framework | auto-fill   | vitest native (no eval harness)                                                                                                                                                                                                                                                                    |
@@ -538,13 +538,13 @@ Architecture is sound. Gaps are in the verification _layers_, not the runtime.
 | -------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------- |
 | **P2**   | No dataset-management eval harness     | Optional: thin vitest-based eval harness (fixtures + judge scoring) vs. introducing a heavy dependency                                                                                                                                                                                                                                                             | deferred                                     |
 | —        | Supervisor live wiring (§3.2 Layer 2)  | `insight-live-quality.test.ts` + `evolution-live-quality.test.ts` import `createSupervisor`; expected frozen from `docs/ACCEPTANCE.md` §1/§2; real-LLM verified                                                                                                                                                                                                    | ✅ wired + verified 2026.8.22                |
-| —        | Live-test CI gate                      | Deliberately none — live suites (`*.live.test.ts`) are LOCAL-ONLY by operator decision (2026.8.22): operator declines storing API keys in GitHub secrets, so no CI workflow may require `ZAI_API_KEY`/`TAVILY_API_KEY`. The canonical Layer-2 gate is the local one-command live run (`KAIJIBOT_LIVE_TEST=1 pnpm test <live-suite>`, keys from `~/.kaijibot/.env`) | ✅ resolved 2026.8.22 (local-only by design) |
+| —        | Live-test CI gate                      | Deliberately none — live suites (`*.live.test.ts`) are LOCAL-ONLY by operator decision (2026.8.22): operator declines storing API keys in GitHub secrets, so no CI workflow may require `ZAI_API_KEY`/`TAVILY_API_KEY`. The canonical Layer-2 gate is the local one-command live run (`ALLBOT_LIVE_TEST=1 pnpm test <live-suite>`, keys from `~/.allbot/.env`) | ✅ resolved 2026.8.22 (local-only by design) |
 | —        | Flag-diff matrix expansion             | `regression-flag-diff.mjs [target] [--flag <config.path>]` (default `cognitive.enabled`, backward compatible); CI matrix: cognitive.enabled / cognitive.evolution.enabled / cognitive.correction.enabled. Verified: `--flag cognitive.correction.enabled` on src/cognitive/correction → 79/79 stable, exit 0                                                       | ✅ wired + verified 2026.8.22                |
 | —        | Supervisor framework (§3.2)            | `test/helpers/eval/supervisor.ts` — clean-context, 4 dims ≥0.7, 8 unit tests (re-verified 2026.8.22)                                                                                                                                                                                                                                                               | ✅ built (round 1)                           |
 | —        | Flag-based regression comparison (§4)  | `scripts/regression-flag-diff.mjs [target]` + weekly CI                                                                                                                                                                                                                                                                                                            | ✅ built + CI wired (round 1)                |
 | —        | Acceptance criteria centralized (§8.5) | `docs/ACCEPTANCE.md` — happy path + reverse acceptance for 7 workflows                                                                                                                                                                                                                                                                                             | ✅ remediated (5→7 workflows 2026.7.19)      |
 
-**DoD reminder (§6):** a feature is done only when its happy-path regression test passes under flag=on, the supervisor reaches threshold, and flag=off shows no regression — all reproducible by one command. As of 2026.8.22 all three layers are live: `node scripts/regression-flag-diff.mjs <target> [--flag <path>]` (Layer 1), the live suites' embedded supervisor asserts (Layer 2), and `KAIJIBOT_LIVE_TEST=1 pnpm test <live-suite>` (reproducible by one command).
+**DoD reminder (§6):** a feature is done only when its happy-path regression test passes under flag=on, the supervisor reaches threshold, and flag=off shows no regression — all reproducible by one command. As of 2026.8.22 all three layers are live: `node scripts/regression-flag-diff.mjs <target> [--flag <path>]` (Layer 1), the live suites' embedded supervisor asserts (Layer 2), and `ALLBOT_LIVE_TEST=1 pnpm test <live-suite>` (reproducible by one command).
 
 ### Verification System — Remediation Status
 
@@ -553,7 +553,7 @@ The P0 supervisor + flag-regression and the P1 acceptance doc have landed:
 | Deliverable                                 | Location                                                  | Usage                                                                                                                                                                                              |
 | ------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Supervisor** (clean-context LLM-as-judge) | `test/helpers/eval/supervisor.ts` (+ `.test.ts`, 8 tests) | `createSupervisor({ generateText })` → `supervise({ expected, actual })`; enforces §3.2 by accepting ONLY expected+actual (no code-leak path). Wire to live LLM via `createStandaloneGenerateText` |
-| **Flag-regression diff**                    | `scripts/regression-flag-diff.mjs [target]`               | Runs a suite twice (cognitive enabled/disabled via temp `KAIJIBOT_CONFIG_PATH`), emits a REGRESSIONS list (pass-off/fail-on). Exit 1 on regression                                                 |
+| **Flag-regression diff**                    | `scripts/regression-flag-diff.mjs [target]`               | Runs a suite twice (cognitive enabled/disabled via temp `ALLBOT_CONFIG_PATH`), emits a REGRESSIONS list (pass-off/fail-on). Exit 1 on regression                                                 |
 | **Acceptance criteria**                     | `docs/ACCEPTANCE.md`                                      | Happy path + reverse acceptance for the 7 workflows — the `expected` text the supervisor scores against                                                                                            |
 
 **How to use them together** (§6 DoD, one command per layer):

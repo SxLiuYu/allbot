@@ -15,11 +15,11 @@ import {
 let tempDir: string | undefined;
 
 function withHandoffStateDir<T>(run: (env: NodeJS.ProcessEnv) => T): T {
-  const envSnapshot = captureEnv(["KAIJIBOT_STATE_DIR"]);
+  const envSnapshot = captureEnv(["ALLBOT_STATE_DIR"]);
   try {
-    return withTempDirSync({ prefix: "kaijibot-handoff-" }, (dir) => {
+    return withTempDirSync({ prefix: "allbot-handoff-" }, (dir) => {
       tempDir = dir;
-      process.env.KAIJIBOT_STATE_DIR = dir;
+      process.env.ALLBOT_STATE_DIR = dir;
       return run(process.env);
     });
   } finally {
@@ -106,7 +106,7 @@ describe("restart-handoff invalid JSON", () => {
   it("returns null for garbage content in handoff file", () => {
     withHandoffStateDir((env) => {
       const handoffPath = path.join(
-        env.KAIJIBOT_STATE_DIR!,
+        env.ALLBOT_STATE_DIR!,
         GATEWAY_SUPERVISOR_RESTART_HANDOFF_FILENAME,
       );
       fs.mkdirSync(path.dirname(handoffPath), { recursive: true });

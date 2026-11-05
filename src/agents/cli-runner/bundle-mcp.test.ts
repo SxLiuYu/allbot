@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   createBundleMcpTempHarness,
   createBundleProbePlugin,
@@ -18,7 +18,7 @@ afterEach(async () => {
 
 describe("prepareCliBundleMcpConfig", () => {
   it("injects a strict empty --mcp-config overlay for bundle-MCP-enabled backends without servers", async () => {
-    const workspaceDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-empty-");
+    const workspaceDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-empty-");
 
     const prepared = await prepareCliBundleMcpConfig({
       enabled: true,
@@ -47,13 +47,13 @@ describe("prepareCliBundleMcpConfig", () => {
   it("injects a merged --mcp-config overlay for bundle-MCP-enabled backends", async () => {
     const env = captureEnv(["HOME"]);
     try {
-      const homeDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-home-");
-      const workspaceDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-workspace-");
+      const homeDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-home-");
+      const workspaceDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-workspace-");
       process.env.HOME = homeDir;
 
       const { serverPath } = await createBundleProbePlugin(homeDir);
 
-      const config: KaijiBotConfig = {
+      const config: AllBotConfig = {
         plugins: {
           entries: {
             "bundle-probe": { enabled: true },
@@ -90,8 +90,8 @@ describe("prepareCliBundleMcpConfig", () => {
   });
 
   it("loads workspace bundle MCP plugins from the configured workspace root", async () => {
-    const workspaceDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-workspace-root-");
-    const pluginRoot = path.join(workspaceDir, ".kaijibot", "extensions", "workspace-probe");
+    const workspaceDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-workspace-root-");
+    const pluginRoot = path.join(workspaceDir, ".allbot", "extensions", "workspace-probe");
     const serverPath = path.join(pluginRoot, "servers", "probe.mjs");
     await fs.mkdir(path.dirname(serverPath), { recursive: true });
     await fs.writeFile(serverPath, "export {};\n", "utf-8");
@@ -147,13 +147,13 @@ describe("prepareCliBundleMcpConfig", () => {
   it("merges loopback overlay config with bundle MCP servers", async () => {
     const env = captureEnv(["HOME"]);
     try {
-      const homeDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-home-");
-      const workspaceDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-workspace-");
+      const homeDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-home-");
+      const workspaceDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-workspace-");
       process.env.HOME = homeDir;
 
       await createBundleProbePlugin(homeDir);
 
-      const config: KaijiBotConfig = {
+      const config: AllBotConfig = {
         plugins: {
           entries: {
             "bundle-probe": { enabled: true },
@@ -172,11 +172,11 @@ describe("prepareCliBundleMcpConfig", () => {
         config,
         additionalConfig: {
           mcpServers: {
-            kaijibot: {
+            allbot: {
               type: "http",
               url: "http://127.0.0.1:23119/mcp",
               headers: {
-                Authorization: "Bearer ${KAIJIBOT_MCP_TOKEN}",
+                Authorization: "Bearer ${ALLBOT_MCP_TOKEN}",
               },
             },
           },
@@ -188,9 +188,9 @@ describe("prepareCliBundleMcpConfig", () => {
       const raw = JSON.parse(await fs.readFile(generatedConfigPath as string, "utf-8")) as {
         mcpServers?: Record<string, { url?: string; headers?: Record<string, string> }>;
       };
-      expect(Object.keys(raw.mcpServers ?? {}).toSorted()).toEqual(["bundleProbe", "kaijibot"]);
-      expect(raw.mcpServers?.kaijibot?.url).toBe("http://127.0.0.1:23119/mcp");
-      expect(raw.mcpServers?.kaijibot?.headers?.Authorization).toBe("Bearer ${KAIJIBOT_MCP_TOKEN}");
+      expect(Object.keys(raw.mcpServers ?? {}).toSorted()).toEqual(["bundleProbe", "allbot"]);
+      expect(raw.mcpServers?.allbot?.url).toBe("http://127.0.0.1:23119/mcp");
+      expect(raw.mcpServers?.allbot?.headers?.Authorization).toBe("Bearer ${ALLBOT_MCP_TOKEN}");
 
       await prepared.cleanup?.();
     } finally {
@@ -199,7 +199,7 @@ describe("prepareCliBundleMcpConfig", () => {
   });
 
   it("preserves extra env values alongside generated MCP config", async () => {
-    const workspaceDir = await tempHarness.createTempDir("kaijibot-cli-bundle-mcp-env-");
+    const workspaceDir = await tempHarness.createTempDir("allbot-cli-bundle-mcp-env-");
 
     const prepared = await prepareCliBundleMcpConfig({
       enabled: true,
@@ -211,14 +211,14 @@ describe("prepareCliBundleMcpConfig", () => {
       workspaceDir,
       config: {},
       env: {
-        KAIJIBOT_MCP_TOKEN: "loopback-token-123",
-        KAIJIBOT_MCP_SESSION_KEY: "agent:main:telegram:group:chat123",
+        ALLBOT_MCP_TOKEN: "loopback-token-123",
+        ALLBOT_MCP_SESSION_KEY: "agent:main:telegram:group:chat123",
       },
     });
 
     expect(prepared.env).toEqual({
-      KAIJIBOT_MCP_TOKEN: "loopback-token-123",
-      KAIJIBOT_MCP_SESSION_KEY: "agent:main:telegram:group:chat123",
+      ALLBOT_MCP_TOKEN: "loopback-token-123",
+      ALLBOT_MCP_SESSION_KEY: "agent:main:telegram:group:chat123",
     });
 
     await prepared.cleanup?.();
@@ -231,7 +231,7 @@ describe("prepareCliBundleMcpConfig", () => {
         command: "node",
         args: ["./fake-cli.mjs"],
       },
-      workspaceDir: "/tmp/kaijibot-bundle-mcp-disabled",
+      workspaceDir: "/tmp/allbot-bundle-mcp-disabled",
     });
 
     expect(prepared.backend.args).toEqual(["./fake-cli.mjs"]);
@@ -247,15 +247,15 @@ describe("prepareCliBundleMcpConfig", () => {
         args: ["exec", "--json"],
         resumeArgs: ["exec", "resume", "{sessionId}"],
       },
-      workspaceDir: "/tmp/kaijibot-bundle-mcp-codex",
+      workspaceDir: "/tmp/allbot-bundle-mcp-codex",
       additionalConfig: {
         mcpServers: {
-          kaijibot: {
+          allbot: {
             type: "http",
             url: "http://127.0.0.1:23119/mcp",
             headers: {
-              Authorization: "Bearer ${KAIJIBOT_MCP_TOKEN}",
-              "x-session-key": "${KAIJIBOT_MCP_SESSION_KEY}",
+              Authorization: "Bearer ${ALLBOT_MCP_TOKEN}",
+              "x-session-key": "${ALLBOT_MCP_SESSION_KEY}",
             },
           },
         },
@@ -266,14 +266,14 @@ describe("prepareCliBundleMcpConfig", () => {
       "exec",
       "--json",
       "-c",
-      'mcp_servers={ kaijibot = { url = "http://127.0.0.1:23119/mcp", bearer_token_env_var = "KAIJIBOT_MCP_TOKEN", env_http_headers = { x-session-key = "KAIJIBOT_MCP_SESSION_KEY" } } }',
+      'mcp_servers={ allbot = { url = "http://127.0.0.1:23119/mcp", bearer_token_env_var = "ALLBOT_MCP_TOKEN", env_http_headers = { x-session-key = "ALLBOT_MCP_SESSION_KEY" } } }',
     ]);
     expect(prepared.backend.resumeArgs).toEqual([
       "exec",
       "resume",
       "{sessionId}",
       "-c",
-      'mcp_servers={ kaijibot = { url = "http://127.0.0.1:23119/mcp", bearer_token_env_var = "KAIJIBOT_MCP_TOKEN", env_http_headers = { x-session-key = "KAIJIBOT_MCP_SESSION_KEY" } } }',
+      'mcp_servers={ allbot = { url = "http://127.0.0.1:23119/mcp", bearer_token_env_var = "ALLBOT_MCP_TOKEN", env_http_headers = { x-session-key = "ALLBOT_MCP_SESSION_KEY" } } }',
     ]);
     expect(prepared.cleanup).toBeUndefined();
   });
@@ -286,25 +286,25 @@ describe("prepareCliBundleMcpConfig", () => {
         command: "gemini",
         args: ["--prompt", "{prompt}"],
       },
-      workspaceDir: "/tmp/kaijibot-bundle-mcp-gemini",
+      workspaceDir: "/tmp/allbot-bundle-mcp-gemini",
       additionalConfig: {
         mcpServers: {
-          kaijibot: {
+          allbot: {
             type: "http",
             url: "http://127.0.0.1:23119/mcp",
             headers: {
-              Authorization: "Bearer ${KAIJIBOT_MCP_TOKEN}",
+              Authorization: "Bearer ${ALLBOT_MCP_TOKEN}",
             },
           },
         },
       },
       env: {
-        KAIJIBOT_MCP_TOKEN: "loopback-token-123",
+        ALLBOT_MCP_TOKEN: "loopback-token-123",
       },
     });
 
     expect(prepared.backend.args).toEqual(["--prompt", "{prompt}"]);
-    expect(prepared.env?.KAIJIBOT_MCP_TOKEN).toBe("loopback-token-123");
+    expect(prepared.env?.ALLBOT_MCP_TOKEN).toBe("loopback-token-123");
     expect(typeof prepared.env?.GEMINI_CLI_SYSTEM_SETTINGS_PATH).toBe("string");
     const raw = JSON.parse(
       await fs.readFile(prepared.env?.GEMINI_CLI_SYSTEM_SETTINGS_PATH as string, "utf-8"),
@@ -312,9 +312,9 @@ describe("prepareCliBundleMcpConfig", () => {
       mcp?: { allowed?: string[] };
       mcpServers?: Record<string, { url?: string; headers?: Record<string, string> }>;
     };
-    expect(raw.mcp?.allowed).toEqual(["kaijibot"]);
-    expect(raw.mcpServers?.kaijibot?.url).toBe("http://127.0.0.1:23119/mcp");
-    expect(raw.mcpServers?.kaijibot?.headers?.Authorization).toBe("Bearer loopback-token-123");
+    expect(raw.mcp?.allowed).toEqual(["allbot"]);
+    expect(raw.mcpServers?.allbot?.url).toBe("http://127.0.0.1:23119/mcp");
+    expect(raw.mcpServers?.allbot?.headers?.Authorization).toBe("Bearer loopback-token-123");
 
     await prepared.cleanup?.();
   });

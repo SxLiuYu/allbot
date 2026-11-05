@@ -4,13 +4,13 @@ import path from "node:path";
 import { resetDiagnosticEventsForTest } from "../infra/diagnostic-events.js";
 import { withEnv } from "../test-utils/env.js";
 import { clearPluginDiscoveryCache } from "./discovery.js";
-import { clearPluginLoaderCache, loadKaijiBotPlugins } from "./loader.js";
+import { clearPluginLoaderCache, loadAllBotPlugins } from "./loader.js";
 import { clearPluginManifestRegistryCache } from "./manifest-registry.js";
 import { resetPluginRuntimeStateForTest } from "./runtime.js";
 
 export type TempPlugin = { dir: string; file: string; id: string };
-export type PluginLoadConfig = NonNullable<Parameters<typeof loadKaijiBotPlugins>[0]>["config"];
-export type PluginRegistry = ReturnType<typeof loadKaijiBotPlugins>;
+export type PluginLoadConfig = NonNullable<Parameters<typeof loadAllBotPlugins>[0]>["config"];
+export type PluginRegistry = ReturnType<typeof loadAllBotPlugins>;
 
 function chmodSafeDir(dir: string) {
   if (process.platform === "win32") {
@@ -30,9 +30,9 @@ export function mkdirSafe(dir: string) {
   chmodSafeDir(dir);
 }
 
-const fixtureRoot = mkdtempSafe(path.join(os.tmpdir(), "kaijibot-plugin-"));
+const fixtureRoot = mkdtempSafe(path.join(os.tmpdir(), "allbot-plugin-"));
 let tempDirIndex = 0;
-const prevBundledDir = process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+const prevBundledDir = process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
 
 export const EMPTY_PLUGIN_SCHEMA = {
   type: "object",
@@ -85,7 +85,7 @@ export function writePlugin(params: {
   const file = path.join(dir, filename);
   fs.writeFileSync(file, params.body, "utf-8");
   fs.writeFileSync(
-    path.join(dir, "kaijibot.plugin.json"),
+    path.join(dir, "allbot.plugin.json"),
     JSON.stringify(
       {
         id: params.id,
@@ -100,7 +100,7 @@ export function writePlugin(params: {
 }
 
 export function useNoBundledPlugins() {
-  process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
+  process.env.ALLBOT_BUNDLED_PLUGINS_DIR = "/nonexistent/bundled/plugins";
 }
 
 export function loadBundleFixture(params: {
@@ -112,10 +112,10 @@ export function loadBundleFixture(params: {
   useNoBundledPlugins();
   const workspaceDir = makeTempDir();
   const stateDir = makeTempDir();
-  const bundleRoot = path.join(workspaceDir, ".kaijibot", "extensions", params.pluginId);
+  const bundleRoot = path.join(workspaceDir, ".allbot", "extensions", params.pluginId);
   params.build(bundleRoot);
-  return withEnv({ KAIJIBOT_STATE_DIR: stateDir, ...params.env }, () =>
-    loadKaijiBotPlugins({
+  return withEnv({ ALLBOT_STATE_DIR: stateDir, ...params.env }, () =>
+    loadAllBotPlugins({
       workspaceDir,
       onlyPluginIds: params.onlyPluginIds ?? [params.pluginId],
       config: {
@@ -139,9 +139,9 @@ export function resetPluginLoaderTestStateForTest() {
   resetPluginRuntimeStateForTest();
   resetDiagnosticEventsForTest();
   if (prevBundledDir === undefined) {
-    delete process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR;
+    delete process.env.ALLBOT_BUNDLED_PLUGINS_DIR;
   } else {
-    process.env.KAIJIBOT_BUNDLED_PLUGINS_DIR = prevBundledDir;
+    process.env.ALLBOT_BUNDLED_PLUGINS_DIR = prevBundledDir;
   }
 }
 

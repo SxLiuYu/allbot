@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 
 vi.mock("../../agents/fast-mode.js", () => ({
   resolveFastModeState: () => ({ enabled: false }),
@@ -52,7 +52,7 @@ describe("buildStatusReply", () => {
       channels: {
         whatsapp: { allowFrom: ["*"] },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const reply = await buildStatusReply({
       cfg,
@@ -97,7 +97,7 @@ describe("buildStatusReply", () => {
       channels: {
         whatsapp: { allowFrom: ["*"] },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const reply = await buildStatusReply({
       cfg,
@@ -142,7 +142,7 @@ describe("buildStatusReply", () => {
       channels: {
         whatsapp: { allowFrom: ["*"] },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const reply = await buildStatusReply({
       cfg,
@@ -187,7 +187,7 @@ describe("buildStatusReply", () => {
       channels: {
         whatsapp: { allowFrom: ["*"] },
       },
-    } as KaijiBotConfig;
+    } as AllBotConfig;
 
     const reply = await buildStatusReply({
       cfg,

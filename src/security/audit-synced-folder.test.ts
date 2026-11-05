@@ -4,8 +4,8 @@ import { collectSyncedFolderFindings } from "./audit-extra.sync.js";
 describe("security audit synced folder findings", () => {
   it("warns when state/config look like a synced folder", () => {
     const findings = collectSyncedFolderFindings({
-      stateDir: "/Users/test/Dropbox/.kaijibot",
-      configPath: "/Users/test/Dropbox/.kaijibot/kaijibot.json",
+      stateDir: "/Users/test/Dropbox/.allbot",
+      configPath: "/Users/test/Dropbox/.allbot/allbot.json",
     });
 
     expect(

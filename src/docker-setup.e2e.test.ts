@@ -62,14 +62,14 @@ async function createDockerSetupSandbox(): Promise<DockerSetupSandbox> {
   await writeFile(dockerfilePath, "FROM scratch\n");
   await writeFile(
     composePath,
-    "services:\n  kaijibot-gateway:\n    image: noop\n  kaijibot-cli:\n    image: noop\n",
+    "services:\n  allbot-gateway:\n    image: noop\n  allbot-cli:\n    image: noop\n",
   );
   await writeDockerStub(binDir, logPath);
 
   return { rootDir, scriptPath, logPath, binDir };
 }
 
-const sandboxRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-docker-setup-" });
+const sandboxRootTracker = createSuiteTempRootTracker({ prefix: "allbot-docker-setup-" });
 
 function createEnv(
   sandbox: DockerSetupSandbox,
@@ -82,9 +82,9 @@ function createEnv(
     LC_ALL: process.env.LC_ALL,
     TMPDIR: process.env.TMPDIR,
     DOCKER_STUB_LOG: sandbox.logPath,
-    KAIJIBOT_GATEWAY_TOKEN: "test-token",
-    KAIJIBOT_CONFIG_DIR: join(sandbox.rootDir, "config"),
-    KAIJIBOT_WORKSPACE_DIR: join(sandbox.rootDir, "kaijibot"),
+    ALLBOT_GATEWAY_TOKEN: "test-token",
+    ALLBOT_CONFIG_DIR: join(sandbox.rootDir, "config"),
+    ALLBOT_WORKSPACE_DIR: join(sandbox.rootDir, "allbot"),
   };
 
   for (const [key, value] of Object.entries(overrides)) {
@@ -129,7 +129,7 @@ async function readDockerLogLines(sandbox: DockerSetupSandbox) {
 }
 
 function isGatewayStartLine(line: string) {
-  return line.includes("compose") && line.includes(" up -d") && line.includes("kaijibot-gateway");
+  return line.includes("compose") && line.includes(" up -d") && line.includes("allbot-gateway");
 }
 
 function findGatewayStartLineIndex(lines: string[]) {
@@ -147,9 +147,9 @@ async function runDockerSetupWithUnsetGatewayToken(
   await prepare?.(configDir);
 
   const result = runDockerSetup(sandbox, {
-    KAIJIBOT_GATEWAY_TOKEN: undefined,
-    KAIJIBOT_CONFIG_DIR: configDir,
-    KAIJIBOT_WORKSPACE_DIR: workspaceDir,
+    ALLBOT_GATEWAY_TOKEN: undefined,
+    ALLBOT_CONFIG_DIR: configDir,
+    ALLBOT_WORKSPACE_DIR: workspaceDir,
   });
   const envFile = await readFile(join(sandbox.rootDir, ".env"), "utf8");
 
@@ -213,34 +213,34 @@ describe("scripts/docker/setup.sh", () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_DOCKER_APT_PACKAGES: "ffmpeg build-essential",
-      KAIJIBOT_EXTRA_MOUNTS: undefined,
-      KAIJIBOT_HOME_VOLUME: "kaijibot-home",
+      ALLBOT_DOCKER_APT_PACKAGES: "ffmpeg build-essential",
+      ALLBOT_EXTRA_MOUNTS: undefined,
+      ALLBOT_HOME_VOLUME: "allbot-home",
     });
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("KAIJIBOT_DOCKER_APT_PACKAGES=ffmpeg build-essential");
-    expect(envFile).toContain("KAIJIBOT_EXTRA_MOUNTS=");
-    expect(envFile).toContain("KAIJIBOT_HOME_VOLUME=kaijibot-home"); // pragma: allowlist secret
+    expect(envFile).toContain("ALLBOT_DOCKER_APT_PACKAGES=ffmpeg build-essential");
+    expect(envFile).toContain("ALLBOT_EXTRA_MOUNTS=");
+    expect(envFile).toContain("ALLBOT_HOME_VOLUME=allbot-home"); // pragma: allowlist secret
     const extraCompose = await readFile(
       join(activeSandbox.rootDir, "docker-compose.extra.yml"),
       "utf8",
     );
-    expect(extraCompose).toContain("kaijibot-home:/home/node");
+    expect(extraCompose).toContain("allbot-home:/home/node");
     expect(extraCompose).toContain("volumes:");
-    expect(extraCompose).toContain("kaijibot-home:");
+    expect(extraCompose).toContain("allbot-home:");
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("--build-arg KAIJIBOT_DOCKER_APT_PACKAGES=ffmpeg build-essential");
+    expect(log).toContain("--build-arg ALLBOT_DOCKER_APT_PACKAGES=ffmpeg build-essential");
     expect(log).toContain(
-      "run --rm --no-deps --entrypoint node kaijibot-gateway dist/index.js onboard --mode local --no-install-daemon",
+      "run --rm --no-deps --entrypoint node allbot-gateway dist/index.js onboard --mode local --no-install-daemon",
     );
     expect(log).toContain(
-      'run --rm --no-deps --entrypoint node kaijibot-gateway dist/index.js config set --batch-json [{"path":"gateway.mode","value":"local"},{"path":"gateway.bind","value":"lan"},{"path":"gateway.controlUi.allowedOrigins","value":["http://localhost:18789","http://127.0.0.1:18789"]}]',
+      'run --rm --no-deps --entrypoint node allbot-gateway dist/index.js config set --batch-json [{"path":"gateway.mode","value":"local"},{"path":"gateway.bind","value":"lan"},{"path":"gateway.controlUi.allowedOrigins","value":["http://localhost:18789","http://127.0.0.1:18789"]}]',
     );
-    expect(log).not.toContain("run --rm kaijibot-cli onboard --mode local --no-install-daemon");
+    expect(log).not.toContain("run --rm allbot-cli onboard --mode local --no-install-daemon");
   });
 
-  it("avoids shared-network kaijibot-cli before the gateway is started", async () => {
+  it("avoids shared-network allbot-cli before the gateway is started", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     await resetDockerLog(activeSandbox);
@@ -252,7 +252,7 @@ describe("scripts/docker/setup.sh", () => {
     expect(gatewayStartIdx).toBeGreaterThanOrEqual(0);
 
     const prestartLines = lines.slice(0, gatewayStartIdx);
-    expect(prestartLines.some((line) => /\bcompose\b.*\brun\b.*\bkaijibot-cli\b/.test(line))).toBe(
+    expect(prestartLines.some((line) => /\bcompose\b.*\brun\b.*\ballbot-cli\b/.test(line))).toBe(
       false,
     );
   });
@@ -263,7 +263,7 @@ describe("scripts/docker/setup.sh", () => {
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_SANDBOX: "1",
+      ALLBOT_SANDBOX: "1",
     });
 
     expect(result.status).toBe(0);
@@ -280,8 +280,8 @@ describe("scripts/docker/setup.sh", () => {
     const workspaceDir = join(activeSandbox.rootDir, "workspace-identity");
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_CONFIG_DIR: configDir,
-      KAIJIBOT_WORKSPACE_DIR: workspaceDir,
+      ALLBOT_CONFIG_DIR: configDir,
+      ALLBOT_WORKSPACE_DIR: workspaceDir,
     });
 
     expect(result.status).toBe(0);
@@ -289,16 +289,16 @@ describe("scripts/docker/setup.sh", () => {
     expect(identityDirStat.isDirectory()).toBe(true);
   });
 
-  it("writes KAIJIBOT_TZ into .env when given a real IANA timezone", async () => {
+  it("writes ALLBOT_TZ into .env when given a real IANA timezone", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_TZ: "Asia/Shanghai",
+      ALLBOT_TZ: "Asia/Shanghai",
     });
 
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("KAIJIBOT_TZ=Asia/Shanghai");
+    expect(envFile).toContain("ALLBOT_TZ=Asia/Shanghai");
   });
 
   it("precreates agent data dirs to avoid EACCES in container", async () => {
@@ -307,8 +307,8 @@ describe("scripts/docker/setup.sh", () => {
     const workspaceDir = join(activeSandbox.rootDir, "workspace-agent-dirs");
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_CONFIG_DIR: configDir,
-      KAIJIBOT_WORKSPACE_DIR: workspaceDir,
+      ALLBOT_CONFIG_DIR: configDir,
+      ALLBOT_WORKSPACE_DIR: workspaceDir,
     });
 
     expect(result.status).toBe(0);
@@ -323,31 +323,31 @@ describe("scripts/docker/setup.sh", () => {
     const onboardIdx = log.indexOf("onboard");
     expect(chownIdx).toBeGreaterThanOrEqual(0);
     expect(onboardIdx).toBeGreaterThan(chownIdx);
-    expect(log).toContain("run --rm --no-deps --user root --entrypoint sh kaijibot-gateway -c");
+    expect(log).toContain("run --rm --no-deps --user root --entrypoint sh allbot-gateway -c");
   });
 
-  it("reuses existing config token when KAIJIBOT_GATEWAY_TOKEN is unset", async () => {
+  it("reuses existing config token when ALLBOT_GATEWAY_TOKEN is unset", async () => {
     const activeSandbox = requireSandbox(sandbox);
     const { result, envFile } = await runDockerSetupWithUnsetGatewayToken(
       activeSandbox,
       "token-reuse",
       async (configDir) => {
         await writeFile(
-          join(configDir, "kaijibot.json"),
+          join(configDir, "allbot.json"),
           JSON.stringify({ gateway: { auth: { mode: "token", token: "config-token-123" } } }),
         );
       },
     );
 
     expect(result.status).toBe(0);
-    expect(envFile).toContain("KAIJIBOT_GATEWAY_TOKEN=config-token-123"); // pragma: allowlist secret
+    expect(envFile).toContain("ALLBOT_GATEWAY_TOKEN=config-token-123"); // pragma: allowlist secret
   });
 
-  it("reuses existing .env token when KAIJIBOT_GATEWAY_TOKEN and config token are unset", async () => {
+  it("reuses existing .env token when ALLBOT_GATEWAY_TOKEN and config token are unset", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await writeFile(
       join(activeSandbox.rootDir, ".env"),
-      "KAIJIBOT_GATEWAY_TOKEN=dotenv-token-123\nKAIJIBOT_GATEWAY_PORT=18789\n", // pragma: allowlist secret
+      "ALLBOT_GATEWAY_TOKEN=dotenv-token-123\nALLBOT_GATEWAY_PORT=18789\n", // pragma: allowlist secret
     );
     const { result, envFile } = await runDockerSetupWithUnsetGatewayToken(
       activeSandbox,
@@ -355,7 +355,7 @@ describe("scripts/docker/setup.sh", () => {
     );
 
     expect(result.status).toBe(0);
-    expect(envFile).toContain("KAIJIBOT_GATEWAY_TOKEN=dotenv-token-123"); // pragma: allowlist secret
+    expect(envFile).toContain("ALLBOT_GATEWAY_TOKEN=dotenv-token-123"); // pragma: allowlist secret
     expect(result.stderr).toBe("");
   });
 
@@ -364,9 +364,9 @@ describe("scripts/docker/setup.sh", () => {
     await writeFile(
       join(activeSandbox.rootDir, ".env"),
       [
-        "KAIJIBOT_GATEWAY_TOKEN=",
-        "KAIJIBOT_GATEWAY_TOKEN=first-token",
-        "KAIJIBOT_GATEWAY_TOKEN=last=token=value\r", // pragma: allowlist secret
+        "ALLBOT_GATEWAY_TOKEN=",
+        "ALLBOT_GATEWAY_TOKEN=first-token",
+        "ALLBOT_GATEWAY_TOKEN=last=token=value\r", // pragma: allowlist secret
       ].join("\n"),
     );
     const { result, envFile } = await runDockerSetupWithUnsetGatewayToken(
@@ -375,26 +375,26 @@ describe("scripts/docker/setup.sh", () => {
     );
 
     expect(result.status).toBe(0);
-    expect(envFile).toContain("KAIJIBOT_GATEWAY_TOKEN=last=token=value"); // pragma: allowlist secret
-    expect(envFile).not.toContain("KAIJIBOT_GATEWAY_TOKEN=first-token");
+    expect(envFile).toContain("ALLBOT_GATEWAY_TOKEN=last=token=value"); // pragma: allowlist secret
+    expect(envFile).not.toContain("ALLBOT_GATEWAY_TOKEN=first-token");
     expect(envFile).not.toContain("\r");
   });
 
-  it("treats KAIJIBOT_SANDBOX=0 as disabled", async () => {
+  it("treats ALLBOT_SANDBOX=0 as disabled", async () => {
     const activeSandbox = requireSandbox(sandbox);
     await resetDockerLog(activeSandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_SANDBOX: "0",
+      ALLBOT_SANDBOX: "0",
     });
 
     expect(result.status).toBe(0);
     const envFile = await readFile(join(activeSandbox.rootDir, ".env"), "utf8");
-    expect(envFile).toContain("KAIJIBOT_SANDBOX=");
+    expect(envFile).toContain("ALLBOT_SANDBOX=");
 
     const log = await readDockerLog(activeSandbox);
-    expect(log).toContain("--build-arg KAIJIBOT_INSTALL_DOCKER_CLI=");
-    expect(log).not.toContain("--build-arg KAIJIBOT_INSTALL_DOCKER_CLI=1");
+    expect(log).toContain("--build-arg ALLBOT_INSTALL_DOCKER_CLI=");
+    expect(log).not.toContain("--build-arg ALLBOT_INSTALL_DOCKER_CLI=1");
     expect(log).toContain("config set agents.defaults.sandbox.mode off");
   });
 
@@ -403,12 +403,12 @@ describe("scripts/docker/setup.sh", () => {
     await resetDockerLog(activeSandbox);
     await writeFile(
       join(activeSandbox.rootDir, "docker-compose.sandbox.yml"),
-      "services:\n  kaijibot-gateway:\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n",
+      "services:\n  allbot-gateway:\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n",
     );
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_SANDBOX: "1",
-      DOCKER_STUB_FAIL_MATCH: "--entrypoint docker kaijibot-gateway --version",
+      ALLBOT_SANDBOX: "1",
+      DOCKER_STUB_FAIL_MATCH: "--entrypoint docker allbot-gateway --version",
     });
 
     expect(result.status).toBe(0);
@@ -425,8 +425,8 @@ describe("scripts/docker/setup.sh", () => {
 
     await withUnixSocket(socketPath, async () => {
       const result = runDockerSetup(activeSandbox, {
-        KAIJIBOT_SANDBOX: "1",
-        KAIJIBOT_DOCKER_SOCKET: socketPath,
+        ALLBOT_SANDBOX: "1",
+        ALLBOT_DOCKER_SOCKET: socketPath,
         DOCKER_STUB_FAIL_MATCH: "config set agents.defaults.sandbox.scope",
       });
 
@@ -440,12 +440,12 @@ describe("scripts/docker/setup.sh", () => {
       );
       expect(gatewayStarts).toHaveLength(2);
       expect(log).toContain(
-        "run --rm --no-deps kaijibot-cli config set agents.defaults.sandbox.mode non-main",
+        "run --rm --no-deps allbot-cli config set agents.defaults.sandbox.mode non-main",
       );
       expect(log).toContain("config set agents.defaults.sandbox.mode off");
       const forceRecreateLine = log
         .split("\n")
-        .find((line) => line.includes("up -d --force-recreate kaijibot-gateway"));
+        .find((line) => line.includes("up -d --force-recreate allbot-gateway"));
       expect(forceRecreateLine).toBeDefined();
       expect(forceRecreateLine).not.toContain("docker-compose.sandbox.yml");
       await expect(
@@ -454,48 +454,48 @@ describe("scripts/docker/setup.sh", () => {
     });
   });
 
-  it("rejects injected multiline KAIJIBOT_EXTRA_MOUNTS values", async () => {
+  it("rejects injected multiline ALLBOT_EXTRA_MOUNTS values", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_EXTRA_MOUNTS: "/tmp:/tmp\n  evil-service:\n    image: alpine",
+      ALLBOT_EXTRA_MOUNTS: "/tmp:/tmp\n  evil-service:\n    image: alpine",
     });
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("KAIJIBOT_EXTRA_MOUNTS cannot contain control characters");
+    expect(result.stderr).toContain("ALLBOT_EXTRA_MOUNTS cannot contain control characters");
   });
 
-  it("rejects invalid KAIJIBOT_EXTRA_MOUNTS mount format", async () => {
+  it("rejects invalid ALLBOT_EXTRA_MOUNTS mount format", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_EXTRA_MOUNTS: "bad mount spec",
+      ALLBOT_EXTRA_MOUNTS: "bad mount spec",
     });
 
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("Invalid mount format");
   });
 
-  it("rejects invalid KAIJIBOT_HOME_VOLUME names", async () => {
+  it("rejects invalid ALLBOT_HOME_VOLUME names", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_HOME_VOLUME: "bad name",
+      ALLBOT_HOME_VOLUME: "bad name",
     });
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("KAIJIBOT_HOME_VOLUME must match");
+    expect(result.stderr).toContain("ALLBOT_HOME_VOLUME must match");
   });
 
-  it("rejects KAIJIBOT_TZ values that are not present in zoneinfo", async () => {
+  it("rejects ALLBOT_TZ values that are not present in zoneinfo", async () => {
     const activeSandbox = requireSandbox(sandbox);
 
     const result = runDockerSetup(activeSandbox, {
-      KAIJIBOT_TZ: "Nope/Bad",
+      ALLBOT_TZ: "Nope/Bad",
     });
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("KAIJIBOT_TZ must match a timezone in /usr/share/zoneinfo");
+    expect(result.stderr).toContain("ALLBOT_TZ must match a timezone in /usr/share/zoneinfo");
   });
 
   it("avoids associative arrays so the script remains Bash 3.2-compatible", async () => {
@@ -536,19 +536,19 @@ describe("scripts/docker/setup.sh", () => {
 
   it("keeps docker-compose CLI network namespace settings in sync", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
-    expect(compose).toContain('network_mode: "service:kaijibot-gateway"');
-    expect(compose).toContain("depends_on:\n      - kaijibot-gateway");
+    expect(compose).toContain('network_mode: "service:allbot-gateway"');
+    expect(compose).toContain("depends_on:\n      - allbot-gateway");
   });
 
   it("keeps docker-compose gateway token env defaults aligned across services", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
-    expect(compose.match(/KAIJIBOT_GATEWAY_TOKEN: \$\{KAIJIBOT_GATEWAY_TOKEN:-\}/g)).toHaveLength(
+    expect(compose.match(/ALLBOT_GATEWAY_TOKEN: \$\{ALLBOT_GATEWAY_TOKEN:-\}/g)).toHaveLength(
       2,
     );
   });
 
   it("keeps docker-compose timezone env defaults aligned across services", async () => {
     const compose = await readFile(join(repoRoot, "docker-compose.yml"), "utf8");
-    expect(compose.match(/TZ: \$\{KAIJIBOT_TZ:-UTC\}/g)).toHaveLength(2);
+    expect(compose.match(/TZ: \$\{ALLBOT_TZ:-UTC\}/g)).toHaveLength(2);
   });
 });

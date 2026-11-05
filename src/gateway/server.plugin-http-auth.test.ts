@@ -119,10 +119,10 @@ function createProtectedPluginAuthOverrides(handlePluginRequest: PluginRequestHa
   };
 }
 
-// Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
 describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
   test("applies default security headers and optional strict transport security", async () => {
-    await withGatewayTempConfig("kaijibot-plugin-http-security-headers-test-", async () => {
+    await withGatewayTempConfig("allbot-plugin-http-security-headers-test-", async () => {
       const withoutHsts = createTestGatewayServer({ resolvedAuth: AUTH_NONE });
       const withoutHstsResponse = await sendRequest(withoutHsts, { path: "/missing" });
       expect(withoutHstsResponse.setHeader).toHaveBeenCalledWith(
@@ -151,7 +151,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
 
   test("serves unauthenticated liveness/readiness probe routes when no other route handles them", async () => {
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-probes-test-",
+      prefix: "allbot-plugin-http-probes-test-",
       resolvedAuth: AUTH_TOKEN,
       run: async (server) => {
         await expectProbeRoutesHealthy(server);
@@ -163,7 +163,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     const handlePluginRequest = createHealthzPluginHandler();
 
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-probes-shadow-test-",
+      prefix: "allbot-plugin-http-probes-shadow-test-",
       resolvedAuth: AUTH_NONE,
       overrides: { handlePluginRequest },
       run: async (server) => {
@@ -174,7 +174,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
 
   test("rejects non-GET/HEAD methods on probe routes", async () => {
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-probes-method-test-",
+      prefix: "allbot-plugin-http-probes-method-test-",
       resolvedAuth: AUTH_NONE,
       run: async (server) => {
         const postResponse = await sendRequest(server, { path: "/healthz", method: "POST" });
@@ -214,7 +214,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-auth-test-",
+      prefix: "allbot-plugin-http-auth-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: {
         handlePluginRequest,
@@ -284,7 +284,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
           trustedProxies: ["203.0.113.10"],
         },
       },
-      prefix: "kaijibot-plugin-http-runtime-scope-trusted-proxy-test-",
+      prefix: "allbot-plugin-http-runtime-scope-trusted-proxy-test-",
       run: async () => {
         const server = createTestGatewayServer({
           resolvedAuth: {
@@ -308,7 +308,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
             headers: {
               "x-forwarded-user": "operator",
               "x-forwarded-for": "198.51.100.20",
-              "x-kaijibot-scopes": "operator.read",
+              "x-allbot-scopes": "operator.read",
             },
           }),
           response.res,
@@ -354,7 +354,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-runtime-scope-bearer-test-",
+      prefix: "allbot-plugin-http-runtime-scope-bearer-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: {
         handlePluginRequest,
@@ -368,7 +368,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
             path: "/secure-hook",
             authorization: "Bearer test-token",
             headers: {
-              "x-kaijibot-scopes": "operator.read",
+              "x-allbot-scopes": "operator.read",
             },
           }),
           response.res,
@@ -383,7 +383,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     expect(writeAllowedResults).toEqual([true]);
   });
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   test.skipIf(process.env.CI)(
     "allows unauthenticated Mattermost slash callback routes while keeping other channel routes protected",
     async () => {
@@ -404,7 +404,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
 
       await withTempConfig({
         cfg: createMattermostCallbackConfig("/api/channels/mattermost/command"),
-        prefix: "kaijibot-plugin-http-auth-mm-callback-",
+        prefix: "allbot-plugin-http-auth-mm-callback-",
         run: async () => {
           const server = createTestGatewayServer({
             resolvedAuth: AUTH_TOKEN,
@@ -428,7 +428,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     },
   );
 
-  // Skip on CI: requires upstream-only channels/plugins not bundled in KaijiBot
+  // Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
   test.skipIf(process.env.CI)(
     "does not bypass auth when mattermost callbackPath points to non-mattermost channel routes",
     async () => {
@@ -444,7 +444,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
 
       await withTempConfig({
         cfg: createMattermostCallbackConfig("/api/channels/nostr/default/profile"),
-        prefix: "kaijibot-plugin-http-auth-mm-misconfig-",
+        prefix: "allbot-plugin-http-auth-mm-misconfig-",
         run: async () => {
           const server = createTestGatewayServer({
             resolvedAuth: AUTH_TOKEN,
@@ -477,7 +477,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-auth-wildcard-handler-test-",
+      prefix: "allbot-plugin-http-auth-wildcard-handler-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: {
         handlePluginRequest,
@@ -516,7 +516,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-auth-wildcard-default-test-",
+      prefix: "allbot-plugin-http-auth-wildcard-default-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: { handlePluginRequest },
       run: async (server) => {
@@ -571,7 +571,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withRootMountedControlUiServer({
-      prefix: "kaijibot-plugin-http-control-ui-precedence-test-",
+      prefix: "allbot-plugin-http-control-ui-precedence-test-",
       handlePluginRequest,
       run: async (server) => {
         const response = await sendRequest(server, {
@@ -598,7 +598,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withRootMountedControlUiServer({
-      prefix: "kaijibot-plugin-http-control-ui-webhook-post-test-",
+      prefix: "allbot-plugin-http-control-ui-webhook-post-test-",
       handlePluginRequest,
       run: async (server) => {
         const response = await sendRequest(server, {
@@ -626,7 +626,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withRootMountedControlUiServer({
-      prefix: "kaijibot-plugin-http-control-ui-shadow-test-",
+      prefix: "allbot-plugin-http-control-ui-shadow-test-",
       handlePluginRequest,
       run: async (server) => {
         const response = await sendRequest(server, { path: "/my-plugin/inbound" });
@@ -642,7 +642,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     const handlePluginRequest = vi.fn(async () => false);
 
     await withRootMountedControlUiServer({
-      prefix: "kaijibot-plugin-http-control-ui-fallthrough-test-",
+      prefix: "allbot-plugin-http-control-ui-fallthrough-test-",
       handlePluginRequest,
       run: async (server) => {
         const response = await sendRequest(server, { path: "/chat" });
@@ -658,7 +658,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     const handlePluginRequest = vi.fn(async () => false);
 
     await withRootMountedControlUiServer({
-      prefix: "kaijibot-plugin-http-control-ui-probes-test-",
+      prefix: "allbot-plugin-http-control-ui-probes-test-",
       handlePluginRequest,
       run: async (server) => {
         await expectProbeRoutesHealthy(server);
@@ -671,7 +671,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     const handlePluginRequest = createHealthzPluginHandler();
 
     await withRootMountedControlUiServer({
-      prefix: "kaijibot-plugin-http-control-ui-probe-shadow-test-",
+      prefix: "allbot-plugin-http-control-ui-probe-shadow-test-",
       handlePluginRequest,
       run: async (server) => {
         await expectHealthzPluginShadow({ server, handlePluginRequest });
@@ -683,7 +683,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     const handlePluginRequest = createCanonicalizedChannelPluginHandler();
 
     await withPluginGatewayServer({
-      prefix: "kaijibot-plugin-http-auth-canonicalized-test-",
+      prefix: "allbot-plugin-http-auth-canonicalized-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: createProtectedPluginAuthOverrides(handlePluginRequest),
       run: async (server) => {
@@ -704,7 +704,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     const handlePluginRequest = createCanonicalizedChannelPluginHandler();
 
     await withPluginGatewayServer({
-      prefix: "kaijibot-plugin-http-auth-fuzz-corpus-test-",
+      prefix: "allbot-plugin-http-auth-fuzz-corpus-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: createProtectedPluginAuthOverrides(handlePluginRequest),
       run: async (server) => {
@@ -729,7 +729,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
     });
 
     await withGatewayServer({
-      prefix: "kaijibot-plugin-http-auth-encoded-order-test-",
+      prefix: "allbot-plugin-http-auth-encoded-order-test-",
       resolvedAuth: AUTH_TOKEN,
       overrides: { handlePluginRequest },
       run: async (server) => {
@@ -742,7 +742,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
   test.each(["0.0.0.0", "::"])(
     "returns 404 (not 500) for non-hook routes with hooks enabled and bindHost=%s",
     async (bindHost) => {
-      await withGatewayTempConfig("kaijibot-plugin-http-hooks-bindhost-", async () => {
+      await withGatewayTempConfig("allbot-plugin-http-hooks-bindhost-", async () => {
         const handleHooksRequest = createHooksHandler(bindHost);
         const server = createTestGatewayServer({
           resolvedAuth: AUTH_NONE,
@@ -758,7 +758,7 @@ describe.skipIf(process.env.CI)("gateway plugin HTTP auth boundary", () => {
   );
 
   test("rejects query-token hooks requests with bindHost=::", async () => {
-    await withGatewayTempConfig("kaijibot-plugin-http-hooks-query-token-", async () => {
+    await withGatewayTempConfig("allbot-plugin-http-hooks-query-token-", async () => {
       const handleHooksRequest = createHooksHandler("::");
       const server = createTestGatewayServer({
         resolvedAuth: AUTH_NONE,

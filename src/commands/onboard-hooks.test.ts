@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import type { HookStatusEntry, HookStatusReport } from "../hooks/hooks-status.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
@@ -57,7 +57,7 @@ describe("onboard-hooks", () => {
       ? undefined
       : "missing requirements") as HookStatusEntry["blockedReason"],
     ...params,
-    source: "kaijibot-bundled" as const,
+    source: "allbot-bundled" as const,
     pluginId: undefined,
     homepage: undefined,
     always: false,
@@ -85,7 +85,7 @@ describe("onboard-hooks", () => {
 
   const createMockHookReport = (eligible = true): HookStatusReport => ({
     workspaceDir: "/mock/workspace",
-    managedHooksDir: "/mock/.kaijibot/hooks",
+    managedHooksDir: "/mock/.allbot/hooks",
     hooks: [
       createMockHook(
         {
@@ -116,7 +116,7 @@ describe("onboard-hooks", () => {
     ],
   });
 
-  async function runSetupInternalHooks(params: { cfg?: KaijiBotConfig; eligible?: boolean }) {
+  async function runSetupInternalHooks(params: { cfg?: AllBotConfig; eligible?: boolean }) {
     const { buildWorkspaceHookStatus } = await import("../hooks/hooks-status.js");
     vi.mocked(buildWorkspaceHookStatus).mockReturnValue(
       createMockHookReport(params.eligible ?? true),
@@ -150,7 +150,7 @@ describe("onboard-hooks", () => {
     });
 
     it("preserves existing hooks config", async () => {
-      const cfg: KaijiBotConfig = {
+      const cfg: AllBotConfig = {
         hooks: {
           enabled: true,
           path: "/webhook",

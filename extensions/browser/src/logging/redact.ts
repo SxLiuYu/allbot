@@ -1,1 +1,1 @@
-export { redactSensitiveText } from "kaijibot/plugin-sdk/browser-security-runtime";
+export { redactSensitiveText } from "allbot/plugin-sdk/browser-security-runtime";

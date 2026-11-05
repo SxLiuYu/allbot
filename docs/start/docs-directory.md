@@ -1,5 +1,5 @@
 ---
-summary: "Curated links to the most used KaijiBot docs."
+summary: "Curated links to the most used AllBot docs."
 read_when:
   - You want quick access to key docs pages
 title: "Docs directory"
@@ -23,7 +23,7 @@ For a complete map of the docs, see [Docs hubs](/start/hubs).
 - [Updating and rollback](/install/updating)
 - [Pairing (DM and nodes)](/channels/pairing)
 - [Nix mode](/install/nix)
-- [KaijiBot assistant setup](/start/kaijibot)
+- [AllBot assistant setup](/start/allbot)
 - [Skills](/tools/skills)
 - [Skills config](/tools/skills-config)
 - [Workspace templates](/reference/templates/AGENTS)

@@ -8,7 +8,7 @@ title: "Camera Capture"
 
 # Camera capture (agent)
 
-KaijiBot supports **camera capture** for agent workflows:
+AllBot supports **camera capture** for agent workflows:
 
 - **iOS node** (paired via Gateway): capture a **photo** (`jpg`) or **short video clip** (`mp4`, with optional audio) via `node.invoke`.
 - **Android node** (paired via Gateway): capture a **photo** (`jpg`) or **short video clip** (`mp4`, with optional audio) via `node.invoke`.
@@ -68,10 +68,10 @@ The easiest way to get attachments is via the CLI helper, which writes decoded m
 Examples:
 
 ```bash
-kaijibot nodes camera snap --node <id>               # default: both front + back (2 MEDIA lines)
-kaijibot nodes camera snap --node <id> --facing front
-kaijibot nodes camera clip --node <id> --duration 3000
-kaijibot nodes camera clip --node <id> --no-audio
+allbot nodes camera snap --node <id>               # default: both front + back (2 MEDIA lines)
+allbot nodes camera snap --node <id> --facing front
+allbot nodes camera clip --node <id> --duration 3000
+allbot nodes camera clip --node <id> --no-audio
 ```
 
 Notes:
@@ -116,31 +116,31 @@ Photos are recompressed to keep the base64 payload under 5 MB.
 
 The macOS companion app exposes a checkbox:
 
-- **Settings → General → Allow Camera** (`kaijibot.cameraEnabled`)
+- **Settings → General → Allow Camera** (`allbot.cameraEnabled`)
   - Default: **off**
   - When off: camera requests return “Camera disabled by user”.
 
 ### CLI helper (node invoke)
 
-Use the main `kaijibot` CLI to invoke camera commands on the macOS node.
+Use the main `allbot` CLI to invoke camera commands on the macOS node.
 
 Examples:
 
 ```bash
-kaijibot nodes camera list --node <id>            # list camera ids
-kaijibot nodes camera snap --node <id>            # prints MEDIA:<path>
-kaijibot nodes camera snap --node <id> --max-width 1280
-kaijibot nodes camera snap --node <id> --delay-ms 2000
-kaijibot nodes camera snap --node <id> --device-id <id>
-kaijibot nodes camera clip --node <id> --duration 10s          # prints MEDIA:<path>
-kaijibot nodes camera clip --node <id> --duration-ms 3000      # prints MEDIA:<path> (legacy flag)
-kaijibot nodes camera clip --node <id> --device-id <id>
-kaijibot nodes camera clip --node <id> --no-audio
+allbot nodes camera list --node <id>            # list camera ids
+allbot nodes camera snap --node <id>            # prints MEDIA:<path>
+allbot nodes camera snap --node <id> --max-width 1280
+allbot nodes camera snap --node <id> --delay-ms 2000
+allbot nodes camera snap --node <id> --device-id <id>
+allbot nodes camera clip --node <id> --duration 10s          # prints MEDIA:<path>
+allbot nodes camera clip --node <id> --duration-ms 3000      # prints MEDIA:<path> (legacy flag)
+allbot nodes camera clip --node <id> --device-id <id>
+allbot nodes camera clip --node <id> --no-audio
 ```
 
 Notes:
 
-- `kaijibot nodes camera snap` defaults to `maxWidth=1600` unless overridden.
+- `allbot nodes camera snap` defaults to `maxWidth=1600` unless overridden.
 - On macOS, `camera.snap` waits `delayMs` (default 2000ms) after warm-up/exposure settle before capturing.
 - Photo payloads are recompressed to keep base64 under 5 MB.
 
@@ -154,7 +154,7 @@ Notes:
 For _screen_ video (not camera), use the macOS companion:
 
 ```bash
-kaijibot nodes screen record --node <id> --duration 10s --fps 15   # prints MEDIA:<path>
+allbot nodes screen record --node <id> --duration 10s --fps 15   # prints MEDIA:<path>
 ```
 
 Notes:

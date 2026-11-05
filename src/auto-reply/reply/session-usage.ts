@@ -4,7 +4,7 @@ import {
   hasNonzeroUsage,
   type NormalizedUsage,
 } from "../../agents/usage.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/config.js";
 import {
   type SessionSystemPromptReport,
@@ -52,7 +52,7 @@ function resolveNonNegativeNumber(value: number | undefined): number | undefined
 }
 
 function estimateSessionRunCostUsd(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   usage?: NormalizedUsage;
   providerUsed?: string;
   modelUsed?: string;
@@ -71,7 +71,7 @@ function estimateSessionRunCostUsd(params: {
 export async function persistSessionUsageUpdate(params: {
   storePath?: string;
   sessionKey?: string;
-  cfg?: KaijiBotConfig;
+  cfg?: AllBotConfig;
   usage?: NormalizedUsage;
   /**
    * Usage from the last individual API call (not accumulated). When provided,

@@ -1,7 +1,7 @@
 ---
 summary: "Windows support: native and WSL2 install paths, daemon, and current caveats"
 read_when:
-  - Installing KaijiBot on Windows
+  - Installing AllBot on Windows
   - Choosing between native Windows and WSL2
   - Looking for Windows companion app status
 title: "Windows"
@@ -9,7 +9,7 @@ title: "Windows"
 
 # Windows
 
-KaijiBot supports both **native Windows** and **WSL2**. WSL2 is the more
+AllBot supports both **native Windows** and **WSL2**. WSL2 is the more
 stable path and recommended for the full experience — the CLI, Gateway, and
 tooling run inside Linux with full compatibility. Native Windows works for
 core CLI and Gateway use, with some caveats noted below.
@@ -29,33 +29,33 @@ Native Windows CLI flows are improving, but WSL2 is still the recommended path.
 What works well on native Windows today:
 
 - website installer via `install.ps1`
-- local CLI use such as `kaijibot --version`, `kaijibot doctor`, and `kaijibot plugins list --json`
+- local CLI use such as `allbot --version`, `allbot doctor`, and `allbot plugins list --json`
 - embedded local-agent/provider smoke such as:
 
 ```powershell
-kaijibot agent --local --agent main --thinking low -m "Reply with exactly WINDOWS-HATCH-OK."
+allbot agent --local --agent main --thinking low -m "Reply with exactly WINDOWS-HATCH-OK."
 ```
 
 Current caveats:
 
-- `kaijibot onboard --non-interactive` still expects a reachable local gateway unless you pass `--skip-health`
-- `kaijibot onboard --non-interactive --install-daemon` and `kaijibot gateway install` try Windows Scheduled Tasks first
-- if Scheduled Task creation is denied, KaijiBot falls back to a per-user Startup-folder login item and starts the gateway immediately
-- if `schtasks` itself wedges or stops responding, KaijiBot now aborts that path quickly and falls back instead of hanging forever
+- `allbot onboard --non-interactive` still expects a reachable local gateway unless you pass `--skip-health`
+- `allbot onboard --non-interactive --install-daemon` and `allbot gateway install` try Windows Scheduled Tasks first
+- if Scheduled Task creation is denied, AllBot falls back to a per-user Startup-folder login item and starts the gateway immediately
+- if `schtasks` itself wedges or stops responding, AllBot now aborts that path quickly and falls back instead of hanging forever
 - Scheduled Tasks are still preferred when available because they provide better supervisor status
 
 If you want the native CLI only, without gateway service install, use one of these:
 
 ```powershell
-kaijibot onboard --non-interactive --skip-health
-kaijibot gateway run
+allbot onboard --non-interactive --skip-health
+allbot gateway run
 ```
 
 If you do want managed startup on native Windows:
 
 ```powershell
-kaijibot gateway install
-kaijibot gateway status --json
+allbot gateway install
+allbot gateway status --json
 ```
 
 If Scheduled Task creation is blocked, the fallback service mode still auto-starts after login through the current user's Startup folder.
@@ -70,19 +70,19 @@ If Scheduled Task creation is blocked, the fallback service mode still auto-star
 Inside WSL2:
 
 ```
-kaijibot onboard --install-daemon
+allbot onboard --install-daemon
 ```
 
 Or:
 
 ```
-kaijibot gateway install
+allbot gateway install
 ```
 
 Or:
 
 ```
-kaijibot configure
+allbot configure
 ```
 
 Select **Gateway service** when prompted.
@@ -90,7 +90,7 @@ Select **Gateway service** when prompted.
 Repair/migrate:
 
 ```
-kaijibot doctor
+allbot doctor
 ```
 
 ## Gateway auto-start before Windows login
@@ -106,12 +106,12 @@ Inside WSL:
 sudo loginctl enable-linger "$(whoami)"
 ```
 
-### 2) Install the KaijiBot gateway user service
+### 2) Install the AllBot gateway user service
 
 Inside WSL:
 
 ```bash
-kaijibot gateway install
+allbot gateway install
 ```
 
 ### 3) Start WSL automatically at Windows boot
@@ -133,8 +133,8 @@ wsl --list --verbose
 After a reboot (before Windows sign-in), check from WSL:
 
 ```bash
-systemctl --user is-enabled kaijibot-gateway.service
-systemctl --user status kaijibot-gateway.service --no-pager
+systemctl --user is-enabled allbot-gateway.service
+systemctl --user status allbot-gateway.service --no-pager
 ```
 
 ## Advanced: expose WSL services over LAN (portproxy)
@@ -177,7 +177,7 @@ Notes:
 
 - SSH from another machine targets the **Windows host IP** (example: `ssh user@windows-host -p 2222`).
 - Remote nodes must point at a **reachable** Gateway URL (not `127.0.0.1`); use
-  `kaijibot status --all` to confirm.
+  `allbot status --all` to confirm.
 - Use `listenaddress=0.0.0.0` for LAN access; `127.0.0.1` keeps it local only.
 - If you want this automatic, register a Scheduled Task to run the refresh
   step at login.
@@ -220,17 +220,17 @@ Re-open Ubuntu, then verify:
 systemctl --user status
 ```
 
-### 3) Install KaijiBot (inside WSL)
+### 3) Install AllBot (inside WSL)
 
 Follow the Linux Getting Started flow inside WSL:
 
 ```bash
-git clone https://github.com/kaijibot/kaijibot.git
-cd kaijibot
+git clone https://github.com/allbot/allbot.git
+cd allbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
 pnpm build
-kaijibot onboard
+allbot onboard
 ```
 
 Full guide: [Getting Started](/start/getting-started)

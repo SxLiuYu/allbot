@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { createSuiteTempRootTracker } from "../test-helpers/temp-dir.js";
 import { withEnvAsync } from "../test-utils/env.js";
 import {
@@ -13,9 +13,9 @@ import {
 } from "./session-cost-usage.js";
 
 describe("session cost usage", () => {
-  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "kaijibot-session-cost-" });
+  const suiteRootTracker = createSuiteTempRootTracker({ prefix: "allbot-session-cost-" });
   const withStateDir = async <T>(stateDir: string, fn: () => Promise<T>): Promise<T> =>
-    await withEnvAsync({ KAIJIBOT_STATE_DIR: stateDir }, fn);
+    await withEnvAsync({ ALLBOT_STATE_DIR: stateDir }, fn);
   const makeSessionCostRoot = async (prefix: string): Promise<string> =>
     await suiteRootTracker.make(prefix);
 
@@ -111,7 +111,7 @@ describe("session cost usage", () => {
           },
         },
       },
-    } as unknown as KaijiBotConfig;
+    } as unknown as AllBotConfig;
 
     await withStateDir(root, async () => {
       const summary = await loadCostUsageSummary({ days: 30, config });

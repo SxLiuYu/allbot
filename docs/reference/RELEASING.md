@@ -8,11 +8,11 @@ read_when:
 
 # Release Policy
 
-KaijiBot ships on two public release lanes:
+AllBot ships on two public release lanes:
 
-- **npm** (`kaijibot`, dist-tag `latest`): the install target for
-  `npm install -g kaijibot`
-- **GitHub Releases**: the `kaijibot-<version>.tgz` tarball attached to each
+- **npm** (`allbot`, dist-tag `latest`): the install target for
+  `npm install -g allbot`
+- **GitHub Releases**: the `allbot-<version>.tgz` tarball attached to each
   tag — the Android/Termux install script downloads this instead of npmjs.org
   for China network reliability. A separate `launcher` tag carries the Android
   Launcher APK, rebuilt on `android/**` changes.
@@ -50,7 +50,7 @@ publish to npm itself — the git tag drives everything in CI:
     attaches it to the GitHub Release for that tag.
 
 npm trusted publishing is registered for this package (repository
-`Kaiji-Z/kaijibot`, workflow filename `publish-tarball.yml`) and the package's
+`Kaiji-Z/allbot`, workflow filename `publish-tarball.yml`) and the package's
 publishing access is set to "Require 2FA and disallow tokens" — token-based
 publishing is rejected by the registry, so the CI workflow is the only
 automated publish path. Provenance attestations are signed automatically

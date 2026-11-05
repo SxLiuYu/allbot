@@ -12,7 +12,7 @@ import {
   resolveAgentWorkspaceDir,
   resolveDefaultAgentId,
 } from "../../agents/agent-scope.js";
-import type { KaijiBotConfig } from "../../config/config.js";
+import type { AllBotConfig } from "../../config/config.js";
 import {
   normalizeLowercaseStringOrEmpty,
   normalizeOptionalLowercaseString,
@@ -24,7 +24,7 @@ import type {
 import type { ConfiguredBindingConsumer } from "./configured-binding-consumers.js";
 import type { ChannelConfiguredBindingConversationRef } from "./types.adapters.js";
 
-function resolveAgentRuntimeAcpDefaults(params: { cfg: KaijiBotConfig; ownerAgentId: string }): {
+function resolveAgentRuntimeAcpDefaults(params: { cfg: AllBotConfig; ownerAgentId: string }): {
   acpAgentId?: string;
   mode?: string;
   cwd?: string;
@@ -46,7 +46,7 @@ function resolveAgentRuntimeAcpDefaults(params: { cfg: KaijiBotConfig; ownerAgen
 }
 
 function resolveConfiguredBindingWorkspaceCwd(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   agentId: string;
 }): string | undefined {
   const explicitAgentWorkspace = normalizeText(
@@ -90,7 +90,7 @@ function buildConfiguredAcpSpec(params: {
 }
 
 function buildAcpTargetFactory(params: {
-  cfg: KaijiBotConfig;
+  cfg: AllBotConfig;
   binding: ConfiguredBindingRuleConfig;
   channel: string;
   agentId: string;

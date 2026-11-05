@@ -1,5 +1,5 @@
 ---
-summary: "How KaijiBot summarizes long conversations to stay within model limits"
+summary: "How AllBot summarizes long conversations to stay within model limits"
 read_when:
   - You want to understand auto-compaction and /compact
   - You are debugging long sessions hitting context limits
@@ -9,7 +9,7 @@ title: "Compaction"
 # Compaction
 
 Every model has a context window -- the maximum number of tokens it can process.
-When a conversation approaches that limit, KaijiBot **compacts** older messages
+When a conversation approaches that limit, AllBot **compacts** older messages
 into a summary so the chat can continue.
 
 ## How it works
@@ -18,9 +18,9 @@ into a summary so the chat can continue.
 2. The summary is saved in the session transcript.
 3. Recent messages are kept intact.
 
-When KaijiBot splits history into compaction chunks, it keeps assistant tool
+When AllBot splits history into compaction chunks, it keeps assistant tool
 calls paired with their matching `toolResult` entries. If a split point lands
-inside a tool block, KaijiBot moves the boundary so the pair stays together and
+inside a tool block, AllBot moves the boundary so the pair stays together and
 the current unsummarized tail is preserved.
 
 The full conversation history stays on disk. Compaction only changes what the
@@ -30,18 +30,18 @@ model sees on the next turn.
 
 Auto-compaction is on by default. It runs when the session nears the context
 limit, or when the model returns a context-overflow error (in which case
-KaijiBot compacts and retries). Typical overflow signatures include
+AllBot compacts and retries). Typical overflow signatures include
 `request_too_large`, `context length exceeded`, `input exceeds the maximum
 number of tokens`, `input token count exceeds the maximum number of input
 tokens`, `input is too long for the model`, and `ollama error: context length
 exceeded`.
 
 <Info>
-Before compacting, KaijiBot automatically reminds the agent to save important
+Before compacting, AllBot automatically reminds the agent to save important
 notes to [memory](/concepts/memory) files. This prevents context loss.
 </Info>
 
-Use the `agents.defaults.compaction` setting in your `kaijibot.json` to configure compaction behavior (mode, target tokens, etc.).
+Use the `agents.defaults.compaction` setting in your `allbot.json` to configure compaction behavior (mode, target tokens, etc.).
 Compaction summarization preserves opaque identifiers by default (`identifierPolicy: "strict"`). You can override this with `identifierPolicy: "off"` or provide custom text with `identifierPolicy: "custom"` and `identifierInstructions`.
 
 You can optionally specify a different model for compaction summarization via `agents.defaults.compaction.model`. This is useful when your primary model is a local or small model and you want compaction summaries produced by a more capable model. The override accepts any `provider/model-id` string:
@@ -76,7 +76,7 @@ When unset, compaction uses the agent’s primary model.
 
 ## Pluggable compaction providers
 
-Plugins can register a custom compaction provider via `registerCompactionProvider()` on the plugin API. When a provider is registered and configured, KaijiBot delegates summarization to it instead of the built-in LLM pipeline.
+Plugins can register a custom compaction provider via `registerCompactionProvider()` on the plugin API. When a provider is registered and configured, AllBot delegates summarization to it instead of the built-in LLM pipeline.
 
 To use a registered provider, set the provider id in your config:
 
@@ -92,18 +92,18 @@ To use a registered provider, set the provider id in your config:
 }
 ```
 
-Setting a `provider` automatically forces `mode: "safeguard"`. Providers receive the same compaction instructions and identifier-preservation policy as the built-in path, and KaijiBot still preserves recent-turn and split-turn suffix context after provider output. If the provider fails or returns an empty result, KaijiBot falls back to built-in LLM summarization.
+Setting a `provider` automatically forces `mode: "safeguard"`. Providers receive the same compaction instructions and identifier-preservation policy as the built-in path, and AllBot still preserves recent-turn and split-turn suffix context after provider output. If the provider fails or returns an empty result, AllBot falls back to built-in LLM summarization.
 
 ## Auto-compaction (default on)
 
-When a session nears or exceeds the model’s context window, KaijiBot triggers auto-compaction and may retry the original request using the compacted context.
+When a session nears or exceeds the model’s context window, AllBot triggers auto-compaction and may retry the original request using the compacted context.
 
 You’ll see:
 
 - `🧹 Auto-compaction complete` in verbose mode
 - `/status` showing `🧹 Compactions: <count>`
 
-Before compaction, KaijiBot can run a **silent memory flush** turn to store
+Before compaction, AllBot can run a **silent memory flush** turn to store
 durable notes to disk. See [Memory](/concepts/memory) for details and config.
 
 ## Manual compaction

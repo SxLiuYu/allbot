@@ -16,8 +16,8 @@ for the first time.
 
 ## What bootstrapping does
 
-On the first agent run, KaijiBot bootstraps the workspace (default
-`~/.kaijibot/workspace`):
+On the first agent run, AllBot bootstraps the workspace (default
+`~/.allbot/workspace`):
 
 - Seeds `AGENTS.md`, `BOOTSTRAP.md`, `IDENTITY.md`, `USER.md`.
 - Runs a short Q&A ritual (one question at a time).
@@ -32,7 +32,7 @@ machine.
 
 <Note>
 When the Gateway runs on another machine, edit workspace files on the gateway
-host (for example, `user@gateway-host:~/.kaijibot/workspace`).
+host (for example, `user@gateway-host:~/.allbot/workspace`).
 </Note>
 
 ## Related docs

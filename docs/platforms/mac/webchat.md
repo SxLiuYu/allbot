@@ -21,10 +21,10 @@ agent (with a session switcher for other sessions).
 - Auto‑open for testing:
 
   ```bash
-  dist/KaijiBot.app/Contents/MacOS/KaijiBot --webchat
+  dist/AllBot.app/Contents/MacOS/AllBot --webchat
   ```
 
-- Logs: `./scripts/clawlog.sh` (subsystem `ai.kaijibot`, category `WebChatSwiftUI`).
+- Logs: `./scripts/clawlog.sh` (subsystem `ai.allbot`, category `WebChatSwiftUI`).
 
 ## How it is wired
 

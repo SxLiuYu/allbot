@@ -1,5 +1,5 @@
 import { listPotentialConfiguredChannelIds } from "../channels/config-presence.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import {
   createPluginActivationSource,
   normalizePluginsConfig,
@@ -29,7 +29,7 @@ function isGatewayStartupSidecar(plugin: PluginManifestRecord): boolean {
 }
 
 export function resolveChannelPluginIds(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -43,7 +43,7 @@ export function resolveChannelPluginIds(params: {
 }
 
 export function resolveConfiguredChannelPluginIds(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -57,7 +57,7 @@ export function resolveConfiguredChannelPluginIds(params: {
 }
 
 export function resolveConfiguredDeferredChannelPluginIds(params: {
-  config: KaijiBotConfig;
+  config: AllBotConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {
@@ -81,8 +81,8 @@ export function resolveConfiguredDeferredChannelPluginIds(params: {
 }
 
 export function resolveGatewayStartupPluginIds(params: {
-  config: KaijiBotConfig;
-  activationSourceConfig?: KaijiBotConfig;
+  config: AllBotConfig;
+  activationSourceConfig?: AllBotConfig;
   workspaceDir?: string;
   env: NodeJS.ProcessEnv;
 }): string[] {

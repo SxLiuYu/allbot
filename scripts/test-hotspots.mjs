@@ -31,7 +31,7 @@ const opts = parseVitestReportArgs(process.argv.slice(2), {
   config: "vitest/vitest.unit.config.ts",
   limit: 20,
 });
-const report = loadVitestReportFromArgs(opts, "kaijibot-vitest-hotspots");
+const report = loadVitestReportFromArgs(opts, "allbot-vitest-hotspots");
 const fileResults = collectVitestFileDurations(report).toSorted(
   (a, b) => b.durationMs - a.durationMs,
 );

@@ -4,7 +4,7 @@
  * Tests the full insight generation pipeline by calling the production
  * buildInsightPrompt and evaluating output quality.
  *
- * Run: KAIJIBOT_LIVE_TEST=1 pnpm test src/cognitive/insight/insight-quality.test.ts
+ * Run: ALLBOT_LIVE_TEST=1 pnpm test src/cognitive/insight/insight-quality.test.ts
  *
  * Requires ZAI_API_KEY in environment (loaded from .env or process env).
  */
@@ -18,7 +18,7 @@ import {
 } from "./llm-engine.js";
 import type { InsightEngineInput } from "./types.js";
 
-const isLive = process.env.KAIJIBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
+const isLive = process.env.ALLBOT_LIVE_TEST === "1" || process.env.LIVE === "1";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const API_URL = "https://api.z.ai/api/coding/paas/v4/chat/completions";
 const MODEL = "glm-5-turbo";

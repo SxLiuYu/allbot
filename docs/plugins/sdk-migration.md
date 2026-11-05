@@ -3,15 +3,15 @@ title: "Plugin SDK Migration"
 sidebarTitle: "Migrate to SDK"
 summary: "Migrate from the legacy backwards-compatibility layer to the modern plugin SDK"
 read_when:
-  - You see the KAIJIBOT_PLUGIN_SDK_COMPAT_DEPRECATED warning
-  - You see the KAIJIBOT_EXTENSION_API_DEPRECATED warning
+  - You see the ALLBOT_PLUGIN_SDK_COMPAT_DEPRECATED warning
+  - You see the ALLBOT_EXTENSION_API_DEPRECATED warning
   - You are updating a plugin to the modern plugin architecture
-  - You maintain an external KaijiBot plugin
+  - You maintain an external AllBot plugin
 ---
 
 # Plugin SDK Migration
 
-KaijiBot has moved from a broad backwards-compatibility layer to a modern plugin
+AllBot has moved from a broad backwards-compatibility layer to a modern plugin
 architecture with focused, documented imports. If your plugin was built before
 the new architecture, this guide helps you migrate.
 
@@ -20,10 +20,10 @@ the new architecture, this guide helps you migrate.
 The old plugin system provided two wide-open surfaces that let plugins import
 anything they needed from a single entry point:
 
-- **`kaijibot/plugin-sdk/compat`** — a single import that re-exported dozens of
+- **`allbot/plugin-sdk/compat`** — a single import that re-exported dozens of
   helpers. It was introduced to keep older hook-based plugins working while the
   new plugin architecture was being built.
-- **`kaijibot/extension-api`** — a bridge that gave plugins direct access to
+- **`allbot/extension-api`** — a bridge that gave plugins direct access to
   host-side helpers like the embedded agent runner.
 
 Both surfaces are now **deprecated**. They still work at runtime, but new
@@ -43,14 +43,14 @@ The old approach caused problems:
 - **Circular dependencies** — broad re-exports made it easy to create import cycles
 - **Unclear API surface** — no way to tell which exports were stable vs internal
 
-The modern plugin SDK fixes this: each import path (`kaijibot/plugin-sdk/\<subpath\>`)
+The modern plugin SDK fixes this: each import path (`allbot/plugin-sdk/\<subpath\>`)
 is a small, self-contained module with a clear purpose and documented contract.
 
 Legacy provider convenience seams for bundled channels are also gone. Imports
-such as `kaijibot/plugin-sdk/slack`, `kaijibot/plugin-sdk/discord`,
-`kaijibot/plugin-sdk/signal`, `kaijibot/plugin-sdk/whatsapp`,
+such as `allbot/plugin-sdk/slack`, `allbot/plugin-sdk/discord`,
+`allbot/plugin-sdk/signal`, `allbot/plugin-sdk/whatsapp`,
 channel-branded helper seams, and
-`kaijibot/plugin-sdk/telegram-core` were private mono-repo shortcuts, not
+`allbot/plugin-sdk/telegram-core` were private mono-repo shortcuts, not
 stable plugin contracts. Use narrow generic SDK subpaths instead. Inside the
 bundled plugin workspace, keep provider-owned helpers in that plugin's own
 `api.ts` or `runtime-api.ts`.
@@ -82,7 +82,7 @@ Current bundled provider examples:
     - `plugin.auth` remains for channel login/logout flows only; approval auth
       hooks there are no longer read by core
     - Register channel-owned runtime objects such as clients, tokens, or Bolt
-      apps through `kaijibot/plugin-sdk/channel-runtime-context`
+      apps through `allbot/plugin-sdk/channel-runtime-context`
     - Do not send plugin-owned reroute notices from native approval handlers;
       core now owns routed-elsewhere notices from actual delivery results
     - When passing `channelRuntime` into `createChannelManager(...)`, provide a
@@ -94,7 +94,7 @@ Current bundled provider examples:
   </Step>
 
   <Step title="Audit Windows wrapper fallback behavior">
-    If your plugin uses `kaijibot/plugin-sdk/windows-spawn`, unresolved Windows
+    If your plugin uses `allbot/plugin-sdk/windows-spawn`, unresolved Windows
     `.cmd`/`.bat` wrappers now fail closed unless you explicitly pass
     `allowShellFallback: true`.
 
@@ -121,7 +121,7 @@ Current bundled provider examples:
 
     ```bash
     grep -r "plugin-sdk/compat" my-plugin/
-    grep -r "kaijibot/extension-api" my-plugin/
+    grep -r "allbot/extension-api" my-plugin/
     ```
 
   </Step>
@@ -135,12 +135,12 @@ Current bundled provider examples:
       createChannelReplyPipeline,
       createPluginRuntimeStore,
       resolveControlCommandGate,
-    } from "kaijibot/plugin-sdk/compat";
+    } from "allbot/plugin-sdk/compat";
 
     // After (modern focused imports)
-    import { createChannelReplyPipeline } from "kaijibot/plugin-sdk/channel-reply-pipeline";
-    import { createPluginRuntimeStore } from "kaijibot/plugin-sdk/runtime-store";
-    import { resolveControlCommandGate } from "kaijibot/plugin-sdk/command-auth";
+    import { createChannelReplyPipeline } from "allbot/plugin-sdk/channel-reply-pipeline";
+    import { createPluginRuntimeStore } from "allbot/plugin-sdk/runtime-store";
+    import { resolveControlCommandGate } from "allbot/plugin-sdk/command-auth";
     ```
 
     For host-side helpers, use the injected plugin runtime instead of importing
@@ -148,7 +148,7 @@ Current bundled provider examples:
 
     ```typescript
     // Before (deprecated extension-api bridge)
-    import { runEmbeddedPiAgent } from "kaijibot/extension-api";
+    import { runEmbeddedPiAgent } from "allbot/extension-api";
     const result = await runEmbeddedPiAgent({ sessionId, prompt });
 
     // After (injected runtime)
@@ -184,7 +184,7 @@ Current bundled provider examples:
   | --- | --- | --- |
   | `plugin-sdk/plugin-entry` | Canonical plugin entry helper | `definePluginEntry` |
   | `plugin-sdk/core` | Legacy umbrella re-export for channel entry definitions/builders | `defineChannelPluginEntry`, `createChatChannelPlugin` |
-  | `plugin-sdk/config-schema` | Root config schema export | `KaijiBotSchema` |
+  | `plugin-sdk/config-schema` | Root config schema export | `AllBotSchema` |
   | `plugin-sdk/provider-entry` | Single-provider entry helper | `defineSingleProviderPluginEntry` |
   | `plugin-sdk/channel-core` | Focused channel entry definitions and builders | `defineChannelPluginEntry`, `defineSetupPluginEntry`, `createChatChannelPlugin`, `createChannelPluginBase` |
   | `plugin-sdk/setup` | Shared setup wizard helpers | Allowlist prompts, setup status builders |
@@ -387,8 +387,8 @@ before the next major release.
 Set these environment variables while you work on migrating:
 
 ```bash
-KAIJIBOT_SUPPRESS_PLUGIN_SDK_COMPAT_WARNING=1 kaijibot gateway run
-KAIJIBOT_SUPPRESS_EXTENSION_API_WARNING=1 kaijibot gateway run
+ALLBOT_SUPPRESS_PLUGIN_SDK_COMPAT_WARNING=1 allbot gateway run
+ALLBOT_SUPPRESS_EXTENSION_API_WARNING=1 allbot gateway run
 ```
 
 This is a temporary escape hatch, not a permanent solution.

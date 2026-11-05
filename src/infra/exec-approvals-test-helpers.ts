@@ -11,7 +11,7 @@ export function makePathEnv(binDir: string): NodeJS.ProcessEnv {
 }
 
 export function makeTempDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "kaijibot-exec-approvals-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "allbot-exec-approvals-"));
 }
 
 export function makeMockExecutableResolution(params: {

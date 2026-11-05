@@ -1,16 +1,16 @@
 ---
-summary: "Run KaijiBot on a Linux server or cloud VPS — provider picker, architecture, and tuning"
+summary: "Run AllBot on a Linux server or cloud VPS — provider picker, architecture, and tuning"
 read_when:
   - You want to run the Gateway on a Linux server or cloud VPS
   - You need a quick map of hosting guides
-  - You want generic Linux server tuning for KaijiBot
+  - You want generic Linux server tuning for AllBot
 title: "Linux Server"
 sidebarTitle: "Linux Server"
 ---
 
 # Linux Server
 
-Run the KaijiBot Gateway on any Linux server or cloud VPS. This page helps you
+Run the AllBot Gateway on any Linux server or cloud VPS. This page helps you
 pick a provider, explains how cloud deployments work, and covers generic Linux
 tuning that applies everywhere.
 
@@ -67,16 +67,16 @@ Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
 If CLI commands feel slow on low-power VMs (or ARM hosts), enable Node's module compile cache:
 
 ```bash
-grep -q 'NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF'
-export NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache
-mkdir -p /var/tmp/kaijibot-compile-cache
-export KAIJIBOT_NO_RESPAWN=1
+grep -q 'NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF'
+export NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache
+mkdir -p /var/tmp/allbot-compile-cache
+export ALLBOT_NO_RESPAWN=1
 EOF
 source ~/.bashrc
 ```
 
 - `NODE_COMPILE_CACHE` improves repeated command startup times.
-- `KAIJIBOT_NO_RESPAWN=1` avoids extra startup overhead from a self-respawn path.
+- `ALLBOT_NO_RESPAWN=1` avoids extra startup overhead from a self-respawn path.
 - First command run warms the cache; subsequent runs are faster.
 - For Raspberry Pi specifics, see [Raspberry Pi](/install/raspberry-pi).
 
@@ -85,31 +85,31 @@ source ~/.bashrc
 For VM hosts using `systemd`, consider:
 
 - Add service env for a stable startup path:
-  - `KAIJIBOT_NO_RESPAWN=1`
-  - `NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache`
+  - `ALLBOT_NO_RESPAWN=1`
+  - `NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache`
 - Keep restart behavior explicit:
   - `Restart=always`
   - `RestartSec=2`
   - `TimeoutStartSec=90`
 - Prefer SSD-backed disks for state/cache paths to reduce random-I/O cold-start penalties.
 
-For the standard `kaijibot onboard --install-daemon` path, edit the user unit:
+For the standard `allbot onboard --install-daemon` path, edit the user unit:
 
 ```bash
-systemctl --user edit kaijibot-gateway.service
+systemctl --user edit allbot-gateway.service
 ```
 
 ```ini
 [Service]
-Environment=KAIJIBOT_NO_RESPAWN=1
-Environment=NODE_COMPILE_CACHE=/var/tmp/kaijibot-compile-cache
+Environment=ALLBOT_NO_RESPAWN=1
+Environment=NODE_COMPILE_CACHE=/var/tmp/allbot-compile-cache
 Restart=always
 RestartSec=2
 TimeoutStartSec=90
 ```
 
 If you deliberately installed a system unit instead, edit
-`kaijibot-gateway.service` via `sudo systemctl edit kaijibot-gateway.service`.
+`allbot-gateway.service` via `sudo systemctl edit allbot-gateway.service`.
 
 How `Restart=` policies help automated recovery:
 [systemd can automate service recovery](https://www.redhat.com/en/blog/systemd-automate-recovery).

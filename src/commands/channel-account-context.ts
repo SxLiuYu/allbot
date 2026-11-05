@@ -1,7 +1,7 @@
 import { resolveChannelDefaultAccountId } from "../channels/plugins/helpers.js";
 import type { ChannelPlugin } from "../channels/plugins/types.js";
 import { inspectReadOnlyChannelAccount } from "../channels/read-only-account-inspect.js";
-import type { KaijiBotConfig } from "../config/config.js";
+import type { AllBotConfig } from "../config/config.js";
 import { formatErrorMessage } from "../infra/errors.js";
 import { isRecord } from "../utils.js";
 
@@ -41,7 +41,7 @@ function formatContextDiagnostic(params: {
 
 export async function resolveDefaultChannelAccountContext(
   plugin: ChannelPlugin,
-  cfg: KaijiBotConfig,
+  cfg: AllBotConfig,
   options?: { mode?: ChannelAccountContextMode; commandName?: string },
 ): Promise<ChannelDefaultAccountContext> {
   const mode = options?.mode ?? "strict";

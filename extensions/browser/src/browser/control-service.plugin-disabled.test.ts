@@ -29,7 +29,7 @@ vi.mock("./config.js", () => ({
   resolveBrowserConfig: vi.fn(() => ({
     enabled: true,
     controlPort: 18791,
-    profiles: { kaijibot: { cdpPort: 18800 } },
+    profiles: { allbot: { cdpPort: 18800 } },
   })),
 }));
 
