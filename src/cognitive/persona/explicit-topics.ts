@@ -29,7 +29,10 @@ function findExistingDomain(domains: Record<string, unknown>, topic: string): st
  * of ones already present. Idempotent: calling it on every load is fine and
  * is how a config change takes effect without editing persona files.
  */
-export function applyExplicitTopics(persona: PersonaTree, topics: string[] | undefined): PersonaTree {
+export function applyExplicitTopics(
+  persona: PersonaTree,
+  topics: string[] | undefined,
+): PersonaTree {
   if (!topics || topics.length === 0) {
     return persona;
   }

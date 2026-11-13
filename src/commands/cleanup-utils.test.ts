@@ -28,10 +28,7 @@ describe("buildCleanupPlan", () => {
     expect(plan.configInsideState).toBe(true);
     expect(plan.oauthInsideState).toBe(false);
     expect(new Set(plan.workspaceDirs)).toEqual(
-      new Set([
-        path.join(tmpRoot, "allbot-workspace-1"),
-        path.join(tmpRoot, "allbot-workspace-2"),
-      ]),
+      new Set([path.join(tmpRoot, "allbot-workspace-1"), path.join(tmpRoot, "allbot-workspace-2")]),
     );
   });
 });

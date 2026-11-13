@@ -109,10 +109,7 @@ export function acquireLocalHeavyCheckLockSync(params) {
     env.ALLBOT_HEAVY_CHECK_LOCK_PROGRESS_MS,
     DEFAULT_LOCK_PROGRESS_MS,
   );
-  const staleLockMs = readPositiveInt(
-    env.ALLBOT_HEAVY_CHECK_STALE_LOCK_MS,
-    DEFAULT_STALE_LOCK_MS,
-  );
+  const staleLockMs = readPositiveInt(env.ALLBOT_HEAVY_CHECK_STALE_LOCK_MS, DEFAULT_STALE_LOCK_MS);
   const startedAt = Date.now();
   let waitingLogged = false;
   let lastProgressAt = 0;

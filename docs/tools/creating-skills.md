@@ -85,10 +85,10 @@ For how skills are loaded and prioritized, see [Skills](/tools/skills).
 
 The YAML frontmatter supports these fields:
 
-| Field                               | Required | Description                                 |
-| ----------------------------------- | -------- | ------------------------------------------- |
-| `name`                              | Yes      | Unique identifier (snake_case)              |
-| `description`                       | Yes      | One-line description shown to the agent     |
+| Field                             | Required | Description                                 |
+| --------------------------------- | -------- | ------------------------------------------- |
+| `name`                            | Yes      | Unique identifier (snake_case)              |
+| `description`                     | Yes      | One-line description shown to the agent     |
 | `metadata.allbot.os`              | No       | OS filter (`["darwin"]`, `["linux"]`, etc.) |
 | `metadata.allbot.requires.bins`   | No       | Required binaries on PATH                   |
 | `metadata.allbot.requires.config` | No       | Required config keys                        |
@@ -107,8 +107,8 @@ The YAML frontmatter supports these fields:
 | `\<workspace\>/skills/`         | Highest    | Per-agent             |
 | `\<workspace\>/.agents/skills/` | High       | Per-workspace agent   |
 | `~/.agents/skills/`             | Medium     | Shared agent profile  |
-| `~/.allbot/skills/`           | Medium     | Shared (all agents)   |
-| Bundled (shipped with AllBot) | Low        | Global                |
+| `~/.allbot/skills/`             | Medium     | Shared (all agents)   |
+| Bundled (shipped with AllBot)   | Low        | Global                |
 | `skills.load.extraDirs`         | Lowest     | Custom shared folders |
 
 ## Related

@@ -2,10 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { Logger as TsLogger } from "tslog";
 import type { AllBotConfig } from "../config/types.js";
-import {
-  POSIX_ALLBOT_TMP_DIR,
-  resolvePreferredAllBotTmpDir,
-} from "../infra/tmp-allbot-dir.js";
+import { POSIX_ALLBOT_TMP_DIR, resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 import { readLoggingConfig, shouldSkipMutatingLoggingConfigRead } from "./config.js";
 import { resolveEnvLogLevelOverride } from "./env-log-level.js";
 import { type LogLevel, levelToMinLevel, normalizeLogLevel } from "./levels.js";

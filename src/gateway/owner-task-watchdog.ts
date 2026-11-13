@@ -1,16 +1,16 @@
+import { loadSubagentRegistryFromDisk } from "../agents/subagent-registry.store.js";
 import type { AllBotConfig } from "../config/config.js";
 import { loadConfig } from "../config/io.js";
+import { isCronJobActive } from "../cron/active-jobs.js";
 import { deliverOutboundPayloads } from "../infra/outbound/deliver.js";
+import type { OutboundChannel } from "../infra/outbound/targets.js";
 import { enqueueSystemEvent } from "../infra/system-events.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { archiveOwnerTasks } from "../tasks/owner/archive.js";
-import { createOwnerTaskStore } from "../tasks/owner/store.js";
 import { reconcileOwnerTasks } from "../tasks/owner/reconcile.js";
-import { runWatchLoopTick } from "../tasks/owner/watch-loop.js";
-import { isCronJobActive } from "../cron/active-jobs.js";
-import { loadSubagentRegistryFromDisk } from "../agents/subagent-registry.store.js";
+import { createOwnerTaskStore } from "../tasks/owner/store.js";
 import type { OwnerTaskRecord } from "../tasks/owner/types.js";
-import type { OutboundChannel } from "../infra/outbound/targets.js";
+import { runWatchLoopTick } from "../tasks/owner/watch-loop.js";
 
 const log = createSubsystemLogger("gateway-watchdog");
 
@@ -18,7 +18,9 @@ const TICK_MS = 60_000;
 const ARCHIVE_EVERY_TICKS = 60;
 let tickCount = 0;
 
-function isWorkerAlive(task: { worker: { kind: string; runId?: string; cronJobId?: string; childSessionKey: string } }): boolean {
+function isWorkerAlive(task: {
+  worker: { kind: string; runId?: string; cronJobId?: string; childSessionKey: string };
+}): boolean {
   if (task.worker.kind === "cron") {
     return isCronJobActive(task.worker.cronJobId ?? "");
   }

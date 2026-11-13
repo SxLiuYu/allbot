@@ -12,9 +12,8 @@ vi.mock("jiti", () => ({
 }));
 
 vi.mock("../discovery.js", () => ({
-  discoverAllBotPlugins: (
-    ...args: Parameters<typeof registryJitiMocks.discoverAllBotPlugins>
-  ) => registryJitiMocks.discoverAllBotPlugins(...args),
+  discoverAllBotPlugins: (...args: Parameters<typeof registryJitiMocks.discoverAllBotPlugins>) =>
+    registryJitiMocks.discoverAllBotPlugins(...args),
 }));
 
 vi.mock("../manifest-registry.js", () => ({

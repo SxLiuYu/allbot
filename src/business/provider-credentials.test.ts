@@ -3,14 +3,14 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  reloadBusinessProviderCredentials,
+  resolveBusinessProviderCredentialPath,
+} from "./provider-credentials.js";
+import {
   listBusinessProviderAdapters,
   resolveBusinessProviderAdapter,
   unregisterBusinessProviderAdapter,
 } from "./provider-registry.js";
-import {
-  reloadBusinessProviderCredentials,
-  resolveBusinessProviderCredentialPath,
-} from "./provider-credentials.js";
 
 const files: string[] = [];
 const adapters: string[] = [];
@@ -104,7 +104,23 @@ describe("business provider credential loader", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const file = await writeCredentialFile({
-      providers: [{ ...validConfig(), credentials: { ...validConfig().credentials, api_key: "sk_live_placeholder" } }, { ...validConfig("identity-primary"), kind: "identity", provider: "persona", credentials: { app_id: "app_test", api_key: "key_test", api_secret: "secret_test", webhook_secret: "whsec_test" } }],
+      providers: [
+        {
+          ...validConfig(),
+          credentials: { ...validConfig().credentials, api_key: "sk_live_placeholder" },
+        },
+        {
+          ...validConfig("identity-primary"),
+          kind: "identity",
+          provider: "persona",
+          credentials: {
+            app_id: "app_test",
+            api_key: "key_test",
+            api_secret: "secret_test",
+            webhook_secret: "whsec_test",
+          },
+        },
+      ],
     });
     const result = await reloadBusinessProviderCredentials({ filePath: file });
     expect(result.ok).toBe(true);
@@ -113,10 +129,7 @@ describe("business provider credential loader", () => {
       { id: "credential-file:payment-primary", kind: "payment" },
       { id: "credential-file:identity-primary", kind: "identity" },
     ]);
-    const provider = resolveBusinessProviderAdapter(
-      "credential-file:payment-primary",
-      "payment",
-    );
+    const provider = resolveBusinessProviderAdapter("credential-file:payment-primary", "payment");
     expect(provider?.kind).toBe("payment");
     const noExternalAdapter = await provider?.execute({
       requestId: "business_test_no_adapter",
@@ -146,7 +159,12 @@ describe("business provider credential loader", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
     const file = await writeCredentialFile({
-      providers: [{ ...validConfig(), credentials: { ...validConfig().credentials, api_key: "pk_test_placeholder" } }],
+      providers: [
+        {
+          ...validConfig(),
+          credentials: { ...validConfig().credentials, api_key: "pk_test_placeholder" },
+        },
+      ],
     });
     const loaded = await reloadBusinessProviderCredentials({ filePath: file });
     expect(loaded.ok).toBe(true);
@@ -159,7 +177,9 @@ describe("business provider credential loader", () => {
     });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(outcome?.ok).toBe(false);
-    expect(outcome && "error" in outcome && outcome.error).toContain("not configured with a Stripe sandbox test key");
+    expect(outcome && "error" in outcome && outcome.error).toContain(
+      "not configured with a Stripe sandbox test key",
+    );
     vi.unstubAllGlobals();
   });
 
@@ -178,7 +198,12 @@ describe("business provider credential loader", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
     const file = await writeCredentialFile({
-      providers: [{ ...validConfig(), credentials: { ...validConfig().credentials, api_key: "sk_test_placeholder" } }],
+      providers: [
+        {
+          ...validConfig(),
+          credentials: { ...validConfig().credentials, api_key: "sk_test_placeholder" },
+        },
+      ],
     });
     const loaded = await reloadBusinessProviderCredentials({ filePath: file });
     expect(loaded.ok).toBe(true);
@@ -293,13 +318,14 @@ describe("business provider credential loader", () => {
       }
       calls.push("dispatch");
       const headers = new Headers(init?.headers);
-      expect(headers.get("authorization")).toBe(
-        "Bearer oak_test_refreshed_token_1234567890",
+      expect(headers.get("authorization")).toBe("Bearer oak_test_refreshed_token_1234567890");
+      return new Response(
+        JSON.stringify({ id: "pi_oauth_refreshed_123", object: "payment_intent" }),
+        {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        },
       );
-      return new Response(JSON.stringify({ id: "pi_oauth_refreshed_123", object: "payment_intent" }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
     });
     vi.stubGlobal("fetch", fetchMock);
     const file = await writeCredentialFile({
@@ -346,15 +372,11 @@ describe("business provider credential loader", () => {
     const persisted = JSON.parse(await fs.readFile(file, "utf8")) as {
       providers: Array<{ credentials: Record<string, unknown> }>;
     };
-    expect(persisted.providers[0]?.credentials.api_key).toBe(
-      "oak_test_refreshed_token_1234567890",
-    );
+    expect(persisted.providers[0]?.credentials.api_key).toBe("oak_test_refreshed_token_1234567890");
     expect(persisted.providers[0]?.credentials.refresh_token).toBe(
       "oart_rotated_refresh_1234567890",
     );
-    expect(persisted.providers[1]?.credentials.api_key).toBe(
-      "oak_test_refreshed_token_1234567890",
-    );
+    expect(persisted.providers[1]?.credentials.api_key).toBe("oak_test_refreshed_token_1234567890");
     expect(persisted.providers[1]?.credentials.refresh_token).toBe(
       "oart_rotated_refresh_1234567890",
     );

@@ -290,12 +290,7 @@ export const cognitiveHandlers: GatewayRequestHandlers = {
       const userId = typeof params.userId === "string" ? params.userId.trim() : "";
       const draftId = typeof params.draftId === "string" ? params.draftId.trim() : "";
       const action = params.action;
-      if (
-        !agentId ||
-        !userId ||
-        !draftId ||
-        (action !== "approve" && action !== "reject")
-      ) {
+      if (!agentId || !userId || !draftId || (action !== "approve" && action !== "reject")) {
         respond(
           false,
           undefined,

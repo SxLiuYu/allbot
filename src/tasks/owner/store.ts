@@ -155,10 +155,7 @@ async function backupIfPresent(filePath: string): Promise<void> {
 }
 
 /** Serializes writers across processes. Reads rely on atomic writes. */
-async function withOwnerTaskWriteLock<T>(
-  filePath: string,
-  fn: () => Promise<T>,
-): Promise<T> {
+async function withOwnerTaskWriteLock<T>(filePath: string, fn: () => Promise<T>): Promise<T> {
   const { release } = await acquireSessionWriteLock({ sessionFile: filePath });
   try {
     return await fn();
@@ -184,17 +181,18 @@ export function createOwnerTaskStore(options: { filePath?: string } = {}): Owner
         return migrated;
       }),
     update: async <T>(mutator: OwnerTaskStoreUpdate<T>): Promise<T> =>
-      await withInProcessLock(async () =>
-        await withOwnerTaskWriteLock(filePath, async () => {
-          const current = withShortIds(await readStoreData(filePath));
-          const outcome = mutator(current);
-          if (outcome.data) {
-            const next = withShortIds(outcome.data);
-            await backupIfPresent(filePath);
-            await writeJsonAtomic(filePath, next);
-          }
-          return outcome.result;
-        }),
+      await withInProcessLock(
+        async () =>
+          await withOwnerTaskWriteLock(filePath, async () => {
+            const current = withShortIds(await readStoreData(filePath));
+            const outcome = mutator(current);
+            if (outcome.data) {
+              const next = withShortIds(outcome.data);
+              await backupIfPresent(filePath);
+              await writeJsonAtomic(filePath, next);
+            }
+            return outcome.result;
+          }),
       ),
   };
 }

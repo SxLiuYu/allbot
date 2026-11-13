@@ -139,9 +139,7 @@ export function scanExecSafeBinCoverage(cfg: AllBotConfig): ExecSafeBinCoverageH
   return hits;
 }
 
-export function scanExecSafeBinTrustedDirHints(
-  cfg: AllBotConfig,
-): ExecSafeBinTrustedDirHintHit[] {
+export function scanExecSafeBinTrustedDirHints(cfg: AllBotConfig): ExecSafeBinTrustedDirHintHit[] {
   const hits: ExecSafeBinTrustedDirHintHit[] = [];
   for (const scope of collectExecSafeBinScopes(cfg)) {
     for (const bin of scope.safeBins) {

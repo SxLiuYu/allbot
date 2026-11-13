@@ -23,11 +23,11 @@ instead of ACP.
 
 There are three nearby surfaces that are easy to confuse:
 
-| You want to...                                                                     | Use this                              | Notes                                                                                                       |
-| ---------------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| You want to...                                                                   | Use this                              | Notes                                                                                                       |
+| -------------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | Run Codex, Claude Code, Gemini CLI, or another external harness _through_ AllBot | This page: ACP agents                 | Chat-bound sessions, `/acp spawn`, `sessions_spawn({ runtime: "acp" })`, background tasks, runtime controls |
-| Expose an AllBot Gateway session _as_ an ACP server for an editor or client      | [`allbot acp`](/cli/acp)            | Bridge mode. IDE/client talks ACP to AllBot over stdio/WebSocket                                          |
-| Reuse a local AI CLI as a text-only fallback model                                 | [CLI Backends](/gateway/cli-backends) | Not ACP. No AllBot tools, no ACP controls, no harness runtime                                             |
+| Expose an AllBot Gateway session _as_ an ACP server for an editor or client      | [`allbot acp`](/cli/acp)              | Bridge mode. IDE/client talks ACP to AllBot over stdio/WebSocket                                            |
+| Reuse a local AI CLI as a text-only fallback model                               | [CLI Backends](/gateway/cli-backends) | Not ACP. No AllBot tools, no ACP controls, no harness runtime                                               |
 
 ## Does this work out of the box?
 
@@ -93,7 +93,7 @@ Use ACP when you want an external harness runtime. Use sub-agents when you want 
 
 | Area          | ACP session                           | Sub-agent run                      |
 | ------------- | ------------------------------------- | ---------------------------------- |
-| Runtime       | ACP backend plugin (for example acpx) | AllBot native sub-agent runtime  |
+| Runtime       | ACP backend plugin (for example acpx) | AllBot native sub-agent runtime    |
 | Session key   | `agent:<agentId>:acp:<uuid>`          | `agent:<agentId>:subagent:<uuid>`  |
 | Main commands | `/acp ...`                            | `/subagents ...`                   |
 | Spawn tool    | `sessions_spawn` with `runtime:"acp"` | `sessions_spawn` (default runtime) |

@@ -1,5 +1,5 @@
-import { Command } from "commander";
 import type { GatewayRpcOpts } from "allbot/plugin-sdk/browser-node-runtime";
+import { Command } from "commander";
 import { createCliRuntimeCapture } from "../../test-support.js";
 import type { CliRuntimeCapture } from "../../test-support.js";
 

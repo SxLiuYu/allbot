@@ -2,11 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { acquireSessionWriteLock } from "../agents/session-write-lock.js";
 import { resolveStateDir } from "../config/paths.js";
-import {
-  getOrCreateScopedAsyncLock,
-  readJsonFile,
-  writeJsonAtomic,
-} from "../infra/json-files.js";
+import { getOrCreateScopedAsyncLock, readJsonFile, writeJsonAtomic } from "../infra/json-files.js";
 import {
   BUSINESS_REQUEST_STORE_VERSION,
   type BusinessRequestRecord,
@@ -17,14 +13,15 @@ export type BusinessRequestStore = {
   filePath: string;
   read: () => Promise<BusinessRequestStoreData>;
   update: <T>(
-    mutator: (data: BusinessRequestStoreData) => { data: BusinessRequestStoreData | null; result: T },
+    mutator: (data: BusinessRequestStoreData) => {
+      data: BusinessRequestStoreData | null;
+      result: T;
+    },
   ) => Promise<T>;
 };
 
 /** `<stateDir>/business/requests.json` — separate from OwnerTask and session stores. */
-export function resolveBusinessRequestStorePath(
-  env: NodeJS.ProcessEnv = process.env,
-): string {
+export function resolveBusinessRequestStorePath(env: NodeJS.ProcessEnv = process.env): string {
   return path.join(resolveStateDir(env), "business", "requests.json");
 }
 
@@ -75,10 +72,7 @@ async function backupIfPresent(filePath: string): Promise<void> {
   }
 }
 
-async function withBusinessRequestWriteLock<T>(
-  filePath: string,
-  fn: () => Promise<T>,
-): Promise<T> {
+async function withBusinessRequestWriteLock<T>(filePath: string, fn: () => Promise<T>): Promise<T> {
   const { release } = await acquireSessionWriteLock({ sessionFile: filePath });
   try {
     return await fn();
@@ -101,15 +95,16 @@ export function createBusinessRequestStore(
         result: T;
       },
     ): Promise<T> =>
-      await withInProcessLock(async () =>
-        await withBusinessRequestWriteLock(filePath, async () => {
-          const outcome = mutator(await readStoreData(filePath));
-          if (outcome.data) {
-            await backupIfPresent(filePath);
-            await writeJsonAtomic(filePath, outcome.data);
-          }
-          return outcome.result;
-        }),
+      await withInProcessLock(
+        async () =>
+          await withBusinessRequestWriteLock(filePath, async () => {
+            const outcome = mutator(await readStoreData(filePath));
+            if (outcome.data) {
+              await backupIfPresent(filePath);
+              await writeJsonAtomic(filePath, outcome.data);
+            }
+            return outcome.result;
+          }),
       ),
   };
 }

@@ -117,8 +117,7 @@ describe("resolveAllBotPackageRoot", () => {
 
   beforeEach(async () => {
     vi.resetModules();
-    ({ resolveAllBotPackageRoot, resolveAllBotPackageRootSync } =
-      await import("./allbot-root.js"));
+    ({ resolveAllBotPackageRoot, resolveAllBotPackageRootSync } = await import("./allbot-root.js"));
   });
 
   it.each([

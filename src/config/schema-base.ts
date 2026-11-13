@@ -239,11 +239,7 @@ function computeBaseConfigSchemaStablePayload(): BaseConfigSchemaStablePayload {
     applyFieldDocumentation(schemaRoot, buildFieldDocumentation());
   }
   const baseHints = mapSensitivePaths(AllBotSchema, "", buildBaseHints());
-  const sensitiveUrlPaths = collectMatchingSchemaPaths(
-    AllBotSchema,
-    "",
-    isSensitiveUrlConfigPath,
-  );
+  const sensitiveUrlPaths = collectMatchingSchemaPaths(AllBotSchema, "", isSensitiveUrlConfigPath);
   const stablePayload = {
     schema: stripLegacyCompatSchemaPaths(stripChannelSchema(schema)),
     uiHints: stripLegacyCompatHints(

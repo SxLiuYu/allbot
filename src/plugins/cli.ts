@@ -18,14 +18,13 @@ type RegisterPluginCliOptions = {
 
 const logger = createPluginCliLogger();
 
-export const loadValidatedConfigForPluginRegistration =
-  async (): Promise<AllBotConfig | null> => {
-    const snapshot = await readConfigFileSnapshot();
-    if (!snapshot.valid) {
-      return null;
-    }
-    return loadConfig();
-  };
+export const loadValidatedConfigForPluginRegistration = async (): Promise<AllBotConfig | null> => {
+  const snapshot = await readConfigFileSnapshot();
+  if (!snapshot.valid) {
+    return null;
+  }
+  return loadConfig();
+};
 
 export async function getPluginCliCommandDescriptors(
   cfg?: AllBotConfig,

@@ -50,9 +50,7 @@
       "allbot/plugin-sdk/secret-ref-runtime": [
         "../../dist/plugin-sdk/src/plugin-sdk/secret-ref-runtime.d.ts"
       ],
-      "allbot/plugin-sdk/ssrf-runtime": [
-        "../../dist/plugin-sdk/src/plugin-sdk/ssrf-runtime.d.ts"
-      ],
+      "allbot/plugin-sdk/ssrf-runtime": ["../../dist/plugin-sdk/src/plugin-sdk/ssrf-runtime.d.ts"],
       "@allbot/*.js": ["../../packages/plugin-sdk/dist/extensions/*.d.ts", "../*"],
       "@allbot/*": ["../*"],
       "@allbot/plugin-sdk/*": ["../../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],

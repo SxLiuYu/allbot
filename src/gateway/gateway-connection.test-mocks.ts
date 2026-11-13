@@ -10,8 +10,7 @@ export const resolveStateDirMock: TestMock<[NodeJS.ProcessEnv], string> = vi.fn(
   (env: NodeJS.ProcessEnv) => env.ALLBOT_STATE_DIR ?? "/tmp/allbot",
 );
 export const resolveConfigPathMock: TestMock<[NodeJS.ProcessEnv, string], string> = vi.fn(
-  (env: NodeJS.ProcessEnv, stateDir: string) =>
-    env.ALLBOT_CONFIG_PATH ?? `${stateDir}/allbot.json`,
+  (env: NodeJS.ProcessEnv, stateDir: string) => env.ALLBOT_CONFIG_PATH ?? `${stateDir}/allbot.json`,
 );
 export const pickPrimaryTailnetIPv4Mock: TestMock = vi.fn();
 export const pickPrimaryLanIPv4Mock: TestMock = vi.fn();

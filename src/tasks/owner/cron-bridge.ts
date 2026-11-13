@@ -82,9 +82,7 @@ export async function syncOwnerTaskFromCronRun(
     // left to reuse. Compare against the most recent card of any status before
     // creating a new one, or every schedule tick grows another done task.
     if (input.autoAccept === true && input.status === "ok") {
-      const last = data.tasks
-        .toReversed()
-        .find((task) => task.worker.cronJobId === input.jobId);
+      const last = data.tasks.toReversed().find((task) => task.worker.cronJobId === input.jobId);
       if (last && (last.resultText ?? "").trim() === resultText) {
         return { synced: true, reviewRequired: false, taskId: last.taskId };
       }

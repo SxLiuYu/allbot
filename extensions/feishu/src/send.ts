@@ -618,8 +618,7 @@ type CardJson = Record<string, unknown>;
 function asCardArray(value: unknown): CardJson[] {
   if (Array.isArray(value)) {
     return value.filter(
-      (item): item is CardJson =>
-        Boolean(item) && typeof item === "object" && !Array.isArray(item),
+      (item): item is CardJson => Boolean(item) && typeof item === "object" && !Array.isArray(item),
     );
   }
   return value && typeof value === "object" ? [value as CardJson] : [];

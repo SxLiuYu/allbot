@@ -1619,8 +1619,7 @@ export async function runEmbeddedPiAgent(
           );
 
           if (!aborted && params.sessionKey && params.config) {
-            const { resolveAgentIdFromSessionKey } =
-              await import("../../routing/session-key.js");
+            const { resolveAgentIdFromSessionKey } = await import("../../routing/session-key.js");
             const agentId = resolveAgentIdFromSessionKey(params.sessionKey);
             if (attempt.toolMetas.length >= 3 && isCognitiveEvolutionEnabled(params.config)) {
               Promise.resolve().then(async () => {

@@ -19,9 +19,7 @@ async function readPackageName(dir: string): Promise<string | null> {
 
 function readPackageNameSync(dir: string): string | null {
   try {
-    return parsePackageName(
-      allBotRootFsSync.readFileSync(path.join(dir, "package.json"), "utf-8"),
-    );
+    return parsePackageName(allBotRootFsSync.readFileSync(path.join(dir, "package.json"), "utf-8"));
   } catch {
     return null;
   }

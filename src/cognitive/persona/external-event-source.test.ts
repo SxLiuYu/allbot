@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  ExternalEventSource,
-  emitExternalEventSignal,
-} from "./feishu-activity-source.js";
+import { ExternalEventSource, emitExternalEventSignal } from "./feishu-activity-source.js";
 
 describe("ExternalEventSource", () => {
   it("turns an opted-in system event into an external scheduler event", () => {

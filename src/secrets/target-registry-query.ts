@@ -291,9 +291,7 @@ export function resolveConfigSecretTargetByPath(pathSegments: string[]): Resolve
   return null;
 }
 
-export function discoverConfigSecretTargets(
-  config: AllBotConfig,
-): DiscoveredConfigSecretTarget[] {
+export function discoverConfigSecretTargets(config: AllBotConfig): DiscoveredConfigSecretTarget[] {
   return discoverConfigSecretTargetsByIds(config);
 }
 

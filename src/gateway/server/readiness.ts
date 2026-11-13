@@ -99,9 +99,7 @@ export function createReadinessChecker(deps: {
       cachedChannelFailing = channelFailing;
     }
 
-    const failing = cognitiveFailing
-      ? [...channelFailing, "cognitive-scheduler"]
-      : channelFailing;
+    const failing = cognitiveFailing ? [...channelFailing, "cognitive-scheduler"] : channelFailing;
     return { ready: failing.length === 0, failing, uptimeMs };
   };
 }

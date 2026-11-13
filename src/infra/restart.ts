@@ -311,10 +311,7 @@ export function triggerAllBotRestart(): RestartAttempt {
 
   const tried: string[] = [];
   if (process.platform === "linux") {
-    const unit = normalizeSystemdUnit(
-      process.env.ALLBOT_SYSTEMD_UNIT,
-      process.env.ALLBOT_PROFILE,
-    );
+    const unit = normalizeSystemdUnit(process.env.ALLBOT_SYSTEMD_UNIT, process.env.ALLBOT_PROFILE);
     const userArgs = ["--user", "restart", unit];
     tried.push(`systemctl ${userArgs.join(" ")}`);
     const userRestart = spawnSync("systemctl", userArgs, {
@@ -353,8 +350,7 @@ export function triggerAllBotRestart(): RestartAttempt {
   }
 
   const label =
-    process.env.ALLBOT_LAUNCHD_LABEL ||
-    resolveGatewayLaunchAgentLabel(process.env.ALLBOT_PROFILE);
+    process.env.ALLBOT_LAUNCHD_LABEL || resolveGatewayLaunchAgentLabel(process.env.ALLBOT_PROFILE);
   const uid = typeof process.getuid === "function" ? process.getuid() : undefined;
   const domain = uid !== undefined ? `gui/${uid}` : "gui/501";
   const target = `${domain}/${label}`;

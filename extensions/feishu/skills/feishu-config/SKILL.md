@@ -207,12 +207,12 @@ Precedence: process env > `./.env` > `~/.allbot/.env` > `allbot.json` env block 
 
 AllBot's feishu extension is based on the upstream openclaw-lark plugin with selective reliability improvements. Most config is identical, but note these differences:
 
-| Official (openclaw-lark)                          | AllBot                           | Notes                                                                                                                                 |
-| ------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `openclaw config set`                             | `allbot config set`              | CLI command prefix differs                                                                                                            |
+| Official (openclaw-lark)                          | AllBot                             | Notes                                                                                                                               |
+| ------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `openclaw config set`                             | `allbot config set`                | CLI command prefix differs                                                                                                          |
 | `threadSession: true/false`                       | `groupSessionScope: "group_topic"` | AllBot uses granular 4-value enum instead of boolean. `"enabled"` in deprecated `topicSessionMode` ≈ official `threadSession: true` |
 | `footer.elapsed`, `footer.status`                 | Not available                      | Footer metrics not in AllBot config schema                                                                                          |
-| `/feishu start`, `/feishu doctor`, `/feishu auth` | Not available                      | Official plugin slash commands not present                                                                                            |
+| `/feishu start`, `/feishu doctor`, `/feishu auth` | Not available                      | Official plugin slash commands not present                                                                                          |
 
 ### Streaming Card Reliability (AllBot-specific)
 

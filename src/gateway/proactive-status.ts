@@ -1,17 +1,14 @@
-import os from "node:os";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import path from "node:path";
 import { readFile } from "node:fs/promises";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import os from "node:os";
+import path from "node:path";
 import { listBusinessProviderAdapters } from "../business/provider-registry.js";
 import { createBusinessRequestStore } from "../business/store.js";
-import {
-  BUSINESS_REQUEST_STATUSES,
-  type BusinessRequestStatus,
-} from "../business/types.js";
+import { BUSINESS_REQUEST_STATUSES, type BusinessRequestStatus } from "../business/types.js";
 import { loadConfig } from "../config/config.js";
-import { resolveConfigDir } from "../utils.js";
 import { resolveStateDir } from "../config/paths.js";
 import { readJsonFile } from "../infra/json-files.js";
+import { resolveConfigDir } from "../utils.js";
 import { isLocalDirectRequest } from "./auth.js";
 
 const STATUS_PATH = "/__allbot/proactive-status";
@@ -25,11 +22,7 @@ type PushEntry = {
 };
 
 function dayFile(day: string): string {
-  return path.join(
-    resolveConfigDir(),
-    "proactive-push-log",
-    `push-${day}.jsonl`,
-  );
+  return path.join(resolveConfigDir(), "proactive-push-log", `push-${day}.jsonl`);
 }
 
 function localDay(offsetDays = 0): string {
@@ -64,10 +57,7 @@ async function readFeishuInboundEvidence(): Promise<{
   lastDmText: string | null;
 }> {
   try {
-    const raw = await readFile(
-      path.join(os.homedir(), "allbot-gateway.log"),
-      "utf8",
-    );
+    const raw = await readFile(path.join(os.homedir(), "allbot-gateway.log"), "utf8");
     const lines = raw.split("\n");
     let bridgeHits = 0;
     let lastDmAt: string | null = null;
@@ -93,13 +83,8 @@ async function readNativeDesktopGuiStatus(): Promise<
   "implemented" | "blocked_by_macos_permissions"
 > {
   try {
-    const raw = await readFile(
-      path.join(os.homedir(), "gui-permission-verdict.txt"),
-      "utf8",
-    );
-    return raw.includes("gui_verdict=PASS")
-      ? "implemented"
-      : "blocked_by_macos_permissions";
+    const raw = await readFile(path.join(os.homedir(), "gui-permission-verdict.txt"), "utf8");
+    return raw.includes("gui_verdict=PASS") ? "implemented" : "blocked_by_macos_permissions";
   } catch {
     return "blocked_by_macos_permissions";
   }

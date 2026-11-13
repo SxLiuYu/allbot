@@ -14,11 +14,11 @@
 
 AllBot 是同一个智能体的三种落地方式，代码在同一个仓库里，各端独立可跑：
 
-| 目录 | 是什么 | 技术栈 | 怎么跑 |
-|---|---|---|---|
-| **根目录** | 服务器端：主动认知、记忆、技能、飞书/微信接入 | Node.js ≥22 + TypeScript | `pnpm install && pnpm build`，见[快速开始](#-快速开始) |
-| [`mobile/`](mobile/README.md) | 手机端（言出）：说一句话，它在后台屏幕上替你操作 App | Android 11+ / Kotlin | `cd mobile && ./gradlew :app:assembleDebug` |
-| [`voice/`](voice/README.md) | 语音硬件端（Charlie）：ESP32 + 语音闭环，改造现有家电 | Python 3.12 + FastAPI | `cd voice/charlie && python voice_server.py` |
+| 目录                          | 是什么                                                | 技术栈                   | 怎么跑                                                 |
+| ----------------------------- | ----------------------------------------------------- | ------------------------ | ------------------------------------------------------ |
+| **根目录**                    | 服务器端：主动认知、记忆、技能、飞书/微信接入         | Node.js ≥22 + TypeScript | `pnpm install && pnpm build`，见[快速开始](#-快速开始) |
+| [`mobile/`](mobile/README.md) | 手机端（言出）：说一句话，它在后台屏幕上替你操作 App  | Android 11+ / Kotlin     | `cd mobile && ./gradlew :app:assembleDebug`            |
+| [`voice/`](voice/README.md)   | 语音硬件端（Charlie）：ESP32 + 语音闭环，改造现有家电 | Python 3.12 + FastAPI    | `cd voice/charlie && python voice_server.py`           |
 
 三端之间靠 HTTP 与 MCP 连接，不是三套独立产品：
 
@@ -37,11 +37,11 @@ AllBot 是同一个智能体的三种落地方式，代码在同一个仓库里�
 
 三端之间不是自动发现的，要手工配一次。**同步网关在 `voice/` 这一侧**（`voice/charlie/app/routes/sync.py`，协议 `mika-relay.v2`），allbot 和 mobile 都是它的客户端：
 
-| 方向 | 谁在哪配 | 配什么 |
-|---|---|---|
-| allbot → voice | `allbot.json` 的 `tasks.sync` | 网关地址 + 设备令牌；`src/tasks/sync/adapter.ts` 负责把 OwnerTask 投影成同步任务 |
-| mobile → allbot | App 的设置页 | 模型端点（OpenAI 兼容）即可；手机端本身不需要同步网关 |
-| mobile → voice | App 的配对入口 | 目前**没有实现**，见下方「已知缺口」 |
+| 方向            | 谁在哪配                      | 配什么                                                                           |
+| --------------- | ----------------------------- | -------------------------------------------------------------------------------- |
+| allbot → voice  | `allbot.json` 的 `tasks.sync` | 网关地址 + 设备令牌；`src/tasks/sync/adapter.ts` 负责把 OwnerTask 投影成同步任务 |
+| mobile → allbot | App 的设置页                  | 模型端点（OpenAI 兼容）即可；手机端本身不需要同步网关                            |
+| mobile → voice  | App 的配对入口                | 目前**没有实现**，见下方「已知缺口」                                             |
 
 先起 `voice/`（它会带上同步网关），再起 allbot 并填上面那张表里的地址。`tasks.sync` 不配时适配器整体短路，allbot 照常单机跑。
 
@@ -62,12 +62,12 @@ AllBot 是同一个智能体的三种落地方式，代码在同一个仓库里�
 
 AllBot 不一样。你在飞书里跟它聊了几次之后，它会开始**主动**给你发消息。不是广告，不是提醒喝水，而是你真正可能感兴趣的东西。
 
-| 能力         | 普通 chatbot | 典型 memory agent (2026) | **AllBot**                                                         |
+| 能力         | 普通 chatbot | 典型 memory agent (2026) | **AllBot**                                                           |
 | ------------ | ------------ | ------------------------ | -------------------------------------------------------------------- |
 | **交互方式** | 你问它才答   | 被动响应 + 长记忆        | **主动推送洞察** + 正常对话                                          |
 | **用户建模** | 无状态       | 向量库 rerank            | **TypedInsight 6 类 + 类别衰减半衰期 + 兴趣生命周期**                |
 | **时机感知** | 不管你在干嘛 | 无                       | **PRISM 成本敏感门控**(凌晨不打扰、信任低时克制)                     |
-| **自我进化** | 无           | 无                       | **Agent 自主创建/删除技能**(LLM 质量门,0.7 分阈值)                  |
+| **自我进化** | 无           | 无                       | **Agent 自主创建/删除技能**(LLM 质量门,0.7 分阈值)                   |
 | **纠错学习** | 无           | 无                       | **双路径纠错记忆**(同样的错误不犯第二次)                             |
 | **部署形态** | 云端 SaaS    | 云端 SaaS                | **云端 / 本地 / Android 手机本地运行**(Termux,完整 agent,非瘦客户端) |
 
@@ -292,7 +292,7 @@ curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install-termux.sh 
 | 条件            | 说明                     | 获取方式                                                                                                                                                                                                                                  |
 | --------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **LLM API Key** | 至少一个 AI 提供商的密钥 | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [通义千问](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) 任选其一 |
-| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat.md)（一等渠道，运行 `allbot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考  |
+| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat.md)（一等渠道，运行 `allbot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考       |
 
 ### 安装（推荐方式）
 
@@ -511,12 +511,12 @@ python -m pytest tests/              # 60+ 用例
 
 ## 许可证
 
-| 范围 | 许可证 | 文件 |
-|---|---|---|
-| 根目录（allbot 服务器端） | MIT | [`LICENSE`](LICENSE) |
-| `mobile/`（Mika / 言出） | Apache-2.0 | [`mobile/LICENSE`](mobile/LICENSE)、[`mobile/NOTICE`](mobile/NOTICE) |
-| `voice/charlie/`（Charlie） | MIT | [`voice/charlie/LICENSE`](voice/charlie/LICENSE) |
-| `voice/Baize/` | Apache-2.0 | [`voice/Baize/LICENSE`](voice/Baize/LICENSE) |
+| 范围                        | 许可证     | 文件                                                                 |
+| --------------------------- | ---------- | -------------------------------------------------------------------- |
+| 根目录（allbot 服务器端）   | MIT        | [`LICENSE`](LICENSE)                                                 |
+| `mobile/`（Mika / 言出）    | Apache-2.0 | [`mobile/LICENSE`](mobile/LICENSE)、[`mobile/NOTICE`](mobile/NOTICE) |
+| `voice/charlie/`（Charlie） | MIT        | [`voice/charlie/LICENSE`](voice/charlie/LICENSE)                     |
+| `voice/Baize/`              | Apache-2.0 | [`voice/Baize/LICENSE`](voice/Baize/LICENSE)                         |
 
 各自的署名与来源见 `mobile/VENDOR.md`、`voice/VENDOR.md`，以及根目录的 [`NOTICE`](NOTICE)。
 

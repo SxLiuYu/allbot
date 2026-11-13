@@ -1,8 +1,8 @@
-import type { Command } from "commander";
 import {
   normalizeOptionalLowercaseString,
   normalizeOptionalString,
 } from "allbot/plugin-sdk/text-runtime";
+import type { Command } from "commander";
 import { runCommandWithRuntime } from "../core-api.js";
 import { runBrowserResizeWithOutput } from "./browser-cli-resize.js";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";

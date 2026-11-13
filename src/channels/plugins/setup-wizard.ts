@@ -71,10 +71,7 @@ export type ChannelSetupWizardEnvShortcut = {
   prompt: string;
   preferredEnvVar?: string;
   isAvailable: (params: { cfg: AllBotConfig; accountId: string }) => boolean;
-  apply: (params: {
-    cfg: AllBotConfig;
-    accountId: string;
-  }) => AllBotConfig | Promise<AllBotConfig>;
+  apply: (params: { cfg: AllBotConfig; accountId: string }) => AllBotConfig | Promise<AllBotConfig>;
 };
 
 export type ChannelSetupWizardCredential = {
@@ -88,10 +85,7 @@ export type ChannelSetupWizardCredential = {
   keepPrompt: string;
   inputPrompt: string;
   allowEnv?: (params: { cfg: AllBotConfig; accountId: string }) => boolean;
-  inspect: (params: {
-    cfg: AllBotConfig;
-    accountId: string;
-  }) => ChannelSetupWizardCredentialState;
+  inspect: (params: { cfg: AllBotConfig; accountId: string }) => ChannelSetupWizardCredentialState;
   shouldPrompt?: (params: {
     cfg: AllBotConfig;
     accountId: string;

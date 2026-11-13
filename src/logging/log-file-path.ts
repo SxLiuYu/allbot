@@ -1,9 +1,6 @@
 import path from "node:path";
 import type { AllBotConfig } from "../config/types.js";
-import {
-  POSIX_ALLBOT_TMP_DIR,
-  resolvePreferredAllBotTmpDir,
-} from "../infra/tmp-allbot-dir.js";
+import { POSIX_ALLBOT_TMP_DIR, resolvePreferredAllBotTmpDir } from "../infra/tmp-allbot-dir.js";
 
 const LOG_PREFIX = "allbot";
 const LOG_SUFFIX = ".log";

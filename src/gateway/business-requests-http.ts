@@ -1,10 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { reloadBusinessProviderCredentials } from "../business/provider-credentials.js";
 import {
   listBusinessProviderAdapters,
   resolveBusinessProviderAdapter,
 } from "../business/provider-registry.js";
-import { reloadBusinessProviderCredentials } from "../business/provider-credentials.js";
 import { createBusinessRequestStore, type BusinessRequestStore } from "../business/store.js";
+import type { BusinessRequestKind } from "../business/types.js";
 import {
   cancelBusinessRequest,
   confirmBusinessRequest,
@@ -15,7 +16,6 @@ import {
   type BusinessRequestActionResult,
   type DispatchBusinessRequestResult,
 } from "../business/workflow.js";
-import type { BusinessRequestKind } from "../business/types.js";
 import { isLocalDirectRequest } from "./auth.js";
 import { readJsonBodyOrError, sendJson, sendMethodNotAllowed } from "./http-common.js";
 import { getHeader } from "./http-utils.js";
@@ -55,7 +55,8 @@ function resolveAdapter(request: {
   kind: BusinessRequestKind;
 }): ReturnType<typeof resolveBusinessProviderAdapter> {
   const custom = (globalThis as GlobalWithResolver)[PROVIDER_ADAPTER_RESOLVER];
-  const resolved = custom?.(request) ?? resolveBusinessProviderAdapter(request.providerId ?? "", request.kind);
+  const resolved =
+    custom?.(request) ?? resolveBusinessProviderAdapter(request.providerId ?? "", request.kind);
   return resolved?.kind === request.kind ? resolved : undefined;
 }
 
@@ -215,9 +216,7 @@ export function handleBusinessRequestsHttpRequest(
       }
       if (action === "reload-providers") {
         const configuredPath =
-          typeof payload.path === "string" && payload.path.trim()
-            ? payload.path.trim()
-            : undefined;
+          typeof payload.path === "string" && payload.path.trim() ? payload.path.trim() : undefined;
         const result = await reloadBusinessProviderCredentials(
           configuredPath ? { filePath: configuredPath } : {},
         );

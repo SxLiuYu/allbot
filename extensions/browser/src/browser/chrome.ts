@@ -37,10 +37,7 @@ import {
   isProfileDecorated,
 } from "./chrome.profile-decoration.js";
 import type { ResolvedBrowserConfig, ResolvedBrowserProfile } from "./config.js";
-import {
-  DEFAULT_ALLBOT_BROWSER_COLOR,
-  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
-} from "./constants.js";
+import { DEFAULT_ALLBOT_BROWSER_COLOR, DEFAULT_ALLBOT_BROWSER_PROFILE_NAME } from "./constants.js";
 
 const log = createSubsystemLogger("browser").child("chrome");
 
@@ -498,10 +495,7 @@ async function requestGracefulCdpClose(running: RunningChrome): Promise<boolean>
   }
 }
 
-export async function stopAllBotChrome(
-  running: RunningChrome,
-  timeoutMs = CHROME_STOP_TIMEOUT_MS,
-) {
+export async function stopAllBotChrome(running: RunningChrome, timeoutMs = CHROME_STOP_TIMEOUT_MS) {
   const proc = running.proc;
   if (proc.killed) {
     return;

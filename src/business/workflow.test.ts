@@ -68,9 +68,7 @@ describe("business request workflow", () => {
       throw new Error("prepare failed");
     }
     expect(created.request.status).toBe("awaiting_confirmation");
-    expect(created.request.confirmationDigest).toBe(
-      hashBusinessConfirmationToken(created.token),
-    );
+    expect(created.request.confirmationDigest).toBe(hashBusinessConfirmationToken(created.token));
     expect(JSON.stringify(await store.read())).not.toContain(created.token);
   });
 

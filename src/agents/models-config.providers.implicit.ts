@@ -53,8 +53,7 @@ type ImplicitProviderContext = ImplicitProviderParams & {
 };
 
 function resolveLiveProviderCatalogTimeoutMs(env: NodeJS.ProcessEnv): number | null {
-  const live =
-    env.ALLBOT_LIVE_TEST === "1" || env.ALLBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
+  const live = env.ALLBOT_LIVE_TEST === "1" || env.ALLBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
   if (!live) {
     return null;
   }
@@ -80,8 +79,7 @@ function resolveProviderDiscoveryFilter(params: {
       .filter(Boolean);
     return ids.length > 0 ? [...new Set(ids)] : undefined;
   }
-  const live =
-    env.ALLBOT_LIVE_TEST === "1" || env.ALLBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
+  const live = env.ALLBOT_LIVE_TEST === "1" || env.ALLBOT_LIVE_GATEWAY === "1" || env.LIVE === "1";
   if (!live) {
     return undefined;
   }

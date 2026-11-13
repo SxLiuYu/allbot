@@ -1,5 +1,5 @@
-import { readFile } from "node:fs/promises";
 import { mkdtempSync, rmSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -99,10 +99,10 @@ describe("runWatchLoopTick", () => {
     const changed = await runWatchLoopTick({ ...base, now: () => 160_001 });
     expect(changed).toEqual({ checked: 1, changed: ["release-notes"], failed: [] });
     expect(enqueue).toHaveBeenCalledTimes(1);
-    expect(enqueue).toHaveBeenCalledWith(
-      expect.stringContaining("Release notes changed"),
-      { sessionKey: "agent:main:main", contextKey: "watch-loop:release-notes" },
-    );
+    expect(enqueue).toHaveBeenCalledWith(expect.stringContaining("Release notes changed"), {
+      sessionKey: "agent:main:main",
+      contextKey: "watch-loop:release-notes",
+    });
     expect(enqueue.mock.calls[0]?.[0]).toContain("Summarize what changed.");
   });
 
@@ -141,10 +141,10 @@ describe("runWatchLoopTick", () => {
       now: () => 160_002,
     });
     expect(result.checked).toBe(0);
-    expect(replay).toHaveBeenCalledWith(
-      expect.stringContaining("Release notes changed"),
-      { sessionKey: "agent:main:main", contextKey: "watch-loop:release-notes" },
-    );
+    expect(replay).toHaveBeenCalledWith(expect.stringContaining("Release notes changed"), {
+      sessionKey: "agent:main:main",
+      contextKey: "watch-loop:release-notes",
+    });
   });
 
   it("rejects non-https URLs and reports failed polls without waking", async () => {

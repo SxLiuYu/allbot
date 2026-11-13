@@ -3,7 +3,6 @@ import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import chokidar, { FSWatcher } from "chokidar";
 import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   buildCaseInsensitiveExtensionGlob,
@@ -38,6 +37,7 @@ import {
   type MemorySyncProgressUpdate,
 } from "allbot/plugin-sdk/memory-core-host-engine-storage";
 import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
+import chokidar, { FSWatcher } from "chokidar";
 import {
   createEmbeddingProvider,
   type EmbeddingProvider,

@@ -1,8 +1,5 @@
 import type { ProviderNormalizeResolvedModelContext } from "allbot/plugin-sdk/core";
-import type {
-  ModelProviderConfig,
-  ProviderPlugin,
-} from "allbot/plugin-sdk/provider-model-shared";
+import type { ModelProviderConfig, ProviderPlugin } from "allbot/plugin-sdk/provider-model-shared";
 import { apiKeyAuthMethod, entraIdAuthMethod } from "./auth.js";
 import { prepareFoundryRuntimeAuth } from "./runtime.js";
 import {

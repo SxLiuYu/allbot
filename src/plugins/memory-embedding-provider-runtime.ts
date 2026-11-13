@@ -11,9 +11,7 @@ export { listRegisteredMemoryEmbeddingProviders };
 export function listRegisteredMemoryEmbeddingProviderAdapters(): MemoryEmbeddingProviderAdapter[] {
   return listRegisteredMemoryEmbeddingProviders().map((entry) => entry.adapter);
 }
-export function listMemoryEmbeddingProviders(
-  cfg?: AllBotConfig,
-): MemoryEmbeddingProviderAdapter[] {
+export function listMemoryEmbeddingProviders(cfg?: AllBotConfig): MemoryEmbeddingProviderAdapter[] {
   const registered = listRegisteredMemoryEmbeddingProviderAdapters();
   if (registered.length > 0) {
     return registered;

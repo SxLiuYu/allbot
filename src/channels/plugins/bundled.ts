@@ -1,7 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { formatErrorMessage } from "../../infra/errors.js";
 import { resolveAllBotPackageRootSync } from "../../infra/allbot-root.js";
+import { formatErrorMessage } from "../../infra/errors.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import type {
   BundledChannelEntryContract,
@@ -87,12 +87,7 @@ function resolveBundledChannelBoundaryRoot(params: {
   metadata: BundledChannelPluginMetadata;
   modulePath: string;
 }): string {
-  const distRoot = path.resolve(
-    ALLBOT_PACKAGE_ROOT,
-    "dist",
-    "extensions",
-    params.metadata.dirName,
-  );
+  const distRoot = path.resolve(ALLBOT_PACKAGE_ROOT, "dist", "extensions", params.metadata.dirName);
   if (params.modulePath === distRoot || params.modulePath.startsWith(`${distRoot}${path.sep}`)) {
     return distRoot;
   }

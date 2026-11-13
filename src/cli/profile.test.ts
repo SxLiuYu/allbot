@@ -5,13 +5,7 @@ import { applyCliProfileEnv, parseCliProfileArgs } from "./profile.js";
 
 describe("parseCliProfileArgs", () => {
   it("leaves gateway --dev for subcommands", () => {
-    const res = parseCliProfileArgs([
-      "node",
-      "allbot",
-      "gateway",
-      "--dev",
-      "--allow-unconfigured",
-    ]);
+    const res = parseCliProfileArgs(["node", "allbot", "gateway", "--dev", "--allow-unconfigured"]);
     if (!res.ok) {
       throw new Error(res.error);
     }
@@ -136,9 +130,7 @@ describe("applyCliProfileEnv", () => {
 
     const resolvedHome = path.resolve("/srv/allbot-home");
     expect(env.ALLBOT_STATE_DIR).toBe(path.join(resolvedHome, ".allbot-work"));
-    expect(env.ALLBOT_CONFIG_PATH).toBe(
-      path.join(resolvedHome, ".allbot-work", "allbot.json"),
-    );
+    expect(env.ALLBOT_CONFIG_PATH).toBe(path.join(resolvedHome, ".allbot-work", "allbot.json"));
   });
 });
 
@@ -197,9 +189,7 @@ describe("formatCliCommand", () => {
   });
 
   it("handles command with no args after allbot", () => {
-    expect(formatCliCommand("allbot", { ALLBOT_PROFILE: "test" })).toBe(
-      "allbot --profile test",
-    );
+    expect(formatCliCommand("allbot", { ALLBOT_PROFILE: "test" })).toBe("allbot --profile test");
   });
 
   it("handles pnpm wrapper", () => {

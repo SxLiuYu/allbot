@@ -4,10 +4,7 @@ import {
   normalizeProviderId,
   resolveProviderEndpoint,
 } from "@allbot/plugin-sdk/provider-model-shared";
-import {
-  applyXaiModelCompat,
-  resolveXaiModelCompatPatch,
-} from "@allbot/plugin-sdk/provider-tools";
+import { applyXaiModelCompat, resolveXaiModelCompatPatch } from "@allbot/plugin-sdk/provider-tools";
 import { readStringValue } from "allbot/plugin-sdk/text-runtime";
 
 export { buildXaiProvider } from "./provider-catalog.js";

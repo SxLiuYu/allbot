@@ -1,5 +1,5 @@
-import type { Command } from "commander";
 import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
+import type { Command } from "commander";
 import { callBrowserRequest, type BrowserParentOpts } from "./browser-cli-shared.js";
 import {
   danger,

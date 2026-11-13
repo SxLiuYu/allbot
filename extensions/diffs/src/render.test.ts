@@ -88,8 +88,8 @@ describe("renderDiffDocument", () => {
     expect(html).toContain("diff.txt");
     expect(html).not.toContain("not-a-real-language");
 
-    const payloads = [...html.matchAll(/data-allbot-diff-payload>(.*?)<\/script>/g)].map(
-      (match) => parseViewerPayloadJson(match[1] ?? ""),
+    const payloads = [...html.matchAll(/data-allbot-diff-payload>(.*?)<\/script>/g)].map((match) =>
+      parseViewerPayloadJson(match[1] ?? ""),
     );
     expect(payloads).toHaveLength(1);
     expect(payloads[0]?.langs).toEqual(["text"]);

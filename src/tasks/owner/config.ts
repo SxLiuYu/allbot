@@ -1,8 +1,5 @@
 import type { AllBotConfig } from "../../config/config.js";
-import {
-  DEFAULT_OWNER_TASK_MAX_ACTIVE,
-  DEFAULT_OWNER_TASK_MAX_ATTEMPTS,
-} from "./types.js";
+import { DEFAULT_OWNER_TASK_MAX_ACTIVE, DEFAULT_OWNER_TASK_MAX_ATTEMPTS } from "./types.js";
 
 export type OwnerTasksConfig = {
   enabled: boolean;

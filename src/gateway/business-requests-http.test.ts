@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import os from "node:os";
 import path from "node:path";
-import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
 import { afterEach, describe, expect, it } from "vitest";
 import { drainSessionWriteLockStateForTest } from "../agents/session-write-lock.js";
@@ -233,9 +233,7 @@ describe("handleBusinessRequestsHttpRequest", () => {
   it("serves loopback-only read status", async () => {
     const store = makeStore();
     const { res, status, json } = makeRes();
-    expect(
-      handler(store)(makeReq("GET", "/__allbot/business-requests.json"), res),
-    ).toBe(true);
+    expect(handler(store)(makeReq("GET", "/__allbot/business-requests.json"), res)).toBe(true);
     await settle();
     expect(status()).toBe(200);
     expect(json().total).toBe(0);

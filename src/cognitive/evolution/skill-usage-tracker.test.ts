@@ -33,9 +33,7 @@ describe("trackSkillUsage", () => {
     const { trackSkillUsage } = await import("./skill-usage-tracker.js");
 
     await trackSkillUsage({
-      toolMetas: [
-        { toolName: "read", meta: `/home/user/.allbot/skills/agent/my-skill/SKILL.md` },
-      ],
+      toolMetas: [{ toolName: "read", meta: `/home/user/.allbot/skills/agent/my-skill/SKILL.md` }],
       configDir: tempDir,
     });
 

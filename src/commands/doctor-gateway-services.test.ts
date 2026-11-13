@@ -138,10 +138,7 @@ async function runRepair(cfg: AllBotConfig) {
   await maybeRepairGatewayServiceConfig(cfg, "local", makeDoctorIo(), makeDoctorPrompts());
 }
 
-async function runNonInteractiveRepair(params: {
-  cfg?: AllBotConfig;
-  updateInProgress?: boolean;
-}) {
+async function runNonInteractiveRepair(params: { cfg?: AllBotConfig; updateInProgress?: boolean }) {
   Object.defineProperty(process.stdin, "isTTY", {
     value: false,
     configurable: true,

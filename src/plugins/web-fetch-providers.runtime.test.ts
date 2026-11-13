@@ -109,13 +109,11 @@ describe("resolvePluginWebFetchProviders", () => {
         ? R
         : never,
     );
-    loadAllBotPluginsMock = vi
-      .spyOn(loaderModule, "loadAllBotPlugins")
-      .mockImplementation(() => {
-        const registry = createEmptyPluginRegistry();
-        registry.webFetchProviders = [createRuntimeWebFetchProvider()];
-        return registry;
-      });
+    loadAllBotPluginsMock = vi.spyOn(loaderModule, "loadAllBotPlugins").mockImplementation(() => {
+      const registry = createEmptyPluginRegistry();
+      registry.webFetchProviders = [createRuntimeWebFetchProvider()];
+      return registry;
+    });
     setActivePluginRegistry(createEmptyPluginRegistry());
   });
 

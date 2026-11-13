@@ -20,11 +20,7 @@ import {
 import type { ModelRow } from "./list.types.js";
 import { isLocalBaseUrl, modelKey } from "./shared.js";
 
-const hasAuthForProvider = (
-  provider: string,
-  cfg?: AllBotConfig,
-  authStore?: AuthProfileStore,
-) => {
+const hasAuthForProvider = (provider: string, cfg?: AllBotConfig, authStore?: AuthProfileStore) => {
   if (!cfg || !authStore) {
     return false;
   }

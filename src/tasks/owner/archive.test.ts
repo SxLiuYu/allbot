@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { readFile } from "node:fs/promises";
 import { afterEach, describe, expect, it } from "vitest";
 import type { AllBotConfig } from "../../config/config.js";
 import { archiveOwnerTasks } from "./archive.js";

@@ -154,13 +154,11 @@ describe("modelsAuthLoginCommand", () => {
     mocks.resolveDefaultAgentWorkspaceDir.mockReturnValue("/tmp/allbot/workspace");
     mocks.isRemoteEnvironment.mockReturnValue(false);
     mocks.loadValidConfigOrThrow.mockImplementation(async () => currentConfig);
-    mocks.updateConfig.mockImplementation(
-      async (mutator: (cfg: AllBotConfig) => AllBotConfig) => {
-        lastUpdatedConfig = mutator(currentConfig);
-        currentConfig = lastUpdatedConfig;
-        return lastUpdatedConfig;
-      },
-    );
+    mocks.updateConfig.mockImplementation(async (mutator: (cfg: AllBotConfig) => AllBotConfig) => {
+      lastUpdatedConfig = mutator(currentConfig);
+      currentConfig = lastUpdatedConfig;
+      return lastUpdatedConfig;
+    });
     mocks.createClackPrompter.mockReturnValue({
       note: vi.fn(async () => {}),
       select: vi.fn(),
@@ -600,9 +598,7 @@ describe("modelsAuthLoginCommand", () => {
       },
       agentDir: "/tmp/allbot/agents/main",
     });
-    expect(runtime.log).toHaveBeenCalledWith(
-      "Anthropic setup-token auth is supported in AllBot.",
-    );
+    expect(runtime.log).toHaveBeenCalledWith("Anthropic setup-token auth is supported in AllBot.");
     expect(runtime.log).toHaveBeenCalledWith(
       "AllBot prefers Claude CLI reuse when it is available on the host.",
     );

@@ -281,9 +281,7 @@ describe("resolveModel forward-compat errors and overrides", () => {
     expect(result.model).toBeUndefined();
     expect(result.error).toContain("Unknown model: ollama/gemma3:4b");
     expect(result.error).toContain("OLLAMA_API_KEY");
-    expect(result.error).toContain(
-      "github.com/SxLiuYu/allbot/blob/main/docs/providers/ollama.md",
-    );
+    expect(result.error).toContain("github.com/SxLiuYu/allbot/blob/main/docs/providers/ollama.md");
   });
 
   it("includes auth hint for unknown vllm models", () => {

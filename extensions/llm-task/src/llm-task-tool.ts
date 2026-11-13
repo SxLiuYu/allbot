@@ -186,9 +186,7 @@ export function createLlmTaskTool(api: AllBotPluginApi) {
 
       let tmpDir: string | null = null;
       try {
-        tmpDir = await fs.mkdtemp(
-          path.join(resolvePreferredAllBotTmpDir(), "allbot-llm-task-"),
-        );
+        tmpDir = await fs.mkdtemp(path.join(resolvePreferredAllBotTmpDir(), "allbot-llm-task-"));
         const sessionId = `llm-task-${Date.now()}`;
         const sessionFile = path.join(tmpDir, "session.json");
 

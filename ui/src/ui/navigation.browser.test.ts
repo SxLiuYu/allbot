@@ -468,9 +468,7 @@ describe("control UI routing", () => {
   });
 
   it("keeps a hash token pending until the gateway URL change is confirmed", async () => {
-    const app = mountApp(
-      "/ui/settings?gatewayUrl=wss://other-gateway.example/allbot#token=abc123",
-    );
+    const app = mountApp("/ui/settings?gatewayUrl=wss://other-gateway.example/allbot#token=abc123");
     await app.updateComplete;
 
     expect(app.settings.gatewayUrl).not.toBe("wss://other-gateway.example/allbot");
@@ -482,9 +480,7 @@ describe("control UI routing", () => {
   });
 
   it("keeps a query token pending until the gateway URL change is confirmed", async () => {
-    const app = mountApp(
-      "/ui/settings?gatewayUrl=wss://other-gateway.example/allbot&token=abc123",
-    );
+    const app = mountApp("/ui/settings?gatewayUrl=wss://other-gateway.example/allbot&token=abc123");
     await app.updateComplete;
 
     expect(app.settings.gatewayUrl).not.toBe("wss://other-gateway.example/allbot");

@@ -135,12 +135,12 @@ describe("installPackageDir", () => {
       error: "post-copy validation failed: Error: validation boom",
     });
     await expect(fs.readFile(path.join(targetDir, "marker.txt"), "utf8")).resolves.toBe("old");
-    await expect(
-      listMatchingDirs(installBaseDir, ".allbot-install-stage-"),
-    ).resolves.toHaveLength(0);
-    await expect(
-      listMatchingDirs(installBaseDir, ".allbot-install-backups"),
-    ).resolves.toHaveLength(0);
+    await expect(listMatchingDirs(installBaseDir, ".allbot-install-stage-")).resolves.toHaveLength(
+      0,
+    );
+    await expect(listMatchingDirs(installBaseDir, ".allbot-install-backups")).resolves.toHaveLength(
+      0,
+    );
   });
 
   it("restores the original install if publish rename fails", async () => {
@@ -179,9 +179,9 @@ describe("installPackageDir", () => {
       error: "failed to copy plugin: Error: publish boom",
     });
     await expect(fs.readFile(path.join(targetDir, "marker.txt"), "utf8")).resolves.toBe("old");
-    await expect(
-      listMatchingDirs(installBaseDir, ".allbot-install-stage-"),
-    ).resolves.toHaveLength(0);
+    await expect(listMatchingDirs(installBaseDir, ".allbot-install-stage-")).resolves.toHaveLength(
+      0,
+    );
     const backupRoot = path.join(installBaseDir, ".allbot-install-backups");
     await expect(fs.readdir(backupRoot)).resolves.toHaveLength(0);
   });

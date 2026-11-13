@@ -201,9 +201,7 @@ describe("resolvePluginTools optional tools", () => {
   beforeEach(() => {
     loadAllBotPluginsMock.mockClear();
     resolveRuntimePluginRegistryMock.mockReset();
-    resolveRuntimePluginRegistryMock.mockImplementation((params) =>
-      loadAllBotPluginsMock(params),
-    );
+    resolveRuntimePluginRegistryMock.mockImplementation((params) => loadAllBotPluginsMock(params));
     applyPluginAutoEnableMock.mockReset();
     applyPluginAutoEnableMock.mockImplementation(({ config }: { config: unknown }) => ({
       config,

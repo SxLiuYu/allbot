@@ -164,11 +164,15 @@ function withOutboundRateLimit<T>(fn: () => Promise<T>): Promise<T> {
 // upload, leaving the already-sent text alone (the legs are effectively
 // idempotent from the caller's perspective). The reply→fallback semantics inside
 // each leg (see send.ts) are untouched.
-function sendTextWithRateLimit(params: Parameters<typeof sendOutboundText>[0]): Promise<Awaited<ReturnType<typeof sendOutboundText>>> {
+function sendTextWithRateLimit(
+  params: Parameters<typeof sendOutboundText>[0],
+): Promise<Awaited<ReturnType<typeof sendOutboundText>>> {
   return withOutboundRateLimit(() => sendOutboundText(params));
 }
 
-function sendMediaWithRateLimit(params: Parameters<typeof sendMediaFeishu>[0]): Promise<Awaited<ReturnType<typeof sendMediaFeishu>>> {
+function sendMediaWithRateLimit(
+  params: Parameters<typeof sendMediaFeishu>[0],
+): Promise<Awaited<ReturnType<typeof sendMediaFeishu>>> {
   return withOutboundRateLimit(() => sendMediaFeishu(params));
 }
 

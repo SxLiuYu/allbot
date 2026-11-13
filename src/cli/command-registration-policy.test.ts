@@ -42,9 +42,7 @@ describe("command-registration-policy", () => {
     expect(shouldEagerRegisterSubcommands({ ALLBOT_DISABLE_LAZY_SUBCOMMANDS: "1" })).toBe(true);
     expect(shouldEagerRegisterSubcommands({ ALLBOT_DISABLE_LAZY_SUBCOMMANDS: "0" })).toBe(false);
     expect(shouldRegisterPrimarySubcommandOnly(["node", "allbot", "acp"], {})).toBe(true);
-    expect(shouldRegisterPrimarySubcommandOnly(["node", "allbot", "acp", "--help"], {})).toBe(
-      true,
-    );
+    expect(shouldRegisterPrimarySubcommandOnly(["node", "allbot", "acp", "--help"], {})).toBe(true);
     expect(
       shouldRegisterPrimarySubcommandOnly(["node", "allbot", "acp"], {
         ALLBOT_DISABLE_LAZY_SUBCOMMANDS: "1",

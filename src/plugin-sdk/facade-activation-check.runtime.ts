@@ -191,11 +191,7 @@ function readBundledPluginManifestRecordFromDir(params: {
   pluginsRoot: string;
   resolvedDirName: string;
 }): FacadePluginManifestLike | null {
-  const manifestPath = path.join(
-    params.pluginsRoot,
-    params.resolvedDirName,
-    "allbot.plugin.json",
-  );
+  const manifestPath = path.join(params.pluginsRoot, params.resolvedDirName, "allbot.plugin.json");
   if (!fs.existsSync(manifestPath)) {
     return null;
   }

@@ -503,10 +503,7 @@ export type ChannelMessagingAdapter = {
     cfg: AllBotConfig;
     accountId?: string | null;
   }) => ReplyPayload | null;
-  enableInteractiveReplies?: (params: {
-    cfg: AllBotConfig;
-    accountId?: string | null;
-  }) => boolean;
+  enableInteractiveReplies?: (params: { cfg: AllBotConfig; accountId?: string | null }) => boolean;
   hasStructuredReplyPayload?: (params: { payload: ReplyPayload }) => boolean;
   targetResolver?: {
     looksLikeId?: (raw: string, normalized?: string) => boolean;

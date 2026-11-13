@@ -94,9 +94,7 @@ function main() {
       }
     }
     if (legacyCompatOffenders.length > 0) {
-      console.error(
-        "Bundled plugin source files must not import legacy allbot/plugin-sdk/compat.",
-      );
+      console.error("Bundled plugin source files must not import legacy allbot/plugin-sdk/compat.");
       for (const file of legacyCompatOffenders.toSorted()) {
         console.error(`- ${relativeToCwd(file)}`);
       }

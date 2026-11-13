@@ -67,8 +67,7 @@ function resolveSourceFirstPublicSurfacePath(params: {
 }): string | null {
   const artifactBasename = normalizeBundledPluginArtifactSubpath(params.artifactBasename);
   const sourceBaseName = artifactBasename.replace(/\.js$/u, "");
-  const sourceRoot =
-    params.bundledPluginsDir ?? path.resolve(getAllBotPackageRoot(), "extensions");
+  const sourceRoot = params.bundledPluginsDir ?? path.resolve(getAllBotPackageRoot(), "extensions");
   for (const ext of PUBLIC_SURFACE_SOURCE_EXTENSIONS) {
     const candidate = path.resolve(sourceRoot, params.dirName, `${sourceBaseName}${ext}`);
     if (fs.existsSync(candidate)) {

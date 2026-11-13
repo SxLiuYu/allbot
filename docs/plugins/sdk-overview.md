@@ -65,7 +65,7 @@ explicitly promotes one as public.
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `plugin-sdk/plugin-entry`   | `definePluginEntry`                                                                                                                                                        |
 | `plugin-sdk/core`           | `defineChannelPluginEntry`, `createChatChannelPlugin`, `createChannelPluginBase`, `defineSetupPluginEntry`, `buildChannelConfigSchema`, `stringEnum`, `optionalStringEnum` |
-| `plugin-sdk/config-schema`  | `AllBotSchema`                                                                                                                                                           |
+| `plugin-sdk/config-schema`  | `AllBotSchema`                                                                                                                                                             |
 | `plugin-sdk/provider-entry` | `defineSingleProviderPluginEntry`                                                                                                                                          |
 
 <AccordionGroup>
@@ -445,7 +445,7 @@ AI CLI backend such as `codex-cli`.
 | `api.description`        | `string?`                 | Plugin description (optional)                                                               |
 | `api.source`             | `string`                  | Plugin source path                                                                          |
 | `api.rootDir`            | `string?`                 | Plugin root directory (optional)                                                            |
-| `api.config`             | `AllBotConfig`          | Current config snapshot (active in-memory runtime snapshot when available)                  |
+| `api.config`             | `AllBotConfig`            | Current config snapshot (active in-memory runtime snapshot when available)                  |
 | `api.pluginConfig`       | `Record<string, unknown>` | Plugin-specific config from `plugins.entries.<id>.config`                                   |
 | `api.runtime`            | `PluginRuntime`           | [Runtime helpers](/plugins/sdk-runtime)                                                     |
 | `api.logger`             | `PluginLogger`            | Scoped logger (`debug`, `info`, `warn`, `error`)                                            |

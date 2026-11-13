@@ -42,7 +42,7 @@ If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helper
 | Command                   | Description                                   |
 | ------------------------- | --------------------------------------------- |
 | `clawdock-shell`          | Open a shell inside the gateway container     |
-| `clawdock-cli <command>`  | Run AllBot CLI commands in Docker           |
+| `clawdock-cli <command>`  | Run AllBot CLI commands in Docker             |
 | `clawdock-exec <command>` | Execute an arbitrary command in the container |
 
 ### Web UI and pairing
@@ -68,8 +68,8 @@ If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helper
 | ---------------------- | --------------------------------------- |
 | `clawdock-health`      | Run a gateway health check              |
 | `clawdock-token`       | Print the gateway token                 |
-| `clawdock-cd`          | Jump to the AllBot project directory  |
-| `clawdock-config`      | Open `~/.allbot`                      |
+| `clawdock-cd`          | Jump to the AllBot project directory    |
+| `clawdock-config`      | Open `~/.allbot`                        |
 | `clawdock-show-config` | Print config files with redacted values |
 | `clawdock-workspace`   | Open the workspace directory            |
 

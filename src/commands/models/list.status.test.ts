@@ -44,9 +44,7 @@ const mocks = vi.hoisted(() => {
         .map(([id]) => id);
     }),
     resolveAuthProfileDisplayLabel: vi.fn(({ profileId }: { profileId: string }) => profileId),
-    resolveAuthStorePathForDisplay: vi
-      .fn()
-      .mockReturnValue("/tmp/allbot-agent/auth-profiles.json"),
+    resolveAuthStorePathForDisplay: vi.fn().mockReturnValue("/tmp/allbot-agent/auth-profiles.json"),
     resolveProfileUnusableUntilForDisplay: vi.fn().mockReturnValue(undefined),
     resolveEnvApiKey: vi.fn((provider: string) => {
       if (provider === "openai") {

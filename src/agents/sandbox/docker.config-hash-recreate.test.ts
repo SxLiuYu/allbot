@@ -330,8 +330,6 @@ describe("ensureSandboxContainer config-hash recreation", () => {
       (call) => call.command === "docker" && call.args[0] === "create",
     );
     expect(createCall).toBeDefined();
-    expect(createCall?.args).toContain(
-      `allbot.mountFormatVersion=${SANDBOX_MOUNT_FORMAT_VERSION}`,
-    );
+    expect(createCall?.args).toContain(`allbot.mountFormatVersion=${SANDBOX_MOUNT_FORMAT_VERSION}`);
   });
 });

@@ -160,12 +160,7 @@ function collectPreservedExistingServiceEnvVars(
       continue;
     }
     const upper = key.toUpperCase();
-    if (
-      upper === "HOME" ||
-      upper === "PATH" ||
-      upper === "TMPDIR" ||
-      upper.startsWith("ALLBOT_")
-    ) {
+    if (upper === "HOME" || upper === "PATH" || upper === "TMPDIR" || upper.startsWith("ALLBOT_")) {
       continue;
     }
     if (managedServiceEnvKeys.has(upper)) {

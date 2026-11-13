@@ -199,10 +199,7 @@ export function applyOnboardAuthAgentModelsAndProviders(
   };
 }
 
-export function applyAgentDefaultModelPrimary(
-  cfg: AllBotConfig,
-  primary: string,
-): AllBotConfig {
+export function applyAgentDefaultModelPrimary(cfg: AllBotConfig, primary: string): AllBotConfig {
   const existingFallbacks = extractAgentDefaultModelFallbacks(cfg.agents?.defaults?.model);
   return {
     ...cfg,

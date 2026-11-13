@@ -234,10 +234,7 @@ function withIMessageChannel(
   };
 }
 
-function resolveIMessageMaxBytes(
-  cfg: AllBotConfig,
-  accountId?: string | null,
-): number | undefined {
+function resolveIMessageMaxBytes(cfg: AllBotConfig, accountId?: string | null): number | undefined {
   return resolveChannelMediaMaxBytes({
     cfg,
     resolveChannelLimitMb: ({ cfg, accountId }) =>

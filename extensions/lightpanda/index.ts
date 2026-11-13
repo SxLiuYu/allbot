@@ -4,8 +4,7 @@ import { createLightpandaWebFetchProvider } from "./src/lightpanda-fetch-provide
 export default definePluginEntry({
   id: "lightpanda",
   name: "Lightpanda Plugin",
-  description:
-    "Bundled Lightpanda page fetching. Renders pages to markdown with no API key.",
+  description: "Bundled Lightpanda page fetching. Renders pages to markdown with no API key.",
   register(api) {
     api.registerWebFetchProvider(createLightpandaWebFetchProvider());
   },

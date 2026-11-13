@@ -4,7 +4,6 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import readline from "node:readline";
-import chokidar, { type FSWatcher } from "chokidar";
 import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import { withFileLock } from "allbot/plugin-sdk/file-lock";
 import {
@@ -49,6 +48,7 @@ import {
   localeLowercasePreservingWhitespace,
   normalizeLowercaseStringOrEmpty,
 } from "allbot/plugin-sdk/text-runtime";
+import chokidar, { type FSWatcher } from "chokidar";
 import { resolveQmdCollectionPatternFlags, type QmdCollectionPatternFlag } from "./qmd-compat.js";
 
 type SqliteDatabase = import("node:sqlite").DatabaseSync;
@@ -295,11 +295,7 @@ export class QmdMemoryManager implements MemorySearchManager {
   private readonly sessionWarm = new Set<string>();
   private collectionPatternFlag: QmdCollectionPatternFlag | null = "--glob";
 
-  private constructor(params: {
-    cfg: AllBotConfig;
-    agentId: string;
-    resolved: ResolvedQmdConfig;
-  }) {
+  private constructor(params: { cfg: AllBotConfig; agentId: string; resolved: ResolvedQmdConfig }) {
     this.cfg = params.cfg;
     this.agentId = params.agentId;
     this.qmd = params.resolved;

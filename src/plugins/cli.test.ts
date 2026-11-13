@@ -14,8 +14,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("./loader.js", () => ({
-  loadAllBotPluginCliRegistry: (...args: unknown[]) =>
-    mocks.loadAllBotPluginCliRegistry(...args),
+  loadAllBotPluginCliRegistry: (...args: unknown[]) => mocks.loadAllBotPluginCliRegistry(...args),
   loadAllBotPlugins: (...args: unknown[]) => mocks.loadAllBotPlugins(...args),
 }));
 

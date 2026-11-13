@@ -38,8 +38,7 @@ export async function archiveOwnerTasks(params: {
   const now = params.now ?? Date.now();
   const afterMs = params.afterMs ?? DEFAULT_OWNER_TASK_ARCHIVE_AFTER_MS;
   const maxArchive = params.maxArchive ?? DEFAULT_OWNER_TASK_ARCHIVE_MAX;
-  const filePath =
-    params.statePath ?? path.join(resolveStateDir(), "tasks", "owner-tasks.json");
+  const filePath = params.statePath ?? path.join(resolveStateDir(), "tasks", "owner-tasks.json");
   const archivePath = `${filePath}.archive-${new Date(now).toISOString().slice(0, 10)}.json`;
 
   const { release } = await acquireSessionWriteLock({

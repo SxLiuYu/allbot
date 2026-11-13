@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultPersona } from "./store.js";
 import { applyExplicitTopics } from "./explicit-topics.js";
+import { createDefaultPersona } from "./store.js";
 
 describe("applyExplicitTopics", () => {
   it("creates a domain for a declared topic", () => {

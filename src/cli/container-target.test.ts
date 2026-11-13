@@ -93,9 +93,9 @@ describe("parseCliContainerArgs", () => {
 
 describe("resolveCliContainerTarget", () => {
   it("uses argv first and falls back to ALLBOT_CONTAINER", () => {
-    expect(
-      resolveCliContainerTarget(["node", "allbot", "--container", "demo", "status"], {}),
-    ).toBe("demo");
+    expect(resolveCliContainerTarget(["node", "allbot", "--container", "demo", "status"], {})).toBe(
+      "demo",
+    );
     expect(resolveCliContainerTarget(["node", "allbot", "status"], {})).toBeNull();
     expect(
       resolveCliContainerTarget(["node", "allbot", "status"], {

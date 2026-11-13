@@ -1,3 +1,4 @@
+import { emitExternalEventSignal } from "../../cognitive/persona/feishu-activity-source.js";
 import { resolveMainSessionKeyFromConfig } from "../../config/sessions.js";
 import {
   loadOrCreateDeviceIdentity,
@@ -6,7 +7,6 @@ import {
 import { getLastHeartbeatEvent } from "../../infra/heartbeat-events.js";
 import { setHeartbeatsEnabled } from "../../infra/heartbeat-runner.js";
 import { enqueueSystemEvent, isSystemEventContextChanged } from "../../infra/system-events.js";
-import { emitExternalEventSignal } from "../../cognitive/persona/feishu-activity-source.js";
 import { listSystemPresence, updateSystemPresence } from "../../infra/system-presence.js";
 import {
   normalizeLowercaseStringOrEmpty,

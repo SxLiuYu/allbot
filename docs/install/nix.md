@@ -76,11 +76,11 @@ defaults write ai.allbot.mac allbot.nixMode -bool true
 
 AllBot reads JSON5 config from `ALLBOT_CONFIG_PATH` and stores mutable data in `ALLBOT_STATE_DIR`. When running under Nix, set these explicitly to Nix-managed locations so runtime state and config stay out of the immutable store.
 
-| Variable               | Default                                 |
-| ---------------------- | --------------------------------------- |
+| Variable             | Default                                 |
+| -------------------- | --------------------------------------- |
 | `ALLBOT_HOME`        | `HOME` / `USERPROFILE` / `os.homedir()` |
-| `ALLBOT_STATE_DIR`   | `~/.allbot`                           |
-| `ALLBOT_CONFIG_PATH` | `$ALLBOT_STATE_DIR/allbot.json`     |
+| `ALLBOT_STATE_DIR`   | `~/.allbot`                             |
+| `ALLBOT_CONFIG_PATH` | `$ALLBOT_STATE_DIR/allbot.json`         |
 
 ## Related
 

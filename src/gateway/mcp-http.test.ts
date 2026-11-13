@@ -148,9 +148,7 @@ describe("createMcpLoopbackServerConfig", () => {
       mcpServers?: Record<string, { url?: string; headers?: Record<string, string> }>;
     };
     expect(config.mcpServers?.allbot?.url).toBe("http://127.0.0.1:23119/mcp");
-    expect(config.mcpServers?.allbot?.headers?.Authorization).toBe(
-      "Bearer ${ALLBOT_MCP_TOKEN}",
-    );
+    expect(config.mcpServers?.allbot?.headers?.Authorization).toBe("Bearer ${ALLBOT_MCP_TOKEN}");
     expect(config.mcpServers?.allbot?.headers?.["x-allbot-message-channel"]).toBe(
       "${ALLBOT_MCP_MESSAGE_CHANNEL}",
     );

@@ -67,8 +67,8 @@ reinstall path for plugins that opt into
 
 AllBot recognizes two plugin formats:
 
-| Format     | How it works                                                       | Examples                                               |
-| ---------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
+| Format     | How it works                                                     | Examples                                               |
+| ---------- | ---------------------------------------------------------------- | ------------------------------------------------------ |
 | **Native** | `allbot.plugin.json` + runtime module; executes in-process       | Official plugins, community npm packages               |
 | **Bundle** | Codex/Claude/Cursor-compatible layout; mapped to AllBot features | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
 
@@ -81,8 +81,8 @@ and the [Plugin SDK Overview](/plugins/sdk-overview).
 
 ### Installable (npm)
 
-| Plugin          | Package                | Docs                                 |
-| --------------- | ---------------------- | ------------------------------------ |
+| Plugin          | Package              | Docs                                 |
+| --------------- | -------------------- | ------------------------------------ |
 | Matrix          | `@allbot/matrix`     | [Matrix](/channels/matrix)           |
 | Microsoft Teams | `@allbot/msteams`    | [Microsoft Teams](/channels/msteams) |
 | Nostr           | `@allbot/nostr`      | [Nostr](/channels/nostr)             |

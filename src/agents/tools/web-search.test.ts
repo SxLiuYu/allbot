@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createEmptyPluginRegistry } from "../../plugins/registry.js";
 import { setActivePluginRegistry } from "../../plugins/runtime.js";
 import { clearActiveRuntimeWebToolsMetadata } from "../../secrets/runtime-web-tools-state.js";
-import { createWebSearchTool } from "./web-search.js";
 import {
   buildUnsupportedSearchFilterResponse,
   isoToPerplexityDate,
@@ -10,6 +9,7 @@ import {
   normalizeFreshness,
 } from "./web-search-provider-common.js";
 import { mergeScopedSearchConfig } from "./web-search-provider-config.js";
+import { createWebSearchTool } from "./web-search.js";
 
 describe("web_search freshness normalization", () => {
   it("accepts Brave shortcut values and maps for Perplexity", () => {

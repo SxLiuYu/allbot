@@ -35,8 +35,6 @@ describe("Feishu activity bridge", () => {
   });
 
   it("is a no-op when the gateway has not installed the bridge", () => {
-    expect(() =>
-      emitFeishuActivitySignal({ senderOpenId: "ou_test", at: 1 }),
-    ).not.toThrow();
+    expect(() => emitFeishuActivitySignal({ senderOpenId: "ou_test", at: 1 })).not.toThrow();
   });
 });

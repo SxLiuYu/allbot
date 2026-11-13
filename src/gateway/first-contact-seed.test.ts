@@ -48,11 +48,7 @@ describe("listSeedTargets", () => {
       }),
     );
 
-    const targets = listSeedTargets(
-      configWithStore(storePath),
-      "main",
-      new Set(["ou_alice"]),
-    );
+    const targets = listSeedTargets(configWithStore(storePath), "main", new Set(["ou_alice"]));
 
     expect(targets.map((t) => t.userId)).toEqual(["ou_bob"]);
   });

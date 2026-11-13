@@ -14,11 +14,11 @@ The first open-source AI companion that turns "proactive cognition" into a syste
 
 AllBot is one agent shipped as three independently runnable pieces in a single repository:
 
-| Directory | What it is | Stack | Run |
-|---|---|---|---|
-| **root** | Server side: proactive cognition, memory, skills, Feishu/WeChat | Node.js ≥22 + TypeScript | `pnpm install && pnpm build` |
-| [`mobile/`](mobile/README.md) | Phone side (Yanchu): say one sentence, it works your apps on a hidden background screen | Android 11+ / Kotlin | `cd mobile && ./gradlew :app:assembleDebug` |
-| [`voice/`](voice/README.md) | Voice and hardware side (Charlie): ESP32 + full voice loop for existing home appliances | Python 3.12 + FastAPI | `cd voice/charlie && python voice_server.py` |
+| Directory                     | What it is                                                                              | Stack                    | Run                                          |
+| ----------------------------- | --------------------------------------------------------------------------------------- | ------------------------ | -------------------------------------------- |
+| **root**                      | Server side: proactive cognition, memory, skills, Feishu/WeChat                         | Node.js ≥22 + TypeScript | `pnpm install && pnpm build`                 |
+| [`mobile/`](mobile/README.md) | Phone side (Yanchu): say one sentence, it works your apps on a hidden background screen | Android 11+ / Kotlin     | `cd mobile && ./gradlew :app:assembleDebug`  |
+| [`voice/`](voice/README.md)   | Voice and hardware side (Charlie): ESP32 + full voice loop for existing home appliances | Python 3.12 + FastAPI    | `cd voice/charlie && python voice_server.py` |
 
 They talk over HTTP and MCP — not three separate products:
 
@@ -31,17 +31,17 @@ They talk over HTTP and MCP — not three separate products:
              root  allbot   brain, memory, governance, proactive pushes
 ```
 
-Any one piece runs on its own. 
+Any one piece runs on its own.
 
 ### How the three connect
 
 Nothing auto-discovers — you wire it once. The **sync gateway lives on the `voice/` side** (`voice/charlie/app/routes/sync.py`, protocol `mika-relay.v2`); allbot and mobile are its clients:
 
-| Direction | Where you configure it | What |
-|---|---|---|
-| allbot → voice | `tasks.sync` in `allbot.json` | Gateway URL + device token; `src/tasks/sync/adapter.ts` projects OwnerTasks into sync tasks |
-| mobile → allbot | App settings | Just an OpenAI-compatible model endpoint; the phone needs no gateway |
-| mobile → voice | App pairing entry | **Not implemented** — see gaps below |
+| Direction       | Where you configure it        | What                                                                                        |
+| --------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| allbot → voice  | `tasks.sync` in `allbot.json` | Gateway URL + device token; `src/tasks/sync/adapter.ts` projects OwnerTasks into sync tasks |
+| mobile → allbot | App settings                  | Just an OpenAI-compatible model endpoint; the phone needs no gateway                        |
+| mobile → voice  | App pairing entry             | **Not implemented** — see gaps below                                                        |
 
 Start `voice/` first (it brings the gateway up), then allbot with the address filled in. With `tasks.sync` unset the adapter short-circuits and allbot runs standalone.
 
@@ -62,7 +62,7 @@ Every AI assistant you've used follows the same pattern: you ask, it answers. Yo
 
 AllBot is different. After a few conversations on Feishu, it starts **reaching out to you** proactively — not with spam or hydration reminders, but with things you'd actually find interesting.
 
-| Capability              | Typical chatbot                | Typical memory agent (2026) | **AllBot**                                                                              |
+| Capability              | Typical chatbot                | Typical memory agent (2026) | **AllBot**                                                                                |
 | ----------------------- | ------------------------------ | --------------------------- | ----------------------------------------------------------------------------------------- |
 | **Interaction**         | Reactive — you ask, it answers | Reactive + long memory      | **Pushes insights proactively** + normal Q&A                                              |
 | **User modeling**       | Stateless                      | Vector DB + rerank          | **TypedInsight 6 categories + category-aware decay half-lives + interest lifecycle**      |
@@ -288,9 +288,9 @@ curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install-termux.sh 
 
 Before you start, you'll need:
 
-| Requirement           | What for                       | How to get it                                                                                                                                                                                                                                                                          |
-| --------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **LLM API key**       | At least one AI provider's key | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [Qwen](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) — pick one                                                |
+| Requirement           | What for                       | How to get it                                                                                                                                                                                                                                                                                      |
+| --------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **LLM API key**       | At least one AI provider's key | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [Qwen](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) — pick one                                                            |
 | **Messaging channel** | For sending/receiving messages | [Feishu](https://open.feishu.cn/) (recommended, wizard supports QR-code auto-creation) · [WeChat](./docs/channels/wechat.md) (first-class channel, run `allbot channels login --channel wechat` to connect) · upstream channels (Telegram/Discord/Slack etc.) have **no packaged code**, docs only |
 
 ### Install (recommended)
@@ -348,7 +348,7 @@ node allbot.mjs onboard
 ```
 
 After that `node allbot.mjs` is the CLI; use `npm link` or an alias to call it as `allbot`.
->
+
 > See `.env.example` for full details.
 
 #### Docker

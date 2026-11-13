@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
+import path from "node:path";
 import type { AllBotConfig } from "../../config/config.js";
 import { resolveStateDir } from "../../config/paths.js";
-import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { readJsonFile, writeJsonAtomic } from "../../infra/json-files.js";
-import path from "node:path";
+import { createSubsystemLogger } from "../../logging/subsystem.js";
 
 const log = createSubsystemLogger("watch-loop");
 
@@ -119,8 +119,7 @@ export async function runWatchLoopTick(deps: WatchLoopDeps): Promise<WatchLoopTi
   }
   const now = deps.now?.() ?? Date.now();
   const fetchImpl = deps.fetchImpl ?? fetch;
-  const filePath =
-    deps.statePath ?? path.join(resolveStateDir(), "tasks", "watch-loop-state.json");
+  const filePath = deps.statePath ?? path.join(resolveStateDir(), "tasks", "watch-loop-state.json");
   const state = await readState(filePath);
   // Replay events persisted before a restart. enqueueSystemEvent dedupes
   // consecutive identical text per session, so replay is safe.

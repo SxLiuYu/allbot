@@ -103,11 +103,7 @@ function createExpiredOauthStore(params: {
 }
 
 describe("resolveApiKeyForProfile openai-codex refresh fallback", () => {
-  const envSnapshot = captureEnv([
-    "ALLBOT_STATE_DIR",
-    "ALLBOT_AGENT_DIR",
-    "PI_CODING_AGENT_DIR",
-  ]);
+  const envSnapshot = captureEnv(["ALLBOT_STATE_DIR", "ALLBOT_AGENT_DIR", "PI_CODING_AGENT_DIR"]);
   let tempRoot = "";
   let agentDir = "";
 

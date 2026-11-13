@@ -153,9 +153,7 @@ describe("video-generation runtime", () => {
     ];
     mocks.listVideoGenerationProviders.mockReturnValue(providers);
 
-    expect(listRuntimeVideoGenerationProviders({ config: {} as AllBotConfig })).toEqual(
-      providers,
-    );
+    expect(listRuntimeVideoGenerationProviders({ config: {} as AllBotConfig })).toEqual(providers);
     expect(mocks.listVideoGenerationProviders).toHaveBeenCalledWith({} as AllBotConfig);
   });
 

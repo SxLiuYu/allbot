@@ -104,8 +104,8 @@ Benefits:
 
 This table maps common inference tasks to the corresponding infer command.
 
-| Task                    | Command                                                                | Notes                                                |
-| ----------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
+| Task                    | Command                                                              | Notes                                                |
+| ----------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- |
 | Run a text/model prompt | `allbot infer model run --prompt "..." --json`                       | Uses the normal local path by default                |
 | Generate an image       | `allbot infer image generate --prompt "..." --json`                  | Use `image edit` when starting from an existing file |
 | Describe an image file  | `allbot infer image describe --file ./image.png --json`              | `--model` must be `<provider/model>`                 |

@@ -3782,19 +3782,17 @@ module.exports = {
     });
 
     try {
-      const registry = withEnv(
-        { ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins" },
-        () =>
-          loadAllBotPlugins({
-            cache: false,
-            workspaceDir: plugin.dir,
-            config: {
-              plugins: {
-                load: { paths: [plugin.file] },
-                allow: ["legacy-root-diagnostic-listener"],
-              },
+      const registry = withEnv({ ALLBOT_BUNDLED_PLUGINS_DIR: "/nonexistent/bundled/plugins" }, () =>
+        loadAllBotPlugins({
+          cache: false,
+          workspaceDir: plugin.dir,
+          config: {
+            plugins: {
+              load: { paths: [plugin.file] },
+              allow: ["legacy-root-diagnostic-listener"],
             },
-          }),
+          },
+        }),
       );
       const record = registry.plugins.find(
         (entry) => entry.id === "legacy-root-diagnostic-listener",

@@ -264,8 +264,7 @@ describe("resolvePluginProviders", () => {
       diagnostics: [],
     });
     vi.doMock("./loader.js", () => ({
-      loadAllBotPlugins: (...args: Parameters<LoadAllBotPlugins>) =>
-        loadAllBotPluginsMock(...args),
+      loadAllBotPlugins: (...args: Parameters<LoadAllBotPlugins>) => loadAllBotPluginsMock(...args),
       isPluginRegistryLoadInFlight: (...args: Parameters<IsPluginRegistryLoadInFlight>) =>
         isPluginRegistryLoadInFlightMock(...args),
       resolveRuntimePluginRegistry: (...args: Parameters<ResolveRuntimePluginRegistry>) =>

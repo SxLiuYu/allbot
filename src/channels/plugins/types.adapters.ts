@@ -601,9 +601,7 @@ export type ChannelDoctorAdapter = {
     cfg: AllBotConfig;
     doctorFixCommand: string;
   }) => string[] | Promise<string[]>;
-  collectMutableAllowlistWarnings?: (params: {
-    cfg: AllBotConfig;
-  }) => string[] | Promise<string[]>;
+  collectMutableAllowlistWarnings?: (params: { cfg: AllBotConfig }) => string[] | Promise<string[]>;
   repairConfig?: (params: {
     cfg: AllBotConfig;
     doctorFixCommand: string;

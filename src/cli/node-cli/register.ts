@@ -28,10 +28,7 @@ export function registerNodeCli(program: Command) {
       "after",
       () =>
         `\n${theme.heading(t("cli.help.heading.examples"))}\n${formatHelpExamples([
-          [
-            "allbot node run --host 127.0.0.1 --port 18789",
-            "Run the node host in the foreground.",
-          ],
+          ["allbot node run --host 127.0.0.1 --port 18789", "Run the node host in the foreground."],
           ["allbot node status", "Check node host service status."],
           ["allbot node install", "Install the node host service."],
           ["allbot node restart", "Restart the installed node host service."],

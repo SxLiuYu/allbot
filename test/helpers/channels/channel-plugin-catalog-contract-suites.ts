@@ -144,9 +144,7 @@ export function describeChannelPluginCatalogEntriesContract() {
       {
         name: "preserves plugin ids when they differ from channel ids",
         setup: () => {
-          const stateDir = fs.mkdtempSync(
-            path.join(os.tmpdir(), "allbot-channel-catalog-state-"),
-          );
+          const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-channel-catalog-state-"));
           writeDiscoveredChannelPlugin({
             stateDir,
             packageName: "@vendor/demo-channel-plugin",

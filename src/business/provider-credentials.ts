@@ -146,7 +146,11 @@ function parseCredentialFile(raw: string): {
   } catch {
     return { configs: [], errors: ["credential file is not valid JSON"] };
   }
-  if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as { providers?: unknown }).providers)) {
+  if (
+    !parsed ||
+    typeof parsed !== "object" ||
+    !Array.isArray((parsed as { providers?: unknown }).providers)
+  ) {
     return { configs: [], errors: ["credential file must contain a providers array"] };
   }
   const providers = (parsed as { providers: unknown[] }).providers;
@@ -172,9 +176,7 @@ function parseCredentialFile(raw: string): {
 
 function stripeAccountId(config: BusinessProviderCredentialConfig): string | undefined {
   const value =
-    config.kind === "payment"
-      ? config.credentials.merchant_id
-      : config.credentials.app_id;
+    config.kind === "payment" ? config.credentials.merchant_id : config.credentials.app_id;
   return typeof value === "string" && value.startsWith("acct_") ? value : undefined;
 }
 
@@ -277,8 +279,7 @@ async function persistUpdatedCredential(
       continue;
     }
     const mutable = credentials as Record<string, unknown>;
-    const entryAccount =
-      record.kind === "payment" ? mutable.merchant_id : mutable.app_id;
+    const entryAccount = record.kind === "payment" ? mutable.merchant_id : mutable.app_id;
     const sameOAuthAccount =
       Boolean(accountId) &&
       mutable.credential_type === "oauth_sandbox" &&
@@ -352,8 +353,7 @@ async function refreshStripeOAuthToken(
     refresh_token?: unknown;
     expires_in?: unknown;
   };
-  const accessToken =
-    typeof record.access_token === "string" ? record.access_token : undefined;
+  const accessToken = typeof record.access_token === "string" ? record.access_token : undefined;
   if (!accessToken || !accessToken.startsWith("oak_")) {
     return false;
   }
@@ -484,10 +484,12 @@ async function executeStripeSandboxAdapter(
  * live keys and other providers are refused. Missing or invalid credentials
  * clear previously registered credential-file adapters.
  */
-export async function reloadBusinessProviderCredentials(options: {
-  filePath?: string;
-  env?: NodeJS.ProcessEnv;
-} = {}): Promise<ReloadBusinessProviderCredentialsResult> {
+export async function reloadBusinessProviderCredentials(
+  options: {
+    filePath?: string;
+    env?: NodeJS.ProcessEnv;
+  } = {},
+): Promise<ReloadBusinessProviderCredentialsResult> {
   stripeOAuthTokenCache.clear();
   const filePath = options.filePath ?? resolveBusinessProviderCredentialPath(options.env);
   const result: ReloadBusinessProviderCredentialsResult = {
@@ -503,7 +505,9 @@ export async function reloadBusinessProviderCredentials(options: {
     [stat, raw] = await Promise.all([fs.stat(filePath), fs.readFile(filePath, "utf8")]);
   } catch (err) {
     clearManagedAdapters();
-    result.errors.push(`credential file unavailable: ${err instanceof Error ? err.message : String(err)}`);
+    result.errors.push(
+      `credential file unavailable: ${err instanceof Error ? err.message : String(err)}`,
+    );
     return result;
   }
   result.mode = stat.mode & 0o777;
@@ -520,9 +524,7 @@ export async function reloadBusinessProviderCredentials(options: {
   }
   clearManagedAdapters();
   for (const config of parsed.configs) {
-    const oauthAccountId = isStripeOAuthConfig(config)
-      ? stripeAccountId(config)
-      : undefined;
+    const oauthAccountId = isStripeOAuthConfig(config) ? stripeAccountId(config) : undefined;
     if (oauthAccountId) {
       stripeOAuthTokenCache.set(oauthAccountId, {
         apiKey: String(config.credentials.api_key),

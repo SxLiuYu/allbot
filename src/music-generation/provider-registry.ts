@@ -59,9 +59,7 @@ function buildProviderMaps(cfg?: AllBotConfig): {
   return { canonical, aliases };
 }
 
-export function listMusicGenerationProviders(
-  cfg?: AllBotConfig,
-): MusicGenerationProviderPlugin[] {
+export function listMusicGenerationProviders(cfg?: AllBotConfig): MusicGenerationProviderPlugin[] {
   return [...buildProviderMaps(cfg).canonical.values()];
 }
 

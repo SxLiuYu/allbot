@@ -64,8 +64,8 @@ allbot tasks flow show <lookup>
 allbot tasks flow cancel <lookup>
 ```
 
-| Command                           | Description                                   |
-| --------------------------------- | --------------------------------------------- |
+| Command                         | Description                                   |
+| ------------------------------- | --------------------------------------------- |
 | `allbot tasks flow list`        | Shows tracked flows with status and sync mode |
 | `allbot tasks flow show <id>`   | Inspect one flow by flow id or lookup key     |
 | `allbot tasks flow cancel <id>` | Cancel a running flow and its active tasks    |

@@ -17,10 +17,7 @@ const OPENAI_SUPPORTED_SIZES = ["1024x1024", "1024x1536", "1536x1024"] as const;
 const OPENAI_MAX_INPUT_IMAGES = 5;
 const MOCK_OPENAI_PROVIDER_ID = "mock-openai";
 
-function shouldAllowPrivateImageEndpoint(req: {
-  provider: string;
-  cfg: AllBotConfig | undefined;
-}) {
+function shouldAllowPrivateImageEndpoint(req: { provider: string; cfg: AllBotConfig | undefined }) {
   if (req.provider === MOCK_OPENAI_PROVIDER_ID) {
     return true;
   }

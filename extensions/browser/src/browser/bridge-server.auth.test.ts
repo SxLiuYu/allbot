@@ -1,10 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { startBrowserBridgeServer, stopBrowserBridgeServer } from "./bridge-server.js";
 import type { ResolvedBrowserConfig } from "./config.js";
-import {
-  DEFAULT_ALLBOT_BROWSER_COLOR,
-  DEFAULT_ALLBOT_BROWSER_PROFILE_NAME,
-} from "./constants.js";
+import { DEFAULT_ALLBOT_BROWSER_COLOR, DEFAULT_ALLBOT_BROWSER_PROFILE_NAME } from "./constants.js";
 
 function buildResolvedConfig(): ResolvedBrowserConfig {
   return {

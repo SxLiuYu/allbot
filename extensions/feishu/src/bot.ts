@@ -21,6 +21,7 @@ import {
 } from "allbot/plugin-sdk/runtime-group-policy";
 import { normalizeOptionalString } from "allbot/plugin-sdk/text-runtime";
 import { resolveFeishuRuntimeAccount } from "./accounts.js";
+import { emitFeishuActivitySignal } from "./activity-bridge.js";
 import {
   checkBotMentioned,
   normalizeFeishuCommandProbeBody,
@@ -38,7 +39,6 @@ import {
   normalizeAgentId,
   resolveChannelContextVisibilityMode,
 } from "./bot-runtime-api.js";
-import { emitFeishuActivitySignal } from "./activity-bridge.js";
 import type { ClawdbotConfig, RuntimeEnv } from "./bot-runtime-api.js";
 import { type FeishuPermissionError, resolveFeishuSenderName } from "./bot-sender-name.js";
 import { createFeishuClient } from "./client.js";

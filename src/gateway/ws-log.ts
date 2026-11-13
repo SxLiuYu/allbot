@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import { resolveSendableOutboundReplyParts } from "allbot/plugin-sdk/reply-payload";
+import chalk from "chalk";
 import { isVerbose } from "../globals.js";
 import { shouldLogSubsystemToConsole } from "../logging/console.js";
 import { getDefaultRedactPatterns, redactSensitiveText } from "../logging/redact.js";

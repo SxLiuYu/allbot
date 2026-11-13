@@ -71,9 +71,7 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
   }
 
   const getenv = deps?.getenv ?? launchctlGetenv;
-  const tokenEntries = [
-    ["ALLBOT_GATEWAY_TOKEN", await getenv("ALLBOT_GATEWAY_TOKEN")],
-  ] as const;
+  const tokenEntries = [["ALLBOT_GATEWAY_TOKEN", await getenv("ALLBOT_GATEWAY_TOKEN")]] as const;
   const passwordEntries = [
     ["ALLBOT_GATEWAY_PASSWORD", await getenv("ALLBOT_GATEWAY_PASSWORD")],
   ] as const;

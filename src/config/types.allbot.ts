@@ -29,8 +29,8 @@ import type { PluginsConfig } from "./types.plugins.js";
 import type { SecretsConfig } from "./types.secrets.js";
 import type { SkillsConfig } from "./types.skills.js";
 import type { TasksConfig } from "./types.tasks.js";
-import type { WatchLoopConfig } from "./types.watch-loops.js";
 import type { ToolsConfig } from "./types.tools.js";
+import type { WatchLoopConfig } from "./types.watch-loops.js";
 
 export type AllBotConfig = {
   meta?: {

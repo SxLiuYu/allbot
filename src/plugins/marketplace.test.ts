@@ -55,9 +55,7 @@ beforeAll(async () => {
 async function listMarketplaceDownloadTempDirs(): Promise<string[]> {
   const entries = await fs.readdir(os.tmpdir(), { withFileTypes: true });
   return entries
-    .filter(
-      (entry) => entry.isDirectory() && entry.name.startsWith("allbot-marketplace-download-"),
-    )
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("allbot-marketplace-download-"))
     .map((entry) => entry.name)
     .toSorted();
 }
@@ -130,10 +128,7 @@ function mockRemoteMarketplaceCloneWithOutsideSymlink(params: {
       repoDir: repoDir as string,
       manifest: params.manifest,
     });
-    const outsideDir = await makeTrackedTempDirAsync(
-      "allbot-marketplace-outside",
-      tempOutsideDirs,
-    );
+    const outsideDir = await makeTrackedTempDirAsync("allbot-marketplace-outside", tempOutsideDirs);
     await fs.mkdir(path.dirname(path.join(repoDir as string, params.symlinkPath)), {
       recursive: true,
     });

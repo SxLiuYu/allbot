@@ -90,11 +90,7 @@ function formatTokenHint(token: string, opts: { showSecrets: boolean }): string 
   return `${head}…${tail} · len ${t.length}`;
 }
 
-async function inspectChannelAccount(
-  plugin: ChannelPlugin,
-  cfg: AllBotConfig,
-  accountId: string,
-) {
+async function inspectChannelAccount(plugin: ChannelPlugin, cfg: AllBotConfig, accountId: string) {
   return (
     plugin.config.inspectAccount?.(cfg, accountId) ??
     (await inspectReadOnlyChannelAccount({

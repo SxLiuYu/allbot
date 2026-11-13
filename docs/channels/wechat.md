@@ -47,12 +47,12 @@ allbot config set channels.wechat.api.baseUrl "https://your-ilink-bot-server"
 
 ## 故障排除
 
-| 问题           | 解决方案                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------- |
+| 问题           | 解决方案                                                                                  |
+| -------------- | ----------------------------------------------------------------------------------------- |
 | 扫码后无响应   | 检查 `allbot channels login --channel wechat` 是否报错；查看 gateway 日志的 `[wechat]` 行 |
-| 群消息不响应   | 群聊默认需要 @机器人，配置 `channels.wechat.replyOnGroupMentionOnly: false` 可改变行为      |
-| 语音消息听不懂 | 确保 `silk-wasm` 已安装（`pnpm install` 后自动）                                            |
-| 图片发不出去   | iLink Bot CDN 偶有限速，等几分钟重试                                                        |
+| 群消息不响应   | 群聊默认需要 @机器人，配置 `channels.wechat.replyOnGroupMentionOnly: false` 可改变行为    |
+| 语音消息听不懂 | 确保 `silk-wasm` 已安装（`pnpm install` 后自动）                                          |
+| 图片发不出去   | iLink Bot CDN 偶有限速，等几分钟重试                                                      |
 
 ## 与飞书的差异
 

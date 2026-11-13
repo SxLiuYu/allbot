@@ -711,9 +711,8 @@ export function registerControlUiAndPairingSuite(): void {
     const { server, ws, port, prevToken } = await startControlUiServerWithClient("secret");
     ws.close();
 
-    const { identityPath, identity } = await createOperatorIdentityFixture(
-      "allbot-bootstrap-node-",
-    );
+    const { identityPath, identity } =
+      await createOperatorIdentityFixture("allbot-bootstrap-node-");
     const client = {
       id: "allbot-ios",
       version: "2026.3.30",
@@ -1305,8 +1304,7 @@ export function registerControlUiAndPairingSuite(): void {
     ws.close();
     const wsDockerCli = await openWs(port, { host: "172.17.0.2:18789" });
     try {
-      const { identity, identityPath } =
-        await createOperatorIdentityFixture("allbot-cli-docker-");
+      const { identity, identityPath } = await createOperatorIdentityFixture("allbot-cli-docker-");
       const nonce = await readConnectChallengeNonce(wsDockerCli);
       const dockerCli = await connectReq(wsDockerCli, {
         token: "secret",

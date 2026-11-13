@@ -30,8 +30,6 @@ describe("shouldSkipMutatingLoggingConfigRead", () => {
     expect(
       __test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "config", "get", "foo"]),
     ).toBe(false);
-    expect(__test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "status"])).toBe(
-      false,
-    );
+    expect(__test__.shouldSkipMutatingLoggingConfigRead(["node", "allbot", "status"])).toBe(false);
   });
 });

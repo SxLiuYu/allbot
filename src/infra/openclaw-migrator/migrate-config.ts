@@ -257,8 +257,7 @@ export async function migrateConfig(
         kind: "merge",
         source: path.relative(source.dir, source.configPath),
         target: path.relative(targetDir, targetConfigPath),
-        detail:
-          "Would merge source config with existing AllBot config (existing takes precedence)",
+        detail: "Would merge source config with existing AllBot config (existing takes precedence)",
       });
     } else {
       await fs.writeFile(targetConfigPath, JSON.stringify(mergedWithExisting, null, 2), "utf-8");

@@ -286,10 +286,7 @@ describe("runDaemonRestart health checks", () => {
 
     await expect(runDaemonRestart({ json: true })).rejects.toMatchObject({
       message: "Gateway restart timed out after 60s waiting for health checks.",
-      hints: [
-        formatCliCommand("allbot gateway status --deep"),
-        formatCliCommand("allbot doctor"),
-      ],
+      hints: [formatCliCommand("allbot gateway status --deep"), formatCliCommand("allbot doctor")],
     });
     expect(terminateStaleGatewayPids).not.toHaveBeenCalled();
     expect(renderRestartDiagnostics).toHaveBeenCalledTimes(1);
@@ -310,10 +307,7 @@ describe("runDaemonRestart health checks", () => {
     await expect(runDaemonRestart({ json: true })).rejects.toMatchObject({
       message:
         "Gateway restart failed after 13s: service stayed stopped and health checks never came up.",
-      hints: [
-        formatCliCommand("allbot gateway status --deep"),
-        formatCliCommand("allbot doctor"),
-      ],
+      hints: [formatCliCommand("allbot gateway status --deep"), formatCliCommand("allbot doctor")],
     });
     expect(terminateStaleGatewayPids).not.toHaveBeenCalled();
     expect(renderRestartDiagnostics).toHaveBeenCalledTimes(1);

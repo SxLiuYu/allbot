@@ -124,8 +124,8 @@ and setup-time config writes through `allbot-gateway` with
 
 The setup script accepts these optional environment variables:
 
-| Variable                       | Purpose                                                          |
-| ------------------------------ | ---------------------------------------------------------------- |
+| Variable                     | Purpose                                                          |
+| ---------------------------- | ---------------------------------------------------------------- |
 | `ALLBOT_IMAGE`               | Use a remote image instead of building locally                   |
 | `ALLBOT_DOCKER_APT_PACKAGES` | Install extra apt packages during build (space-separated)        |
 | `ALLBOT_EXTENSIONS`          | Pre-install extension deps at build time (space-separated names) |

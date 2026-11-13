@@ -868,9 +868,7 @@ describe("killAllControlledSubagentRuns", () => {
   });
 
   it("does not let a stale bulk entry suppress the current live entry for the same child key", async () => {
-    const tmpDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "allbot-subagent-stale-kill-all-shadow-"),
-    );
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "allbot-subagent-stale-kill-all-shadow-"));
     const storePath = path.join(tmpDir, "sessions.json");
     const childSessionKey = "agent:main:subagent:stale-kill-all-shadow-worker";
 

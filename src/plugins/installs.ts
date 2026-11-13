@@ -13,10 +13,7 @@ export function buildNpmResolutionInstallFields(
   return buildNpmResolutionFields(resolution);
 }
 
-export function recordPluginInstall(
-  cfg: AllBotConfig,
-  update: PluginInstallUpdate,
-): AllBotConfig {
+export function recordPluginInstall(cfg: AllBotConfig, update: PluginInstallUpdate): AllBotConfig {
   const { pluginId, ...record } = update;
   const installs = {
     ...cfg.plugins?.installs,

@@ -71,13 +71,13 @@ allbot tasks flow cancel <lookup>
 
 ## What creates a task
 
-| Source                 | Runtime type | When a task record is created                          | Default notify policy |
-| ---------------------- | ------------ | ------------------------------------------------------ | --------------------- |
-| ACP background runs    | `acp`        | Spawning a child ACP session                           | `done_only`           |
-| Subagent orchestration | `subagent`   | Spawning a subagent via `sessions_spawn`               | `done_only`           |
-| Cron jobs (all types)  | `cron`       | Every cron execution (main-session and isolated)       | `silent`              |
+| Source                 | Runtime type | When a task record is created                        | Default notify policy |
+| ---------------------- | ------------ | ---------------------------------------------------- | --------------------- |
+| ACP background runs    | `acp`        | Spawning a child ACP session                         | `done_only`           |
+| Subagent orchestration | `subagent`   | Spawning a subagent via `sessions_spawn`             | `done_only`           |
+| Cron jobs (all types)  | `cron`       | Every cron execution (main-session and isolated)     | `silent`              |
 | CLI operations         | `cli`        | `allbot agent` commands that run through the gateway | `silent`              |
-| Agent media jobs       | `cli`        | Session-backed `video_generate` runs                   | `silent`              |
+| Agent media jobs       | `cli`        | Session-backed `video_generate` runs                 | `silent`              |
 
 Main-session cron tasks use `silent` notify policy by default — they create records for tracking but do not generate notifications. Isolated cron tasks also default to `silent` but are more visible because they run in their own session.
 
@@ -112,7 +112,7 @@ stateDiagram-v2
 | `succeeded` | Completed successfully                                                     |
 | `failed`    | Completed with an error                                                    |
 | `timed_out` | Exceeded the configured timeout                                            |
-| `cancelled` | Stopped by the operator via `allbot tasks cancel`                        |
+| `cancelled` | Stopped by the operator via `allbot tasks cancel`                          |
 | `lost`      | The runtime lost authoritative backing state after a 5-minute grace period |
 
 Transitions happen automatically — when the associated agent run ends, the task status updates to match.

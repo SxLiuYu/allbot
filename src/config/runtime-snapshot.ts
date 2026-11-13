@@ -22,10 +22,7 @@ let runtimeConfigSourceSnapshot: AllBotConfig | null = null;
 let runtimeConfigSnapshotRefreshHandler: RuntimeConfigSnapshotRefreshHandler | null = null;
 const runtimeConfigWriteListeners = new Set<(event: RuntimeConfigWriteNotification) => void>();
 
-export function setRuntimeConfigSnapshot(
-  config: AllBotConfig,
-  sourceConfig?: AllBotConfig,
-): void {
+export function setRuntimeConfigSnapshot(config: AllBotConfig, sourceConfig?: AllBotConfig): void {
   runtimeConfigSnapshot = config;
   runtimeConfigSourceSnapshot = sourceConfig ?? null;
 }

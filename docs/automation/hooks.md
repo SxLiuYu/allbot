@@ -155,7 +155,7 @@ Npm specs are registry-only (package name + optional exact version or dist-tag).
 | --------------------- | ------------------------------ | ----------------------------------------------------- |
 | session-memory        | `command:new`, `command:reset` | Saves session context to `<workspace>/memory/`        |
 | bootstrap-extra-files | `agent:bootstrap`              | Injects additional bootstrap files from glob patterns |
-| command-logger        | `command`                      | Logs all commands to `~/.allbot/logs/commands.log`  |
+| command-logger        | `command`                      | Logs all commands to `~/.allbot/logs/commands.log`    |
 | boot-md               | `gateway:startup`              | Runs `BOOT.md` when the gateway starts                |
 
 Enable any bundled hook:

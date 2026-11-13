@@ -18,12 +18,12 @@ describe("waitForever", () => {
 });
 
 describe("shouldSkipRespawnForArgv", () => {
-  it.each([
-    { argv: ["node", "allbot", "--help"] },
-    { argv: ["node", "allbot", "-V"] },
-  ] as const)("skips respawn for argv %j", ({ argv }) => {
-    expect(shouldSkipRespawnForArgv([...argv]), argv.join(" ")).toBe(true);
-  });
+  it.each([{ argv: ["node", "allbot", "--help"] }, { argv: ["node", "allbot", "-V"] }] as const)(
+    "skips respawn for argv %j",
+    ({ argv }) => {
+      expect(shouldSkipRespawnForArgv([...argv]), argv.join(" ")).toBe(true);
+    },
+  );
 
   it("keeps respawn path for normal commands", () => {
     expect(shouldSkipRespawnForArgv(["node", "allbot", "status"])).toBe(false);

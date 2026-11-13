@@ -79,10 +79,7 @@ let cachedHookProvidersByConfig = new WeakMap<
   WeakMap<NodeJS.ProcessEnv, Map<string, ProviderPlugin[]>>
 >();
 
-function resolveHookProviderCacheBucket(params: {
-  config?: AllBotConfig;
-  env: NodeJS.ProcessEnv;
-}) {
+function resolveHookProviderCacheBucket(params: { config?: AllBotConfig; env: NodeJS.ProcessEnv }) {
   if (!params.config) {
     let bucket = cachedHookProvidersWithoutConfig.get(params.env);
     if (!bucket) {

@@ -24,9 +24,7 @@ type ReplyConfigWithMarker = AllBotConfig & {
 };
 
 function isSlowReplyTestAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
-  return (
-    env.ALLBOT_ALLOW_SLOW_REPLY_TESTS === "1" || env.ALLBOT_STRICT_FAST_REPLY_CONFIG === "0"
-  );
+  return env.ALLBOT_ALLOW_SLOW_REPLY_TESTS === "1" || env.ALLBOT_STRICT_FAST_REPLY_CONFIG === "0";
 }
 
 function resolveFastSessionKey(ctx: MsgContext): string {

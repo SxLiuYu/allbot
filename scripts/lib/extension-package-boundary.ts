@@ -99,9 +99,7 @@ export const EXTENSION_PACKAGE_BOUNDARY_XAI_PATHS = {
   "allbot/plugin-sdk/provider-env-vars": [
     "../../dist/plugin-sdk/src/plugin-sdk/provider-env-vars.d.ts",
   ],
-  "allbot/plugin-sdk/provider-entry": [
-    "../../dist/plugin-sdk/src/plugin-sdk/provider-entry.d.ts",
-  ],
+  "allbot/plugin-sdk/provider-entry": ["../../dist/plugin-sdk/src/plugin-sdk/provider-entry.d.ts"],
   "allbot/plugin-sdk/provider-web-search-contract": [
     "../../dist/plugin-sdk/src/plugin-sdk/provider-web-search-contract.d.ts",
   ],

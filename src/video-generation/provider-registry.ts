@@ -59,9 +59,7 @@ function buildProviderMaps(cfg?: AllBotConfig): {
   return { canonical, aliases };
 }
 
-export function listVideoGenerationProviders(
-  cfg?: AllBotConfig,
-): VideoGenerationProviderPlugin[] {
+export function listVideoGenerationProviders(cfg?: AllBotConfig): VideoGenerationProviderPlugin[] {
   return [...buildProviderMaps(cfg).canonical.values()];
 }
 

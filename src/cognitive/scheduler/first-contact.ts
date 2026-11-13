@@ -1,5 +1,5 @@
-import type { PersonaTree } from "../types.js";
 import type { InsightCandidate } from "../insight/types.js";
+import type { PersonaTree } from "../types.js";
 import { isOutsideActiveHours } from "./gate.js";
 import type { SchedulerConfig } from "./types.js";
 

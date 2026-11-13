@@ -59,9 +59,7 @@ function buildProviderMaps(cfg?: AllBotConfig): {
   return { canonical, aliases };
 }
 
-export function listImageGenerationProviders(
-  cfg?: AllBotConfig,
-): ImageGenerationProviderPlugin[] {
+export function listImageGenerationProviders(cfg?: AllBotConfig): ImageGenerationProviderPlugin[] {
   return [...buildProviderMaps(cfg).canonical.values()];
 }
 

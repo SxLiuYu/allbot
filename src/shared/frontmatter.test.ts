@@ -51,9 +51,7 @@ describe("shared/frontmatter", () => {
 
   test("resolveAllBotManifestBlock returns undefined for invalid input", () => {
     expect(resolveAllBotManifestBlock({ frontmatter: {} })).toBeUndefined();
-    expect(
-      resolveAllBotManifestBlock({ frontmatter: { metadata: "not-json5" } }),
-    ).toBeUndefined();
+    expect(resolveAllBotManifestBlock({ frontmatter: { metadata: "not-json5" } })).toBeUndefined();
     expect(resolveAllBotManifestBlock({ frontmatter: { metadata: "123" } })).toBeUndefined();
     expect(resolveAllBotManifestBlock({ frontmatter: { metadata: "[]" } })).toBeUndefined();
     expect(
@@ -78,10 +76,7 @@ describe("shared/frontmatter", () => {
       config: [],
     });
     expect(resolveAllBotManifestRequires({})).toBeUndefined();
-    expect(resolveAllBotManifestOs({ os: [" darwin ", "linux", ""] })).toEqual([
-      "darwin",
-      "linux",
-    ]);
+    expect(resolveAllBotManifestOs({ os: [" darwin ", "linux", ""] })).toEqual(["darwin", "linux"]);
   });
 
   it("parses and applies install common fields", () => {
@@ -146,10 +141,7 @@ describe("shared/frontmatter", () => {
       kind: "npm",
     });
     expect(
-      applyAllBotManifestInstallCommonFields(
-        { id: "keep", label: "Keep", bins: ["bun"] },
-        parsed!,
-      ),
+      applyAllBotManifestInstallCommonFields({ id: "keep", label: "Keep", bins: ["bun"] }, parsed!),
     ).toEqual({
       id: "keep",
       label: "Keep",

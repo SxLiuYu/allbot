@@ -510,13 +510,9 @@ async function startGateway(runtime: OutputRuntimeEnv): Promise<void> {
 
   spawnSync("termux-wake-lock", [], { stdio: "ignore" });
   const logPath = path.join(os.homedir(), ".allbot", "gateway.log");
-  spawnSync(
-    "bash",
-    ["-c", `nohup allbot gateway --port ${GATEWAY_PORT} >> "${logPath}" 2>&1 &`],
-    {
-      stdio: "ignore",
-    },
-  );
+  spawnSync("bash", ["-c", `nohup allbot gateway --port ${GATEWAY_PORT} >> "${logPath}" 2>&1 &`], {
+    stdio: "ignore",
+  });
   await new Promise((resolve) => setTimeout(resolve, 3000));
   const alive = runText("pgrep", ["-f", "allbot"]);
   if (alive.length > 0) {
@@ -525,8 +521,6 @@ async function startGateway(runtime: OutputRuntimeEnv): Promise<void> {
   } else {
     runtime.log(`  ${theme.warn("⚠")} Gateway may not have started. Check logs:`);
     runtime.log(`  ${theme.muted("    tail -20 ~/.allbot/gateway.log")}`);
-    runtime.log(
-      `  ${theme.muted(`    Or start manually: allbot gateway --port ${GATEWAY_PORT}`)}`,
-    );
+    runtime.log(`  ${theme.muted(`    Or start manually: allbot gateway --port ${GATEWAY_PORT}`)}`);
   }
 }

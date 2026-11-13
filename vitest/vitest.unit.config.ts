@@ -52,9 +52,7 @@ export function createUnitVitestConfigWithOptions(
       name: options.name ?? "unit",
       isolate,
       ...(isolate ? { runner: undefined } : { runner: "./test/non-isolated-runner.ts" }),
-      setupFiles: [
-        ...new Set([...(sharedTest.setupFiles ?? []), "test/setup-allbot-runtime.ts"]),
-      ],
+      setupFiles: [...new Set([...(sharedTest.setupFiles ?? []), "test/setup-allbot-runtime.ts"])],
       include: loadIncludePatternsFromEnv(env) ?? cliIncludePatterns ?? defaultIncludePatterns,
       exclude: [
         ...new Set([

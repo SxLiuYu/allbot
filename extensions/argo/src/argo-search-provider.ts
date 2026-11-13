@@ -114,7 +114,10 @@ export function resolveCommand(config: ArgoConfig | undefined): string {
   return configured || DEFAULT_ARGO_COMMAND;
 }
 
-function resolveTimeoutMs(config: ArgoConfig | undefined, searchConfig?: SearchConfigRecord): number {
+function resolveTimeoutMs(
+  config: ArgoConfig | undefined,
+  searchConfig?: SearchConfigRecord,
+): number {
   if (typeof config?.timeoutMs === "number" && Number.isFinite(config.timeoutMs)) {
     return Math.max(1000, Math.min(180_000, Math.floor(config.timeoutMs)));
   }
@@ -173,9 +176,8 @@ export function normalizeArgoResults(payload: unknown): ArgoResult[] {
   if (!Array.isArray(results)) {
     return [];
   }
-  return results.filter(
-    (entry): entry is ArgoResult =>
-      Boolean(entry && typeof entry === "object" && !Array.isArray(entry)),
+  return results.filter((entry): entry is ArgoResult =>
+    Boolean(entry && typeof entry === "object" && !Array.isArray(entry)),
   );
 }
 
@@ -230,10 +232,9 @@ function runArgoCli(params: {
         if (error) {
           const detail = String(stderr ?? "").trim() || String(stdout ?? "").trim();
           reject(
-            new Error(
-              `Argo search failed (${params.command}): ${detail || error.message}`,
-              { cause: error },
-            ),
+            new Error(`Argo search failed (${params.command}): ${detail || error.message}`, {
+              cause: error,
+            }),
           );
           return;
         }

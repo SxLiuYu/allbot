@@ -11,10 +11,7 @@ vi.mock("../../plugins/commands.js", () => ({
   executePluginCommand: executePluginCommandMock,
 }));
 
-function buildPluginParams(
-  commandBodyNormalized: string,
-  cfg: AllBotConfig,
-): HandleCommandsParams {
+function buildPluginParams(commandBodyNormalized: string, cfg: AllBotConfig): HandleCommandsParams {
   return {
     cfg,
     ctx: {

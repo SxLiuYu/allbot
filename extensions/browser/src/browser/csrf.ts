@@ -1,5 +1,5 @@
-import type { NextFunction, Request, Response } from "express";
 import { normalizeLowercaseStringOrEmpty } from "allbot/plugin-sdk/text-runtime";
+import type { NextFunction, Request, Response } from "express";
 import { isLoopbackHost } from "../gateway/net.js";
 
 function firstHeader(value: string | string[] | undefined): string {

@@ -109,10 +109,10 @@ All of these run on the main Gateway port and use the same trusted operator auth
 
 ### Port and bind precedence
 
-| Setting      | Resolution order                                              |
-| ------------ | ------------------------------------------------------------- |
+| Setting      | Resolution order                                            |
+| ------------ | ----------------------------------------------------------- |
 | Gateway port | `--port` → `ALLBOT_GATEWAY_PORT` → `gateway.port` → `18789` |
-| Bind mode    | CLI/override → `gateway.bind` → `loopback`                    |
+| Bind mode    | CLI/override → `gateway.bind` → `loopback`                  |
 
 ### Hot reload modes
 

@@ -3,8 +3,8 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeLowercaseStringOrEmpty } from "../shared/string-coerce.js";
-import { resolveGitHeadPath } from "./git-root.js";
 import { resolveAllBotPackageRootSync } from "./allbot-root.js";
+import { resolveGitHeadPath } from "./git-root.js";
 
 const formatCommit = (value?: string | null) => {
   if (!value) {

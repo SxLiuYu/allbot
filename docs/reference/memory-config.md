@@ -355,10 +355,10 @@ similarity automatically.
 
 ## Index storage
 
-| Key                   | Type     | Default                               | Description                                 |
-| --------------------- | -------- | ------------------------------------- | ------------------------------------------- |
+| Key                   | Type     | Default                             | Description                                 |
+| --------------------- | -------- | ----------------------------------- | ------------------------------------------- |
 | `store.path`          | `string` | `~/.allbot/memory/{agentId}.sqlite` | Index location (supports `{agentId}` token) |
-| `store.fts.tokenizer` | `string` | `unicode61`                           | FTS5 tokenizer (`unicode61` or `trigram`)   |
+| `store.fts.tokenizer` | `string` | `unicode61`                         | FTS5 tokenizer (`unicode61` or `trigram`)   |
 
 ---
 

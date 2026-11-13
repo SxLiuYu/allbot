@@ -147,9 +147,9 @@ Those belong in your plugin code and `package.json`.
 | `providers`                         | No       | `string[]`                       | Provider ids owned by this plugin.                                                                                                                                                                           |
 | `modelSupport`                      | No       | `object`                         | Manifest-owned shorthand model-family metadata used to auto-load the plugin before runtime.                                                                                                                  |
 | `cliBackends`                       | No       | `string[]`                       | CLI inference backend ids owned by this plugin. Used for startup auto-activation from explicit config refs.                                                                                                  |
-| `providerAuthEnvVars`               | No       | `Record<string, string[]>`       | Cheap provider-auth env metadata that AllBot can inspect without loading plugin code.                                                                                                                      |
+| `providerAuthEnvVars`               | No       | `Record<string, string[]>`       | Cheap provider-auth env metadata that AllBot can inspect without loading plugin code.                                                                                                                        |
 | `providerAuthAliases`               | No       | `Record<string, string>`         | Provider ids that should reuse another provider id for auth lookup, for example a coding provider that shares the base provider API key and auth profiles.                                                   |
-| `channelEnvVars`                    | No       | `Record<string, string[]>`       | Cheap channel env metadata that AllBot can inspect without loading plugin code. Use this for env-driven channel setup or auth surfaces that generic startup/config helpers should see.                     |
+| `channelEnvVars`                    | No       | `Record<string, string[]>`       | Cheap channel env metadata that AllBot can inspect without loading plugin code. Use this for env-driven channel setup or auth surfaces that generic startup/config helpers should see.                       |
 | `providerAuthChoices`               | No       | `object[]`                       | Cheap auth-choice metadata for onboarding pickers, preferred-provider resolution, and simple CLI flag wiring.                                                                                                |
 | `contracts`                         | No       | `object`                         | Static bundled capability snapshot for speech, realtime transcription, realtime voice, media-understanding, image-generation, music-generation, video-generation, web-fetch, web search, and tool ownership. |
 | `channelConfigs`                    | No       | `Record<string, object>`         | Manifest-owned channel config metadata merged into discovery and validation surfaces before runtime loads.                                                                                                   |
@@ -169,7 +169,7 @@ AllBot reads this before provider runtime loads.
 | `provider`            | Yes      | `string`                                        | Provider id this choice belongs to.                                                                      |
 | `method`              | Yes      | `string`                                        | Auth method id to dispatch to.                                                                           |
 | `choiceId`            | Yes      | `string`                                        | Stable auth-choice id used by onboarding and CLI flows.                                                  |
-| `choiceLabel`         | No       | `string`                                        | User-facing label. If omitted, AllBot falls back to `choiceId`.                                        |
+| `choiceLabel`         | No       | `string`                                        | User-facing label. If omitted, AllBot falls back to `choiceId`.                                          |
 | `choiceHint`          | No       | `string`                                        | Short helper text for the picker.                                                                        |
 | `assistantPriority`   | No       | `number`                                        | Lower values sort earlier in assistant-driven interactive pickers.                                       |
 | `assistantVisibility` | No       | `"visible"` \| `"manual-only"`                  | Hide the choice from assistant pickers while still allowing manual CLI selection.                        |
@@ -328,10 +328,10 @@ ownership.
 
 The two files serve different jobs:
 
-| File                   | Use it for                                                                                                                       |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `allbot.plugin.json` | Discovery, config validation, auth-choice metadata, and UI hints that must exist before plugin code runs                         |
-| `package.json`         | npm metadata, dependency installation, and the `allbot` block used for entrypoints, install gating, setup, or catalog metadata |
+| File                 | Use it for                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `allbot.plugin.json` | Discovery, config validation, auth-choice metadata, and UI hints that must exist before plugin code runs                       |
+| `package.json`       | npm metadata, dependency installation, and the `allbot` block used for entrypoints, install gating, setup, or catalog metadata |
 
 If you are unsure where a piece of metadata belongs, use this rule:
 
@@ -345,16 +345,16 @@ Some pre-runtime plugin metadata intentionally lives in `package.json` under the
 
 Important examples:
 
-| Field                                                             | What it means                                                                                                                                |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Field                                                           | What it means                                                                                                                                |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `allbot.extensions`                                             | Declares native plugin entrypoints.                                                                                                          |
 | `allbot.setupEntry`                                             | Lightweight setup-only entrypoint used during onboarding and deferred channel startup.                                                       |
 | `allbot.channel`                                                | Cheap channel catalog metadata like labels, docs paths, aliases, and selection copy.                                                         |
 | `allbot.channel.configuredState`                                | Lightweight configured-state checker metadata that can answer "does env-only setup already exist?" without loading the full channel runtime. |
 | `allbot.channel.persistedAuthState`                             | Lightweight persisted-auth checker metadata that can answer "is anything already signed in?" without loading the full channel runtime.       |
-| `allbot.install.npmSpec` / `allbot.install.localPath`         | Install/update hints for bundled and externally published plugins.                                                                           |
+| `allbot.install.npmSpec` / `allbot.install.localPath`           | Install/update hints for bundled and externally published plugins.                                                                           |
 | `allbot.install.defaultChoice`                                  | Preferred install path when multiple install sources are available.                                                                          |
-| `allbot.install.minHostVersion`                                 | Minimum supported AllBot host version, using a semver floor like `>=2026.3.22`.                                                            |
+| `allbot.install.minHostVersion`                                 | Minimum supported AllBot host version, using a semver floor like `>=2026.3.22`.                                                              |
 | `allbot.install.allowInvalidConfigRecovery`                     | Allows a narrow bundled-plugin reinstall recovery path when config is invalid.                                                               |
 | `allbot.startup.deferConfiguredChannelFullLoadUntilAfterListen` | Lets setup-only channel surfaces load before the full channel plugin during startup.                                                         |
 

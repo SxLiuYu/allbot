@@ -24,10 +24,7 @@ function buildLegacyTalkProviderCompat(
   return Object.keys(compat).length > 0 ? compat : undefined;
 }
 
-export function normalizeLegacyBrowserConfig(
-  cfg: AllBotConfig,
-  changes: string[],
-): AllBotConfig {
+export function normalizeLegacyBrowserConfig(cfg: AllBotConfig, changes: string[]): AllBotConfig {
   const rawBrowser = cfg.browser;
   if (!isRecord(rawBrowser)) {
     return cfg;
@@ -184,10 +181,7 @@ type ModelProviderEntry = Partial<
 >;
 type ModelsConfigPatch = Partial<NonNullable<AllBotConfig["models"]>>;
 
-export function normalizeLegacyNanoBananaSkill(
-  cfg: AllBotConfig,
-  changes: string[],
-): AllBotConfig {
+export function normalizeLegacyNanoBananaSkill(cfg: AllBotConfig, changes: string[]): AllBotConfig {
   const NANO_BANANA_SKILL_KEY = "nano-banana-pro";
   const NANO_BANANA_MODEL = "google/gemini-3-pro-image-preview";
   const rawSkills = cfg.skills;

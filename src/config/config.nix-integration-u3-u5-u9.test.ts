@@ -80,9 +80,7 @@ describe("Nix integration (U3, U5, U9)", () => {
 
     it("CONFIG_PATH respects ALLBOT_CONFIG_PATH override", () => {
       expect(
-        resolveConfigPathCandidate(
-          envWith({ ALLBOT_CONFIG_PATH: "/nix/store/abc/allbot.json" }),
-        ),
+        resolveConfigPathCandidate(envWith({ ALLBOT_CONFIG_PATH: "/nix/store/abc/allbot.json" })),
       ).toBe(path.resolve("/nix/store/abc/allbot.json"));
     });
 
@@ -116,19 +114,13 @@ describe("Nix integration (U3, U5, U9)", () => {
 
     it("prefers ALLBOT_GATEWAY_PORT over config", () => {
       expect(
-        resolveGatewayPort(
-          { gateway: { port: 19002 } },
-          envWith({ ALLBOT_GATEWAY_PORT: "19001" }),
-        ),
+        resolveGatewayPort({ gateway: { port: 19002 } }, envWith({ ALLBOT_GATEWAY_PORT: "19001" })),
       ).toBe(19001);
     });
 
     it("falls back to config when env is invalid", () => {
       expect(
-        resolveGatewayPort(
-          { gateway: { port: 19003 } },
-          envWith({ ALLBOT_GATEWAY_PORT: "nope" }),
-        ),
+        resolveGatewayPort({ gateway: { port: 19003 } }, envWith({ ALLBOT_GATEWAY_PORT: "nope" })),
       ).toBe(19003);
     });
   });

@@ -444,8 +444,8 @@ allbot pairing list feishu
 
 ## Gateway management commands
 
-| Command                    | Description                   |
-| -------------------------- | ----------------------------- |
+| Command                  | Description                   |
+| ------------------------ | ----------------------------- |
 | `allbot gateway status`  | Show gateway status           |
 | `allbot gateway install` | Install/start gateway service |
 | `allbot gateway stop`    | Stop gateway service          |

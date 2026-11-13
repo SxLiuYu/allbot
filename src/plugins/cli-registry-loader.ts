@@ -92,9 +92,7 @@ export async function loadPluginCliMetadataRegistryWithContext(
 ): Promise<PluginCliRegistryLoadResult> {
   return {
     ...context,
-    registry: await loadAllBotPluginCliRegistry(
-      buildPluginCliLoaderParams(context, loaderOptions),
-    ),
+    registry: await loadAllBotPluginCliRegistry(buildPluginCliLoaderParams(context, loaderOptions)),
   };
 }
 

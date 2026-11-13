@@ -170,10 +170,7 @@ export function resolveAgentConfig(
   };
 }
 
-export function resolveAgentSkillsFilter(
-  cfg: AllBotConfig,
-  agentId: string,
-): string[] | undefined {
+export function resolveAgentSkillsFilter(cfg: AllBotConfig, agentId: string): string[] | undefined {
   return resolveEffectiveAgentSkillFilter(cfg, agentId);
 }
 
@@ -307,10 +304,7 @@ function isPathWithinRoot(candidatePath: string, rootPath: string): boolean {
   return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
-export function resolveAgentIdsByWorkspacePath(
-  cfg: AllBotConfig,
-  workspacePath: string,
-): string[] {
+export function resolveAgentIdsByWorkspacePath(cfg: AllBotConfig, workspacePath: string): string[] {
   const normalizedWorkspacePath = normalizePathForComparison(workspacePath);
   const ids = listAgentIds(cfg);
   const matches: Array<{ id: string; workspaceDir: string; order: number }> = [];

@@ -25,9 +25,7 @@ describe("sanitizeChatHistoryMessages", () => {
     const result = sanitizeChatHistoryMessages(messages, 10000);
     const systemMsgs = result.filter((m) => (m as { role?: string }).role === "system");
     expect(systemMsgs).toHaveLength(1);
-    expect((systemMsgs[0] as { __allbot?: { kind?: string } }).__allbot?.kind).toBe(
-      "compaction",
-    );
+    expect((systemMsgs[0] as { __allbot?: { kind?: string } }).__allbot?.kind).toBe("compaction");
   });
 
   it("returns empty array unchanged", () => {

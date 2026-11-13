@@ -38,11 +38,7 @@ function makeRemoteGatewayConfig(remote: { token?: string; password?: string }):
 }
 
 function withGatewayAuthEnv<T>(env: NodeJS.ProcessEnv, fn: () => T): T {
-  const keys = [
-    "ALLBOT_GATEWAY_TOKEN",
-    "ALLBOT_GATEWAY_PASSWORD",
-    "ALLBOT_SERVICE_KIND",
-  ] as const;
+  const keys = ["ALLBOT_GATEWAY_TOKEN", "ALLBOT_GATEWAY_PASSWORD", "ALLBOT_SERVICE_KIND"] as const;
   const previous = new Map<string, string | undefined>();
   for (const key of keys) {
     previous.set(key, process.env[key]);

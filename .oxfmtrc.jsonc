@@ -22,5 +22,7 @@
     "src/auto-reply/reply/export-html/",
     "Swabble/",
     "vendor/",
+    "mobile/",
+    "voice/",
   ],
 }

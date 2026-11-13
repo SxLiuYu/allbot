@@ -104,7 +104,11 @@ export const CognitiveCorrectionSchema = z
 export const CognitiveHandshakeSchema = z
   .object({
     enabled: z.boolean().optional(),
-    minGapHours: z.number().min(0).max(24 * 365).optional(),
+    minGapHours: z
+      .number()
+      .min(0)
+      .max(24 * 365)
+      .optional(),
   })
   .strict()
   .optional();

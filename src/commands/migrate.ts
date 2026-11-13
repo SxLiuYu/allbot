@@ -168,9 +168,7 @@ export async function migrateCommand(
   runtime.log("");
   runtime.log(theme.heading("Post-migration steps:"));
   runtime.log(`  1. Run ${theme.accent("allbot doctor")} to verify your installation.`);
-  runtime.log(
-    `  2. Run ${theme.accent("allbot memory index --force")} to rebuild search indexes.`,
-  );
+  runtime.log(`  2. Run ${theme.accent("allbot memory index --force")} to rebuild search indexes.`);
   runtime.log(
     `  3. In conversation, ask AllBot to ${theme.accent("organize memory")} to restructure imported memory.`,
   );

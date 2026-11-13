@@ -156,9 +156,7 @@ export async function runGatewayLoop(params: {
     // External supervisors (launchd kickstart -k, systemd restart) commonly
     // send SIGTERM. Give in-flight user turns a short, bounded chance to finish
     // and deliver their final reply instead of dropping the work immediately.
-    const drainTimeoutMs = isRestart
-      ? resolveRestartDrainTimeoutMs()
-      : resolveStopDrainTimeoutMs();
+    const drainTimeoutMs = isRestart ? resolveRestartDrainTimeoutMs() : resolveStopDrainTimeoutMs();
     gatewayLog.info(`received ${signal}; ${isRestart ? "restarting" : "shutting down"}`);
 
     // Allow extra time for draining active turns before shutdown/restart.

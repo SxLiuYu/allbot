@@ -87,43 +87,39 @@ async function expectInlineBundleMcpServer(params: {
 
 describe("loadEnabledBundleMcpConfig", () => {
   it("loads enabled Claude bundle MCP config and absolutizes relative args", async () => {
-    await withBundleHomeEnv(
-      tempHarness,
-      "allbot-bundle-mcp",
-      async ({ homeDir, workspaceDir }) => {
-        const { pluginRoot, serverPath } = await createBundleProbePlugin(homeDir);
+    await withBundleHomeEnv(tempHarness, "allbot-bundle-mcp", async ({ homeDir, workspaceDir }) => {
+      const { pluginRoot, serverPath } = await createBundleProbePlugin(homeDir);
 
-        const config: AllBotConfig = {
-          plugins: {
-            entries: {
-              "bundle-probe": { enabled: true },
-            },
+      const config: AllBotConfig = {
+        plugins: {
+          entries: {
+            "bundle-probe": { enabled: true },
           },
-        };
+        },
+      };
 
-        const loaded = loadEnabledBundleMcpConfig({
-          workspaceDir,
-          cfg: config,
-        });
-        const resolvedServerPath = await fs.realpath(serverPath);
-        const loadedServer = loaded.config.mcpServers.bundleProbe;
-        const loadedArgs = getServerArgs(loadedServer);
-        const loadedServerPath = typeof loadedArgs?.[0] === "string" ? loadedArgs[0] : undefined;
-        const resolvedPluginRoot = await fs.realpath(pluginRoot);
+      const loaded = loadEnabledBundleMcpConfig({
+        workspaceDir,
+        cfg: config,
+      });
+      const resolvedServerPath = await fs.realpath(serverPath);
+      const loadedServer = loaded.config.mcpServers.bundleProbe;
+      const loadedArgs = getServerArgs(loadedServer);
+      const loadedServerPath = typeof loadedArgs?.[0] === "string" ? loadedArgs[0] : undefined;
+      const resolvedPluginRoot = await fs.realpath(pluginRoot);
 
-        expectNoDiagnostics(loaded.diagnostics);
-        expect(isRecord(loadedServer) ? loadedServer.command : undefined).toBe("node");
-        expect(loadedArgs).toHaveLength(1);
-        expect(loadedServerPath).toBeDefined();
-        if (!loadedServerPath) {
-          throw new Error("expected bundled MCP args to include the server path");
-        }
-        expect(normalizePathForAssertion(await fs.realpath(loadedServerPath))).toBe(
-          normalizePathForAssertion(resolvedServerPath),
-        );
-        await expectResolvedPathEqual(loadedServer.cwd, resolvedPluginRoot);
-      },
-    );
+      expectNoDiagnostics(loaded.diagnostics);
+      expect(isRecord(loadedServer) ? loadedServer.command : undefined).toBe("node");
+      expect(loadedArgs).toHaveLength(1);
+      expect(loadedServerPath).toBeDefined();
+      if (!loadedServerPath) {
+        throw new Error("expected bundled MCP args to include the server path");
+      }
+      expect(normalizePathForAssertion(await fs.realpath(loadedServerPath))).toBe(
+        normalizePathForAssertion(resolvedServerPath),
+      );
+      await expectResolvedPathEqual(loadedServer.cwd, resolvedPluginRoot);
+    });
   });
 
   it("merges inline bundle MCP servers and skips disabled bundles", async () => {

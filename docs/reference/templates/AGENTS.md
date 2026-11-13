@@ -65,7 +65,7 @@ Each file has a specific responsibility. Respect these boundaries:
 | MEMORY.md            | Hybrid memory index (8KB: inline high-freq + topic pointers) | Bot via memory tools   |
 | memory/YYYY-MM-DD.md | Daily session notes                                          | Bot                    |
 | memory/topics/\*.md  | Classified long-term memories by topic                       | Bot via memory_save    |
-| ALLBOT-GUIDE.md    | Configuration reference                                      | System template        |
+| ALLBOT-GUIDE.md      | Configuration reference                                      | System template        |
 | BOOTSTRAP.md         | First-run ritual (delete after completion)                   | System                 |
 
 ## Red Lines

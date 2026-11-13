@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { ALLBOT_CLI_ENV_VALUE } from "./allbot-exec-env.js";
 import {
   isDangerousHostEnvOverrideVarName,
   isDangerousHostEnvVarName,
@@ -11,7 +12,6 @@ import {
   sanitizeHostExecEnvWithDiagnostics,
   sanitizeSystemRunEnvOverrides,
 } from "./host-env-security.js";
-import { ALLBOT_CLI_ENV_VALUE } from "./allbot-exec-env.js";
 
 function findSystemCommandPath(command: string) {
   if (process.platform === "win32") {

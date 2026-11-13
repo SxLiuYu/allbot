@@ -79,7 +79,11 @@ export function parseLightpandaOutput(stdout: string): LightpandaFetchOutput | u
   if (Array.isArray(parsed)) {
     return parsed[0] as LightpandaFetchOutput | undefined;
   }
-  if (parsed && typeof parsed === "object" && Array.isArray((parsed as { results?: unknown }).results)) {
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    Array.isArray((parsed as { results?: unknown }).results)
+  ) {
     return ((parsed as { results: unknown[] }).results[0] ?? undefined) as
       | LightpandaFetchOutput
       | undefined;

@@ -75,10 +75,7 @@ export function createHookPackInstallLogger(): {
   };
 }
 
-export function enableInternalHookEntries(
-  config: AllBotConfig,
-  hookNames: string[],
-): AllBotConfig {
+export function enableInternalHookEntries(config: AllBotConfig, hookNames: string[]): AllBotConfig {
   const entries = { ...config.hooks?.internal?.entries } as Record<string, HookInternalEntryLike>;
 
   for (const hookName of hookNames) {

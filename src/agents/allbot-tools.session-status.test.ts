@@ -225,9 +225,7 @@ function createCommandsStatusRuntimeModuleMock() {
         modelAuth,
         includeTranscriptUsage: params.includeTranscriptUsage,
       });
-      return ["AllBot", `👾 Model: ${primary}`, params.taskLineOverride]
-        .filter(Boolean)
-        .join("\n");
+      return ["AllBot", `👾 Model: ${primary}`, params.taskLineOverride].filter(Boolean).join("\n");
     },
   };
 }

@@ -5,8 +5,7 @@ import { createTaskFlowWebhookRequestHandler, type TaskFlowWebhookTarget } from 
 export default definePluginEntry({
   id: "webhooks",
   name: "Webhooks",
-  description:
-    "Authenticated inbound webhooks that bind external automation to AllBot TaskFlows.",
+  description: "Authenticated inbound webhooks that bind external automation to AllBot TaskFlows.",
   async register(api: AllBotPluginApi) {
     const routes = await resolveWebhooksPluginConfig({
       pluginConfig: api.pluginConfig,

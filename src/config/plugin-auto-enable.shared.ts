@@ -288,10 +288,7 @@ function configMayNeedPluginManifestRegistry(cfg: AllBotConfig): boolean {
   return false;
 }
 
-export function configMayNeedPluginAutoEnable(
-  cfg: AllBotConfig,
-  env: NodeJS.ProcessEnv,
-): boolean {
+export function configMayNeedPluginAutoEnable(cfg: AllBotConfig, env: NodeJS.ProcessEnv): boolean {
   if (hasConfiguredPluginConfigEntry(cfg)) {
     return true;
   }

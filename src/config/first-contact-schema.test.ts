@@ -9,9 +9,7 @@ describe("cognitive proactive first-contact config", () => {
         enabled: true,
         firstContactEnabled: false,
         firstContactName: "刘工",
-        firstContactTo: [
-          { channel: "feishu", to: "ou_alice", accountId: "default" },
-        ],
+        firstContactTo: [{ channel: "feishu", to: "ou_alice", accountId: "default" }],
       },
     });
 

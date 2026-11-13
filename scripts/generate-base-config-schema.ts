@@ -74,8 +74,7 @@ if (args.has("--check") && args.has("--write")) {
 // never matches on Windows (drive letters / backslashes), which made
 // `pnpm config:schema:gen` silently write nothing there.
 const invokedDirectly =
-  process.argv[1] !== undefined &&
-  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+  process.argv[1] !== undefined && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (invokedDirectly) {
   const result = writeBaseConfigSchemaModule({ check: args.has("--check") });

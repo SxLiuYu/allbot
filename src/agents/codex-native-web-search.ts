@@ -293,9 +293,7 @@ export function isCodexNativeWebSearchRelevant(params: {
   });
 }
 
-export function describeCodexNativeWebSearch(
-  config: AllBotConfig | undefined,
-): string | undefined {
+export function describeCodexNativeWebSearch(config: AllBotConfig | undefined): string | undefined {
   if (config?.tools?.web?.search?.enabled === false) {
     return undefined;
   }

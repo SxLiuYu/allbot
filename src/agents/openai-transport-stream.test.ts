@@ -209,9 +209,7 @@ describe("openai transport stream", () => {
 
     const prepared = prepareTransportAwareSimpleModel(model);
 
-    expect(resolveTransportAwareSimpleApi(model.api)).toBe(
-      "allbot-google-generative-ai-transport",
-    );
+    expect(resolveTransportAwareSimpleApi(model.api)).toBe("allbot-google-generative-ai-transport");
     expect(prepared).toMatchObject({
       api: "allbot-google-generative-ai-transport",
       provider: "google",

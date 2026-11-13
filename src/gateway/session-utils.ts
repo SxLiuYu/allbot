@@ -724,10 +724,7 @@ function resolveDefaultStoreAgentId(cfg: AllBotConfig): string {
   return normalizeAgentId(resolveDefaultAgentId(cfg));
 }
 
-export function resolveSessionStoreKey(params: {
-  cfg: AllBotConfig;
-  sessionKey: string;
-}): string {
+export function resolveSessionStoreKey(params: { cfg: AllBotConfig; sessionKey: string }): string {
   const raw = normalizeOptionalString(params.sessionKey) ?? "";
   if (!raw) {
     return raw;

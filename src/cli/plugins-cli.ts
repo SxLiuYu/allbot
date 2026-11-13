@@ -871,10 +871,7 @@ export function registerPluginsCli(program: Command) {
           lines.push(`- ${formatPluginCompatibilityNotice(notice)} [${marker}]`);
         }
       }
-      const docs = formatDocsLink(
-        "/plugin",
-        "github.com/SxLiuYu/allbot/blob/main/docs/plugin.md",
-      );
+      const docs = formatDocsLink("/plugin", "github.com/SxLiuYu/allbot/blob/main/docs/plugin.md");
       lines.push("");
       lines.push(`${theme.muted(t("cli.plugins.docs"))} ${docs}`);
       defaultRuntime.log(lines.join("\n"));

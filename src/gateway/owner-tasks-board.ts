@@ -1,10 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { isLocalDirectRequest } from "./auth.js";
 import { loadConfig } from "../config/config.js";
 import { resolveOwnerTasksConfig } from "../tasks/owner/config.js";
 import { createOwnerTaskStore } from "../tasks/owner/store.js";
 import { resolveOwnerTaskDisplayId } from "../tasks/owner/store.js";
 import type { OwnerTaskRecord } from "../tasks/owner/types.js";
+import { isLocalDirectRequest } from "./auth.js";
 
 const BOARD_PATH = "/__allbot/owner-tasks";
 const BOARD_DATA_PATH = "/__allbot/owner-tasks.json";
@@ -128,9 +128,8 @@ export function handleOwnerTasksBoardHttpRequest(
                   deviceRequired: tasks.filter((task) => task.execution?.requiresDevice).length,
                 },
                 sensitivityCounts: {
-                  normal: tasks.filter(
-                    (task) => !task.sensitivity || task.sensitivity === "normal",
-                  ).length,
+                  normal: tasks.filter((task) => !task.sensitivity || task.sensitivity === "normal")
+                    .length,
                   sensitive: tasks.filter(
                     (task) => Boolean(task.sensitivity) && task.sensitivity !== "normal",
                   ).length,

@@ -2,10 +2,7 @@ import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import { resolveStateDir } from "../config/paths.js";
 import { writeTextAtomic } from "../infra/json-files.js";
-import type {
-  BusinessProviderAdapter,
-  BusinessProviderResult,
-} from "./provider-registry.js";
+import type { BusinessProviderAdapter, BusinessProviderResult } from "./provider-registry.js";
 import type { BusinessRequestStore } from "./store.js";
 import {
   BUSINESS_REQUEST_DEFAULT_TTL_MS,
@@ -112,7 +109,12 @@ export async function writeBusinessConfirmationToken(
   token: string,
   env: NodeJS.ProcessEnv = process.env,
 ): Promise<string> {
-  const filePath = path.join(resolveStateDir(env), "business", "confirmation-tokens", `${requestId}.token`);
+  const filePath = path.join(
+    resolveStateDir(env),
+    "business",
+    "confirmation-tokens",
+    `${requestId}.token`,
+  );
   await writeTextAtomic(filePath, token, { mode: 0o600, ensureDirMode: 0o700 });
   return filePath;
 }

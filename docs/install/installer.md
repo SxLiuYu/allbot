@@ -15,7 +15,7 @@ AllBot supports multiple installation methods. Pick the one that suits your envi
 | Method                                     | Command                    | Best for                             |
 | ------------------------------------------ | -------------------------- | ------------------------------------ |
 | **One-click install** (recommended / 推荐) | `curl -fsSL ... \| bash`   | Most users, fastest path             |
-| **npm install**                            | `npm install -g allbot`  | Users with Node.js already installed |
+| **npm install**                            | `npm install -g allbot`    | Users with Node.js already installed |
 | **Docker**                                 | `docker compose up -d`     | Containerized / headless deployments |
 | **Build from source**                      | `git clone` + `pnpm build` | Contributors and custom builds       |
 
@@ -174,15 +174,15 @@ container.
 
 Same source-build steps as above. Useful commands for contributors:
 
-| Command             | Purpose                            |
-| ------------------- | ---------------------------------- |
-| `pnpm build`        | Compile TypeScript                 |
-| `pnpm tsgo`         | Type check only                    |
-| `pnpm check`        | Lint + typecheck + boundary checks |
-| `pnpm test`         | Run tests (Vitest)                 |
-| `pnpm test <path>`  | Scoped test run                    |
-| `pnpm format:fix`   | Auto-format (oxfmt)                |
-| `pnpm allbot ...` | Run CLI in dev                     |
+| Command            | Purpose                            |
+| ------------------ | ---------------------------------- |
+| `pnpm build`       | Compile TypeScript                 |
+| `pnpm tsgo`        | Type check only                    |
+| `pnpm check`       | Lint + typecheck + boundary checks |
+| `pnpm test`        | Run tests (Vitest)                 |
+| `pnpm test <path>` | Scoped test run                    |
+| `pnpm format:fix`  | Auto-format (oxfmt)                |
+| `pnpm allbot ...`  | Run CLI in dev                     |
 
 Pre-commit hooks: `prek install`. Skip with `FAST_COMMIT=1`.
 

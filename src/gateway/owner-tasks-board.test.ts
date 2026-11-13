@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { describe, expect, it } from "vitest";
 import { handleOwnerTasksBoardHttpRequest } from "./owner-tasks-board.js";
 
 function makeReq(url: string, method = "GET", remoteAddress = "127.0.0.1") {
@@ -35,10 +35,7 @@ describe("handleOwnerTasksBoardHttpRequest", () => {
   it("rejects non-loopback requests", () => {
     const { res, chunks } = makeRes();
     expect(
-      handleOwnerTasksBoardHttpRequest(
-        makeReq("/__allbot/owner-tasks", "GET", "203.0.113.9"),
-        res,
-      ),
+      handleOwnerTasksBoardHttpRequest(makeReq("/__allbot/owner-tasks", "GET", "203.0.113.9"), res),
     ).toBe(true);
     expect(res.statusCode).toBe(403);
     expect(chunks.join("")).toContain("loopback-only");

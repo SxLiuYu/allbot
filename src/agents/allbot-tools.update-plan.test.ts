@@ -23,9 +23,7 @@ describe("allbot-tools update_plan gating", () => {
 
   it("auto-enables update_plan for OpenAI-family providers", () => {
     expect(isUpdatePlanToolEnabledForAllBotTools({} as AllBotConfig, "openai")).toBe(true);
-    expect(isUpdatePlanToolEnabledForAllBotTools({} as AllBotConfig, "openai-codex")).toBe(
-      true,
-    );
+    expect(isUpdatePlanToolEnabledForAllBotTools({} as AllBotConfig, "openai-codex")).toBe(true);
     expect(isUpdatePlanToolEnabledForAllBotTools({} as AllBotConfig, "anthropic")).toBe(false);
   });
 

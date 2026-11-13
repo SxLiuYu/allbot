@@ -217,9 +217,9 @@ describe("migrateConfig", () => {
     expect(result.changes).toHaveLength(1);
     expect(result.changes[0]!.detail).toContain("Would create");
 
-    await expect(fs.readFile(path.join(targetDir, "allbot.json"), "utf-8")).rejects.toMatchObject(
-      { code: "ENOENT" },
-    );
+    await expect(fs.readFile(path.join(targetDir, "allbot.json"), "utf-8")).rejects.toMatchObject({
+      code: "ENOENT",
+    });
   });
 
   it("returns warning when source config is unreadable", async () => {

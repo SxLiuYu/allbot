@@ -118,18 +118,18 @@ Expected output:
 AllBot runs in Docker, but Docker is not the source of truth.
 All long-lived state must survive restarts, rebuilds, and reboots.
 
-| Component           | Location                          | Persistence mechanism  | Notes                                                         |
-| ------------------- | --------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| Gateway config      | `/home/node/.allbot/`           | Host volume mount      | Includes `allbot.json`, `.env`                              |
+| Component           | Location                        | Persistence mechanism  | Notes                                                         |
+| ------------------- | ------------------------------- | ---------------------- | ------------------------------------------------------------- |
+| Gateway config      | `/home/node/.allbot/`           | Host volume mount      | Includes `allbot.json`, `.env`                                |
 | Model auth profiles | `/home/node/.allbot/agents/`    | Host volume mount      | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API keys) |
 | Skill configs       | `/home/node/.allbot/skills/`    | Host volume mount      | Skill-level state                                             |
 | Agent workspace     | `/home/node/.allbot/workspace/` | Host volume mount      | Code and agent artifacts                                      |
 | WhatsApp session    | `/home/node/.allbot/`           | Host volume mount      | Preserves QR login                                            |
 | Gmail keyring       | `/home/node/.allbot/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD`                               |
-| External binaries   | `/usr/local/bin/`                 | Docker image           | Must be baked at build time                                   |
-| Node runtime        | Container filesystem              | Docker image           | Rebuilt every image build                                     |
-| OS packages         | Container filesystem              | Docker image           | Do not install at runtime                                     |
-| Docker container    | Ephemeral                         | Restartable            | Safe to destroy                                               |
+| External binaries   | `/usr/local/bin/`               | Docker image           | Must be baked at build time                                   |
+| Node runtime        | Container filesystem            | Docker image           | Rebuilt every image build                                     |
+| OS packages         | Container filesystem            | Docker image           | Do not install at runtime                                     |
+| Docker container    | Ephemeral                       | Restartable            | Safe to destroy                                               |
 
 ## Updates
 

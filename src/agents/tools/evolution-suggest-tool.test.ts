@@ -413,9 +413,7 @@ describe("createEvolutionSuggestTool", () => {
 
       expect(mockSave).toHaveBeenCalledTimes(1);
       const savedRecord = mockSave.mock.calls[0][1];
-      expect(savedRecord.savedSkillPath).toBe(
-        "/home/test/.allbot/skills/agent/path-test/SKILL.md",
-      );
+      expect(savedRecord.savedSkillPath).toBe("/home/test/.allbot/skills/agent/path-test/SKILL.md");
       expect(savedRecord.draft.name).toBe("path-test");
     });
 

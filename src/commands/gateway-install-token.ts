@@ -1,9 +1,5 @@
 import { formatCliCommand } from "../cli/command-format.js";
-import {
-  readConfigFileSnapshot,
-  replaceConfigFile,
-  type AllBotConfig,
-} from "../config/config.js";
+import { readConfigFileSnapshot, replaceConfigFile, type AllBotConfig } from "../config/config.js";
 import { resolveSecretInputRef } from "../config/types.secrets.js";
 import { shouldRequireGatewayTokenForInstall } from "../gateway/auth-install-policy.js";
 import { hasAmbiguousGatewayAuthModeConfig } from "../gateway/auth-mode-policy.js";

@@ -31,10 +31,7 @@ type CachedCompiledConfiguredBindingRegistry = {
   registry: CompiledConfiguredBindingRegistry;
 };
 
-const compiledRegistryCache = new WeakMap<
-  AllBotConfig,
-  CachedCompiledConfiguredBindingRegistry
->();
+const compiledRegistryCache = new WeakMap<AllBotConfig, CachedCompiledConfiguredBindingRegistry>();
 
 function resolveLoadedChannelPlugin(channel: string) {
   const normalized = normalizeOptionalLowercaseString(channel);
@@ -198,9 +195,7 @@ export function resolveCompiledBindingRegistry(
   return registry;
 }
 
-export function primeCompiledBindingRegistry(
-  cfg: AllBotConfig,
-): CompiledConfiguredBindingRegistry {
+export function primeCompiledBindingRegistry(cfg: AllBotConfig): CompiledConfiguredBindingRegistry {
   const activeRegistry = requireActivePluginChannelRegistry();
   const registry = compileConfiguredBindingRegistry({ cfg });
   compiledRegistryCache.set(cfg, {

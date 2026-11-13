@@ -1,9 +1,9 @@
-import type { Command } from "commander";
 import {
   formatDocsLink,
   formatHelpExamples,
   theme,
 } from "allbot/plugin-sdk/memory-core-host-runtime-cli";
+import type { Command } from "commander";
 import type {
   MemoryCommandOptions,
   MemoryPromoteCommandOptions,

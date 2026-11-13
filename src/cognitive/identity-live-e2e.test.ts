@@ -169,9 +169,7 @@ describe("Phase 1: resolveCognitiveUserId end-to-end with stores", () => {
   it("senderId takes priority over sessionKey", async () => {
     const { resolveCognitiveUserId } = await import("./identity.js");
     expect(resolveCognitiveUserId("agent:main:main", "ou_feishu_user")).toBe("ou_feishu_user");
-    expect(resolveCognitiveUserId("agent:main:feishu:direct:ou_x", "allbot-tui")).toBe(
-      "operator",
-    );
+    expect(resolveCognitiveUserId("agent:main:feishu:direct:ou_x", "allbot-tui")).toBe("operator");
   });
 });
 

@@ -176,7 +176,7 @@ Built-in commands intercepted before the AI queue:
 | Command        | Description                          |
 | -------------- | ------------------------------------ |
 | `/bot-ping`    | Latency test                         |
-| `/bot-version` | Show the AllBot framework version  |
+| `/bot-version` | Show the AllBot framework version    |
 | `/bot-help`    | List all commands                    |
 | `/bot-upgrade` | Show the QQBot upgrade guide link    |
 | `/bot-logs`    | Export recent gateway logs as a file |

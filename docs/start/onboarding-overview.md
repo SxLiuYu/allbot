@@ -20,7 +20,7 @@ optional chat channels — they just differ in how you interact with the setup.
 | **Interface**  | Terminal wizard                        |
 | **Best for**   | Servers, headless, full control        |
 | **Automation** | `--non-interactive` for scripts        |
-| **Command**    | `allbot onboard`                     |
+| **Command**    | `allbot onboard`                       |
 
 Most users should start with **CLI onboarding** — it works everywhere and gives
 you the most control.

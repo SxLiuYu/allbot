@@ -105,16 +105,16 @@ Both resolve from process env at activation time. SecretRef details are document
 
 ## Path-related env vars
 
-| Variable               | Purpose                                                                                                                                                                          |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variable             | Purpose                                                                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ALLBOT_HOME`        | Override the home directory used for all internal path resolution (`~/.allbot/`, agent dirs, sessions, credentials). Useful when running AllBot as a dedicated service user. |
-| `ALLBOT_STATE_DIR`   | Override the state directory (default `~/.allbot`).                                                                                                                            |
+| `ALLBOT_STATE_DIR`   | Override the state directory (default `~/.allbot`).                                                                                                                          |
 | `ALLBOT_CONFIG_PATH` | Override the config file path (default `~/.allbot/allbot.json`).                                                                                                             |
 
 ## Logging
 
-| Variable             | Purpose                                                                                                                                                                                      |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variable           | Purpose                                                                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ALLBOT_LOG_LEVEL` | Override log level for both file and console (e.g. `debug`, `trace`). Takes precedence over `logging.level` and `logging.consoleLevel` in config. Invalid values are ignored with a warning. |
 
 ### `ALLBOT_HOME`

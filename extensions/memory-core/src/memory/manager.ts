@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { DatabaseSync } from "node:sqlite";
-import { type FSWatcher } from "chokidar";
 import { formatErrorMessage } from "allbot/plugin-sdk/error-runtime";
 import {
   createSubsystemLogger,
@@ -22,6 +21,7 @@ import {
   type MemorySource,
   type MemorySyncProgressUpdate,
 } from "allbot/plugin-sdk/memory-core-host-engine-storage";
+import { type FSWatcher } from "chokidar";
 import {
   createEmbeddingProvider,
   type EmbeddingProvider,

@@ -433,9 +433,7 @@ describe("computeGradedGate", () => {
       makeGateContext({ persona, event: { type: "persona_change", timestamp: now } }),
     );
     expect(result.decision).toBe(false);
-    expect(result.reasons).toEqual(
-      expect.arrayContaining([expect.stringContaining("Cold start")]),
-    );
+    expect(result.reasons).toEqual(expect.arrayContaining([expect.stringContaining("Cold start")]));
   });
 
   it("cold start does not bypass suppression", () => {

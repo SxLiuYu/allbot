@@ -58,9 +58,7 @@ describe("diffs tool", () => {
       mode: "view",
     });
 
-    expect(readTextContent(result, 0)).toContain(
-      "https://example.com/allbot/plugins/diffs/view/",
-    );
+    expect(readTextContent(result, 0)).toContain("https://example.com/allbot/plugins/diffs/view/");
     expect((result?.details as Record<string, unknown>).viewerUrl).toEqual(
       expect.stringContaining("https://example.com/allbot/plugins/diffs/view/"),
     );

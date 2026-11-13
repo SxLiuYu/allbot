@@ -406,8 +406,9 @@ export function resetPluginsCliTestState() {
   });
   writeConfigFile.mockResolvedValue(undefined);
   replaceConfigFile.mockImplementation(
-    (async (params: { nextConfig: AllBotConfig }) =>
-      await writeConfigFile(params.nextConfig)) as (...args: unknown[]) => Promise<unknown>,
+    (async (params: { nextConfig: AllBotConfig }) => await writeConfigFile(params.nextConfig)) as (
+      ...args: unknown[]
+    ) => Promise<unknown>,
   );
   resolveStateDir.mockReturnValue("/tmp/allbot-state");
   resolveMarketplaceInstallShortcut.mockResolvedValue(null);

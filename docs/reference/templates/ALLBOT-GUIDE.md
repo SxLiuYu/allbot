@@ -16,11 +16,11 @@ read_when:
 
 ## 常用快捷操作
 
-| 操作         | 方式                                    |
-| ------------ | --------------------------------------- |
+| 操作         | 方式                                  |
+| ------------ | ------------------------------------- |
 | 切换模型     | `allbot models set "zai/glm-5-turbo"` |
-| 开关认知系统 | `config.schema.lookup "cognitive"`      |
-| 其他所有配置 | `config.schema.lookup` 自查             |
+| 开关认知系统 | `config.schema.lookup "cognitive"`    |
+| 其他所有配置 | `config.schema.lookup` 自查           |
 
 ## 非显而易见的排查
 

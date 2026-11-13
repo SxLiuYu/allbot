@@ -89,16 +89,14 @@ const sharedGenerateText = vi.fn(async (prompt: string): Promise<string> => {
 });
 
 vi.mock("../../cognitive/evolution/standalone-generate.js", () => ({
-  createStandaloneGenerateText: vi.fn(
-    async (_cfg: unknown, options?: CapturedOption) => {
-      capturedOptions.push({
-        maxTokens: options?.maxTokens,
-        timeout: options?.timeout,
-        modelRef: options?.modelRef,
-      });
-      return sharedGenerateText;
-    },
-  ),
+  createStandaloneGenerateText: vi.fn(async (_cfg: unknown, options?: CapturedOption) => {
+    capturedOptions.push({
+      maxTokens: options?.maxTokens,
+      timeout: options?.timeout,
+      modelRef: options?.modelRef,
+    });
+    return sharedGenerateText;
+  }),
 }));
 
 describe("evolution suggest tool structured-JSON maxTokens", () => {
@@ -193,7 +191,9 @@ describe("evolution suggest tool structured-JSON maxTokens", () => {
     await new Promise((r) => setTimeout(r, 10));
 
     // The reviewer call must have used a safe, non-200 budget.
-    const reviewerCall = capturedOptions.find((o) => o.modelRef !== undefined && o.maxTokens === 1500);
+    const reviewerCall = capturedOptions.find(
+      (o) => o.modelRef !== undefined && o.maxTokens === 1500,
+    );
     expect(reviewerCall).toBeDefined();
     expect(reviewerCall!.maxTokens).toBe(1500);
 

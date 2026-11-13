@@ -1024,6 +1024,8 @@
     "./cli-entry": "./allbot.mjs"
   },
   "scripts": {
+    "allbot": "node scripts/run-node.mjs",
+    "allbot:rpc": "node scripts/run-node.mjs agent --mode rpc --json",
     "audit:seams": "node scripts/audit-seams.mjs",
     "build": "node scripts/build-all.mjs",
     "build:docker": "node scripts/tsdown-build.mjs && node scripts/runtime-postbuild.mjs && node scripts/build-stamp.mjs && node --import tsx scripts/canvas-a2ui-copy.ts && node --import tsx scripts/copy-hook-metadata.ts && node --import tsx scripts/copy-export-html-templates.ts && node --import tsx scripts/write-build-info.ts && node --experimental-strip-types scripts/write-cli-startup-metadata.ts && node --import tsx scripts/write-cli-compat.ts",
@@ -1068,8 +1070,6 @@
     "gateway:dev:reset": "ALLBOT_SKIP_CHANNELS=1 node scripts/run-node.mjs --dev gateway --reset",
     "gateway:watch": "node scripts/watch-node.mjs gateway --force",
     "gw:deploy": "bash scripts/deploy-gateway.sh",
-    "allbot": "node scripts/run-node.mjs",
-    "allbot:rpc": "node scripts/run-node.mjs agent --mode rpc --json",
     "lint": "node scripts/run-oxlint.mjs",
     "lint:agent:ingress-owner": "node scripts/check-ingress-agent-owner-context.mjs",
     "lint:auth:no-pairing-store-group": "node scripts/check-no-pairing-store-group-auth.mjs",
