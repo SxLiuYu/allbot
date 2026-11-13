@@ -57,22 +57,74 @@ case "$TZ_PROP" in
 esac
 
 info "获取最新版本号..."
-KB_VER=$(curl -fsSL --connect-timeout 15 https://registry.npmjs.org/allbot/latest 2>/dev/null | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).version" 2>/dev/null || true)
+# Do NOT read the version from registry.npmjs.org/allbot: that name belongs to
+# an unrelated 2015 project (bot-lab/allbot, 0.1.70), so it would install the
+# wrong package. AllBot ships through GitHub Releases; the tag list also holds
+# a `launcher` tag (the APK), so filter to `v<calver>` only.
+#
+# We also read the asset name from the same response instead of assuming
+# "allbot-<tag>.tgz": a release built before the version bump carries the old
+# version in the filename (e.g. tag v2026.11.13 -> allbot-2026.11.02.tgz).
+RELEASES_JSON=$(
+  curl -fsSL --connect-timeout 15 "https://api.github.com/repos/SxLiuYu/allbot/releases?per_page=30" 2>/dev/null || true
+)
+
+# Pick the newest v<calver> release that actually carries a tarball asset.
+# The picker lives in a temp file rather than an inline `node -e`: nesting a
+# quoted regex inside $( ) makes bash's paren matching fragile.
+PICK=""
+if [ -n "$RELEASES_JSON" ]; then
+  PICKER=$(mktemp) || PICKER=""
+  if [ -n "$PICKER" ]; then
+    cat >"$PICKER" <<'NODE_PICK'
+let s = "";
+process.stdin.on("data", (d) => (s += d)).on("end", () => {
+  try {
+    const rs = JSON.parse(s);
+    const ok = rs
+      .filter((r) => /^v\d{4}\.\d{1,2}\.\d{1,2}(-\d+)?$/.test(r.tag_name || ""))
+      .sort((a, b) => (a.tag_name < b.tag_name ? 1 : -1));
+    for (const r of ok) {
+      const tgz = (r.assets || []).find((a) => /^allbot-.*\.tgz$/.test(a.name || ""));
+      if (tgz) {
+        console.log(r.tag_name.replace(/^v/, "") + "\t" + tgz.browser_download_url + "\t" + tgz.name);
+        return;
+      }
+    }
+  } catch (e) {
+    /* unparseable response: leave output empty and fall through */
+  }
+});
+NODE_PICK
+    PICK=$(printf '%s' "$RELEASES_JSON" | node "$PICKER" 2>/dev/null || true)
+    rm -f "$PICKER"
+  fi
+fi
+
+if [ -z "${ALLBOT_VERSION:-}" ] && [ -n "$PICK" ]; then
+  KB_VER=$(printf '%s' "$PICK" | cut -f1)
+  TGZ_URL=$(printf '%s' "$PICK" | cut -f2)
+  TGZ_NAME=$(printf '%s' "$PICK" | cut -f3)
+else
+  KB_VER="${ALLBOT_VERSION:-}"
+  TGZ_NAME="allbot-${KB_VER}.tgz"
+  TGZ_URL="https://github.com/SxLiuYu/allbot/releases/download/v${KB_VER}/${TGZ_NAME}"
+fi
 
 if [ -z "$KB_VER" ]; then
-  info "无法获取版本号，直接从 npm 安装..."
-  npm install -g allbot@latest --force $NPM_REGISTRY
-else
-  info "安装 AllBot v${KB_VER}..."
-  # Priority: npmmirror (China) → npmjs.org (global CDN) → GitHub tarball (last resort)
-  npm install -g "allbot@${KB_VER}" --force $NPM_REGISTRY || {
-    info "镜像源失败，尝试 npmjs.org..."
-    npm install -g "allbot@${KB_VER}" --force --registry=https://registry.npmjs.org || {
-      info "npmjs.org 也失败，尝试 GitHub tarball..."
-      npm install -g "https://github.com/SxLiuYu/allbot/releases/download/v${KB_VER}/allbot-${KB_VER}.tgz" --force
-    }
-  }
+  printf '\033[31m✗\033[0m 无法从 GitHub 获取 AllBot 版本号。\n' >&2
+  printf '  请检查网络后重试，或手动指定版本：\n' >&2
+  printf '  ALLBOT_VERSION=2026.11.14 bash install-termux.sh\n' >&2
+  exit 1
 fi
+
+info "安装 AllBot v${KB_VER} (${TGZ_NAME})..."
+npm install -g "$TGZ_URL" --force $NPM_REGISTRY || {
+  info "npm 安装 tarball 失败，改用 git clone 源码安装..."
+  git clone --depth 1 --branch "v${KB_VER}" https://github.com/SxLiuYu/allbot ~/allbot \
+    && cd ~/allbot && pnpm install --frozen-lockfile && pnpm build \
+    && npm install -g . --force
+}
 ok "AllBot $(allbot --version)"
 
 # Optional: local speech engine (voice input + read-aloud). Non-fatal.

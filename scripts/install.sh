@@ -1950,7 +1950,7 @@ is_explicit_package_install_spec() {
 can_resolve_registry_package_version() {
     local value="${1:-}"
     if [[ -z "$value" ]]; then
-        return 0
+        return 1
     fi
     if [[ "${value,,}" == "main" ]]; then
         return 1
@@ -1958,7 +1958,56 @@ can_resolve_registry_package_version() {
     if is_explicit_package_install_spec "$value"; then
         return 1
     fi
+    # The `allbot` name on npm is an unrelated 2015 project, so there is no
+    # registry version to resolve. Only scope-qualified names can be looked up.
+    if [[ "${value}" != @* ]]; then
+        return 1
+    fi
     return 0
+}
+
+# Resolve a GitHub Release tarball URL for the requested version.
+#
+# Prints "<version>\t<url>" on success. The `allbot` package name is taken on
+# npm by an unrelated project, so npm is NOT a valid install source for this
+# repo; every install path lands on the Release tarball instead.
+resolve_release_tarball() {
+    local want="${1:-latest}"
+    local json
+    json="$(curl -fsSL --connect-timeout 15 \
+        "https://api.github.com/repos/SxLiuYu/allbot/releases?per_page=30" 2>/dev/null || true)"
+    [[ -z "$json" ]] && return 1
+
+    local picker
+    picker="$(mktemp 2>/dev/null || echo "")"
+    [[ -z "$picker" ]] && return 1
+    cat >"$picker" <<'NODE_PICK'
+let s = "";
+process.stdin.on("data", (d) => (s += d)).on("end", () => {
+  const want = process.argv[2] || "latest";
+  try {
+    const rs = JSON.parse(s);
+    const ok = rs
+      .filter((r) => /^v\d{4}\.\d{1,2}\.\d{1,2}(-\d+)?$/.test(r.tag_name || ""))
+      .sort((a, b) => (a.tag_name < b.tag_name ? 1 : -1));
+    for (const r of ok) {
+      if (want !== "latest" && r.tag_name.replace(/^v/, "") !== want) continue;
+      const tgz = (r.assets || []).find((a) => /^allbot-.*\.tgz$/.test(a.name || ""));
+      if (tgz) {
+        process.stdout.write(r.tag_name.replace(/^v/, "") + "\t" + tgz.browser_download_url);
+        return;
+      }
+    }
+  } catch (e) {
+    /* unparseable: fall through to a non-zero exit */
+  }
+});
+NODE_PICK
+    local out
+    out="$(printf '%s' "$json" | node "$picker" "$want" 2>/dev/null || true)"
+    rm -f "$picker"
+    [[ -z "$out" ]] && return 1
+    printf '%s' "$out"
 }
 
 resolve_package_install_spec() {
@@ -1998,17 +2047,29 @@ install_allbot() {
         ALLBOT_VERSION="latest"
     fi
 
-    local resolved_version=""
-    if can_resolve_registry_package_version "${ALLBOT_VERSION}"; then
-        resolved_version="$(npm view "${package_name}@${ALLBOT_VERSION}" version 2>/dev/null || true)"
-    fi
-    if [[ -n "$resolved_version" ]]; then
-        ui_info "Installing AllBot v${resolved_version}"
-    else
-        ui_info "Installing AllBot (${ALLBOT_VERSION})"
-    fi
+    # Default path: install from the GitHub Release tarball. npm is not a valid
+    # source for this repo (the `allbot` name belongs to another project), so we
+    # only fall back to npm-style specs when the caller passed one explicitly.
     local install_spec=""
-    install_spec="$(resolve_package_install_spec "${package_name}" "${ALLBOT_VERSION}")"
+    local release_pick=""
+    if ! is_explicit_package_install_spec "${ALLBOT_VERSION}" && [[ "${package_name}" != @* ]]; then
+        release_pick="$(resolve_release_tarball "${ALLBOT_VERSION}" || true)"
+    fi
+
+    if [[ -n "$release_pick" ]]; then
+        local release_version release_url
+        release_version="$(printf '%s' "$release_pick" | cut -f1)"
+        release_url="$(printf '%s' "$release_pick" | cut -f2)"
+        ui_info "Installing AllBot v${release_version} from GitHub Release"
+        install_spec="$release_url"
+    else
+        if ! is_explicit_package_install_spec "${ALLBOT_VERSION}"; then
+            ui_warn "Could not reach GitHub Releases; falling back to a source build"
+            install_spec="github:SxLiuYu/allbot#main"
+        else
+            install_spec="$(resolve_package_install_spec "${package_name}" "${ALLBOT_VERSION}")"
+        fi
+    fi
 
     if ! install_allbot_npm "${install_spec}"; then
         ui_warn "npm install failed; retrying"

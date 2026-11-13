@@ -7,6 +7,13 @@ on:
 
 jobs:
   publish-npm:
+    # The `allbot` name on npm belongs to an unrelated 2015 project
+    # (bot-lab/allbot), so trusted publishing cannot be registered for it and
+    # this job would fail on every tag. Keeping it as a hard failure only makes
+    # the release look broken. Set repo variable PUBLISH_NPM=true once the
+    # package is renamed to a scope (e.g. @sxliuyu/allbot) or npm ownership is
+    # obtained; until then the release ships via GitHub Releases + source.
+    if: vars.PUBLISH_NPM == 'true'
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
