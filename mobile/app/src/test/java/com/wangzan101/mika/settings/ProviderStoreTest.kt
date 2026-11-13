@@ -247,7 +247,7 @@ class ProviderStoreTest {
     fun legacySelfHostedProviderGetsPresetCapabilitiesOnLoad() {
         File(tmp.root, "providers.json").writeText(
             """{"services":[""" +
-                """{"id":"mnn","name":"MNN","kind":"OpenAiCompat","baseUrl":"http://172.16.84.88:8097/v1","models":[]},""" +
+                """{"id":"mnn","name":"MNN","kind":"OpenAiCompat","baseUrl":"http://192.168.1.10:8097/v1","models":[]},""" +
                 """{"id":"cloud","name":"MNN","kind":"OpenAiCompat","baseUrl":"https://cloud.example/v1","models":[]}""" +
                 """]}""",
         )

@@ -47,7 +47,7 @@ class LocalLightProviderTest {
     private fun configured(): ProviderStore {
         val s = store()
         val main = connected(s, "Remote", "https://remote.test/v1")
-        val local = connected(s, "MNN", "http://172.16.84.88:8097/v1")
+        val local = connected(s, "MNN", "http://192.168.1.10:8097/v1")
         assertTrue(s.use(ModelRole.Main, main.id, "main", caps(true)))
         assertTrue(s.use(ModelRole.Light, local.id, "local", caps(false)))
         return s

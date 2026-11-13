@@ -51,7 +51,7 @@ class ProviderPresetsTest {
         assertFalse(mnn.capabilities.vision)
         assertEquals(8_192, mnn.capabilities.contextTokens)
         assertEquals(PromptCaching.None, mnn.capabilities.promptCaching)
-        val lan = AddForm.of(mnn).copy(baseUrl = "http://172.16.84.88:8097/v1")
+        val lan = AddForm.of(mnn).copy(baseUrl = "http://192.168.1.10:8097/v1")
         assertTrue(lan.urlEditable)
         assertFalse(lan.keyRequired)
         assertTrue(lan.canTest)

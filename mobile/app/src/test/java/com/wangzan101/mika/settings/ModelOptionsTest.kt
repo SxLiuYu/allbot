@@ -216,7 +216,7 @@ class ModelOptionsTest {
 
     /** 自己跑的服务改了局域网地址:不能只凭名字把同名云端服务商也标成纯文本。 */
     @Test fun editedSelfHostedUrlDoesNotGuessCapabilitiesFromName() {
-        val lan = Provider("p", "MNN", ProviderConfig.Kind.OpenAiCompat, "http://172.16.84.88:8097/v1")
+        val lan = Provider("p", "MNN", ProviderConfig.Kind.OpenAiCompat, "http://192.168.1.10:8097/v1")
         val cloud = Provider("q", "MNN", ProviderConfig.Kind.OpenAiCompat, "https://cloud.example/v1")
         assertTrue(ModelOptions.baseOf(lan).toolCalls)
         assertTrue(ModelOptions.baseOf(cloud).toolCalls)
