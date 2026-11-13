@@ -2,6 +2,10 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import {
+  clearRuntimeConfigSnapshot,
+  setRuntimeConfigSnapshot,
+} from "../config/runtime-snapshot.js";
 import { findSessionKeyForUserId, resolveCognitiveDeliveryTarget } from "./cognitive-delivery.js";
 
 describe("findSessionKeyForUserId", () => {
@@ -187,13 +191,26 @@ describe("resolveCognitiveDeliveryTarget", () => {
     });
     // Store migration moves agent:main:main with feishu delivery to
     // agent:main:feishu:direct:ou_test123 — query must use the open ID.
-    const result = resolveCognitiveDeliveryTarget(makeCfg(storePath), "ou_test123");
-    expect(result).toEqual({
-      sessionKey: "agent:main:feishu:direct:ou_test123",
-      channel: "feishu",
-      to: "user:ou_test123",
-      accountId: "default",
-    });
+    // The migration only runs when the effective dmScope is per-peer, which
+    // needs a channel carrying credentials; otherwise dmScope stays "main"
+    // and the legacy key is kept. store-load reads that from loadConfig(), so
+    // the pinned runtime snapshot is what has to say so.
+    const cfg = {
+      session: { store: storePath },
+      channels: { feishu: { appId: "cli_test", appSecret: "secret" } },
+    } as never;
+    setRuntimeConfigSnapshot(cfg);
+    try {
+      const result = resolveCognitiveDeliveryTarget(cfg, "ou_test123");
+      expect(result).toEqual({
+        sessionKey: "agent:main:feishu:direct:ou_test123",
+        channel: "feishu",
+        to: "user:ou_test123",
+        accountId: "default",
+      });
+    } finally {
+      clearRuntimeConfigSnapshot();
+    }
   });
 
   it("returns undefined when session has no lastChannel", () => {

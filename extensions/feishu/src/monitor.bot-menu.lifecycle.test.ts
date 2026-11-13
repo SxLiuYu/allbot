@@ -176,7 +176,11 @@ describe("Feishu bot-menu lifecycle", () => {
       expect.objectContaining({
         accountId: "acct-menu",
         chatId: "p2p:ou_user1",
-        replyToMessageId: "bot-menu:quick-actions:1700000000001",
+        // Bot-menu events are synthetic: their message id is an internal
+        // idempotency key (`bot-menu:<key>:<ts>`), not a real Feishu message
+        // id. Replying to it fails with 99992354, so the dispatcher must get
+        // no reply target at all.
+        replyToMessageId: undefined,
       }),
     );
     expect(finalizeInboundContextMock).toHaveBeenCalledWith(
