@@ -1,0 +1,19 @@
+# Default reviewers for changes that need a maintainer's eyes.
+# CODEOWNERS only takes effect once branch protection requires review; it is
+# still useful as an @-mention shortcut on PRs.
+*                                   @SxLiuYu
+
+# Release and CI plumbing
+/.github/                           @SxLiuYu
+/scripts/install.sh                 @SxLiuYu
+/scripts/install.ps1                @SxLiuYu
+/scripts/install-termux.sh          @SxLiuYu
+/package.json                       @SxLiuYu
+
+# License surface — a change here alters redistribution terms
+/LICENSE                            @SxLiuYu
+/NOTICE                             @SxLiuYu
+/mobile/LICENSE                     @SxLiuYu
+/mobile/NOTICE                      @SxLiuYu
+/voice/charlie/LICENSE              @SxLiuYu
+/voice/Baize/LICENSE                @SxLiuYu

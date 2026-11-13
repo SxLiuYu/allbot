@@ -1,0 +1,33 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.{ts,tsx,js,jsx,mjs,cjs,json,jsonc,yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{sh,bash}]
+indent_size = 2
+
+# Go-template HTML in the mobile relay must keep its exact bytes.
+[mobile/tools/relay/web/*.html]
+insert_final_newline = unset
+trim_trailing_whitespace = false
+
+[*.py]
+indent_size = 4
+
+[*.{kt,kts}]
+indent_size = 4
+
+[*.{png,jpg,jpeg,gif,mp4,apk,jar,xz,zip,tgz}]
+insert_final_newline = unset
+trim_trailing_whitespace = unset

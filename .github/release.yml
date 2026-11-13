@@ -1,0 +1,41 @@
+# Groups the auto-generated release notes by label. Only used when a release is
+# created with --generate-notes; hand-written release notes are unaffected.
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+  categories:
+    - title: 破坏性变更
+      labels:
+        - breaking
+        - breaking-change
+    - title: 服务器端
+      labels:
+        - server
+        - gateway
+        - cognitive
+    - title: 手机端（mobile/）
+      labels:
+        - mobile
+        - android
+    - title: 语音端（voice/）
+      labels:
+        - voice
+        - esp32
+    - title: 新功能
+      labels:
+        - enhancement
+        - feat
+    - title: 修复
+      labels:
+        - bug
+        - fix
+    - title: 文档
+      labels:
+        - docs
+        - documentation
+    - title: 其他改动
+      labels:
+        - "*"
