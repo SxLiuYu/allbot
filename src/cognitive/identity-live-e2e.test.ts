@@ -256,12 +256,21 @@ describe("Phase 1c: consolidation resolves operator userId", () => {
 // ===========================================================================
 describe("Phase 1d: resolveEffectiveDmScope adaptive promotion", () => {
   it("promotes main→per-peer when feishu channel configured", async () => {
+    // Promotion only applies when dmScope is left unset. An explicit
+    // `session.dmScope: "main"` is a deliberate single-owner choice and wins
+    // over credential detection -- see the comment on resolveEffectiveDmScope.
     const { resolveEffectiveDmScope } = await import("../routing/session-key.js");
-    const result = resolveEffectiveDmScope({
+    const explicitMain = resolveEffectiveDmScope({
       session: { dmScope: "main" },
       channels: { feishu: { appId: "cli_x", appSecret: "secret" } },
     });
-    expect(result).toBe("per-peer");
+    expect(explicitMain).toBe("main");
+
+    const unset = resolveEffectiveDmScope({
+      session: {},
+      channels: { feishu: { appId: "cli_x", appSecret: "secret" } },
+    });
+    expect(unset).toBe("per-peer");
   });
 
   it("keeps main when no channels configured", async () => {

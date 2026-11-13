@@ -350,8 +350,18 @@ describe("installPluginFromClawHub", () => {
     });
 
     expect(result).toMatchObject({ ok: true, pluginId: "demo" });
-    expect(logger.warn).toHaveBeenCalledWith(
-      'ClawHub package "demo@2026.3.22" is missing sha256hash; falling back to files[] verification. Validated files: dist/index.js, allbot.plugin.json. Validated generated metadata files present in archive: _meta.json (JSON parse plus slug/version match only).',
+    // The validated-file list comes from a directory read, so its order is not
+    // part of the contract -- assert the contents, not the sequence.
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+    const warnMessage = String(logger.warn.mock.calls[0]?.[0]);
+    expect(warnMessage).toContain(
+      'ClawHub package "demo@2026.3.22" is missing sha256hash; falling back to files[] verification.',
+    );
+    const validated = warnMessage.slice(warnMessage.indexOf("Validated files: "));
+    expect(validated).toContain("dist/index.js");
+    expect(validated).toContain("allbot.plugin.json");
+    expect(warnMessage).toContain(
+      "Validated generated metadata files present in archive: _meta.json (JSON parse plus slug/version match only).",
     );
   });
 

@@ -14,7 +14,10 @@ describe("shared/assistant-identity-values", () => {
   });
 
   it("truncates overlong trimmed values at the exact limit", () => {
-    expect(coerceIdentityValue("  AllBot Assistant  ", 8)).toBe("AllBot");
+    // slice(0, 8) of "AllBot Assistant" is "AllBot A" -- it cuts mid-word,
+    // which is why the test is named "at the exact limit" rather than about
+    // word boundaries.
+    expect(coerceIdentityValue("  AllBot Assistant  ", 8)).toBe("AllBot A");
   });
 
   // Skip on CI: assertion below expects "OpenCla" but actual returns "AllBotBo"

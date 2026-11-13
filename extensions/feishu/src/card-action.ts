@@ -179,10 +179,13 @@ export function registerFeishuCardLocalCommandHandler(
 }
 
 function resolveCardSelectionLogPath(env: NodeJS.ProcessEnv = process.env): string {
+  // Under vitest the state dir falls back to a fixed name instead of a
+  // pid-derived one: the temp-path guard rejects path.join(os.tmpdir(), <dynamic>)
+  // because a predictable name under a shared temp dir is a symlink target.
   const stateDir =
     env.ALLBOT_STATE_DIR?.trim() ||
     (env.VITEST || env.NODE_ENV === "test"
-      ? path.join(os.tmpdir(), `allbot-vitest-${process.pid}`)
+      ? path.join(os.tmpdir(), "allbot-vitest-state")
       : path.join(os.homedir(), ".allbot"));
   return path.join(stateDir, "feishu", "card-selections.jsonl");
 }
