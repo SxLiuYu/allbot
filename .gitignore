@@ -75,3 +75,6 @@ skills-lock.json
 allbot@*
 /node
 state/
+
+# 本机迁移清单，不进公开仓库
+MIGRATION.md
