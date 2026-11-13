@@ -649,8 +649,12 @@ function extractCardBody(card: CardJson): {
     const rows: CardJson[] = [];
     for (const row of card.elements as unknown[]) {
       const group = asCardArray(row);
-      if (group.length === 0) continue;
-      if (group.some(isButtonElement)) continue;
+      if (group.length === 0) {
+        continue;
+      }
+      if (group.some(isButtonElement)) {
+        continue;
+      }
       for (const element of group) {
         // v1 stores plain text as `{tag:"text", text:"..."}`; write it back in
         // a form the v2-ish writer accepts.

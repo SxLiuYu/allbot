@@ -56,7 +56,9 @@ export function createHttpSyncGatewayClient(options: {
       signal: AbortSignal.timeout(options.timeoutMs ?? 15_000),
     });
     const text = await response.text();
-    if (!response.ok) throw new SyncGatewayError(response.status, text.slice(0, 500));
+    if (!response.ok) {
+      throw new SyncGatewayError(response.status, text.slice(0, 500));
+    }
     return (text ? JSON.parse(text) : {}) as T;
   }
   return {
@@ -68,7 +70,7 @@ export function createHttpSyncGatewayClient(options: {
       return result.tasks;
     },
     async createTask(task, idempotencyKey) {
-      return await request<SyncTask>("POST", "/sync/v1/tasks", task, idempotencyKey);
+      return await request("POST", "/sync/v1/tasks", task, idempotencyKey);
     },
     async appendEvent(event) {
       await request("POST", `/sync/v1/tasks/${encodeURIComponent(event.taskId)}/events`, event);

@@ -76,7 +76,9 @@ export async function syncOwnerTaskFromSubagentCompletion(
       if (result.ok && cfg.tasks?.sync?.enabled) {
         // Optional outbound sync never changes the local review decision.
         const adapter = createConfiguredOwnerTaskSyncAdapter(cfg, { store });
-        if (adapter) void adapter.project(result.task);
+        if (adapter) {
+          void adapter.project(result.task);
+        }
       }
       return result.ok ? { synced: true, reviewRequired: true, taskId: task.taskId } : EMPTY_RESULT;
     }

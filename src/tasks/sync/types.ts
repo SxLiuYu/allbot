@@ -123,8 +123,12 @@ export function ownerTargetFromSync(
   target: SyncTask["target"],
   deviceId?: string,
 ): OwnerTaskRecord["execution"] | null {
-  if (target === "cloud") return { environment: "cloud", ...(deviceId ? { deviceId } : {}) };
-  if (target === "mac") return { environment: "gateway", ...(deviceId ? { deviceId } : {}) };
+  if (target === "cloud") {
+    return { environment: "cloud", ...(deviceId ? { deviceId } : {}) };
+  }
+  if (target === "mac") {
+    return { environment: "gateway", ...(deviceId ? { deviceId } : {}) };
+  }
   return null;
 }
 
@@ -143,9 +147,13 @@ export function assertSyncTransition(
     failed: [],
     cancelled: [],
   };
-  if (!allowed[from].includes(to)) throw new Error(`illegal sync transition ${from} -> ${to}`);
-  if (from === "running" && to === "done" && sensitivity !== "normal")
+  if (!allowed[from].includes(to)) {
+    throw new Error(`illegal sync transition ${from} -> ${to}`);
+  }
+  if (from === "running" && to === "done" && sensitivity !== "normal") {
     throw new Error("sensitive task requires review");
-  if (from === "waiting_review" && to === "done" && !actor.startsWith("owner:"))
+  }
+  if (from === "waiting_review" && to === "done" && !actor.startsWith("owner:")) {
     throw new Error("review acceptance requires human owner");
+  }
 }

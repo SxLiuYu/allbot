@@ -59,11 +59,15 @@ export class OwnerTaskSyncAdapter {
 
   async importRemote(remote: SyncTask): Promise<OwnerTaskRecord | null> {
     const execution = ownerTargetFromSync(remote.target, remote.deviceId);
-    if (!execution) return null;
+    if (!execution) {
+      return null;
+    }
     const existing = (await this.options.store.read()).tasks.find(
       (task) => task.taskId === remote.id,
     );
-    if (existing) return existing;
+    if (existing) {
+      return existing;
+    }
     const now = this.options.now?.() ?? Date.now();
     await this.client.appendEvent({
       taskId: remote.id,
@@ -92,9 +96,13 @@ export class OwnerTaskSyncAdapter {
   }
 
   async dispatchCloud(remote: SyncTask): Promise<boolean> {
-    if (remote.target !== "cloud" || !remote.deviceId || !this.options.nodeInvoke) return false;
+    if (remote.target !== "cloud" || !remote.deviceId || !this.options.nodeInvoke) {
+      return false;
+    }
     const task = await this.importRemote(remote);
-    if (!task || task.status !== "in_progress") return false;
+    if (!task || task.status !== "in_progress") {
+      return false;
+    }
     const nodeId = this.options.deviceId ?? remote.deviceId;
     return await this.runOnNode({
       task,
@@ -111,12 +119,18 @@ export class OwnerTaskSyncAdapter {
    * through the node instead of re-invoking a child session that has no loop.
    */
   async redispatch(task: OwnerTaskRecord): Promise<boolean> {
-    if (!this.options.nodeInvoke) return false;
+    if (!this.options.nodeInvoke) {
+      return false;
+    }
     const tasks = await this.client.listTasks();
     const remote = tasks.find((entry) => entry.id === task.taskId);
-    if (!remote || remote.target !== "cloud") return false;
+    if (!remote || remote.target !== "cloud") {
+      return false;
+    }
     const nodeId = this.options.deviceId ?? remote.deviceId;
-    if (!nodeId) return false;
+    if (!nodeId) {
+      return false;
+    }
     return await this.runOnNode({
       task,
       remote,
@@ -135,7 +149,9 @@ export class OwnerTaskSyncAdapter {
   }): Promise<boolean> {
     const { task, remote, nodeId, tag, idempotency } = params;
     const nodeInvoke = this.options.nodeInvoke;
-    if (!nodeInvoke) return false;
+    if (!nodeInvoke) {
+      return false;
+    }
     const prepared = await nodeInvoke({
       nodeId,
       command: "system.run.prepare",
@@ -196,7 +212,9 @@ export class OwnerTaskSyncAdapter {
       resultText: text,
       note: succeeded ? "cloud VM execution finished" : text,
     });
-    if (!local.ok) return false;
+    if (!local.ok) {
+      return false;
+    }
     await this.client.appendEvent({
       taskId: remote.id,
       deviceId: remote.deviceId ?? nodeId,
@@ -229,15 +247,18 @@ export function createConfiguredOwnerTaskSyncAdapter(
   } = {},
 ): OwnerTaskSyncAdapter | null {
   const config = (cfg ?? loadConfig()).tasks?.sync;
-  if (!config?.enabled) return null;
+  if (!config?.enabled) {
+    return null;
+  }
   const tokenEnv = config.tokenEnv ?? "ALLBOT_SYNC_GATEWAY_TOKEN";
   let token = process.env[tokenEnv];
   if (!token) {
     try {
       const file = path.join(os.homedir(), ".allbot", "sync-gateway-token");
       token = fs.readFileSync(file, "utf8").trim();
-      if (process.platform !== "win32" && (fs.statSync(file).mode & 0o077) !== 0)
+      if (process.platform !== "win32" && (fs.statSync(file).mode & 0o077) !== 0) {
         throw new Error("token file permissions must be 0600");
+      }
     } catch {
       /* missing file is handled by the disabled log */
     }

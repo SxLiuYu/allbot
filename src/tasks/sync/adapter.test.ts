@@ -15,7 +15,9 @@ import {
 
 const dirs: string[] = [];
 afterEach(() => {
-  for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true });
+  for (const dir of dirs.splice(0)) {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 function store() {
   const dir = mkdtempSync(path.join(os.tmpdir(), "owner-sync-"));
@@ -134,7 +136,9 @@ describe("OwnerTask sync contract", () => {
       { store: s, nodeInvoke, now: () => 200 },
     );
     const imported = await adapter.importRemote(cloud);
-    if (!imported) throw new Error("import failed");
+    if (!imported) {
+      throw new Error("import failed");
+    }
     const reviewed = await transitionOwnerTask({
       store: s,
       taskId: imported.taskId,

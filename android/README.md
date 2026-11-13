@@ -23,7 +23,7 @@ gradle assembleDebug
 
 或通过 GitHub Actions 自动构建(`android/**` 路径推送到 main 时触发,自动上传到 `launcher` release tag)。
 
-> 注意:Termux APK(`app/src/main/res/raw/termux.apk`,约 34MB)在 `.gitignore` 里,不长期追踪。CI 构建时从 [`v2026.6.25-1` release](https://github.com/SxLiuYu/allbot/releases/tag/v2026.6.25-1) 的 `termux-arm64.apk` 资源拉取。本地构建需要手动放置。详见 `.github/workflows/android-build.yml`。
+> 注意:Termux APK(`app/src/main/res/raw/termux.apk`,约 34MB)在 `.gitignore` 里,不长期追踪。CI 构建时从 [Termux 官方 release](https://github.com/termux/termux-app/releases/tag/v0.118.3) 拉 `termux-app_v0.118.3+github-debug_arm64-v8a.apk`（约 33MB）。本地构建需要手动放置。详见 `.github/workflows/android-build.yml`。
 
 ## 技术方案
 

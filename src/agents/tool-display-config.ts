@@ -613,6 +613,31 @@ export const TOOL_DISPLAY_CONFIG: ToolDisplayConfig = {
       title: "Report Task Step",
       detailKeys: ["taskId", "stepIndex", "done"],
     },
+    task_list: {
+      emoji: "🗂️",
+      title: "List Owner Tasks",
+      detailKeys: ["status", "limit"],
+    },
+    task_get: {
+      emoji: "🔍",
+      title: "Get Owner Task",
+      detailKeys: ["taskId"],
+    },
+    task_accept: {
+      emoji: "✅",
+      title: "Accept Owner Task",
+      detailKeys: ["taskId", "resultVersion"],
+    },
+    task_reject: {
+      emoji: "↩️",
+      title: "Reject Owner Task",
+      detailKeys: ["taskId", "feedback"],
+    },
+    task_cancel: {
+      emoji: "🚫",
+      title: "Cancel Owner Task",
+      detailKeys: ["taskId"],
+    },
     dialogue_list: {
       emoji: "💬",
       title: "Dialogue List",

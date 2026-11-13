@@ -97,7 +97,6 @@ import {
 } from "../secrets/runtime.js";
 import { onSessionLifecycleEvent } from "../sessions/session-lifecycle-events.js";
 import { onSessionTranscriptUpdate } from "../sessions/transcript-events.js";
-import { createOwnerTaskStore } from "../tasks/owner/store.js";
 import { setOwnerTaskRedispatchHandler } from "../tasks/owner/actions.js";
 import { createConfiguredOwnerTaskSyncAdapter } from "../tasks/sync/adapter.js";
 import {
@@ -3348,7 +3347,9 @@ export async function startGatewayServer(
 
   return {
     close: async (opts) => {
-      if (ownerSyncPoll) clearInterval(ownerSyncPoll);
+      if (ownerSyncPoll) {
+        clearInterval(ownerSyncPoll);
+      }
       // Run gateway_stop plugin hook before shutdown
       await runGlobalGatewayStopSafely({
         event: { reason: opts?.reason ?? "gateway stopping" },

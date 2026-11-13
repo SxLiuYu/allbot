@@ -218,9 +218,9 @@ export function handleBusinessRequestsHttpRequest(
           typeof payload.path === "string" && payload.path.trim()
             ? payload.path.trim()
             : undefined;
-        const result = await reloadBusinessProviderCredentials({
-          ...(configuredPath ? { filePath: configuredPath } : {}),
-        });
+        const result = await reloadBusinessProviderCredentials(
+          configuredPath ? { filePath: configuredPath } : {},
+        );
         sendJson(res, result.ok ? 200 : 400, {
           status: result.ok ? "ok" : "invalid_provider_credentials",
           ...result,

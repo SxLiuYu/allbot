@@ -109,11 +109,15 @@ async function remindPendingReviews(cfg: AllBotConfig): Promise<boolean> {
     });
     return false;
   }
-  if (tasks.length === 0) return true;
+  if (tasks.length === 0) {
+    return true;
+  }
   const groups = new Map<string, { channel: string; to: string; tasks: OwnerTaskRecord[] }>();
   for (const task of tasks) {
     const target = task.source?.replyTo;
-    if (!target?.channel || !target.to) continue;
+    if (!target?.channel || !target.to) {
+      continue;
+    }
     const key = `${target.channel}:${target.to}`;
     const group = groups.get(key) ?? { channel: target.channel, to: target.to, tasks: [] };
     group.tasks.push(task);
@@ -136,7 +140,9 @@ async function remindPendingReviews(cfg: AllBotConfig): Promise<boolean> {
         payloads: [{ text }],
         bestEffort: true,
       });
-      if (results.length === 0) throw new Error("outbound delivery returned no results");
+      if (results.length === 0) {
+        throw new Error("outbound delivery returned no results");
+      }
       log.info("pending review reminder sent", {
         channel: group.channel,
         count: group.tasks.length,
@@ -167,7 +173,9 @@ export function startOwnerTaskWatchdog(cfg: AllBotConfig = loadConfig()): void {
   const remind = (delayMs: number) => {
     const timer = setTimeout(() => {
       void remindPendingReviews(cfg).then((ok) => {
-        if (!ok) remind(60_000);
+        if (!ok) {
+          remind(60_000);
+        }
       });
     }, delayMs);
     timer.unref?.();
