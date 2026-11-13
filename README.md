@@ -4,11 +4,15 @@
 
 首个把"主动认知"做成系统级能力的开源 AI 伙伴 · 主动推送洞察 · 持续建模用户 · Agent 自主进化技能 · 同样的错误不犯第二次 · 可装进口袋在 Android 手机本地运行
 
+[![CI](https://github.com/SxLiuYu/allbot/actions/workflows/ci.yml/badge.svg)](https://github.com/SxLiuYu/allbot/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/SxLiuYu/allbot?label=release)](https://github.com/SxLiuYu/allbot/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js >=22](https://img.shields.io/badge/Node.js-%3E%3D22-339933.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6.svg)](https://www.typescriptlang.org/)
+[![Android 11+](https://img.shields.io/badge/Android-11%2B-3DDC84.svg)](mobile/README.md)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12%2B-3776AB.svg)](voice/README.md)
 
-**README** | [English](./README.en.md) | **简体中文**
+**README** | [English](./README.en.md) | **简体中文** · [贡献指南](CONTRIBUTING.md) · [安全策略](SECURITY.md) · [行为准则](CODE_OF_CONDUCT.md)
 
 ## 一个仓库，三种形态
 

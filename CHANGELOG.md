@@ -7,7 +7,58 @@
 All notable AllBot changes, grouped by milestone. AllBot uses CalVer `YYYY.M.DD`;
 multiple releases on the same date append `-1`, `-2`, etc.
 
-Repo: https://github.com/SxLiuYu/allbot · Backup: https://github.com/SxLiuYu/allbot
+Repo: https://github.com/SxLiuYu/allbot
+
+---
+
+## 2026.11.14 — 首个公开发行版
+
+第一个按「一个仓库三种形态」发布的版本。此前 2026.4–2026.7 的内容都是单项目时期的
+内部迭代，从这一版起对外发行。
+
+### 发布内容
+
+| 目录      | 是什么                                               | 许可证                          |
+| --------- | ---------------------------------------------------- | ------------------------------- |
+| 根目录    | AllBot 服务器端：主动认知、记忆、技能、飞书/微信接入 | MIT                             |
+| `mobile/` | 手机端（言出）：Mika 的品牌改造版，含通话功能        | Apache-2.0                      |
+| `voice/`  | 语音硬件端（Charlie）：ESP32 语音闭环 + 三端同步网关 | MIT（`Baize/` 子树 Apache-2.0） |
+
+### 本版修掉的缺陷
+
+- **Android CI 必挂**：`android-build.yml` 从本仓库的 `v2026.6.25-1` release 拉
+  Termux，该 tag 已不存在（404）。改指 Termux 官方 `v0.118.3` 的 arm64 包。
+  注意文件名含 `+`，URL 里必须写 `%2B`。
+- **Windows 上构建失败**：`scripts/pnpm-runner.mjs` 把 `npm_execpath` 指向的
+  `pnpm.exe`（原生二进制）交给 node 执行，报 `SyntaxError`。改为只认 `.cjs`/`.js`。
+  同样的错误在 `scripts/build-control-ui.ts` 里也有（`.bin/vite` 在 Windows 上是
+  POSIX sh 脚本），改用 `vite/bin/vite.js`。
+- **打包失败**：`src/tasks/sync/` 落在 `src/sync/`，而 `server.impl.ts` 与
+  `subagent-bridge.ts` 按 `../tasks/sync/adapter.js` 引用。
+- **lint 与格式化在 CI 上从未通过**：`mobile/` 与 `voice/` 是上游快照，不该被本仓库
+  规则扫描（648 个错误里 618 个来自它们）。加进 ignorePatterns 后修掉剩余 30 个真错误。
+- **两份基线漂移**：plugin-sdk API 基线因格式化改变函数签名呈现而变；config 基线因
+  `tasks.sync` 新增 5 个配置项而变。均已重算。
+- **测试用已移除的渠道**：`task-registry.test.ts` 拿 telegram/discord 当投递目标，
+  但仓库只打包飞书+微信，投递判定走 `session_queued` 分支，15 个用例必挂。
+- **可预测的临时路径**（安全隐患）：`extensions/feishu/src/card-action.ts` 用
+  `pid` 在共享临时目录拼路径，是符号链接攻击面，被仓库自己的 temp-path-guard 扫出。
+- **若干过时断言**：`text-format`、`clawhub`、`assistant-identity-values`、
+  `identity-live-e2e`、`cognitive-delivery`、`monitor.bot-menu.lifecycle` 的期望值
+  与当前实现或文档不符。
+- **flaky 测试**：`subagent-bridge.logging.test.ts` 依赖 `vi.mock` 赢得模块加载竞争。
+  本地为提速关掉隔离时 3 次挂 1 次（CI 上不挂）。改为注入 logger，去掉对加载顺序的依赖。
+
+### 已知缺口
+
+- 手机端还没有同步网关的配对入口，目前只能当独立的手机助手用。
+- 通话音频双向出声未验证，需要火山（Volcengine）凭证且必须真人听。
+- `voice/firmware/` 只有说明，16MB 固件走 Release 分发。
+- npm 上的 `allbot` 包名属于 2015 年的另一个项目，本项目尚未发布到 npm。
+
+### 上一个里程碑：2026.7.19
+
+单项目时期的内容见下一节。
 
 ---
 

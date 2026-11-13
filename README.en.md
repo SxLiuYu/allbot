@@ -4,11 +4,15 @@
 
 The first open-source AI companion that turns "proactive cognition" into a system-level capability · Pushes insights to you · Continuously models you · Agent autonomously evolves its own skills · Never makes the same mistake twice · Runs locally on Android phones
 
+[![CI](https://github.com/SxLiuYu/allbot/actions/workflows/ci.yml/badge.svg)](https://github.com/SxLiuYu/allbot/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/SxLiuYu/allbot?label=release)](https://github.com/SxLiuYu/allbot/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js >=22](https://img.shields.io/badge/Node.js-%3E%3D22-339933.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6.svg)](https://www.typescriptlang.org/)]
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178C6.svg)](https://www.typescriptlang.org/)
+[![Android 11+](https://img.shields.io/badge/Android-11%2B-3DDC84.svg)](mobile/README.md)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12%2B-3776AB.svg)](voice/README.md)
 
-[English](./README.en.md) | [简体中文](./README.md)
+[English](./README.en.md) | [简体中文](./README.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## One repository, three form factors
 

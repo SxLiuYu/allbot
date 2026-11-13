@@ -4,9 +4,7 @@ AllBot is an independent project — a proactive cognitive AI assistant with a p
 
 - Repo: independent project, originally forked from [OpenClaw](https://github.com/openclaw/openclaw)
   - Main (GitHub): `https://github.com/SxLiuYu/allbot`
-  - Backup (Gitee): `https://github.com/SxLiuYu/allbot`
   - Upstream (GitHub): `https://github.com/openclaw/openclaw`
-  - Upstream mirror (Gitee): `https://github.com/openclaw/openclaw` (manual mirror, squash history)
 - In chat replies, file references must be repo-root relative only (e.g. `src/gateway/server.impl.ts:80`); never absolute paths or `~/...`.
 
 ## Mandatory Verification Protocol
@@ -411,25 +409,49 @@ Correction (system prompt injection):
 
 ## Release Process
 
-- **Versioning**: `YYYY.M.DD` format (e.g. `2026.6.27`). Multiple releases on the same date append `-1`, `-2`, `-3` (e.g. `2026.6.27-1`, `2026.6.27-2`). Do NOT use future dates.
-- **One command**: `bash scripts/release.sh <version>` (e.g. `bash scripts/release.sh 2026.6.27-1`)
-- The script: bumps version → `pnpm build` (sanity gate) → `git commit` + `git tag` + `git push` (both remotes). It does NOT publish to npm itself.
-- **npm publishing runs in CI via trusted publishing (OIDC)**: `.github/workflows/publish-tarball.yml` triggers on tag push (`v*`) and runs two parallel jobs — `publish-npm` (Node 24 / npm ≥ 11.5.1, `id-token: write`, `npm publish --ignore-scripts`) and `upload-tarball` (`npm pack`, uploads `allbot-<version>.tgz` to the corresponding GitHub Release). No npm token lives on the machine or in repo secrets.
-- Prerequisite (one-time, completed 2026-08-15): trusted publisher registered on npmjs.com for `allbot` — org `SxLiuYu`, repo `allbot`, workflow filename `publish-tarball.yml`, allowed action `npm publish`. First verified release: `v2026.8.15-3` (publish-npm job green, provenance signed and logged at sigstore logIndex 2477083775). Re-publishing an already-published version fails with E403 (versions are immutable) — same-date `-N` suffixes already handle this.
-- Tarball is required for Android/Termux install (the install script downloads it from GitHub Releases instead of npmjs.org for China network reliability)
-- Launcher APK: `.github/workflows/android-build.yml` triggers on `android/**` changes, builds APK with bundled Termux, uploads to `launcher` release tag
+- **Versioning**: `YYYY.M.DD` format (e.g. `2026.11.14`). Multiple releases on the same date append `-1`, `-2`, `-3`. Do NOT use future dates.
+- **Version lives in `package.json`** — `src/version.ts` reads it, and
+  `src/config/schema.base.generated.ts` embeds it. After bumping, run
+  `pnpm config:schema:gen` so the generated schema matches.
+- **Steps**: bump `package.json` → `pnpm config:schema:gen` → `pnpm check` +
+  `pnpm build` → commit → `git tag -a v<version>` → `git push origin main` +
+  `git push origin v<version>` → create the GitHub Release.
+- **CI on tag push**: `.github/workflows/publish-tarball.yml` triggers on `v*`
+  and runs two jobs — `upload-tarball` (`npm pack`, uploads
+  `allbot-<version>.tgz` to the corresponding Release) and `publish-npm`.
+- **`publish-npm` currently fails by design**: the `allbot` name on npm belongs
+  to an unrelated 2015 project (`bot-lab/allbot`, 0.1.70), so trusted
+  publishing cannot be registered for it. Until the package is renamed to a
+  scope (e.g. `@sxliuyu/allbot`, which is free) or npm ownership is obtained,
+  release distribution is **GitHub Releases + source**, not npm. Do not treat
+  a red `publish-npm` as a release blocker; check `upload-tarball` instead.
+- Tarball on the Release is the install path for Android/Termux (the install
+  script downloads it from GitHub Releases rather than npmjs.org).
+- Launcher APK: `.github/workflows/android-build.yml` triggers on `android/**`
+  changes, builds the APK with bundled Termux, uploads to the `launcher` tag.
+  Its Termux download URL points at the **official Termux release**
+  (`v0.118.3`, arm64), not at this repo — the old in-repo tag no longer exists.
+- **Remote**: push over SSH on port 443 —
+  `git@ssh.github.com:443/SxLiuYu/allbot.git`. HTTPS to github.com is
+  unreachable from the maintainer's network, and a global
+  `url.https://github.com/.insteadof=git@github.com:` rule will rewrite a plain
+  `git@github.com:` URL into the broken HTTPS form.
 - Release guardrails: do not change version numbers without operator's explicit consent.
 
 ### Manual release (if `release.sh` is unavailable)
 
-These gotchas are handled by `release.sh` automatically. If doing manual steps:
-
-1. **`pnpm build` is mandatory before publishing** — `dist/` is not committed to git; npm package includes it. Without rebuild, published package has stale code.
+1. **`pnpm build` is mandatory before publishing** — `dist/` is not committed to git; the npm package includes it. Without a rebuild, the package has stale code.
 2. **`npm publish --ignore-scripts` is mandatory** — the `prepack` script fails on Control UI build (non-fatal error exits with code 1). `--ignore-scripts` skips prepack.
 3. **Prefer letting CI publish** (push the tag; trusted publishing handles auth). The package requires 2FA and disallows tokens (verified 2026-08-15: token publish is rejected with E403 at the auth layer), so local publish only works from an interactive `npm login` 2FA session.
-4. **GitHub push uses SSH** — `git push github main` (remote `github` = `git@github.com:SxLiuYu/allbot.git`). Never use HTTPS to github.com (port 443 unreachable from this machine).
-5. **Gitee push uses HTTPS** — `git push origin main` (remote `origin` = Gitee).
-6. **GitHub Release tarball is uploaded by CI**; if manually publishing, also run `npm pack --ignore-scripts` and upload the `.tgz` to the Release for that tag. Android install script depends on it.
+4. **Push uses SSH on port 443** — remote is
+   `ssh://git@ssh.github.com:443/SxLiuYu/allbot.git`. A plain
+   `git@github.com:` URL gets rewritten to HTTPS by the global
+   `url.https://github.com/.insteadof` rule, and HTTPS to github.com is
+   unreachable from the maintainer's network.
+5. **npm publish is blocked on the package name** — see the note above; the
+   only working distribution path today is the GitHub Release tarball plus
+   source install.
+6. **GitHub Release tarball is uploaded by CI**; if publishing manually, also run `npm pack --ignore-scripts` and upload the `.tgz` to the Release for that tag. The Android install script depends on it.
 
 ## Prompt Cache Stability
 
@@ -471,8 +493,7 @@ The upstream remotes are kept dormant for this occasional reference only:
 
 ```bash
 # Reference only — do NOT merge into main.
-git remote add upstream https://github.com/openclaw/openclaw      # GitHub
-git remote add openclaw  https://github.com/openclaw/openclaw      # Gitee mirror (squash history)
+git remote add upstream https://github.com/openclaw/openclaw
 ```
 
 If you do selectively port a fix, attribute it in the commit message (e.g. `port: <fix> from OpenClaw`). The cognitive layer (`src/cognitive/`) is unique to AllBot and never has an upstream counterpart.

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安全问题（请勿公开）
+    url: https://github.com/SxLiuYu/allbot/security/advisories/new
+    about: 漏洞请走私密上报，不要在公开 Issue 里写细节。
+  - name: 想先聊聊再提 Issue
+    url: https://github.com/SxLiuYu/allbot/discussions
+    about: 用法疑问、想法讨论放这里。
