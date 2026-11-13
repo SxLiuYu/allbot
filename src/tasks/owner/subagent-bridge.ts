@@ -1,6 +1,6 @@
 import type { AllBotConfig } from "../../config/config.js";
 import { loadConfig } from "../../config/io.js";
-import { createSubsystemLogger } from "../../logging/subsystem.js";
+import { createSubsystemLogger, type SubsystemLogger } from "../../logging/subsystem.js";
 import { createConfiguredOwnerTaskSyncAdapter } from "../sync/adapter.js";
 import { ownerTasksEnabled } from "./config.js";
 import { createOwnerTaskStore, type OwnerTaskStore } from "./store.js";
@@ -20,6 +20,12 @@ export type SubagentCompletionSyncInput = {
   now?: number;
   store?: OwnerTaskStore;
   cfg?: AllBotConfig;
+  /**
+   * Optional logger override. Tests inject their own so they don't depend on
+   * `vi.mock` winning the module-cache race against other files that import
+   * this module in the same non-isolated worker.
+   */
+  logger?: Pick<SubsystemLogger, "debug" | "warn">;
 };
 
 export type SubagentCompletionSyncResult = {
@@ -29,7 +35,7 @@ export type SubagentCompletionSyncResult = {
 };
 
 const EMPTY_RESULT: SubagentCompletionSyncResult = { synced: false, reviewRequired: false };
-const log = createSubsystemLogger("owner-task-sync");
+const defaultLog = createSubsystemLogger("owner-task-sync");
 
 /**
  * Copies a finished subagent run into its owner task:
@@ -43,6 +49,7 @@ const log = createSubsystemLogger("owner-task-sync");
 export async function syncOwnerTaskFromSubagentCompletion(
   input: SubagentCompletionSyncInput,
 ): Promise<SubagentCompletionSyncResult> {
+  const log = input.logger ?? defaultLog;
   try {
     const cfg = input.cfg ?? loadConfig();
     if (!ownerTasksEnabled(cfg)) {
