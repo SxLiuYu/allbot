@@ -1,0 +1,35 @@
+{
+  "id": "argo",
+  "enabledByDefault": true,
+  "uiHints": {
+    "webSearch.command": {
+      "label": "Argo CLI path",
+      "help": "Path to the argo-search CLI entry (bin/argo.js). Defaults to `argo-search` on PATH."
+    },
+    "webSearch.timeoutMs": {
+      "label": "Search timeout (ms)",
+      "help": "Hard timeout for one Argo search call. Defaults to 45000."
+    }
+  },
+  "contracts": {
+    "webSearchProviders": ["argo"]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "webSearch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "timeoutMs": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

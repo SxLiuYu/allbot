@@ -1,0 +1,33 @@
+AllBot
+Copyright 2025 Peter Steinberger (OpenClaw)
+Copyright 2025-2026 AllBot Contributors
+
+---
+
+本仓库包含三个来源的代码。各自的许可证与署名如下，二次发行时请一并保留。
+
+## 根目录 — AllBot 服务器端
+
+MIT，见 `LICENSE`。
+最初 fork 自 OpenClaw（https://github.com/openclaw/openclaw），现独立开发：
+认知层、记忆层、飞书/微信渠道为 AllBot 新增。
+
+## mobile/ — Mika / 言出
+
+Apache License 2.0，见 `mobile/LICENSE`。
+
+    Mika
+    Copyright 2026 wangzan101
+
+上游 https://github.com/wangzan101/Mika，收录于提交
+`2dce3bb42bbd0291c11ddbe930cd70fb6271cd27`。品牌改造与新增的电话功能见
+`mobile/VENDOR.md`。
+
+## voice/ — Charlie
+
+MIT，见 `voice/charlie/LICENSE`。
+上游 https://github.com/SxLiuYu/charlie-voice-assistant，收录于提交
+`710d2c4bd2d4d015b0e7ee5af4038e89e4d25827`。同步网关与飞书发送方收口见
+`voice/VENDOR.md`。
+
+`voice/Baize/` 子树另行授权为 Apache License 2.0，见 `voice/Baize/LICENSE`。

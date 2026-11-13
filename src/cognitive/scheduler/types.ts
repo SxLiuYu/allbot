@@ -1,0 +1,81 @@
+import type { InsightMode } from "../insight/types.js";
+import type { PersonaTree } from "../types.js";
+
+/** Event that triggers the proactive scheduler */
+export type SchedulerEvent = {
+  type: "timer" | "persona_change" | "info_scan" | "evolution_scan" | "activity_scan" | "external";
+  timestamp: number;
+  payload?: unknown;
+};
+
+/** Gate decision (legacy binary interface) */
+export type GateDecision = {
+  allowed: boolean;
+  reasons: string[];
+  suggestedDelayMs?: number;
+};
+
+/** PRISM-inspired graded gate decision with cost-sensitive probabilities */
+export interface GradedGateDecision {
+  /** Probability the user needs proactive help right now */
+  pNeed: number;
+  /** Probability the user will accept / respond positively */
+  pAccept: number;
+  /** Combined action probability: sqrt(pNeed * pAccept) — geometric mean accounting for correlation */
+  pAct: number;
+  /** Final decision: true if pAct > cost-adjusted threshold and no hard vetoes */
+  decision: boolean;
+  /** Human-readable reasons for veto or acceptance */
+  reasons: string[];
+  /** Suggested delay before next gate check (ms) */
+  suggestedDelayMs?: number;
+}
+
+/** Context bundle passed to the graded gate computation */
+export interface GateContext {
+  persona: PersonaTree;
+  event: SchedulerEvent;
+  /** Number of recent insight candidates generated (for domain activity) */
+  recentInsightCount: number;
+  config: SchedulerConfig;
+  /** Added by the fatigue brake when the 7-day ignore rate is in the 40–60% band. */
+  thresholdBoost?: number;
+}
+
+/** PROBE-style opportunity discovered during the search phase */
+export interface Opportunity {
+  type: "cross_domain" | "domain_depth" | "info_scan_hit" | "exploration";
+  targetDomains: string[];
+  sourceDomains: string[];
+  pNeed: number;
+  pAccept: number;
+  pAct: number;
+  metadata?: Record<string, unknown>;
+  /** Candidate insight modes for this opportunity (set by search, finalized by resolve). */
+  modeCandidates?: InsightMode[];
+}
+
+/** Scheduler configuration */
+export type SchedulerConfig = {
+  minIntervalHours: number;
+  minTrustScore: number;
+  activeHoursStart?: string; // "09:00"
+  activeHoursEnd?: string; // "22:00"
+  timezone?: string;
+  /** Cost of false negative (missed opportunity). Default 5.0 */
+  costFalseNegative?: number;
+  /** Cost of false alarm (unnecessary interruption). Default 1.0 */
+  costFalseAlarm?: number;
+  /** Use LLM-as-Judge to verify pattern-mode insights (default: true) */
+  patternVerification?: boolean;
+  /** Use LLM to check semantic novelty after trigram dedup passes (default: true) */
+  llmFreshnessCheck?: boolean;
+  /** Epsilon-greedy exploration probability (0-1, default 0.2). With probability ε, an exploration candidate is promoted to the front of the resolve loop. Set to 0 to disable. */
+  epsilonGreedy?: number;
+  /**
+   * Max opportunities returned by identify() per event (default 2). Mirrors
+   * cognitive.insight.maxCandidatesPerEvent; when unset here the scheduler
+   * falls back to that config value and then to 2.
+   */
+  maxCandidatesPerEvent?: number;
+};

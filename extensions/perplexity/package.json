@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/perplexity-plugin",
+  "version": "2026.5.22",
+  "private": true,
+  "description": "AllBot Perplexity plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

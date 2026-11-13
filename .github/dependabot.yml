@@ -1,0 +1,13 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    # Routine dependency bumps are handled directly via pnpm on main — zero
+    # dependabot version-update PRs (they previously piled up unmerged and
+    # rotted: conflicting branches, red CI). Security updates are a separate
+    # mechanism driven by repo Security settings and still open PRs
+    # regardless of this limit.
+    open-pull-requests-limit: 0

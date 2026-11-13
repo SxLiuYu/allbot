@@ -1,0 +1,69 @@
+name: Build Android APK
+
+on:
+  push:
+    paths:
+      - "android/**"
+      - ".github/workflows/android-build.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: true
+
+      - name: Install SDK platforms
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "8.7"
+
+      - name: Download Termux APK and bundle into project
+        run: |
+          mkdir -p android/app/src/main/res/raw
+          curl -fsSL -o android/app/src/main/res/raw/termux.apk \
+            "https://github.com/SxLiuYu/allbot/releases/download/v2026.6.25-1/termux-arm64.apk"
+          ls -lh android/app/src/main/res/raw/termux.apk
+
+      - name: Build debug APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+            allbot-launcher.apk
+
+      - name: Upload to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! gh release view launcher > /dev/null 2>&1; then
+            gh release create launcher --title "AllBot Launcher APK" --latest --notes "Android 一键安装包（内置 Termux）。安装后打开，按提示操作即可。不需要更新此 APK — 它会自动安装最新版 AllBot。"
+          else
+            gh release edit launcher --latest
+          fi
+          gh release upload launcher allbot-launcher.apk --clobber
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: allbot-launcher
+          path: allbot-launcher.apk
+          retention-days: 90

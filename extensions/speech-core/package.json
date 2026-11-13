@@ -1,0 +1,10 @@
+{
+  "name": "@allbot/speech-core",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot speech runtime package",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/lightpanda",
+  "version": "2026.11.6",
+  "private": true,
+  "description": "AllBot Lightpanda page-fetch plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

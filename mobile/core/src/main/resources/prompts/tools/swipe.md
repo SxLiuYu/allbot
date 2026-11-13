@@ -1,0 +1,1 @@
+Swipe between two normalized 0-999 points. To scroll a page down, swipe upward (from a larger y to a smaller y). For ordinary scrolling use {{scroll}}. For a carousel, use a short sideways swipe; a long sideways swipe on a list row may delete it, so inspect the result. See Calling tools in the system prompt for effect.kind.

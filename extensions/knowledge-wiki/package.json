@@ -1,0 +1,27 @@
+{
+  "name": "@allbot/knowledge-wiki",
+  "version": "2026.4.12",
+  "private": true,
+  "description": "AllBot persistent wiki plugin",
+  "type": "module",
+  "dependencies": {
+    "yaml": "^2.8.3"
+  },
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*",
+    "allbot": "workspace:*"
+  },
+  "peerDependencies": {
+    "allbot": ">=2026.4.12"
+  },
+  "peerDependenciesMeta": {
+    "allbot": {
+      "optional": true
+    }
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

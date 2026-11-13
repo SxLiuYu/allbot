@@ -1,0 +1,12 @@
+{
+  "name": "@allbot/lmstudio-provider",
+  "version": "2026.4.6",
+  "private": true,
+  "description": "AllBot LM Studio provider plugin",
+  "type": "module",
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/github-copilot-provider",
+  "version": "2026.4.12",
+  "private": true,
+  "description": "AllBot GitHub Copilot provider plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/huggingface-provider",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot Hugging Face provider plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@allbot/media-understanding-core",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot media understanding runtime package",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  }
+}

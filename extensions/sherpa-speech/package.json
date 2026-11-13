@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/sherpa-speech",
+  "version": "2026.8.19",
+  "private": true,
+  "description": "AllBot local ASR plugin (sherpa-onnx, offline)",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

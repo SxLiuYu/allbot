@@ -1,0 +1,331 @@
+#!/usr/bin/env node
+import { spawn } from "node:child_process";
+import fs from "node:fs";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+/**
+ * Flag-based regression comparison (VERIFICATION.md §4).
+ *
+ * Runs the SAME test suite twice — once with the cognitive layer ENABLED
+ * (flag=on) and once with it DISABLED (flag=off) — then diffs the per-test
+ * results to surface "what silently broke" when the feature is active.
+ *
+ * Mechanism: toggles the flag path via two temp configs pointed at by
+ * `ALLBOT_CONFIG_PATH`, leaving the operator's real config untouched. Vitest
+ * is invoked with `--reporter=json` so results are parsed deterministically
+ * (no fragile stdout scraping).
+ *
+ * Classification (the §4 signal):
+ *   REGRESSION      — PASS(off) + FAIL(on): the feature broke a test that
+ *                     passed in baseline. This is the critical output.
+ *   FEATURE-ONLY    — PASS(on) + FAIL(off): test only passes WITH the feature
+ *                     (expected for cognitive-specific tests).
+ *   STABLE          — same status both runs.
+ *   ALWAYS-BROKEN   — FAIL both runs (pre-existing, independent of the flag).
+ *
+ * Usage:
+ *   node scripts/regression-flag-diff.mjs [target] [--flag <config.path>]
+ *   node scripts/regression-flag-diff.mjs src/cognitive/insight
+ *   node scripts/regression-flag-diff.mjs src/cognitive --flag cognitive.evolution.enabled
+ *
+ * The flag path defaults to `cognitive.enabled`. Any dotted config path
+ * pointing at a boolean can be toggled (e.g. cognitive.correction.enabled).
+ *
+ * Exit code: 1 if any REGRESSION found, else 0.
+ */
+import { createRequire } from "node:module";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const require = createRequire(import.meta.url);
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+// ---------------------------------------------------------------------------
+// Args.
+// ---------------------------------------------------------------------------
+function parseArgs(argv) {
+  const positional = [];
+  let flagPath = "cognitive.enabled";
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--flag") {
+      flagPath = argv[i + 1] ?? "";
+      i += 1;
+    } else {
+      positional.push(argv[i]);
+    }
+  }
+  if (!/^[a-zA-Z_][\w]*(:?\.[a-zA-Z_][\w]*)*$/.test(flagPath)) {
+    console.error(`Invalid --flag path: "${flagPath}"`);
+    process.exit(2);
+  }
+  return { target: positional[0] ?? "src/cognitive", flagPath };
+}
+
+// ---------------------------------------------------------------------------
+// Config resolution (mirrors src/config: ALLBOT_CONFIG_PATH > ALLBOT_HOME).
+// ---------------------------------------------------------------------------
+function resolveRealConfigPath(env = process.env) {
+  if (env.ALLBOT_CONFIG_PATH?.trim()) {
+    return env.ALLBOT_CONFIG_PATH.trim();
+  }
+  const home = env.ALLBOT_HOME?.trim() || env.HOME || "";
+  return path.join(home, ".allbot", "allbot.json");
+}
+
+async function readJsonMaybe(filePath) {
+  try {
+    return JSON.parse(await readFile(filePath, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+/** Deep-merge a flag override into a config object, creating intermediate objects. */
+function setFlagByPath(config, flagPath, enabled) {
+  const clone = structuredClone(config);
+  const parts = flagPath.split(".");
+  let node = clone;
+  for (let i = 0; i < parts.length - 1; i++) {
+    node[parts[i]] = { ...node[parts[i]] };
+    node = node[parts[i]];
+  }
+  node[parts[parts.length - 1]] = enabled;
+  return clone;
+}
+
+function getFlagByPath(config, flagPath) {
+  let node = config;
+  for (const part of flagPath.split(".")) {
+    if (node === null || typeof node !== "object") {
+      return undefined;
+    }
+    node = node[part];
+  }
+  return node;
+}
+
+// ---------------------------------------------------------------------------
+// Vitest invocation.
+// ---------------------------------------------------------------------------
+function resolveVitestCliEntry() {
+  const vitestPackageJson = require.resolve("vitest/package.json");
+  return path.join(path.dirname(vitestPackageJson), "vitest.mjs");
+}
+
+function resolveVitestNodeArgs(env = process.env) {
+  const enableMaglev = ["1", "true", "yes", "on"].includes(
+    env.ALLBOT_VITEST_ENABLE_MAGLEV?.trim().toLowerCase() ?? "",
+  );
+  return enableMaglev ? [] : ["--no-maglev"];
+}
+
+/**
+ * Pick the vitest project config for a target. Cognitive targets (default)
+ * use the cognitive lane; extensions/* targets need the extensions lane
+ * (otherwise the filter matches zero files and the diff is vacuous).
+ */
+function resolveVitestConfigForTarget(target) {
+  return target.startsWith("extensions/")
+    ? "vitest/vitest.extensions.config.ts"
+    : "vitest/vitest.cognitive.config.ts";
+}
+
+/**
+ * The extensions vitest project resolves positional filters relative to its
+ * `dir: "extensions"` root, so directory-prefix targets from the repo root
+ * match nothing. Collect the test files explicitly instead (mirrors the
+ * router's include-file mechanism).
+ */
+function collectExtensionsTestFiles(target) {
+  const root = path.join(repoRoot, target);
+  const out = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name === "dist" || entry.name === "node_modules") {
+        continue;
+      }
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+        continue;
+      }
+      if (
+        entry.name.endsWith(".test.ts") &&
+        !entry.name.endsWith(".e2e.test.ts") &&
+        !entry.name.endsWith(".live.test.ts")
+      ) {
+        out.push(path.relative(repoRoot, full));
+      }
+    }
+  };
+  walk(root);
+  return out.toSorted((a, b) => a.localeCompare(b));
+}
+
+/**
+ * Run vitest once with the given config-path env override, writing JSON
+ * results to `outputFile`. Returns the parsed vitest JSON report.
+ */
+function runVitestWithConfig({ configPath, target, outputFile, env }) {
+  return new Promise((resolve, reject) => {
+    const vitestEntry = resolveVitestCliEntry();
+    const targetArgs = target.startsWith("extensions/")
+      ? collectExtensionsTestFiles(target)
+      : [target];
+    const args = [
+      ...resolveVitestNodeArgs(env),
+      vitestEntry,
+      "run",
+      "--config",
+      resolveVitestConfigForTarget(target),
+      "--reporter=json",
+      "--outputFile",
+      outputFile,
+      ...targetArgs,
+    ];
+    const child = spawn("pnpm", ["exec", "node", ...args], {
+      env: { ...env, ALLBOT_CONFIG_PATH: configPath },
+      stdio: ["inherit", "pipe", "pipe"],
+    });
+    let stderr = "";
+    child.stderr.setEncoding("utf8");
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    // Swallow stdout (JSON reporter writes to file; noisy progress goes to stdout).
+    child.stdout.on("data", () => {});
+    child.on("error", reject);
+    child.on("exit", () => resolve({ stderr }));
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Result parsing + diffing.
+// ---------------------------------------------------------------------------
+/** Map of `file :: fullName` → status ("passed"|"failed"|"skipped"|"..."). */
+function flattenResults(report) {
+  const out = new Map();
+  for (const file of report?.testResults ?? []) {
+    for (const assertion of file.assertionResults ?? []) {
+      out.set(`${file.name} :: ${assertion.fullName}`, assertion.status ?? "unknown");
+    }
+  }
+  return out;
+}
+
+function classifyDiff(onResults, offResults) {
+  const regression = [];
+  const featureOnly = [];
+  const alwaysBroken = [];
+  let stablePassed = 0;
+  let stableFailed = 0;
+
+  const allKeys = new Set([...onResults.keys(), ...offResults.keys()]);
+  for (const key of allKeys) {
+    const on = onResults.get(key);
+    const off = offResults.get(key);
+    const onPass = on === "passed";
+    const offPass = off === "passed";
+    if (offPass && !onPass) {
+      regression.push({ key, off, on });
+    } else if (onPass && !offPass) {
+      featureOnly.push({ key, off, on });
+    } else if (!onPass && !offPass) {
+      alwaysBroken.push({ key, off, on });
+    } else if (onPass && offPass) {
+      stablePassed += 1;
+    } else {
+      stableFailed += 1;
+    }
+  }
+  return { regression, featureOnly, alwaysBroken, stablePassed, stableFailed };
+}
+
+// ---------------------------------------------------------------------------
+// Main.
+// ---------------------------------------------------------------------------
+async function main() {
+  const { target, flagPath } = parseArgs(process.argv.slice(2));
+  const realConfigPath = resolveRealConfigPath();
+  const baseConfig = await readJsonMaybe(realConfigPath);
+
+  if (getFlagByPath(baseConfig, flagPath) === false) {
+    console.warn(`⚠️  Real config has ${flagPath}=false; the "off" run will match baseline.`);
+  }
+
+  const workDir = await mkdtemp(path.join(tmpdir(), "allbot-flagdiff-"));
+  const onConfigPath = path.join(workDir, "on.json");
+  const offConfigPath = path.join(workDir, "off.json");
+  const onOutput = path.join(workDir, "on-results.json");
+  const offOutput = path.join(workDir, "off-results.json");
+
+  await writeFile(onConfigPath, JSON.stringify(setFlagByPath(baseConfig, flagPath, true), null, 2));
+  await writeFile(
+    offConfigPath,
+    JSON.stringify(setFlagByPath(baseConfig, flagPath, false), null, 2),
+  );
+
+  console.log(`Flag-regression diff — target: ${target}, flag: ${flagPath}`);
+  console.log(`Real config: ${realConfigPath}`);
+  console.log(`Temp configs: ${workDir}\n`);
+
+  try {
+    console.log(`▶ Run 1/2: ${flagPath} ENABLED (flag=on)…`);
+    await runVitestWithConfig({
+      configPath: onConfigPath,
+      target,
+      outputFile: onOutput,
+      env: process.env,
+    });
+    console.log(`▶ Run 2/2: ${flagPath} DISABLED (flag=off)…\n`);
+    await runVitestWithConfig({
+      configPath: offConfigPath,
+      target,
+      outputFile: offOutput,
+      env: process.env,
+    });
+
+    const onReport = JSON.parse(await readFile(onOutput, "utf8"));
+    const offReport = JSON.parse(await readFile(offOutput, "utf8"));
+    const diff = classifyDiff(flattenResults(onReport), flattenResults(offReport));
+
+    const totalOn = onReport.numTotalTests ?? 0;
+    const totalOff = offReport.numTotalTests ?? 0;
+    console.log("━".repeat(60));
+    console.log(`Tests run: ${totalOn} (on) / ${totalOff} (off)`);
+    console.log(`Stable: ${diff.stablePassed} pass, ${diff.stableFailed} same-status-non-pass`);
+    console.log(
+      `Feature-only (pass-on / fail-off): ${diff.featureOnly.length}  ← expected for flag-dependent suites`,
+    );
+    console.log(`Always-broken (fail both): ${diff.alwaysBroken.length}`);
+    console.log(`🔴 REGRESSIONS (pass-off / fail-on): ${diff.regression.length}`);
+
+    if (diff.regression.length > 0) {
+      console.log("\n## REGRESSIONS — tests the feature broke:");
+      for (const r of diff.regression) {
+        console.log(`  • ${r.key}  [${r.off} → ${r.on}]`);
+      }
+    }
+    if (diff.featureOnly.length > 0 && process.env.FLAGDIFF_VERBOSE === "1") {
+      console.log("\n## Feature-only (verbose):");
+      for (const f of diff.featureOnly) {
+        console.log(`  • ${f.key}  [${f.off} → ${f.on}]`);
+      }
+    }
+    console.log("━".repeat(60));
+    console.log(
+      diff.regression.length === 0
+        ? `✅ No regressions introduced by ${flagPath}=on.`
+        : `❌ ${diff.regression.length} regression(s) — see above.`,
+    );
+
+    await rm(workDir, { recursive: true, force: true });
+    process.exit(diff.regression.length === 0 ? 0 : 1);
+  } catch (err) {
+    console.error("Flag-regression diff failed:", err);
+    await rm(workDir, { recursive: true, force: true });
+    process.exit(2);
+  }
+}
+
+main();

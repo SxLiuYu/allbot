@@ -1,0 +1,2048 @@
+import { homedir } from "node:os";
+import { join } from "node:path";
+import type { AllBotConfig } from "../../config/types.allbot.js";
+import { formatErrorMessage } from "../../infra/errors.js";
+import { createSubsystemLogger } from "../../logging/subsystem.js";
+import { KeyedAsyncQueue } from "../../plugin-sdk/keyed-async-queue.js";
+import { processNoResponse } from "../feedback/collector.js";
+import { pickBestTopic } from "../feedback/preference-learner.js";
+import {
+  isDuplicateBySemanticOverlap,
+  computeTrigramSimilarity,
+} from "../insight/content-similarity.js";
+import { findCrossDomainConnections, semanticDistance } from "../insight/cross-domain-mapper.js";
+import { generateInsightCandidates } from "../insight/engine.js";
+import { FragmentStore } from "../insight/fragment-store.js";
+import {
+  assessInsightQuality,
+  critiqueInsightWithLLM,
+  refineInsightWithLLM,
+  verifyInsightWithLLM,
+  checkSemanticNoveltyWithLLM,
+} from "../insight/llm-engine.js";
+import type { LlmInsightDeps } from "../insight/llm-engine.js";
+import { isSearchUnavailable } from "../insight/search-availability.js";
+import type { InsightCandidate, InsightEngineInput, InsightMode } from "../insight/types.js";
+import type { DecisionLedger } from "../ledger/index.js";
+import type { PersonaTree } from "../types.js";
+import { computeContentStrategy } from "./content-strategy.js";
+import { bumpDailySend, checkStochasticSpacing } from "./delivery-pacing.js";
+import {
+  appendProactiveOutcome,
+  evaluateFatigueBrake,
+  filterFatiguedOpportunities,
+  getMutedDomains,
+  OUTCOME_RESOLVE_GRACE_MS,
+} from "./fatigue-brake.js";
+import { buildFirstContactCandidate, evaluateFirstContact } from "./first-contact.js";
+import { computeGradedGate, isColdStart } from "./gate.js";
+import { SCHEDULER_WATCHDOG_INTERVAL_MS, type SchedulerRuntimeHealth } from "./health.js";
+import { selectMode } from "./mode-selection.js";
+import { evaluateReEngagementBudget } from "./re-engagement.js";
+import type {
+  SchedulerEvent,
+  SchedulerConfig,
+  GateContext,
+  GradedGateDecision,
+  Opportunity,
+} from "./types.js";
+
+const log = createSubsystemLogger("cognitive/scheduler");
+
+function computeDomainOverlap(a: string[], b: string[]): number {
+  if (a.length === 0 || b.length === 0) {
+    return 0;
+  }
+  const setB = new Set(b.map((d) => d.toLowerCase()));
+  const overlap = a.filter((d) => setB.has(d.toLowerCase())).length;
+  return overlap / Math.max(a.length, b.length);
+}
+
+function getFatiguedDomains(recentInsightDomains: string[][]): Set<string> {
+  if (recentInsightDomains.length === 0) {
+    return new Set();
+  }
+  const last5 = recentInsightDomains.slice(-5);
+  const counts = new Map<string, number>();
+  for (const domains of last5) {
+    for (const d of domains) {
+      counts.set(d, (counts.get(d) ?? 0) + 1);
+    }
+  }
+  const fatigued = new Set<string>();
+  for (const [domain, count] of counts) {
+    if (count >= 2) {
+      fatigued.add(domain);
+    }
+  }
+  return fatigued;
+}
+
+export type InsightGeneratorFn = (
+  persona: PersonaTree,
+  input: InsightEngineInput,
+  options?: {
+    verificationLevel?: "basic" | "strict" | "paranoid";
+    maxCandidates?: number;
+    mode?: InsightMode;
+    /** Agent whose workspace owns SOUL.md / correction records. */
+    agentId?: string;
+  },
+) => Promise<InsightCandidate[]>;
+
+const MAX_QUALITY_RETRIES = 2;
+const QUALITY_EARLY_EXIT_THRESHOLD = 0.85;
+
+function scoreCandidate(c: InsightCandidate): number {
+  return c.compositeScore > 0
+    ? c.compositeScore
+    : c.relevanceScore * 0.4 + c.surpriseScore * 0.3 + Math.min(c.sources.length, 3) * 0.1;
+}
+
+export function isTopicStale(
+  opportunity: Opportunity,
+  recentInsightContents: string[],
+  recentInsightDomains: string[][],
+): boolean {
+  // Check domain overlap: if overlap with ANY recent domain set > 0.5 → stale
+  if (opportunity.targetDomains.length > 0 && recentInsightDomains.length > 0) {
+    for (const prev of recentInsightDomains) {
+      if (computeDomainOverlap(opportunity.targetDomains, prev) > 0.5) {
+        return true;
+      }
+    }
+  }
+
+  // Check trigram similarity against recent insight contents
+  if (opportunity.targetDomains.length > 0 && recentInsightContents.length > 0) {
+    const fingerprint = [...opportunity.targetDomains, ...opportunity.sourceDomains].join(" ");
+    for (const recent of recentInsightContents) {
+      if (computeTrigramSimilarity(fingerprint, recent) > 0.4) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function seededRandom(seed: number): number {
+  const s = (seed * 1103515245 + 12345) & 0x7fffffff;
+  return s / 0x7fffffff;
+}
+
+function hashIdentity(agentId: string, userId: string): number {
+  const value = `${agentId}:${userId}`;
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * Mix the agent/user identity into a timestamp-derived seed. Without this,
+ * every user processed at the same tick draws the same random number and
+ * they all send (or all stay silent) together.
+ */
+export function mixUserSeed(seed: number, agentId: string, userId: string): number {
+  return (seed ^ hashIdentity(agentId, userId)) >>> 0;
+}
+
+let decisionTraceCounter = 0;
+
+function nextTraceId(agentId: string, userId: string, at: number): string {
+  decisionTraceCounter = (decisionTraceCounter + 1) % 1_000_000;
+  return `scheduler-${at}-${agentId}-${userId}-${decisionTraceCounter}`;
+}
+
+/**
+ * The re-engagement channel keeps its own, higher floor: it reopens contact
+ * after 10+ days of mutual silence, which is only defensible with some
+ * relationship behind it. The cadence gate uses the lower
+ * MIN_EXCHANGES_FOR_ANY_CONTACT from gate.ts and its own cold-start lane —
+ * the two floors are intentionally different.
+ */
+const MIN_EXCHANGES_FOR_RE_ENGAGEMENT = 5;
+
+function isOutsideActiveHours(nowMs: number, config: SchedulerConfig): boolean {
+  if (!config.activeHoursStart || !config.activeHoursEnd) {
+    return false;
+  }
+  const tz = config.timezone ?? "Asia/Shanghai";
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    });
+    const [currentHour = 0, currentMin = 0] = formatter
+      .format(new Date(nowMs))
+      .split(":")
+      .map(Number);
+    const currentMinutes = currentHour * 60 + currentMin;
+
+    const [startHour = 0, startMin = 0] = config.activeHoursStart.split(":").map(Number);
+    const [endHour = 0, endMin = 0] = config.activeHoursEnd.split(":").map(Number);
+    const startMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+
+    if (startMinutes > endMinutes) {
+      return currentMinutes >= endMinutes && currentMinutes < startMinutes;
+    }
+    return currentMinutes < startMinutes || currentMinutes > endMinutes;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Hard vetoes that still apply to the re-engagement channel. That channel
+ * bypasses only the probabilistic gate and the stochastic hazard draw —
+ * suppression, active hours, relationship floor, and trust floor are safety
+ * rails, not pacing preferences.
+ */
+export function computeReEngagementVetoes(
+  persona: PersonaTree,
+  event: SchedulerEvent,
+  config: SchedulerConfig,
+): string[] {
+  const reasons: string[] = [];
+  const now = event.timestamp;
+
+  if (config.activeHoursStart && config.activeHoursEnd && isOutsideActiveHours(now, config)) {
+    reasons.push(`Outside active hours (${config.activeHoursStart}-${config.activeHoursEnd})`);
+  }
+  if (persona.feedbackProfile.suppressUntil && persona.feedbackProfile.suppressUntil > now) {
+    const remaining = persona.feedbackProfile.suppressUntil - now;
+    reasons.push(`Suppressed for ${Math.round(remaining / 3_600_000)}h`);
+  }
+  if (persona.rapport.trustScore < config.minTrustScore) {
+    reasons.push(
+      `Trust ${persona.rapport.trustScore.toFixed(2)} < ${config.minTrustScore.toFixed(2)}`,
+    );
+  }
+  if (persona.rapport.totalExchanges < MIN_EXCHANGES_FOR_RE_ENGAGEMENT) {
+    reasons.push(
+      `Only ${persona.rapport.totalExchanges} exchanges — need at least ${MIN_EXCHANGES_FOR_RE_ENGAGEMENT}`,
+    );
+  }
+
+  return reasons;
+}
+
+const DEFAULT_EPSILON_GREEDY = 0.2;
+/**
+ * Multiplier applied to the identify() cost threshold for cold-start users.
+ * At the default τ = 0.3 the cold-start pAccept ceiling (0.30) sits exactly
+ * on the boundary, so this pulls the cutoff below it while the opportunity
+ * ranking, dedup penalties and starvation bonuses still decide the order.
+ */
+const COLD_START_THRESHOLD_RELAXATION = 0.6;
+const PENDING_DELIVERY_TTL_MS = 24 * 60 * 60 * 1000;
+// Safety net for awaitingDeliveryConfirmation: its only clearance path is the
+// heartbeat outcome report, and system events are in-memory — a gateway restart
+// or dropped event would otherwise silence the user forever. Expire instead.
+export const AWAITING_CONFIRMATION_TTL_MS = 60 * 60 * 1000;
+const RESOLVE_FAILURE_BACKOFF_THRESHOLD = 3;
+const RESOLVE_FAILURE_BACKOFF_MAX_FACTOR = 48;
+
+export function applyEpsilonGreedy(
+  candidates: Opportunity[],
+  epsilon: number,
+  seed: number,
+): Opportunity[] {
+  if (epsilon <= 0 || candidates.length <= 1) {
+    return candidates;
+  }
+  const rng = seededRandom(seed);
+  if (rng >= epsilon) {
+    return candidates;
+  }
+
+  const explorationIndices = candidates
+    .map((c, i) => (c.type === "exploration" ? i : -1))
+    .filter((i) => i >= 0);
+
+  if (explorationIndices.length === 0) {
+    return candidates;
+  }
+
+  // Independent second roll: the first rng value is already < epsilon by the
+  // gate above, so reusing it would bias the pick (floor(epsilon * L) is 0
+  // for the common epsilon values) and always promote the first candidate.
+  const pickRng = seededRandom(seed ^ 0x9e3779b9);
+  const pickIdx =
+    explorationIndices[
+      Math.floor(pickRng * explorationIndices.length) % explorationIndices.length
+    ]!;
+  const promoted = candidates[pickIdx]!;
+  const rest = candidates.filter((_, i) => i !== pickIdx);
+
+  return [promoted, ...rest];
+}
+
+export class ProactiveScheduler {
+  private timerHandle: ReturnType<typeof setTimeout> | undefined;
+  private readonly generateInsights: InsightGeneratorFn;
+  private readonly fragmentStore: FragmentStore;
+  private readonly llmDeps: LlmInsightDeps | undefined;
+  private readonly botConfig: AllBotConfig | undefined;
+  private readonly ledger: DecisionLedger | undefined;
+  private readonly processEventQueue = new KeyedAsyncQueue();
+  private readonly lastProcessEventAt = new Map<string, number>();
+  private stopped = false;
+
+  private readonly health: SchedulerRuntimeHealth = {
+    enabled: false,
+    running: false,
+    startedAt: null,
+    lastHeartbeatAt: null,
+    lastTickStartedAt: null,
+    lastTickCompletedAt: null,
+    lastEventAt: null,
+    nextTickAt: null,
+    tickInFlight: false,
+    timerScheduled: false,
+    expectedIntervalMs: 0,
+    tickCount: 0,
+    eventCount: 0,
+    consecutiveTickFailures: 0,
+  };
+  private healthTimerHandle: ReturnType<typeof setInterval> | undefined;
+
+  constructor(
+    private readonly config: SchedulerConfig,
+    readonly callbacks: {
+      loadPersona: (agentId: string, userId: string) => Promise<PersonaTree | undefined>;
+      onInsightReady: (
+        agentId: string,
+        userId: string,
+        candidate: InsightCandidate,
+      ) => Promise<boolean>;
+      savePersona: (agentId: string, userId: string, persona: PersonaTree) => Promise<void>;
+      /**
+       * Atomic no-response ledger transition on freshly-loaded state.
+       *
+       * When provided, the host re-evaluates the unanswered condition against
+       * the CURRENT persona (a user reply that landed after this scheduler's
+       * snapshot was loaded resets the streak and refreshes
+       * lifecycle.lastActiveAt, making the transition void) and persists the
+       * increment in a single store.update. Returns the updated persona, or
+       * undefined when the store cannot load it.
+       *
+       * Without this callback the scheduler falls back to mutating its
+       * snapshot and saving via savePersona — correct only when no reply can
+       * interleave (tests).
+       */
+      applyNoResponseLedger?: (
+        agentId: string,
+        userId: string,
+        lastProactiveAt: number,
+      ) => Promise<PersonaTree | undefined>;
+      listRecentInsightContents?: (
+        agentId: string,
+        userId: string,
+        limit: number,
+      ) => Promise<string[]>;
+      /**
+       * Audit hook for refusals. Called for every gate veto, skip, and
+       * first-contact deferral so the push log records why nothing was sent,
+       * not just the attempts that reached a channel.
+       */
+      onPushRefused?: (
+        agentId: string,
+        userId: string,
+        reason: string,
+        kind: "first_contact" | "insight",
+      ) => void;
+    },
+    deps?: {
+      insightGenerator?: InsightGeneratorFn;
+      fragmentStore?: FragmentStore;
+      llmDeps?: LlmInsightDeps;
+      botConfig?: AllBotConfig;
+      ledger?: DecisionLedger;
+    },
+  ) {
+    this.generateInsights = deps?.insightGenerator ?? defaultInsightGenerator;
+    this.fragmentStore = deps?.fragmentStore ?? new FragmentStore(join(homedir(), ".allbot"));
+    this.llmDeps = deps?.llmDeps;
+    this.botConfig = deps?.botConfig;
+    this.ledger = deps?.ledger;
+  }
+
+  private async recordVetoDecision(
+    agentId: string,
+    userId: string,
+    event: SchedulerEvent,
+    reason: string,
+  ): Promise<void> {
+    this.callbacks.onPushRefused?.(agentId, userId, reason, "insight");
+    if (!this.ledger) {
+      return;
+    }
+    try {
+      await this.ledger.record({
+        traceId: nextTraceId(agentId, userId, event.timestamp),
+        agentId,
+        userId,
+        at: event.timestamp,
+        eventType: event.type,
+        decision: "vetoed",
+        vetoReasons: [reason],
+        llmCalls: 0,
+      });
+    } catch (err) {
+      log.warn("decision ledger write failed", {
+        userId,
+        eventType: event.type,
+        error: formatErrorMessage(err),
+      });
+    }
+  }
+
+  async search(persona: PersonaTree, event: SchedulerEvent): Promise<Opportunity[]> {
+    const opportunities: Opportunity[] = [];
+
+    switch (event.type) {
+      case "timer":
+      case "external":
+        opportunities.push(...scanCrossDomain(persona, event));
+        opportunities.push(...scanDomainDepth(persona, event));
+        break;
+      case "persona_change":
+        opportunities.push(...scanPersonaChange(persona, event));
+        opportunities.push(...scanDomainDepth(persona, event));
+        break;
+      case "info_scan":
+        opportunities.push(...scanCrossDomain(persona, event));
+        opportunities.push(...scanDomainDepth(persona, event));
+        opportunities.push(...scanInfoScan(persona, event));
+        break;
+      case "evolution_scan":
+        // Skill-evolution scans look for deepening opportunities in domains
+        // the user already engages with. Mark the opportunities so delivery
+        // logs can distinguish them from ordinary timer ticks.
+        opportunities.push(
+          ...scanDomainDepth(persona, event).map((opportunity) => ({
+            ...opportunity,
+            metadata: { ...opportunity.metadata, evolutionScanDerived: true },
+          })),
+        );
+        break;
+      case "activity_scan":
+        // A real Feishu message signals user activity. Look for domains worth
+        // deepening and mark the result so delivery logs can attribute it.
+        opportunities.push(
+          ...scanDomainDepth(persona, event).map((opportunity) => ({
+            ...opportunity,
+            metadata: { ...opportunity.metadata, feishuActivityDerived: true },
+          })),
+        );
+        break;
+    }
+
+    opportunities.push(...(await this.scanExploration(persona, event)));
+
+    const allowed = filterBlacklistedOpportunities(opportunities, persona.domainBlacklist);
+    return filterFatiguedOpportunities(allowed, getMutedDomains(persona, event.timestamp));
+  }
+
+  identify(opportunities: Opportunity[], persona?: PersonaTree, thresholdBoost = 0): Opportunity[] {
+    if (opportunities.length === 0) {
+      return [];
+    }
+
+    const cfn = this.config.costFalseNegative ?? DEFAULT_C_FN;
+    const cfa = this.config.costFalseAlarm ?? DEFAULT_C_FA;
+    const threshold = Math.min(0.95, cfa / (cfn + cfa) + thresholdBoost);
+
+    // Cold-start ranking floor. `computeBaselinePAccept` is capped at
+    // 0.5*trust + 0.5*bandit, so a new user (trust 0.1, no bandits) yields
+    // 0.30 — mathematically unable to clear a 0.3 threshold for any
+    // opportunity, however relevant. Relax the cutoff for exactly that
+    // population and keep the ranking intact; the gate's own cold-start
+    // lane, the fatigue brake, and the ledger still bound how often it fires.
+    const coldStart = persona !== undefined && isColdStart(persona);
+    const effectiveThreshold = coldStart ? threshold * COLD_START_THRESHOLD_RELAXATION : threshold;
+
+    const recentDomains = persona?.feedbackProfile.recentInsightDomains ?? [];
+
+    const penalized = opportunities.map((opp) => {
+      let adjustedPAct = opp.pAct;
+
+      if (recentDomains.length > 0 && opp.targetDomains.length > 0) {
+        const overlapCount = recentDomains.reduce((count, prev) => {
+          const overlap = computeDomainOverlap(opp.targetDomains, prev);
+          return count + (overlap > 0.5 ? 1 : 0);
+        }, 0);
+        if (overlapCount > 0) {
+          adjustedPAct *= Math.pow(0.5, overlapCount);
+        }
+      }
+
+      return { ...opp, pAct: adjustedPAct };
+    });
+
+    const STARVATION_WINDOW = 8;
+    const STARVATION_BONUS = 1.5;
+
+    const recentInsightDomainsAll = persona?.feedbackProfile?.recentInsightDomains ?? [];
+    const windowDomains = new Set(recentInsightDomainsAll.slice(-STARVATION_WINDOW).flat());
+
+    const boosted =
+      recentInsightDomainsAll.length === 0
+        ? penalized
+        : penalized.map((opp) => {
+            if (opp.targetDomains.length === 0) {
+              return opp;
+            }
+            const starvedDomains = opp.targetDomains.filter((d) => !windowDomains.has(d));
+            if (starvedDomains.length === 0) {
+              return opp;
+            }
+            const starvedRatio = starvedDomains.length / opp.targetDomains.length;
+            return { ...opp, pAct: opp.pAct * (1 + STARVATION_BONUS * starvedRatio) };
+          });
+
+    const fatigued = getFatiguedDomains(recentDomains);
+    const personaDomains = persona?.domains;
+    const DORMANT_PENALTY = 0.5;
+    const REVIVED_BONUS = 1.3;
+    const phaseAdjusted = personaDomains
+      ? boosted.map((opp) => {
+          if (opp.targetDomains.length === 0) {
+            return opp;
+          }
+          const phases = opp.targetDomains
+            .map((d) => personaDomains[d]?.phase)
+            .filter((p): p is NonNullable<typeof p> => Boolean(p));
+          if (phases.length === 0) {
+            return opp;
+          }
+          const hasDormant = phases.includes("dormant");
+          const hasRevived = phases.includes("revived");
+          if (hasRevived) {
+            return { ...opp, pAct: opp.pAct * REVIVED_BONUS };
+          }
+          if (hasDormant) {
+            return { ...opp, pAct: opp.pAct * DORMANT_PENALTY };
+          }
+          return opp;
+        })
+      : boosted;
+    const nonFatigued =
+      fatigued.size > 0
+        ? phaseAdjusted.filter((opp) => !opp.targetDomains.some((d) => fatigued.has(d)))
+        : phaseAdjusted;
+    const sorted = [...nonFatigued].toSorted((a, b) => b.pAct - a.pAct);
+    const pool =
+      sorted.length > 0 ? sorted : [...phaseAdjusted].toSorted((a, b) => b.pAct - a.pAct);
+
+    const aboveThreshold = pool.filter((opp) => opp.pAct > effectiveThreshold);
+    const maxCandidates = Math.max(
+      1,
+      this.config.maxCandidatesPerEvent ??
+        this.botConfig?.cognitive?.insight?.maxCandidatesPerEvent ??
+        2,
+    );
+    return aboveThreshold.slice(0, maxCandidates);
+  }
+
+  async resolve(
+    agentId: string,
+    persona: PersonaTree,
+    opportunity: Opportunity,
+    opts?: { bypassDomainDedup?: boolean },
+  ): Promise<InsightCandidate | null> {
+    const recentInsightIds = persona.feedbackProfile.recentInsightIds ?? [];
+    const recentInsightContents = persona.feedbackProfile.recentInsightContents ?? [];
+    const recentQueryHistory = persona.feedbackProfile.recentInsightQueryHistory ?? [];
+    const recentInsightDomains = persona.feedbackProfile.recentInsightDomains ?? [];
+    // Mode selection: prefer explicit metadata.mode (content strategy override),
+    // otherwise use bandit-weighted selection from modeCandidates
+    let mode: InsightMode | undefined = (
+      opportunity.metadata as Record<string, unknown> | undefined
+    )?.mode as InsightMode | undefined;
+    if (!mode) {
+      const strategyHint = computeContentStrategy(persona);
+      mode = selectMode(
+        opportunity.modeCandidates,
+        persona.feedbackProfile.modeBandits,
+        strategyHint,
+        Date.now(),
+      );
+    }
+
+    if (mode === "pattern") {
+      const userId = persona.identity?.userId;
+      if (!userId) {
+        // Same fallback rationale as empty clusters below: pattern mode
+        // cannot run, but that must not discard the delivery opportunity.
+        log.info("pattern mode: no user id — falling back to knowledge path");
+        mode = "surprise";
+      } else {
+        const [fragments, clusters] = await Promise.all([
+          this.fragmentStore.load(agentId, userId),
+          this.fragmentStore.findClusters(agentId, userId),
+        ]);
+
+        if (clusters.length === 0) {
+          // Falling back to the knowledge path instead of wasting the whole
+          // event: pattern mode needs clusters; without them a null return
+          // discards the delivery opportunity entirely (and made scheduler
+          // behavior depend on the mode-selection roll).
+          log.info("pattern mode: no clusters available — falling back to knowledge path", {
+            userId,
+            clusterCount: clusters.length,
+          });
+          mode = "surprise";
+        } else {
+          const result = await this.generateInsights(
+            persona,
+            {
+              targetDomains: [],
+              recentFocus: persona.recentFocus,
+              trustScore: persona.rapport.trustScore,
+              recentInsightIds,
+              recentInsightContents,
+              mode: "pattern",
+              recentQueryHistory,
+              recentInsightDomains,
+              fragmentClusters: clusters,
+              fragments,
+            },
+            {
+              verificationLevel: "basic",
+              maxCandidates: 1,
+              mode: "pattern",
+              agentId,
+            },
+          );
+
+          if (!result || result.length === 0) {
+            log.info("pattern mode: LLM generated no candidates", { userId });
+            return null;
+          }
+
+          const candidate = result[0]!;
+          candidate.source = "pattern";
+
+          if (recentInsightContents.length > 0) {
+            if (
+              isDuplicateBySemanticOverlap(candidate.content, recentInsightContents, {
+                trigramThreshold: 0.95,
+                contentWordThreshold: 0.8,
+              })
+            ) {
+              log.info("safety-net dedup: near-identical content blocked", {
+                userId,
+                contentPreview: candidate.content.slice(0, 60),
+              });
+              return null;
+            }
+          }
+
+          if (
+            this.llmDeps &&
+            this.botConfig &&
+            this.config.llmFreshnessCheck !== false &&
+            recentInsightContents.length >= 3
+          ) {
+            const freshness = await checkSemanticNoveltyWithLLM(
+              candidate,
+              recentInsightContents,
+              this.botConfig,
+              this.llmDeps,
+              undefined,
+              persona,
+            );
+            if (!freshness.isNovel) {
+              log.info("LLM freshness check: pattern semantically repetitive", {
+                userId,
+                reason: freshness.reason,
+              });
+              return null;
+            }
+          }
+
+          candidate.verificationStatus = "partial";
+
+          let verification: Awaited<ReturnType<typeof verifyInsightWithLLM>> | undefined;
+          if (this.llmDeps && this.botConfig && this.config.patternVerification !== false) {
+            verification = await verifyInsightWithLLM(
+              candidate,
+              persona,
+              this.botConfig,
+              this.llmDeps,
+            );
+            candidate.verificationStatus = verification.status;
+          }
+
+          log.info("pattern-mode insight verification complete", {
+            userId,
+            content: candidate.content.slice(0, 60),
+            clusterCount: clusters.length,
+            fragmentCount: fragments.length,
+            verificationStatus: candidate.verificationStatus,
+          });
+
+          if (candidate.verificationStatus === "contradicted") {
+            log.warn("pattern-mode insight contradicted by verification, skipping delivery", {
+              userId,
+              content: candidate.content.slice(0, 80),
+            });
+            return null;
+          }
+          if (verification && !verification.approved) {
+            log.info("pattern-mode insight not approved by judge, skipping delivery", {
+              userId,
+              confidence: verification.confidence,
+              notes: verification.notes,
+            });
+            return null;
+          }
+
+          candidate.resolvedMode = "pattern";
+          return candidate;
+        }
+      }
+    }
+
+    // Knowledge mode: generate with self-refine (or blind retry fallback)
+    //
+    // Every non-exploration insight must arrive with at least one source, and
+    // sources can only come from web search. With search unavailable the
+    // generation below is guaranteed to be discarded at the source gate, so
+    // skip it rather than pay for an LLM round trip per event. Exploration
+    // opportunities are exempt (they are explicitly allowed to be
+    // source-less), so they still get through.
+    if (opportunity.type !== "exploration" && isSearchUnavailable()) {
+      log.warn("resolve: skipping knowledge-mode generation — web search unavailable", {
+        userId: persona.identity?.userId,
+        opportunityType: opportunity.type,
+      });
+      return null;
+    }
+
+    const userId = persona.identity?.userId;
+    let knowledgeFragments: import("../insight/fragment-types.js").Fragment[] | undefined;
+    if (userId) {
+      try {
+        const allFragments = await this.fragmentStore.load(agentId, userId);
+        const allowedKinds = new Set(["knowledge_gap", "assumption", "implicit_priority"]);
+        knowledgeFragments = allFragments.filter((f) => allowedKinds.has(f.kind));
+        if (knowledgeFragments.length > 0) {
+          log.info("knowledge-mode fragments loaded", { userId, count: knowledgeFragments.length });
+        }
+      } catch (err) {
+        log.warn("failed to load fragments for knowledge mode", { userId, error: String(err) });
+      }
+    }
+
+    const input: InsightEngineInput = {
+      targetDomains:
+        opportunity.targetDomains.length > 0
+          ? opportunity.targetDomains
+          : Object.entries(persona.domains)
+              .toSorted(([, a], [, b]) => b.lastMentioned - a.lastMentioned)
+              .slice(0, 3)
+              .map(([name]) => name),
+      recentFocus: persona.recentFocus,
+      trustScore: persona.rapport.trustScore,
+      recentInsightIds,
+      recentInsightContents,
+      mode,
+      recentQueryHistory,
+      recentInsightDomains,
+      fragments: knowledgeFragments,
+      feedbackProfile: persona.feedbackProfile,
+    };
+
+    const genOpts = {
+      verificationLevel: "basic" as const,
+      maxCandidates: 1,
+      mode,
+      agentId,
+    };
+
+    let candidate: InsightCandidate;
+
+    const canSelfRefine = !!(this.llmDeps && this.botConfig);
+    log.info("resolve: knowledge mode path selected", {
+      userId: persona.identity?.userId,
+      path: canSelfRefine ? "self-refine" : "blind-retry",
+      mode,
+      targetDomains: opportunity.targetDomains,
+    });
+
+    if (this.llmDeps && this.botConfig) {
+      // Self-refine path: generate → critique → refine → evaluate
+      const initialResult = await this.generateInsights(persona, input, genOpts);
+
+      if (!initialResult || initialResult.length === 0) {
+        log.warn("insight generation produced no candidates", {
+          userId: persona.identity?.userId,
+          mode,
+        });
+        return null;
+      }
+
+      let bestCandidate: InsightCandidate = initialResult[0]!;
+      let bestScore = scoreCandidate(bestCandidate);
+      const initialQuality = assessInsightQuality(bestCandidate, input.targetDomains);
+
+      if (!initialQuality.needsRefinement) {
+        log.info("deterministic quality gate: skipping refine", {
+          userId: persona.identity?.userId,
+          score: bestScore,
+          sources: bestCandidate.sources.length,
+        });
+      } else {
+        log.info("deterministic quality gate: refinement needed", {
+          userId: persona.identity?.userId,
+          failures: initialQuality.failures,
+        });
+        for (let refine = 0; refine < MAX_QUALITY_RETRIES; refine++) {
+          const critique = await critiqueInsightWithLLM(
+            bestCandidate,
+            persona,
+            this.botConfig,
+            this.llmDeps,
+          );
+          if (!critique) {
+            break;
+          }
+
+          const refined = await refineInsightWithLLM(
+            `Generate a ${mode}-mode insight for domains: ${input.targetDomains.join(", ") || "(none)"}.`,
+            bestCandidate,
+            critique,
+            persona,
+            this.botConfig,
+            this.llmDeps,
+          );
+          if (!refined) {
+            break;
+          }
+
+          const refinedScore = scoreCandidate(refined);
+          const refinedQuality = assessInsightQuality(refined, input.targetDomains);
+          if (
+            refinedScore > bestScore ||
+            refinedQuality.failures.length < initialQuality.failures.length
+          ) {
+            bestCandidate = refined;
+            bestScore = refinedScore;
+          }
+          if (!refinedQuality.needsRefinement) {
+            break;
+          }
+        }
+      }
+
+      candidate = bestCandidate;
+      log.info("resolve: self-refine selected candidate", {
+        userId: persona.identity?.userId,
+        finalScore: bestScore,
+      });
+    } else {
+      // Blind retry fallback (no LLM deps)
+      const allCandidates: InsightCandidate[] = [];
+      for (let attempt = 0; attempt < MAX_QUALITY_RETRIES; attempt++) {
+        const result = await this.generateInsights(persona, input, genOpts);
+        if (result && result.length > 0) {
+          allCandidates.push(...result);
+        }
+        if (attempt > 0) {
+          log.info("resolve: quality retry", {
+            userId: persona.identity?.userId,
+            attempt: attempt + 1,
+            candidatesSoFar: allCandidates.length,
+          });
+        }
+        if (allCandidates.length > 0 && attempt < MAX_QUALITY_RETRIES) {
+          const bestSoFar = Math.max(...allCandidates.map(scoreCandidate));
+          if (bestSoFar >= QUALITY_EARLY_EXIT_THRESHOLD) {
+            log.info("resolve: early exit — quality threshold met", {
+              userId: persona.identity?.userId,
+              attempt: attempt + 1,
+              bestScore: bestSoFar,
+            });
+            break;
+          }
+        }
+      }
+
+      if (allCandidates.length === 0) {
+        return null;
+      }
+
+      const scored = allCandidates
+        .map((c) => ({
+          candidate: c,
+          score: scoreCandidate(c),
+        }))
+        .toSorted((a, b) => b.score - a.score);
+
+      candidate = scored[0]!.candidate;
+      log.info("resolve: selected best candidate", {
+        userId: persona.identity?.userId,
+        finalScore: scored[0]!.score,
+        totalCandidates: allCandidates.length,
+      });
+    }
+
+    // Safety-net dedup: block near-identical content only
+    if (recentInsightContents.length > 0) {
+      if (
+        isDuplicateBySemanticOverlap(candidate.content, recentInsightContents, {
+          trigramThreshold: 0.95,
+          contentWordThreshold: 0.8,
+        })
+      ) {
+        log.info("safety-net dedup: near-identical content blocked", {
+          userId: persona.identity?.userId,
+          contentPreview: candidate.content.slice(0, 60),
+        });
+        return null;
+      }
+    }
+
+    // Candidate-level domain dedup: the pre-gen staleness check only sees
+    // OPPORTUNITY domains — a generator returning already-delivered domains
+    // would slip through on differing content alone. The current attempt's
+    // own appended entry (== opportunity.targetDomains) is excluded: a
+    // candidate covering its own opportunity is expected, not a repeat.
+    const deliveredDomainHistory = recentInsightDomains.filter(
+      (prev, idx) =>
+        !(
+          idx === recentInsightDomains.length - 1 &&
+          [...prev].toSorted().join("\u0000") ===
+            [...opportunity.targetDomains].toSorted().join("\u0000")
+        ),
+    );
+    if (
+      !opts?.bypassDomainDedup &&
+      candidate.targetDomains.length > 0 &&
+      deliveredDomainHistory.some(
+        (prev) => computeDomainOverlap(candidate.targetDomains, prev) > 0.5,
+      )
+    ) {
+      log.info("candidate covers recently-delivered domains, skipping", {
+        userId: persona.identity?.userId,
+        targetDomains: candidate.targetDomains,
+      });
+      return null;
+    }
+
+    if (
+      this.llmDeps &&
+      this.botConfig &&
+      this.config.llmFreshnessCheck !== false &&
+      recentInsightContents.length >= 2
+    ) {
+      // Cheap trigram pre-check: if all similarities are below 0.3, skip LLM call
+      let maxTrigramSimilarity = 0;
+      for (const recent of recentInsightContents) {
+        const sim = computeTrigramSimilarity(candidate.content, recent);
+        if (sim > maxTrigramSimilarity) {
+          maxTrigramSimilarity = sim;
+        }
+      }
+
+      if (maxTrigramSimilarity < 0.3) {
+        log.info("freshness: trigram pre-check passed, skipping LLM novelty check", {
+          userId: persona.identity?.userId,
+          maxTrigramSimilarity,
+        });
+      } else {
+        const freshness = await checkSemanticNoveltyWithLLM(
+          candidate,
+          recentInsightContents,
+          this.botConfig,
+          this.llmDeps,
+          undefined,
+          persona,
+        );
+        if (!freshness.isNovel) {
+          log.info("LLM freshness check: semantically repetitive", {
+            userId: persona.identity?.userId,
+            reason: freshness.reason,
+          });
+          return null;
+        }
+      }
+    }
+
+    if (this.llmDeps && this.botConfig) {
+      const verification = await verifyInsightWithLLM(
+        candidate,
+        persona,
+        this.botConfig,
+        this.llmDeps,
+      );
+      candidate.verificationStatus = verification.status;
+      log.info("knowledge-mode insight verification complete", {
+        userId: persona.identity?.userId,
+        verificationStatus: candidate.verificationStatus,
+        hasSources: candidate.sources.length > 0,
+      });
+
+      if (candidate.verificationStatus === "contradicted") {
+        log.warn("knowledge-mode insight contradicted by verification, skipping delivery", {
+          userId: persona.identity?.userId,
+          content: candidate.content.slice(0, 80),
+        });
+        return null;
+      }
+      if (!verification.approved) {
+        log.info("knowledge-mode insight not approved by judge, skipping delivery", {
+          userId: persona.identity?.userId,
+          confidence: verification.confidence,
+          notes: verification.notes,
+        });
+        return null;
+      }
+    } else {
+      candidate.verificationStatus = candidate.sources.length > 0 ? "verified" : "unverified";
+    }
+
+    if (candidate.sources.length === 0 && opportunity.type !== "exploration") {
+      log.warn("knowledge-mode insight has zero sources, skipping delivery", {
+        userId: persona.identity?.userId,
+        content: candidate.content.slice(0, 80),
+        mode,
+        opportunityType: opportunity.type,
+      });
+      return null;
+    }
+
+    if (opportunity.type !== "exploration" && candidate.verificationStatus === "unverified") {
+      log.warn("insight candidate has no verifiable sources, skipping delivery", {
+        sources: candidate.sources.length,
+        content: candidate.content.slice(0, 80),
+      });
+      return null;
+    }
+
+    candidate.resolvedMode = mode;
+    return candidate;
+  }
+
+  async processEvent(
+    userId: string,
+    event: SchedulerEvent,
+    agentId?: string,
+  ): Promise<InsightCandidate | undefined> {
+    const effectiveAgentId = agentId ?? "main";
+    this.health.lastEventAt = Date.now();
+    this.health.eventCount += 1;
+    return this.processEventQueue.enqueue(userId, () =>
+      this._processEventInner(effectiveAgentId, userId, event),
+    );
+  }
+
+  static finalizeDelivery(
+    persona: PersonaTree,
+    eventTimestamp: number,
+    insight: InsightCandidate,
+    opportunityType: string,
+  ): PersonaTree {
+    appendProactiveOutcome(persona, {
+      at: eventTimestamp,
+      insightId: insight.id,
+      domains: insight.targetDomains,
+      response: "pending",
+    });
+    persona.feedbackProfile.lastProactiveAt = eventTimestamp;
+    persona.feedbackProfile.pendingInsightDelivery = null;
+
+    // Idempotent append: the delivered:false outcome handler already records
+    // the candidate before a pending retry, so re-recording it would double-
+    // book one insight into two of the dedup window's slots.
+    const prevIds = persona.feedbackProfile.recentInsightIds ?? [];
+    persona.feedbackProfile.recentInsightIds = (
+      prevIds[prevIds.length - 1] === insight.id ? prevIds : [...prevIds, insight.id]
+    ).slice(-20);
+    const prevContents = persona.feedbackProfile.recentInsightContents ?? [];
+    persona.feedbackProfile.recentInsightContents = (
+      prevContents[prevContents.length - 1] === insight.content
+        ? prevContents
+        : [...prevContents, insight.content]
+    ).slice(-10);
+    // The scheduler already appended the attempted domains/types before
+    // resolve ran; only append again when they are not the tail entry, so a
+    // delivered insight occupies one slot instead of two.
+    const prevDomains = persona.feedbackProfile.recentInsightDomains ?? [];
+    const lastDomains = prevDomains[prevDomains.length - 1];
+    const domainsAlreadyRecorded =
+      lastDomains !== undefined &&
+      lastDomains.length === insight.targetDomains.length &&
+      lastDomains.every((d, i) => d === insight.targetDomains[i]);
+    persona.feedbackProfile.recentInsightDomains = domainsAlreadyRecorded
+      ? prevDomains
+      : [...prevDomains, insight.targetDomains].slice(-5);
+    const prevTypes = persona.feedbackProfile.recentInsightTypes ?? [];
+    const typesAlreadyRecorded = prevTypes[prevTypes.length - 1] === opportunityType;
+    persona.feedbackProfile.recentInsightTypes = typesAlreadyRecorded
+      ? prevTypes
+      : [...prevTypes, opportunityType].slice(-5);
+    const mode = insight.resolvedMode ?? "surprise";
+    const prevModes = persona.feedbackProfile.recentInsightModes ?? [];
+    persona.feedbackProfile.recentInsightModes = [...prevModes, mode].slice(-5);
+    if (insight.searchQueryUsed) {
+      const queries = [
+        ...(persona.feedbackProfile.recentInsightQueryHistory ?? []),
+        insight.searchQueryUsed,
+      ].slice(-10);
+      persona.feedbackProfile.recentInsightQueryHistory = queries;
+    }
+
+    return persona;
+  }
+
+  private async _processEventInner(
+    agentId: string,
+    userId: string,
+    event: SchedulerEvent,
+  ): Promise<InsightCandidate | undefined> {
+    let persona = await this.callbacks.loadPersona(agentId, userId);
+    if (!persona) {
+      return undefined;
+    }
+
+    // One-time opening message. Handled here, before any cadence machinery,
+    // because every channel below presumes a relationship this user does not
+    // have yet (see scheduler/first-contact.ts for why that is a deadlock
+    // rather than restraint).
+    const firstContactEnabled = this.botConfig?.cognitive?.proactive?.firstContactEnabled !== false;
+    if (
+      firstContactEnabled &&
+      persona.rapport.totalExchanges === 0 &&
+      !persona.feedbackProfile.firstContactAt
+    ) {
+      const decision = evaluateFirstContact(
+        persona,
+        event.timestamp,
+        seededRandom(hashIdentity(agentId, userId)),
+        this.config,
+      );
+      if (!decision.allowed) {
+        this.callbacks.onPushRefused?.(agentId, userId, decision.reason, "first_contact");
+        log.info("first contact skipped", { userId, reason: decision.reason });
+      } else {
+        const candidate = buildFirstContactCandidate(
+          persona,
+          event.timestamp,
+          this.botConfig?.cognitive?.proactive?.firstContactName,
+        );
+        const delivered = await this.callbacks.onInsightReady(agentId, userId, candidate);
+        if (delivered) {
+          persona.feedbackProfile.firstContactAt = event.timestamp;
+          persona.feedbackProfile.lastProactiveAt = event.timestamp;
+          persona.feedbackProfile.pendingInsightDelivery = null;
+          await this.callbacks.savePersona(agentId, userId, persona);
+          log.info("first contact sent", { userId });
+          return candidate;
+        }
+        this.callbacks.onPushRefused?.(agentId, userId, "delivery failed", "first_contact");
+        log.info("first contact could not be delivered; will retry on a later event", {
+          userId,
+        });
+        return undefined;
+      }
+    }
+
+    const cooldownKey = `${agentId}:${userId}`;
+
+    // Pending insight delivery retry — bypasses gate and LLM (zero token cost).
+    // Stored in persona file so it survives gateway restarts.
+    // After one failed attempt (attemptCount >= 1, typically a NO_REPLY), stop
+    // timer retries: the pending insight stays for handshake injection on the
+    // next user conversation, and normal gate/dedup flow resumes.
+    const pending = persona.feedbackProfile.pendingInsightDelivery;
+    if (pending) {
+      const ageMs = event.timestamp - pending.generatedAt;
+      if (ageMs > PENDING_DELIVERY_TTL_MS) {
+        persona.feedbackProfile.pendingInsightDelivery = null;
+        log.info("pending insight expired (TTL)", { userId, ageMs: Math.round(ageMs / 3600_000) });
+      } else if ((pending.attemptCount ?? 0) >= 1) {
+        log.info("pending insight already attempted; waiting for handshake", {
+          userId,
+          insightId: pending.candidate.id,
+          attemptCount: pending.attemptCount,
+          ageMs: Math.round(ageMs / 60_000),
+        });
+      } else {
+        // Pending retries respect the same fatigue brake as a new insight:
+        // an ignored user must not be re-sent an old message while paused.
+        const retryFatigue = evaluateFatigueBrake(persona, event.timestamp);
+        if (!retryFatigue.allowed) {
+          log.info("pending retry deferred by fatigue brake", {
+            userId,
+            reason: retryFatigue.reason,
+          });
+          await this.recordVetoDecision(agentId, userId, event, retryFatigue.reason);
+          return undefined;
+        }
+        log.info("retrying pending insight delivery", {
+          userId,
+          insightId: pending.candidate.id,
+          ageMs: Math.round(ageMs / 60_000),
+        });
+        const retryResult = await this.callbacks.onInsightReady(agentId, userId, pending.candidate);
+        if (retryResult) {
+          bumpDailySend(persona, event.timestamp);
+          persona.feedbackProfile.awaitingDeliveryConfirmation = {
+            candidate: pending.candidate,
+            opportunityType: pending.opportunityType,
+            eventTimestamp: event.timestamp,
+          };
+          persona.feedbackProfile.pendingInsightDelivery = null;
+          this.lastProcessEventAt.set(cooldownKey, event.timestamp);
+          await this.callbacks.savePersona(agentId, userId, persona);
+          log.info("pending insight re-enqueued, awaiting confirmation", {
+            userId,
+            insightId: pending.candidate.id,
+          });
+          return pending.candidate;
+        }
+        log.info("pending insight delivery still failing", {
+          userId,
+          ageMs: Math.round(ageMs / 60_000),
+        });
+        pending.attemptCount = (pending.attemptCount ?? 0) + 1;
+        await this.callbacks.savePersona(agentId, userId, persona);
+        return undefined;
+      }
+    }
+
+    const resolveFailures = persona.feedbackProfile.consecutiveResolveFailures ?? 0;
+    const backoffFactor =
+      resolveFailures >= RESOLVE_FAILURE_BACKOFF_THRESHOLD
+        ? Math.min(2 ** (resolveFailures - 2), RESOLVE_FAILURE_BACKOFF_MAX_FACTOR)
+        : 1;
+    const cooldownMs = (this.config.minIntervalHours ?? 0.5) * 60 * 60 * 1000 * backoffFactor;
+    const lastAt = this.lastProcessEventAt.get(cooldownKey);
+    if (lastAt && event.timestamp - lastAt < cooldownMs) {
+      await this.recordVetoDecision(agentId, userId, event, "in-process cooldown");
+      return undefined;
+    }
+
+    // Previous insight still awaiting delivery confirmation — don't generate
+    // a new one until the outcome is known (avoids stacking insights).
+    // Expire stale awaiting: the outcome report can be lost forever (system
+    // events are in-memory; gateway restart drops them), and an unexpired
+    // awaiting would skip this user's generation on every future event.
+    const awaiting = persona.feedbackProfile.awaitingDeliveryConfirmation;
+    if (awaiting) {
+      const awaitingAgeMs = event.timestamp - awaiting.eventTimestamp;
+      if (awaitingAgeMs > AWAITING_CONFIRMATION_TTL_MS) {
+        persona.feedbackProfile.awaitingDeliveryConfirmation = null;
+        await this.callbacks.savePersona(agentId, userId, persona);
+        log.info("awaiting delivery confirmation expired (TTL)", {
+          userId,
+          insightId: awaiting.candidate.id,
+          ageMs: Math.round(awaitingAgeMs / 60_000),
+        });
+      } else {
+        log.info("skipping — previous insight awaiting delivery confirmation", { userId });
+        await this.recordVetoDecision(
+          agentId,
+          userId,
+          event,
+          "previous insight awaiting delivery confirmation",
+        );
+        return undefined;
+      }
+    }
+
+    // Social ledger lazy transition: when the last proactive message went
+    // unanswered (user inactive since it was sent), record it exactly once
+    // per send (deduped via lastNoResponseAt). The user-reply path clears
+    // the ledger to zero (curator mergeExtraction), making silence
+    // conditional: answered → resume instantly; ignored → go quiet.
+    const lastProactiveAt = persona.feedbackProfile.lastProactiveAt;
+    if (
+      lastProactiveAt > 0 &&
+      lastProactiveAt > persona.lifecycle.lastActiveAt &&
+      event.timestamp - lastProactiveAt >= OUTCOME_RESOLVE_GRACE_MS &&
+      persona.feedbackProfile.lastNoResponseAt !== lastProactiveAt
+    ) {
+      if (this.callbacks.applyNoResponseLedger) {
+        // Atomic transition on freshly-loaded state. The gateway re-checks
+        // the condition against current data, so a reply that landed while
+        // this event was queued resets the streak instead of being clobbered
+        // by this snapshot.
+        const updated = await this.callbacks.applyNoResponseLedger(
+          agentId,
+          userId,
+          lastProactiveAt,
+        );
+        if (updated) {
+          persona = updated;
+        }
+        log.info("ledger: unanswered proactive recorded", {
+          userId,
+          unanswered: persona.feedbackProfile.consecutiveNoResponses,
+        });
+      } else {
+        const recentDomains = persona.feedbackProfile.recentInsightDomains ?? [];
+        const prevDomains =
+          recentDomains.length >= 1 ? (recentDomains[recentDomains.length - 1] ?? []) : [];
+        const recentModes = persona.feedbackProfile.recentInsightModes ?? [];
+        const prevMode =
+          recentModes.length >= 1 ? (recentModes[recentModes.length - 1] ?? undefined) : undefined;
+        persona = processNoResponse(persona, {
+          previousDomains: prevDomains,
+          previousMode: prevMode,
+        });
+        persona.feedbackProfile.lastNoResponseAt = lastProactiveAt;
+        log.info("ledger: unanswered proactive recorded", {
+          userId,
+          unanswered: persona.feedbackProfile.consecutiveNoResponses,
+        });
+        await this.callbacks.savePersona(agentId, userId, persona);
+      }
+    }
+
+    // Dynamic fatigue brake replaces the fixed daily cap. It reads the
+    // timestamped outcome ledger: >60% ignored in 7 days pauses for 24h,
+    // three consecutive non-substantive outcomes silence for 2h, and the
+    // 40–60% band raises the PRISM threshold by 0.10.
+    const fatigue = evaluateFatigueBrake(persona, event.timestamp);
+    if (!fatigue.allowed) {
+      await this.recordVetoDecision(agentId, userId, event, fatigue.reason);
+      return undefined;
+    }
+    log.info("fatigue brake verdict", {
+      userId,
+      ignoreRate: fatigue.ignoreRate,
+      samples: fatigue.samples,
+      thresholdBoost: fatigue.thresholdBoost,
+    });
+
+    const mutedDomains = getMutedDomains(persona, event.timestamp);
+    if (mutedDomains.length > 0) {
+      log.info("fatigue brake: muted domains", { userId, mutedDomains });
+    }
+
+    // Re-engagement budget: the only channel allowed to reach a user whose
+    // silence has closed the normal cadence path (momentum 0). Bypasses the
+    // graded gate; rate-limited and ledger-capped by its own rules.
+    const userSeed = mixUserSeed(event.timestamp, agentId, userId);
+    const budget = evaluateReEngagementBudget(persona, event.timestamp, seededRandom(userSeed));
+
+    // Stochastic hazard spacing (replaces the deterministic interval floor,
+    // which made the rhythm metronomic). The re-engagement channel has its
+    // own 14-day cadence and skips the hazard draw. Failures here defer to
+    // the next event — the hazard only rises with elapsed time.
+    if (!budget.allowed) {
+      const pacing = checkStochasticSpacing(
+        persona,
+        event.type,
+        event.timestamp,
+        seededRandom(
+          mixUserSeed(
+            event.timestamp ^
+              Math.max(1, Math.floor(persona.feedbackProfile.lastProactiveAt / 1000)),
+            agentId,
+            userId,
+          ),
+        ),
+      );
+      if (!pacing.allowed) {
+        await this.recordVetoDecision(agentId, userId, event, pacing.reason);
+        return undefined;
+      }
+      if (pacing.allowed && pacing.reason === "conversational moment") {
+        log.info("pacing: conversational burst window", { userId, eventType: event.type });
+      }
+    }
+
+    const gateContext: GateContext = {
+      persona,
+      event,
+      recentInsightCount: 0,
+      config: this.config,
+      thresholdBoost: fatigue.thresholdBoost,
+    };
+    let gateResult: GradedGateDecision;
+    if (budget.allowed) {
+      // Re-engagement bypasses only the probability gate and the hazard
+      // draw. Suppression, active hours, trust, and relationship depth are
+      // hard vetoes — a check-in must not ignore a user's "don't contact me".
+      const vetoes = computeReEngagementVetoes(persona, event, this.config);
+      if (vetoes.length > 0) {
+        gateResult = {
+          pNeed: 0,
+          pAccept: 0,
+          pAct: 0,
+          decision: false,
+          reasons: vetoes,
+        };
+      } else {
+        gateResult = {
+          pNeed: 0.5,
+          pAccept: 0.5,
+          pAct: 0.5,
+          decision: true,
+          reasons: ["re-engagement budget"],
+        };
+        // Persist the attempt before generation: a check-in that fails in
+        // resolve() still consumed the 14-day cooldown slot, otherwise every
+        // tick would retry the same silent user forever.
+        persona.feedbackProfile.lastReEngageAttemptAt = event.timestamp;
+        await this.callbacks.savePersona(agentId, userId, persona);
+        log.info("re-engagement budget check-in", {
+          userId,
+          unanswered: persona.feedbackProfile.consecutiveNoResponses ?? 0,
+        });
+      }
+    } else {
+      gateResult = computeGradedGate(gateContext);
+    }
+    if (!gateResult.decision) {
+      await this.recordVetoDecision(
+        agentId,
+        userId,
+        event,
+        gateResult.reasons.join("; ") || "graded gate veto",
+      );
+      await this.callbacks.savePersona(agentId, userId, persona);
+      log.info("gate vetoed", {
+        userId,
+        pNeed: gateResult.pNeed,
+        pAccept: gateResult.pAccept,
+        pAct: gateResult.pAct,
+        reasons: gateResult.reasons,
+        eventType: event.type,
+      });
+      return undefined;
+    }
+    log.info("gate passed", {
+      userId,
+      pNeed: gateResult.pNeed,
+      pAccept: gateResult.pAccept,
+      pAct: gateResult.pAct,
+      eventType: event.type,
+    });
+
+    const opportunities = await this.search(persona, event);
+    const byType: Record<string, number> = {};
+    for (const opp of opportunities) {
+      byType[opp.type] = (byType[opp.type] ?? 0) + 1;
+    }
+    log.info("search found opportunities", { userId, count: opportunities.length, byType });
+    const fatigueFiltered = filterFatiguedOpportunities(opportunities, mutedDomains);
+    if (fatigueFiltered.length !== opportunities.length) {
+      log.info("fatigue brake: filtered muted-topic opportunities", {
+        userId,
+        before: opportunities.length,
+        after: fatigueFiltered.length,
+      });
+    }
+    const recentTypes = persona.feedbackProfile.recentInsightTypes ?? [];
+    const candidates = this.identify(fatigueFiltered, persona, fatigue.thresholdBoost);
+    if (candidates.length === 0) {
+      log.info("identify selected nothing", { userId });
+      return undefined;
+    }
+    log.info("identify selected pool", {
+      userId,
+      poolSize: candidates.length,
+      topType: candidates[0].type,
+      topTargetDomains: candidates[0].targetDomains,
+      topPAct: candidates[0].pAct,
+      recentTypes,
+    });
+
+    const ddCount = recentTypes.filter((t) => t === "domain_depth").length;
+    if (ddCount >= 4) {
+      log.info("identify: domain_depth dominance detected", {
+        recentTypes,
+        suggestion: "consider relaxing domain cooldown or adding type diversity boost",
+      });
+    }
+
+    let recentInsightContents = persona.feedbackProfile.recentInsightContents ?? [];
+    const recentInsightDomains = persona.feedbackProfile.recentInsightDomains ?? [];
+
+    // The 10-slot persona window is the only dedup history the SIRI loop sees;
+    // backfill it from the persisted InsightStore so insights older than the
+    // window cannot be regenerated verbatim.
+    if (this.callbacks.listRecentInsightContents) {
+      try {
+        const storedContents = await this.callbacks.listRecentInsightContents(agentId, userId, 10);
+        const merged = [...recentInsightContents];
+        for (const stored of storedContents) {
+          if (!merged.includes(stored)) {
+            merged.push(stored);
+          }
+        }
+        recentInsightContents = merged.slice(-10);
+        persona.feedbackProfile.recentInsightContents = recentInsightContents;
+      } catch (err) {
+        log.info("insight store backfill failed (dedup proceeds with persona window)", {
+          userId,
+          error: formatErrorMessage(err),
+        });
+      }
+    }
+
+    const epsilon = this.config.epsilonGreedy ?? DEFAULT_EPSILON_GREEDY;
+    const orderedCandidates = applyEpsilonGreedy(
+      candidates,
+      epsilon,
+      mixUserSeed(event.timestamp, agentId, userId),
+    );
+    if (orderedCandidates !== candidates) {
+      log.info("epsilon-greedy promoted exploration candidate", {
+        userId,
+        promotedType: orderedCandidates[0].type,
+        promotedDomains: orderedCandidates[0].targetDomains,
+        promotedPAct: orderedCandidates[0].pAct,
+        epsilon,
+      });
+    }
+
+    let insight: InsightCandidate | null = null;
+    let selected: Opportunity | undefined;
+    let attemptedResolve = false;
+    // Dedup windows captured just before the attempt that produced the
+    // delivered insight. A failed delivery must release those slots: the
+    // insight never reached the user, so it cannot suppress the next send.
+    let preDeliveryDomains = persona.feedbackProfile.recentInsightDomains;
+    let preDeliveryTypes = persona.feedbackProfile.recentInsightTypes;
+    for (const candidate of orderedCandidates) {
+      // Budget check-ins ("long time no see") bypass the domain freshness
+      // window: for a user silent for weeks, the "recent" insight history is
+      // itself weeks old — stale dedup constraints must not veto a greeting.
+      // Content-level dedup inside resolve() still applies.
+      if (!budget.allowed && isTopicStale(candidate, recentInsightContents, recentInsightDomains)) {
+        log.info("pre-gen freshness check: skipping stale candidate", {
+          userId,
+          type: candidate.type,
+          targetDomains: candidate.targetDomains,
+        });
+        continue;
+      }
+
+      selected = candidate;
+      // Snapshot for rollback: an attempt that resolve() rejects must not
+      // consume a slot in the domain dedup window, otherwise every failed
+      // attempt progressively silences the domains we tried.
+      const previousDomains = persona.feedbackProfile.recentInsightDomains;
+      const previousTypes = persona.feedbackProfile.recentInsightTypes;
+      preDeliveryDomains = previousDomains;
+      preDeliveryTypes = previousTypes;
+      const attemptedDomains = [...(previousDomains ?? []), selected.targetDomains].slice(-5);
+      persona.feedbackProfile.recentInsightDomains = attemptedDomains;
+      const attemptedTypes = [...(previousTypes ?? []), selected.type].slice(-5);
+      persona.feedbackProfile.recentInsightTypes = attemptedTypes;
+
+      attemptedResolve = true;
+      insight = await this.resolve(agentId, persona, selected, {
+        bypassDomainDedup: budget.allowed,
+      });
+      if (insight) {
+        break;
+      }
+      persona.feedbackProfile.recentInsightDomains = previousDomains;
+      persona.feedbackProfile.recentInsightTypes = previousTypes;
+      await this.callbacks.savePersona(agentId, userId, persona);
+    }
+
+    if (attemptedResolve && !insight) {
+      persona.feedbackProfile.consecutiveResolveFailures =
+        (persona.feedbackProfile.consecutiveResolveFailures ?? 0) + 1;
+      log.info("resolve failed for all attempted candidates", {
+        userId,
+        consecutiveResolveFailures: persona.feedbackProfile.consecutiveResolveFailures,
+      });
+    }
+
+    if (!insight || !selected) {
+      await this.callbacks.savePersona(agentId, userId, persona);
+      return undefined;
+    }
+
+    log.info("insight generated", {
+      userId,
+      insightId: insight.id,
+      contentPreview: insight.content.slice(0, 80),
+      sourceCount: insight.sources.length,
+      hasWebSources: insight.sources.length > 0,
+      targetDomains: insight.targetDomains,
+      source: insight.source ?? "knowledge",
+      verificationStatus: insight.verificationStatus,
+      mode: insight.resolvedMode ?? "unknown",
+      opportunityType: selected.type,
+    });
+
+    // Resolve() can fall back to the persona's top domains when an
+    // exploration opportunity has no target domains. Re-check the generated
+    // candidate here so a muted topic cannot slip through that fallback.
+    const mutedSet = new Set(mutedDomains.map((d) => d.toLowerCase()));
+    if (
+      mutedSet.size > 0 &&
+      insight.targetDomains.some((d) => mutedSet.has(d.trim().toLowerCase()))
+    ) {
+      log.warn("fatigue brake: blocking generated insight with muted topic", {
+        userId,
+        targetDomains: insight.targetDomains,
+        mutedDomains,
+      });
+      persona.feedbackProfile.recentInsightDomains = preDeliveryDomains;
+      persona.feedbackProfile.recentInsightTypes = preDeliveryTypes;
+      await this.callbacks.savePersona(agentId, userId, persona);
+      return undefined;
+    }
+
+    // Final safety net: block 0-source knowledge-mode insights that somehow bypassed resolve()
+    const insightMode = insight.resolvedMode ?? "surprise";
+    if (insightMode !== "pattern" && insight.sources.length === 0) {
+      log.warn("safety-net: blocking 0-source knowledge insight before delivery", {
+        userId,
+        contentPreview: insight.content.slice(0, 80),
+        mode: insightMode,
+      });
+      persona.feedbackProfile.recentInsightDomains = preDeliveryDomains;
+      persona.feedbackProfile.recentInsightTypes = preDeliveryTypes;
+      await this.callbacks.savePersona(agentId, userId, persona);
+      return undefined;
+    }
+
+    // Persist the gate decision with the candidate so calibration can compare
+    // it against the outcome; without it every sample falls back to 0.5.
+    insight.gateSnapshot = { pAccept: gateResult.pAccept };
+
+    const deliveryResult = await this.callbacks.onInsightReady(agentId, userId, insight);
+    if (!deliveryResult) {
+      persona.feedbackProfile.pendingInsightDelivery = {
+        candidate: insight,
+        generatedAt: event.timestamp,
+        opportunityType: selected.type,
+      };
+      // The insight never reached the user: give back the dedup slots its
+      // generation attempt consumed, otherwise a channel outage silently
+      // blocks the domains we just tried.
+      persona.feedbackProfile.recentInsightDomains = preDeliveryDomains;
+      persona.feedbackProfile.recentInsightTypes = preDeliveryTypes;
+      await this.callbacks.savePersona(agentId, userId, persona);
+      log.info("insight delivery failed, stored as pending", {
+        userId,
+        insightId: insight.id,
+      });
+      return undefined;
+    }
+
+    persona.feedbackProfile.awaitingDeliveryConfirmation = {
+      candidate: insight,
+      opportunityType: selected.type,
+      eventTimestamp: event.timestamp,
+    };
+    persona.feedbackProfile.consecutiveResolveFailures = 0;
+    bumpDailySend(persona, event.timestamp);
+    // Cooldown starts only after a real send. Gate-vetoed or failed attempts
+    // must not make the next event look "too soon".
+    this.lastProcessEventAt.set(cooldownKey, event.timestamp);
+    await this.callbacks.savePersona(agentId, userId, persona);
+
+    return insight;
+  }
+
+  start(
+    listUsers: () => Promise<Array<{ agentId: string; userId: string }>>,
+    intervalMs?: number,
+  ): void {
+    const baseInterval = intervalMs ?? this.config.minIntervalHours * 60 * 60 * 1000;
+    this.stopped = false;
+
+    const scheduleNext = (): void => {
+      if (this.stopped) {
+        return;
+      }
+      const jitter = baseInterval * (0.5 + Math.random());
+      this.timerHandle = setTimeout(tick, jitter);
+      this.timerHandle?.unref?.();
+      this.health.nextTickAt = Date.now() + jitter;
+      this.health.timerScheduled = true;
+    };
+
+    const tick = async (): Promise<void> => {
+      const startedAt = Date.now();
+      this.health.tickInFlight = true;
+      this.health.lastTickStartedAt = startedAt;
+      try {
+        // listUsers() is outside the per-user try: one registry/IO failure
+        // must not kill the timer chain permanently.
+        const users = await listUsers();
+        log.info("timer tick", { userCount: users.length, baseInterval });
+        for (const { agentId, userId } of users) {
+          try {
+            const result = await this.processEvent(
+              userId,
+              {
+                type: "timer",
+                timestamp: Date.now(),
+              },
+              agentId,
+            );
+            log.info("processEvent done", {
+              userId,
+              result: result ? "insight generated" : "no insight",
+            });
+          } catch (err) {
+            log.warn("tick failed", { userId, error: String(err) });
+          }
+        }
+        this.health.consecutiveTickFailures = 0;
+      } catch (err) {
+        this.health.consecutiveTickFailures += 1;
+        this.health.lastError = String(err);
+        log.warn("tick failed", { error: String(err) });
+      } finally {
+        this.health.lastTickCompletedAt = Date.now();
+        this.health.tickInFlight = false;
+        this.health.tickCount += 1;
+        scheduleNext();
+      }
+    };
+
+    this.health.enabled = true;
+    this.health.running = true;
+    this.health.startedAt = Date.now();
+    this.health.expectedIntervalMs = baseInterval;
+    this.health.lastHeartbeatAt = Date.now();
+    this.healthTimerHandle = setInterval(() => {
+      this.health.lastHeartbeatAt = Date.now();
+    }, SCHEDULER_WATCHDOG_INTERVAL_MS);
+    this.healthTimerHandle?.unref?.();
+
+    scheduleNext();
+  }
+
+  getHealth(): SchedulerRuntimeHealth {
+    return { ...this.health };
+  }
+
+  private async scanExploration(
+    persona: PersonaTree,
+    _event: SchedulerEvent,
+  ): Promise<Opportunity[]> {
+    const userDomainKeys = Object.keys(persona.domains);
+    if (userDomainKeys.length === 0) {
+      return [];
+    }
+
+    const fatigued = getFatiguedDomains(persona.feedbackProfile.recentInsightDomains ?? []);
+    const strategy = computeContentStrategy(persona);
+    const allExcluded = new Set([...fatigued, ...strategy.excludeDomains]);
+    const baseline = computeBaselinePAccept(
+      persona,
+      allExcluded.size > 0 ? allExcluded : undefined,
+    );
+
+    if (strategy.forceMode) {
+      log.info("content strategy override", {
+        userId: persona.identity?.userId,
+        streak: persona.feedbackProfile.consecutiveNoResponses,
+        forceMode: strategy.forceMode,
+        excludedDomains: [...allExcluded],
+        noveltyBoost: strategy.noveltyBoost,
+      });
+      const fatiguedList = [...allExcluded];
+      const bestTopic = pickBestTopic(persona.feedbackProfile, { excludeTopics: fatiguedList });
+      const targetDomain = bestTopic ?? userDomainKeys.find((d) => !allExcluded.has(d));
+      if (!targetDomain && strategy.forceMode !== "pattern") {
+        return [
+          {
+            type: "exploration" as const,
+            targetDomains: [],
+            sourceDomains: [],
+            pNeed: strategy.noveltyBoost ? 0.6 : 0.55,
+            pAccept: baseline,
+            pAct: (strategy.noveltyBoost ? 0.6 : 0.55) * baseline,
+            metadata: { mode: strategy.forceMode },
+            modeCandidates: [strategy.forceMode],
+          },
+        ];
+      }
+      return [
+        {
+          type: "exploration" as const,
+          targetDomains: targetDomain ? [targetDomain] : [],
+          sourceDomains: [],
+          pNeed: strategy.noveltyBoost ? 0.6 : 0.55,
+          pAccept: baseline,
+          pAct: (strategy.noveltyBoost ? 0.6 : 0.55) * baseline,
+          metadata: { mode: strategy.forceMode },
+          modeCandidates: [strategy.forceMode],
+        },
+      ];
+    }
+
+    // No content strategy override — all three modes are candidates
+    // Mode selection deferred to resolve() via banditWeightedSelect
+    const fatiguedList = [...allExcluded];
+    const bestTopic = pickBestTopic(persona.feedbackProfile, { excludeTopics: fatiguedList });
+    const targetDomain = bestTopic ?? userDomainKeys.find((d) => !allExcluded.has(d));
+
+    log.info("exploration mode candidates set", {
+      userId: persona.identity?.userId,
+      fatiguedDomains: [...fatigued],
+      strategyExcluded: strategy.excludeDomains,
+      targetDomain,
+      streak: persona.feedbackProfile.consecutiveNoResponses,
+    });
+
+    return [
+      {
+        type: "exploration" as const,
+        targetDomains: targetDomain ? [targetDomain] : [],
+        sourceDomains: [],
+        pNeed: 0.65,
+        pAccept: baseline,
+        pAct: 0.65 * baseline,
+        modeCandidates: ["pattern", "surprise", "extend"],
+      },
+    ];
+  }
+
+  stop(): void {
+    this.stopped = true;
+    if (this.timerHandle !== undefined) {
+      clearTimeout(this.timerHandle);
+      this.timerHandle = undefined;
+    }
+    if (this.healthTimerHandle !== undefined) {
+      clearInterval(this.healthTimerHandle);
+      this.healthTimerHandle = undefined;
+    }
+    this.health.running = false;
+    this.health.timerScheduled = false;
+    this.health.nextTickAt = null;
+    this.health.tickInFlight = false;
+  }
+}
+
+const DEFAULT_C_FN = 5.0;
+const DEFAULT_C_FA = 1.0;
+
+const defaultInsightGenerator: InsightGeneratorFn = (persona, input, options) => {
+  return Promise.resolve(generateInsightCandidates(persona, input, options));
+};
+
+/** Seeded Fisher-Yates shuffle for deterministic but varied ordering. */
+function seededShuffle<T>(arr: readonly T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const j = s % (i + 1);
+    [result[i], result[j]] = [result[j]!, result[i]!];
+  }
+  return result;
+}
+
+function scanCrossDomain(persona: PersonaTree, event: SchedulerEvent): Opportunity[] {
+  const userDomains = Object.keys(persona.domains);
+  if (userDomains.length === 0) {
+    return [];
+  }
+
+  const connections = findCrossDomainConnections(userDomains, undefined);
+  const shuffled = seededShuffle(connections, event.timestamp);
+  const pAccept = computeBaselinePAccept(persona);
+
+  const results: Opportunity[] = shuffled.slice(0, 3).map((conn) => {
+    const fromDomain = persona.domains[conn.from];
+    const depthFactor = fromDomain ? Math.min(fromDomain.depth / 5, 1) : 0.3;
+    const pNeed = 0.55 * depthFactor + 0.3;
+
+    return {
+      type: "cross_domain" as const,
+      targetDomains: [conn.from],
+      sourceDomains: [conn.to],
+      pNeed,
+      pAccept,
+      pAct: pNeed * pAccept,
+      metadata: { bridge: conn.bridge, distance: conn.distance },
+      modeCandidates: ["pattern", "surprise", "extend"],
+    };
+  });
+
+  // Fallback: intra-user cross-pollination when graph is fully covered by user domains
+  if (results.length === 0 && userDomains.length >= 2) {
+    let weakestPair: { from: string; to: string; distance: number } | null = null;
+    let maxDist = 0;
+
+    for (let i = 0; i < userDomains.length; i++) {
+      for (let j = i + 1; j < userDomains.length; j++) {
+        const d = semanticDistance(userDomains[i]!, userDomains[j]!);
+        if (d > maxDist) {
+          maxDist = d;
+          weakestPair = { from: userDomains[i]!, to: userDomains[j]!, distance: d };
+        }
+      }
+    }
+
+    if (weakestPair && maxDist > 0.5) {
+      const fromDomain = persona.domains[weakestPair.from];
+      const depthFactor = fromDomain ? Math.min(fromDomain.depth / 5, 1) : 0.3;
+      const pNeed = 0.55 * depthFactor + 0.3;
+      results.push({
+        type: "cross_domain",
+        targetDomains: [weakestPair.from, weakestPair.to],
+        sourceDomains: [],
+        pNeed,
+        pAccept,
+        pAct: pNeed * pAccept,
+        metadata: { intraUserCrossPollination: true, semanticDistance: weakestPair.distance },
+        modeCandidates: ["pattern", "surprise", "extend"],
+      });
+    }
+  }
+
+  return results;
+}
+
+function scanDomainDepth(persona: PersonaTree, _event: SchedulerEvent): Opportunity[] {
+  const pAccept = computeBaselinePAccept(persona);
+  const now = Date.now();
+
+  const recentDomainSet = new Set((persona.feedbackProfile.recentInsightDomains ?? []).flat());
+
+  const filtered = Object.entries(persona.domains).filter(
+    ([name, d]) => d.depth >= 3 && !recentDomainSet.has(name),
+  );
+
+  const entries =
+    filtered.length > 0
+      ? filtered
+      : Object.entries(persona.domains).filter(([, d]) => d.depth >= 3);
+
+  return entries
+    .toSorted(([, a], [, b]) => {
+      const recencyDelta = a.lastMentioned - b.lastMentioned;
+      if (Math.abs(recencyDelta) > 24 * 60 * 60 * 1000) {
+        return -recencyDelta;
+      }
+      return b.depth - a.depth;
+    })
+    .slice(0, 2)
+    .map(([domainName, domain]) => {
+      const daysSinceMention = (now - domain.lastMentioned) / (24 * 60 * 60 * 1000);
+      const recencyBoost = Math.max(0, 1 - daysSinceMention / 7);
+      const pNeed = Math.min(0.4, 0.3 + 0.1 * Math.min(domain.depth, 8) + 0.2 * recencyBoost);
+
+      return {
+        type: "domain_depth" as const,
+        targetDomains: [domainName],
+        sourceDomains: [],
+        pNeed,
+        pAccept,
+        pAct: pNeed * pAccept,
+        modeCandidates: ["pattern", "surprise", "extend"],
+      };
+    });
+}
+
+function scanPersonaChange(persona: PersonaTree, event: SchedulerEvent): Opportunity[] {
+  const pAccept = computeBaselinePAccept(persona);
+  const payload = event.payload as { newDomains?: string[]; domainCount?: number } | undefined;
+  const newDomains = payload?.newDomains ?? [];
+
+  if (newDomains.length === 0) {
+    return Object.keys(persona.domains)
+      .slice(0, 1)
+      .map((domain) => ({
+        type: "cross_domain" as const,
+        targetDomains: [domain],
+        sourceDomains: [],
+        pNeed: 0.7,
+        pAccept,
+        pAct: 0.7 * pAccept,
+        modeCandidates: ["pattern", "surprise", "extend"],
+      }));
+  }
+
+  return newDomains.map((domain) => {
+    const existingConnections = Object.keys(persona.domains).filter(
+      (existing) => existing !== domain,
+    );
+    return {
+      type: "cross_domain" as const,
+      targetDomains: [domain],
+      sourceDomains: existingConnections.slice(0, 2),
+      pNeed: 0.9,
+      pAccept,
+      pAct: 0.9 * pAccept,
+      metadata: { isNewDomain: true },
+      modeCandidates: ["pattern", "surprise", "extend"],
+    };
+  });
+}
+
+function scanInfoScan(persona: PersonaTree, event: SchedulerEvent): Opportunity[] {
+  const pAccept = computeBaselinePAccept(persona);
+  const domains = Object.keys(persona.domains);
+  if (domains.length === 0) {
+    return [];
+  }
+
+  const startIdx = event.timestamp % domains.length;
+  const rotated = [...domains.slice(startIdx), ...domains.slice(0, startIdx)];
+
+  return rotated.slice(0, 2).map((domain) => ({
+    type: "info_scan_hit" as const,
+    targetDomains: [domain],
+    sourceDomains: [],
+    pNeed: 0.6,
+    pAccept,
+    pAct: 0.6 * pAccept,
+    metadata: { scanDerived: true },
+    modeCandidates: ["pattern", "surprise", "extend"],
+  }));
+}
+
+function computeBaselinePAccept(persona: PersonaTree, fatiguedDomains?: Set<string>): number {
+  const trustFactor = persona.rapport.trustScore;
+  const banditEntries = Object.entries(persona.feedbackProfile.topicBandits).filter(
+    ([topic]) => !fatiguedDomains?.has(topic),
+  );
+
+  let banditFactor = 0.5;
+  if (banditEntries.length > 0) {
+    const meanPosterior =
+      banditEntries.reduce((sum, [, b]) => sum + b.alpha / (b.alpha + b.beta), 0) /
+      banditEntries.length;
+    banditFactor = meanPosterior;
+  }
+
+  return clamp01(0.5 * trustFactor + 0.5 * banditFactor);
+}
+
+function clamp01(x: number): number {
+  return Math.max(0, Math.min(1, x));
+}
+
+export function filterBlacklistedOpportunities(
+  opportunities: Opportunity[],
+  domainBlacklist: string[] | undefined,
+): Opportunity[] {
+  if (!domainBlacklist || domainBlacklist.length === 0) {
+    return opportunities;
+  }
+  const blacklistSet = new Set(domainBlacklist);
+  return opportunities.filter((opp) => {
+    const hasBlacklistedTarget = opp.targetDomains.some((d) => blacklistSet.has(d));
+    const hasBlacklistedSource = opp.sourceDomains.some((d) => blacklistSet.has(d));
+    return !hasBlacklistedTarget && !hasBlacklistedSource;
+  });
+}

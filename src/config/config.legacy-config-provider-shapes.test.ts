@@ -1,0 +1,39 @@
+import { describe, expect, it } from "vitest";
+import { readConfigFileSnapshot, validateConfigObject } from "./config.js";
+import { withTempHome, writeAllBotConfig } from "./test-helpers.js";
+
+// Skip on CI: requires upstream-only channels/plugins not bundled in AllBot
+describe.skipIf(process.env.CI)("legacy provider-shaped config snapshots", () => {
+  it("accepts a string map of voice aliases while still flagging legacy talk config", async () => {
+    await withTempHome(async (home) => {
+      await writeAllBotConfig(home, {
+        talk: {
+          voiceAliases: {
+            Clawd: "VoiceAlias1234567890",
+            Roger: "CwhRBWXzGAHq8TQ4Fs17",
+          },
+        },
+      });
+
+      const snap = await readConfigFileSnapshot();
+
+      expect(snap.valid).toBe(true);
+      expect(snap.legacyIssues.some((issue) => issue.path === "talk")).toBe(true);
+      expect(snap.sourceConfig.talk?.providers?.elevenlabs?.voiceAliases).toEqual({
+        Clawd: "VoiceAlias1234567890",
+        Roger: "CwhRBWXzGAHq8TQ4Fs17",
+      });
+    });
+  });
+
+  it("rejects non-string voice alias values", () => {
+    const res = validateConfigObject({
+      talk: {
+        voiceAliases: {
+          Clawd: 123,
+        },
+      },
+    });
+    expect(res.ok).toBe(false);
+  });
+});

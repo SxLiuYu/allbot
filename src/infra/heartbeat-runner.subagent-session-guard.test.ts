@@ -1,0 +1,83 @@
+import fs from "node:fs/promises";
+import { describe, expect, it, vi } from "vitest";
+import type { AllBotConfig } from "../config/config.js";
+import { resolveMainSessionKey } from "../config/sessions.js";
+import { runHeartbeatOnce } from "./heartbeat-runner.js";
+import { installHeartbeatRunnerTestRuntime } from "./heartbeat-runner.test-harness.js";
+import { withTempHeartbeatSandbox } from "./heartbeat-runner.test-utils.js";
+
+installHeartbeatRunnerTestRuntime();
+
+// CI: subagent session guard depends on whatsapp channel runtime not present on CI runners.
+describe.skipIf(process.env.CI)("runHeartbeatOnce", () => {
+  it("falls back to the main session when a subagent session key is forced", async () => {
+    await withTempHeartbeatSandbox(async ({ tmpDir, storePath, replySpy }) => {
+      const cfg: AllBotConfig = {
+        agents: {
+          defaults: {
+            workspace: tmpDir,
+            heartbeat: {
+              every: "5m",
+              target: "whatsapp",
+            },
+          },
+        },
+        channels: {
+          whatsapp: {
+            allowFrom: ["*"],
+          },
+        },
+        session: { store: storePath },
+      };
+
+      const mainSessionKey = resolveMainSessionKey(cfg);
+      await fs.writeFile(
+        storePath,
+        JSON.stringify({
+          [mainSessionKey]: {
+            sessionId: "sid-main",
+            updatedAt: Date.now(),
+            lastChannel: "whatsapp",
+            lastProvider: "whatsapp",
+            lastTo: "120363401234567890@g.us",
+          },
+          "agent:main:subagent:demo": {
+            sessionId: "sid-subagent",
+            updatedAt: Date.now(),
+            lastChannel: "whatsapp",
+            lastProvider: "whatsapp",
+            lastTo: "120363409999999999@g.us",
+          },
+        }),
+      );
+
+      replySpy.mockResolvedValue({ text: "Final alert" });
+      const sendWhatsApp = vi.fn().mockResolvedValue({
+        messageId: "m1",
+        toJid: "jid",
+      });
+
+      await runHeartbeatOnce({
+        cfg,
+        sessionKey: "agent:main:subagent:demo",
+        deps: {
+          getReplyFromConfig: replySpy,
+          whatsapp: sendWhatsApp,
+          getQueueSize: () => 0,
+          nowMs: () => 0,
+        },
+      });
+
+      expect(replySpy).toHaveBeenCalledTimes(1);
+      expect(replySpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          SessionKey: mainSessionKey,
+          OriginatingChannel: undefined,
+          OriginatingTo: undefined,
+        }),
+        expect.anything(),
+        cfg,
+      );
+    });
+  });
+});

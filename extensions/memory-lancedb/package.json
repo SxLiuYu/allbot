@@ -1,0 +1,34 @@
+{
+  "name": "@allbot/memory-lancedb",
+  "version": "2026.4.12",
+  "description": "AllBot LanceDB-backed long-term memory plugin with auto-recall/capture",
+  "type": "module",
+  "dependencies": {
+    "@lancedb/lancedb": "^0.27.2",
+    "openai": "^6.34.0",
+    "typebox": "^1.1"
+  },
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "install": {
+      "npmSpec": "@allbot/memory-lancedb",
+      "defaultChoice": "npm",
+      "minHostVersion": ">=2026.4.10"
+    },
+    "compat": {
+      "pluginApi": ">=2026.4.12"
+    },
+    "build": {
+      "allbotVersion": "2026.4.12"
+    },
+    "release": {
+      "publishToClawHub": true,
+      "publishToNpm": true
+    }
+  }
+}

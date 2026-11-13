@@ -1,0 +1,386 @@
+import { completeSimple, type Api, type Model, type TextContent } from "@earendil-works/pi-ai";
+import type { ResolvedProviderAuth } from "../../agents/model-auth.js";
+import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
+import { prepareSimpleCompletionModel } from "../../agents/simple-completion-runtime.js";
+import type { AllBotConfig } from "../../config/types.allbot.js";
+import { createSubsystemLogger } from "../../logging/subsystem.js";
+import type { PersonaTree, InsightCategory } from "../types.js";
+import { migrateInsightCategory } from "./curator.js";
+import { extractFromMessage } from "./extractor.js";
+import type { ExtractionResult } from "./types.js";
+const log = createSubsystemLogger("cognitive/persona-extractor");
+
+export type LlmExtractorDeps = {
+  complete: typeof completeSimple;
+  prepareModel: (
+    cfg: AllBotConfig,
+    modelRef?: string,
+  ) => Promise<{ model: Model<Api>; auth: ResolvedProviderAuth } | { error: string }>;
+};
+
+export type LlmExtractorOptions = {
+  modelRef?: string;
+  timeout?: number;
+  maxTokens?: number;
+};
+
+const DEFAULT_TIMEOUT_MS = 60_000;
+const DEFAULT_MAX_TOKENS = 1_500;
+
+function isTextContentBlock(block: { type: string }): block is TextContent {
+  return block.type === "text";
+}
+
+function splitModelRef(modelRef: string): { provider: string; modelId: string } | null {
+  const idx = modelRef.indexOf("/");
+  if (idx > 0 && idx < modelRef.length - 1) {
+    return { provider: modelRef.slice(0, idx), modelId: modelRef.slice(idx + 1) };
+  }
+  return null;
+}
+
+export function createDefaultDeps(): LlmExtractorDeps {
+  return {
+    complete: completeSimple,
+    prepareModel: async (cfg, modelRef) => {
+      if (modelRef) {
+        const split = splitModelRef(modelRef);
+        if (split) {
+          return prepareSimpleCompletionModel({
+            cfg,
+            provider: split.provider,
+            modelId: split.modelId,
+          });
+        }
+      }
+      const resolved = resolveDefaultModelForAgent({ cfg });
+      return prepareSimpleCompletionModel({
+        cfg,
+        provider: resolved.provider,
+        modelId: resolved.model,
+      });
+    },
+  };
+}
+
+/**
+ * LLM-based persona extraction with rule-based fallback.
+ *
+ * Sends the conversation turn + existing persona to the LLM and asks it to
+ * extract structured persona attributes. Falls back to the rule-based
+ * `extractFromMessage()` on timeout, error, or empty/unparseable response.
+ *
+ * This function **never throws**.
+ */
+export async function extractFromMessageLLM(
+  userMessage: string,
+  assistantMessage: string,
+  existingPersona: PersonaTree | undefined,
+  config: AllBotConfig,
+  deps: LlmExtractorDeps,
+  options?: LlmExtractorOptions,
+): Promise<ExtractionResult> {
+  const prompt = buildExtractionPrompt(userMessage, assistantMessage, existingPersona);
+
+  try {
+    const modelRef = options?.modelRef ?? config.cognitive?.persona?.extractionModel;
+    const prepared = await deps.prepareModel(config, modelRef);
+
+    if ("error" in prepared) {
+      log.warn("persona extraction fell back to rule-based", { reason: "error" });
+      return extractFromMessage(userMessage, assistantMessage, existingPersona);
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), options?.timeout ?? DEFAULT_TIMEOUT_MS);
+
+    let result: Awaited<ReturnType<typeof completeSimple>>;
+    try {
+      result = await deps.complete(
+        prepared.model,
+        {
+          messages: [{ role: "user", content: prompt, timestamp: Date.now() }],
+        },
+        {
+          apiKey: prepared.auth.apiKey,
+          maxTokens: options?.maxTokens ?? DEFAULT_MAX_TOKENS,
+          temperature: 0.2,
+          signal: controller.signal,
+        },
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    const text = result.content
+      .filter(isTextContentBlock)
+      .map((block) => block.text)
+      .join("")
+      .trim();
+
+    if (!text) {
+      log.warn("persona extraction fell back to rule-based", { reason: "empty" });
+      return extractFromMessage(userMessage, assistantMessage, existingPersona);
+    }
+
+    const parsed = parseLLMExtraction(text);
+    // If the LLM returned nothing meaningful, fall back to rule-based
+    if (
+      parsed.attributes.length === 0 &&
+      parsed.domains.length === 0 &&
+      parsed.recentFocus.length === 0
+    ) {
+      log.warn("persona extraction fell back to rule-based", {
+        reason: "parse-failed",
+        rawPreview: text.slice(0, 200),
+      });
+      return extractFromMessage(userMessage, assistantMessage, existingPersona);
+    }
+
+    log.info("persona extraction completed", {
+      method: "llm",
+      domainsFound: parsed.domains.length,
+      attributesFound: Object.keys(parsed.attributes).length,
+      hasFocus: parsed.recentFocus.length > 0,
+    });
+    return parsed;
+  } catch {
+    log.warn("persona extraction fell back to rule-based", { reason: "timeout" });
+    return extractFromMessage(userMessage, assistantMessage, existingPersona);
+  }
+}
+
+function buildExtractionPrompt(
+  userMessage: string,
+  assistantMessage: string,
+  persona: PersonaTree | undefined,
+): string {
+  const personaContext = persona
+    ? `\n\nKnown persona:\n- Domains: ${Object.keys(persona.domains).join(", ") || "none"}\n- Focus: ${persona.recentFocus.slice(0, 5).join(", ") || "none"}`
+    : "";
+
+  return `You are a persona extraction system. Analyze the conversation turn below and extract structured persona attributes ABOUT THE HUMAN USER ONLY.
+
+USER MESSAGE (from the human):
+${userMessage.slice(-1000)}
+
+ASSISTANT MESSAGE (from the AI assistant, for context only):
+${assistantMessage.slice(-500)}
+${personaContext}
+
+Extract and respond with ONLY a JSON object in this exact format (no markdown, no code fences):
+{
+  "attributes": [
+    {"field": "identity.coreTraits.职业", "value": "...", "confidence": 0.8, "source": "explicit", "evidence": "..."},
+    {"field": "identity.communicationStyle.technicalLevel", "value": "expert", "confidence": 0.7, "source": "inferred", "evidence": "..."}
+  ],
+  "domains": [
+    {
+      "name": "AI/机器学习",
+      "depth": 3,
+      "insights": ["user understands transformer architecture"],
+      "typedInsights": [
+        {"text": "user understands transformer architecture", "category": "durable", "confidence": 0.8, "source": "inferred"},
+        {"text": "user prefers Rust for systems programming", "category": "durable", "confidence": 0.9, "source": "explicit"}
+      ],
+      "questions": []
+    }
+  ],
+  "recentFocus": ["topic1", "topic2"]
+}
+
+Rules:
+- ONLY extract attributes about the HUMAN USER, never about the AI assistant
+- If the assistant says "I am an AI" or "I don't have consciousness", do NOT extract that as a user trait
+- The ASSISTANT MESSAGE is provided for conversational context only — it tells you what the user was responding to, but you must NOT extract the assistant's self-descriptions as user attributes
+- Only extract what the USER clearly states or strongly implies about THEMSELVES
+- confidence: 0-1, where 1 is absolutely certain
+- source: "explicit" (user stated it), "inferred" (strongly implied from user's words), "observed" (from user behavior)
+- domain depth: 1=mentioned, 3=familiar, 5=expert
+- Only include domains that are actually discussed by the USER
+- Discover domains dynamically — do NOT limit to a predefined list. Name domains naturally in Chinese or English based on the conversation content (e.g. "前端开发", "DevOps", "量化交易", "游戏设计", "区块链")
+- Each domain MUST include typedInsights. Classify every insight into exactly one category:
+  - durable: Long-lasting knowledge, preferences, behaviors, or goals (e.g. "knows Rust", "prefers typed languages", "plans to open-source")
+  - ephemeral: Short-lived or situational facts, tool configs, current context (e.g. "currently using VS Code", "at work today")
+- typedInsights must have: text (string), category (durable or ephemeral), confidence (0-1), source (explicit/inferred/observed)
+- If nothing meaningful can be extracted, return empty arrays
+- Respond with ONLY the JSON, nothing else`;
+}
+
+function parseLLMExtraction(text: string): ExtractionResult {
+  try {
+    const jsonStr = extractJSONFromMixedText(text);
+    if (!jsonStr) {
+      log.warn("parseLLMExtraction: no JSON object found in response", { raw: text.slice(0, 200) });
+      return { attributes: [], domains: [], recentFocus: [] };
+    }
+
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(jsonStr) as Record<string, unknown>;
+    } catch {
+      log.warn("parseLLMExtraction: JSON parse failed", { raw: jsonStr.slice(0, 200) });
+      return { attributes: [], domains: [], recentFocus: [] };
+    }
+
+    return {
+      attributes: Array.isArray(parsed.attributes)
+        ? parsed.attributes.map((a: Record<string, unknown>) => ({
+            field: String(a.field ?? ""),
+            value: String(a.value ?? ""),
+            confidence: clamp01(Number(a.confidence ?? 0.5)),
+            source: validSource(a.source),
+            evidence: String(a.evidence ?? ""),
+          }))
+        : [],
+      domains: Array.isArray(parsed.domains)
+        ? parsed.domains.map((d: Record<string, unknown>) => ({
+            name: String(d.name ?? ""),
+            depth: clampDepth(Number(d.depth ?? 1)),
+            insights: Array.isArray(d.insights) ? d.insights.map(String) : [],
+            typedInsights: Array.isArray(d.typedInsights)
+              ? d.typedInsights
+                  .filter(
+                    (ti: Record<string, unknown>) =>
+                      typeof ti.text === "string" && ti.text.length > 0,
+                  )
+                  .map((ti: Record<string, unknown>) => ({
+                    text: String(ti.text),
+                    category: validInsightCategory(ti.category),
+                    confidence: clamp01(Number(ti.confidence ?? 0.5)),
+                    source: validSource(ti.source),
+                  }))
+              : undefined,
+            questions: Array.isArray(d.questions) ? d.questions.map(String) : [],
+          }))
+        : [],
+      recentFocus: Array.isArray(parsed.recentFocus)
+        ? parsed.recentFocus.map(String).slice(0, 5)
+        : [],
+    };
+  } catch {
+    return { attributes: [], domains: [], recentFocus: [] };
+  }
+}
+
+function extractJSONFromMixedText(text: string): string | null {
+  const trimmed = text.trim();
+  try {
+    JSON.parse(trimmed);
+    return trimmed;
+  } catch {
+    // continue to extraction
+  }
+
+  const stripped = trimmed
+    .replace(/^```(?:json)?\s*\n?/i, "")
+    .replace(/\n?\s*```\s*$/i, "")
+    .trim();
+  try {
+    JSON.parse(stripped);
+    return stripped;
+  } catch {
+    // continue to extraction
+  }
+
+  const firstBrace = stripped.indexOf("{");
+  const lastBrace = stripped.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    const candidate = stripped.slice(firstBrace, lastBrace + 1);
+    try {
+      JSON.parse(candidate);
+      return candidate;
+    } catch {
+      const fixed = tryFixTruncatedJSON(candidate);
+      if (fixed) {
+        return fixed;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Attempt to fix truncated JSON by closing open brackets.
+ */
+function tryFixTruncatedJSON(jsonStr: string): string | null {
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escape = false;
+
+  for (const ch of jsonStr) {
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === "\\") {
+      if (inString) {
+        escape = true;
+      }
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) {
+      continue;
+    }
+    if (ch === "{") {
+      openBraces++;
+    } else if (ch === "}") {
+      openBraces--;
+    } else if (ch === "[") {
+      openBrackets++;
+    } else if (ch === "]") {
+      openBrackets--;
+    }
+  }
+
+  if (openBraces < 0 || openBrackets < 0) {
+    return null;
+  }
+
+  let fixed = jsonStr;
+  if (inString) {
+    fixed += '"';
+  }
+
+  fixed = fixed.replace(/,\s*"[^"]*"\s*:\s*$/s, "");
+
+  for (let i = 0; i < openBrackets; i++) {
+    fixed += "]";
+  }
+  for (let i = 0; i < openBraces; i++) {
+    fixed += "}";
+  }
+
+  try {
+    JSON.parse(fixed);
+    return fixed;
+  } catch {
+    return null;
+  }
+}
+
+function clamp01(n: number): number {
+  return Math.max(0, Math.min(1, n));
+}
+
+function clampDepth(n: number): number {
+  return Math.max(1, Math.min(5, n));
+}
+
+function validSource(value: unknown): "explicit" | "inferred" | "observed" {
+  const s = String(value);
+  if (s === "explicit" || s === "inferred" || s === "observed") {
+    return s;
+  }
+  return "inferred";
+}
+
+function validInsightCategory(value: unknown): InsightCategory {
+  return migrateInsightCategory(value);
+}

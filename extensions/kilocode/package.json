@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/kilocode-provider",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot Kilo Gateway provider plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

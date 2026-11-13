@@ -1,0 +1,2 @@
+# ego_lite_client is a shared library kept outside this repository.
+# Symlink it here (or vendor it) before running magic-browser.py / magic-apps.py.

@@ -1,0 +1,45 @@
+{
+  "id": "lightpanda",
+  "enabledByDefault": true,
+  "uiHints": {
+    "webFetch.command": {
+      "label": "Lightpanda binary",
+      "help": "Path to the lightpanda executable. Defaults to `lightpanda` on PATH."
+    },
+    "webFetch.maxBytes": {
+      "label": "Max page bytes",
+      "help": "Cap on the fetched document before markdown conversion. Defaults to 200000."
+    },
+    "webFetch.waitMs": {
+      "label": "Render wait (ms)",
+      "help": "How long to wait for a page to settle before dumping. Defaults to 2000."
+    }
+  },
+  "contracts": {
+    "webFetchProviders": ["lightpanda"]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "webFetch": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "timeoutMs": {
+            "type": "number"
+          },
+          "maxBytes": {
+            "type": "number"
+          },
+          "waitMs": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

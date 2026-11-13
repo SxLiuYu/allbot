@@ -1,0 +1,433 @@
+/**
+ * Structured summary generation for session memory.
+ *
+ * Uses a single-turn LLM call to extract a structured summary from
+ * conversation transcripts. Falls back to a minimal raw-dump structure on
+ * LLM failure so that no session is lost.
+ */
+
+import { createBackgroundGenerateText } from "../../../cognitive/evolution/standalone-generate.js";
+import type { AllBotConfig } from "../../../config/config.js";
+import { createSubsystemLogger } from "../../../logging/subsystem.js";
+import { normalizeLowercaseStringOrEmpty } from "../../../shared/string-coerce.js";
+
+const log = createSubsystemLogger("hooks/session-memory/summary");
+
+/**
+ * Hard cap on transcript chars sent to the LLM. ~30K tokens at ~3 chars/token
+ * for mixed CJK/English — fits comfortably in 32K+ context models with room
+ * for the 4K output budget. Truncation keeps the MOST RECENT chars, which
+ * capture the compaction entry (summary of older content) + nearby messages.
+ */
+const SUMMARY_TRANSCRIPT_CHAR_BUDGET = 100_000;
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface StructuredSummary {
+  /** 2-3 sentence enriched overview of the conversation */
+  summary: string;
+  /** What the user explicitly asked for */
+  primaryRequest?: string;
+  /** Key technical concepts, technologies, frameworks discussed */
+  technicalConcepts?: string[];
+  /** Files read, modified, or created with brief descriptions */
+  filesAndChanges?: string[];
+  /** Errors encountered and how they were fixed */
+  errorsAndFixes?: string[];
+  /** Approaches tried, problems solved */
+  problemSolving?: string[];
+  /** What was in progress when session ended */
+  currentWork?: string;
+  /** Suggested next action */
+  nextStep?: string;
+  /** Key decisions made during the conversation */
+  decisions: string[];
+  /** Pending action items / follow-ups */
+  followups: string[];
+  /** Topic tags for routing to topic files */
+  topics: string[];
+  /** Participants involved */
+  participants: string[];
+  /** Subject-based topic name for routing (kebab-case, e.g. "feishu", "product") */
+  topicSlug: string;
+  /** Primary memory classification for inline section routing. Prefer "core" and "active" over legacy types. Omit if none applies. */
+  memoryType?: "core" | "active" | "user" | "feedback" | "project" | "reference";
+  /** One-sentence description of what the topic covers (for registry). Only set when creating a new topic. */
+  topicDescription?: string;
+}
+
+// ---------------------------------------------------------------------------
+// LLM summary prompt
+// ---------------------------------------------------------------------------
+
+const SUMMARY_SYSTEM_PROMPT = `You are a structured conversation summarizer. The assistant being summarized is a proactive cognitive AI — it intentionally sends unsolicited messages to the user about their interests, cross-domain connections, behavioral patterns, and knowledge suggestions. These proactive messages are a core feature, NOT errors or hallucinations.
+
+Analyze the conversation and produce a JSON object with exactly these fields:
+
+- "summary": 2-3 sentence enriched overview in the same language as the conversation (Chinese or English). Cover what happened, key outcomes, and current state.
+- "primaryRequest": string — what the user explicitly asked for. Omit if unclear.
+- "technicalConcepts": array of key technical concepts, technologies, frameworks discussed (as strings). Empty if none.
+- "filesAndChanges": array of strings describing files read, modified, or created (e.g. "src/index.ts: added retry logic"). Empty if none.
+- "errorsAndFixes": array of strings describing actual technical errors (crashes, type errors, API failures, tool call failures) and how they were resolved. Only include genuine bugs and failures — NOT proactive messages, suggestions, or any content the assistant sent without being directly asked. Empty if none.
+- "problemSolving": array of strings describing approaches tried and problems solved. Empty if none.
+- "currentWork": string — what was in progress when the session ended. Omit if nothing in progress.
+- "nextStep": string — suggested next action. Omit if none.
+- "decisions": array of key decisions made (as strings). Empty if none.
+- "followups": array of pending action items (as strings). Empty if none.
+- "topics": array of 1-3 short topic tags (lowercase, hyphenated, e.g. "api-design", "user-preferences"). Empty if none.
+- "participants": array of participant names/roles (e.g. ["user", "assistant"]). At minimum ["user"].
+- "topicSlug": a short 1-3 word slug for the topic file name (lowercase, hyphenated, max 30 chars). This is the primary classification — choose a subject that groups related memories together (e.g. "feishu", "philosophy", "product", "football").
+- "memoryType": the primary memory classification. Prefer "core" and "active" over legacy types:
+    - "core" — important assertions: user preferences, knowledge, behavioral patterns, key facts (PREFERRED for most stable content)
+    - "active" — time-sensitive work: current goals, active projects, recent focus areas (PREFERRED for in-progress content)
+    - "user" — (legacy, maps to core) user personal info
+    - "feedback" — (legacy, maps to core) user feedback about the assistant
+    - "project" — (legacy, maps to active) project-related info
+    - "reference" — (legacy, maps to core) reference material
+  Use "core" for stable knowledge and "active" for current work. Omit if none applies.
+- "topicDescription": one-sentence description of what the topic covers. Only provide when the topic is genuinely new and doesn't match an existing topic. Omit if routing to an existing topic.
+
+## What NOT to save in memory
+
+- Code patterns, conventions, architecture, file paths, or project structure
+- Git history, recent changes, or who-changed-what
+- Debugging solutions or fix recipes — the fix is in the code
+- Anything already documented in project files
+- Ephemeral task details: in-progress work, temporary state, current conversation context
+- Information tools can look up in real-time (weather, time, file contents)
+- Diagnostic metadata (confidence scores, evidence paths, status markers)
+
+These exclusions apply even when explicitly asked to save. If asked to save a list or summary, ask what was *surprising* or *non-obvious* about it.
+
+Reply with ONLY the JSON object, no markdown fences, no commentary.`;
+
+// ---------------------------------------------------------------------------
+// JSON parsing helper
+// ---------------------------------------------------------------------------
+
+function extractJsonObject(text: string): string | null {
+  // Try to find a JSON object in the response
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+    return null;
+  }
+  return text.slice(firstBrace, lastBrace + 1);
+}
+
+function parseStructuredSummaryResponse(raw: string): StructuredSummary | null {
+  const jsonStr = extractJsonObject(raw);
+  if (!jsonStr) {
+    return null;
+  }
+
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch {
+    return null;
+  }
+
+  const summary = typeof parsed.summary === "string" ? parsed.summary : "";
+  if (!summary) {
+    return null;
+  }
+
+  const primaryRequest =
+    typeof parsed.primaryRequest === "string" && parsed.primaryRequest.trim()
+      ? parsed.primaryRequest
+      : undefined;
+
+  const technicalConcepts = Array.isArray(parsed.technicalConcepts)
+    ? parsed.technicalConcepts.filter((c): c is string => typeof c === "string")
+    : undefined;
+
+  const filesAndChanges = Array.isArray(parsed.filesAndChanges)
+    ? parsed.filesAndChanges.filter((f): f is string => typeof f === "string")
+    : undefined;
+
+  const errorsAndFixes = Array.isArray(parsed.errorsAndFixes)
+    ? parsed.errorsAndFixes.filter((e): e is string => typeof e === "string")
+    : undefined;
+
+  const problemSolving = Array.isArray(parsed.problemSolving)
+    ? parsed.problemSolving.filter((p): p is string => typeof p === "string")
+    : undefined;
+
+  const currentWork =
+    typeof parsed.currentWork === "string" && parsed.currentWork.trim()
+      ? parsed.currentWork
+      : undefined;
+
+  const nextStep =
+    typeof parsed.nextStep === "string" && parsed.nextStep.trim() ? parsed.nextStep : undefined;
+
+  const decisions = Array.isArray(parsed.decisions)
+    ? parsed.decisions.filter((d): d is string => typeof d === "string")
+    : [];
+
+  const followups = Array.isArray(parsed.followups)
+    ? parsed.followups.filter((f): f is string => typeof f === "string")
+    : [];
+
+  const topics = Array.isArray(parsed.topics)
+    ? parsed.topics.filter((t): t is string => typeof t === "string")
+    : [];
+
+  const participants = Array.isArray(parsed.participants)
+    ? parsed.participants.filter((p): p is string => typeof p === "string")
+    : ["user"];
+
+  const topicSlug =
+    typeof parsed.topicSlug === "string"
+      ? normalizeLowercaseStringOrEmpty(parsed.topicSlug)
+          .replace(/[^a-z0-9-]/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "")
+          .slice(0, 30)
+      : (topics[0]
+          ?.replace(/[^a-z0-9-]/g, "-")
+          .replace(/-+/g, "-")
+          .slice(0, 30) ?? "session");
+
+  const VALID_MEMORY_TYPES: readonly string[] = [
+    "core",
+    "active",
+    "user",
+    "feedback",
+    "project",
+    "reference",
+  ];
+  const rawMemoryType = typeof parsed.memoryType === "string" ? parsed.memoryType : "";
+  const memoryType = VALID_MEMORY_TYPES.includes(rawMemoryType)
+    ? (rawMemoryType as "core" | "active" | "user" | "feedback" | "project" | "reference")
+    : undefined;
+
+  const topicDescription =
+    typeof parsed.topicDescription === "string" && parsed.topicDescription.trim()
+      ? parsed.topicDescription.trim()
+      : undefined;
+
+  return {
+    summary,
+    primaryRequest,
+    technicalConcepts: technicalConcepts?.length ? technicalConcepts : undefined,
+    filesAndChanges: filesAndChanges?.length ? filesAndChanges : undefined,
+    errorsAndFixes: errorsAndFixes?.length ? errorsAndFixes : undefined,
+    problemSolving: problemSolving?.length ? problemSolving : undefined,
+    currentWork,
+    nextStep,
+    decisions,
+    followups,
+    topics,
+    participants,
+    topicSlug: topicSlug || "session",
+    topicDescription,
+    memoryType,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Fallback summary
+// ---------------------------------------------------------------------------
+
+function createFallbackSummary(transcript: string): StructuredSummary {
+  const firstLine = transcript.split("\n")[0] ?? "";
+  const truncated = firstLine.length > 200 ? `${firstLine.slice(0, 200)}…` : firstLine;
+  return {
+    summary: truncated || "(session transcript too short to summarize)",
+    primaryRequest: undefined,
+    technicalConcepts: undefined,
+    filesAndChanges: undefined,
+    errorsAndFixes: undefined,
+    problemSolving: undefined,
+    currentWork: undefined,
+    nextStep: undefined,
+    decisions: [],
+    followups: [],
+    topics: [],
+    participants: ["user"],
+    topicSlug: "session",
+    topicDescription: undefined,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Main: generateStructuredSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a structured summary from a conversation transcript using LLM.
+ * Falls back to a minimal raw structure on any failure (timeout, parse error,
+ * network error, etc.) so that no session data is lost.
+ */
+export async function generateStructuredSummary(params: {
+  transcript: string;
+  cfg: AllBotConfig;
+  existingTopics?: Array<{ name: string; description: string }>;
+}): Promise<StructuredSummary> {
+  const { transcript, cfg, existingTopics } = params;
+
+  if (!transcript.trim()) {
+    return createFallbackSummary(transcript);
+  }
+
+  try {
+    const transcriptSlice =
+      transcript.length > SUMMARY_TRANSCRIPT_CHAR_BUDGET
+        ? transcript.slice(-SUMMARY_TRANSCRIPT_CHAR_BUDGET)
+        : transcript;
+    log.debug("Generating structured summary", {
+      transcriptLength: transcript.length,
+      slicedLength: transcriptSlice.length,
+    });
+
+    const generateText = await createBackgroundGenerateText(cfg, {
+      maxTokens: 4000,
+      timeout: 60_000,
+    });
+
+    let prompt = `${SUMMARY_SYSTEM_PROMPT}\n\nConversation transcript:\n${transcriptSlice}`;
+
+    if (existingTopics && existingTopics.length > 0) {
+      const topicList = existingTopics.map((t) => `- "${t.name}": ${t.description}`).join("\n");
+      prompt += `\n\n## Existing Topics\nThe following topics already exist. Route to one of these if the content fits:\n\n${topicList}\n\nChoose the topicSlug from the list above if the conversation fits. Only create a new slug if the content genuinely doesn't fit any existing topic.`;
+      if (existingTopics.length >= 30) {
+        prompt +=
+          "\n\nNote: There are many existing topics. Strongly prefer routing to an existing topic.";
+      }
+    }
+
+    const rawResponse = await generateText(prompt);
+
+    log.debug("LLM response received", { responseLength: rawResponse.length });
+
+    const summary = parseStructuredSummaryResponse(rawResponse);
+    if (summary) {
+      return summary;
+    }
+
+    log.debug("LLM response could not be parsed, using fallback", {
+      responseLength: rawResponse.length,
+    });
+    return createFallbackSummary(transcript);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    log.error(`Failed to generate structured summary: ${message}`);
+    return createFallbackSummary(transcript);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Markdown formatting
+// ---------------------------------------------------------------------------
+
+/**
+ * Format a StructuredSummary as a markdown document with YAML frontmatter,
+ * suitable for appending to a daily memory file.
+ */
+export interface SessionPointer {
+  sessionId: string;
+  sessionsDir: string;
+}
+
+export function formatSummaryAsMarkdown(
+  summary: StructuredSummary,
+  dateStr: string,
+  sessionKey?: string,
+  sessionPointer?: SessionPointer,
+): string {
+  const frontmatter = [
+    "---",
+    `type: session-summary`,
+    `date: ${dateStr}`,
+    `topics: [${summary.topics.join(", ")}]`,
+    `participants: [${summary.participants.join(", ")}]`,
+    "---",
+    "",
+  ].join("\n");
+
+  const sections: string[] = [frontmatter];
+
+  if (sessionKey) {
+    sections.push(`- **Session Key**: ${sessionKey}`, "");
+  }
+
+  if (sessionPointer) {
+    sections.push(
+      `- **Session ID**: ${sessionPointer.sessionId}`,
+      `- **会话目录**: ${sessionPointer.sessionsDir}`,
+      "",
+    );
+  }
+
+  sections.push("## 摘要", "", summary.summary, "");
+
+  if (summary.primaryRequest) {
+    sections.push("## 核心请求", "", summary.primaryRequest, "");
+  }
+
+  if (summary.technicalConcepts && summary.technicalConcepts.length > 0) {
+    sections.push("## 技术概念");
+    for (const c of summary.technicalConcepts) {
+      sections.push(`- ${c}`);
+    }
+    sections.push("");
+  }
+
+  if (summary.filesAndChanges && summary.filesAndChanges.length > 0) {
+    sections.push("## 文件与变更");
+    for (const f of summary.filesAndChanges) {
+      sections.push(`- ${f}`);
+    }
+    sections.push("");
+  }
+
+  if (summary.errorsAndFixes && summary.errorsAndFixes.length > 0) {
+    sections.push("## 错误与修复");
+    for (const e of summary.errorsAndFixes) {
+      sections.push(`- ${e}`);
+    }
+    sections.push("");
+  }
+
+  if (summary.problemSolving && summary.problemSolving.length > 0) {
+    sections.push("## 问题解决");
+    for (const p of summary.problemSolving) {
+      sections.push(`- ${p}`);
+    }
+    sections.push("");
+  }
+
+  if (summary.decisions.length > 0) {
+    sections.push("## 关键决策");
+    for (const d of summary.decisions) {
+      sections.push(`- ${d}`);
+    }
+    sections.push("");
+  }
+
+  if (summary.followups.length > 0) {
+    sections.push("## 待跟进");
+    for (const f of summary.followups) {
+      sections.push(`- [ ] ${f}`);
+    }
+    sections.push("");
+  }
+
+  if (summary.currentWork) {
+    sections.push("## 当前工作", "", summary.currentWork, "");
+  }
+
+  if (summary.nextStep) {
+    sections.push("## 下一步", "", summary.nextStep, "");
+  }
+
+  if (summary.topicSlug) {
+    sections.push(`## 详细记录 → memory/topics/${summary.topicSlug}.md`, "");
+  }
+
+  return sections.join("\n");
+}

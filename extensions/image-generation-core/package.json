@@ -1,0 +1,10 @@
+{
+  "name": "@allbot/image-generation-core",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot image generation runtime package",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  }
+}

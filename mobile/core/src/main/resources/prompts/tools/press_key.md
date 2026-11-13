@@ -1,0 +1,1 @@
+Press a navigation or editing key on the current screen. Allowed: {{keys}} (by name or numeric keycode). Volume, power, home, recents, search, assistant, camera and media keys are rejected. See Calling tools in the system prompt for effect.kind.

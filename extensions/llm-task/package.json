@@ -1,0 +1,19 @@
+{
+  "name": "@allbot/llm-task",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot JSON-only LLM task plugin",
+  "type": "module",
+  "dependencies": {
+    "ajv": "^8.18.0",
+    "typebox": "^1.1"
+  },
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

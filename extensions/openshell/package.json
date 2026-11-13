@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/openshell-sandbox",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot OpenShell sandbox backend",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/tavily",
+  "version": "2026.4.12",
+  "private": true,
+  "description": "AllBot Tavily plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

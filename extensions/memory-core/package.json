@@ -1,0 +1,24 @@
+{
+  "name": "@allbot/memory-core",
+  "version": "2026.4.12",
+  "private": true,
+  "description": "AllBot core memory search plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*",
+    "allbot": "workspace:*"
+  },
+  "peerDependencies": {
+    "allbot": ">=2026.4.12"
+  },
+  "peerDependenciesMeta": {
+    "allbot": {
+      "optional": true
+    }
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

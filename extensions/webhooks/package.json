@@ -1,0 +1,21 @@
+{
+  "name": "@allbot/webhooks",
+  "version": "2026.4.10",
+  "private": true,
+  "description": "AllBot webhook bridge plugin",
+  "type": "module",
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "bundle": {
+      "stageRuntimeDependencies": true
+    },
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

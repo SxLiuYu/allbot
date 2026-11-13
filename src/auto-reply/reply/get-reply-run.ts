@@ -1,0 +1,829 @@
+import crypto from "node:crypto";
+import { resolveSessionAuthProfileOverride } from "../../agents/auth-profiles/session-override.js";
+import type { ExecToolDefaults } from "../../agents/bash-tools.js";
+import { resolveFastModeState } from "../../agents/fast-mode.js";
+import { t } from "../../cli/i18n/translate.js";
+import type { AllBotConfig } from "../../config/config.js";
+import { resolveGroupSessionKey } from "../../config/sessions/group.js";
+import {
+  resolveSessionFilePath,
+  resolveSessionFilePathOptions,
+} from "../../config/sessions/paths.js";
+import { resolveSessionStoreEntry } from "../../config/sessions/store.js";
+import type { SessionEntry } from "../../config/sessions/types.js";
+import { logVerbose } from "../../globals.js";
+import { clearCommandLane, getQueueSize } from "../../process/command-queue.js";
+import { normalizeMainKey } from "../../routing/session-key.js";
+import { getSubagentDepth, isCronSessionKey } from "../../sessions/session-key-utils.js";
+import { normalizeOptionalString } from "../../shared/string-coerce.js";
+import { ownerTasksEnabled } from "../../tasks/owner/config.js";
+import { isReasoningTagProvider } from "../../utils/provider-utils.js";
+import { hasControlCommand } from "../command-detection.js";
+import { resolveEnvelopeFormatOptions } from "../envelope.js";
+import type { MsgContext, TemplateContext } from "../templating.js";
+import {
+  type ElevatedLevel,
+  formatXHighModelHint,
+  normalizeThinkLevel,
+  type ReasoningLevel,
+  supportsXHighThinking,
+  type ThinkLevel,
+  type VerboseLevel,
+} from "../thinking.js";
+import { SILENT_REPLY_TOKEN } from "../tokens.js";
+import type { GetReplyOptions, ReplyPayload } from "../types.js";
+import { applySessionHints } from "./body.js";
+import type { buildCommandContext } from "./commands.js";
+import type { InlineDirectives } from "./directive-handling.js";
+import { shouldUseReplyFastTestRuntime } from "./get-reply-fast-path.js";
+import { resolvePreparedReplyQueueState } from "./get-reply-run-queue.js";
+import { buildGroupChatContext, buildGroupIntro } from "./groups.js";
+import { buildInboundMetaSystemPrompt, buildInboundUserContextPrefix } from "./inbound-meta.js";
+import type { createModelSelectionState } from "./model-selection.js";
+import { resolveOriginMessageProvider } from "./origin-routing.js";
+import { buildReplyPromptBodies } from "./prompt-prelude.js";
+import { resolveActiveRunQueueAction } from "./queue-policy.js";
+import { resolveQueueSettings } from "./queue/settings.js";
+import { buildBareSessionResetPrompt } from "./session-reset-prompt.js";
+import { drainFormattedSystemEvents } from "./session-system-events.js";
+import { resolveTypingMode } from "./typing-mode.js";
+import { resolveRunTypingPolicy } from "./typing-policy.js";
+import type { TypingController } from "./typing.js";
+
+type AgentDefaults = NonNullable<AllBotConfig["agents"]>["defaults"];
+type ExecOverrides = Pick<ExecToolDefaults, "host" | "security" | "ask" | "node">;
+
+export function buildExecOverridePromptHint(params: {
+  execOverrides?: ExecOverrides;
+  elevatedLevel: ElevatedLevel;
+}): string | undefined {
+  const exec = params.execOverrides;
+  if (!exec && params.elevatedLevel === "off") {
+    return undefined;
+  }
+  const parts = [
+    exec?.host ? `host=${exec.host}` : undefined,
+    exec?.security ? `security=${exec.security}` : undefined,
+    exec?.ask ? `ask=${exec.ask}` : undefined,
+    exec?.node ? `node=${exec.node}` : undefined,
+  ].filter(Boolean);
+  const execLine =
+    parts.length > 0
+      ? `Current session exec defaults: ${parts.join(" ")}.`
+      : "Current session exec defaults: inherited from configured agent/global defaults.";
+  const elevatedLine = `Current elevated level: ${params.elevatedLevel}.`;
+  return [
+    "## Current Exec Session State",
+    execLine,
+    elevatedLine,
+    "If the user asks to run a command, use the current exec state above. Do not assume a prior denial still applies after `/exec` or `/elevated` changed.",
+  ].join("\n");
+}
+
+let piEmbeddedRuntimePromise: Promise<typeof import("../../agents/pi-embedded.runtime.js")> | null =
+  null;
+let agentRunnerRuntimePromise: Promise<typeof import("./agent-runner.runtime.js")> | null = null;
+let sessionUpdatesRuntimePromise: Promise<typeof import("./session-updates.runtime.js")> | null =
+  null;
+let sessionStoreRuntimePromise: Promise<
+  typeof import("../../config/sessions/store.runtime.js")
+> | null = null;
+
+function loadPiEmbeddedRuntime() {
+  piEmbeddedRuntimePromise ??= import("../../agents/pi-embedded.runtime.js");
+  return piEmbeddedRuntimePromise;
+}
+
+function loadAgentRunnerRuntime() {
+  agentRunnerRuntimePromise ??= import("./agent-runner.runtime.js");
+  return agentRunnerRuntimePromise;
+}
+
+function loadSessionUpdatesRuntime() {
+  sessionUpdatesRuntimePromise ??= import("./session-updates.runtime.js");
+  return sessionUpdatesRuntimePromise;
+}
+
+function loadSessionStoreRuntime() {
+  sessionStoreRuntimePromise ??= import("../../config/sessions/store.runtime.js");
+  return sessionStoreRuntimePromise;
+}
+
+type RunPreparedReplyParams = {
+  ctx: MsgContext;
+  sessionCtx: TemplateContext;
+  cfg: AllBotConfig;
+  agentId: string;
+  agentDir: string;
+  agentCfg: AgentDefaults;
+  sessionCfg: AllBotConfig["session"];
+  commandAuthorized: boolean;
+  command: ReturnType<typeof buildCommandContext>;
+  commandSource?: string;
+  allowTextCommands: boolean;
+  directives: InlineDirectives;
+  defaultActivation: Parameters<typeof buildGroupIntro>[0]["defaultActivation"];
+  resolvedThinkLevel: ThinkLevel | undefined;
+  resolvedVerboseLevel: VerboseLevel | undefined;
+  resolvedReasoningLevel: ReasoningLevel;
+  resolvedElevatedLevel: ElevatedLevel;
+  execOverrides?: ExecOverrides;
+  elevatedEnabled: boolean;
+  elevatedAllowed: boolean;
+  blockStreamingEnabled: boolean;
+  blockReplyChunking?: {
+    minChars: number;
+    maxChars: number;
+    breakPreference: "paragraph" | "newline" | "sentence";
+    flushOnParagraph?: boolean;
+  };
+  resolvedBlockStreamingBreak: "text_end" | "message_end";
+  modelState: Awaited<ReturnType<typeof createModelSelectionState>>;
+  provider: string;
+  model: string;
+  perMessageQueueMode?: InlineDirectives["queueMode"];
+  perMessageQueueOptions?: {
+    debounceMs?: number;
+    cap?: number;
+    dropPolicy?: InlineDirectives["dropPolicy"];
+  };
+  typing: TypingController;
+  opts?: GetReplyOptions;
+  defaultProvider: string;
+  defaultModel: string;
+  timeoutMs: number;
+  isNewSession: boolean;
+  resetTriggered: boolean;
+  systemSent: boolean;
+  sessionEntry?: SessionEntry;
+  sessionStore?: Record<string, SessionEntry>;
+  sessionKey: string;
+  sessionId?: string;
+  storePath?: string;
+  workspaceDir: string;
+  abortedLastRun: boolean;
+};
+
+export async function runPreparedReply(
+  params: RunPreparedReplyParams,
+): Promise<ReplyPayload | ReplyPayload[] | undefined> {
+  const {
+    ctx,
+    sessionCtx,
+    cfg,
+    agentId,
+    agentDir,
+    agentCfg,
+    sessionCfg,
+    commandAuthorized,
+    command,
+    allowTextCommands,
+    directives,
+    defaultActivation,
+    elevatedEnabled,
+    elevatedAllowed,
+    blockStreamingEnabled,
+    blockReplyChunking,
+    resolvedBlockStreamingBreak,
+    modelState,
+    provider,
+    model,
+    perMessageQueueMode,
+    perMessageQueueOptions,
+    typing,
+    opts,
+    defaultModel,
+    timeoutMs,
+    isNewSession,
+    resetTriggered,
+    systemSent,
+    sessionKey,
+    sessionId,
+    storePath,
+    workspaceDir,
+    sessionStore,
+  } = params;
+  let {
+    sessionEntry,
+    resolvedThinkLevel,
+    resolvedVerboseLevel,
+    resolvedReasoningLevel,
+    resolvedElevatedLevel,
+    execOverrides,
+    abortedLastRun,
+  } = params;
+  const useFastReplyRuntime = shouldUseReplyFastTestRuntime({
+    cfg,
+    isFastTestEnv: process.env.ALLBOT_TEST_FAST === "1",
+  });
+  let currentSystemSent = systemSent;
+
+  const isFirstTurnInSession = isNewSession || !currentSystemSent;
+  const isGroupChat = sessionCtx.ChatType === "group";
+  const wasMentioned = ctx.WasMentioned === true;
+  const isHeartbeat = opts?.isHeartbeat === true;
+  const { typingPolicy, suppressTyping } = resolveRunTypingPolicy({
+    requestedPolicy: opts?.typingPolicy,
+    suppressTyping: opts?.suppressTyping === true,
+    isHeartbeat,
+    originatingChannel: ctx.OriginatingChannel,
+  });
+  const typingMode = resolveTypingMode({
+    configured: sessionCfg?.typingMode ?? agentCfg?.typingMode,
+    isGroupChat,
+    wasMentioned,
+    isHeartbeat,
+    typingPolicy,
+    suppressTyping,
+  });
+  const shouldInjectGroupIntro = Boolean(
+    isGroupChat && (isFirstTurnInSession || sessionEntry?.groupActivationNeedsSystemIntro),
+  );
+  // Always include persistent group chat context (name, participants, reply guidance)
+  const groupChatContext = isGroupChat ? buildGroupChatContext({ sessionCtx }) : "";
+  // Behavioral intro (activation mode, lurking, etc.) only on first turn / activation needed
+  const groupIntro = shouldInjectGroupIntro
+    ? buildGroupIntro({
+        cfg,
+        sessionCtx,
+        sessionEntry,
+        defaultActivation,
+        silentToken: SILENT_REPLY_TOKEN,
+      })
+    : "";
+  const groupSystemPrompt = normalizeOptionalString(sessionCtx.GroupSystemPrompt) ?? "";
+  const inboundMetaPrompt = buildInboundMetaSystemPrompt(
+    isNewSession ? sessionCtx : { ...sessionCtx, ThreadStarterBody: undefined },
+    { includeFormattingHints: !useFastReplyRuntime },
+  );
+  const extraSystemPromptParts = [
+    inboundMetaPrompt,
+    groupChatContext,
+    groupIntro,
+    groupSystemPrompt,
+    buildExecOverridePromptHint({
+      execOverrides,
+      elevatedLevel: resolvedElevatedLevel,
+    }),
+  ].filter(Boolean);
+  const baseBody = sessionCtx.BodyStripped ?? sessionCtx.Body ?? "";
+  // Use CommandBody/RawBody for bare reset detection (clean message without structural context).
+  const rawBodyTrimmed = (ctx.CommandBody ?? ctx.RawBody ?? ctx.Body ?? "").trim();
+
+  // Cognitive layer: classify mode, load persona, inject context into system prompt.
+  let cognitivePersona: import("../../cognitive/types.js").PersonaTree | undefined;
+  let corrections: import("../../cognitive/correction/types.js").CorrectionRecord[] | undefined;
+  try {
+    const { buildCognitiveModePrompt, shouldBuildHandshake } =
+      await import("../../cognitive/context-writer.js");
+    const { looksLikeImperativeInjection } = await import("../../cognitive/insight/llm-engine.js");
+    const { PersonaStore } = await import("../../cognitive/persona/store.js");
+    const { resolveConfigDir } = await import("../../utils.js");
+    const cognitiveCfg = cfg.cognitive;
+    const userId = sessionCtx.SenderId;
+    if (userId) {
+      const store = new PersonaStore(resolveConfigDir());
+      cognitivePersona = await store.load(agentId, userId);
+    }
+    try {
+      if (cognitiveCfg?.correction?.enabled !== false) {
+        const { CorrectionStore } = await import("../../cognitive/correction/store.js");
+        if (userId) {
+          const corrStore = new CorrectionStore(resolveConfigDir());
+          corrections = await corrStore.listActive(agentId, userId);
+        }
+      }
+    } catch {}
+    const { prompt: cognitivePrompt, classification: cognitiveClassification } =
+      buildCognitiveModePrompt({
+        message: rawBodyTrimmed,
+        cognitiveEnabled: cognitiveCfg?.enabled,
+        evolutionEnabled: cognitiveCfg?.evolution?.enabled !== false,
+        persona: cognitivePersona,
+        corrections,
+        pendingInsightDelivery: cognitivePersona?.feedbackProfile.pendingInsightDelivery ?? null,
+        handshakeConfig: cognitiveCfg?.handshake,
+      });
+    if (cognitivePrompt) {
+      extraSystemPromptParts.push(cognitivePrompt);
+    }
+
+    // Clear the pending insight only when the handshake section actually
+    // carried its cue into this turn's prompt. Clearing unconditionally would
+    // silently consume the undelivered insight for users who return within
+    // minGapHours of their last interaction; when the cue was dropped by the
+    // imperative-injection filter, the pending stays for the 24h TTL instead
+    // (security drop must not re-arm delivery, but also must not wipe state
+    // the filter flagged only tentatively).
+    const pendingInsight = cognitivePersona?.feedbackProfile.pendingInsightDelivery;
+    if (
+      cognitivePersona &&
+      pendingInsight &&
+      userId &&
+      shouldBuildHandshake(cognitivePersona, cognitiveCfg?.handshake) &&
+      !looksLikeImperativeInjection(pendingInsight.candidate.content)
+    ) {
+      const store = new PersonaStore(resolveConfigDir());
+      await store.update(agentId, userId, (persona) => {
+        persona.feedbackProfile.pendingInsightDelivery = null;
+        return persona;
+      });
+    }
+
+    if (cognitiveCfg?.enabled !== false) {
+      const { buildContextManifest } = await import("../../cognitive/context-manifest.js");
+      const manifest = buildContextManifest({
+        classification: cognitiveClassification,
+        persona: cognitivePersona,
+        selectedCorrections: corrections ?? [],
+        totalCorrectionsAvailable: corrections?.length ?? 0,
+        evolutionEnabled: cognitiveCfg?.evolution?.enabled !== false,
+      });
+      logVerbose(
+        `context manifest: mode=${manifest.mode} persona=${manifest.personaActive} corrections=${manifest.correctionsInjected}/${manifest.correctionsAvailable} evolution=${manifest.evolutionSectionActive}`,
+      );
+    }
+
+    // Soul preset onboarding: first conversation, no persona yet, no soul preset configured.
+    const isSoulOnboardingNeeded = !cognitivePersona && isFirstTurnInSession && userId;
+    if (isSoulOnboardingNeeded) {
+      const { readConfigFileSnapshot } = await import("../../config/config.js");
+      const snapshot = await readConfigFileSnapshot();
+      const hasSoulPreset = Boolean(snapshot.resolved?.agents?.list?.some((a) => a.soul?.preset));
+      if (!hasSoulPreset) {
+        extraSystemPromptParts.push(
+          [
+            "## Soul Preset Selection",
+            "This is the user's first conversation with you. Before responding to their message, briefly introduce yourself and invite them to choose a soul preset.",
+            "Explain that a soul preset defines your personality and behavioral style. Present these options naturally in conversation (not as a raw list):",
+            ...[
+              ["intj", "strategic, systems-thinking, counter-evidence first"],
+              ["intp", "analytical, multi-hypothesis, confidence labels"],
+              ["entj", "decisive, actionable plans with timelines"],
+              ["entp", "must challenge user's arguments, no echo chamber"],
+              ["infj", "Socratic questioning, emotional intelligence"],
+              ["infp", "unconventional solutions, cross-domain creativity"],
+              ["enfj", "adaptive teaching, verify understanding"],
+              ["enfp", "enthusiastic, cross-domain connections"],
+              ["istj", "fact-verified, source-cited, process-oriented"],
+              ["isfj", "anticipates needs, reliable, detail-oriented"],
+              ["estj", "goal-tracking, reject vague objectives"],
+              ["esfj", "relationship-aware, consensus-building"],
+              ["istp", "code quality focus, complexity watchdog"],
+              ["isfp", "offers options, subjective/objective separated"],
+              ["estp", "fastest path, experiment-first, risk-aware"],
+              ["esfp", "engaging delivery, story-driven, fun"],
+            ].map(
+              ([key, traits]) =>
+                `- ${key.toUpperCase()} ${t(`cli.soul.preset.${key}`)} — ${traits}`,
+            ),
+            "If they choose one, call the switch_soul tool with the preset key (e.g., 'intj'). If they say they don't want to choose, respect that and proceed normally. Keep it brief — don't overwhelm.",
+          ].join("\n"),
+        );
+      }
+    }
+  } catch {
+    // Cognitive layer failure must not block the agent turn.
+  }
+
+  // Owner task summary: Router sessions only, active work only, capped at 8
+  // entries by the builder. No worker transcripts or artifact contents.
+  if (
+    ownerTasksEnabled(cfg) &&
+    !isGroupChat &&
+    getSubagentDepth(sessionKey) === 0 &&
+    !isCronSessionKey(sessionKey)
+  ) {
+    try {
+      const { listOwnerTasks } = await import("../../tasks/owner/actions.js");
+      const { buildOwnerTaskSummarySection } = await import("../../tasks/owner/summary.js");
+      const tasks = await listOwnerTasks({ ownerId: "", sessionKey });
+      const section = buildOwnerTaskSummarySection(tasks);
+      if (section) {
+        extraSystemPromptParts.push(section);
+      }
+    } catch {
+      // Task summary failure must not block the agent turn.
+    }
+  }
+
+  const baseBodyTrimmedRaw = baseBody.trim();
+  const isWholeMessageCommand = command.commandBodyNormalized.trim() === rawBodyTrimmed;
+  const isResetOrNewCommand = /^\/(new|reset)(?:\s|$)/.test(rawBodyTrimmed);
+  if (
+    allowTextCommands &&
+    (!commandAuthorized || !command.isAuthorizedSender) &&
+    isWholeMessageCommand &&
+    (hasControlCommand(rawBodyTrimmed, cfg) || isResetOrNewCommand)
+  ) {
+    typing.cleanup();
+    return undefined;
+  }
+  const isBareNewOrReset = rawBodyTrimmed === "/new" || rawBodyTrimmed === "/reset";
+  const isBareSessionReset =
+    isNewSession &&
+    ((baseBodyTrimmedRaw.length === 0 && rawBodyTrimmed.length > 0) || isBareNewOrReset);
+  if (isBareSessionReset) {
+    try {
+      const { buildAutoRecallContext } = await import("./auto-recall.js");
+      const recallContext = await buildAutoRecallContext({
+        cfg,
+        agentId,
+        persona: cognitivePersona,
+      });
+      if (recallContext) {
+        extraSystemPromptParts.unshift(recallContext);
+      }
+    } catch {
+      // Auto-recall failure must not block session startup.
+    }
+  }
+
+  // Inject lark-cli profile hint so the agent uses --profile for multi-bot setups.
+  const accountId = sessionCtx.AccountId;
+  if (accountId) {
+    extraSystemPromptParts.push(
+      `## Lark CLI Profile\nYou are operating as feishu bot account "${accountId}". When using any lark-cli command, always add \`--profile ${accountId}\` to ensure the correct bot credentials are used.`,
+    );
+  }
+
+  const baseBodyFinal = isBareSessionReset ? buildBareSessionResetPrompt(cfg) : baseBody;
+  const envelopeOptions = resolveEnvelopeFormatOptions(cfg);
+  const inboundUserContext = buildInboundUserContextPrefix(
+    isNewSession
+      ? {
+          ...sessionCtx,
+          ...(normalizeOptionalString(sessionCtx.ThreadHistoryBody)
+            ? { InboundHistory: undefined, ThreadStarterBody: undefined }
+            : {}),
+        }
+      : { ...sessionCtx, ThreadStarterBody: undefined },
+    envelopeOptions,
+  );
+  const baseBodyForPrompt = isBareSessionReset
+    ? baseBodyFinal
+    : [inboundUserContext, baseBodyFinal].filter(Boolean).join("\n\n");
+  const baseBodyTrimmed = baseBodyForPrompt.trim();
+  const hasMediaAttachment = Boolean(
+    sessionCtx.MediaPath || (sessionCtx.MediaPaths && sessionCtx.MediaPaths.length > 0),
+  );
+  if (!baseBodyTrimmed && !hasMediaAttachment) {
+    await typing.onReplyStart();
+    logVerbose("Inbound body empty after normalization; skipping agent run");
+    typing.cleanup();
+    return {
+      text: "I didn't receive any text in your message. Please resend or add a caption.",
+    };
+  }
+  // When the user sends media without text, provide a minimal body so the agent
+  // run proceeds and the image/document is injected by the embedded runner.
+  const effectiveBaseBody = baseBodyTrimmed
+    ? baseBodyForPrompt
+    : "[User sent media without caption]";
+  let prefixedBodyBase = await applySessionHints({
+    baseBody: effectiveBaseBody,
+    abortedLastRun,
+    sessionEntry,
+    sessionStore,
+    sessionKey,
+    storePath,
+    abortKey: command.abortKey,
+  });
+  const isGroupSession = sessionEntry?.chatType === "group" || sessionEntry?.chatType === "channel";
+  const isMainSession = !isGroupSession && sessionKey === normalizeMainKey(sessionCfg?.mainKey);
+  // Extract first-token think hint from the user body BEFORE prepending system events.
+  // If done after, the System: prefix becomes parts[0] and silently shadows any
+  // low|medium|high shorthand the user typed.
+  if (!resolvedThinkLevel && prefixedBodyBase) {
+    const parts = prefixedBodyBase.split(/\s+/);
+    const maybeLevel = normalizeThinkLevel(parts[0]);
+    if (maybeLevel && (maybeLevel !== "xhigh" || supportsXHighThinking(provider, model))) {
+      resolvedThinkLevel = maybeLevel;
+      prefixedBodyBase = parts.slice(1).join(" ").trim();
+    }
+  }
+  const prefixedBodyCore = prefixedBodyBase;
+  const threadStarterBody = normalizeOptionalString(ctx.ThreadStarterBody);
+  const threadHistoryBody = normalizeOptionalString(ctx.ThreadHistoryBody);
+  const threadContextNote = threadHistoryBody
+    ? `[Thread history - for context]\n${threadHistoryBody}`
+    : threadStarterBody
+      ? `[Thread starter - for context]\n${threadStarterBody}`
+      : undefined;
+  const drainedSystemEventBlocks: string[] = [];
+  const rebuildPromptBodies = async (): Promise<{
+    prefixedCommandBody: string;
+    queuedBody: string;
+  }> => {
+    if (!useFastReplyRuntime) {
+      const eventsBlock = await drainFormattedSystemEvents({
+        cfg,
+        sessionKey,
+        isMainSession,
+        isNewSession,
+      });
+      if (eventsBlock) {
+        drainedSystemEventBlocks.push(eventsBlock);
+      }
+    }
+    return buildReplyPromptBodies({
+      ctx,
+      sessionCtx,
+      effectiveBaseBody,
+      prefixedBody: prefixedBodyCore,
+      threadContextNote,
+      systemEventBlocks: drainedSystemEventBlocks,
+    });
+  };
+  const skillResult =
+    process.env.ALLBOT_TEST_FAST === "1"
+      ? {
+          sessionEntry,
+          skillsSnapshot: sessionEntry?.skillsSnapshot,
+          systemSent: currentSystemSent,
+        }
+      : await (async () => {
+          const { ensureSkillSnapshot } = await loadSessionUpdatesRuntime();
+          return ensureSkillSnapshot({
+            sessionEntry,
+            sessionStore,
+            sessionKey,
+            storePath,
+            sessionId,
+            isFirstTurnInSession,
+            workspaceDir,
+            cfg,
+            skillFilter: opts?.skillFilter,
+          });
+        })();
+  sessionEntry = skillResult.sessionEntry ?? sessionEntry;
+  currentSystemSent = skillResult.systemSent;
+  const skillsSnapshot = skillResult.skillsSnapshot;
+  let { prefixedCommandBody, queuedBody } = await rebuildPromptBodies();
+  if (!resolvedThinkLevel) {
+    resolvedThinkLevel = await modelState.resolveDefaultThinkingLevel();
+  }
+  if (resolvedThinkLevel === "xhigh" && !supportsXHighThinking(provider, model)) {
+    const explicitThink = directives.hasThinkDirective && directives.thinkLevel !== undefined;
+    if (explicitThink) {
+      typing.cleanup();
+      return {
+        text: `Thinking level "xhigh" is only supported for ${formatXHighModelHint()}. Use /think high or switch to one of those models.`,
+      };
+    }
+    resolvedThinkLevel = "high";
+    if (sessionEntry && sessionStore && sessionKey && sessionEntry.thinkingLevel === "xhigh") {
+      sessionEntry.thinkingLevel = "high";
+      sessionEntry.updatedAt = Date.now();
+      sessionStore[sessionKey] = sessionEntry;
+      if (storePath) {
+        const { updateSessionStore } = await loadSessionStoreRuntime();
+        await updateSessionStore(storePath, (store) => {
+          store[sessionKey] = sessionEntry;
+        });
+      }
+    }
+  }
+  const sessionIdFinal = sessionId ?? crypto.randomUUID();
+  const sessionFilePathOptions = resolveSessionFilePathOptions({ agentId, storePath });
+  const resolvePreparedSessionState = (): {
+    sessionEntry: SessionEntry | undefined;
+    sessionId: string;
+    sessionFile: string;
+  } => {
+    const latestSessionEntry =
+      sessionStore && sessionKey
+        ? (resolveSessionStoreEntry({
+            store: sessionStore,
+            sessionKey,
+          }).existing ?? sessionEntry)
+        : sessionEntry;
+    const latestSessionId = latestSessionEntry?.sessionId ?? sessionIdFinal;
+    return {
+      sessionEntry: latestSessionEntry,
+      sessionId: latestSessionId,
+      sessionFile: resolveSessionFilePath(
+        latestSessionId,
+        latestSessionEntry,
+        sessionFilePathOptions,
+      ),
+    };
+  };
+  let preparedSessionState = resolvePreparedSessionState();
+  const resolvedQueue = useFastReplyRuntime
+    ? {
+        mode: "collect" as const,
+        debounceMs: 0,
+        cap: 1,
+        dropPolicy: "summarize" as const,
+      }
+    : resolveQueueSettings({
+        cfg,
+        channel: sessionCtx.Provider,
+        sessionEntry,
+        inlineMode: perMessageQueueMode,
+        inlineOptions: perMessageQueueOptions,
+      });
+  const piRuntime = useFastReplyRuntime ? null : await loadPiEmbeddedRuntime();
+  const sessionLaneKey = piRuntime
+    ? piRuntime.resolveEmbeddedSessionLane(sessionKey ?? sessionIdFinal)
+    : undefined;
+  const laneSize = sessionLaneKey ? getQueueSize(sessionLaneKey) : 0;
+  if (resolvedQueue.mode === "interrupt" && sessionLaneKey && laneSize > 0) {
+    const cleared = clearCommandLane(sessionLaneKey);
+    const activeSessionId = piRuntime?.resolveActiveEmbeddedRunSessionId(sessionKey);
+    const aborted = piRuntime?.abortEmbeddedPiRun(
+      activeSessionId ?? preparedSessionState.sessionId,
+    );
+    logVerbose(`Interrupting ${sessionLaneKey} (cleared ${cleared}, aborted=${aborted})`);
+  }
+  let authProfileId = useFastReplyRuntime
+    ? undefined
+    : await resolveSessionAuthProfileOverride({
+        cfg,
+        provider,
+        agentDir,
+        sessionEntry: preparedSessionState.sessionEntry,
+        sessionStore,
+        sessionKey,
+        storePath,
+        isNewSession,
+      });
+  const { runReplyAgent } = await loadAgentRunnerRuntime();
+  const queueKey = sessionKey ?? sessionIdFinal;
+  preparedSessionState = resolvePreparedSessionState();
+  const resolveActiveQueueSessionId = () =>
+    piRuntime?.resolveActiveEmbeddedRunSessionId(sessionKey) ?? preparedSessionState.sessionId;
+  const resolveQueueBusyState = () => {
+    const activeSessionId = resolveActiveQueueSessionId();
+    if (!activeSessionId || !piRuntime) {
+      return { activeSessionId: undefined, isActive: false, isStreaming: false };
+    }
+    return {
+      activeSessionId,
+      isActive: piRuntime.isEmbeddedPiRunActive(activeSessionId),
+      isStreaming: piRuntime.isEmbeddedPiRunStreaming(activeSessionId),
+    };
+  };
+  let { activeSessionId, isActive, isStreaming } = resolveQueueBusyState();
+  const shouldSteer = resolvedQueue.mode === "steer" || resolvedQueue.mode === "steer-backlog";
+  const shouldFollowup =
+    resolvedQueue.mode === "followup" ||
+    resolvedQueue.mode === "collect" ||
+    resolvedQueue.mode === "steer-backlog";
+  const activeRunQueueAction = resolveActiveRunQueueAction({
+    isActive,
+    isHeartbeat: opts?.isHeartbeat === true,
+    shouldFollowup,
+    queueMode: resolvedQueue.mode,
+  });
+  if (isActive && activeRunQueueAction === "run-now") {
+    const queueState = await resolvePreparedReplyQueueState({
+      activeRunQueueAction,
+      activeSessionId: activeSessionId ?? resolveActiveQueueSessionId(),
+      queueMode: resolvedQueue.mode,
+      sessionKey,
+      sessionId: sessionIdFinal,
+      abortActiveRun: (activeRunSessionId) =>
+        piRuntime?.abortEmbeddedPiRun(activeRunSessionId) ?? false,
+      waitForActiveRunEnd: (activeRunSessionId) =>
+        piRuntime?.waitForEmbeddedPiRunEnd(activeRunSessionId) ?? Promise.resolve(undefined),
+      refreshPreparedState: async () => {
+        preparedSessionState = resolvePreparedSessionState();
+        authProfileId = useFastReplyRuntime
+          ? undefined
+          : await resolveSessionAuthProfileOverride({
+              cfg,
+              provider,
+              agentDir,
+              sessionEntry: preparedSessionState.sessionEntry,
+              sessionStore,
+              sessionKey,
+              storePath,
+              isNewSession,
+            });
+        preparedSessionState = resolvePreparedSessionState();
+        ({ prefixedCommandBody, queuedBody } = await rebuildPromptBodies());
+      },
+      resolveBusyState: resolveQueueBusyState,
+    });
+    if (queueState.kind === "reply") {
+      typing.cleanup();
+      return queueState.reply;
+    }
+    ({ activeSessionId, isActive, isStreaming } = queueState.busyState);
+  }
+  const authProfileIdSource = preparedSessionState.sessionEntry?.authProfileOverrideSource;
+  const followupRun = {
+    prompt: queuedBody,
+    messageId: sessionCtx.MessageSidFull ?? sessionCtx.MessageSid,
+    summaryLine: baseBodyTrimmedRaw,
+    enqueuedAt: Date.now(),
+    // Originating channel for reply routing.
+    originatingChannel: ctx.OriginatingChannel,
+    originatingTo: ctx.OriginatingTo,
+    originatingAccountId: sessionCtx.AccountId,
+    originatingThreadId: ctx.MessageThreadId,
+    originatingChatType: ctx.ChatType,
+    run: {
+      agentId,
+      agentDir,
+      sessionId: preparedSessionState.sessionId,
+      sessionKey,
+      messageProvider: resolveOriginMessageProvider({
+        originatingChannel: ctx.OriginatingChannel ?? sessionCtx.OriginatingChannel,
+        // Prefer Provider over Surface for fallback channel identity.
+        // Surface can carry relayed metadata (for example "webchat") while Provider
+        // still reflects the active channel that should own tool routing.
+        provider: ctx.Provider ?? ctx.Surface ?? sessionCtx.Provider,
+      }),
+      agentAccountId: sessionCtx.AccountId,
+      groupId: resolveGroupSessionKey(sessionCtx)?.id ?? undefined,
+      groupChannel:
+        normalizeOptionalString(sessionCtx.GroupChannel) ??
+        normalizeOptionalString(sessionCtx.GroupSubject),
+      groupSpace: normalizeOptionalString(sessionCtx.GroupSpace),
+      senderId: normalizeOptionalString(sessionCtx.SenderId),
+      senderName: normalizeOptionalString(sessionCtx.SenderName),
+      senderUsername: normalizeOptionalString(sessionCtx.SenderUsername),
+      senderE164: normalizeOptionalString(sessionCtx.SenderE164),
+      senderIsOwner: command.senderIsOwner,
+      sessionFile: preparedSessionState.sessionFile,
+      transient: preparedSessionState.sessionEntry?.transient,
+      workspaceDir,
+      config: cfg,
+      skillsSnapshot,
+      provider,
+      model,
+      authProfileId,
+      authProfileIdSource,
+      thinkLevel: resolvedThinkLevel,
+      fastMode: useFastReplyRuntime
+        ? false
+        : resolveFastModeState({
+            cfg,
+            provider,
+            model,
+            agentId,
+            sessionEntry: preparedSessionState.sessionEntry,
+          }).enabled,
+      verboseLevel: resolvedVerboseLevel,
+      reasoningLevel: resolvedReasoningLevel,
+      elevatedLevel: resolvedElevatedLevel,
+      execOverrides,
+      bashElevated: {
+        enabled: elevatedEnabled,
+        allowed: elevatedAllowed,
+        defaultLevel: resolvedElevatedLevel ?? "off",
+      },
+      timeoutMs,
+      blockReplyBreak: resolvedBlockStreamingBreak,
+      ownerNumbers: command.ownerList.length > 0 ? command.ownerList : undefined,
+      inputProvenance: ctx.InputProvenance ?? sessionCtx.InputProvenance,
+      extraSystemPrompt: extraSystemPromptParts.join("\n\n") || undefined,
+      skipProviderRuntimeHints: useFastReplyRuntime,
+      ...(!useFastReplyRuntime &&
+      isReasoningTagProvider(provider, {
+        config: cfg,
+        workspaceDir,
+        modelId: model,
+      })
+        ? { enforceFinalTag: true }
+        : {}),
+    },
+  };
+
+  return runReplyAgent({
+    commandBody: prefixedCommandBody,
+    followupRun,
+    queueKey,
+    resolvedQueue,
+    shouldSteer,
+    shouldFollowup,
+    isActive,
+    isRunActive: () => {
+      const latestSessionState = resolvePreparedSessionState();
+      const latestActiveSessionId =
+        piRuntime?.resolveActiveEmbeddedRunSessionId(sessionKey) ?? latestSessionState.sessionId;
+      return piRuntime?.isEmbeddedPiRunActive(latestActiveSessionId) ?? false;
+    },
+    isStreaming,
+    opts,
+    typing,
+    sessionEntry: preparedSessionState.sessionEntry,
+    sessionStore,
+    sessionKey,
+    storePath,
+    defaultModel,
+    agentCfgContextTokens: agentCfg?.contextTokens,
+    resolvedVerboseLevel: resolvedVerboseLevel ?? "off",
+    isNewSession,
+    blockStreamingEnabled,
+    blockReplyChunking,
+    resolvedBlockStreamingBreak,
+    sessionCtx,
+    shouldInjectGroupIntro,
+    typingMode,
+    resetTriggered,
+  });
+}

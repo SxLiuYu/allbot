@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/zai-provider",
+  "version": "2026.5.22",
+  "private": true,
+  "description": "AllBot Z.AI provider plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@allbot/argo",
+  "version": "2026.11.6",
+  "private": true,
+  "description": "AllBot Argo search plugin",
+  "type": "module",
+  "devDependencies": {
+    "@allbot/plugin-sdk": "workspace:*"
+  },
+  "allbot": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

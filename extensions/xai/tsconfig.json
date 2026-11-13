@@ -1,0 +1,75 @@
+{
+  "extends": "../tsconfig.package-boundary.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "paths": {
+      "allbot/extension-api": ["../../src/extensionAPI.ts"],
+      "allbot/plugin-sdk": ["../../dist/plugin-sdk/src/plugin-sdk/index.d.ts"],
+      "allbot/plugin-sdk/*": ["../../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
+      "allbot/plugin-sdk/account-id": ["../../dist/plugin-sdk/src/plugin-sdk/account-id.d.ts"],
+      "allbot/plugin-sdk/channel-entry-contract": [
+        "../../dist/plugin-sdk/src/plugin-sdk/channel-entry-contract.d.ts"
+      ],
+      "allbot/plugin-sdk/browser-maintenance": [
+        "../../dist/plugin-sdk/src/plugin-sdk/browser-maintenance.d.ts"
+      ],
+      "allbot/plugin-sdk/browser-config-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/browser-config-runtime.d.ts"
+      ],
+      "allbot/plugin-sdk/browser-node-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/browser-node-runtime.d.ts"
+      ],
+      "allbot/plugin-sdk/browser-setup-tools": [
+        "../../dist/plugin-sdk/src/plugin-sdk/browser-setup-tools.d.ts"
+      ],
+      "allbot/plugin-sdk/browser-security-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/browser-security-runtime.d.ts"
+      ],
+      "allbot/plugin-sdk/channel-secret-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/channel-secret-runtime.d.ts"
+      ],
+      "allbot/plugin-sdk/channel-streaming": [
+        "../../dist/plugin-sdk/src/plugin-sdk/channel-streaming.d.ts"
+      ],
+      "allbot/plugin-sdk/cli-runtime": ["../../dist/plugin-sdk/src/plugin-sdk/cli-runtime.d.ts"],
+      "allbot/plugin-sdk/error-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/error-runtime.d.ts"
+      ],
+      "allbot/plugin-sdk/provider-catalog-shared": [
+        "../../dist/plugin-sdk/src/plugin-sdk/provider-catalog-shared.d.ts"
+      ],
+      "allbot/plugin-sdk/provider-env-vars": [
+        "../../dist/plugin-sdk/src/plugin-sdk/provider-env-vars.d.ts"
+      ],
+      "allbot/plugin-sdk/provider-entry": [
+        "../../dist/plugin-sdk/src/plugin-sdk/provider-entry.d.ts"
+      ],
+      "allbot/plugin-sdk/provider-web-search-contract": [
+        "../../dist/plugin-sdk/src/plugin-sdk/provider-web-search-contract.d.ts"
+      ],
+      "allbot/plugin-sdk/secret-ref-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/secret-ref-runtime.d.ts"
+      ],
+      "allbot/plugin-sdk/ssrf-runtime": [
+        "../../dist/plugin-sdk/src/plugin-sdk/ssrf-runtime.d.ts"
+      ],
+      "@allbot/*.js": ["../../packages/plugin-sdk/dist/extensions/*.d.ts", "../*"],
+      "@allbot/*": ["../*"],
+      "@allbot/plugin-sdk/*": ["../../dist/plugin-sdk/src/plugin-sdk/*.d.ts"],
+      "@allbot/anthropic-vertex/api.js": ["./.boundary-stubs/anthropic-vertex-api.d.ts"],
+      "@allbot/ollama/api.js": ["./.boundary-stubs/ollama-api.d.ts"],
+      "@allbot/ollama/runtime-api.js": ["./.boundary-stubs/ollama-runtime-api.d.ts"],
+      "@allbot/speech-core/runtime-api.js": ["./.boundary-stubs/speech-core-runtime-api.d.ts"]
+    }
+  },
+  "include": ["./*.ts", "./src/**/*.ts"],
+  "exclude": [
+    "./**/*.test.ts",
+    "./dist/**",
+    "./node_modules/**",
+    "./src/test-support/**",
+    "./src/**/*test-helpers.ts",
+    "./src/**/*test-harness.ts",
+    "./src/**/*test-support.ts"
+  ]
+}
