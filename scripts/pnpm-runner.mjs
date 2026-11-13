@@ -2,8 +2,14 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { buildCmdExeCommandLine } from "./windows-cmd-helpers.mjs";
 
+/**
+ * `npm_execpath` 只有指向 JS 包装（pnpm.cjs / pnpm-cli.js）时才能交给 node 执行。
+ * Windows 上的 pnpm 安装（含 @pnpm/exe 的独立版）会把它设成 pnpm.exe，那是原生的
+ * PE 二进制，交给 node 会报 "SyntaxError: Invalid or unexpected token"。所以只认
+ * .cjs / .js，其余（.exe / .cmd / 裸名）一律走下面的平台分支。
+ */
 function isPnpmExecPath(value) {
-  return /^pnpm(?:-cli)?(?:\.(?:c?js|cmd|exe))?$/.test(path.basename(value).toLowerCase());
+  return /^pnpm(?:-cli)?\.(?:cjs|js)$/.test(path.basename(value).toLowerCase());
 }
 
 export function resolvePnpmRunner(params = {}) {
