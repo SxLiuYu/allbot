@@ -31,7 +31,27 @@ They talk over HTTP and MCP — not three separate products:
              root  allbot   brain, memory, governance, proactive pushes
 ```
 
-Any one piece runs on its own. Both subdirectories are rebranded snapshots of upstream projects — **no upstream git history** — with provenance and every change recorded in their `VENDOR.md`:
+Any one piece runs on its own. 
+
+### How the three connect
+
+Nothing auto-discovers — you wire it once. The **sync gateway lives on the `voice/` side** (`voice/charlie/app/routes/sync.py`, protocol `mika-relay.v2`); allbot and mobile are its clients:
+
+| Direction | Where you configure it | What |
+|---|---|---|
+| allbot → voice | `tasks.sync` in `allbot.json` | Gateway URL + device token; `src/tasks/sync/adapter.ts` projects OwnerTasks into sync tasks |
+| mobile → allbot | App settings | Just an OpenAI-compatible model endpoint; the phone needs no gateway |
+| mobile → voice | App pairing entry | **Not implemented** — see gaps below |
+
+Start `voice/` first (it brings the gateway up), then allbot with the address filled in. With `tasks.sync` unset the adapter short-circuits and allbot runs standalone.
+
+**Known gaps** (stated plainly — don't count on these):
+
+- `mobile/` has no pairing entry for the sync gateway. `RelayGateway.parse` hard-requires https and there's no SyncTaskClient-style mapping. The phone works today only as a standalone phone agent.
+- `voice/firmware/` holds a README only; the 16MB firmware binary ships via Releases, not git.
+- Two-way call audio is unverified — it needs Volcengine credentials and a human listening.
+
+Both subdirectories are rebranded snapshots of upstream projects — **no upstream git history** — with provenance and every change recorded in their `VENDOR.md`:
 
 - `mobile/` ← [wangzan101/Mika](https://github.com/wangzan101/Mika) @ `2dce3bb4`, Apache-2.0
 - `voice/` ← [Charlie](https://github.com/SxLiuYu/charlie-voice-assistant) @ `710d2c4`, MIT (`voice/Baize/` is Apache-2.0)
@@ -51,7 +71,7 @@ AllBot is different. After a few conversations on Feishu, it starts **reaching o
 | **Correction learning** | None                           | None                        | **Dual-path correction memory** (never makes the same mistake twice)                      |
 | **Deployment**          | Cloud SaaS                     | Cloud SaaS                  | **Cloud / local / Android phone local** (Termux, full agent, not a thin client)           |
 
-> Channel integration: Feishu · WeChat (first-class channels, deep support); 18 additional channels bundled from upstream (Telegram/Discord/Slack etc., not deeply tested). EN/zh CLI / wizard / cognitive prompts auto-switch. 40+ LLM providers pluggable.
+> Channel integration: only **Feishu + WeChat** ship as first-class channels (deep support). Upstream OpenClaw's Telegram/Discord/Slack channels have **no packaged code** in AllBot — their docs are kept under `docs/archive/channels/` for reference only, see `docs/channels/index.md`. EN/zh CLI / wizard / cognitive prompts auto-switch. 40+ LLM providers pluggable.
 
 ## ✨ Core Features
 
@@ -271,7 +291,7 @@ Before you start, you'll need:
 | Requirement           | What for                       | How to get it                                                                                                                                                                                                                                                                          |
 | --------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **LLM API key**       | At least one AI provider's key | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [Qwen](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) — pick one                                                |
-| **Messaging channel** | For sending/receiving messages | [Feishu](https://open.feishu.cn/) (recommended, wizard supports QR-code auto-creation) · [WeChat](./docs/channels/) (first-class channel, run `allbot channels login --channel wechat` to connect) · 18 additional bundled channels (Telegram/Discord/Slack etc., not deeply tested) |
+| **Messaging channel** | For sending/receiving messages | [Feishu](https://open.feishu.cn/) (recommended, wizard supports QR-code auto-creation) · [WeChat](./docs/channels/wechat.md) (first-class channel, run `allbot channels login --channel wechat` to connect) · upstream channels (Telegram/Discord/Slack etc.) have **no packaged code**, docs only |
 
 ### Install (recommended)
 
@@ -313,16 +333,21 @@ npm install -g allbot
 allbot onboard   # Interactive wizard, auto-configures
 ```
 
-> ⚠️ **postinstall behavior**: `npm install allbot` runs a postinstall hook that
-> (1) fetches bundled-extension runtime deps (e.g. `@larksuiteoapi/node-sdk`) into
-> the package root, and (2) installs ~28 lark-cli skills to `~/.agents/skills/` via
-> `npx -y skills add larksuite/cli -g --all`. Both pull third-party npm packages at
-> install time. To skip:
->
-> ```bash
-> ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1 npm install -g allbot   # skip all postinstall
-> ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1 npm install -g allbot          # skip lark-cli skills only
-> ```
+> ⚠️ **That package is not this project**: the `allbot` name on npm belongs to a 2015
+> chatbot framework (`bot-lab/allbot`, 0.1.70). AllBot is **not published to npm yet**,
+> so the command above installs someone else's package. **Build from source for now.**
+
+From source (the only supported path today):
+
+```bash
+git clone https://github.com/SxLiuYu/allbot.git
+cd allbot
+pnpm install
+pnpm build
+node allbot.mjs onboard
+```
+
+After that `node allbot.mjs` is the CLI; use `npm link` or an alias to call it as `allbot`.
 >
 > See `.env.example` for full details.
 
@@ -427,6 +452,40 @@ The cognitive system design draws on the following research:
 ### Open Source Dependencies
 
 [Feishu Open Platform](https://open.feishu.cn/), [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/), [tsdown](https://github.com/nicepkg/tsdown), [Zod](https://zod.dev/).
+
+## Development
+
+The three subprojects have independent toolchains:
+
+```bash
+# root (server)
+pnpm install
+pnpm build              # tsdown, plugin SDK, Control UI
+pnpm test               # full unit suite
+pnpm check              # types + lint + boundary checks
+node scripts/test-projects.mjs src/tasks/sync   # one directory only
+
+# mobile/
+cd mobile
+./gradlew :app:testDebugUnitTest     # JVM unit tests
+./gradlew :app:assembleDebug         # build the APK
+# needs local.properties with sdk.dir=<your Android SDK>
+
+# voice/
+cd voice/charlie
+pip install -r requirements-core.txt
+python -m pytest tests/              # 60+ cases
+```
+
+When touching **upstream code** in `mobile/` or `voice/`: these are upstream snapshots, so pulling from upstream collides with the rebranding and URL rewrites. Merge by hand each time — `mobile/VENDOR.md` and `voice/VENDOR.md` list the conflict points.
+
+Run `pnpm check` (server) or the subproject's tests before committing. `AGENTS.md` holds the repo-level conventions and verification protocol.
+
+## Contributing
+
+- **Report a bug**: [open an issue](https://github.com/SxLiuYu/allbot/issues/new/choose) with the version (`node allbot.mjs --version` or the in-app About page), OS and steps.
+- **Send a change**: fork and open a PR. Keep the three subprojects in separate PRs.
+- **Phone-side issues**: About › Send feedback in the app copies diagnostics you can paste into the issue.
 
 ## License
 

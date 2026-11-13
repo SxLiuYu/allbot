@@ -33,6 +33,24 @@ AllBot 是同一个智能体的三种落地方式，代码在同一个仓库里�
 
 只想用其中一端也行。装了根目录的服务端，`mobile/` 和 `voice/` 都是可选的；只用 `mobile/` 的话，它就是一台能自己操作手机的助手。
 
+### 三端怎么接起来
+
+三端之间不是自动发现的，要手工配一次。**同步网关在 `voice/` 这一侧**（`voice/charlie/app/routes/sync.py`，协议 `mika-relay.v2`），allbot 和 mobile 都是它的客户端：
+
+| 方向 | 谁在哪配 | 配什么 |
+|---|---|---|
+| allbot → voice | `allbot.json` 的 `tasks.sync` | 网关地址 + 设备令牌；`src/tasks/sync/adapter.ts` 负责把 OwnerTask 投影成同步任务 |
+| mobile → allbot | App 的设置页 | 模型端点（OpenAI 兼容）即可；手机端本身不需要同步网关 |
+| mobile → voice | App 的配对入口 | 目前**没有实现**，见下方「已知缺口」 |
+
+先起 `voice/`（它会带上同步网关），再起 allbot 并填上面那张表里的地址。`tasks.sync` 不配时适配器整体短路，allbot 照常单机跑。
+
+**已知缺口**（如实写，别当成能做）：
+
+- `mobile/` 侧没有同步网关的配对入口。App 里 `RelayGateway.parse` 硬要求 https，也没有 SyncTaskClient 之类的映射代码。手机端现在只能当「独立的手机助手」用。
+- `voice/firmware/` 只有 README，16MB 固件 bin 走 Release 分发，不在 git 里。
+- 通话音频双向出声未验证，需要火山（Volcengine）凭证且必须真人听。
+
 两个子目录都是上游项目的品牌改造版，**收录的是快照，不带上游 git 历史**，来源与逐项改动写在各自的 `VENDOR.md` 里：
 
 - `mobile/` ← [wangzan101/Mika](https://github.com/wangzan101/Mika) @ `2dce3bb4`，Apache-2.0
@@ -274,7 +292,7 @@ curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install-termux.sh 
 | 条件            | 说明                     | 获取方式                                                                                                                                                                                                                                  |
 | --------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **LLM API Key** | 至少一个 AI 提供商的密钥 | [DeepSeek](https://platform.deepseek.com/) · [Claude](https://console.anthropic.com/) · [Gemini](https://aistudio.google.com/apikey) · [通义千问](https://dashscope.console.aliyun.com/) · [Kimi](https://platform.moonshot.cn/) 任选其一 |
-| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat)（一等渠道，运行 `allbot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考  |
+| **消息渠道**    | 用于收发消息             | [飞书](https://open.feishu.cn/)（推荐，向导支持扫码自动创建）· [微信](./docs/channels/wechat.md)（一等渠道，运行 `allbot channels login --channel wechat` 接入）· 上游频道（Telegram/Discord/Slack 等）没有打包代码，仅保留文档参考  |
 
 ### 安装（推荐方式）
 
@@ -329,17 +347,21 @@ npm install -g allbot
 allbot onboard   # 交互式向导，自动配置
 ```
 
-> ⚠️ **postinstall 行为说明**：`npm install allbot` 会运行 postinstall 钩子，
-> 它会 (1) 拉取捆绑扩展的运行时依赖（如 `@larksuiteoapi/node-sdk`）到包根，
-> (2) 通过 `npx -y skills add larksuite/cli -g --all` 安装 ~28 个 lark-cli skill 到 `~/.agents/skills/`。
-> 这两步都会在安装时拉取第三方 npm 包。如需跳过：
->
-> ```bash
-> ALLBOT_DISABLE_BUNDLED_PLUGIN_POSTINSTALL=1 npm install -g allbot   # 跳过全部 postinstall
-> ALLBOT_DISABLE_LARK_SKILLS_INSTALL=1 npm install -g allbot          # 仅跳过 lark-cli skills
-> ```
->
-> 详见 `.env.example`。
+> ⚠️ **包名不是这个项目**：npm 上的 [`allbot`](https://www.npmjs.com/package/allbot)
+> 是 2015 年的另一个 chatbot 框架（`bot-lab/allbot`，0.1.70）。本项目尚未发布到 npm，
+> 上面那条命令装的是别人的包。**目前请用下面的从源码安装。**
+
+从源码装（当前唯一受支持的方式）：
+
+```bash
+git clone https://github.com/SxLiuYu/allbot.git
+cd allbot
+pnpm install
+pnpm build
+node allbot.mjs onboard
+```
+
+装好后 `node allbot.mjs` 就是 `allbot` 命令；想全局调用可以 `npm link` 或加 alias。
 
 #### Docker 部署
 
@@ -452,6 +474,40 @@ AllBot 站在 [OpenClaw](https://github.com/openclaw/openclaw)(由 Peter Steinbe
 ### 开源依赖
 
 [飞书开放平台](https://open.feishu.cn/)、[Vitest](https://vitest.dev/)、[Playwright](https://playwright.dev/)、[tsdown](https://github.com/nicepkg/tsdown)、[Zod](https://zod.dev/)。
+
+## 开发
+
+三个子项目的工具链各自独立，互不干扰：
+
+```bash
+# 根目录（服务器端）
+pnpm install
+pnpm build              # 含 tsdown、插件 SDK、控制台 UI
+pnpm test               # 全量单测
+pnpm check              # 类型 + lint + 各类边界检查
+node scripts/test-projects.mjs src/tasks/sync   # 只跑一个目录
+
+# mobile/（手机端）
+cd mobile
+./gradlew :app:testDebugUnitTest     # JVM 单测
+./gradlew :app:assembleDebug         # 出 APK
+# 需要 local.properties 写 sdk.dir=<你的 Android SDK>
+
+# voice/（语音端）
+cd voice/charlie
+pip install -r requirements-core.txt
+python -m pytest tests/              # 60+ 用例
+```
+
+改完 `mobile/` 或 `voice/` 的**上游代码**时注意：这两个目录是上游快照，从上游拉更新会与品牌替换和地址改写冲突，每次都要手工合并，方式和冲突点写在 `mobile/VENDOR.md`、`voice/VENDOR.md`。
+
+提交前请跑 `pnpm check`（服务器端）或对应子项目的测试。`AGENTS.md` 里有仓库级约定与验证协议。
+
+## 参与
+
+- **报问题**：[开 Issue](https://github.com/SxLiuYu/allbot/issues/new/choose)。附上版本（`node allbot.mjs --version` 或 App 的「关于」页）、操作系统、复现步骤。
+- **提改动**：fork 后开 PR。三个子项目分开提，别混在一个 PR 里。
+- **手机端的问题**：App 里「关于 › 反馈问题」能一键复制诊断信息，贴进 Issue 最省事。
 
 ## 许可证
 
