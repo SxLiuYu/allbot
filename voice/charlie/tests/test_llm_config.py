@@ -7,7 +7,35 @@ from unittest.mock import patch
 class TestProviderRegistry:
     def test_providers_has_five_providers(self):
         from app.llm_config import PROVIDERS
-        assert set(PROVIDERS.keys()) == {"agnes", "sagnes", "stepfun", "glm", "ark"}
+        assert set(PROVIDERS.keys()) == {"agnes", "sagnes", "stepfun", "glm", "ark", "local"}
+
+    def test_local_provider_is_off_by_default(self):
+        """local 不在默认链里：没显式配 LLM_PRIORITY=local 就不该被选中。"""
+        from app.llm_config import PROVIDERS, _get_priority_list
+        assert PROVIDERS["local"]["default_base"] == ""
+        assert "local" not in _get_priority_list()
+
+    def test_local_provider_configured_by_base_not_key(self):
+        """局域网服务不鉴权，判据是 base 有没有填。"""
+        from app import llm_config
+        with patch.dict(os.environ, {"LOCAL_LLM_BASE": ""}):
+            assert llm_config._is_provider_configured("local") is False
+        with patch.dict(os.environ, {"LOCAL_LLM_BASE": "http://192.168.1.10:8091"}):
+            assert llm_config._is_provider_configured("local") is True
+
+    def test_resolve_local_returns_usable_api_key(self):
+        """OpenAI SDK 不接受空 api_key，local 必须有个占位值。"""
+        from app import llm_config
+        with patch.dict(os.environ, {
+            "LLM_PRIORITY": "local",
+            "LOCAL_LLM_BASE": "http://192.168.1.10:8091",
+            "LOCAL_LLM_MODEL": "qwen35-4b",
+        }):
+            cfg = llm_config.resolve()
+            assert cfg["api_base"] == "http://192.168.1.10:8091"
+            assert cfg["api_key"]  # 非空
+            assert cfg["model"] == "qwen35-4b"
+            assert cfg["generate_cfg"]["extra_body"]["thinking"]["type"] == "disabled"
 
     def test_resolve_returns_agnes_when_configured(self):
         from app.llm_config import resolve

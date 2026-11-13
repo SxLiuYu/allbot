@@ -93,6 +93,21 @@ PROVIDERS: dict[str, dict] = {
         "thinking_disabled": True,
         "label": "火山引擎 ARK",
     },
+    # 局域网 LLM（Mac 上常驻的 OpenAI 兼容服务，默认 Qwen3.5-4B）。
+    # 这条链上的服务不做鉴权，所以「配没配」的判据是 base 有没有填，而不是
+    # key——由 `_is_provider_configured` 单独放行。默认 LLM_PRIORITY 不含
+    # `local`，只有显式写进去才会被选中。
+    "local": {
+        "base_env": "LOCAL_LLM_BASE",
+        "key_env": "LOCAL_LLM_KEY",
+        "model_env": "LOCAL_LLM_MODEL",
+        "default_base": "",
+        "default_key": "local",
+        "default_model": "qwen35-4b",
+        "max_tokens": 512,
+        "thinking_disabled": True,
+        "label": "局域网 LLM",
+    },
 }
 
 # ======================================================================
@@ -151,10 +166,16 @@ def _read_env(name: str, default: str = "") -> str:
 
 
 def _is_provider_configured(name: str) -> bool:
-    """从 PROVIDERS registry 检查某个 provider 的 key 是否已配"""
+    """从 PROVIDERS registry 检查某个 provider 是否可用。
+
+    一般的 provider 看 key 有没有填；局域网节点没有鉴权，看 base 有没有填。
+    """
     p = PROVIDERS.get(name)
     if p is None:
         return False
+    if name == "local":
+        # 只写了 base 才算配好。key 缺省给 "local"，OpenAI SDK 不接受空串。
+        return bool(_read_env(p["base_env"], ""))
     return _is_configured(p["key_env"])
 
 

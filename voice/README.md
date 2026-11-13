@@ -229,6 +229,9 @@ python3 -m pytest tests/ -q
 | `esp32` | ESP32 开发板终端 |
 | `push` | 个性化热点推送 |
 
+语音链路默认走云端。想把它切到局域网常驻的 ASR/LLM/TTS 服务（首 token
+200ms 量级、文本不出内网），见 [docs/LOCAL-REALTIME.md](docs/LOCAL-REALTIME.md)。
+
 ---
 
 ## 🔒 安全

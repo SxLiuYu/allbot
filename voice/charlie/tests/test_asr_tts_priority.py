@@ -23,7 +23,10 @@ class TestStepfunVoiceMapping:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.content = b"audio"
-        with patch("agent.asr_tts.get_effective_tts_config", return_value=("Ethan", 1.0)), \
+        # _tts_stepfun 开头会检查 STEPFUN_KEY，没配就抛「未配置」——这条测的是
+        # 音色映射，与 Key 有无无关，必须先把 Key 补上才走得到发请求那一步。
+        with patch.dict(os.environ, {"STEPFUN_KEY": "sk-test"}), \
+             patch("agent.asr_tts.get_effective_tts_config", return_value=("Ethan", 1.0)), \
              patch("voice_agent._session.post", return_value=mock_resp) as mock_post:
             result = asr_tts._tts_stepfun("你好")
             payload = mock_post.call_args.kwargs.get("json") or mock_post.call_args[1].get("json")
@@ -91,17 +94,14 @@ class TestASRPriority:
     def test_asr_skips_unknown_provider(self):
         from agent import asr_tts
         fake_bd = MagicMock(return_value="你好")
+        original = asr_tts.ASR_PRIORITY
         with patch.dict(asr_tts._ASR_PROVIDERS, {"baidu": fake_bd}):
             asr_tts.ASR_PRIORITY = ["unknown_provider", "baidu"]
             try:
                 result = asr_tts.asr(b"audio", "mp3")
                 assert result == "你好"
             finally:
-                asr_tts.ASR_PRIORITY = [
-                    p.strip() for p in
-                    os.getenv("ASR_PRIORITY", "sensevoice,baidu,stepfun,vosk").split(",")
-                    if p.strip()
-                ]
+                asr_tts.ASR_PRIORITY = original
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -155,6 +155,9 @@ class TestTTSPriority:
                 assert fake_sf.call_count == 0
             finally:
                 asr_tts._TTS_PROVIDERS.pop("vosk", None)
+                # 全链失败会把熔断打开 120s，不清掉后面所有 tts() 用例都会直接抛
+                asr_tts._tts_unavailable_until = 0.0
+                asr_tts._tts_failures = 0
 
     def test_tts_unavailable_error_fallthrough(self):
         """When a provider raises TTSUnavailableError (cooldown/rate-limited),
@@ -164,11 +167,14 @@ class TestTTSPriority:
         fake_bd = MagicMock(side_effect=TTSUnavailableError("cooldown"))
         fake_sf = MagicMock(return_value=b"audio_ok")
         fake_fn = MagicMock(side_effect=AssertionError("should not be called"))
-        with patch.dict(asr_tts._TTS_PROVIDERS, {
-            "baidu": fake_bd,
-            "stepfun": fake_sf,
-            "finna": fake_fn,
-        }):
+        # stepfun 需要 Key 才不会被跳过；这条断言的就是「跳到 stepfun」。
+        with patch.dict(os.environ, {"STEPFUN_KEY": "sk-test"}), \
+             patch.object(asr_tts, "_tts_unavailable_until", 0.0), \
+             patch.dict(asr_tts._TTS_PROVIDERS, {
+                 "baidu": fake_bd,
+                 "stepfun": fake_sf,
+                 "finna": fake_fn,
+             }):
             result = asr_tts.tts("你好")
             assert result == b"audio_ok"
             fake_bd.assert_called()
@@ -198,15 +204,162 @@ class TestTTSPriority:
 class TestProviderRegistry:
     def test_asr_providers_has_four(self):
         from agent.asr_tts import _ASR_PROVIDERS
-        assert set(_ASR_PROVIDERS.keys()) == {"sensevoice", "baidu", "stepfun", "vosk"}
+        assert set(_ASR_PROVIDERS.keys()) == {
+            "sensevoice", "baidu", "stepfun", "vosk", "local"}
 
     def test_tts_providers_has_four(self):
         from agent.asr_tts import _TTS_PROVIDERS
         # 6 个 provider：audio8(本地克隆) / cosyvoice(克隆，惰性加载占位 None)
         assert set(_TTS_PROVIDERS.keys()) == {
-            "baidu", "finna", "stepfun", "edge", "audio8", "cosyvoice"}
+            "baidu", "finna", "stepfun", "edge", "audio8", "local", "cosyvoice"}
         # cosyvoice 注册前是占位 None，由 tts() 分发循环惰性加载
         assert _TTS_PROVIDERS["cosyvoice"] is None
+
+    def test_registry_names_are_in_default_priority_chains(self):
+        """注册了 provider 但没进默认链等于没接。"""
+        from agent import asr_tts
+        assert "local" in asr_tts.ASR_PRIORITY
+        assert "local" in asr_tts.TTS_PRIORITY
+        # 局域网链路排在云端之后：不可达时不该拖慢首选路径
+        assert asr_tts.ASR_PRIORITY.index("local") > asr_tts.ASR_PRIORITY.index("sensevoice")
+        assert asr_tts.TTS_PRIORITY.index("local") > asr_tts.TTS_PRIORITY.index("stepfun")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 局域网语音链路（Mac 上的 realtime 三件套）
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestLocalProviders:
+    """local provider 的契约来自实测：
+    ASR = WebSocket /asr/stream（start/二进制/commit → final）
+    TTS = OpenAI 兼容 /v1/audio/speech，返回 WAV，且 voice 参数必须省略
+    """
+
+    def test_tts_local_posts_openai_shaped_body(self):
+        from agent import asr_tts
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.content = b"RIFF" + b"\x00" * 500
+        with patch.dict(os.environ, {"LOCAL_TTS_URL": "http://tts.test/v1/audio/speech"}), \
+             patch("voice_agent._session.post", return_value=mock_resp) as mock_post:
+            out = asr_tts._tts_local("你好")
+        assert out == mock_resp.content
+        url = mock_post.call_args.args[0]
+        payload = mock_post.call_args.kwargs["json"]
+        assert url == "http://tts.test/v1/audio/speech"
+        assert payload["input"] == "你好"
+        assert payload["model"] == "moss-tts-nano"
+        # 服务端只有 voice 缺省时才 200；传任何值都 500（实测四个取值）
+        assert "voice" not in payload
+
+    def test_tts_local_raises_when_url_missing(self):
+        from agent import asr_tts
+        with patch.dict(os.environ, {"LOCAL_TTS_URL": ""}):
+            with pytest.raises(RuntimeError, match="LOCAL_TTS_URL"):
+                asr_tts._tts_local("你好")
+
+    def test_tts_local_raises_on_http_error(self):
+        from agent import asr_tts
+        mock_resp = MagicMock()
+        mock_resp.status_code = 500
+        mock_resp.text = "voice not supported"
+        with patch.dict(os.environ, {"LOCAL_TTS_URL": "http://tts.test/v1/audio/speech"}), \
+             patch("voice_agent._session.post", return_value=mock_resp):
+            with pytest.raises(RuntimeError, match="HTTP 500"):
+                asr_tts._tts_local("你好")
+
+    def test_asr_local_raises_when_url_missing(self):
+        from agent import asr_tts
+        with patch.dict(os.environ, {"LOCAL_ASR_URL": ""}):
+            with pytest.raises(RuntimeError, match="LOCAL_ASR_URL"):
+                asr_tts._asr_local(b"\x00" * 400, "wav")
+
+    def test_asr_local_rejects_tiny_audio(self):
+        from agent import asr_tts
+        with patch.dict(os.environ, {"LOCAL_ASR_URL": "ws://asr.test/asr/stream"}):
+            with pytest.raises(RuntimeError, match="无有效音频"):
+                asr_tts._asr_local(b"\x00" * 10, "wav")
+
+    def test_local_skipped_in_tts_chain_when_unconfigured(self):
+        """未配置 LOCAL_TTS_URL 时不该走 local，也不该因为抛异常打断链。"""
+        from agent import asr_tts
+        fake_sf = MagicMock(return_value=b"cloud-audio")
+        original = asr_tts.TTS_PRIORITY
+        asr_tts.TTS_PRIORITY = ["stepfun", "local"]
+        try:
+            # STEPFUN_KEY 必须给值：tts() 在 key 为空时会跳过 stepfun，
+            # 那样整条链一次都不调，测不到「local 被跳过」这件事。
+            with patch.dict(os.environ, {"LOCAL_TTS_URL": "", "STEPFUN_KEY": "sk-test"}), \
+                 patch.dict(asr_tts._TTS_PROVIDERS, {
+                     "stepfun": fake_sf,
+                     "local": MagicMock(side_effect=AssertionError("local 不该被调用")),
+                 }), \
+                 patch.object(asr_tts, "_tts_unavailable_until", 0.0), \
+                 patch.object(asr_tts, "_tts_failures", 0), \
+                 patch.object(asr_tts, "_tts_cache", {}):
+                out = asr_tts.tts("你好")
+        finally:
+            asr_tts.TTS_PRIORITY = original
+            # tts() 成功会写缓存，失败会写熔断，两种都清掉免得连累后面的用例
+            asr_tts._tts_unavailable_until = 0.0
+            asr_tts._tts_failures = 0
+            asr_tts._tts_cache.clear()
+        assert out == b"cloud-audio"
+
+    def test_local_skipped_in_asr_chain_when_unconfigured(self):
+        from agent import asr_tts
+        fake_sv = MagicMock(return_value="你好")
+        with patch.dict(os.environ, {"LOCAL_ASR_URL": ""}), \
+             patch.dict(asr_tts._ASR_PROVIDERS, {
+                 "sensevoice": fake_sv,
+                 "local": MagicMock(side_effect=AssertionError("local 不该被调用")),
+             }):
+            out = asr_tts.asr(b"audio", "mp3")
+        assert out == "你好"
+
+
+class TestLocalUrnUrlNormalisation:
+    """LOCAL_ASR_URL 允许写成 http://，asr_url 归一化要落到 ws://。"""
+
+    @pytest.mark.parametrize("given,expected_prefix", [
+        ("http://172.16.84.88:8095/asr/stream", "ws://"),
+        ("https://asr.test/asr/stream", "wss://"),
+        ("ws://172.16.84.88:8095/asr/stream", "ws://"),
+    ])
+    def test_scheme_is_normalised(self, given, expected_prefix):
+        from agent import asr_tts
+        captured = {}
+
+        class _FakeWS:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *exc):
+                return False
+
+            async def send(self, _data):
+                return None
+
+            async def recv(self):
+                import json as _j
+                # 第一条必须是 ready，之后给 final
+                if not captured.get("greeted"):
+                    captured["greeted"] = True
+                    return _j.dumps({"type": "ready"})
+                return _j.dumps({"type": "final", "text": "你好"})
+
+        def _fake_connect(url, **_kw):
+            captured["url"] = url
+            return _FakeWS()
+
+        fake_mod = MagicMock()
+        fake_mod.connect = _fake_connect
+        with patch.dict(os.environ, {"LOCAL_ASR_URL": given}), \
+             patch.dict("sys.modules", {"websockets": fake_mod}), \
+             patch("subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(stdout=b"\x00\x00" * 4000, returncode=0)
+            assert asr_tts._asr_local(b"\x00" * 400, "wav") == "你好"
+        assert captured["url"].startswith(expected_prefix)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

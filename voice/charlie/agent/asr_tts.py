@@ -108,8 +108,8 @@ def get_current_emotion() -> str:
     """获取当前轮 TTS 情感，空串=默认中性。"""
     return getattr(_emotion_ctx, "emotion", "")
 
-ASR_PRIORITY = [p.strip() for p in os.getenv("ASR_PRIORITY", "sensevoice,baidu,stepfun,vosk").split(",") if p.strip()]
-TTS_PRIORITY = [p.strip() for p in os.getenv("TTS_PRIORITY", "audio8,baidu,stepfun,finna").split(",") if p.strip()]
+ASR_PRIORITY = [p.strip() for p in os.getenv("ASR_PRIORITY", "sensevoice,baidu,stepfun,vosk,local").split(",") if p.strip()]
+TTS_PRIORITY = [p.strip() for p in os.getenv("TTS_PRIORITY", "audio8,baidu,stepfun,finna,local").split(",") if p.strip()]
 
 # ===== 规范音色 → 各 provider 音色映射（单一真相源）=====
 # 角色 tts_voice 使用规范音色名，由 resolve_voice 翻译成各 provider 的具体音色ID。
@@ -210,8 +210,8 @@ def reload() -> None:
     TTS_CACHE_MAX = int(os.getenv("TTS_CACHE_MAX", "200"))
     _tts_speed = float(os.getenv("TTS_SPEED", "1.0"))
 
-    ASR_PRIORITY = [p.strip() for p in os.getenv("ASR_PRIORITY", "sensevoice,baidu,stepfun,vosk").split(",") if p.strip()]
-    TTS_PRIORITY = [p.strip() for p in os.getenv("TTS_PRIORITY", "audio8,baidu,stepfun,finna").split(",") if p.strip()]
+    ASR_PRIORITY = [p.strip() for p in os.getenv("ASR_PRIORITY", "sensevoice,baidu,stepfun,vosk,local").split(",") if p.strip()]
+    TTS_PRIORITY = [p.strip() for p in os.getenv("TTS_PRIORITY", "audio8,baidu,stepfun,finna,local").split(",") if p.strip()]
 
     # 清空旧 token（内存 + 落盘文件），下次用新凭证重新获取
     with _baidu_token_lock:
@@ -399,6 +399,9 @@ def tts(text: str) -> bytes:
         if name == "stepfun" and not os.getenv("STEPFUN_KEY", ""):
             log.debug("[tts] StepFun 未配置，跳过")
             continue
+        if name == "local" and not os.getenv("LOCAL_TTS_URL", "").strip():
+            log.debug("[tts] 局域网 TTS 未配置（LOCAL_TTS_URL 为空），跳过")
+            continue
         try:
             audio = _retry(lambda fn=provider_fn: fn(cleaned), name=f"TTS({name})")
         except TTSUnavailableError as e:
@@ -449,6 +452,9 @@ def asr(audio_bytes: bytes, fmt: str = "mp3", session_id: str = "default") -> st
             continue
         if name == "stepfun" and not os.getenv("STEPFUN_KEY", ""):
             log.debug("[asr] StepFun 未配置，跳过")
+            continue
+        if name == "local" and not _local_asr_url():
+            log.debug("[asr] 局域网 ASR 未配置（LOCAL_ASR_URL 为空），跳过")
             continue
         try:
             text = provider_fn(audio_bytes, fmt)
@@ -514,6 +520,15 @@ def asr_race(audio_bytes: bytes, fmt: str = "wav", session_id: str = "default", 
             return text, "sensevoice"
         except Exception as e:
             log.warning(f"[asr-race] local failed: {e}")
+            # SenseVoice 挂了但配了局域网链路时，别直接落到串行链——串行链里
+            # 局域网 ASR 排最后，中间的百度/StepFun 每个都要多付一次超时。
+            if _local_asr_url():
+                try:
+                    text = _asr_local(audio_bytes, fmt)
+                    log.info("[asr-race] 选择=局域网ASR 原因=SenseVoice不可用")
+                    return text, "local"
+                except Exception as e2:
+                    log.warning(f"[asr-race] 局域网 ASR 也失败: {e2}")
             return asr(audio_bytes, fmt, session_id), "legacy"
 
     deadline_ms = deadline_ms if deadline_ms is not None else int(os.getenv("ASR_RACE_DEADLINE_MS", "1200"))
@@ -771,6 +786,109 @@ def _asr_stepfun(audio_bytes: bytes, fmt: str = "mp3") -> str:
     if not text:
         raise RuntimeError("StepFun 识别为空")
     return text
+
+# ── 局域网 realtime 三件套（Mac 常驻服务，见 voice/README 的「局域网语音链路」）──
+# 8095 Paraformer online 流式 ASR / 8099 MOSS-TTS-Nano / 8091 Qwen3.5-4B。
+# 三个都跑在同一台机器上，地址用 LOCAL_ASR_URL / LOCAL_TTS_URL / LOCAL_LLM_BASE 覆盖。
+# 未配置时这些 provider 一调用就抛异常，优先级链自动降级，行为与接入前一致。
+
+def _local_asr_url() -> str:
+    return os.getenv("LOCAL_ASR_URL", "").strip()
+
+
+def _asr_local(audio_bytes: bytes, fmt: str = "mp3") -> str:
+    """局域网流式 ASR（Paraformer online，WebSocket /asr/stream）。
+
+    走的是「整段音频一次灌进去 + commit」的批处理用法：服务端是流式的，
+    但这里没有实时麦克风可挂，拿到的已经是 VAD 判停后的完整一段。
+    实测 2s 音频约 1.1s 返回，比 SenseVoice 的 26ms 慢，但比云端 StepFun
+    稳定，且文本不出网。
+
+    协议（服务端 scripts/asr_stream_server.py）：
+      → {"type":"start","sample_rate":16000} / <裸 PCM16 单声道> / {"type":"commit"}
+      ← {"type":"ready"} / {"type":"partial","text":...} / {"type":"final","text":...}
+    final 才是完整句子，partial 在短音频下是截断的，不能拿来当结果。
+    """
+    url = _local_asr_url()
+    if not url:
+        raise RuntimeError("LOCAL_ASR_URL 未配置")
+    if not audio_bytes or len(audio_bytes) < 200:
+        raise RuntimeError("无有效音频")
+    # 服务端只吃 16k 单声道裸 PCM；上游给的是 wav 头或 mp3/opus，统一转一遍。
+    import subprocess
+    r = subprocess.run(
+        ["ffmpeg", "-y", "-i", "pipe:0", "-ar", "16000", "-ac", "1", "-f", "s16le", "pipe:1"],
+        input=audio_bytes, capture_output=True, timeout=15)
+    pcm = r.stdout
+    if not pcm or len(pcm) < 3200:
+        raise RuntimeError("音频转换失败")
+
+    import asyncio
+    import json as _json
+
+    async def _run() -> str:
+        import websockets
+        ws_url = url.replace("https://", "wss://").replace("http://", "ws://")
+        async with websockets.connect(ws_url, open_timeout=5) as ws:
+            # 首条是 {"type":"ready"}，等不到就别往下发
+            await asyncio.wait_for(ws.recv(), timeout=10)
+            await ws.send(_json.dumps({"type": "start", "sample_rate": 16000}))
+            # 3200B = 100ms 一帧，与服务端 chunk_ms=600 的攒块粒度无耦合
+            for i in range(0, len(pcm), 3200):
+                await ws.send(pcm[i:i + 3200])
+            await ws.send(_json.dumps({"type": "commit"}))
+            # final 之前的 partial 都丢掉：短音频下 partial 是截断的
+            while True:
+                msg = await asyncio.wait_for(ws.recv(), timeout=20)
+                if isinstance(msg, bytes):
+                    continue
+                obj = _json.loads(msg)
+                kind = obj.get("type")
+                if kind == "final":
+                    await ws.send(_json.dumps({"type": "close"}))
+                    return (obj.get("text") or "").strip()
+                if kind == "error":
+                    raise RuntimeError(f"局域网 ASR 报错: {obj.get('message')}")
+
+    try:
+        text = asyncio.run(_run())
+    except Exception as e:
+        raise RuntimeError(f"局域网 ASR 失败: {e}") from e
+    if not text:
+        raise RuntimeError("局域网 ASR 识别为空")
+    return text
+
+
+def _tts_local(text: str) -> bytes:
+    """局域网 TTS（MOSS-TTS-Nano，OpenAI 兼容 /v1/audio/speech）。
+
+    返回的其实是 WAV 而不是 mp3（服务的 response_format 参数当前被忽略，
+    mp3/wav/pcm 都回 audio/wav）。下游 `mp3_to_opus_packets` 用 ffmpeg
+    auto-probe 解码，不看扩展名，所以这里不用二次转码——多转一次要多付
+    一次 ffmpeg 启动的几十毫秒。
+
+    voice 参数不能传：服务端只认空值，传 "default"/"中文女"/"tingting"
+    一律 500（实测）。所以角色音色在局域网 TTS 上不生效，统一用它自己的
+    默认音色。
+    """
+    url = os.getenv("LOCAL_TTS_URL", "").strip()
+    if not url:
+        raise RuntimeError("LOCAL_TTS_URL 未配置")
+    from voice_agent import _session
+    r = _session.post(
+        url,
+        json={
+            "input": text,
+            "model": os.getenv("LOCAL_TTS_MODEL", "moss-tts-nano"),
+        },
+        timeout=60,
+    )
+    if r.status_code != 200:
+        raise RuntimeError(f"局域网 TTS HTTP {r.status_code}: {r.text[:200]}")
+    if not r.content or len(r.content) < 100:
+        raise RuntimeError("局域网 TTS 返回空音频")
+    return r.content
+
 
 def _vosk_asr(audio_bytes, fmt="mp3"):
     try:
@@ -1135,12 +1253,114 @@ def _tts_audio8_stream(text: str, chunk_cb=None):
         elif event == "complete":
             break
 
+
+def _tts_local_stream(text: str, *, sample_rate: int = 24000,
+                      frame_duration: int = 60, cancel_evt=None, _encoder=None):
+    """局域网 TTS 的流式版本 —— 边收 PCM 边编 opus，直接 yield 可发送的包。
+
+    为什么不复用 `_tts_audio8_stream` 那条「yield base64 WAV」的路：那条是给
+    浏览器 SSE 用的，设备侧要的是 opus 包。这里把重采样和 opus 编码放在收流
+    的同一个循环里，省掉中间那份完整音频，也省掉一次 ffmpeg 启动。
+
+    服务端（MOSS-TTS-Nano `/v1/audio/speech/stream`）返回裸 PCM16，
+    采样率与声道数在响应头 `x-sample-rate` / `x-channels` 里声明
+    （实测 48000 / 2）。下行设备要 24kHz 单声道，所以要做一次
+    「立体声→单声道 + 48k→24k」两个变换。用 `audioop.ratecv` 保留跨块状态：
+    每块各自 ratecv 会在块边界产生台阶，听感是规律的咔哒声。
+
+    实测首块 142-225ms，整句 800-900ms。相比非流式的 1.0s 全部返回，
+    流式把「首音频」提前到 200ms 量级，代价是编码分散在各块里。
+
+    Args:
+        _encoder: 测试注入点。真实调用传 None，按 (sample_rate, 1) 建 opus 编码器；
+            没装 libopuslib 的环境（CI 容器）可用它跑通除编码外的全部逻辑。
+
+    Yields:
+        bytes: 一个个 opus 包，可直接 ws.send_bytes()
+    """
+    url = os.getenv("LOCAL_TTS_STREAM_URL", "").strip()
+    if not url:
+        raise RuntimeError("LOCAL_TTS_STREAM_URL 未配置")
+    try:
+        import audioop
+    except ImportError:  # Python 3.13 移除
+        audioop = None
+    if audioop is None:
+        raise RuntimeError("流式重采样需要 audioop（Python ≤3.12）")
+    from voice_agent import _session
+
+    if _encoder is None:
+        import opuslib
+        encoder = opuslib.Encoder(sample_rate, 1, opuslib.APPLICATION_VOIP)
+    else:
+        encoder = _encoder
+    frame_samples = sample_rate * frame_duration // 1000
+    frame_bytes = frame_samples * 2
+
+    payload = {
+        "input": text,
+        "model": os.getenv("LOCAL_TTS_MODEL", "moss-tts-nano"),
+    }
+    ratecv_state = None
+    # 两个缓冲各管一件事，别混用：
+    #   raw_pending — 服务端字节流里还不够一个 src 帧（4 字节）的残留
+    #   pcm_pending — 已转成 24k 单声道、但还不够一个 opus 帧的残留
+    raw_pending = b""
+    pcm_pending = b""
+    t0 = time.time()
+
+    def _encode_ready(buf: bytes):
+        """把攒够整帧的部分编码吐出来，返回剩下的尾巴。"""
+        out = []
+        n = len(buf) - len(buf) % frame_bytes
+        for off in range(0, n, frame_bytes):
+            try:
+                out.append(encoder.encode(buf[off:off + frame_bytes], frame_samples))
+            except Exception as e:  # noqa: BLE001 单帧失败不该中断整句
+                log.warning("[tts-local-stream] opus 编码失败: %s", e)
+        return out, buf[n:]
+
+    with _session.post(url, json=payload, stream=True, timeout=60) as r:
+        if r.status_code != 200:
+            raise RuntimeError(f"局域网流式 TTS HTTP {r.status_code}: {r.text[:200]}")
+        src_rate = int(r.headers.get("x-sample-rate") or 48000)
+        src_ch = int(r.headers.get("x-channels") or 2)
+        src_frame = 2 * src_ch  # 一个立体声采样帧的字节数
+        for chunk in r.iter_content(chunk_size=4096):
+            if not chunk:
+                break
+            if cancel_evt is not None and cancel_evt.is_set():
+                return
+            raw_pending += chunk
+            usable = len(raw_pending) - len(raw_pending) % src_frame
+            if usable <= 0:
+                continue
+            data, raw_pending = raw_pending[:usable], raw_pending[usable:]
+            if src_ch > 1:
+                data = audioop.tomono(data, 2, 0.5, 0.5)
+            if src_rate != sample_rate:
+                data, ratecv_state = audioop.ratecv(
+                    data, 2, 1, src_rate, sample_rate, ratecv_state)
+            pcm_pending += data
+            packets, pcm_pending = _encode_ready(pcm_pending)
+            for pkt in packets:
+                yield pkt
+    # 收尾：最后不足一帧的补零，丢掉会让句尾听起来被切
+    if pcm_pending and not (cancel_evt is not None and cancel_evt.is_set()):
+        pcm_pending += b"\x00" * ((-len(pcm_pending)) % frame_bytes)
+        packets, _ = _encode_ready(pcm_pending)
+        for pkt in packets:
+            yield pkt
+    log.debug("[tts-local-stream] %d 字 完成 %.0fms", len(text), (time.time() - t0) * 1000)
+
+
 # ── Provider 注册表（供 ASR_PRIORITY / TTS_PRIORITY 按需遍历） ──────────────
 _ASR_PROVIDERS: dict[str, Any] = {
     "sensevoice": _asr_sense_voice,
     "baidu": _asr_baidu,
     "stepfun": _asr_stepfun,
     "vosk": _vosk_asr,
+    "local": _asr_local,
 }
 
 _TTS_PROVIDERS: dict[str, Any] = {
@@ -1149,6 +1369,7 @@ _TTS_PROVIDERS: dict[str, Any] = {
     "stepfun": _tts_stepfun,
     "edge": _tts_edge,
     "audio8": _tts_audio8,
+    "local": _tts_local,
     "cosyvoice": None,  # lazy import: from agent.cosyvoice_clone import tts_cosyvoice
 }
 

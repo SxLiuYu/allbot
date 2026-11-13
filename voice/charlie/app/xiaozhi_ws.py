@@ -21,7 +21,7 @@ import uuid
 import warnings
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from starlette.websockets import WebSocketState
@@ -282,6 +282,58 @@ def _synth_wake_beep() -> bytes:
 
 
 _finna_cooldown_until = 0.0  # Finna 429 冷却截止时间戳（限流后60s内跳过Finna）
+
+
+def _local_stream_ready() -> bool:
+    """局域网流式 TTS 是否可用（配了流式端点才算）。
+
+    单独一个开关，不跟 LOCAL_TTS_URL 绑：两者是同一服务的不同端点，
+    可以只开非流式（流式端点当前实测不稳定，见 _tts_local_stream 注释）。
+    """
+    return bool(os.getenv("LOCAL_TTS_STREAM_URL", "").strip())
+
+
+_LOCAL_STREAM_EOF = object()
+
+
+def _local_stream_packets(sentence: str, cancel_evt=None):
+    """把流式 TTS 的包生成器包一层，异常转成正常结束。
+
+    消费者按「第二项是 bytes 还是可迭代」分支，这里保证返回值永远是迭代器，
+    不会因为网络错在生产者线程里炸掉整条回复。
+    """
+    from agent.asr_tts import _tts_local_stream
+
+    def _gen():
+        try:
+            yield from _tts_local_stream(
+                sentence,
+                sample_rate=DOWNLINK_SAMPLE_RATE,
+                frame_duration=OPUS_FRAME_DURATION_MS,
+                cancel_evt=cancel_evt,
+            )
+        except Exception as e:  # noqa: BLE001 流式失败降级到静默，别中断播报
+            log.warning("[xiaozhi] 局域网流式TTS失败，本句跳过: %s", e)
+
+    return _gen()
+
+
+async def _aiter_packets(loop, source):
+    """把「list[bytes]」或「同步生成器」统一成 async 迭代器。
+
+    同步生成器的 next() 会阻塞在 HTTP 读上（流式 TTS 每块间隔 100ms 量级），
+    直接在主循环里 next() 会卡住整个事件循环，所以走线程池。
+    """
+    if hasattr(source, "__len__"):
+        for pkt in source:
+            yield pkt
+        return
+    it = iter(source)
+    while True:
+        pkt = await loop.run_in_executor(None, next, it, _LOCAL_STREAM_EOF)
+        if pkt is _LOCAL_STREAM_EOF:
+            return
+        yield pkt
 
 
 def _synth_mp3(sentence: str, *, _cache_get=None, _cache_put=None, cancel_evt=None) -> bytes:
@@ -690,7 +742,7 @@ def register_xiaozhi_routes(app: FastAPI):
             # while the consumer is busy playing the previous sentence. The
             # queue therefore carries (label, mp3) pairs; the consumer only
             # does fast local opus transcoding + paced sending.
-            q: "asyncio.Queue[Optional[Tuple[str, bytes]]]" = asyncio.Queue(
+            q: "asyncio.Queue[Optional[Tuple[str, Any]]]" = asyncio.Queue(
                 maxsize=16)
             _SENTINEL = object()  # end-of-stream marker
             _fallback_sent = False  # 防止兜底语重复发送
@@ -788,6 +840,12 @@ def register_xiaozhi_routes(app: FastAPI):
                             if s in ("__MUSIC__", "__MUSIC_STOP__") \
                                     or s.startswith("__MUSIC__"):
                                 _put_blocking((s, None))
+                                continue
+                            if _local_stream_ready():
+                                # 流式：把包生成器交给消费者边收边发，首音频
+                                # 从「整句合成完」提前到「首块到达」
+                                pending_sentences.append(s)
+                                _put_blocking((s, _local_stream_packets(s, cancel_evt)))
                                 continue
                             mp3 = _synth_mp3(s, cancel_evt=cancel_evt)
                             if mp3 and len(mp3) > 100:
@@ -951,6 +1009,12 @@ def register_xiaozhi_routes(app: FastAPI):
                         bump_metric("music_plays")
                         label = f"♪ {label}"
                         is_tts = False
+                    elif mp3 is not None and not isinstance(mp3, (bytes, bytearray)):
+                        # 流式来源：第二项是 opus 包生成器，边拉边发。
+                        # 不先收完——收完就退化成非流式，首音频优势全没了。
+                        pkts = mp3
+                        label = s
+                        is_tts = True
                     elif mp3:
                         pkts = await loop.run_in_executor(
                             None, mp3_to_opus_packets, mp3,
@@ -970,12 +1034,16 @@ def register_xiaozhi_routes(app: FastAPI):
                     await send_json({
                         "type": "tts", "state": "sentence_start", "text": label})
                     t_opus = loop.time()
-                    sizes = len(pkts)
-                    for pkt in pkts:
+                    # 帧数在流式路径下是边收边定的，先按长度能算出就记，算不出置 0
+                    sizes = len(pkts) if hasattr(pkts, "__len__") else 0
+                    async for pkt in _aiter_packets(loop, pkts):
+                        if pkt is None:
+                            break
                         if ws.client_state != WebSocketState.CONNECTED:
                             break
                         await ws.send_bytes(pkt)
                         sent += 1
+                        sizes += 1
                         target = sent - HEAD_START_FRAMES
                         if target > 0:
                             wait = target * frame_s - (loop.time() - first_send)
