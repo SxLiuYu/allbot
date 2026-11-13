@@ -35,14 +35,16 @@ iwr -useb https://github.com/SxLiuYu/allbot/raw/main/scripts/install.ps1 | iex
 The script auto-detects your system, installs Node.js if needed, and launches
 the `allbot onboard` wizard.（自动检测系统、安装 Node.js，并启动 onboard 向导。）
 
-## npm install
+## Release tarball
 
 If you already have Node.js 22+:
 
 ```bash
-npm install -g allbot
+curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install.sh | bash
 allbot onboard
 ```
+
+> `npm install -g allbot` installs an unrelated project — that name on npm is taken.
 
 ## Source build
 

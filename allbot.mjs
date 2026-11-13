@@ -119,9 +119,12 @@ const buildMissingEntryErrorMessage = async () => {
     "Build locally with `pnpm install && pnpm build`, or install a built package instead.",
   );
   lines.push(
-    "For pinned GitHub installs, use `npm install -g github:allbot/allbot#<ref>` instead of a raw `/archive/<ref>.tar.gz` URL.",
+    "For pinned GitHub installs, use `npm install -g github:SxLiuYu/allbot#<ref>` instead of a raw `/archive/<ref>.tar.gz` URL.",
   );
-  lines.push("For releases, use `npm install -g allbot@latest`.");
+  // `allbot` on npm is an unrelated 2015 project; point at the Release tarball.
+  lines.push(
+    "For releases, install the tarball from https://github.com/SxLiuYu/allbot/releases/latest",
+  );
   return lines.join("\n");
 };
 

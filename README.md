@@ -344,18 +344,22 @@ allbot gateway --port 18789 --verbose
 
 直接下载 [AllBot Launcher APK](https://github.com/SxLiuYu/allbot/releases/tag/launcher),三步搞定 —— 详见上文 [📱 Android 手机本地运行](#-android-手机本地运行--把-ai-伙伴装进口袋) 章节。
 
-#### npm 全局安装（已有 Node.js 22+ 环境）
+#### 从 Release tarball 安装（已有 Node.js 22+ 环境）
 
 ```bash
-npm install -g allbot
+# 只装最新的正式版
+npm install -g "https://github.com/SxLiuYu/allbot/releases/latest/download/allbot-<版本>.tgz"
 allbot onboard   # 交互式向导，自动配置
 ```
 
-> ⚠️ **包名不是这个项目**：npm 上的 [`allbot`](https://www.npmjs.com/package/allbot)
-> 是 2015 年的另一个 chatbot 框架（`bot-lab/allbot`，0.1.70）。本项目尚未发布到 npm，
-> 上面那条命令装的是别人的包。**目前请用下面的从源码安装。**
+脚本会自动选对版本与文件名，不用手填：`scripts/install.sh`（macOS/Linux）与
+`scripts/install.ps1`（Windows）都从 Release 取 tarball。
 
-从源码装（当前唯一受支持的方式）：
+> ⚠️ **不要用 `npm install -g allbot`**：npm 上的 [`allbot`](https://www.npmjs.com/package/allbot)
+> 是 2015 年的另一个 chatbot 框架（`bot-lab/allbot`，0.1.70），装回来的是完全不相干的东西。
+> 本项目尚未发布到 npm。
+
+从源码装（想改代码或追 `main` 时用这个）：
 
 ```bash
 git clone https://github.com/SxLiuYu/allbot.git

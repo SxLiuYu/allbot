@@ -255,16 +255,57 @@ async function ensureAllBot(runtime: OutputRuntimeEnv): Promise<void> {
     runtime.log(`  ${theme.success("✓")} AllBot CLI present (${theme.muted(version)})`);
     return;
   }
-  runtime.log(`  ${theme.warn("→")} AllBot CLI not found. Installing via npm...`);
-  const install = run("npm", ["install", "-g", "allbot", "--force"], { stdio: "inherit" });
+  // Never install `allbot` from npm: that name belongs to an unrelated 2015
+  // project. The release tarball is the only supported source, and its asset
+  // name does not always match the tag, so resolve it from the releases API.
+  runtime.log(`  ${theme.warn("→")} AllBot CLI not found. Installing from the latest release...`);
+  const tarballUrl = resolveReleaseTarballUrl();
+  if (!tarballUrl) {
+    runtime.error(
+      `Failed to locate the AllBot release tarball. Install it manually from ${theme.command("https://github.com/SxLiuYu/allbot/releases/latest")}.`,
+    );
+    runtime.exit(1);
+    return;
+  }
+  const install = run("npm", ["install", "-g", tarballUrl, "--force"], { stdio: "inherit" });
   if (install.error || install.status !== 0) {
     runtime.error(
-      `Failed to install AllBot. Run ${theme.command("npm install -g allbot --force")} manually.`,
+      `Failed to install AllBot. Run ${theme.command(`npm install -g ${tarballUrl} --force`)} manually.`,
     );
     runtime.exit(1);
     return;
   }
   runtime.log(`  ${theme.success("✓")} AllBot installed`);
+}
+
+/**
+ * Newest `v<calver>` release that actually carries an `allbot-*.tgz` asset.
+ * The releases list also holds a `launcher` tag (the Android APK), so the tag
+ * pattern matters. Returns null when the API is unreachable or unparseable.
+ */
+function resolveReleaseTarballUrl(): string | null {
+  const script =
+    'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{' +
+    "try{const rs=JSON.parse(s);" +
+    'const ok=rs.filter(r=>/^v\\d{4}\\.\\d{1,2}\\.\\d{1,2}(-\\d+)?$/.test(r.tag_name||""))' +
+    ".sort((a,b)=>(a.tag_name<b.tag_name?1:-1));" +
+    'for(const r of ok){const t=(r.assets||[]).find(a=>/^allbot-.*\\.tgz$/.test(a.name||""));' +
+    "if(t){console.log(t.browser_download_url);return}}}catch(e){}});";
+  const probe = run("curl", [
+    "-fsSL",
+    "--connect-timeout",
+    "15",
+    "https://api.github.com/repos/SxLiuYu/allbot/releases?per_page=30",
+  ]);
+  if (probe.status !== 0 || !probe.stdout) {
+    return null;
+  }
+  const picked = spawnSync(process.execPath, ["-e", script], {
+    input: probe.stdout,
+    encoding: "utf8",
+  });
+  const url = String(picked.stdout ?? "").trim();
+  return url.length > 0 ? url : null;
 }
 
 async function installSharpWasm32(runtime: OutputRuntimeEnv): Promise<void> {

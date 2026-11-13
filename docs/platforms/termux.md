@@ -52,8 +52,8 @@ allbot android-install
 # 1. 更新包管理器并安装依赖
 pkg update && pkg install nodejs-lts imagemagick ffmpeg
 
-# 2. 安装 AllBot
-npm install -g allbot --force
+# 2. 安装 AllBot（从 GitHub Release 取 tarball；npm 上的 allbot 是别的项目）
+curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install-termux.sh | bash
 
 # 3. 安装图片处理库（WASM 版，适用于 Termux 的 arm32 环境）
 npm install -g @img/sharp-wasm32 --force
@@ -221,8 +221,10 @@ echo 'export NODE_EXTRA_CA_CERTS=$PREFIX/etc/tls/ca-bundle.crt' >> ~/.bashrc
 某些包（如 `@lancedb/lancedb`）没有 arm64 预编译包，安装会报平台检查错误。加 `--force` 跳过：
 
 ```bash
-npm install -g allbot --force
+curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install-termux.sh | bash
 ```
+
+> 不要用 `npm install -g allbot`：npm 上那个名字属于 2015 年的另一个项目。
 
 ### 内存不足
 

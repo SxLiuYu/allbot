@@ -12,12 +12,16 @@ title: "Installation Guide"
 AllBot supports multiple installation methods. Pick the one that suits your environment.
 （AllBot 支持多种安装方式，按需选择。）
 
-| Method                                     | Command                    | Best for                             |
-| ------------------------------------------ | -------------------------- | ------------------------------------ |
-| **One-click install** (recommended / 推荐) | `curl -fsSL ... \| bash`   | Most users, fastest path             |
-| **npm install**                            | `npm install -g allbot`    | Users with Node.js already installed |
-| **Docker**                                 | `docker compose up -d`     | Containerized / headless deployments |
-| **Build from source**                      | `git clone` + `pnpm build` | Contributors and custom builds       |
+| Method                                     | Command                                | Best for                             |
+| ------------------------------------------ | -------------------------------------- | ------------------------------------ |
+| **One-click install** (recommended / 推荐) | `curl -fsSL ... \| bash`               | Most users, fastest path             |
+| **Release tarball**                        | `npm install -g <release tarball URL>` | Users with Node.js already installed |
+| **Docker**                                 | `docker compose up -d`                 | Containerized / headless deployments |
+| **Build from source**                      | `git clone` + `pnpm build`             | Contributors and custom builds       |
+
+> `npm install -g allbot` does **not** install this project — that name on npm
+> belongs to an unrelated 2015 framework (`bot-lab/allbot`). Use the release
+> tarball, or the install scripts which resolve it for you.
 
 ## Prerequisites
 
@@ -56,12 +60,16 @@ iwr -useb https://github.com/SxLiuYu/allbot/raw/main/scripts/install.ps1 | iex
 
 ---
 
-## npm install (npm 全局安装)
+## Release tarball (从发布包安装)
 
-If you already have Node.js 22+ installed:
+If you already have Node.js 22+ installed, install straight from the newest GitHub Release:
 
 ```bash
-npm install -g allbot
+# let the script pick the version and asset name
+curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install.sh | bash
+
+# or, if you already downloaded the tarball
+npm install -g ./allbot-<version>.tgz
 allbot onboard   # interactive setup wizard
 ```
 

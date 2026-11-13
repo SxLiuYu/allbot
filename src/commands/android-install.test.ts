@@ -23,6 +23,9 @@ import { runAndroidInstall } from "./android-install.js";
 
 type SpawnArgs = readonly string[];
 
+/** Version used by the mocked GitHub releases lookup. */
+const TEST_RELEASE_VERSION = "2026.11.14";
+
 function stdoutResult(stdout: string, status = 0) {
   return { status, stdout, stderr: "", signal: null, pid: 0, output: [stdout, "", ""] };
 }
@@ -65,6 +68,16 @@ function defaultSpawnMap(call: { cmd: string; args: SpawnArgs }): {
   }
   if (cmd === "allbot" && args[0] === "--version") {
     return { status: 0, stdout: "" };
+  }
+  // Resolving the release tarball: curl fetches the releases JSON, then a
+  // node one-liner picks the newest v<calver> asset out of it.
+  if (cmd === "curl") {
+    return { status: 0, stdout: "[]" };
+  }
+  // process.execPath is an absolute path, so match on the -e argument instead
+  // of the command name.
+  if (args[0] === "-e") {
+    return { status: 0, stdout: `https://example.test/allbot-${TEST_RELEASE_VERSION}.tgz\n` };
   }
   if (cmd === "npm") {
     return { status: 0, stdout: "" };
@@ -154,7 +167,14 @@ describe("runAndroidInstall - full happy path", () => {
     expect(cmds.some((c) => c.includes('command -v "magick"'))).toBe(true);
     expect(cmds.some((c) => c.includes('command -v "ffmpeg"'))).toBe(true);
     expect(cmds.some((c) => c.startsWith("allbot --version"))).toBe(true);
-    expect(cmds.some((c) => c.startsWith("npm install -g allbot"))).toBe(true);
+    expect(
+      cmds.some(
+        (c) =>
+          c.startsWith("npm install -g https://example.test/allbot-") && c.endsWith(".tgz --force"),
+      ),
+    ).toBe(true);
+    // Never install the npm package by name: that name is an unrelated project.
+    expect(cmds.some((c) => /^npm install -g allbot(\s|$)/.test(c))).toBe(false);
     expect(cmds.some((c) => c.includes("@img/sharp-wasm32"))).toBe(true);
     expect(cmds.some((c) => c.startsWith("pm list packages"))).toBe(true);
     expect(cmds.some((c) => c.startsWith("getprop ro.product.manufacturer"))).toBe(true);

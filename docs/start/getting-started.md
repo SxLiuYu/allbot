@@ -8,7 +8,7 @@ title: "Getting Started"
 
 # Getting Started
 
-Build AllBot from source, run onboarding, and start chatting in about 5 minutes. Alternatively, use the [one-click installer](/install) or `npm install -g allbot` for a faster setup. By the end you will have a running Gateway, configured auth, and a working chat session.
+Build AllBot from source, run onboarding, and start chatting in about 5 minutes. Alternatively, use the [one-click installer](/install) for a faster setup. By the end you will have a running Gateway, configured auth, and a working chat session.
 
 ## What you need
 
@@ -81,15 +81,18 @@ docker compose up -d
 
 See [Docker](/install/docker) for configuration details.
 
-## npm install (alternative)
+## Install from the release tarball (alternative)
 
 If you already have Node.js 22+ installed, skip the source build entirely:
 
 ```bash
-npm install -g allbot
+curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install.sh | bash
 allbot onboard
 allbot gateway --port 18789
 ```
+
+> `npm install -g allbot` installs an unrelated 2015 project — that name on npm
+> is taken. Always install from the GitHub Release tarball.
 
 Or use the one-click installer for the fastest path: see [Installation Guide](/install).
 

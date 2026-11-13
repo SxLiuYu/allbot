@@ -44,12 +44,14 @@ pnpm build
 ## Alternative: manual pnpm or bun
 
 ```bash
-pnpm add -g allbot@latest
+pnpm add -g "https://github.com/SxLiuYu/allbot/releases/latest/download/allbot-<version>.tgz"
 ```
 
 ```bash
-bun add -g allbot@latest
+bun add -g "https://github.com/SxLiuYu/allbot/releases/latest/download/allbot-<version>.tgz"
 ```
+
+> `allbot` on npm is an unrelated 2015 package; always install from the release tarball.
 
 ## Auto-updater
 

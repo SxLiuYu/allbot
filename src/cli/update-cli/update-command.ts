@@ -1031,7 +1031,9 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       );
       defaultRuntime.log(
         theme.muted(
-          `Examples: \`${replaceCliName("npm i -g allbot@latest", CLI_NAME)}\` or \`${replaceCliName("pnpm add -g allbot@latest", CLI_NAME)}\``,
+          // Do not point at `npm i -g allbot`: that name on npm is an unrelated
+          // project. Direct the user at the release tarball instead.
+          `Install the newest tarball from https://github.com/SxLiuYu/allbot/releases/latest, then rerun \`${replaceCliName(formatCliCommand("allbot doctor"), CLI_NAME)}\`.`,
         ),
       );
     }

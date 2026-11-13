@@ -330,18 +330,23 @@ Once started, find your bot in Feishu and send a message. AllBot automatically b
 
 Just download the [AllBot Launcher APK](https://github.com/SxLiuYu/allbot/releases/tag/launcher) — three steps and you're done. See the [📱 Runs Locally on Android](#-runs-locally-on-android--put-your-ai-companion-in-your-pocket) section above.
 
-#### npm global install (if you already have Node.js 22+)
+#### Install from the release tarball (if you already have Node.js 22+)
 
 ```bash
-npm install -g allbot
+# installs the newest release
+npm install -g "https://github.com/SxLiuYu/allbot/releases/latest/download/allbot-<version>.tgz"
 allbot onboard   # Interactive wizard, auto-configures
 ```
 
-> ⚠️ **That package is not this project**: the `allbot` name on npm belongs to a 2015
-> chatbot framework (`bot-lab/allbot`, 0.1.70). AllBot is **not published to npm yet**,
-> so the command above installs someone else's package. **Build from source for now.**
+The install scripts pick the right version and asset name for you:
+`scripts/install.sh` (macOS/Linux) and `scripts/install.ps1` (Windows) both
+pull the tarball from GitHub Releases.
 
-From source (the only supported path today):
+> ⚠️ **Do not run `npm install -g allbot`**: that name on npm belongs to a 2015
+> chatbot framework (`bot-lab/allbot`, 0.1.70), so you would install an
+> unrelated package. AllBot is not published to npm.
+
+From source (when you want to change code or track `main`):
 
 ```bash
 git clone https://github.com/SxLiuYu/allbot.git

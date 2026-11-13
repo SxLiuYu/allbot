@@ -8,14 +8,17 @@ read_when:
 
 # Release Policy
 
-AllBot ships on two public release lanes:
+AllBot ships on two release lanes, but only one of them is live:
 
-- **npm** (`allbot`, dist-tag `latest`): the install target for
-  `npm install -g allbot`
-- **GitHub Releases**: the `allbot-<version>.tgz` tarball attached to each
-  tag — the Android/Termux install script downloads this instead of npmjs.org
-  for China network reliability. A separate `launcher` tag carries the Android
-  Launcher APK, rebuilt on `android/**` changes.
+- **GitHub Releases** (the only working lane): the `allbot-<version>.tgz`
+  tarball attached to each tag. The install scripts resolve it from the
+  releases API, so they never have to guess the asset name. A separate
+  `launcher` tag carries the Android Launcher APK, rebuilt on `android/**`
+  changes.
+- **npm** (blocked): the `allbot` name on npm belongs to an unrelated 2015
+  project (`bot-lab/allbot`), so trusted publishing cannot be registered and
+  `publish-npm` in `publish-tarball.yml` is gated behind the `PUBLISH_NPM`
+  repo variable. Do not tell users to run `npm install -g allbot`.
 
 ## Version naming
 

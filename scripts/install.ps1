@@ -273,20 +273,57 @@ function Test-ExplicitPackageInstallSpec {
         $Target -match '^(file|github|git\+ssh|git\+https|git\+http|git\+file|npm):'
 }
 
+function Resolve-ReleaseTarball {
+    # The `allbot` name on npm belongs to an unrelated 2015 project
+    # (bot-lab/allbot), so npm is not a valid install source. Resolve the
+    # GitHub Release tarball instead. The releases list also holds a
+    # `launcher` tag (the APK), so only `v<calver>` tags are considered.
+    param([string]$Target = "latest")
+
+    try {
+        $releases = Invoke-RestMethod -TimeoutSec 20 `
+            -Uri "https://api.github.com/repos/SxLiuYu/allbot/releases?per_page=30" `
+            -Headers @{ "User-Agent" = "allbot-install" } -ErrorAction Stop
+    } catch {
+        return $null
+    }
+
+    $candidates = @($releases |
+        Where-Object { $_.tag_name -match '^v\d{4}\.\d{1,2}\.\d{1,2}(-\d+)?$' } |
+        Sort-Object -Property tag_name -Descending)
+
+    foreach ($r in $candidates) {
+        $ver = $r.tag_name -replace '^v', ''
+        if ($Target -ne "latest" -and $Target -ne $ver) { continue }
+        $tgz = @($r.assets | Where-Object { $_.name -match '^allbot-.*\.tgz$' })[0]
+        if ($null -ne $tgz) {
+            return [pscustomobject]@{ Version = $ver; Url = $tgz.browser_download_url }
+        }
+    }
+    return $null
+}
+
 function Resolve-PackageInstallSpec {
     param([string]$Target = "latest")
 
     $trimmed = $Target.Trim()
     if ([string]::IsNullOrWhiteSpace($trimmed)) {
-        return "allbot@latest"
+        $trimmed = "latest"
     }
     if ($trimmed.ToLowerInvariant() -eq "main") {
-        return "github:Kaiji-Z/allbot#main"
+        return "github:SxLiuYu/allbot#main"
     }
     if (Test-ExplicitPackageInstallSpec -Target $trimmed) {
         return $trimmed
     }
-    return "allbot@$trimmed"
+
+    $release = Resolve-ReleaseTarball -Target $trimmed
+    if ($null -ne $release) {
+        return $release.Url
+    }
+
+    # Offline or API failure: build from source at the requested ref.
+    return "github:SxLiuYu/allbot#main"
 }
 
 function Add-ToPath {
