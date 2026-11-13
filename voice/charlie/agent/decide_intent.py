@@ -29,7 +29,7 @@ import time
 
 log = logging.getLogger("magic")
 
-_DECIDE_CTX_ID = "charlie-intent-v5"   # 见下方 context 注释：改说明必须换 id
+_DECIDE_CTX_ID = "charlie-intent-v6"   # 见下方 context 注释：改说明必须换 id
 _CONNECT_TIMEOUT_S = 1.0
 _READ_TIMEOUT_S = 2.5
 _FAIL_THRESHOLD = 3          # 连续失败 N 次 → 冷却（服务挂了别每句都等超时）
@@ -42,7 +42,7 @@ DOMAINS = ["none", "amap-maps", "baize-skills", "filesystem", "magic-music",
            "magic-dev", "magic-scenes", "magic-evolution", "magic-browser",
            "magic-apps", "magic-feishu", "magic-douyin", "magic-taobao",
            "magic-wardrobe", "magic-jarvis", "magic-memory", "magic-habits",
-           "magic-summary", "mimo-vision", "magic-tv", "magic-agent"]
+           "magic-summary", "mimo-vision", "magic-tv"]
 
 # 域说明原文做 context——改内容必须换 _DECIDE_CTX_ID（同 id = 同文本，服务端缓存）
 # 校准史（2026-09-20，67 句语料多变体对比，阈值 0.5 下的实错判数）：
@@ -60,6 +60,12 @@ DOMAINS = ["none", "amap-maps", "baize-skills", "filesystem", "magic-music",
 #       选 magic-life 但 conf=0.41<0.5 弃权落 LLM（magic-life 描述里有"出门"，
 #       弃权兜住）。阈值维持 0.5——0.45 多 1 错、0.55 多挡 3 个正确快命中。
 # 结论：准确率修复走 context 描述而非抬阈值（抬阈值对全部查询收效率税，描述修复免费）。
+#   v6（2026-11-14）: 删掉 magic-agent 域。该域只在 decider 里，LLM prompt 没有它，
+#       agent/magic_agent.py 也从未被任何产品代码 import（只有它自己的测试），
+#       属于没接线的功能。decider 已于 2026-09-20 停用、prompt 是路由唯一真源，
+#       所以保留 domain 只会让 test_domain_list_matches_llm_prompt_set 长期失败。
+#       _LAYA_GROUPS 里 "agent" 组的主域同步改成 magic-dev（该组里唯一还在
+#       prompt 中的主域）。将来若真接 magic_agent，再连同 prompt 一起加回。
 _DECIDE_CTX = """任务: 判断用户输入需要哪个工具域。
 - none = 闲聊/问候/常识问答/讲笑话/感恩告别（你好/谢谢/晚安/讲个笑话/太阳系最大的行星/1加1等于几）
 - amap-maps = 天气/地图/导航/我在哪/附近/路线/加油站/温度
@@ -78,8 +84,6 @@ _DECIDE_CTX = """任务: 判断用户输入需要哪个工具域。
 - ac-control = 空调/制冷/制热/风扇/灯光/温度调节（电视控制归 magic-tv，不是这里）
 - mimo-vision = 截图/看看屏幕/识别图片/图中有什么
 - magic-tv = 电视DLNA控制（电视音量/电视静音/投屏到电视，所有电视控制都归这里）
-- magic-agent = 开放式系统任务：清理磁盘/释放空间/整理下载/排查网络/备份归档/修复故障等
-  需要多步操作、固定工具域覆盖不了的系统维护请求（问"为什么慢/怎么办"也算）
 注意："音量调大"没有说电视时是音箱设备 = magic-system；"记一下开会"是备忘 = magic-notes。"""
 
 _session = None              # 惰性 requests.Session（测试替换入口）
@@ -119,7 +123,7 @@ _LAYA_GROUPS = {
     "memory": ("magic-memory", ["magic-memory", "magic-notes", "magic-preferences",
                                 "magic-habits", "magic-summary"]),
     "recipe": ("magic-recipe", ["magic-recipe"]),
-    "agent": ("magic-agent", ["magic-agent", "magic-dev", "magic-evolution",
+    "agent": ("magic-dev", ["magic-dev", "magic-evolution",
                               "magic-life", "magic-scenes", "magic-roles",
                               "magic-jarvis", "mimo-vision", "baize-skills",
                               "filesystem", "magic-wardrobe"]),
