@@ -87,7 +87,11 @@ class PrefixStabilityAdaptersTest {
         )
         override val keys = setOf("instructions", "tools", "input")
         override val replay = "ENC"
-        override val compactions = listOf(13, 24)
+        // 与另外三种不同：Responses 把助手消息、工具调用、回放的推理拆成三个
+        // input item，同样内容的线上字节比 Anthropic/Gemini/OpenAI 兼容多，
+        // 80K 窗口下更早越过压缩触发点（13→12 提前一次，且多压一次到 30）。
+        // 这是接口形态不同导致的，不是实现回归。
+        override val compactions = listOf(12, 21, 30)
         override fun zone0(body: JsonObject) = body["instructions"].toString() + body["tools"]
         override fun messages(body: JsonObject) = body["input"]!!.jsonArray.map { it.toString() }
         override fun tools(body: JsonObject) = body["tools"]!!.jsonArray.map { it.toString() to it.jsonObject.str("name")!! }

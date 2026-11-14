@@ -56,6 +56,13 @@ internal class LocalRealtimeSession(
     private var resampleLast = 0
     private var resamplePhase = 0
 
+    /**
+     * 上一帧是否真的存在过。首帧不能把 `padded[0]` 填成 `resampleLast`（初值 0），
+     * 那会让输出第 0 个采样恒为 0：纯音输入的开头被吃掉一个采样，常量信号更明显
+     * （整段输出第一步跳到 0 再回来）。跨帧衔接仍然用 `resampleLast`。
+     */
+    private var resampleStarted = false
+
     override val events: Flow<VolcRealtimeEvent> = flow {
         check(collecting.compareAndSet(false, true)) { "Realtime events have one consumer" }
         for (event in output) if (!discardPending) emit(event)
@@ -215,8 +222,10 @@ internal class LocalRealtimeSession(
         val samples = input.size / 2
         if (samples == 0) return ByteArray(0)
         // 拼接序列：p[0] = 上一帧末采样，p[1..n] = 本帧采样。
+        // 首帧没有上一帧，p[0] 必须取本帧第一个采样；填 0 会让输出第 0 个采样
+        // 恒为 0，常量输入整段在第一步跳 0、斜坡输入首步回跳。
         val padded = IntArray(samples + 1)
-        padded[0] = resampleLast
+        padded[0] = if (resampleStarted) resampleLast else readSample(input, 0)
         for (i in 0 until samples) padded[i + 1] = readSample(input, i)
         // 相位单位是 1/3 输入采样，跨帧保留；每输出一个采样步进 2。
         var pos = resamplePhase // 单位：1/3 采样，值域 0..2
@@ -231,6 +240,7 @@ internal class LocalRealtimeSession(
         }
         resamplePhase = pos - (samples * 3) // 下一帧起点相对本帧末尾的偏移
         resampleLast = padded[samples]
+        resampleStarted = true
         val out = ByteArray(result.size * 2)
         result.forEachIndexed { index, v -> writeSample(out, index, v) }
         return out
