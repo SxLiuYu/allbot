@@ -344,7 +344,8 @@ pull the tarball from GitHub Releases.
 
 > ⚠️ **Do not run `npm install -g allbot`**: that name on npm belongs to a 2015
 > chatbot framework (`bot-lab/allbot`, 0.1.70), so you would install an
-> unrelated package. AllBot is not published to npm.
+> unrelated package. Ours is scoped as `@sxliuyu/allbot` and is not on npm yet —
+> use the install scripts above.
 
 From source (when you want to change code or track `main`):
 

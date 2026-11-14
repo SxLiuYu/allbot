@@ -399,7 +399,7 @@ describe("update-cli", () => {
     vi.spyOn(updateCliShared, "readPackageName").mockImplementation(readPackageName);
     vi.spyOn(updateCliShared, "readPackageVersion").mockImplementation(readPackageVersion);
     vi.spyOn(updateCliShared, "resolveGlobalManager").mockImplementation(resolveGlobalManager);
-    readPackageName.mockResolvedValue("allbot");
+    readPackageName.mockResolvedValue("@sxliuyu/allbot");
     readPackageVersion.mockResolvedValue("1.0.0");
     resolveGlobalManager.mockResolvedValue("npm");
     serviceLoaded.mockResolvedValue(false);
@@ -583,7 +583,15 @@ describe("update-cli", () => {
       } else {
         expect(runGatewayUpdate).not.toHaveBeenCalled();
         expect(runCommandWithTimeout).toHaveBeenCalledWith(
-          ["npm", "i", "-g", "allbot@latest", "--no-fund", "--no-audit", "--loglevel=error"],
+          [
+            "npm",
+            "i",
+            "-g",
+            "@sxliuyu/allbot@latest",
+            "--no-fund",
+            "--no-audit",
+            "--loglevel=error",
+          ],
           expect.any(Object),
         );
       }
@@ -614,7 +622,7 @@ describe("update-cli", () => {
 
     expect(runGatewayUpdate).not.toHaveBeenCalled();
     expect(runCommandWithTimeout).toHaveBeenCalledWith(
-      ["npm", "i", "-g", "allbot@latest", "--no-fund", "--no-audit", "--loglevel=error"],
+      ["npm", "i", "-g", "@sxliuyu/allbot@latest", "--no-fund", "--no-audit", "--loglevel=error"],
       expect.any(Object),
     );
   });
@@ -632,7 +640,7 @@ describe("update-cli", () => {
 
     expect(runGatewayUpdate).not.toHaveBeenCalled();
     expect(runCommandWithTimeout).not.toHaveBeenCalledWith(
-      ["npm", "i", "-g", "allbot@latest", "--no-fund", "--no-audit", "--loglevel=error"],
+      ["npm", "i", "-g", "@sxliuyu/allbot@latest", "--no-fund", "--no-audit", "--loglevel=error"],
       expect.any(Object),
     );
     expect(defaultRuntime.exit).toHaveBeenCalledWith(1);
@@ -650,7 +658,7 @@ describe("update-cli", () => {
         mockPackageInstallStatus(createCaseDir("allbot-update"));
         await updateCommand({ tag: "next" });
       },
-      expectedSpec: "allbot@next",
+      expectedSpec: "@sxliuyu/allbot@next",
     },
     {
       name: "main shorthand",
@@ -685,7 +693,7 @@ describe("update-cli", () => {
     "resolves package install specs from tags and env overrides: $name",
     async ({ run, expectedSpec }) => {
       vi.clearAllMocks();
-      readPackageName.mockResolvedValue("allbot");
+      readPackageName.mockResolvedValue("@sxliuyu/allbot");
       readPackageVersion.mockResolvedValue("1.0.0");
       resolveGlobalManager.mockResolvedValue("npm");
       vi.mocked(resolveAllBotPackageRoot).mockResolvedValue(process.cwd());
@@ -814,7 +822,7 @@ describe("update-cli", () => {
           isOwningNpmCommand(argv[0], brewPrefix) &&
           argv[1] === "i" &&
           argv[2] === "-g" &&
-          argv[3] === "allbot@latest",
+          argv[3] === "@sxliuyu/allbot@latest",
       );
 
     expect(installCall).toBeDefined();

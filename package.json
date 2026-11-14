@@ -1,5 +1,5 @@
 {
-  "name": "allbot",
+  "name": "@sxliuyu/allbot",
   "version": "2026.11.14",
   "description": "Proactive cognitive AI assistant with Feishu/WeChat integration — learns user interests, pushes cross-domain insights, evolves skills, self-corrects. 40+ LLM providers, runs on cloud/desktop/Android.",
   "keywords": [
@@ -1022,6 +1022,9 @@
     },
     "./extension-api": "./dist/extensionAPI.js",
     "./cli-entry": "./allbot.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "allbot": "node scripts/run-node.mjs",

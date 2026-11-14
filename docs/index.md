@@ -110,6 +110,7 @@ curl -fsSL https://github.com/SxLiuYu/allbot/raw/main/scripts/install.sh | bash
 ```
 
 > `npm install -g allbot` downloads an unrelated 2015 project; do not use it.
+> The scoped name `@sxliuyu/allbot` is not published yet.
 
 **Or build from source:**
 

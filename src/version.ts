@@ -2,7 +2,9 @@ import { createRequire } from "node:module";
 import { normalizeOptionalString } from "./shared/string-coerce.js";
 
 declare const __ALLBOT_VERSION__: string | undefined;
-const CORE_PACKAGE_NAME = "allbot";
+// npm 包名带 scope：不带 scope 的 `allbot` 在 npm 上是 2015 年另一个项目。
+// 读 package.json 时按这个名字认「这是本仓库的清单」。
+const CORE_PACKAGE_NAME = "@sxliuyu/allbot";
 
 const PACKAGE_JSON_CANDIDATES = [
   "../package.json",

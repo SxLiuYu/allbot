@@ -7,12 +7,12 @@ on:
 
 jobs:
   publish-npm:
-    # The `allbot` name on npm belongs to an unrelated 2015 project
-    # (bot-lab/allbot), so trusted publishing cannot be registered for it and
-    # this job would fail on every tag. Keeping it as a hard failure only makes
-    # the release look broken. Set repo variable PUBLISH_NPM=true once the
-    # package is renamed to a scope (e.g. @sxliuyu/allbot) or npm ownership is
-    # obtained; until then the release ships via GitHub Releases + source.
+    # Package is now `@sxliuyu/allbot` (scoped). The bare `allbot` name on npm
+    # belongs to an unrelated 2015 project, which is why this used to be off.
+    # A scoped publish works, but OIDC trusted publishing still has to be
+    # registered for this repo/package on npmjs.com first — until then the job
+    # would fail with ENEEDAUTH. Set repo variable PUBLISH_NPM=true after that
+    # registration exists; releases ship via GitHub Releases + tarball either way.
     if: vars.PUBLISH_NPM == 'true'
     runs-on: ubuntu-24.04
     permissions:

@@ -357,7 +357,8 @@ allbot onboard   # 交互式向导，自动配置
 
 > ⚠️ **不要用 `npm install -g allbot`**：npm 上的 [`allbot`](https://www.npmjs.com/package/allbot)
 > 是 2015 年的另一个 chatbot 框架（`bot-lab/allbot`，0.1.70），装回来的是完全不相干的东西。
-> 本项目尚未发布到 npm。
+> 本项目的包名带 scope，是 `@sxliuyu/allbot`；首次发布完成前 npm 上还取不到，
+> 请用上面的脚本装。
 
 从源码装（想改代码或追 `main` 时用这个）：
 

@@ -57,10 +57,13 @@ export function parseTimeoutMsOrExit(timeout?: string): number | undefined | nul
 const ALLBOT_REPO_URL = "https://github.com/SxLiuYu/allbot.git";
 const MAX_LOG_CHARS = 8000;
 
-export const DEFAULT_PACKAGE_NAME = "allbot";
+// npm 包名带 scope；不带 scope 的 `allbot` 在 npm 上是 2015 年另一个项目，
+// 拿它去 `npm view` 会查到别人的版本号。
+export const DEFAULT_PACKAGE_NAME = "@sxliuyu/allbot";
 const CORE_PACKAGE_NAMES = new Set([DEFAULT_PACKAGE_NAME]);
 
 export function normalizeTag(value?: string | null): string | null {
+  // 两种写法都要认：历史用户可能还在用不带 scope 的 `allbot@next`。
   return normalizePackageTagInput(value, ["allbot", DEFAULT_PACKAGE_NAME]);
 }
 

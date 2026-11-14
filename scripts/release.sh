@@ -39,7 +39,7 @@ echo "[3/3] Pushed. CI will publish to npm (trusted publishing) and upload the t
 echo ""
 echo "=== Done! ==="
 echo "Watch CI:  https://github.com/SxLiuYu/allbot/actions"
-echo "npm:      npm install -g allbot@${VERSION}   (available after CI finishes)"
+echo "npm:      npm install -g @sxliuyu/allbot@${VERSION}   (available after CI finishes)"
 echo "tarball:  https://github.com/SxLiuYu/allbot/releases/download/v${VERSION}/allbot-${VERSION}.tgz"
 echo ""
 echo "Note: publish-npm job requires the npm trusted publisher registration"

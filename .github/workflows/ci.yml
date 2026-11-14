@@ -132,4 +132,3 @@ jobs:
             mobile/**/build/reports/tests/
             mobile/**/build/test-results/
           retention-days: 7
-

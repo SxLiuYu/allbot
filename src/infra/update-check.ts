@@ -8,6 +8,10 @@ import { channelToNpmTag, type UpdateChannel } from "./update-channels.js";
 
 export type PackageManager = "pnpm" | "bun" | "npm" | "unknown";
 
+// npm 包名带 scope。不带 scope 的 `allbot` 在 npm 上是 2015 年另一个项目，
+// 查它的版本号会拿到别人的数据。
+const NPM_PACKAGE_NAME = "@sxliuyu/allbot";
+
 export type GitUpdateStatus = {
   root: string;
   sha: string | null;
@@ -309,8 +313,10 @@ export async function fetchNpmPackageTargetStatus(params: {
   const timeoutMs = params.timeoutMs ?? 3500;
   const target = params.target;
   try {
+    // npm 包名带 scope，registry 路径里 `/` 必须编码成 %2F，
+    // 直接写 @scope/name 会 404。
     const res = await fetchWithTimeout(
-      `https://registry.npmjs.org/allbot/${encodeURIComponent(target)}`,
+      `https://registry.npmjs.org/${encodeURIComponent(NPM_PACKAGE_NAME)}/${encodeURIComponent(target)}`,
       {},
       Math.max(250, timeoutMs),
     );

@@ -1183,7 +1183,8 @@ detect_allbot_checkout() {
     if [[ ! -f "$dir/pnpm-workspace.yaml" ]]; then
         return 1
     fi
-    if ! grep -q '"name"[[:space:]]*:[[:space:]]*"allbot"' "$dir/package.json" 2>/dev/null; then
+    # npm 包名是 scope 形式，源码目录识别要按带 scope 的名字匹配
+    if ! grep -q '"name"[[:space:]]*:[[:space:]]*"@sxliuyu/allbot"' "$dir/package.json" 2>/dev/null; then
         return 1
     fi
     echo "$dir"
@@ -1958,8 +1959,9 @@ can_resolve_registry_package_version() {
     if is_explicit_package_install_spec "$value"; then
         return 1
     fi
-    # The `allbot` name on npm is an unrelated 2015 project, so there is no
-    # registry version to resolve. Only scope-qualified names can be looked up.
+    # `value` 是版本号（latest / 2026.11.14 / main），不是包名。scope 包名
+    # @sxliuyu/allbot 走 registry，非 scope 的 `allbot` 在 npm 上是 2015 年的
+    # 无关项目，绝不能拿去装。带 scope 的写法（@x/y@1.0）由上游早返回放行。
     if [[ "${value}" != @* ]]; then
         return 1
     fi
@@ -2029,14 +2031,15 @@ resolve_package_install_spec() {
 }
 
 install_allbot() {
-    local package_name="allbot"
+    # npm 包名是 scope 形式。`allbot`（无 scope）属于 2015 年另一个无关项目，
+    # 装它装的是别人家的东西。
+    local package_name="@sxliuyu/allbot"
     if [[ "$USE_BETA" == "1" ]]; then
         local beta_version=""
         beta_version="$(resolve_beta_version || true)"
         if [[ -n "$beta_version" ]]; then
             ALLBOT_VERSION="$beta_version"
             ui_info "Beta tag detected (${beta_version})"
-            package_name="allbot"
         else
             ALLBOT_VERSION="latest"
             ui_info "No beta tag found; using latest"
@@ -2047,12 +2050,12 @@ install_allbot() {
         ALLBOT_VERSION="latest"
     fi
 
-    # Default path: install from the GitHub Release tarball. npm is not a valid
-    # source for this repo (the `allbot` name belongs to another project), so we
-    # only fall back to npm-style specs when the caller passed one explicitly.
+    # Default path: install from the GitHub Release tarball, which works without
+    # an npm account and pins the exact bytes CI built. npm is only used when the
+    # caller passed an explicit package spec.
     local install_spec=""
     local release_pick=""
-    if ! is_explicit_package_install_spec "${ALLBOT_VERSION}" && [[ "${package_name}" != @* ]]; then
+    if ! is_explicit_package_install_spec "${ALLBOT_VERSION}"; then
         release_pick="$(resolve_release_tarball "${ALLBOT_VERSION}" || true)"
     fi
 
@@ -2077,11 +2080,11 @@ install_allbot() {
         install_allbot_npm "${install_spec}"
     fi
 
-    if [[ "${ALLBOT_VERSION}" == "latest" && "${package_name}" == "allbot" ]]; then
+    if [[ "${ALLBOT_VERSION}" == "latest" && "${package_name}" == "@sxliuyu/allbot" ]]; then
         if ! resolve_allbot_bin &> /dev/null; then
-            ui_warn "npm install allbot@latest failed; retrying allbot@next"
+            ui_warn "npm install ${package_name}@latest failed; retrying @next"
             cleanup_npm_allbot_paths
-            install_allbot_npm "allbot@next"
+            install_allbot_npm "${package_name}@next"
         fi
     fi
 
