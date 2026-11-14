@@ -107,8 +107,19 @@ jobs:
             exit 1
           fi
           echo "uploading $TARBALL for $TAG"
+          # 手写 notes 优先：仓库里的 commit 没有打 label，`--generate-notes`
+          # 只能产出一句 "Full Changelog" 的空壳。约定放
+          # `docs/releases/<tag>.md`，存在就整份拿来当 release 正文。
+          NOTES_FILE="docs/releases/${TAG}.md"
+          NOTES_ARGS=(--generate-notes)
+          if [ -f "$NOTES_FILE" ]; then
+            echo "using hand-written notes: $NOTES_FILE"
+            NOTES_ARGS=(--notes-file "$NOTES_FILE")
+          else
+            echo "no $NOTES_FILE, falling back to --generate-notes"
+          fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$TARBALL" --clobber
           else
-            gh release create "$TAG" "$TARBALL" --title "$TAG" --generate-notes
+            gh release create "$TAG" "$TARBALL" --title "$TAG" "${NOTES_ARGS[@]}"
           fi
