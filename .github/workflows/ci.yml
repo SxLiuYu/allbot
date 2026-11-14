@@ -125,6 +125,26 @@ jobs:
               echo "(no log captured)"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+      # Workflow commands land in the check run's `annotations`, which — unlike
+      # the job log — is readable through the public API without admin rights.
+      # One annotation per failing test so the list can be pulled programmatically.
+      - name: Publish failures as annotations
+        if: always()
+        working-directory: voice/charlie
+        run: |
+          if [ ! -f /tmp/voice-pytest.log ]; then
+            echo "::error title=voice pytest::no log captured"
+            exit 0
+          fi
+          n=0
+          while IFS= read -r line; do
+            n=$((n + 1))
+            [ "$n" -gt 50 ] && break
+            # `::` and `%` are reserved in workflow commands; escape them.
+            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | tr '\n' ' ')
+            echo "::error title=voice pytest::${msg}"
+          done < <(grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log || true)
+          echo "::error title=voice pytest summary::$(tail -1 /tmp/voice-pytest.log)"
       - name: Fail if tests failed
         if: steps.pytest.outputs.exit_code != '0'
         run: |
@@ -194,6 +214,21 @@ jobs:
               echo '```'
             done
           } >> "$GITHUB_STEP_SUMMARY"
+      # Same reason as voice: check-run annotations are readable anonymously,
+      # the job log is not.
+      - name: Publish failures as annotations
+        if: always()
+        run: |
+          for f in /tmp/mobile-core.log /tmp/mobile-app.log; do
+            [ -f "$f" ] || continue
+            n=0
+            while IFS= read -r line; do
+              n=$((n + 1))
+              [ "$n" -gt 25 ] && break
+              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | tr '\n' ' ' | cut -c1-800)
+              echo "::error title=$(basename "$f")::${msg}"
+            done < <(grep -E 'FAILED|error:|e: |What went wrong' "$f" || true)
+          done
       - name: Fail if either module's tests failed
         if: steps.core_test.outputs.exit_code != '0' || steps.app_test.outputs.exit_code != '0'
         run: |
