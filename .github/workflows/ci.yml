@@ -111,6 +111,27 @@ jobs:
           set +e
           python -m pytest tests -q --tb=short --junitxml=/tmp/voice-junit.xml 2>&1 | tee /tmp/voice-pytest.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+      # 分离「FR-14 未实现的失败」和「其他失败」。跑第二遍是浪费机器，但两件事
+      # 混在一个数字里没法判断进度，而 job 日志又读不到。新增算力换可见性，值。
+      - name: Run tests excluding FR-14 (diagnostic)
+        id: pytest_nonfr14
+        working-directory: voice/charlie
+        env:
+          ALLBOT_TEST_MODE: "1"
+        continue-on-error: true
+        run: |
+          set +e
+          python -m pytest tests -q --tb=line \
+            --ignore=tests/test_fr14_batch2_uid_sharding.py \
+            --ignore=tests/test_fr14_batch3a_system_msg_scope.py \
+            --ignore=tests/test_fr14_batch3b_tool_data_scope.py \
+            --ignore=tests/test_fr14_batch4a_device_binding.py \
+            --ignore=tests/test_fr14_batch4b_reminder_routing.py \
+            --ignore=tests/test_fr14_batch5_role_identity.py \
+            --ignore=tests/test_fr14_batch6_device_room.py \
+            --ignore=tests/test_fr14_cross_channel_dedup.py \
+            2>&1 | tee /tmp/voice-nonfr14.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
       - name: Summarise failures
         if: always()
         working-directory: voice/charlie
@@ -136,14 +157,25 @@ jobs:
             echo "::error title=voice pytest::no log captured"
             exit 0
           fi
-          grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log | head -8 | while IFS= read -r line; do
+          grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log | head -4 | while IFS= read -r line; do
             msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
             echo "::error title=voice pytest::${msg}"
           done
+          # 非 FR-14 那遍的失败单独发，前缀区分开，一眼能看出还剩多少与 FR-14 无关
+          if [ -f /tmp/voice-nonfr14.log ]; then
+            grep -E '^(FAILED|ERROR)' /tmp/voice-nonfr14.log | head -4 | while IFS= read -r line; do
+              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+              echo "::error title=voice non-fr14::${msg}"
+            done
+            grep -E '[0-9]+ (passed|failed|error|skipped)' /tmp/voice-nonfr14.log | tail -1 | while IFS= read -r line; do
+              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+              echo "::error title=voice non-fr14 summary::${msg}"
+            done
+          fi
           # `-q` 下 progress 点也被写进同一行，tail 会拿到一长串点号。pytest 的
           # 汇总行形如 "===== 3 failed, 2080 passed, 12 warnings in 240s ====="，
           # 要按 "N failed/passed" 匹配，不能只看行首。
-          summary=$(grep -E '[0-9]+ (passed|failed|error|skipped)' /tmp/voice-pytest.log | tail -2)
+          summary=$(grep -E '[0-9]+ (passed|failed|error|skipped)' /tmp/voice-pytest.log | tail -1)
           if [ -z "$summary" ]; then
             summary=$(tail -3 /tmp/voice-pytest.log)
           fi
