@@ -61,3 +61,75 @@ jobs:
       - run: pnpm test
         env:
           ALLBOT_BUNDLED_PLUGINS_DIR: ${{ github.workspace }}/extensions
+
+  # ---------------------------------------------------------------------------
+  # voice/ = vendored Charlie snapshot（Python/FastAPI）。
+  #
+  # Runs on 3.12 to match what the snapshot was developed against; 3.13 dropped
+  # `audioop`, which `_tts_local_stream` needs for downmix/resample.
+  #
+  # `libopus0` is not optional: `app/xiaozhi_codec.py` imports opuslib at module
+  # scope, so without the shared library every test that touches the xiaozhi WS
+  # path fails during collection rather than at assert time.
+  # ---------------------------------------------------------------------------
+  voice:
+    name: Voice
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: voice/charlie/requirements*.txt
+      - name: Install system packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg libopus0 libopus-dev portaudio19-dev
+      - name: Install Python dependencies
+        working-directory: voice/charlie
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+      - name: Run tests
+        working-directory: voice/charlie
+        env:
+          # 不联网、不读真实 Key；测试里凡是需要外部服务的都已被 mock。
+          ALLBOT_TEST_MODE: "1"
+        run: python -m pytest tests -q --tb=short
+      - name: Compile check
+        working-directory: voice/charlie
+        run: python -m compileall -q voice_server.py voice_agent.py local_wake.py presence.py app/ agent/
+
+  # ---------------------------------------------------------------------------
+  # mobile/ = vendored Mika/言出 snapshot（Android/Kotlin）。
+  #
+  # Two modules: `:core` is a plain kotlin-jvm module (no Android SDK needed),
+  # `:app` is the Android application. Both are exercised here so the README's
+  # "539 Kotlin tests" claim stays true.
+  # ---------------------------------------------------------------------------
+  mobile:
+    name: Mobile
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Unit tests
+        working-directory: mobile
+        run: ./gradlew :core:test :app:testDebugUnitTest --stacktrace
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-test-reports
+          path: |
+            mobile/**/build/reports/tests/
+            mobile/**/build/test-results/
+          retention-days: 7
+
