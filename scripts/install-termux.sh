@@ -117,7 +117,7 @@ fi
 if [ -z "$KB_VER" ]; then
   printf '\033[31m✗\033[0m 无法从 GitHub 获取 AllBot 版本号。\n' >&2
   printf '  请检查网络后重试，或手动指定版本：\n' >&2
-  printf '  ALLBOT_VERSION=2026.11.16 bash install-termux.sh\n' >&2
+  printf '  ALLBOT_VERSION=2026.11.17 bash install-termux.sh\n' >&2
   exit 1
 fi
 

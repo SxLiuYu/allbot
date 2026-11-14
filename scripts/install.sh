@@ -1959,7 +1959,7 @@ can_resolve_registry_package_version() {
     if is_explicit_package_install_spec "$value"; then
         return 1
     fi
-    # `value` 是版本号（latest / 2026.11.16 / main），不是包名。scope 包名
+    # `value` 是版本号（latest / 2026.11.17 / main），不是包名。scope 包名
     # @sxliuyu/allbot 走 registry，非 scope 的 `allbot` 在 npm 上是 2015 年的
     # 无关项目，绝不能拿去装。带 scope 的写法（@x/y@1.0）由上游早返回放行。
     if [[ "${value}" != @* ]]; then
