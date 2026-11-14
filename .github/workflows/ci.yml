@@ -92,15 +92,44 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
+      # 语法检查放测试之前：测试红了会跳过后面所有步骤，那连「能不能 import」
+      # 这种更基础的问题都看不到。
+      - name: Compile check
+        working-directory: voice/charlie
+        run: python -m compileall -q voice_server.py voice_agent.py local_wake.py presence.py app/ agent/
       - name: Run tests
+        id: pytest
         working-directory: voice/charlie
         env:
           # 不联网、不读真实 Key；测试里凡是需要外部服务的都已被 mock。
           ALLBOT_TEST_MODE: "1"
-        run: python -m pytest tests -q --tb=short
-      - name: Compile check
+        # continue-on-error + 单独一步判定：这样失败清单能完整落进 Job Summary。
+        # 直接用 `run: pytest` 时，红了的 job 只留一句 exit code，看不到是哪些
+        # 用例——仓库 API 拿 job 日志还要求 admin 权限。
+        continue-on-error: true
+        run: |
+          set +e
+          python -m pytest tests -q --tb=short --junitxml=/tmp/voice-junit.xml 2>&1 | tee /tmp/voice-pytest.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+      - name: Summarise failures
+        if: always()
         working-directory: voice/charlie
-        run: python -m compileall -q voice_server.py voice_agent.py local_wake.py presence.py app/ agent/
+        run: |
+          {
+            echo "### voice/ pytest"
+            if [ -f /tmp/voice-pytest.log ]; then
+              grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log | head -100 || echo "(no FAILED/ERROR lines)"
+              echo
+              tail -3 /tmp/voice-pytest.log
+            else
+              echo "(no log captured)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Fail if tests failed
+        if: steps.pytest.outputs.exit_code != '0'
+        run: |
+          echo "pytest exited ${{ steps.pytest.outputs.exit_code }}"
+          exit 1
 
   # ---------------------------------------------------------------------------
   # mobile/ = vendored Mika/言出 snapshot（Android/Kotlin）。
@@ -108,6 +137,11 @@ jobs:
   # Two modules: `:core` is a plain kotlin-jvm module (no Android SDK needed),
   # `:app` is the Android application. Both are exercised here so the README's
   # "539 Kotlin tests" claim stays true.
+  #
+  # `:app` needs the Android SDK: app/build.gradle.kts pins compileSdk = 36,
+  # and without a platform installed the Kotlin compile task fails before any
+  # test runs. `local.properties` is gitignored, so the SDK path must come from
+  # ANDROID_HOME/sdk.dir that the setup action provides.
   # ---------------------------------------------------------------------------
   mobile:
     name: Mobile
@@ -119,10 +153,21 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: true
+      - name: Install SDK platform for compileSdk
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Unit tests
+      # Split the two modules so a `:app` environment problem doesn't hide
+      # `:core` results — `:core` is pure JVM and always runnable.
+      - name: Unit tests (:core, pure JVM)
         working-directory: mobile
-        run: ./gradlew :core:test :app:testDebugUnitTest --stacktrace
+        run: ./gradlew :core:test --stacktrace
+      - name: Unit tests (:app, Android)
+        working-directory: mobile
+        run: ./gradlew :app:testDebugUnitTest --stacktrace
       - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4
