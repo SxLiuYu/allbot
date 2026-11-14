@@ -162,12 +162,44 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       # Split the two modules so a `:app` environment problem doesn't hide
       # `:core` results — `:core` is pure JVM and always runnable.
+      # continue-on-error + a summary step for the same reason as voice: the
+      # job log needs admin rights to read through the API, the Job Summary
+      # does not.
       - name: Unit tests (:core, pure JVM)
+        id: core_test
+        continue-on-error: true
         working-directory: mobile
-        run: ./gradlew :core:test --stacktrace
+        run: |
+          set +e
+          ./gradlew :core:test --stacktrace 2>&1 | tee /tmp/mobile-core.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
       - name: Unit tests (:app, Android)
+        id: app_test
+        continue-on-error: true
         working-directory: mobile
-        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        run: |
+          set +e
+          ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee /tmp/mobile-app.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+      - name: Summarise failures
+        if: always()
+        run: |
+          {
+            echo "### mobile/ gradle"
+            for f in /tmp/mobile-core.log /tmp/mobile-app.log; do
+              [ -f "$f" ] || continue
+              echo "#### $(basename "$f")"
+              echo '```'
+              grep -E 'FAILED|error:|e: |What went wrong' -A3 "$f" | head -60 || tail -20 "$f"
+              echo '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Fail if either module's tests failed
+        if: steps.core_test.outputs.exit_code != '0' || steps.app_test.outputs.exit_code != '0'
+        run: |
+          echo ":core exit=${{ steps.core_test.outputs.exit_code }}"
+          echo ":app  exit=${{ steps.app_test.outputs.exit_code }}"
+          exit 1
       - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4
