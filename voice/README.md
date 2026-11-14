@@ -200,6 +200,8 @@ voice/
 │   ├── ESP32.md              # ESP32 烧录指南
 │   ├── DEPLOYMENT.md         # 部署指南
 │   ├── DEMO_MODE.md          # Demo 模式说明
+│   ├── LOCAL-REALTIME.md     # 局域网语音链路（Mac realtime 四件套）
+│   ├── SETTINGS-AND-KEYS.md  # 设置中心 + StepFun 多 Key 轮询
 │   └── WINDOWS_BUILD.md      # Windows 打包
 └── skills/                   # MCP 技能生态
 ```
