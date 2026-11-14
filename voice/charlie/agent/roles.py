@@ -121,12 +121,19 @@ def switch_role(role_id: str) -> tuple[bool, str]:
     if role_id not in _ROLES:
         available = ", ".join(_ROLES.keys())
         return False, f"未知角色 '{role_id}'，可选: {available}"
+    role = _ROLES[role_id]
+    # 先切内存里的当前角色，再尝试落盘。反过来的话，一次偏好写入失败
+    # （磁盘满、权限、锁被占）会让整个切换返回失败，而 _current_role 也没变——
+    # 用户看到「切换失败」，实际什么都没发生，连临时切一下都做不到。
+    # 角色是进程内状态，持久化只是为了保证重启后还在。
+    _current_role = role_id
     try:
         from agent.preferences import set_preference
         set_preference("current_role", role_id)
-        _current_role = role_id
-        role = _ROLES[role_id]
         log.info(f"[roles] 切换角色: {role['name']} ({role_id})")
+    except Exception as e:  # noqa: BLE001 落盘失败不该回滚内存状态
+        log.warning(f"[roles] 角色已切到 {role_id}，但写偏好失败（重启后会丢）: {e}")
+    try:
         # 切换角色改变 tts_voice 时清空 TTS 缓存，避免旧角色缓存占槽位
         try:
             from agent.asr_tts import _tts_cache, _tts_lock
@@ -144,9 +151,11 @@ def switch_role(role_id: str) -> tuple[bool, str]:
         except Exception as e:
             log.debug(f"[agent.roles] error at line 130: {e}")
             pass
-        return True, f"已切换为 {role['name']} 模式"
-    except Exception as e:
-        return False, f"切换角色失败: {e}"
+    except Exception as e:  # noqa: BLE001
+        # 到这里 _current_role 已经切好了。缓存清理是尽力而为的副作用，
+        # 它失败不该让调用方以为角色没切成。
+        log.warning(f"[roles] 角色已切到 {role_id}，但缓存清理失败: {e}")
+    return True, f"已切换为 {role['name']} 模式"
 
 
 def get_role_system_prompt(role_id: Optional[str] = None) -> str:
