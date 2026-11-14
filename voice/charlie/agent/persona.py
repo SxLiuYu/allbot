@@ -64,9 +64,16 @@ def _load(uid: str = None) -> dict:
                 state = json.load(f)
         except Exception:
             state = copy.deepcopy(_DEFAULT)
-        # 迁移：旧文件缺少新字段时补默认值
+        # 迁移：旧文件缺少新字段时补默认值。
+        # 用 `get(k) is None` 而不是 `setdefault`：setdefault 只在键不存在时生效，
+        # 但磁盘上存在 `"interaction_count": null` 这种半损坏的人设文件（旧版本
+        # 写过、或手工编辑过）。那种情况下 setdefault 不修，后续
+        # `state["interaction_count"] += 1` 会抛
+        # `unsupported operand type(s) for +=: 'NoneType' and 'int'`，
+        # 表现为「切换角色失败」这种看起来毫不相关的错误。
         for k, v in _DEFAULT.items():
-            state.setdefault(k, v)
+            if state.get(k) is None:
+                state[k] = copy.deepcopy(v)
         _states[uid] = state
         return state
 
