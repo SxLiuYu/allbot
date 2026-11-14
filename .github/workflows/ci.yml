@@ -127,7 +127,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       # Workflow commands land in the check run's `annotations`, which — unlike
       # the job log — is readable through the public API without admin rights.
-      # One annotation per failing test so the list can be pulled programmatically.
+      # GitHub caps a step at 10 annotations, so: 8 failing tests + 2 summary lines.
       - name: Publish failures as annotations
         if: always()
         working-directory: voice/charlie
@@ -136,15 +136,16 @@ jobs:
             echo "::error title=voice pytest::no log captured"
             exit 0
           fi
-          n=0
-          while IFS= read -r line; do
-            n=$((n + 1))
-            [ "$n" -gt 50 ] && break
-            # `::` and `%` are reserved in workflow commands; escape them.
-            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | tr '\n' ' ')
+          grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log | head -8 | while IFS= read -r line; do
+            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
             echo "::error title=voice pytest::${msg}"
-          done < <(grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log || true)
-          echo "::error title=voice pytest summary::$(tail -1 /tmp/voice-pytest.log)"
+          done
+          # 汇总行（"N failed, M passed"）给总数，定位优先看它。
+          tail -2 /tmp/voice-pytest.log | while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+            echo "::error title=voice pytest summary::${msg}"
+          done
       - name: Fail if tests failed
         if: steps.pytest.outputs.exit_code != '0'
         run: |
@@ -221,13 +222,19 @@ jobs:
         run: |
           for f in /tmp/mobile-core.log /tmp/mobile-app.log; do
             [ -f "$f" ] || continue
-            n=0
-            while IFS= read -r line; do
-              n=$((n + 1))
-              [ "$n" -gt 25 ] && break
-              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | tr '\n' ' ' | cut -c1-800)
-              echo "::error title=$(basename "$f")::${msg}"
-            done < <(grep -E 'FAILED|error:|e: |What went wrong' "$f" || true)
+            base=$(basename "$f")
+            # Gradle 的失败原因常在最后几行（BUILD FAILED / What went wrong）。
+            # GitHub 每个 step 最多收 10 条 annotation，所以尾部只发 6 行、
+            # 关键行发 4 条，避免互相挤掉。
+            tail -6 "$f" | while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+              echo "::error title=${base} tail::${msg}"
+            done
+            grep -nE 'FAILED|error:|^e: |What went wrong|Execution failed' "$f" | tail -4 | while IFS= read -r line; do
+              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+              echo "::error title=${base} key::${msg}"
+            done
           done
       - name: Fail if either module's tests failed
         if: steps.core_test.outputs.exit_code != '0' || steps.app_test.outputs.exit_code != '0'
