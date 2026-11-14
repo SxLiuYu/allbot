@@ -136,28 +136,26 @@ jobs:
         if: always()
         working-directory: voice/charlie
         run: |
-          if [ ! -f /tmp/voice-pytest.log ]; then
-            echo "::error title=voice pytest::no log captured"
-            exit 0
+          # `-q` 下进度点会拼在 FAILED 行前面，`^FAILED` 匹配不到；JUnit XML 里的
+          # <failure> 才是干净的来源，还带断言消息。脚本放 scripts/ 是因为 heredoc
+          # 写在 run: | 块里会被 YAML 缩进规则弄坏（左对齐即结束块）。
+          if [ -f /tmp/voice-junit.xml ]; then
+            python3 ../../scripts/pytest-junit-to-annotations.py /tmp/voice-junit.xml
+          else
+            echo "::error title=voice pytest::no junit xml produced"
           fi
-          grep -E '^(FAILED|ERROR)' /tmp/voice-pytest.log | head -4 | while IFS= read -r line; do
-            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
-            echo "::error title=voice pytest::${msg}"
-          done
-          # xfail 的条数只进汇总，不占 annotation 配额：它不代表失败，但
+          # xfail 的条数只进日志，不占 annotation 配额：它不代表失败，但
           # 「标记了几条、有没有偷偷变多」是必须能看到的。
-          xfail=$(grep -c '^XFAIL' /tmp/voice-pytest.log || true)
-          echo "# xfail: ${xfail}"
-          # `-q` 下 progress 点也被写进同一行，tail 会拿到一长串点号。pytest 的
+          echo "# xfail: $(grep -c 'XFAIL' /tmp/voice-pytest.log || true)"
           # 汇总行形如 "===== 3 failed, 2080 passed, 12 warnings in 240s ====="，
-          # 要按 "N failed/passed" 匹配，不能只看行首。
+          # 要按行内 "N failed/passed" 匹配，不能只看行首。
           summary=$(grep -E '[0-9]+ (passed|failed|error|skipped)' /tmp/voice-pytest.log | tail -1)
           if [ -z "$summary" ]; then
             summary=$(tail -3 /tmp/voice-pytest.log)
           fi
           printf '%s\n' "$summary" | while IFS= read -r line; do
             [ -z "$line" ] && continue
-            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+            msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-600)
             echo "::error title=voice pytest summary::${msg}"
           done
       - name: Fail if tests failed
