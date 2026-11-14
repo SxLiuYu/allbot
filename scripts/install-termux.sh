@@ -85,7 +85,7 @@ process.stdin.on("data", (d) => (s += d)).on("end", () => {
       .filter((r) => /^v\d{4}\.\d{1,2}\.\d{1,2}(-\d+)?$/.test(r.tag_name || ""))
       .sort((a, b) => (a.tag_name < b.tag_name ? 1 : -1));
     for (const r of ok) {
-      const tgz = (r.assets || []).find((a) => /^allbot-.*\.tgz$/.test(a.name || ""));
+      const tgz = (r.assets || []).find((a) => /^(?:[a-z0-9-]+-)?allbot-.*\.tgz$/.test(a.name || ""));
       if (tgz) {
         console.log(r.tag_name.replace(/^v/, "") + "\t" + tgz.browser_download_url + "\t" + tgz.name);
         return;
@@ -107,7 +107,10 @@ if [ -z "${ALLBOT_VERSION:-}" ] && [ -n "$PICK" ]; then
   TGZ_NAME=$(printf '%s' "$PICK" | cut -f3)
 else
   KB_VER="${ALLBOT_VERSION:-}"
-  TGZ_NAME="allbot-${KB_VER}.tgz"
+  # 包名是 scoped 的 @sxliuyu/allbot，npm pack 产出的文件名带 scope 前缀：
+  # sxliuyu-allbot-<ver>.tgz。手动指定版本时走的就是这条兜底路径，
+  # 名字写错会直接 404。
+  TGZ_NAME="sxliuyu-allbot-${KB_VER}.tgz"
   TGZ_URL="https://github.com/SxLiuYu/allbot/releases/download/v${KB_VER}/${TGZ_NAME}"
 fi
 

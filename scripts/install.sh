@@ -1994,7 +1994,7 @@ process.stdin.on("data", (d) => (s += d)).on("end", () => {
       .sort((a, b) => (a.tag_name < b.tag_name ? 1 : -1));
     for (const r of ok) {
       if (want !== "latest" && r.tag_name.replace(/^v/, "") !== want) continue;
-      const tgz = (r.assets || []).find((a) => /^allbot-.*\.tgz$/.test(a.name || ""));
+      const tgz = (r.assets || []).find((a) => /^(?:[a-z0-9-]+-)?allbot-.*\.tgz$/.test(a.name || ""));
       if (tgz) {
         process.stdout.write(r.tag_name.replace(/^v/, "") + "\t" + tgz.browser_download_url);
         return;

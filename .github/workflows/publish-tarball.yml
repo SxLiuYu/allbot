@@ -87,6 +87,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           TAG=${GITHUB_REF#refs/tags/}
-          TARBALL=$(ls allbot-*.tgz | head -1)
-          gh release create "$TAG" "$TARBALL" --title "$TAG" --generate-notes || gh release upload "$TAG" "$TARBALL" --clobber
+          # 包名是 scoped 的 `@sxliuyu/allbot`，`npm pack` 产出的文件名是
+          # `sxliuyu-allbot-<ver>.tgz`，不是 `allbot-<ver>.tgz`。原来按
+          # `allbot-*.tgz` 匹配，得到一个空变量，`gh release create` 因缺文件
+          # 参数失败（v2026.11.15 就是这样挂的）。同时兼容两种形态，防止以后
+          # 又改回非 scoped 包名。
+          TARBALL=$(ls -1 sxliuyu-allbot-*.tgz allbot-*.tgz 2>/dev/null | head -1)
+          if [ -z "$TARBALL" ]; then
+            echo "::error title=publish::npm pack 未产出 tarball"
+            ls -1 *.tgz || echo "(no .tgz in workspace)"
+            exit 1
+          fi
+          echo "uploading $TARBALL for $TAG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$TARBALL" --clobber
+          else
+            gh release create "$TAG" "$TARBALL" --title "$TAG" --generate-notes
+          fi

@@ -1,4 +1,8 @@
-import { spawnSync, type SpawnSyncOptions, type SpawnSyncReturns } from "node:child_process";
+import {
+  spawnSync,
+  type SpawnSyncOptions,
+  type SpawnSyncReturns,
+} from "node:child_process";
 import { accessSync, constants } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
@@ -11,7 +15,11 @@ export type AndroidInstallOptions = {
   nonInteractive?: boolean;
 };
 
-const REQUIRED_PACKAGES: ReadonlyArray<{ pkg: string; binary: string; required: boolean }> = [
+const REQUIRED_PACKAGES: ReadonlyArray<{
+  pkg: string;
+  binary: string;
+  required: boolean;
+}> = [
   { pkg: "git", binary: "git", required: true },
   { pkg: "lsof", binary: "lsof", required: true },
   { pkg: "imagemagick", binary: "magick", required: false },
@@ -79,7 +87,10 @@ export async function runAndroidInstall(
 }
 
 function isTermux(): boolean {
-  return process.platform === "android" && Boolean(process.env.PREFIX?.includes("com.termux"));
+  return (
+    process.platform === "android" &&
+    Boolean(process.env.PREFIX?.includes("com.termux"))
+  );
 }
 
 function run(
@@ -87,10 +98,17 @@ function run(
   args: readonly string[],
   options: SpawnSyncOptions = {},
 ): SpawnSyncReturns<string | Buffer> {
-  return spawnSync(cmd, args as string[], { ...DEFAULT_SPAWN_OPTIONS, ...options });
+  return spawnSync(cmd, args as string[], {
+    ...DEFAULT_SPAWN_OPTIONS,
+    ...options,
+  });
 }
 
-function runText(cmd: string, args: readonly string[], options: SpawnSyncOptions = {}): string {
+function runText(
+  cmd: string,
+  args: readonly string[],
+  options: SpawnSyncOptions = {},
+): string {
   const result = run(cmd, args, options);
   if (result.status !== 0 || result.error) {
     return "";
@@ -106,7 +124,11 @@ function runText(cmd: string, args: readonly string[], options: SpawnSyncOptions
  * because `which` is not guaranteed to exist on Termux/Android.
  */
 function findBinary(name: string): string {
-  const result = spawnSync("sh", ["-c", `command -v "${name}"`], DEFAULT_SPAWN_OPTIONS);
+  const result = spawnSync(
+    "sh",
+    ["-c", `command -v "${name}"`],
+    DEFAULT_SPAWN_OPTIONS,
+  );
   if (result.status === 0 && typeof result.stdout === "string") {
     const found = result.stdout.trim();
     if (found.length > 0) {
@@ -153,7 +175,9 @@ function isChinaTimezone(): boolean {
 
 async function switchTermuxMirror(runtime: OutputRuntimeEnv): Promise<void> {
   if (!isChinaTimezone()) {
-    runtime.log(`  ${theme.success("✓")} Termux default mirror (non-China timezone)`);
+    runtime.log(
+      `  ${theme.success("✓")} Termux default mirror (non-China timezone)`,
+    );
     return;
   }
   const sourcesPath = path.join(
@@ -188,7 +212,9 @@ async function ensureNode(runtime: OutputRuntimeEnv): Promise<void> {
   }
 
   if (major === null) {
-    runtime.log(`  ${theme.warn("→")} Node.js not found. Installing nodejs-lts via pkg...`);
+    runtime.log(
+      `  ${theme.warn("→")} Node.js not found. Installing nodejs-lts via pkg...`,
+    );
   } else {
     runtime.log(
       `  ${theme.warn("→")} Node.js too old (v${major}). Upgrading to nodejs-lts via pkg...`,
@@ -205,10 +231,14 @@ async function ensureNode(runtime: OutputRuntimeEnv): Promise<void> {
     runtime.exit(1);
     return;
   }
-  runtime.log(`  ${theme.success("✓")} Node.js installed (v${refreshed.replace(/^v/, "")})`);
+  runtime.log(
+    `  ${theme.success("✓")} Node.js installed (v${refreshed.replace(/^v/, "")})`,
+  );
 }
 
-async function ensureRequiredPackages(runtime: OutputRuntimeEnv): Promise<void> {
+async function ensureRequiredPackages(
+  runtime: OutputRuntimeEnv,
+): Promise<void> {
   for (const { pkg, binary, required } of REQUIRED_PACKAGES) {
     const found = findBinary(binary);
     if (found.length > 0) {
@@ -252,13 +282,17 @@ function runPkg(runtime: OutputRuntimeEnv, args: readonly string[]): void {
 async function ensureAllBot(runtime: OutputRuntimeEnv): Promise<void> {
   const version = runText("allbot", ["--version"]);
   if (version.length > 0) {
-    runtime.log(`  ${theme.success("✓")} AllBot CLI present (${theme.muted(version)})`);
+    runtime.log(
+      `  ${theme.success("✓")} AllBot CLI present (${theme.muted(version)})`,
+    );
     return;
   }
   // Never install `allbot` from npm: that name belongs to an unrelated 2015
   // project. The release tarball is the only supported source, and its asset
   // name does not always match the tag, so resolve it from the releases API.
-  runtime.log(`  ${theme.warn("→")} AllBot CLI not found. Installing from the latest release...`);
+  runtime.log(
+    `  ${theme.warn("→")} AllBot CLI not found. Installing from the latest release...`,
+  );
   const tarballUrl = resolveReleaseTarballUrl();
   if (!tarballUrl) {
     runtime.error(
@@ -267,7 +301,9 @@ async function ensureAllBot(runtime: OutputRuntimeEnv): Promise<void> {
     runtime.exit(1);
     return;
   }
-  const install = run("npm", ["install", "-g", tarballUrl, "--force"], { stdio: "inherit" });
+  const install = run("npm", ["install", "-g", tarballUrl, "--force"], {
+    stdio: "inherit",
+  });
   if (install.error || install.status !== 0) {
     runtime.error(
       `Failed to install AllBot. Run ${theme.command(`npm install -g ${tarballUrl} --force`)} manually.`,
@@ -282,6 +318,11 @@ async function ensureAllBot(runtime: OutputRuntimeEnv): Promise<void> {
  * Newest `v<calver>` release that actually carries an `allbot-*.tgz` asset.
  * The releases list also holds a `launcher` tag (the Android APK), so the tag
  * pattern matters. Returns null when the API is unreachable or unparseable.
+ *
+ * 包名是 scoped 的 `@sxliuyu/allbot`，`npm pack` 产出的 asset 名是
+ * `sxliuyu-allbot-<ver>.tgz`。原来的正则只认 `allbot-*`，改 scope 之后
+ * 一个都匹配不到 —— tarball 安装链路会静静地回退到 npm 全局安装。
+ * 两种形态都接受，避免以后再改包名时又漏一处。
  */
 function resolveReleaseTarballUrl(): string | null {
   const script =
@@ -289,7 +330,7 @@ function resolveReleaseTarballUrl(): string | null {
     "try{const rs=JSON.parse(s);" +
     'const ok=rs.filter(r=>/^v\\d{4}\\.\\d{1,2}\\.\\d{1,2}(-\\d+)?$/.test(r.tag_name||""))' +
     ".sort((a,b)=>(a.tag_name<b.tag_name?1:-1));" +
-    'for(const r of ok){const t=(r.assets||[]).find(a=>/^allbot-.*\\.tgz$/.test(a.name||""));' +
+    'for(const r of ok){const t=(r.assets||[]).find(a=>/^(?:[a-z0-9-]+-)?allbot-.*\\.tgz$/.test(a.name||""));' +
     "if(t){console.log(t.browser_download_url);return}}}catch(e){}});";
   const probe = run("curl", [
     "-fsSL",
@@ -309,11 +350,19 @@ function resolveReleaseTarballUrl(): string | null {
 }
 
 async function installSharpWasm32(runtime: OutputRuntimeEnv): Promise<void> {
-  runtime.log(`  ${theme.warn("→")} Installing @img/sharp-wasm32 (image processing)...`);
-  const registry = isChinaTimezone() ? ["--registry=https://registry.npmmirror.com"] : [];
-  const result = run("npm", ["install", "-g", "@img/sharp-wasm32", "--force", ...registry], {
-    stdio: "inherit",
-  });
+  runtime.log(
+    `  ${theme.warn("→")} Installing @img/sharp-wasm32 (image processing)...`,
+  );
+  const registry = isChinaTimezone()
+    ? ["--registry=https://registry.npmmirror.com"]
+    : [];
+  const result = run(
+    "npm",
+    ["install", "-g", "@img/sharp-wasm32", "--force", ...registry],
+    {
+      stdio: "inherit",
+    },
+  );
   if (result.error || result.status !== 0) {
     runtime.log(
       `  ${theme.warn("⚠")} Could not install @img/sharp-wasm32 (image features may be limited). Retry with ${theme.command("npm install -g @img/sharp-wasm32 --force")}.`,
@@ -335,7 +384,9 @@ async function writeBootScript(runtime: OutputRuntimeEnv): Promise<void> {
   } catch {
     // best-effort; writeTextAtomic already attempted chmod
   }
-  runtime.log(`  ${theme.success("✓")} Boot script written: ${theme.accent(bootPath)}`);
+  runtime.log(
+    `  ${theme.success("✓")} Boot script written: ${theme.accent(bootPath)}`,
+  );
 
   const allbotDir = path.join(os.homedir(), ".allbot");
   const startScriptPath = path.join(allbotDir, "start-gateway.sh");
@@ -354,7 +405,9 @@ async function writeBootScript(runtime: OutputRuntimeEnv): Promise<void> {
   } catch {
     // best-effort
   }
-  runtime.log(`  ${theme.success("✓")} Start script written: ${theme.accent(startScriptPath)}`);
+  runtime.log(
+    `  ${theme.success("✓")} Start script written: ${theme.accent(startScriptPath)}`,
+  );
 }
 
 async function writeBashrcAutostart(runtime: OutputRuntimeEnv): Promise<void> {
@@ -395,9 +448,13 @@ function triggerBatteryDialog(runtime: OutputRuntimeEnv): void {
     { stdio: "ignore" },
   );
   if (result.status === 0) {
-    runtime.log(`  ${theme.success("✓")} Battery settings opened — tap "Allow"`);
+    runtime.log(
+      `  ${theme.success("✓")} Battery settings opened — tap "Allow"`,
+    );
   } else {
-    runtime.log(`  ${theme.warn("⚠")} Could not auto-open settings. See manual steps below.`);
+    runtime.log(
+      `  ${theme.warn("⚠")} Could not auto-open settings. See manual steps below.`,
+    );
   }
 }
 
@@ -428,7 +485,9 @@ function checkTermuxBoot(runtime: OutputRuntimeEnv): void {
   runtime.log(
     `  Install it from F-Droid: ${theme.command("https://f-droid.org/packages/com.termux.boot/")}`,
   );
-  runtime.log(`  Then open it once and tap "Allow" when it requests permissions.`);
+  runtime.log(
+    `  Then open it once and tap "Allow" when it requests permissions.`,
+  );
   runtime.log("");
 }
 
@@ -489,7 +548,9 @@ function batteryInstructionsFor(manufacturer: string): string[] {
   }
 }
 
-async function ensureAllowExternalApps(runtime: OutputRuntimeEnv): Promise<void> {
+async function ensureAllowExternalApps(
+  runtime: OutputRuntimeEnv,
+): Promise<void> {
   const propsPath = path.join(os.homedir(), ".termux", "termux.properties");
   let existing = "";
   try {
@@ -507,14 +568,22 @@ async function ensureAllowExternalApps(runtime: OutputRuntimeEnv): Promise<void>
     existing.length === 0 || existing.endsWith("\n")
       ? `${existing}allow-external-apps=true\n`
       : `${existing}\nallow-external-apps=true\n`;
-  await writeTextAtomic(propsPath, appended, { mode: PROPS_FILE_MODE, ensureDirMode: 0o700 });
+  await writeTextAtomic(propsPath, appended, {
+    mode: PROPS_FILE_MODE,
+    ensureDirMode: 0o700,
+  });
   runtime.log(
     `  ${theme.success("✓")} allow-external-apps=true appended to ${theme.accent(propsPath)}`,
   );
-  runtime.log(`  ${theme.muted("    Reload with: ")}${theme.command("termux-reload-settings")}`);
+  runtime.log(
+    `  ${theme.muted("    Reload with: ")}${theme.command("termux-reload-settings")}`,
+  );
 }
 
-async function runOnboard(runtime: OutputRuntimeEnv, opts: AndroidInstallOptions): Promise<void> {
+async function runOnboard(
+  runtime: OutputRuntimeEnv,
+  opts: AndroidInstallOptions,
+): Promise<void> {
   runtime.log("");
   runtime.log(theme.heading("Starting onboard wizard..."));
   runtime.log(`  ${theme.muted("Configure your LLM API key and Feishu bot.")}`);
@@ -551,17 +620,30 @@ async function startGateway(runtime: OutputRuntimeEnv): Promise<void> {
 
   spawnSync("termux-wake-lock", [], { stdio: "ignore" });
   const logPath = path.join(os.homedir(), ".allbot", "gateway.log");
-  spawnSync("bash", ["-c", `nohup allbot gateway --port ${GATEWAY_PORT} >> "${logPath}" 2>&1 &`], {
-    stdio: "ignore",
-  });
+  spawnSync(
+    "bash",
+    [
+      "-c",
+      `nohup allbot gateway --port ${GATEWAY_PORT} >> "${logPath}" 2>&1 &`,
+    ],
+    {
+      stdio: "ignore",
+    },
+  );
   await new Promise((resolve) => setTimeout(resolve, 3000));
   const alive = runText("pgrep", ["-f", "allbot"]);
   if (alive.length > 0) {
-    runtime.log(`  ${theme.success("✓")} Gateway started on port ${GATEWAY_PORT}`);
+    runtime.log(
+      `  ${theme.success("✓")} Gateway started on port ${GATEWAY_PORT}`,
+    );
     runtime.log(`  ${theme.muted("    Logs: tail -f ~/.allbot/gateway.log")}`);
   } else {
-    runtime.log(`  ${theme.warn("⚠")} Gateway may not have started. Check logs:`);
+    runtime.log(
+      `  ${theme.warn("⚠")} Gateway may not have started. Check logs:`,
+    );
     runtime.log(`  ${theme.muted("    tail -20 ~/.allbot/gateway.log")}`);
-    runtime.log(`  ${theme.muted(`    Or start manually: allbot gateway --port ${GATEWAY_PORT}`)}`);
+    runtime.log(
+      `  ${theme.muted(`    Or start manually: allbot gateway --port ${GATEWAY_PORT}`)}`,
+    );
   }
 }
