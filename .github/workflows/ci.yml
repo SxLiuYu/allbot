@@ -140,8 +140,14 @@ jobs:
             msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
             echo "::error title=voice pytest::${msg}"
           done
-          # 汇总行（"N failed, M passed"）给总数，定位优先看它。
-          tail -2 /tmp/voice-pytest.log | while IFS= read -r line; do
+          # `-q` 下 progress 点也被写进同一行，tail 会拿到一长串点号。pytest 的
+          # 汇总行形如 "===== 3 failed, 2080 passed, 12 warnings in 240s ====="，
+          # 要按 "N failed/passed" 匹配，不能只看行首。
+          summary=$(grep -E '[0-9]+ (passed|failed|error|skipped)' /tmp/voice-pytest.log | tail -2)
+          if [ -z "$summary" ]; then
+            summary=$(tail -3 /tmp/voice-pytest.log)
+          fi
+          printf '%s\n' "$summary" | while IFS= read -r line; do
             [ -z "$line" ] && continue
             msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
             echo "::error title=voice pytest summary::${msg}"
@@ -227,17 +233,27 @@ jobs:
           for f in /tmp/mobile-core.log /tmp/mobile-app.log; do
             [ -f "$f" ] || continue
             base=$(basename "$f")
-            # Gradle 的失败原因常在最后几行（BUILD FAILED / What went wrong）。
-            # GitHub 每个 step 最多收 10 条 annotation，所以尾部只发 6 行、
-            # 关键行发 4 条，避免互相挤掉。
-            tail -6 "$f" | while IFS= read -r line; do
+            # GitHub 每个 step 最多收 10 条 annotation。取两处最有信息量的内容：
+            #   1) "What went wrong" 之后 5 行——gradle 把失败原因放这里，
+            #      BUILD FAILED 那行本身不含原因。
+            #   2) 明细里的 `> There were failing tests` / 用例名。
+            # 尾部（BUILD FAILED + 堆栈）信息量最低，只留 2 行当锚点。
+            grep -n 'What went wrong' "$f" | head -1 | cut -d: -f1 | while read -r ln; do
+              [ -z "$ln" ] && continue
+              sed -n "$((ln)),$((ln + 5))p" "$f" | while IFS= read -r line; do
+                [ -z "$line" ] && continue
+                msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+                echo "::error title=${base} reason::${msg}"
+              done
+            done
+            grep -E 'There were failing tests|^[A-Za-z0-9_.]+ > .* FAILED|FAILED$' "$f" | head -3 | while IFS= read -r line; do
+              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
+              echo "::error title=${base} failing::${msg}"
+            done
+            tail -2 "$f" | while IFS= read -r line; do
               [ -z "$line" ] && continue
               msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
               echo "::error title=${base} tail::${msg}"
-            done
-            grep -nE 'FAILED|error:|^e: |What went wrong|Execution failed' "$f" | tail -4 | while IFS= read -r line; do
-              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
-              echo "::error title=${base} key::${msg}"
             done
           done
       - name: Fail if either module's tests failed
