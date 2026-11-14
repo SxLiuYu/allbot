@@ -192,6 +192,9 @@ jobs:
         working-directory: mobile
         run: |
           set +e
+          # 仓库里 gradlew 的 git 模式位若丢了（100644），runner 上会
+          # "Permission denied"。这里兜一层，不依赖索引位。
+          chmod +x gradlew
           ./gradlew :core:test --stacktrace 2>&1 | tee /tmp/mobile-core.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
       - name: Unit tests (:app, Android)
@@ -200,6 +203,7 @@ jobs:
         working-directory: mobile
         run: |
           set +e
+          chmod +x gradlew
           ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee /tmp/mobile-app.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
       - name: Summarise failures
