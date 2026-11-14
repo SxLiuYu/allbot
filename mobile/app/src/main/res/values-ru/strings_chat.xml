@@ -5,9 +5,9 @@
     <string name="chat_greeting_afternoon">Добрый день</string>
     <string name="chat_greeting_evening">Добрый вечер</string>
     <string name="chat_greeting_night">Не спится?</string>
-    <string name="chat_empty_prompt">Что поручить 言出?</string>
-    <string name="chat_example_message">Открой WeChat и напиши Wang Zan, чтобы добавил меня в бета-группу 言出</string>
-    <string name="chat_example_group_summary">Кратко перескажи, о чём сегодня говорили в бета-группе 言出 в WeChat</string>
+    <string name="chat_empty_prompt">Что поручить Mika?</string>
+    <string name="chat_example_message">Открой WeChat и напиши Wang Zan, чтобы добавил меня в бета-группу Mika</string>
+    <string name="chat_example_group_summary">Кратко перескажи, о чём сегодня говорили в бета-группе Mika в WeChat</string>
     <string name="chat_example_jobs">Откликнись на 150 вакансий менеджера AI-продуктов в BOSS Zhipin</string>
     <string name="chat_example_music">Открой Qishui Music и посмотри рекламу, чтобы получить VIP на 24 часа</string>
     <string name="chat_example_alarms">Поставь будильники на завтра на 9:40, 9:50 и 10:00 утра</string>
@@ -27,7 +27,7 @@
     </plurals>
     <string name="chat_background_note">Работает в фоне: пользуйтесь телефоном как обычно. Нажмите на маленькое окно, чтобы увеличить его.</string>
     <string name="chat_placeholder_busy">Дополните или измените детали…</string>
-    <string name="chat_placeholder_answer">Ответьте на вопрос 言出</string>
+    <string name="chat_placeholder_answer">Ответьте на вопрос Mika</string>
     <string name="chat_placeholder_more">Добавьте что-нибудь…</string>
     <string name="chat_cannot_start">Пока нельзя запускать задачи</string>
     <string name="chat_missing">Не хватает: %1$s</string>
@@ -37,7 +37,7 @@
     <string name="chat_expand_steps">Показать шаги</string>
     <string name="chat_collapse_steps">Скрыть шаги</string>
     <string name="chat_view_process">Посмотреть, как всё прошло</string>
-    <string name="chat_unlock_body">Телефон заблокирован. 言出 продолжит, как только вы его разблокируете.</string>
+    <string name="chat_unlock_body">Телефон заблокирован. Mika продолжит, как только вы его разблокируете.</string>
     <string name="chat_input_body">%1$s\nВыберите вариант или введите ответ ниже. %2$s</string>
     <string name="chat_refuse">Отказать</string>
     <string name="chat_allow_once">Разрешить один раз</string>
@@ -107,11 +107,11 @@
     <string name="attach_album">Фото</string>
     <string name="attach_files">Файлы</string>
     <string name="attach_recent">Недавние фото</string>
-    <string name="attach_recent_partial">Фото, к которым вы дали доступ 言出</string>
+    <string name="attach_recent_partial">Фото, к которым вы дали доступ Mika</string>
     <string name="attach_all">Все фото</string>
     <string name="attach_change">Изменить доступ</string>
     <string name="attach_no_photos">Фото пока нет</string>
-    <string name="attach_need_access">Чтобы выбирать фото здесь, разрешите 言出 доступ к вашим фото</string>
+    <string name="attach_need_access">Чтобы выбирать фото здесь, разрешите Mika доступ к вашим фото</string>
     <string name="attach_grant">Разрешить доступ к фото</string>
     <string name="attach_grant_hint">Можно также нажать «Фото» выше и выбрать снимок в системном окне выбора</string>
     <string name="attach_full">Не более %1$d вложений за раз</string>
@@ -134,10 +134,10 @@
     <string name="attach_file_and_more">%1$s и ещё файлов: %2$d</string>
     <string name="screen_tag">Ваш экран сейчас</string>
     <string name="screen_blocked">Не удалось снять экран: эта страница запрещает снимки экрана</string>
-    <string name="screen_camera">Снять этот экран для 言出</string>
+    <string name="screen_camera">Снять этот экран для Mika</string>
     <string name="screen_remove">Убрать этот снимок экрана</string>
-    <string name="screen_send">Отправить 言出 ваш текущий экран</string>
-    <string name="pip_screen">Виртуальный экран 言出</string>
+    <string name="screen_send">Отправить Mika ваш текущий экран</string>
+    <string name="pip_screen">Виртуальный экран Mika</string>
     <string name="collapse">Свернуть</string>
     <string name="no_app_for_link">Нет приложения, которое может открыть эту ссылку</string>
     <string name="source_none">Для этого ответа источник не сохранён</string>
@@ -150,7 +150,7 @@
     <string name="chat_copied">Скопировано</string>
     <string name="chat_select_hint">Нажмите на текст и удерживайте, чтобы выделить его</string>
     <string name="chat_quote_remove">Убрать цитату</string>
-    <string name="chat_quoting_mika">Цитата 言出: %1$s</string>
+    <string name="chat_quoting_mika">Цитата Mika: %1$s</string>
     <string name="chat_quoting_you">Ваша цитата: %1$s</string>
     <string name="chat_edit_message">Изменить сообщение</string>
     <string name="chat_withdraw_message">Отозвать сообщение</string>

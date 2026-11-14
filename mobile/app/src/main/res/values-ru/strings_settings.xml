@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">Язык</string>
     <string name="language_system">Как в системе</string>
-    <string name="language_system_detail">Используется язык системы, если 言出 его знает, иначе английский</string>
+    <string name="language_system_detail">Используется язык системы, если Mika его знает, иначе английский</string>
     <string name="settings_basic">Основное</string>
     <string name="settings_model">Модель</string>
     <string name="settings_not_set">Не задано</string>
@@ -11,7 +11,7 @@
     <string name="settings_during_work_sub">Темп работы, экран не гаснет, звук используемого приложения отключён</string>
     <string name="settings_notif_sub">Когда они всплывают; меняется в системных настройках</string>
     <string name="settings_privacy">Конфиденциальность и данные</string>
-    <string name="settings_memory_sub">Что помнит 言出 и чему она научилась</string>
+    <string name="settings_memory_sub">Что помнит Mika и чему она научилась</string>
     <string name="settings_web_logins">Входы на сайты</string>
     <plurals name="settings_count_sites">
         <item quantity="one">%1$d сайт</item>
@@ -30,7 +30,7 @@
     </plurals>
     <string name="settings_recovery">Восстановление и ремонт</string>
     <string name="settings_developer">Для разработчиков</string>
-    <string name="settings_about">О 言出</string>
+    <string name="settings_about">О Mika</string>
     <string name="pill_unsupported">Не поддерживается</string>
     <string name="pill_available">Готово</string>
     <string name="pill_needs_attention">Нужно внимание</string>
@@ -40,7 +40,7 @@
     <string name="settings_all_ready_detail">Модель настроена · Управление телефоном готово</string>
     <string name="settings_status">Состояние</string>
     <string name="settings_a11y">Служба специальных возможностей</string>
-    <string name="settings_a11y_sub">Читает виртуальный экран 言出 и управляет им</string>
+    <string name="settings_a11y_sub">Читает виртуальный экран Mika и управляет им</string>
     <string name="settings_notif_progress_sub">Ход задач и сообщения «Нужны вы»</string>
     <string name="settings_system_version">Версия системы</string>
     <string name="settings_android_focus">Android %1$s · В Android 12–13 фоновая работа может отнимать фокус у вашего экрана; рекомендуется Android 14 и новее</string>
@@ -52,7 +52,7 @@
     <string name="settings_keep_on">Не выключать экран</string>
     <string name="settings_keep_on_sub">Пока выполняется задача, экран не гаснет (без действий он, как обычно, затемняется), а потом всё возвращается как было</string>
     <string name="settings_mute">Отключать звук используемого приложения</string>
-    <string name="settings_mute_sub">Приложения, с которыми работает 言出, молчат; звук возвращается, когда вы берёте управление на себя</string>
+    <string name="settings_mute_sub">Приложения, с которыми работает Mika, молчат; звук возвращается, когда вы берёте управление на себя</string>
     <string name="settings_pace">Темп работы</string>
     <string name="settings_pace_fast">Быстрый</string>
     <string name="settings_pace_fast_detail">Без пауз между шагами; текст вводится сразу</string>
@@ -71,14 +71,14 @@
     </plurals>
     <string name="capsule_settings_title">Плавающая капсула</string>
     <string name="capsule_settings_sub">Показывает ход задачи на экране, пока вы пользуетесь другими приложениями</string>
-    <string name="capsule_settings_foot">Капсула рисуется с помощью уже включённой службы специальных возможностей 言出, поэтому дополнительное разрешение не нужно. Если эта служба выключена или не может рисовать, уведомления вы всё равно получите.</string>
-    <string name="capsule_settings_background">Некоторые телефоны закрывают приложения в фоне. Если капсула пропадает, разрешите 言出 работать в фоне и запускаться автоматически в системных настройках телефона.</string>
+    <string name="capsule_settings_foot">Капсула рисуется с помощью уже включённой службы специальных возможностей Mika, поэтому дополнительное разрешение не нужно. Если эта служба выключена или не может рисовать, уведомления вы всё равно получите.</string>
+    <string name="capsule_settings_background">Некоторые телефоны закрывают приложения в фоне. Если капсула пропадает, разрешите Mika работать в фоне и запускаться автоматически в системных настройках телефона.</string>
     <string name="capsule_mode_off">Выключена</string>
     <string name="capsule_mode_tasks">Во время задач</string>
     <string name="capsule_mode_always">Всегда</string>
     <string name="capsule_mode_off_detail">Только уведомления</string>
     <string name="capsule_mode_tasks_detail">Появляется, пока выполняется задача или ждёт вас, и исчезает через несколько секунд после</string>
-    <string name="capsule_mode_always_detail">Значок 言出 остаётся на экране, даже когда задач нет</string>
+    <string name="capsule_mode_always_detail">Значок Mika остаётся на экране, даже когда задач нет</string>
     <string name="routes_saved">Сохранённые маршруты</string>
     <string name="loading">Загрузка</string>
     <plurals name="routes_count">
@@ -89,14 +89,14 @@
     </plurals>
     <string name="routes_clear_all">Очистить всё</string>
     <string name="routes_clear_title">Очистить все сохранённые маршруты?</string>
-    <string name="routes_clear_body">После очистки 言出 в следующий раз снова будет разбираться шаг за шагом. Остальные настройки не затрагиваются.</string>
+    <string name="routes_clear_body">После очистки Mika в следующий раз снова будет разбираться шаг за шагом. Остальные настройки не затрагиваются.</string>
     <string name="clear">Очистить</string>
     <string name="sandbox_proxy_off">%1$s · используется, когда включён доступ к сети</string>
     <string name="net_proxy">Сетевой прокси</string>
     <string name="net_proxy_row_sub">Для обращений к моделям, обновлений, встроенного браузера и команд</string>
-    <string name="net_proxy_hint">Используется для обращений 言出 к моделям (чат, списки моделей, вход через аккаунт), загрузки обновлений в приложении, встроенного браузера и команд в разделе «Файлы и среда вычислений», пока там включён доступ к сети. Адреса этого телефона и локальной сети (localhost, 192.168.x.x, 10.x.x.x, имена на .local) всегда подключаются напрямую, так что локальные модели продолжают работать. Может содержать user:password@ — хранится на этом телефоне в зашифрованном виде. Оставьте пустым для прямого подключения.</string>
+    <string name="net_proxy_hint">Используется для обращений Mika к моделям (чат, списки моделей, вход через аккаунт), загрузки обновлений в приложении, встроенного браузера и команд в разделе «Файлы и среда вычислений», пока там включён доступ к сети. Адреса этого телефона и локальной сети (localhost, 192.168.x.x, 10.x.x.x, имена на .local) всегда подключаются напрямую, так что локальные модели продолжают работать. Может содержать user:password@ — хранится на этом телефоне в зашифрованном виде. Оставьте пустым для прямого подключения.</string>
     <string name="net_proxy_invalid">Укажите в виде http://host:port (подойдут также socks5, socks5h и https), при необходимости с user:password@ перед хостом.</string>
-    <string name="net_proxy_container_only">Прокси https:// используются только командами в разделе «Файлы и среда вычислений»; собственные подключения 言出 остаются прямыми. Чтобы охватить всё, используйте http:// или socks5://.</string>
+    <string name="net_proxy_container_only">Прокси https:// используются только командами в разделе «Файлы и среда вычислений»; собственные подключения Mika остаются прямыми. Чтобы охватить всё, используйте http:// или socks5://.</string>
     <string name="net_proxy_browser_unsupported">WebView на этом телефоне не поддерживает отдельный прокси для приложения, поэтому встроенный браузер подключается напрямую.</string>
     <string name="net_proxy_browser_socks_auth">Встроенный браузер не может использовать SOCKS-прокси с именем пользователя и паролем, поэтому подключается напрямую.</string>
     <string name="net_proxy_unreachable">Не удалось подключиться к сетевому прокси, или он не передал запрос дальше. Проверьте, что прокси запущен и адрес в «Настройки › Сетевой прокси» указан верно.</string>
@@ -123,6 +123,6 @@
     <string name="appearance_system_detail">Светлое или тёмное, как на телефоне</string>
     <string name="appearance_light">Всегда светлое</string>
     <string name="appearance_dark">Всегда тёмное</string>
-    <string name="settings_self_config">Разрешить 言出 менять свои настройки</string>
+    <string name="settings_self_config">Разрешить Mika менять свои настройки</string>
     <string name="settings_self_config_sub">Когда включено, у задач появляется один инструмент для чтения и изменения этих настроек (темп, звук, капсула, оформление, экран не гаснет). Модели, ключи API, сеть контейнера и всё, что удаляет данные, никогда не включаются</string>
 </resources>

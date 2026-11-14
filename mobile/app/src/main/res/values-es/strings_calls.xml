@@ -127,4 +127,12 @@
     <string name="calls_notification_settings">Abrir ajustes de notificaciones</string>
     <string name="calls_speaker_edit_note">Elija las voces clonadas en Clonación de voz. Deje el campo vacío para restaurar la voz predeterminada.</string>
     <string name="calls_greeting_hint">Se leerá tal como está escrito. Déjalo en blanco para que la otra persona hable primero.</string>
+    <string name="calls_verify_blocked">Primero completa esto: %1$s.</string>
+    <string name="calls_missing_disabled">Las llamadas con IA están desactivadas</string>
+    <string name="calls_missing_phone_permission">permiso de teléfono</string>
+    <string name="calls_missing_notifications">notificaciones de llamada</string>
+    <string name="calls_missing_credentials">credenciales de Volcengine</string>
+    <string name="calls_missing_audio">ruta de audio de la llamada</string>
+    <string name="calls_missing_helper">asistente de teléfono</string>
+    <string name="calls_missing_join">, </string>
 </resources>

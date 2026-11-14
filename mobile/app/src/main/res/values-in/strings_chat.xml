@@ -5,9 +5,9 @@
     <string name="chat_greeting_afternoon">Selamat sore</string>
     <string name="chat_greeting_evening">Selamat malam</string>
     <string name="chat_greeting_night">Belum tidur?</string>
-    <string name="chat_empty_prompt">Apa yang harus dikerjakan 言出?</string>
-    <string name="chat_example_message">Buka WeChat dan kirim pesan ke Wang Zan agar saya ditambahkan ke grup beta 言出</string>
-    <string name="chat_example_group_summary">Ringkas obrolan grup beta 言出 di WeChat hari ini</string>
+    <string name="chat_empty_prompt">Apa yang harus dikerjakan Mika?</string>
+    <string name="chat_example_message">Buka WeChat dan kirim pesan ke Wang Zan agar saya ditambahkan ke grup beta Mika</string>
+    <string name="chat_example_group_summary">Ringkas obrolan grup beta Mika di WeChat hari ini</string>
     <string name="chat_example_jobs">Lamar 150 lowongan manajer produk AI di BOSS Zhipin</string>
     <string name="chat_example_music">Buka Qishui Music dan tonton iklan untuk dapat VIP 24 jam</string>
     <string name="chat_example_alarms">Pasang alarm pukul 9.40, 9.50, dan 10.00 besok pagi</string>
@@ -24,7 +24,7 @@
     </plurals>
     <string name="chat_background_note">Berjalan di latar belakang — silakan lanjut memakai ponsel. Ketuk tampilan kecil untuk memperbesarnya.</string>
     <string name="chat_placeholder_busy">Tambah atau ubah detail…</string>
-    <string name="chat_placeholder_answer">Jawab pertanyaan 言出</string>
+    <string name="chat_placeholder_answer">Jawab pertanyaan Mika</string>
     <string name="chat_placeholder_more">Tambahkan sesuatu…</string>
     <string name="chat_cannot_start">Belum bisa memulai tugas</string>
     <string name="chat_missing">Kurang: %1$s</string>
@@ -34,7 +34,7 @@
     <string name="chat_expand_steps">Tampilkan langkah</string>
     <string name="chat_collapse_steps">Sembunyikan langkah</string>
     <string name="chat_view_process">Lihat prosesnya</string>
-    <string name="chat_unlock_body">Ponsel Anda terkunci. 言出 akan melanjutkan setelah Anda membukanya.</string>
+    <string name="chat_unlock_body">Ponsel Anda terkunci. Mika akan melanjutkan setelah Anda membukanya.</string>
     <string name="chat_input_body">%1$s\nKetuk pilihan atau ketik di bawah. %2$s</string>
     <string name="chat_refuse">Tolak</string>
     <string name="chat_allow_once">Izinkan kali ini saja</string>
@@ -95,11 +95,11 @@
     <string name="attach_album">Foto</string>
     <string name="attach_files">Berkas</string>
     <string name="attach_recent">Foto terbaru</string>
-    <string name="attach_recent_partial">Foto yang Anda izinkan diakses 言出</string>
+    <string name="attach_recent_partial">Foto yang Anda izinkan diakses Mika</string>
     <string name="attach_all">Semua foto</string>
     <string name="attach_change">Ubah akses</string>
     <string name="attach_no_photos">Belum ada foto</string>
-    <string name="attach_need_access">Untuk memilih foto di sini, izinkan 言出 mengakses foto Anda</string>
+    <string name="attach_need_access">Untuk memilih foto di sini, izinkan Mika mengakses foto Anda</string>
     <string name="attach_grant">Izinkan akses foto</string>
     <string name="attach_grant_hint">Anda juga bisa mengetuk “Foto” di atas untuk memakai pemilih foto sistem</string>
     <string name="attach_full">Maksimal %1$d lampiran sekaligus</string>
@@ -119,10 +119,10 @@
     <string name="attach_file_and_more">%1$s dan %2$d berkas lainnya</string>
     <string name="screen_tag">Layar Anda saat ini</string>
     <string name="screen_blocked">Gagal menangkap: halaman ini tidak mengizinkan tangkapan layar</string>
-    <string name="screen_camera">Tangkap layar ini untuk 言出</string>
+    <string name="screen_camera">Tangkap layar ini untuk Mika</string>
     <string name="screen_remove">Hapus tangkapan layar ini</string>
-    <string name="screen_send">Kirim layar Anda saat ini ke 言出</string>
-    <string name="pip_screen">Layar virtual 言出</string>
+    <string name="screen_send">Kirim layar Anda saat ini ke Mika</string>
+    <string name="pip_screen">Layar virtual Mika</string>
     <string name="collapse">Ciutkan</string>
     <string name="no_app_for_link">Tidak ada aplikasi yang bisa membuka tautan ini</string>
     <string name="source_none">Tidak ada sumber yang disimpan untuk jawaban ini</string>
@@ -135,7 +135,7 @@
     <string name="chat_copied">Disalin</string>
     <string name="chat_select_hint">Tekan lama teks untuk memilihnya</string>
     <string name="chat_quote_remove">Hapus kutipan</string>
-    <string name="chat_quoting_mika">Mengutip 言出: %1$s</string>
+    <string name="chat_quoting_mika">Mengutip Mika: %1$s</string>
     <string name="chat_quoting_you">Mengutip Anda: %1$s</string>
     <string name="chat_edit_message">Ubah pesan</string>
     <string name="chat_withdraw_message">Tarik pesan</string>

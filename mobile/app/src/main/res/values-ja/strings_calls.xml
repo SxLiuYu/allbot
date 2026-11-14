@@ -127,4 +127,12 @@
     <string name="calls_notification_settings">通知設定を開く</string>
     <string name="calls_speaker_edit_note">クローン音声は「音声クローン」で選択してください。空欄にすると既定の声に戻ります。</string>
     <string name="calls_greeting_hint">入力したとおりに読み上げます。空欄の場合は相手が話し始めるまで待ちます。</string>
+    <string name="calls_verify_blocked">先に次を済ませてください: %1$s。</string>
+    <string name="calls_missing_disabled">AI 通話がオフになっています</string>
+    <string name="calls_missing_phone_permission">電話の権限</string>
+    <string name="calls_missing_notifications">通話の通知</string>
+    <string name="calls_missing_credentials">Volcengine の認証情報</string>
+    <string name="calls_missing_audio">通話音声の経路</string>
+    <string name="calls_missing_helper">電話ヘルパー</string>
+    <string name="calls_missing_join">、</string>
 </resources>

@@ -127,4 +127,12 @@
     <string name="calls_notification_settings">Открыть настройки уведомлений</string>
     <string name="calls_speaker_edit_note">Выбирайте клонированные голоса в разделе «Клонирование голоса». Оставьте поле пустым, чтобы вернуть голос по умолчанию.</string>
     <string name="calls_greeting_hint">Текст будет прочитан дословно. Оставьте поле пустым, чтобы собеседник заговорил первым.</string>
+    <string name="calls_verify_blocked">Сначала выполните это: %1$s.</string>
+    <string name="calls_missing_disabled">ИИ-звонки выключены</string>
+    <string name="calls_missing_phone_permission">разрешение на телефон</string>
+    <string name="calls_missing_notifications">уведомления о звонках</string>
+    <string name="calls_missing_credentials">учётные данные Volcengine</string>
+    <string name="calls_missing_audio">путь аудио звонка</string>
+    <string name="calls_missing_helper">помощник телефона</string>
+    <string name="calls_missing_join">, </string>
 </resources>

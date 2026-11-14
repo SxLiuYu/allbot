@@ -127,4 +127,12 @@
     <string name="calls_notification_settings">開啟通知設定</string>
     <string name="calls_speaker_edit_note">請在「音色復刻」中選擇復刻音色。清空此欄可恢復預設音色。</string>
     <string name="calls_greeting_hint">按填寫的內容播報；留空則等對方先開口。</string>
+    <string name="calls_verify_blocked">請先完成：%1$s。</string>
+    <string name="calls_missing_disabled">AI 通話已關閉</string>
+    <string name="calls_missing_phone_permission">電話權限</string>
+    <string name="calls_missing_notifications">通話通知</string>
+    <string name="calls_missing_credentials">Volcengine 憑證</string>
+    <string name="calls_missing_audio">通話音訊路徑</string>
+    <string name="calls_missing_helper">電話助手</string>
+    <string name="calls_missing_join">、</string>
 </resources>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trigger_reminder">Pengingat 言出</string>
+    <string name="trigger_reminder">Pengingat Mika</string>
     <string name="trigger_not_started_body">Tugas terjadwal gagal dimulai. Periksa di halaman Tugas terjadwal dan jalankan lagi.</string>
     <string name="trigger_start_failed">Gagal dimulai</string>
     <string name="trigger_not_started">Tugas terjadwal tidak dimulai</string>
-    <string name="trigger_interrupted_body">Tugas terjadwal terhenti dan hasilnya tidak bisa dipastikan. Periksa dulu apa yang sebenarnya terjadi; 言出 tidak akan mengulanginya otomatis.</string>
+    <string name="trigger_interrupted_body">Tugas terjadwal terhenti dan hasilnya tidak bisa dipastikan. Periksa dulu apa yang sebenarnya terjadi; Mika tidak akan mengulanginya otomatis.</string>
     <string name="trigger_unconfirmed">Hasil tugas terjadwal perlu diperiksa</string>
     <string name="trigger_alarm_title">Tugas terjadwal memerlukan izin “Alarm &amp; pengingat”</string>
     <string name="trigger_alarm_body">Tanpanya, tugas terjadwal bisa terlambat atau tidak berjalan sama sekali. Ketuk di sini untuk mengaktifkannya.</string>
@@ -12,7 +12,7 @@
     <string name="plans_alarm_body">Tanpa izin ini, tugas terjadwal bisa terlambat atau tidak berjalan sama sekali. Anda hanya perlu mengaktifkannya sekali.</string>
     <string name="plans_running_n">Aktif %1$d</string>
     <string name="plans_stopped_n">Nonaktif %1$d</string>
-    <string name="plans_empty">Belum ada tugas terjadwal\nBilang ke 言出 di obrolan kapan harus mengingatkan Anda, atau kapan mengerjakan sesuatu untuk Anda.</string>
+    <string name="plans_empty">Belum ada tugas terjadwal\nBilang ke Mika di obrolan kapan harus mengingatkan Anda, atau kapan mengerjakan sesuatu untuk Anda.</string>
     <string name="plans_none_running">Tidak ada tugas terjadwal yang aktif</string>
     <string name="plans_none_stopped">Tidak ada tugas terjadwal yang dinonaktifkan</string>
     <string name="plans_footer">Anda juga bisa membuatnya dengan mengatakan “setiap hari pukul 8…” atau “kabari saya kalau harganya turun” di obrolan; hasilnya kembali ke obrolan itu. Eksekusi terjadwal bisa terpengaruh penghemat baterai; menonaktifkan atau menghapus hanya memengaruhi eksekusi berikutnya.</string>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trigger_reminder">Recordatorio de 言出</string>
+    <string name="trigger_reminder">Recordatorio de Mika</string>
     <string name="trigger_not_started_body">Una tarea programada no pudo iniciarse. Revísala en la página de Tareas programadas y ejecútala de nuevo.</string>
     <string name="trigger_start_failed">No se pudo iniciar</string>
     <string name="trigger_not_started">La tarea programada no se inició</string>
-    <string name="trigger_interrupted_body">Una tarea programada se interrumpió y no se puede confirmar su resultado. Comprueba primero qué pasó en realidad; 言出 no la repetirá automáticamente.</string>
+    <string name="trigger_interrupted_body">Una tarea programada se interrumpió y no se puede confirmar su resultado. Comprueba primero qué pasó en realidad; Mika no la repetirá automáticamente.</string>
     <string name="trigger_unconfirmed">Hay que revisar el resultado de una tarea programada</string>
     <string name="trigger_alarm_title">Las tareas programadas necesitan el permiso “Alarmas y recordatorios”</string>
     <string name="trigger_alarm_body">Sin él, las tareas programadas pueden ejecutarse tarde o no ejecutarse. Toca aquí para activarlo.</string>
@@ -12,7 +12,7 @@
     <string name="plans_alarm_body">Sin este permiso, las tareas programadas pueden ejecutarse tarde o no ejecutarse. Solo hace falta activarlo una vez.</string>
     <string name="plans_running_n">Activas %1$d</string>
     <string name="plans_stopped_n">Desactivadas %1$d</string>
-    <string name="plans_empty">Aún no hay tareas programadas\nDile a 言出 en un chat cuándo recordarte algo o cuándo hacer algo por ti.</string>
+    <string name="plans_empty">Aún no hay tareas programadas\nDile a Mika en un chat cuándo recordarte algo o cuándo hacer algo por ti.</string>
     <string name="plans_none_running">No hay tareas programadas activas</string>
     <string name="plans_none_stopped">No hay tareas programadas desactivadas</string>
     <string name="plans_footer">También puedes crear una diciendo “todos los días a las 8…” o “avísame cuando baje el precio” en un chat; los resultados vuelven a ese chat. El ahorro de batería puede afectar a las ejecuciones programadas; desactivar o eliminar solo afecta a las próximas ejecuciones.</string>

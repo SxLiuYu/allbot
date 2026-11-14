@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trigger_reminder">言出 からのリマインダー</string>
+    <string name="trigger_reminder">Mika からのリマインダー</string>
     <string name="trigger_not_started_body">スケジュールされたタスクを開始できませんでした。「スケジュールされたタスク」のページで確認して、もう一度実行してください。</string>
     <string name="trigger_start_failed">開始に失敗しました</string>
     <string name="trigger_not_started">スケジュールされたタスクが開始されませんでした</string>
-    <string name="trigger_interrupted_body">スケジュールされたタスクが中断され、結果を確認できません。まず実際に何が起きたかを確認してください。言出 が自動でやり直すことはありません。</string>
+    <string name="trigger_interrupted_body">スケジュールされたタスクが中断され、結果を確認できません。まず実際に何が起きたかを確認してください。Mika が自動でやり直すことはありません。</string>
     <string name="trigger_unconfirmed">スケジュールされたタスクの結果を確認してください</string>
     <string name="trigger_alarm_title">スケジュールされたタスクには「アラームとリマインダー」の権限が必要です</string>
     <string name="trigger_alarm_body">権限がないと、スケジュールされたタスクが遅れたり、実行されなかったりすることがあります。ここをタップしてオンにしてください。</string>
@@ -12,7 +12,7 @@
     <string name="plans_alarm_body">この権限がないと、スケジュールされたタスクが遅れたり、実行されなかったりすることがあります。オンにするのは一度だけです。</string>
     <string name="plans_running_n">有効 %1$d</string>
     <string name="plans_stopped_n">オフ %1$d</string>
-    <string name="plans_empty">スケジュールされたタスクはまだありません\nチャットで、いつリマインドするか、いつ代わりに何かをするかを 言出 に伝えてください。</string>
+    <string name="plans_empty">スケジュールされたタスクはまだありません\nチャットで、いつリマインドするか、いつ代わりに何かをするかを Mika に伝えてください。</string>
     <string name="plans_none_running">有効なスケジュールされたタスクはありません</string>
     <string name="plans_none_stopped">オフにしたスケジュールされたタスクはありません</string>
     <string name="plans_footer">チャットで「毎日 8 時に…」や「値段が下がったら教えて」と話しかけても作れます。結果はそのチャットに戻ります。時間指定の実行は、バッテリーの節約機能の影響を受けることがあります。オフにしたり削除したりすると、今後の実行にだけ影響します。</string>

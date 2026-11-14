@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">Idioma</string>
     <string name="language_system">Seguir o sistema</string>
-    <string name="language_system_detail">Usa o idioma do sistema se o 言出 o tiver; caso contrário, inglês</string>
+    <string name="language_system_detail">Usa o idioma do sistema se o Mika o tiver; caso contrário, inglês</string>
     <string name="settings_basic">Básico</string>
     <string name="settings_model">Modelo</string>
     <string name="settings_not_set">Não definido</string>
@@ -11,7 +11,7 @@
     <string name="settings_during_work_sub">Ritmo de operação, tela sempre ligada, som do app em uso silenciado</string>
     <string name="settings_notif_sub">Quando elas aparecem, mude nas configurações do sistema</string>
     <string name="settings_privacy">Privacidade e dados</string>
-    <string name="settings_memory_sub">O que o 言出 lembra e as habilidades que aprendeu</string>
+    <string name="settings_memory_sub">O que o Mika lembra e as habilidades que aprendeu</string>
     <string name="settings_web_logins">Logins em sites</string>
     <plurals name="settings_count_sites">
         <item quantity="one">%1$d site</item>
@@ -28,7 +28,7 @@
     </plurals>
     <string name="settings_recovery">Recuperação e reparo</string>
     <string name="settings_developer">Opções do desenvolvedor</string>
-    <string name="settings_about">Sobre o 言出</string>
+    <string name="settings_about">Sobre o Mika</string>
     <string name="pill_unsupported">Não compatível</string>
     <string name="pill_available">Pronto</string>
     <string name="pill_needs_attention">Precisa de atenção</string>
@@ -38,7 +38,7 @@
     <string name="settings_all_ready_detail">Modelo configurado · Controle do celular pronto</string>
     <string name="settings_status">Status</string>
     <string name="settings_a11y">Serviço de acessibilidade</string>
-    <string name="settings_a11y_sub">Lê e controla a tela virtual do 言出</string>
+    <string name="settings_a11y_sub">Lê e controla a tela virtual do Mika</string>
     <string name="settings_notif_progress_sub">Andamento e alertas de “Precisa de você”</string>
     <string name="settings_system_version">Versão do sistema</string>
     <string name="settings_android_focus">Android %1$s · No Android 12–13, o trabalho em segundo plano pode tirar o foco da sua tela; recomendado Android 14 ou superior</string>
@@ -50,7 +50,7 @@
     <string name="settings_keep_on">Manter a tela ligada</string>
     <string name="settings_keep_on_sub">A tela fica ligada enquanto uma tarefa roda (escurece como sempre quando você não está usando) e depois volta ao normal</string>
     <string name="settings_mute">Silenciar o app em uso</string>
-    <string name="settings_mute_sub">Os apps que o 言出 usa ficam em silêncio; o som volta quando você assume o controle</string>
+    <string name="settings_mute_sub">Os apps que o Mika usa ficam em silêncio; o som volta quando você assume o controle</string>
     <string name="settings_pace">Ritmo de operação</string>
     <string name="settings_pace_fast">Rápido</string>
     <string name="settings_pace_fast_detail">Sem pausas entre os passos; o texto é preenchido de uma vez</string>
@@ -68,14 +68,14 @@
     </plurals>
     <string name="capsule_settings_title">Cápsula flutuante</string>
     <string name="capsule_settings_sub">Veja o andamento das tarefas na tela enquanto usa outros apps</string>
-    <string name="capsule_settings_foot">A cápsula é desenhada pelo serviço de acessibilidade do 言出 que já está ativado, então não precisa de nenhuma permissão extra. Se esse serviço estiver desativado ou não conseguir desenhar, você ainda recebe notificações.</string>
-    <string name="capsule_settings_background">Alguns celulares fecham apps em segundo plano. Se a cápsula sumir, permita que o 言出 rode em segundo plano e inicie automaticamente nas configurações do sistema do seu celular.</string>
+    <string name="capsule_settings_foot">A cápsula é desenhada pelo serviço de acessibilidade do Mika que já está ativado, então não precisa de nenhuma permissão extra. Se esse serviço estiver desativado ou não conseguir desenhar, você ainda recebe notificações.</string>
+    <string name="capsule_settings_background">Alguns celulares fecham apps em segundo plano. Se a cápsula sumir, permita que o Mika rode em segundo plano e inicie automaticamente nas configurações do sistema do seu celular.</string>
     <string name="capsule_mode_off">Desativada</string>
     <string name="capsule_mode_tasks">Durante tarefas</string>
     <string name="capsule_mode_always">Sempre</string>
     <string name="capsule_mode_off_detail">Somente notificações</string>
     <string name="capsule_mode_tasks_detail">Aparece enquanto uma tarefa roda ou espera por você e some alguns segundos depois</string>
-    <string name="capsule_mode_always_detail">Mantém um ícone do 言出 na tela mesmo sem tarefas</string>
+    <string name="capsule_mode_always_detail">Mantém um ícone do Mika na tela mesmo sem tarefas</string>
     <string name="routes_saved">Roteiros salvos</string>
     <string name="loading">Carregando</string>
     <plurals name="routes_count">
@@ -85,14 +85,14 @@
     </plurals>
     <string name="routes_clear_all">Limpar tudo</string>
     <string name="routes_clear_title">Limpar todos os roteiros salvos?</string>
-    <string name="routes_clear_body">Depois de limpar, o 言出 voltará a resolver tudo passo a passo da próxima vez. As outras configurações não são afetadas.</string>
+    <string name="routes_clear_body">Depois de limpar, o Mika voltará a resolver tudo passo a passo da próxima vez. As outras configurações não são afetadas.</string>
     <string name="clear">Limpar</string>
     <string name="sandbox_proxy_off">%1$s · usado quando o acesso à rede for ativado</string>
     <string name="net_proxy">Proxy de rede</string>
     <string name="net_proxy_row_sub">Para chamadas de modelo, atualizações, navegador integrado e comandos</string>
-    <string name="net_proxy_hint">Usado nas chamadas de modelo do 言出 (chat, listas de modelos, login com conta), nos downloads de atualização dentro do app, no navegador integrado e nos comandos de Arquivos e ambiente de computação enquanto o acesso à rede estiver ativado lá. Endereços deste celular ou da sua rede local (localhost, 192.168.x.x, 10.x.x.x, nomes terminados em .local) sempre se conectam direto, então modelos locais continuam funcionando. Pode incluir usuário:senha@, que fica criptografado neste celular. Deixe vazio para conexão direta.</string>
+    <string name="net_proxy_hint">Usado nas chamadas de modelo do Mika (chat, listas de modelos, login com conta), nos downloads de atualização dentro do app, no navegador integrado e nos comandos de Arquivos e ambiente de computação enquanto o acesso à rede estiver ativado lá. Endereços deste celular ou da sua rede local (localhost, 192.168.x.x, 10.x.x.x, nomes terminados em .local) sempre se conectam direto, então modelos locais continuam funcionando. Pode incluir usuário:senha@, que fica criptografado neste celular. Deixe vazio para conexão direta.</string>
     <string name="net_proxy_invalid">Escreva no formato http://host:porta (socks5, socks5h e https também funcionam), opcionalmente com usuário:senha@ antes do host.</string>
-    <string name="net_proxy_container_only">Proxies https:// só são usados pelos comandos de Arquivos e ambiente de computação; as conexões do próprio 言出 continuam diretas. Use http:// ou socks5:// para cobrir tudo.</string>
+    <string name="net_proxy_container_only">Proxies https:// só são usados pelos comandos de Arquivos e ambiente de computação; as conexões do próprio Mika continuam diretas. Use http:// ou socks5:// para cobrir tudo.</string>
     <string name="net_proxy_browser_unsupported">O WebView deste celular não aceita um proxy próprio do app, então o navegador integrado se conecta direto.</string>
     <string name="net_proxy_browser_socks_auth">O navegador integrado não consegue usar um proxy SOCKS que exige usuário e senha, então se conecta direto.</string>
     <string name="net_proxy_unreachable">Não foi possível conectar ao proxy de rede, ou ele não repassou a solicitação. Verifique se o proxy está ativo e se o endereço em Configurações › Proxy de rede está certo.</string>
@@ -119,6 +119,6 @@
     <string name="appearance_system_detail">Claro ou escuro, conforme o celular estiver</string>
     <string name="appearance_light">Sempre claro</string>
     <string name="appearance_dark">Sempre escuro</string>
-    <string name="settings_self_config">Deixar o 言出 alterar as próprias configurações</string>
+    <string name="settings_self_config">Deixar o Mika alterar as próprias configurações</string>
     <string name="settings_self_config_sub">Ativado, as tarefas ganham uma ferramenta para ler e alterar estas preferências (ritmo, silenciar, cápsula, aparência, tela ligada). Modelos, chaves de API, rede do contêiner e qualquer coisa que apague dados nunca são incluídos</string>
 </resources>

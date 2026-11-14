@@ -127,4 +127,12 @@
     <string name="calls_notification_settings">알림 설정 열기</string>
     <string name="calls_speaker_edit_note">복제 음색은 음성 복제에서 선택하세요. 기본 음색으로 되돌리려면 이 칸을 비우세요.</string>
     <string name="calls_greeting_hint">입력한 그대로 읽습니다. 비워 두면 상대방이 먼저 말할 때까지 기다립니다.</string>
+    <string name="calls_verify_blocked">먼저 다음을 완료하세요: %1$s.</string>
+    <string name="calls_missing_disabled">AI 통화가 꺼져 있습니다</string>
+    <string name="calls_missing_phone_permission">전화 권한</string>
+    <string name="calls_missing_notifications">통화 알림</string>
+    <string name="calls_missing_credentials">Volcengine 인증 정보</string>
+    <string name="calls_missing_audio">통화 오디오 경로</string>
+    <string name="calls_missing_helper">전화 도우미</string>
+    <string name="calls_missing_join">, </string>
 </resources>

@@ -127,4 +127,12 @@
     <string name="calls_notification_settings">Buka pengaturan notifikasi</string>
     <string name="calls_speaker_edit_note">Pilih suara hasil kloning di Kloning suara. Kosongkan kolom untuk memulihkan suara default.</string>
     <string name="calls_greeting_hint">Teks dibacakan apa adanya. Kosongkan agar lawan bicara berbicara terlebih dahulu.</string>
+    <string name="calls_verify_blocked">Selesaikan ini dulu: %1$s.</string>
+    <string name="calls_missing_disabled">Panggilan AI dinonaktifkan</string>
+    <string name="calls_missing_phone_permission">izin telepon</string>
+    <string name="calls_missing_notifications">notifikasi panggilan</string>
+    <string name="calls_missing_credentials">kredensial Volcengine</string>
+    <string name="calls_missing_audio">jalur audio panggilan</string>
+    <string name="calls_missing_helper">asisten telepon</string>
+    <string name="calls_missing_join">, </string>
 </resources>
