@@ -24,7 +24,7 @@ import { runAndroidInstall } from "./android-install.js";
 type SpawnArgs = readonly string[];
 
 /** Version used by the mocked GitHub releases lookup. */
-const TEST_RELEASE_VERSION = "2026.11.17";
+const TEST_RELEASE_VERSION = "2026.11.18";
 
 function stdoutResult(stdout: string, status = 0) {
   return { status, stdout, stderr: "", signal: null, pid: 0, output: [stdout, "", ""] };
