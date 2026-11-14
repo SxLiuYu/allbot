@@ -582,10 +582,22 @@ export function onceMessage<T extends GatewayTestMessage = GatewayTestMessage>(
   // Full-suite runs can saturate the event loop (581+ files). Keep this high
   // enough to avoid flaky RPC timeouts, but still fail fast when a response
   // never arrives.
-  timeoutMs = 10_000,
+  //
+  // 30s 而不是 10s：10s 在负载饱和的 runner 上会偶发超时——同一个 commit
+  // 重跑一次就绿（v2026.11.18 的 Test job 就是这样挂的，断言全部通过、
+  // 只有这个 helper 的 setTimeout 触发）。真挂的时候多等 20s 不改变结论，
+  // 只是把「偶发红」变成「要么绿、要么真红」。
+  timeoutMs = 30_000,
 ): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("timeout")), timeoutMs);
+    const startedAt = Date.now();
+    const timer = setTimeout(
+      () =>
+        // 带上已等待时长：区分「差一点就等到」和「完全没响应」，
+        // 后者要往 RPC 断链方向查，前者只是机器慢。
+        reject(new Error(`timeout after ${Date.now() - startedAt}ms (limit ${timeoutMs}ms)`)),
+      timeoutMs,
+    );
     const closeHandler = (code: number, reason: Buffer) => {
       clearTimeout(timer);
       ws.off("message", handler);
@@ -659,9 +671,14 @@ async function startGatewayServerWithRetries(params: {
   throw new Error("failed to start gateway server after retries");
 }
 
-async function waitForWebSocketOpen(ws: WebSocket, timeoutMs = 10_000): Promise<void> {
+// 30s 同 onceMessage：满负载 runner 上建立连接也会慢，10s 会偶发挂。
+async function waitForWebSocketOpen(ws: WebSocket, timeoutMs = 30_000): Promise<void> {
   await new Promise<void>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("timeout waiting for ws open")), timeoutMs);
+    const startedAt = Date.now();
+    const timer = setTimeout(
+      () => reject(new Error(`timeout waiting for ws open after ${Date.now() - startedAt}ms`)),
+      timeoutMs,
+    );
     const cleanup = () => {
       clearTimeout(timer);
       ws.off("open", onOpen);
