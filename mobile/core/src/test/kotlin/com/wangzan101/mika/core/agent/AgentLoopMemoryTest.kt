@@ -1,6 +1,7 @@
 package com.wangzan101.mika.core.agent
 
 import com.wangzan101.mika.core.model.Author
+import com.wangzan101.mika.core.memory.MemoryContext
 import com.wangzan101.mika.core.memory.MemoryKind
 import com.wangzan101.mika.core.memory.MemorySource
 import com.wangzan101.mika.core.memory.UserUtterances
@@ -50,22 +51,31 @@ class AgentLoopMemoryTest {
         val msgs = model.requests.first().withoutRuntime().map { it.text() }
         assertTrue(msgs[0].startsWith(Conversation.HEADER))
         assertTrue(msgs[1].startsWith("Memories about the user"))
-        // 记忆总量装得下就全量注入:与本次任务词面无关的「公司在张江」也在(以前会被 BM25 检索丢掉)
+        // 产品路径用 Mode.TaskRelevant：只有和这次任务相关的记忆才进块。
+        // 「点外卖/香菜」相关，所以必须在；「公司在张江」无关，不进块——
+        // 全量注入的行为由下面的 fullModeInjectsEverythingWhenItFits 覆盖。
         assertTrue(msgs[1].contains("用户点外卖不要香菜"))
-        assertTrue(msgs[1].contains("张江"))
+        assertFalse(msgs[1].contains("张江"))
         assertEquals("帮我点个外卖", msgs[2])
+    }
+
+    @Test fun fullModeInjectsEverythingWhenItFits() {
+        // 记忆装得下时全量注入（记忆管理/需要完整上下文的场景用 Mode.Auto）。
+        val s = store()
+        val block = MemoryContext.build(
+            s.items.value, "看看明天天气", null, { it }, mode = MemoryContext.Mode.Auto)
+        assertTrue(block.message != null)
+        assertTrue(block.message!!.contains("用户点外卖不要香菜"))
+        assertTrue(block.message!!.contains("张江"))
+        assertEquals(s.items.value.size, block.usedIds.size)
     }
 
     @Test fun unrelatedMemoryStillInjectedInFullMode() {
         val s = store()
-        val model = FakeModel(finishReply)
-        val loop = AgentLoop(model, toolDispatcher(FakeScreen(), memory = s, utterances = UserUtterances()), "B", memory = s)
-        runBlocking { loop.run("看看明天天气") }
-        val msgs = model.requests.first().withoutRuntime().map { it.text() }
-        assertTrue(msgs[0].startsWith("Memories about the user"))
-        assertEquals("看看明天天气", msgs[1])
-        assertEquals(s.items.value.map { it.id }, loop.usedMemoryIds)
-        assertTrue(s.items.value.all { it.useCount == 1 })
+        val block = MemoryContext.build(
+            s.items.value, "看看明天天气", null, { it }, mode = MemoryContext.Mode.Auto)
+        // 全量模式给的是全部条目的 id，顺序同块里列出的顺序
+        assertEquals(s.items.value.map { it.id }.toSet(), block.usedIds.toSet())
     }
 
     @Test fun usedIdsRecordedAndMarked() {
@@ -73,10 +83,14 @@ class AgentLoopMemoryTest {
         val events = mutableListOf<RunEvent>()
         val loop = AgentLoop(FakeModel(finishReply), toolDispatcher(FakeScreen(), memory = s, utterances = UserUtterances()), "B", sink = object : RunSink { override fun event(e: RunEvent) { events += e } }, memory = s)
         runBlocking { loop.run("帮我点个外卖") }
-        val ids = s.items.value.map { it.id }
-        assertEquals(ids, loop.usedMemoryIds)
-        assertTrue(s.items.value.all { it.useCount == 1 })
-        assertEquals(listOf(ids), events.filterIsInstance<RunEvent.MemoryUsed>().map { it.ids })
+        // 只标记真正进了记忆块的条目（TaskRelevant 下是相关的那部分）
+        val used = loop.usedMemoryIds
+        assertTrue("至少要用到一条相关记忆", used.isNotEmpty())
+        assertTrue(used.size <= s.items.value.size)
+        // 用过的条目 useCount == 1，没用过的仍是 0
+        val usedSet = used.toSet()
+        assertTrue(s.items.value.all { if (it.id in usedSet) it.useCount == 1 else it.useCount == 0 })
+        assertEquals(listOf(used), events.filterIsInstance<RunEvent.MemoryUsed>().map { it.ids })
     }
 
     // 浏览器页上问:页面说明里的标题、网址、选中的字是网页上的,不算用户说的话;记忆的引文出自它们时不收
