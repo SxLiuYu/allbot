@@ -19,8 +19,15 @@ def _get_current_uid() -> str:
     return os.environ.get("CHARLIE_USER_ID", "default")
 
 
-def _persona_file() -> str:
-    uid = _get_current_uid()
+def _persona_file(uid: str = None) -> str:
+    """人设文件的路径。`default` 用原文件名（老数据不迁移），其余加 `_{uid}` 后缀。
+
+    [uid] 显式传入时必须用它，不能回落到 `CHARLIE_USER_ID`：`_load(uid)` /
+    `_save(uid)` 已经在内部解析过 uid，若这里再读一次 env，env 在两次调用之间
+    变了就会「读 A 的文件、写 B 的文件」。
+    """
+    if uid is None:
+        uid = _get_current_uid()
     if uid == "default":
         return os.path.join(DATA_DIR, "persona_state.json")
     return os.path.join(DATA_DIR, f"persona_state_{uid}.json")
@@ -53,7 +60,7 @@ def _load(uid: str = None) -> dict:
             return _states[uid]
         state = None
         try:
-            with open(_persona_file(), encoding="utf-8") as f:
+            with open(_persona_file(uid), encoding="utf-8") as f:
                 state = json.load(f)
         except Exception:
             state = copy.deepcopy(_DEFAULT)
@@ -73,13 +80,14 @@ def _save(uid: str = None) -> None:
             return
         # tempfile + os.replace 原子替换：并发/中途崩溃都不会留下半写文件
         payload = json.dumps(state, ensure_ascii=False, indent=2)
+        target = _persona_file(uid)
         fd, tmp_path = tempfile.mkstemp(
-            dir=os.path.dirname(_persona_file()) or ".",
+            dir=os.path.dirname(target) or ".",
             prefix=".persona_", suffix=".tmp")
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 f.write(payload)
-            os.replace(tmp_path, _persona_file())
+            os.replace(tmp_path, target)
         except Exception:
             try:
                 os.unlink(tmp_path)
