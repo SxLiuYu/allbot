@@ -141,9 +141,16 @@ def detect_emotion(text: str) -> str:
 
 
 def update(text: str):
-    """根据用户输入更新人设状态"""
+    """根据用户输入更新人设状态
+
+    uid 只解析一次并贯穿整次更新：`_load()` 和 `_save()` 各自调
+    `_get_current_uid()` 的话，两次之间 env 一变（多用户切换、测试里
+    reload 与调用交错），`_save()` 会去 `_states` 里找另一个 uid 的条目、
+    找不到就静默 return——文件不写，调用方毫无感知。
+    """
     with _STATE_LOCK:
-        state = _load()
+        uid = _get_current_uid()
+        state = _load(uid)
         emotion = detect_emotion(text)
         state["interaction_count"] += 1
         recent = state.get("recent_emotions", [])
@@ -165,7 +172,7 @@ def update(text: str):
             state["mood"] = "neutral"
             state["humor_level"] = 0.3
 
-        _save()
+        _save(uid)
 
 
 _EMOTION_TO_TTS = {
@@ -238,15 +245,19 @@ def set_relationship_level(level: str) -> None:
     if level not in ("stranger", "acquaintance", "friend", "family"):
         level = "acquaintance"
     with _STATE_LOCK:
-        state = _load()
+        # uid 一次解析、读写共用（见 update() 的说明）
+        uid = _get_current_uid()
+        state = _load(uid)
         state["relationship_level"] = level
-        _save()
+        _save(uid)
 
 
 def update_relationship_from_interaction(text: str) -> None:
     """根据用户输入更新关系亲密度"""
     with _STATE_LOCK:
-        state = _load()
+        # uid 一次解析、读写共用（见 update() 的说明）
+        uid = _get_current_uid()
+        state = _load(uid)
         state["interaction_count"] = state.get("interaction_count", 0) + 1
         count = state["interaction_count"]
 
@@ -270,7 +281,7 @@ def update_relationship_from_interaction(text: str) -> None:
         else:
             state["tone_profile"] = "casual"
 
-        _save()
+        _save(uid)
 
 
 def contextual_response_style(level: str = "") -> str:

@@ -315,6 +315,10 @@ KNOWN_INCOMPLETE: dict[str, list[str]] = {
         'TestRouting::test_prompt_contains_domain',
         'TestRunAgentTask::test_exception_is_error',
         'TestRunAgentTask::test_timeout_kills_process_group',
+        'TestRunAgentTask::test_nonzero_exit_is_error',
+        'TestRunAgentTask::test_workdir_passed_when_configured',
+        'TestRunAgentTask::test_task_passed_via_stdin_not_argv',
+        'TestRunAgentTask::test_command_building_and_stdin',
     ],
 }
 

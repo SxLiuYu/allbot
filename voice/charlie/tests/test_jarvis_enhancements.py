@@ -527,7 +527,15 @@ class TestRound4SchedulerProactiveGreeting:
 
         fake_state = {"state": "home_awake", "confidence": 0.9}
 
+        # `_proactive_suggestions` 用持久化状态文件做去重（天气每小时才查一次、
+        # 场景每小时只触发一次）。那个路径是 import 期算出来的模块常量，
+        # setup_method 里改 ASSISTANT_KID_DATA_DIR 不会跟着变：机器上若有残留
+        # 文件（本地跑过一次就有），`last_weather_check` 还在冷却里，循环直接
+        # 跳过天气分支，`load_magic_module("magic_jarvis")` 永远不会被调用。
+        # 表现为「本地过、CI 挂」这类顺序依赖。指到本测试的临时目录。
+        empty_state = os.path.join(self._tmp_dir, "suggestions_state.json")
         with patch("app.schedulers.datetime") as mock_dt, \
+             patch("app.schedulers.SUGGEST_STATE_FILE", empty_state), \
              patch("app.schedulers.load_magic_module", side_effect=fake_load), \
              patch("voice_agent.get_user_state", return_value=fake_state), \
              patch("app.schedulers.time.sleep", side_effect=[None, StopIteration]), \
