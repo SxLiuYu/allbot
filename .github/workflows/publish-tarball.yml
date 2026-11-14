@@ -90,14 +90,20 @@ jobs:
           set -euo pipefail
           TAG=${GITHUB_REF#refs/tags/}
           # 包名是 scoped 的 `@sxliuyu/allbot`，`npm pack` 产出的文件名是
-          # `sxliuyu-allbot-<ver>.tgz`，不是 `allbot-<ver>.tgz`。原来按
-          # `allbot-*.tgz` 匹配，得到一个空变量，`gh release create` 因缺文件
-          # 参数失败（v2026.11.15 就是这样挂的）。同时兼容两种形态，防止以后
-          # 又改回非 scoped 包名。
-          TARBALL=$(ls -1 sxliuyu-allbot-*.tgz allbot-*.tgz 2>/dev/null | head -1)
+          # `sxliuyu-allbot-<ver>.tgz`，不是 `allbot-<ver>.tgz`。原来的
+          # `TARBALL=$(ls allbot-*.tgz | head -1)` 在改名后拿到空变量，
+          # `gh release create` 因缺文件参数失败（v2026.11.15 就是这样挂的）。
+          #
+          # ⚠️ 不要写成 `ls a-*.tgz b-*.tgz`：只要有任意一个通配符没匹配到，
+          # ls 就以 exit 2 结束，`pipefail` + `set -e` 让整步直接失败
+          # （v2026.11.16 的 exit code 2 就是这么来的）。用 find 逐条筛选，
+          # 没有匹配只返回空、退出码恒为 0。
+          TARBALL=$(find . -maxdepth 1 -type f \
+            \( -name 'sxliuyu-allbot-*.tgz' -o -name 'allbot-*.tgz' \) \
+            -printf '%f\n' | sort | head -1)
           if [ -z "$TARBALL" ]; then
             echo "::error title=publish::npm pack 未产出 tarball"
-            ls -1 *.tgz || echo "(no .tgz in workspace)"
+            find . -maxdepth 1 -name '*.tgz' -printf '%f\n' || echo "(no .tgz in workspace)"
             exit 1
           fi
           echo "uploading $TARBALL for $TAG"
