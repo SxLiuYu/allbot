@@ -258,36 +258,31 @@ jobs:
             done
           } >> "$GITHUB_STEP_SUMMARY"
       # Same reason as voice: check-run annotations are readable anonymously,
-      # the job log is not.
+      # the job log is not. GitHub caps a step at 10 annotations, so the budget
+      # goes to the assertion messages first — those are the only thing that
+      # says *why* a case failed; the gradle stdout just names the case.
       - name: Publish failures as annotations
         if: always()
         run: |
-          for f in /tmp/mobile-core.log /tmp/mobile-app.log; do
-            [ -f "$f" ] || continue
-            base=$(basename "$f")
-            # GitHub 每个 step 最多收 10 条 annotation。取两处最有信息量的内容：
-            #   1) "What went wrong" 之后 5 行——gradle 把失败原因放这里，
-            #      BUILD FAILED 那行本身不含原因。
-            #   2) 明细里的 `> There were failing tests` / 用例名。
-            # 尾部（BUILD FAILED + 堆栈）信息量最低，只留 2 行当锚点。
-            grep -n 'What went wrong' "$f" | head -1 | cut -d: -f1 | while read -r ln; do
-              [ -z "$ln" ] && continue
-              sed -n "$((ln)),$((ln + 5))p" "$f" | while IFS= read -r line; do
-                [ -z "$line" ] && continue
-                msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
-                echo "::error title=${base} reason::${msg}"
+          # JUnit XML 里才有断言消息；gradle 的 stdout 只给用例名。
+          # 脚本放在 scripts/ 下：heredoc 写在这里会被 YAML 的 run: | 块缩进规则
+          # 弄坏（左对齐即结束块），而缩进进去又会让 Python 报 IndentationError。
+          python3 scripts/gradle-failures-to-annotations.py mobile | tee /tmp/junit-out.txt
+          # 没有 XML（编译期就挂了、测试根本没跑）时退回 gradle 的失败段
+          if ! grep -q 'title=assert' /tmp/junit-out.txt; then
+            for f in /tmp/mobile-core.log /tmp/mobile-app.log; do
+              [ -f "$f" ] || continue
+              base=$(basename "$f")
+              grep -n 'What went wrong' "$f" | head -1 | cut -d: -f1 | while read -r ln; do
+                [ -z "$ln" ] && continue
+                sed -n "$((ln + 1)),$((ln + 3))p" "$f" | while IFS= read -r line; do
+                  [ -z "$line" ] && continue
+                  msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-700)
+                  echo "::error title=${base} reason::${msg}"
+                done
               done
             done
-            grep -E 'There were failing tests|^[A-Za-z0-9_.]+ > .* FAILED|FAILED$' "$f" | head -3 | while IFS= read -r line; do
-              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
-              echo "::error title=${base} failing::${msg}"
-            done
-            tail -2 "$f" | while IFS= read -r line; do
-              [ -z "$line" ] && continue
-              msg=$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r//g' | cut -c1-900)
-              echo "::error title=${base} tail::${msg}"
-            done
-          done
+          fi
       - name: Fail if either module's tests failed
         if: steps.core_test.outputs.exit_code != '0' || steps.app_test.outputs.exit_code != '0'
         run: |
