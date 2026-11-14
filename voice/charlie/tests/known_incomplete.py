@@ -303,6 +303,9 @@ KNOWN_INCOMPLETE: dict[str, list[str]] = {
         'TestPushFeishuAsyncThread::test_public_alias_delegates',
     ],
     'tests/test_magic_agent.py': [
+        # TestRunAgentTask 整类原先靠 xfail 压着，真实原因只是没 patch
+        # `shutil.which`：CI 上没有 hermes 二进制，所有用例都拿到
+        # ("no_binary", ...)。类上加了 autouse fixture 后已能真跑，故摘除。
         'TestDispatchTask::test_refresh_ack_cache_pays_next_budget',
         'TestEarlyExitBranch::test_ack_not_cached',
         'TestEarlyExitBranch::test_magic_agent_yields_ack_without_brain',
@@ -313,12 +316,6 @@ KNOWN_INCOMPLETE: dict[str, list[str]] = {
         'TestRouting::test_keyword_variants_verbal_particles',
         'TestRouting::test_normalize_intent_passthrough',
         'TestRouting::test_prompt_contains_domain',
-        'TestRunAgentTask::test_exception_is_error',
-        'TestRunAgentTask::test_timeout_kills_process_group',
-        'TestRunAgentTask::test_nonzero_exit_is_error',
-        'TestRunAgentTask::test_workdir_passed_when_configured',
-        'TestRunAgentTask::test_task_passed_via_stdin_not_argv',
-        'TestRunAgentTask::test_command_building_and_stdin',
     ],
 }
 

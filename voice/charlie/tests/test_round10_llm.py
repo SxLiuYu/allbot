@@ -232,10 +232,15 @@ class TestLiteConstants:
         import agent.llm as _llm_mod
         assert _llm_mod._LITE_HISTORY_TURNS == 6
 
-    def test_first_content_timeout_is_4_5(self):
-        """_LITE_FIRST_CONTENT_TIMEOUT should be 4.5 (Agnes 尾部抖动最高 7.9s，放宽以减少误退)."""
+    def test_first_content_timeout_is_8(self):
+        """_LITE_FIRST_CONTENT_TIMEOUT should be 8.0.
+
+        最初是 4.5s，但实测 Agnes 尾部抖动最高 7.9s，4.5s 会把正常的慢首包
+        误判成「无 content」并中断整段回复。放宽到 8.0s（见 agent/llm.py:1456
+        的注释）。用例名跟着改，避免「名字说 4.5、断言比 8.0」这种自相矛盾。
+        """
         import agent.llm as _llm_mod
-        assert _llm_mod._LITE_FIRST_CONTENT_TIMEOUT == 4.5
+        assert _llm_mod._LITE_FIRST_CONTENT_TIMEOUT == 8.0
 
 
 # ======================================================================

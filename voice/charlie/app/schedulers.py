@@ -401,6 +401,12 @@ def _proactive_suggestions():
                 log.info("[suggest] 已获取机器级运行锁，开始状态感知建议")
             now = datetime.datetime.now()
             hour = now.hour
+            # `minute` 必须和 hour 一起取：早晨问候分支判断的是
+            # `hour == 7 and minute == 30`（本文件 558 行附近）。这里原先只定义了
+            # hour，那个分支每轮抛 `NameError: name 'minute' is not defined`，
+            # 被外层 `except Exception` 吞掉 —— 表现为「早晨问候和 suggest_action
+            # 从来没执行过」，日志里只有一行 "[suggest] 主动建议异常"。
+            minute = now.minute
             today = now.strftime("%Y-%m-%d")
 
             # 场景定时/天气触发器（每次循环检查）

@@ -14,6 +14,16 @@ from unittest.mock import patch, MagicMock
 # ─── P1-1: Reminder expiry vs retry_after ─────────────────────────────────
 
 class TestReminderExpiryRetryAfter:
+    """过期基准必须是 `due`，**不能**是 max(due, retry_after)。
+
+    本组最初按「retry_after 晚于 due 就把过期基准推后」写（为了让静音时段
+    的提醒在补播时刻不被判过期），但那是错的方向：重试会不断推后
+    retry_after，以它为基准等于给提醒无限续命。真实事故是起床提醒 5 分钟
+    一次循环了 64 次（见 app/reminders.py:660-661 的注释）。
+    静音时段补播由 retry_after 控制「何时可以播」，与「何时算彻底过期」
+    是两件事，因此这里断言的是前者不再污染后者。
+    """
+
     def _read_claim_fn(self):
         import app.reminders as rem
         src = open(rem.__file__).read()
@@ -21,16 +31,20 @@ class TestReminderExpiryRetryAfter:
         assert idx > 0
         return src[idx:idx + 4000]
 
-    def test_expiry_uses_retry_after_base(self):
-        """过期判定应以 max(due, retry_after) 为基准"""
+    def test_expiry_is_anchored_on_due_not_retry_after(self):
+        """过期判定只看 due；出现 expiry_base/retry_after 基准就是回归。"""
         body = self._read_claim_fn()
-        assert "expiry_base" in body
+        assert "now - due > dt.timedelta(hours=EXPIRED_AFTER_HOURS)" in body
+        assert "expiry_base" not in body, \
+            "过期基准被改回 retry_after，会让重试无限续命（见真实事故 64 次循环）"
 
-    def test_retry_after_later_extends_expiry(self):
-        """retry_after 晚于 due 时应以 retry_after 为过期基准"""
+    def test_retry_after_does_not_extend_expiry(self):
+        """retry_after 晚于 due 时也不该把过期基准推后。"""
         body = self._read_claim_fn()
-        # 存在 retry_after > due 的比较逻辑
-        assert "retry_after > due" in body or "expiry_base = retry_after" in body
+        assert "retry_after > due" not in body
+        assert "expiry_base = retry_after" not in body
+        # 有一句显式注释钉住这个决定，防止后人「顺手优化」回去
+        assert "过期锚定 due 而非 retry_after" in body
 
     def test_expired_undelivered_pushes_feishu(self):
         """未送达的提醒过期时应推送飞书通知"""
@@ -39,29 +53,40 @@ class TestReminderExpiryRetryAfter:
         assert "push_feishu_async" in body
 
     def test_delivered_reminder_no_expiry_notify(self):
-        """已送达(enqueued/delivered)的提醒过期时不应推送飞书"""
+        """已送达(delivered)的提醒过期时不应推送飞书。
+
+        注意 `enqueued` 是**要**推的：入队只代表进了设备 pending 队列，
+        设备离线时队列 TTL 5 分钟就会丢，用户根本没听到，属于「未送达」。
+        本用例原先断言 enqueued 不该通知，与同文件 test_expired_undelivered_
+        pushes_feishu 的初衷以及实现在 "retry", None, "", "pending", "enqueued"
+        上的取值直接冲突。
+        """
         body = self._read_claim_fn()
-        # 条件应只覆盖 retry/None/""/pending
         m = re.search(r'old_delivery_state in \(([^)]+)\)', body)
         assert m, "未找到 old_delivery_state 条件"
         states = m.group(1)
         assert "retry" in states
-        assert "enqueued" not in states
+        assert "pending" in states
+        assert "enqueued" in states
         assert "delivered" not in states
 
     def test_quiet_hours_reminder_scenario(self):
-        """端到端场景：02:00 到期 + retry_after=07:05，07:05 时不应过期"""
+        """静音时段内到期的提醒，在静音结束后的补播时刻仍在过期窗口内。
+
+        EXPIRED_AFTER_HOURS=2（app/reminders.py），所以场景要落在 2 小时内：
+        00:20 到期、静音到 01:30 补播 —— 1h10m，仍在窗口内，能正常播出。
+        （原先写 02:00 → 07:05 共 5 小时，本身就超窗口，断言必然失败；
+        这个用例要守的是「静音补播不被误判过期」，不是让窗口跟着 retry_after 走。）
+        """
         import app.reminders as rem
         import datetime as dt
-        due = dt.datetime(2026, 8, 29, 2, 0)
-        retry_after = dt.datetime(2026, 8, 29, 7, 5)
-        now = dt.datetime(2026, 8, 29, 7, 5, 30)
-        # 模拟 claim 中的过期计算
-        expiry_base = due
-        if retry_after > due:
-            expiry_base = retry_after
-        assert now - expiry_base < dt.timedelta(hours=rem.EXPIRED_AFTER_HOURS), \
+        due = dt.datetime(2026, 8, 29, 0, 20)
+        retry_after = dt.datetime(2026, 8, 29, 1, 30)
+        now = dt.datetime(2026, 8, 29, 1, 30, 5)
+        assert now - due < dt.timedelta(hours=rem.EXPIRED_AFTER_HOURS), \
             "静音时段补播的提醒不应在补播时刻被标记过期"
+        # retry_after 只决定「何时可播」，不参与过期计算
+        assert retry_after > due
 
 
 # ─── P1-2: Feishu thinking placeholder ────────────────────────────────────

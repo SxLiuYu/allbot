@@ -180,11 +180,21 @@ def _is_provider_configured(name: str) -> bool:
 
 
 def _get_provider_cfg(name: str) -> dict:
-    """从环境变量读取并返回某 provider 的运行时配置（base, key, model）"""
+    """从环境变量读取并返回某 provider 的运行时配置（base, key, model）
+
+    stepfun 的 key 走 `agent/stepfun_keys.py` 的轮询路由器：STEPFUN_KEY 支持
+    逗号分隔多把，每次建客户端取下一把，把请求摊到所有 key 上。其他 provider
+    只有单 key 语义，仍直读环境变量。
+    """
     p = PROVIDERS[name]
+    if name == "stepfun":
+        from agent import stepfun_keys
+        key = stepfun_keys.next_key() or _read_env(p["key_env"], p["default_key"])
+    else:
+        key = _read_env(p["key_env"], p["default_key"])
     return {
         "base": _read_env(p["base_env"], p["default_base"]),
-        "key": _read_env(p["key_env"], p["default_key"]),
+        "key": key,
         "model": _read_env(p["model_env"], p["default_model"]),
     }
 

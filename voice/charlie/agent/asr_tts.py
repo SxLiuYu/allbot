@@ -10,6 +10,9 @@ import tempfile
 from typing import Optional, Dict, Any, Tuple
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from agent.intent import is_garbled_asr
+# StepFun 多 key 轮询路由器（STEPFUN_KEY 支持逗号分隔多把）。
+# 模块级别名是为了让测试能 patch `asr_tts._stepfun_keys` 整体替换掉路由器。
+from agent import stepfun_keys as _stepfun_keys
 
 log = logging.getLogger("magic")
 
@@ -1095,16 +1098,22 @@ def _tts_baidu(text: str) -> bytes:
         r.close()
 
 def _tts_stepfun(text: str) -> bytes:
-    """StepFun TTS (step-tts-2 + 系统预设音色, OpenAI兼容 /audio/speech, ~1.5s)"""
-    if not os.getenv("STEPFUN_KEY", ""):
+    """StepFun TTS (step-tts-2 + 系统预设音色, OpenAI兼容 /audio/speech, ~1.5s)
+
+    key 从轮询路由器取（STEPFUN_KEY 支持逗号分隔多把），单把时行为与老写法
+    完全一致。非 200 响应按状态码打标：429 短冷却、401/403 长隔离，下次轮询
+    自动滑到别的 key，避免单 key 配额把整条 TTS 链路卡死。
+    """
+    if not _stepfun_keys.has_keys():
         raise RuntimeError("StepFun Key 未配置")
+    key = _stepfun_keys.next_key()
     from voice_agent import _session
     voice, speed = get_effective_tts_config()
     voice = resolve_voice(voice, "stepfun")
     r = _session.post(
         f"{os.getenv('STEPFUN_TTS_BASE', 'https://api.stepfun.com/v1')}/audio/speech",
         headers={
-            "Authorization": f"Bearer {os.getenv('STEPFUN_KEY', '')}",
+            "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
         },
         json={
@@ -1117,6 +1126,7 @@ def _tts_stepfun(text: str) -> bytes:
         timeout=15,
     )
     if r.status_code != 200:
+        _stepfun_keys.mark_from_status(key, r.status_code)
         raise RuntimeError(f"StepFun TTS HTTP {r.status_code}: {r.text[:200]}")
     return r.content
 

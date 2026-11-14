@@ -112,30 +112,42 @@ class TestWorkingMemorySwitchSession:
 # ===== B4: persona 原子写 =====
 
 class TestPersonaAtomicSave:
-    def test_save_produces_valid_json(self, tmp_path):
-        persona_file = tmp_path / "persona_state.json"
-        with patch.dict(os.environ, {"ASSISTANT_KID_DATA_DIR": str(tmp_path)}):
-            import importlib
-            from agent import persona
-            importlib.reload(persona)
-            persona._state = None  # 强制重新加载（新目录 → 默认值）
-            persona.update("今天真开心哈哈")
-            data = json.loads(persona_file.read_text(encoding="utf-8"))
-            assert data["interaction_count"] == 1
+    """每个用例都要显式清掉 CHARLIE_USER_ID。
 
-    def test_concurrent_updates_no_lost_counts(self, tmp_path):
-        with patch.dict(os.environ, {"ASSISTANT_KID_DATA_DIR": str(tmp_path)}):
-            import importlib
-            from agent import persona
-            importlib.reload(persona)
-            persona._state = None
-            threads = [threading.Thread(target=persona.update, args=("测试消息",))
-                       for _ in range(8)]
-            for t in threads:
-                t.start()
-            for t in threads:
-                t.join()
-            assert persona._load()["interaction_count"] == 8
+    `persona._persona_file()` 在 uid != "default" 时返回
+    `persona_state_{uid}.json`；进程环境里只要还留着别的用例写进去的 uid
+    （历史上 tests/test_memory_store.py 在导入期设过 `test_user`），
+    断言的文件名就对不上，报 FileNotFoundError。
+    """
+
+    @staticmethod
+    def _reload_with(tmp_path, monkeypatch):
+        import importlib
+        from agent import persona
+        monkeypatch.setenv("ASSISTANT_KID_DATA_DIR", str(tmp_path))
+        monkeypatch.delenv("CHARLIE_USER_ID", raising=False)
+        # DATA_DIR 是导入期常量（persona.py:12），只改 env 不生效
+        monkeypatch.setattr(persona, "DATA_DIR", str(tmp_path))
+        with persona._STATE_LOCK:
+            persona._states.clear()
+        return persona
+
+    def test_save_produces_valid_json(self, tmp_path, monkeypatch):
+        persona_file = tmp_path / "persona_state.json"
+        persona = self._reload_with(tmp_path, monkeypatch)
+        persona.update("今天真开心哈哈")
+        data = json.loads(persona_file.read_text(encoding="utf-8"))
+        assert data["interaction_count"] == 1
+
+    def test_concurrent_updates_no_lost_counts(self, tmp_path, monkeypatch):
+        persona = self._reload_with(tmp_path, monkeypatch)
+        threads = [threading.Thread(target=persona.update, args=("测试消息",))
+                   for _ in range(8)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        assert persona._load()["interaction_count"] == 8
 
 
 # ===== H3: 空调快路径守卫与失败反馈 =====

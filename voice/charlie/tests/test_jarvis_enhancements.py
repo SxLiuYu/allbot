@@ -542,7 +542,10 @@ class TestRound4SchedulerProactiveGreeting:
              patch("app.schedulers.add_notification") as mock_add, \
              patch("app.schedulers.play_reminder_audio"), \
              patch("app.schedulers._get_weather", return_value=[]):
-            mock_dt.datetime.now.return_value = datetime.datetime(2026, 8, 21, 9, 0)
+            # 早晨问候 + suggest_action 在 `hour == 7 and minute == 30` 分支里
+            # （app/schedulers.py:558）。原用例 mock 成 9:00，那条分支根本进不去，
+            # `call_log` 自然为空 —— 断言和实现的条件对不上，不是功能缺失。
+            mock_dt.datetime.now.return_value = datetime.datetime(2026, 8, 21, 7, 30)
             mock_dt.side_effect = datetime.datetime
             try:
                 _proactive_suggestions()

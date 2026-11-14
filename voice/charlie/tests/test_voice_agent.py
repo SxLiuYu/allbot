@@ -486,6 +486,13 @@ class TestBuildSystemMsg:
         monkeypatch.setattr(app_reminders, "_load_reminders", fake_load_reminders)
         monkeypatch.setattr("builtins.open", reject_direct_open)
         voice_agent.invalidate_system_msg_cache()
+        # context 有 60s TTL 缓存（agent/context.py:19）。全量跑时前面的用例
+        # 很可能已经把空上下文烤进 `_context_cache`，这里 `get_context()` 直接
+        # 返回缓存、根本不调 `_load_reminders`，`calls["load"]` 恒为 0 —— 表现
+        # 就是「单独跑过、全量跑挂」。清掉缓存再断言。
+        from agent import context as _ctx_mod
+        monkeypatch.setattr(_ctx_mod, "_context_cache", {})
+        monkeypatch.setattr(_ctx_mod, "_context_cache_ts", 0.0)
 
         msg = voice_agent._build_system_msg()
 
@@ -648,25 +655,56 @@ class TestOpenAICompat:
         assert brain.llm._chat_complete_create(model="deepseek", messages=[], enable_thinking=False) == []
         assert brain.llm.create.calls[1]["extra_body"] == {"enable_thinking": False}
 
-    def test_none_brain_mcp_list_excludes_jarvis_includes_preferences(self):
-        """none brain 应含 magic-preferences，但不应含 magic-jarvis"""
+    def test_none_brain_mcp_list_excludes_jarvis_includes_preferences(self, monkeypatch):
+        """none brain 应含 preferences 工具，但不应含 jarvis 工具。
+
+        默认走进程内工具（`MCP_INPROC=1`，agent/llm.py:823），`function_list`
+        是工具类列表而不是 `[{"mcpServers": ...}]`。原来按后者取
+        `function_list[0]["mcpServers"]` 会报 `'InprocTool_set_pref' object
+        is not subscriptable`。这里改成断言工具名集合 —— 这才是
+        「按 mcp_set 选工具集」这条契约的可观察形态。
+        """
+        monkeypatch.delenv("MCP_INPROC", raising=False)
         with patch.dict(sys.modules, _fake_modules), \
              patch.dict(sys.modules, {"psutil": _fake_psutil}):
             brain = voice_agent._build_brain("none")
 
-        mcps = brain.function_list[0]["mcpServers"] if brain.function_list else {}
-        assert "magic-preferences" in mcps, "none brain 应始终注入 magic-preferences"
-        assert "magic-jarvis" not in mcps, "none brain 不应注入 magic-jarvis（避免闲聊延迟）"
+        names = {getattr(t, "name", "") for t in (brain.function_list or [])}
+        assert any("pref" in n for n in names), \
+            f"none brain 应始终注入 preferences 工具，实际: {sorted(names)}"
+        assert not any("jarvis" in n.lower() for n in names), \
+            f"none brain 不应注入 jarvis 工具（避免闲聊延迟），实际: {sorted(names)}"
 
-    def test_non_none_brain_mcp_list_includes_jarvis(self):
-        """非 none brain（如 all）应同时含 preferences 和 jarvis"""
+    def test_non_none_brain_mcp_list_includes_jarvis(self, monkeypatch):
+        """非 none brain（如 all）应同时含 preferences 和 jarvis 工具。
+
+        jarvis 的工具名是具体功能名（morning_briefing / suggest_action /
+        get_air_quality ...），不带 "jarvis" 字样，所以按工具名集合取样判断。
+        """
+        monkeypatch.delenv("MCP_INPROC", raising=False)
         with patch.dict(sys.modules, _fake_modules), \
              patch.dict(sys.modules, {"psutil": _fake_psutil}):
             brain = voice_agent._build_brain("all")
 
-        mcps = brain.function_list[0]["mcpServers"] if brain.function_list else {}
+        names = {getattr(t, "name", "") for t in (brain.function_list or [])}
+        assert any("pref" in n for n in names), f"缺 preferences 工具: {sorted(names)}"
+        jarvis_tools = {"morning_briefing", "suggest_action", "proactive_greeting"}
+        assert jarvis_tools & names, \
+            f"非 none brain 应注入 jarvis 工具集: 期望含 {jarvis_tools}，实际 {sorted(names)}"
+
+    def test_stdio_fallback_still_wraps_mcpservers(self, monkeypatch):
+        """MCP_INPROC=0 回退到 stdio 模式时，function_list 仍是 [{"mcpServers": ...}]。
+
+        这条锁住回退路径的形态：inproc 是默认，回退分支不能被悄悄删掉。
+        """
+        monkeypatch.setenv("MCP_INPROC", "0")
+        with patch.dict(sys.modules, _fake_modules), \
+             patch.dict(sys.modules, {"psutil": _fake_psutil}):
+            brain = voice_agent._build_brain("none")
+
+        assert brain.function_list, "stdio 回退路径应产出 MCP 配置"
+        mcps = brain.function_list[0].get("mcpServers", {})
         assert "magic-preferences" in mcps
-        assert "magic-jarvis" in mcps, "非 none brain 应注入 magic-jarvis"
 
     def test_brain_cache_evicts_oldest_when_full(self):
         """_get_brain 缓存达到上限时应淘汰最旧条目"""
@@ -993,12 +1031,21 @@ class TestTTSFailureCooldown:
     def test_success_resets_cooldown(self):
         agent.asr_tts._tts_unavailable_until = 0.0  # 清 setup 留下熔断, 让首次走 _retry 而非直接熔断
         wav = b"wav-audio-bytes" + b"x" * 120
-        # First N calls fail (all providers in chain), then success on next call after cooldown
+        # provider 链长不是常数：`TTS_PRIORITY` 默认串里有哪些 provider、各自
+        # 是否配了 key（全量跑时别的用例可能改过 env），都决定第一次失败调用
+        # 会 fallthrough 几次。原先写死 "前 3 次失败、总共 4 次"，链一变就
+        # 「单独跑过、全量跑挂」。这里按实际链长推导。
+        chain = [
+            p for p in agent.asr_tts.TTS_PRIORITY
+            if p in agent.asr_tts._TTS_PROVIDERS
+        ] or ["stepfun"]
+        fail_n = len(chain)
         _call_n = [0]
+
         def _retry_side_effect(*args, **kwargs):
             _call_n[0] += 1
-            # First pass: all 3 providers fail → global cooldown set
-            if _call_n[0] <= 3:
+            # First pass: 整条链都失败 → 设置全局冷却
+            if _call_n[0] <= fail_n:
                 raise voice_agent.TTSUnavailableError("TTSHTTP异常: 429")
             return wav
         with patch.object(agent.asr_tts, "TTS_FAILURE_COOLDOWN", 0.02), \
@@ -1008,8 +1055,9 @@ class TestTTSFailureCooldown:
             time.sleep(0.03)
             assert voice_agent.tts("恢复") == wav
 
-        # 3 failed + 1 success = 4 total _retry calls
-        assert mock_retry.call_count == 4
+        # fail_n 次失败 + 1 次成功
+        assert mock_retry.call_count == fail_n + 1, \
+            f"链长 {fail_n}（{chain}），期望 {fail_n + 1} 次调用，实际 {mock_retry.call_count}"
         assert voice_agent._tts_unavailable_until == 0.0
 
 

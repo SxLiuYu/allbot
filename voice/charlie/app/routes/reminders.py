@@ -124,6 +124,28 @@ async def lan_info():
         "https_port": https_port(),
     }
 
+def _ota_device_offer():
+    """OTA 响应里的 `device` 段：把服务端设置下发给固件。
+
+    背景：OTA 服务器地址原本编译进固件（CONFIG_OTA_URL），Mac 换 IP 后设备
+    就找不到服务器。改成由设置中心下发后，服务器搬家可以在设备还连得上旧地址
+    时提前改好。
+
+    契约（tests/test_runtime_settings.py::TestOtaDeviceOffer 锁死）：
+    - XIAOZHI_OTA_DEVICE_ENABLE != "1" 时整段不下发，返回 None；
+    - 空串不下发：显式清空覆盖等价于「不干预」，下发空串会把设备导向空地址；
+    - auto_listen 恒在图里（有默认值，不属于「不干预」语义）。
+    """
+    if os.getenv("XIAOZHI_OTA_DEVICE_ENABLE", "0") != "1":
+        return None
+    from app import runtime_settings
+    offer = {"auto_listen": runtime_settings.get("device.auto_listen")}
+    ota_url = runtime_settings.get("device.ota_url")
+    if ota_url:
+        offer["ota_url"] = ota_url
+    return offer
+
+
 @router.api_route("/xiaozhi/ota", methods=["GET", "POST"])
 async def xiaozhi_ota(request: Request):
     """OTA config endpoint for xiaozhi firmware."""
@@ -161,4 +183,67 @@ async def xiaozhi_ota(request: Request):
             "keepalive": 60,
         }
         log.info(f"[xiaozhi] OTA 返回 MQTT 配置: {mqtt_broker}:{mqtt_port} (device={device_id})")
+    # 设置中心下发的设备段（默认关闭；见 _ota_device_offer 的契约说明）
+    device_offer = _ota_device_offer()
+    if device_offer:
+        ota_response["device"] = device_offer
     return JSONResponse(ota_response)
+
+
+# OTA 地址必须是 http(s)：固件拿它去轮询，畸形值一旦落盘，设备下次激活
+# 直接失败且报错难定位（没有 ssh 的话基本只能重烧）。
+_URL_SCHEMES = ("http://", "https://")
+
+
+def _validate_setting(key, value):
+    """参数级校验；返回错误串或 None。`_coerce` 只管类型，这里管语义。"""
+    if key == "device.ota_url":
+        s = "" if value is None else str(value).strip()
+        # 空串是合法操作：等价于「不干预设备已保存地址」
+        if s and not s.lower().startswith(_URL_SCHEMES):
+            return "OTA 服务器地址必须以 http:// 或 https:// 开头"
+    return None
+
+
+@router.get("/api/settings")
+async def get_settings():
+    """当前设置 + 非法覆盖的提示（站点页面渲染用）。"""
+    from app import runtime_settings
+    settings = {}
+    for key in runtime_settings.schema():
+        # 无覆盖时取参数表声明的默认值（env 惰性求值）
+        settings[key] = runtime_settings.get(key, runtime_settings.default_for(key))
+    return {"settings": settings, "overrides": runtime_settings.overrides()}
+
+
+@router.post("/api/settings")
+async def post_settings(payload: dict):
+    """批量写入设置。全部合法才落盘，避免改一半留下不一致状态。
+
+    返回 {"ok": bool, "errors": [..], "applied": {..}}：`ok` 为 False 时
+    `errors` 给出每条被拒的原因，`applied` 为空（不做部分写入）。
+    """
+    from app import runtime_settings
+    if not isinstance(payload, dict):
+        return JSONResponse({"ok": False, "errors": ["请求体必须是对象"]}, status_code=400)
+    errors = []
+    staged = {}
+    for key, value in payload.items():
+        if key not in runtime_settings.schema():
+            errors.append(f"未知参数: {key}")
+            continue
+        bad = _validate_setting(key, value)
+        if bad:
+            errors.append(bad)
+            continue
+        ok, msg = runtime_settings.set_value(key, value)
+        if not ok:
+            errors.append(msg)
+        else:
+            staged[key] = runtime_settings.get(key, runtime_settings.default_for(key))
+    if errors:
+        # 回滚已写入的键，保证「要么全改、要么不改」
+        for key in staged:
+            runtime_settings.clear(key)
+        return JSONResponse({"ok": False, "errors": errors, "applied": {}})
+    return {"ok": True, "errors": [], "applied": staged}

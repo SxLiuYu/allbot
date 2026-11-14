@@ -116,7 +116,11 @@ class TestVisionFallback:
 
         with tempfile.TemporaryDirectory() as tmp:
             from agent import vision as vision_mod
-            with patch.object(vision_mod.os.path, "isfile", return_value=True):
+            # `screencapture` 只在 Darwin 分支里调用（agent/vision.py:225）；
+            # Linux CI 上走 mss/scrot，side_effect 永远碰不到 screencapture，
+            # 超时分支压根不触发。这条用例是给 macOS 路径写的，钉住平台。
+            with patch.object(vision_mod.platform, "system", return_value="Darwin"), \
+                 patch.object(vision_mod.os.path, "isfile", return_value=True):
                 with patch.object(vision_mod.subprocess, "run",
                                   side_effect=side_effect) as mock_run:
                     with patch.object(vision_mod.os, "unlink") as mock_unlink:

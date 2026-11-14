@@ -611,8 +611,12 @@ def _verify_openai_compat_key(api_key: str, base: str, label: str) -> tuple[bool
 
 
 def _verify_stepfun_key(api_key: str = "") -> tuple[bool, str]:
+    # STEPFUN_KEY 支持逗号分隔多把（agent/stepfun_keys.py）。校验只打第一把：
+    # 把整串 "sk-a,sk-b" 当 Bearer 发出去必然 401，用户会以为配置错了。
+    raw = api_key or os.getenv("STEPFUN_KEY", "")
+    first = next((p.strip() for p in raw.replace(";", ",").split(",") if p.strip()), "")
     return _verify_openai_compat_key(
-        api_key or os.getenv("STEPFUN_KEY", ""),
+        first,
         os.getenv("STEPFUN_LLM_BASE", "https://api.stepfun.com/step_plan/v1"),
         "StepFun",
     )

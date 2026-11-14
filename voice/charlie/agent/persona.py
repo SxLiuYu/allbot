@@ -199,15 +199,20 @@ def get_current_emotion() -> str:
     return _EMOTION_TO_TTS.get(raw, "")
 
 
-def get_current_mood() -> str:
+def get_current_mood(uid: str = None) -> str:
     """返回当前 mood（playful/caring/serious/neutral）"""
-    state = _load()
+    state = _load(uid)
     return state.get("mood", "neutral")
 
 
-def get_persona_prompt() -> str:
-    """返回动态人设提示片段，注入到 system message"""
-    state = _load()
+def get_persona_prompt(uid: str = None) -> str:
+    """返回动态人设提示片段，注入到 system message
+
+    `uid` 由 `_build_system_msg_dynamic` 传入。早先这里不收 uid，而调用方传了，
+    于是每轮都抛 TypeError 被 `except Exception` 吞掉 —— 人格段从来没注入过，
+    日志里只留一句 debug，表现为「人设不生效」且极难定位。
+    """
+    state = _load(uid)
     mood = state.get("mood", "neutral")
 
     prompts = {
@@ -284,8 +289,10 @@ def update_relationship_from_interaction(text: str) -> None:
         _save(uid)
 
 
-def contextual_response_style(level: str = "") -> str:
+def contextual_response_style(level: str = "", uid: str = None) -> str:
     """根据关系等级返回回复风格提示片段
+
+    `uid` 同 `get_persona_prompt`：调用方一直传，这里一直不收，异常被吞。
 
     关系等级影响：
     - stranger:  正式、礼貌、保持距离
@@ -293,7 +300,7 @@ def contextual_response_style(level: str = "") -> str:
     - friend:   轻松、幽默、可以开玩笑
     - family:   随意、亲密、像家人一样
     """
-    state = _load()
+    state = _load(uid)
     if not level:
         level = state.get("relationship_level", "acquaintance")
     tone = state.get("tone_profile", "casual")

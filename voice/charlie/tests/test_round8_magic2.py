@@ -112,7 +112,10 @@ class TestMagicSummary:
     def test_simple_summary_concatenates_correctly(self):
         mod = _load_module("magic_summary_test2", "magic-summary.py")
         convs = [{"role": "user", "content": "今天天气", "time": "10:00"}]
-        result = mod._simple_summary(convs, [], [], "今日摘要")
+        # 实现签名是 (conversations, decisions, memories, topics, title) 五个参数
+        # （magic-summary.py:272）。这里原来只传了四个、少一个 topics 的位置，
+        # 报 "missing 1 required positional argument: 'title'"。
+        result = mod._simple_summary(convs, [], [], [], "今日摘要")
         assert "1 次对话" in result
         assert "今日摘要" in result
 

@@ -167,6 +167,26 @@ class TestExtractAnswer:
 # ===== run_agent_task =====
 
 class TestRunAgentTask:
+    """run_agent_task 的首行是 `if not agent_cli_available(): return "no_binary"`。
+
+    `agent_cli_available()` 读 `shutil.which(AGENT_CLI_BIN)`，取决于机器上装没装
+    hermes：开发机有、CI 没有。缺这个 patch 时所有用例都拿到 `("no_binary", ...)`，
+    报的错五花八门（`assert 'no_binary' == 'empty'`、timeout 断言里 killpg 根本没被
+    调用……），但根因只有一个。这里在类上统一钉成「可用」，各用例再按需覆盖行为。
+    需要测「不可用」的用例自己 monkeypatch 回 False（见 test_no_binary）。
+    """
+
+    @pytest.fixture(autouse=True)
+    def _cli_available(self, monkeypatch):
+        # 模拟「hermes 已安装」，但保留 which 的按名字查找语义：
+        # test_no_binary 故意把 AGENT_CLI_BIN 改成一个不存在的名字来验证降级
+        # 路径，若 which 恒返回路径，它就永远走不到 no_binary 分支。
+        # 默认名在 fixture 跑的时候还没被用例改，先抓下来做比较基准。
+        default_bin = magic_agent.AGENT_CLI_BIN
+        monkeypatch.setattr(
+            magic_agent.shutil, "which",
+            lambda name, *a, **k: "/usr/bin/hermes" if name == default_bin else None)
+
     def test_command_building_and_stdin(self):
         """任务文本走 stdin（--query-file -）：不经 shell，任意中文/$() 安全。"""
         captured = {}
@@ -277,6 +297,11 @@ class TestDispatchTask:
             return "ok", "完成"
 
         monkeypatch.setattr(magic_agent, "run_agent_task", _fake_run)
+        # 必须把可用性判定也钉住：dispatch_task 在 agent_cli_available() 为
+        # False 时提前返回 ""（落回大脑路径），而可用性取决于 `shutil.which()`
+        # 能否找到 hermes 二进制 —— CI 上没有，本地开发机上有。不 patch 就是
+        # 「本地过、CI 断言 '' == ACK_TEXT 失败」。
+        monkeypatch.setattr(magic_agent, "agent_cli_available", lambda: True)
         t0 = time.time()
         ack = magic_agent.dispatch_task("清理磁盘", "sess-1")
         assert ack == magic_agent.ACK_TEXT

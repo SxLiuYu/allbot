@@ -34,8 +34,12 @@ def test_voice_server_import_uses_configured_log_dir(tmp_path):
 
     assert result.stdout.strip().endswith(str(log_dir))
     assert (log_dir / "app.log").exists()
+    # 干净的 runner 上项目根根本没有 logs/app.log（这正是期望：日志没写回项目）。
+    # 原实现无条件 read_text 会 FileNotFoundError，把「最理想的情况」报成失败。
     project_log = Path(project_dir) / "logs" / "app.log"
-    assert f"ASSISTANT_KID_LOG_DIR={log_dir}" not in project_log.read_text(encoding="utf-8", errors="ignore")
+    if project_log.exists():
+        assert f"ASSISTANT_KID_LOG_DIR={log_dir}" not in project_log.read_text(
+            encoding="utf-8", errors="ignore")
 
 
 def test_runtime_files_use_configured_data_dir():

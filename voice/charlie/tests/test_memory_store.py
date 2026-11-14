@@ -5,9 +5,13 @@ import tempfile
 import shutil
 import pytest
 
-# Ensure isolated temp dir for test DB
-os.environ["ASSISTANT_KID_DATA_DIR"] = tempfile.mkdtemp(prefix="charlie_mem_test_")
-os.environ["CHARLIE_USER_ID"] = "test_user"
+# 只设测试模式，**不改** ASSISTANT_KID_DATA_DIR / CHARLIE_USER_ID。
+#
+# 这两行原本写在模块顶层，后果是整轮收集期就把进程环境改掉了：之后所有用例
+# （persona / preferences / roles ...）都去写 `persona_state_test_user.json`，
+# 而断言 `persona_state.json` 的用例报 FileNotFoundError。表现为「本地过、
+# CI 挂」，因为 Windows 与 Linux 的收集顺序不同，巧合躲过了。
+# 需要隔离的用例自己用下面的 _iso_data_dir fixture。
 os.environ["CHARLIE_TEST_MODE"] = "1"
 
 from agent.memory_store import (
@@ -21,6 +25,22 @@ from agent.memory_store import (
     _HOT_FACT_CACHE_MAX,
 )
 from agent import memory_store as ms
+
+
+@pytest.fixture(autouse=True)
+def _iso_data_dir(tmp_path, monkeypatch):
+    """每个用例独立数据目录 + 独立 uid，用完还原。
+
+    `agent.memory_store.DATA_DIR` 是**导入期**常量（memory_store.py:43），
+    只改 env 不够，必须同时改属性，否则 _get_db_path() 仍指旧目录。
+    """
+    d = str(tmp_path)
+    monkeypatch.setenv("ASSISTANT_KID_DATA_DIR", d)
+    monkeypatch.setenv("CHARLIE_USER_ID", "test_user")
+    monkeypatch.setattr(ms, "DATA_DIR", d)
+    yield
+    ms._hot_fact_cache.clear()
+
 
 
 def _fresh_db():

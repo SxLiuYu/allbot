@@ -212,8 +212,17 @@ def invalidate_context_cache() -> None:
         _context_cache_ts = 0.0
 
 
-def format_context_for_prompt(ctx: Optional[dict[str, Any]] = None, session_id: str = "default") -> str:
-    """将上下文格式化为系统 prompt 片段。"""
+def format_context_for_prompt(ctx: Optional[dict[str, Any]] = None,
+                              session_id: str = "default",
+                              uid: str | None = None) -> str:
+    """将上下文格式化为系统 prompt 片段。
+
+    `uid` 只做签名兼容与转发：`_build_system_msg_dynamic` 会传
+    `format_context_for_prompt(session_id=..., uid=...)`。早先这里没有 uid 参数，
+    调用直接抛 TypeError 并被外层的 `except Exception` 静默吞掉 —— 结果是
+    时间/位置/天气/用户状态/待办**整段**都没注入过系统提示词，而日志只留一句
+    debug。加参数而不是删调用：get_context 将来按 uid 隔离时这里已经就位。
+    """
     if ctx is None:
         ctx = get_context(session_id=session_id)
     parts: list[str] = []
