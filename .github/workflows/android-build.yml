@@ -2,8 +2,14 @@ name: Build Android APK
 
 on:
   push:
+    # ⚠️ 不要在这里再加 `tags:`。GitHub Actions 里 push 的 paths 与 tags
+    # 是 AND 关系：写了 paths 之后，tag push 也必须改动这些路径才会触发。
+    # 想让打 tag 时也出 APK，得单独开一个不带 paths 的 workflow。
+    # 当前策略：mobile/ 有改动或手动 dispatch 时构建，产物挂到 `yanyu`
+    # 这个固定 release 上（同 launcher 的做法），随时能拿到最新包。
     paths:
       - "android/**"
+      - "mobile/**"
       - ".github/workflows/android-build.yml"
   workflow_dispatch:
 
@@ -68,4 +74,87 @@ jobs:
         with:
           name: allbot-launcher
           path: allbot-launcher.apk
+          retention-days: 90
+
+  # ---------------------------------------------------------------------------
+  # mobile/ = 言出（Mika）。和上面的 launcher 是两个完全不同的 App：
+  # launcher 是根目录 android/ 的壳（内置 Termux，用来装 Node 版服务端），
+  # mobile/ 是独立的 Android 应用（applicationId com.suoshou.yide）。
+  #
+  # 构建 `perf` 变体而不是 release：release 没有配 signingConfig（发不出来），
+  # perf 是 initWith(release) + debug 签名 —— 不可调试、性能接近发行版，
+  # 又能直接安装。debug 包不做预编译，界面会慢好几倍，不适合分发。
+  # ---------------------------------------------------------------------------
+  mobile-apk:
+    name: Build 言出 APK
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: true
+
+      # app/build.gradle.kts 里 compileSdk = 36，缺这个平台会在 Kotlin 编译
+      # 之前就失败。local.properties 是 gitignore 的，SDK 路径靠 ANDROID_HOME。
+      - name: Install SDK platform for compileSdk
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build perf APK
+        working-directory: mobile
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assemblePerf --stacktrace
+
+      - name: Collect APK
+        run: |
+          set -euo pipefail
+          # 文件名带版本号，避免不同 release 之间覆盖后看不出装的是哪版
+          VER=$(node -p "require('./package.json').version")
+          SRC=$(find mobile/app/build/outputs/apk/perf -name '*.apk' | head -1)
+          if [ -z "$SRC" ]; then
+            echo "::error title=mobile apk::assemblePerf 未产出 APK"
+            find mobile/app/build/outputs -name '*.apk' || true
+            exit 1
+          fi
+          echo "built: $SRC"
+          cp "$SRC" "yanyu-${VER}.apk"
+          ls -lh yanyu-*.apk
+
+      - name: Upload to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          APK=$(ls yanyu-*.apk | head -1)
+          # 挂到固定的 `yanyu` release（同 launcher 的做法）：本 workflow 由
+          # mobile/ 变更或手动触发，没有 tag 可挂，固定的 release 反而让下载
+          # 链接长期稳定（每次 --clobber 覆盖成最新包）。
+          if ! gh release view yanyu >/dev/null 2>&1; then
+            gh release create yanyu --title "言出 APK" \
+              --notes "言出（Mika）Android 应用包。
+
+          - applicationId: \`com.suoshou.yide\`
+          - minSdk 30（Android 11+）、targetSdk 35
+          - 变体 perf：release 优化 + 调试签名，可直接安装（debug 包不做预编译，界面会明显更慢）
+          - 文件名带版本号，装之前先核对"
+          fi
+          echo "uploading $APK"
+          gh release upload yanyu "$APK" --clobber
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yanyu-apk
+          path: yanyu-*.apk
           retention-days: 90
