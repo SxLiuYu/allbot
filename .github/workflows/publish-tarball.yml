@@ -7,12 +7,12 @@ on:
 
 jobs:
   publish-npm:
-    # Package is now `@sxliuyu/allbot` (scoped). The bare `allbot` name on npm
-    # belongs to an unrelated 2015 project, which is why this used to be off.
-    # A scoped publish works, but OIDC trusted publishing still has to be
-    # registered for this repo/package on npmjs.com first — until then the job
-    # would fail with ENEEDAUTH. Set repo variable PUBLISH_NPM=true after that
-    # registration exists; releases ship via GitHub Releases + tarball either way.
+    # 包名是 scoped 的 `@sxliuyu/allbot`（裸 `allbot` 在 npm 上属于 2015 年的
+    # 另一个项目，所以不能直接用）。发布需要一种 npm 凭证：
+    #   - `NPM_TOKEN` secret（最省事，一次性生成）
+    #   - OIDC trusted publishing（要在 npmjs.com 网页上登录 npm 账号 + 2FA 注册）
+    # 两者都没有时这一步必然 ENEEDAUTH，所以用仓库变量 PUBLISH_NPM 显式开关；
+    # 关掉也不影响发版——GitHub Release 与 tarball 照常产出。
     if: vars.PUBLISH_NPM == 'true'
     runs-on: ubuntu-24.04
     permissions:
@@ -52,8 +52,25 @@ jobs:
       # Same-date "-N" versions look like semver prereleases to npm 11+, which
       # refuses to publish them without an explicit dist-tag. They are real
       # releases in our scheme, so pin them to latest (matches npm 10 behavior).
-      - name: Publish to npm (trusted publishing / OIDC)
-        run: npm publish --access public --ignore-scripts --tag latest
+      #
+      # 两种鉴权方式，有 token 就优先用它：
+      # - `NPM_TOKEN` secret（Granular access token，勾 Automation 或 Publish）
+      # - OIDC trusted publishing（需在 npmjs.com 上为该包注册 trusted publisher）
+      # token 更容易先跑通：注册 trusted publisher 要在网页上登录 npm 账号并过
+      # 2FA，而 token 只是一次性生成。两种都不存在时这一步仍然会失败，
+      # 所以 job 的 if 条件同时看 PUBLISH_NPM 变量（显式开关）。
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "auth: NPM_TOKEN secret"
+            printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > "$HOME/.npmrc"
+          else
+            echo "auth: OIDC trusted publishing（无 NPM_TOKEN secret）"
+          fi
+          npm publish --access public --ignore-scripts --tag latest
 
   upload-tarball:
     runs-on: ubuntu-24.04
