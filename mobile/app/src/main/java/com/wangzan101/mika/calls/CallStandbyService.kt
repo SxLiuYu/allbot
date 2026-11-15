@@ -159,7 +159,7 @@ class CallStandbyService : Service() {
 
 internal object CallStandbyPolicy {
     fun optedIn(config: CallConfig, userUnlocked: Boolean): Boolean =
-        userUnlocked && config.enabled && config.autoAnswer && config.audioVerified && config.credentialsConfigured
+        userUnlocked && config.enabled && config.autoAnswer && config.audioVerified && config.backendReady
 
     fun interactiveForeground(visible: Boolean, interactive: Boolean, keyguardShowing: Boolean): Boolean =
         visible && interactive && !keyguardShowing

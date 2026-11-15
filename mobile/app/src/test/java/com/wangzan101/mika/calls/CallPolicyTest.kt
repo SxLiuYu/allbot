@@ -76,6 +76,29 @@ class CallPolicyTest {
         assertFalse("没有火山凭证", CallPolicy.callerAllowed(config(allowAll = true, credentials = false), n, now))
     }
 
+    /** 本地后端地址：没填/空白归 null；填了就必须是 ws(s):// 完整地址。 */
+    @Test fun localEndpointsAreValidatedOrCleared() {
+        assertNull(CallPolicy.localEndpoint(null))
+        assertNull(CallPolicy.localEndpoint("   "))
+        assertEquals("ws://127.0.0.1:8000/api/v1/realtime/ws/mika",
+            CallPolicy.localEndpoint(" ws://127.0.0.1:8000/api/v1/realtime/ws/mika "))
+        assertEquals("wss://voice.example.com", CallPolicy.localEndpoint("wss://voice.example.com"))
+        for (bad in listOf("http://127.0.0.1:8000", "ws://", "127.0.0.1:8000", "ws://under score:8000"))
+            assertTrue("不该放行: [$bad]", runCatching { CallPolicy.localEndpoint(bad) }.isFailure)
+        assertTrue("超长地址要拒", runCatching {
+            CallPolicy.localEndpoint("ws://" + "a".repeat(300))
+        }.isFailure)
+    }
+
+    /** 配了本地后端就不需要火山凭据也能自动接听；两边都没有时仍然拦住。 */
+    @Test fun localBackendCanReplaceVolcanoCredentialsForAutoAnswer() {
+        val n = "13800138000"
+        val local = config(allowAll = true, credentials = false).copy(
+            localEndpoint = "ws://127.0.0.1:8000/api/v1/realtime/ws/mika")
+        assertTrue("本地后端可替代火山凭据", CallPolicy.callerAllowed(local, n, now))
+        assertFalse("两边都没有还是要拦", CallPolicy.callerAllowed(config(allowAll = true, credentials = false), n, now))
+    }
+
     @Test fun theAllowlistIsMatchedNotFuzzy() {
         val c = config(allow = setOf("13800138000"))
         assertTrue(CallPolicy.callerAllowed(c, "13800138000", now))

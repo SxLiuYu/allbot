@@ -131,7 +131,9 @@
     <string name="calls_missing_disabled">ИИ-звонки выключены</string>
     <string name="calls_missing_phone_permission">разрешение на телефон</string>
     <string name="calls_missing_notifications">уведомления о звонках</string>
-    <string name="calls_missing_credentials">учётные данные Volcengine</string>
+    <string name="calls_missing_credentials">Учётные данные Volcengine или локальный сервер</string>
+    <string name="calls_local_endpoint">Локальный сервер</string>
+    <string name="calls_local_endpoint_note">Укажите адрес ws:// или wss://, чтобы подключать звонки ИИ к своему серверу (waihu). Пусто — используется Volcengine.</string>
     <string name="calls_missing_audio">путь аудио звонка</string>
     <string name="calls_missing_helper">помощник телефона</string>
     <string name="calls_missing_join">, </string>

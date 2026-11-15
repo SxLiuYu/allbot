@@ -46,6 +46,7 @@ class CallSettings(
         require(speaker.length <= CallPolicy.MAX_SPEAKER_CHARS && speaker.all { it in 'a'..'z' || it in 'A'..'Z' || it in '0'..'9' || it in "_-" }) {
             "无效的火山音色编号"
         }
+        val localEndpoint = CallPolicy.localEndpoint(config.localEndpoint)
         val audioVerified = CallPolicy.audioVerificationSurvives(config.audioVerified, previous.audioMode, config.audioMode)
         val next = config.copy(
             allowedIncomingNumbers = numbers,
@@ -61,6 +62,7 @@ class CallSettings(
             greeting = config.greeting.trim(), // An explicitly empty greeting is different from a missing preference.
             systemPrompt = config.systemPrompt.trim(),
             speaker = speaker,
+            localEndpoint = localEndpoint,
             credentialsConfigured = previous.credentialsConfigured,
         )
         val committed = prefs.edit()
@@ -79,6 +81,7 @@ class CallSettings(
             .putString("greeting", next.greeting)
             .putString("prompt", next.systemPrompt)
             .putString("speaker", next.speaker)
+            .putString("local_endpoint", next.localEndpoint.orEmpty())
             .commit()
         // A failed write may not leave auto-answer running with a policy the user tried to change.
         mutable.value = if (committed) next else previous.copy(enabled = next.enabled && previous.enabled, autoAnswer = false, backgroundStandbyAuthorized = false)
@@ -90,7 +93,7 @@ class CallSettings(
     @Synchronized
     internal fun authorizeBackgroundStandby(): Boolean {
         val config = mutable.value
-        if (!config.enabled || !config.autoAnswer || !config.audioVerified || !config.credentialsConfigured) return false
+        if (!config.enabled || !config.autoAnswer || !config.audioVerified || !config.backendReady) return false
         if (config.backgroundStandbyAuthorized) return true
         if (!prefs.edit().putBoolean(BACKGROUND_AUTHORIZED, true).commit()) return false
         mutable.value = config.copy(backgroundStandbyAuthorized = true)
@@ -172,6 +175,7 @@ class CallSettings(
                 .take(CallPolicy.MAX_GREETING_CHARS),
             systemPrompt = prefs.getString("prompt", "").orEmpty().take(CallPolicy.MAX_PROMPT_CHARS),
             speaker = prefs.getString("speaker", defaults.speaker).orEmpty().take(CallPolicy.MAX_SPEAKER_CHARS),
+            localEndpoint = prefs.getString("local_endpoint", null)?.trim()?.takeIf { it.isNotEmpty() },
         )
     }.getOrDefault(CallConfig())
 

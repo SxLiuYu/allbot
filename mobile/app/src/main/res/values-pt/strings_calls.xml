@@ -131,7 +131,9 @@
     <string name="calls_missing_disabled">As chamadas com IA estão desligadas</string>
     <string name="calls_missing_phone_permission">permissão de telefone</string>
     <string name="calls_missing_notifications">notificações de chamada</string>
-    <string name="calls_missing_credentials">credenciais do Volcengine</string>
+    <string name="calls_missing_credentials">Credenciais da Volcengine ou servidor local</string>
+    <string name="calls_local_endpoint">Servidor local</string>
+    <string name="calls_local_endpoint_note">Informe um endereço ws:// ou wss:// para conectar as chamadas de IA ao seu próprio servidor (waihu). Deixe vazio para usar a Volcengine.</string>
     <string name="calls_missing_audio">caminho de áudio da chamada</string>
     <string name="calls_missing_helper">assistente de telefone</string>
     <string name="calls_missing_join">, </string>

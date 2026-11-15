@@ -63,7 +63,9 @@
     <string name="calls_missing_disabled">AI 通话开关是关的</string>
     <string name="calls_missing_phone_permission">电话权限</string>
     <string name="calls_missing_notifications">通话通知</string>
-    <string name="calls_missing_credentials">火山语音凭据</string>
+    <string name="calls_missing_credentials">火山凭据或本地后端地址</string>
+    <string name="calls_local_endpoint">本地后端地址</string>
+    <string name="calls_local_endpoint_note">填 ws:// 或 wss:// 地址后，AI 通话改连自建后端（waihu），留空走火山引擎。</string>
     <string name="calls_missing_audio">通话音频通道</string>
     <string name="calls_missing_helper">手机操作助手</string>
     <string name="calls_missing_join">、</string>

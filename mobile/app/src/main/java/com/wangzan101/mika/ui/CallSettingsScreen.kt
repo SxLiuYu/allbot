@@ -101,7 +101,7 @@ private fun CallSettingsWorkspace(
     val settingsErrorText = stringResource(R.string.calls_device_system_settings_failed)
     val device = rememberCallDeviceControls(runtime) { feedback = CallActionResult(false, settingsErrorText) }
     val ready = config.enabled && state.prepared && state.shellConnected && device.readiness.phoneAllowed &&
-        device.readiness.callNotificationsAllowed && state.notificationsAvailable && config.credentialsConfigured && state.audioReady
+        device.readiness.callNotificationsAllowed && state.notificationsAvailable && config.backendReady && state.audioReady
     val canStartStandby = ready && config.audioVerified && config.autoAnswer && idle && pendingLockedDial == null &&
         device.readiness.standbyNotificationsAllowed && !busy && !controlBusy && !settingsBusy
 
@@ -288,6 +288,7 @@ private fun CallSettingsWorkspace(
                             onPrepare = prepare, onStop = { perform(priority = true) { runtime.stop() } },
                             onHelperSetup = onHelperSetup, onStartStandby = startStandby,
                             onCredentials = { dialog = CallDialog.Credentials }, onProfile = { dialog = CallDialog.Profile },
+                            onLocalEndpoint = { dialog = CallDialog.LocalEndpoint },
                             onVerifyAudio = { verified ->
                                 scope.launch { save { it.copy(audioVerified = verified, autoAnswer = verified && it.autoAnswer) } }
                             },
@@ -331,11 +332,14 @@ private fun CallSettingsWorkspace(
                     speaker = edits.speaker, audioMode = edits.audioMode, maxCallSeconds = edits.maxCallSeconds)
             }
         })
+        CallDialog.LocalEndpoint -> CallLocalEndpointDialog(config, onDismiss = { dialog = null }, onSave = { edits ->
+            save { latest -> latest.copy(localEndpoint = edits.localEndpoint) }
+        })
         null -> Unit
     }
 }
 
-private enum class CallDialog { Rules, Bypass, Credentials, Profile }
+private enum class CallDialog { Rules, Bypass, Credentials, Profile, LocalEndpoint }
 
 private enum class CallWorkspaceTab(val label: Int) {
     Receive(R.string.calls_nav_receive), Task(R.string.calls_nav_task),
@@ -574,6 +578,7 @@ private fun CallPreferencesPage(
     config: CallConfig, state: CallRuntimeState, ready: Boolean, openDeviceRequest: Int,
     canConfigure: Boolean, stopBusy: Boolean, device: CallDeviceControls, canStartStandby: Boolean,
     onPrepare: () -> Unit, onStop: () -> Unit, onCredentials: () -> Unit, onProfile: () -> Unit,
+    onLocalEndpoint: () -> Unit,
     onVerifyAudio: (Boolean) -> Unit, onDefaultSim: (String?) -> Unit,
     onHelperSetup: () -> Unit, onStartStandby: () -> Unit,
 ) {
@@ -613,7 +618,7 @@ private fun CallPreferencesPage(
                             stringResource(R.string.calls_missing_notifications).takeIf {
                                 !device.readiness.callNotificationsAllowed || !state.notificationsAvailable
                             },
-                            stringResource(R.string.calls_missing_credentials).takeIf { !config.credentialsConfigured },
+                            stringResource(R.string.calls_missing_credentials).takeIf { !config.backendReady },
                             stringResource(R.string.calls_missing_audio).takeIf { !state.audioReady },
                             stringResource(R.string.calls_missing_helper).takeIf { !state.shellConnected },
                         )
@@ -660,6 +665,11 @@ private fun CallPreferencesPage(
                 stringResource(if (config.credentialsConfigured) R.string.calls_key_saved else R.string.calls_key_missing),
                 first = true, onClick = onCredentials.takeIf { canConfigure },
             ) { RowChevron() }
+            ListRow(
+                MikaIcons.Code, stringResource(R.string.calls_local_endpoint),
+                config.localEndpoint ?: stringResource(R.string.calls_key_missing),
+                onClick = onLocalEndpoint.takeIf { canConfigure },
+            ) { RowChevron() }
             ListRow(MikaIcons.Message, stringResource(R.string.calls_profile),
                 stringResource(R.string.calls_model_label, config.model), onClick = onProfile.takeIf { canConfigure }) { RowChevron() }
         }
@@ -704,7 +714,7 @@ private fun CallReadinessActions(
             },
             style = MaterialTheme.typography.bodySmall, color = MikaTheme.colors.ink3,
         )
-        if (canPrepare && state.prepared && !config.credentialsConfigured) {
+        if (canPrepare && state.prepared && !config.backendReady) {
             CallPrimaryButton(stringResource(R.string.calls_credentials), enabled, onCredentials)
         } else if (canPrepare && !ready) {
             CallPrimaryButton(stringResource(if (config.enabled) R.string.calls_prepare else R.string.calls_enable),
@@ -946,6 +956,39 @@ private fun CallCredentialsDialog(runtime: CallRuntime, onDismiss: () -> Unit, o
                     } catch (e: CancellationException) { throw e }
                     catch (_: Exception) { error = true }
                     finally { busy = false }
+                }
+            }) { Text(stringResource(R.string.calls_save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss, enabled = !busy) { Text(stringResource(R.string.calls_cancel)) } },
+    )
+}
+
+@Composable
+private fun CallLocalEndpointDialog(config: CallConfig, onDismiss: () -> Unit, onSave: suspend (CallConfig) -> Boolean) {
+    var endpoint by rememberSaveable { mutableStateOf(config.localEndpoint.orEmpty()) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    AlertDialog(
+        onDismissRequest = { if (!busy) onDismiss() },
+        title = { Text(stringResource(R.string.calls_local_endpoint)) },
+        text = {
+            Column(Modifier.heightIn(max = 420.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.calls_local_endpoint_note))
+                OutlinedTextField(
+                    endpoint, { endpoint = it; error = false }, modifier = Modifier.fillMaxWidth(),
+                    label = { Text("ws://…") }, singleLine = true, enabled = !busy,
+                )
+                if (error) Text(stringResource(R.string.calls_action_failed), color = MaterialTheme.colorScheme.error)
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = !busy, onClick = {
+                busy = true
+                scope.launch {
+                    try {
+                        if (onSave(config.copy(localEndpoint = endpoint.trim().ifEmpty { null }))) onDismiss() else error = true
+                    } finally { busy = false }
                 }
             }) { Text(stringResource(R.string.calls_save)) }
         },

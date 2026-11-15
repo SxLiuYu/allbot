@@ -22,6 +22,7 @@ data class CallConfig(
     val autoAnswerDelaySeconds: Int = MIN_AUTO_ANSWER_DELAY_SECONDS,
     val defaultOutgoingSimId: String? = null,
     val bypassIncomingNumbers: Set<String> = emptySet(),
+    val localEndpoint: String? = null,
     val autoAnswerPausedUntilMs: Long? = null,
     internal val backgroundStandbyAuthorized: Boolean = false,
 ) {
@@ -31,6 +32,9 @@ data class CallConfig(
     }
 
     val model: String get() = "1.2.6.1"
+
+    /** 通话后端就绪：本地后端地址或火山凭据任一即可，两边都空才挡住接听。 */
+    val backendReady: Boolean get() = credentialsConfigured || !localEndpoint.isNullOrBlank()
     override fun toString(): String =
         "CallConfig(enabled=$enabled, autoAnswer=$autoAnswer, allowAllIncoming=$allowAllIncoming, " +
             "allowlistSize=${allowedIncomingNumbers.size}, maxCallSeconds=$maxCallSeconds, " +
@@ -84,7 +88,7 @@ internal object CallPolicy {
         config.autoAnswerPausedUntilMs?.takeIf { it > nowMs }?.minus(nowMs) ?: 0L
 
     fun callerAllowed(config: CallConfig, number: String?, nowMs: Long = System.currentTimeMillis()): Boolean {
-        if (!config.enabled || !config.autoAnswer || !config.credentialsConfigured || !config.audioVerified) return false
+        if (!config.enabled || !config.autoAnswer || !config.backendReady || !config.audioVerified) return false
         if (autoAnswerPauseRemainingMs(config, nowMs) > 0L || isBypassed(config, number)) return false
         if (number == null) return config.allowAllIncoming // Explicit all includes unavailable caller ID.
         val key = incomingMatchKey(number) ?: return false
@@ -159,6 +163,19 @@ internal object CallPolicy {
     fun credentialFieldsUsable(appId: String, accessKey: String, apiKey: String): Boolean =
         listOf(appId, accessKey, apiKey).all { value ->
             value.length <= MAX_CREDENTIAL_CHARS && value.all { it.code in 33..126 }
+        }
+
+    const val MAX_LOCAL_ENDPOINT_CHARS = 200
+
+    // adb reverse / 内网调试都是点分 IPv4 + 可选端口 + 可选路径；IPv6 字面量
+    // 不在白名单里，真要用再说。
+    private val wsEndpoint = Regex("^wss?://[\\w.-]+(?::\\d{1,5})?(?:/\\S*)?$")
+
+    /** 本地后端地址归一：空白归 null（走火山），否则必须是 ws(s):// 完整地址。 */
+    fun localEndpoint(value: String?): String? =
+        value?.trim()?.takeIf { it.isNotEmpty() }?.also {
+            require(it.length <= MAX_LOCAL_ENDPOINT_CHARS) { "本地后端地址过长" }
+            require(wsEndpoint.matches(it)) { "本地后端地址必须是 ws:// 或 wss:// 开头的完整地址" }
         }
 
     fun previousAppOpMode(output: String): String? {

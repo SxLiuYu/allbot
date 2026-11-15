@@ -88,6 +88,22 @@ class CallSettingsTest {
         assertEquals("zh_male_x", again.speaker)
     }
 
+    @Test fun localEndpointSavesReadsBackAndRejectsGarbage() {
+        val prefs = MemoryPrefs()
+        val endpoint = "ws://127.0.0.1:8000/api/v1/realtime/ws/mika"
+        val saved = settings(prefs).save(CallConfig(enabled = true, localEndpoint = "  $endpoint  "))
+        assertEquals("首尾空白要去掉", endpoint, saved.localEndpoint)
+        assertEquals("同一份 prefs 读回来要一致", endpoint,
+            settings(prefs).state.value.localEndpoint)
+
+        assertTrue("http 不是 ws(s)://，要拒", runCatching {
+            settings(prefs).save(CallConfig(localEndpoint = "http://127.0.0.1:8000"))
+        }.isFailure)
+        // 留空 = 走火山：存进去的是空串，读回来是 null
+        settings(prefs).save(CallConfig(enabled = true))
+        assertNull(settings(prefs).state.value.localEndpoint)
+    }
+
     @Test fun aDifferentBuildInvalidatesTheAudioVerification() {
         // 换了系统版本,上次「听过出声」的结论不能顺延。
         val prefs = MemoryPrefs()

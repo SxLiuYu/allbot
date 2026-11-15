@@ -63,7 +63,9 @@
     <string name="calls_missing_disabled">AI calling is off</string>
     <string name="calls_missing_phone_permission">phone permission</string>
     <string name="calls_missing_notifications">call notifications</string>
-    <string name="calls_missing_credentials">Volcengine credentials</string>
+    <string name="calls_missing_credentials">Volcengine credentials or local backend</string>
+    <string name="calls_local_endpoint">Local backend endpoint</string>
+    <string name="calls_local_endpoint_note">Enter a ws:// or wss:// address to route AI calls to your own backend (waihu). Leave empty to use Volcengine.</string>
     <string name="calls_missing_audio">call audio path</string>
     <string name="calls_missing_helper">phone helper</string>
     <string name="calls_missing_join">, </string>

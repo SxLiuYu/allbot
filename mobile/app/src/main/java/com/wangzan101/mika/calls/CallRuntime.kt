@@ -151,12 +151,12 @@ class CallRuntime(private val app: MikaApp) {
             var previousMode: CallAudioMode? = null
             var previousEnabled = false
             settings.state.collect { config ->
-                lockedDial?.takeIf { !config.enabled || !config.credentialsConfigured || config.audioMode != it.config.audioMode }
+                lockedDial?.takeIf { !config.enabled || !config.backendReady || config.audioMode != it.config.audioMode }
                     ?.let { finishLockedDial(it, "电话设置已变更，未执行锁屏拨出") }
                 if (!hasAuthorizedIncomingStandby()) standbyService?.revokeIncomingAuthorization()
                 stopBackgroundStandbyIfUnneeded()
                 val active = work
-                if (active != null && (!config.enabled || !config.credentialsConfigured ||
+                if (active != null && (!config.enabled || !config.backendReady ||
                         config.audioMode != active.config.audioMode ||
                         (active.automatic && !active.answerSent && !CallPolicy.callerAllowed(config, active.track?.number)))) {
                     cancelWork("AI 电话设置已变更，电话由系统处理")
@@ -857,8 +857,11 @@ class CallRuntime(private val app: MikaApp) {
             prerequisite(ignoreWork = true)?.let { throw CallProblem(it) }
             validateTarget(w)
             val helper = shell ?: throw CallProblem("Mika 内置助手未连接")
-            val credentials = withContext(Dispatchers.IO) { settings.credentials() }
-                ?: throw CallProblem("火山凭据不可用，请重新保存")
+            val localEndpoint = w.config.localEndpoint
+            val credentials = if (localEndpoint == null) {
+                withContext(Dispatchers.IO) { settings.credentials() }
+                    ?: throw CallProblem("火山凭据不可用，请重新保存")
+            } else null
             if (!probeAudio()) throw CallProblem(audioDetail ?: "此设备的双向通话音频不可用")
             if (shell !== helper || w.config.audioMode != settings.state.value.audioMode) {
                 throw CallProblem("通话音频设置已变化，请重试")
@@ -870,14 +873,29 @@ class CallRuntime(private val app: MikaApp) {
                     .getOrElse { throw CallProblem("无法读取电话交代，未由 AI 操作电话") }
             }
             validateTarget(w)
+            val systemPrompt = CallPolicy.prompt(w.config.systemPrompt, w.direction, ownerRules, task = w.task)
             val session = withTimeoutOrNull(5_000L) {
-                VolcRealtimeClient().connect(credentials, VolcRealtimeConfig(
-                    systemPrompt = CallPolicy.prompt(w.config.systemPrompt, w.direction, ownerRules, task = w.task),
-                    speaker = w.config.speaker,
-                ))
-            } ?: throw CallProblem("火山实时语音连接超时，未由 AI 接管")
+                if (localEndpoint != null) {
+                    // 本地后端（waihu 直连）：开场白在 onOpen 的 configure 帧里交给
+                    // waihu，火山那边的 sendGreeting 在本地会话是空操作，见
+                    // LocalRealtimeSession——两边开场白语义相同，都用 spokenGreeting。
+                    LocalRealtimeSession(
+                        endpoint = localEndpoint,
+                        greeting = CallPolicy.spokenGreeting(w.config.greeting, hasTask = w.task != null),
+                        systemPrompt = systemPrompt,
+                    ).connect()
+                } else {
+                    VolcRealtimeClient().connect(checkNotNull(credentials), VolcRealtimeConfig(
+                        systemPrompt = systemPrompt,
+                        speaker = w.config.speaker,
+                    ))
+                }
+            } ?: throw CallProblem(
+                if (localEndpoint != null) "本地语音后端连接超时，未由 AI 接管"
+                else "火山实时语音连接超时，未由 AI 接管")
             w.session = session
-            if (!session.setMuted(true)) throw CallProblem("火山实时语音未进入就绪状态")
+            if (!session.setMuted(true)) throw CallProblem(
+                if (localEndpoint != null) "本地语音后端未进入就绪状态" else "火山实时语音未进入就绪状态")
             if (!withContext(Dispatchers.IO) { access.ready() }) {
                 armed = false
                 throw CallProblem("系统通话管理权限不可用，未由 AI 操作电话")
@@ -956,12 +974,13 @@ class CallRuntime(private val app: MikaApp) {
             }
         } catch (e: VolcRealtimeException) {
             debugMediaException(w, e)
+            val backend = if (w.config.localEndpoint != null) "本地语音后端" else "火山实时语音"
             w.stopReason.record(when (e.kind) {
-                VolcRealtimeException.Kind.AUTH -> "火山拒绝认证，请检查电话语音凭据和服务开通状态"
-                VolcRealtimeException.Kind.RATE_LIMITED -> "火山实时语音达到服务限额，电话由系统处理"
-                VolcRealtimeException.Kind.TIMEOUT, VolcRealtimeException.Kind.NETWORK -> "火山实时语音连接不可用，电话由系统处理"
-                VolcRealtimeException.Kind.BACKPRESSURE -> "火山实时音频拥塞，电话由系统处理"
-                else -> "火山实时语音未能继续，请检查通话配置"
+                VolcRealtimeException.Kind.AUTH -> "$backend 拒绝认证，请检查电话语音凭据和服务开通状态"
+                VolcRealtimeException.Kind.RATE_LIMITED -> "$backend 达到服务限额，电话由系统处理"
+                VolcRealtimeException.Kind.TIMEOUT, VolcRealtimeException.Kind.NETWORK -> "$backend 连接不可用，电话由系统处理"
+                VolcRealtimeException.Kind.BACKPRESSURE -> "$backend 音频拥塞，电话由系统处理"
+                else -> "$backend 未能继续，请检查通话配置"
             })
         } catch (e: Exception) {
             debugMediaException(w, e)
@@ -1359,7 +1378,7 @@ class CallRuntime(private val app: MikaApp) {
         configuring -> "AI 电话正在配置"
         !armed || !access.hasPhonePermissions() -> "请先准备 AI 电话"
         shell == null -> "Mika 内置助手未连接"
-        !settings.state.value.credentialsConfigured -> "请先配置火山实时语音凭据"
+        !settings.state.value.backendReady -> "请先配置火山凭据或本地后端地址"
         !(notificationReady ?: notifications.ready()) -> "请允许 AI 电话通知，以便取消或接管"
         !ignoreWork && work?.direction == CallDirection.OUTGOING -> "已在处理另一通电话"
         else -> null
