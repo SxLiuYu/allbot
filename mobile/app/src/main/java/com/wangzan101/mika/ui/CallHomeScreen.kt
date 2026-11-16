@@ -99,9 +99,9 @@ fun CallHomeScreen(
 
     val setupMissing = CallSetupStep.missing(config, state)
     val ready = setupMissing.isEmpty()
-    val join = stringResource(R.string.calls_missing_join)
-    // 先在这里取文字：stringResource 不能出现在非 composable 的 lambda 里。
-    val missingText = setupMissing.map { stringResource(it.label()) }.joinToString(join)
+    // 副标题只报「还差几步」：把五个步骤名连成一串既冗长又会撑成三行，
+    // 具体是哪几步进向导页看即可。
+    val setupHint = stringResource(R.string.calls_home_setup_needed, setupMissing.size)
     val idle = state.phase == CallPhase.IDLE
     val canToggleAuto = ready && idle && !busy
 
@@ -199,7 +199,7 @@ fun CallHomeScreen(
                         CallFoldDivider()
                         ListRow(
                             MikaIcons.Gear, stringResource(R.string.calls_setup_title),
-                            subtitle = missingText,
+                            subtitle = setupHint,
                             onClick = onOpenSetup,
                         ) { RowChevron() }
                     }
@@ -391,15 +391,6 @@ private fun CurrentCallSummary(
             feedback?.let { CallFeedback(it) }
         }
     }
-}
-
-/** 步骤 → 字符串资源。放在这里而不是枚举里，避免 calls 包依赖 R。 */
-private fun CallSetupStep.label(): Int = when (this) {
-    CallSetupStep.DEVICE_PERMISSIONS -> R.string.calls_setup_step_permissions
-    CallSetupStep.BUILTIN_HELPER -> R.string.calls_setup_step_helper
-    CallSetupStep.NOTIFICATIONS -> R.string.calls_setup_step_notifications
-    CallSetupStep.AUDIO_VERIFIED -> R.string.calls_setup_step_audio
-    CallSetupStep.BACKEND -> R.string.calls_setup_step_backend
 }
 
 /** 卡片内的分隔线；与 GroupCard 的 hairlines 对齐。 */
