@@ -133,7 +133,7 @@
     <string name="calls_missing_notifications">通話の通知</string>
     <string name="calls_missing_credentials">通話サービス</string>
     <string name="calls_local_endpoint">ローカルバックエンド</string>
-    <string name="calls_local_endpoint_note">ws:// または wss:// のアドレスを入力すると、AI 通話が自前のバックエンド（waihu）に接続します。空欄なら Volcengine を使います。</string>
+    <string name="calls_local_endpoint_note">通話サービスのアドレス。ws:// または wss:// で始まります。トークンを含む完全なアドレスは提供元から入手してください。</string>
     <string name="calls_missing_audio">通話音声の経路</string>
     <string name="calls_missing_helper">電話ヘルパー</string>
     <string name="calls_missing_join">、</string>

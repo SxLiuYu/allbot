@@ -133,7 +133,7 @@
     <string name="calls_missing_notifications">уведомления о звонках</string>
     <string name="calls_missing_credentials">Служба звонков</string>
     <string name="calls_local_endpoint">Локальный сервер</string>
-    <string name="calls_local_endpoint_note">Укажите адрес ws:// или wss://, чтобы подключать звонки ИИ к своему серверу (waihu). Пусто — используется Volcengine.</string>
+    <string name="calls_local_endpoint_note">Адрес службы звонков, начинается с ws:// или wss://. Полный адрес вместе с токеном запросите у поставщика услуги.</string>
     <string name="calls_missing_audio">путь аудио звонка</string>
     <string name="calls_missing_helper">помощник телефона</string>
     <string name="calls_missing_join">, </string>

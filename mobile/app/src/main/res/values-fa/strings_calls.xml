@@ -128,7 +128,7 @@
     <string name="calls_speaker_edit_note">صداهای شبیه‌سازی‌شده را در بخش شبیه‌سازی صدا انتخاب کنید. برای بازگرداندن صدای پیش‌فرض، خالی بگذارید.</string>
     <string name="calls_greeting_hint">همان‌طور که نوشته شده خوانده می‌شود. برای اینکه طرف مقابل ابتدا صحبت کند، خالی بگذارید.</string>
     <string name="calls_local_endpoint">سرور محلی</string>
-    <string name="calls_local_endpoint_note">برای اتصال تماس‌های هوش مصنوعی به سرور خودتان (waihu) یک نشانی ws:// یا wss:// وارد کنید؛ خالی بگذارید تا از Volcengine استفاده شود.</string>
+    <string name="calls_local_endpoint_note">نشانی سرویس تماس، با ws:// یا wss:// شروع می‌شود. نشانی کامل همراه با توکن را از ارائه‌دهنده بگیرید.</string>
     <string name="welcome_start_calls">شروع با تماس‌های هوش مصنوعی</string>
     <string name="calls_home_answer_title">پاسخ به تماس‌ها</string>
     <string name="calls_home_answer_sub">فقط شماره‌هایی که اجازه می‌دهید؛ بقیه طبق معمول به خودتان می‌رسد</string>

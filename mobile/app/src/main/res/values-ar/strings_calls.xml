@@ -128,7 +128,7 @@
     <string name="calls_speaker_edit_note">اختر الأصوات المستنسخة في قسم استنساخ الصوت. اترك الحقل فارغًا لاستعادة الصوت الافتراضي.</string>
     <string name="calls_greeting_hint">تُقرأ التحية كما كُتبت. اترك الحقل فارغًا ليتكلم الطرف الآخر أولًا.</string>
     <string name="calls_local_endpoint">الخادم المحلي</string>
-    <string name="calls_local_endpoint_note">أدخل عنوان ws:// أو wss:// لتوصيل مكالمات الذكاء الاصطناعي بخادمك الخاص (waihu). اتركه فارغًا لاستخدام Volcengine.</string>
+    <string name="calls_local_endpoint_note">عنوان خدمة المكالمات، يبدأ بـ ws:// أو wss://. اطلب العنوان الكامل مع الرمز من مزوّد الخدمة.</string>
     <string name="calls_home_answer_title">الرد على المكالمات</string>
     <string name="calls_home_answer_sub">الأرقام التي تسمح بها فقط؛ البقية تصلك كالمعتاد</string>
     <string name="calls_home_dial_title">إجراء مكالمة</string>

@@ -133,7 +133,7 @@
     <string name="calls_missing_notifications">notificações de chamada</string>
     <string name="calls_missing_credentials">Serviço de chamadas</string>
     <string name="calls_local_endpoint">Servidor local</string>
-    <string name="calls_local_endpoint_note">Informe um endereço ws:// ou wss:// para conectar as chamadas de IA ao seu próprio servidor (waihu). Deixe vazio para usar a Volcengine.</string>
+    <string name="calls_local_endpoint_note">Endereço do serviço de chamadas, começando por ws:// ou wss://. Peça ao fornecedor o endereço completo, incluindo o token.</string>
     <string name="calls_missing_audio">caminho de áudio da chamada</string>
     <string name="calls_missing_helper">assistente de telefone</string>
     <string name="calls_missing_join">, </string>

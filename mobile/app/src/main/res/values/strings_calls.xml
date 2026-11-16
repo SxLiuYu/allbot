@@ -65,7 +65,7 @@
     <string name="calls_missing_notifications">call notifications</string>
     <string name="calls_missing_credentials">Calling service</string>
     <string name="calls_local_endpoint">Local backend endpoint</string>
-    <string name="calls_local_endpoint_note">Enter a ws:// or wss:// address to route AI calls to your own backend (waihu). Leave empty to use Volcengine.</string>
+    <string name="calls_local_endpoint_note">Address of the calling service, starting with ws:// or wss://. Ask your provider for the full address, including any token.</string>
     <string name="calls_missing_audio">call audio path</string>
     <string name="calls_missing_helper">phone helper</string>
     <string name="calls_missing_join">, </string>
