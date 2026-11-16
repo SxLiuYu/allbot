@@ -6,6 +6,8 @@ import android.os.LocaleList
 import android.os.SystemClock
 import androidx.test.platform.app.InstrumentationRegistry
 import com.wangzan101.mika.i18n.AppLanguage
+import com.wangzan101.mika.i18n.ResourceTexts
+import com.wangzan101.mika.i18n.UiText
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -14,23 +16,38 @@ import org.junit.runners.model.Statement
  * 真机测试里把 Mika 的界面固定成简体中文(断言写的是简体中文):安卓 13 起经系统的「应用语言」临时换成简体中文,测完换回;
  * 要放在最外层(`@get:Rule(order = Int.MIN_VALUE)`),在界面起来之前换好。
  * 安卓 12 及以前没有单个 App 的语言,测试界面跟着系统:请在简体中文系统上跑。
+ *
+ * 同时装上 [UiText.source]:界面以外算文字的地方(`AboutCopy` 这类)走 `tr()`,而这个源只在
+ * `MikaApp.onCreate` 里装。仪器测试不起 MikaApp,所以不装就会在渲染时抛
+ * 「UiText.source is not installed」,界面直接空白。
  */
 class ChineseUi : TestRule {
     override fun apply(base: Statement, description: Description): Statement = object : Statement() {
         override fun evaluate() {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return base.evaluate()
             val context = InstrumentationRegistry.getInstrumentation().targetContext
-            val simplified = { context.resources.getString(R.string.ui_locale) == AppLanguage.SimplifiedChinese.tag }
-            if (simplified()) return base.evaluate()
-            val lm = context.getSystemService(LocaleManager::class.java)
-            val before = lm.applicationLocales
-            lm.applicationLocales = LocaleList.forLanguageTags(AppLanguage.SimplifiedChinese.tag)
-            waitFor(simplified)
+            val before = UiText.source
+            UiText.source = ResourceTexts { AppLanguage.resources(context) }
             try {
-                base.evaluate()
+                evaluateInSimplifiedChinese(base)
             } finally {
-                lm.applicationLocales = before
+                UiText.source = before
             }
+        }
+    }
+
+    private fun evaluateInSimplifiedChinese(base: Statement) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return base.evaluate()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val simplified = { context.resources.getString(R.string.ui_locale) == AppLanguage.SimplifiedChinese.tag }
+        if (simplified()) return base.evaluate()
+        val lm = context.getSystemService(LocaleManager::class.java)
+        val before = lm.applicationLocales
+        lm.applicationLocales = LocaleList.forLanguageTags(AppLanguage.SimplifiedChinese.tag)
+        waitFor(simplified)
+        try {
+            base.evaluate()
+        } finally {
+            lm.applicationLocales = before
         }
     }
 

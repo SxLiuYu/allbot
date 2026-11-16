@@ -45,3 +45,9 @@ internal fun ComposeContentTestRule.typeAndSend(text: String) {
 /** 按 App 当前界面语言取的文字。 */
 internal fun appString(id: Int): String =
     AppLanguage.resources(InstrumentationRegistry.getInstrumentation().targetContext).getString(id)
+
+/**
+ * 虚拟屏小窗的无障碍名字。取资源而不写死:产品改过一次名(「Mika 的虚拟屏」→「言出 的虚拟屏」),
+ * 写死的话界面对了、测试却一直红。
+ */
+internal val virtualScreenLabel: String get() = appString(R.string.pip_screen)

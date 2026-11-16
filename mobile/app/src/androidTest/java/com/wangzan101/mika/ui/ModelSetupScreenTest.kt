@@ -77,6 +77,17 @@ class ModelSetupScreenTest {
         assertEquals(listOf("start"), calls)
     }
 
+    /** 只想先用 AI 接电话的人走另一条入口:跳过模型配置,两个按钮各走各的。 */
+    @Test fun welcomeHasASeparateEntryForCallsOnly() {
+        compose.setContent {
+            MikaTheme { WelcomeScreen(onStartCalls = { calls += "calls" }) { calls += "start" } }
+        }
+        compose.onNodeWithTag("welcome-start-calls").assertIsDisplayed().performClick()
+        assertEquals(listOf("calls"), calls)
+        compose.onNodeWithTag("welcome-start").performClick()
+        assertEquals(listOf("calls", "start"), calls)
+    }
+
     @Test fun firstVisitShowsFormAndNextIsDisabled() {
         show(ModelSetupUi(form))
         compose.onNodeWithTag("setup-next").assertIsNotEnabled()

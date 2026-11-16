@@ -33,7 +33,7 @@ class AgentPipWebFrameTest {
             AgentPip(PipUi(visible = true), frame, webContent = true, reduceMotion = true,
                 topInset = 0f, bottomInset = 0f, onExpand = {}, onCollapse = {}, onAttention = {})
         }
-        val pixels = compose.onNodeWithContentDescription("Mika 的虚拟屏").captureToImage().toPixelMap()
+        val pixels = compose.onNodeWithContentDescription(virtualScreenLabel).captureToImage().toPixelMap()
         val y = pixels.height / 2
         val left = pixels[pixels.width / 10, y]
         val right = pixels[pixels.width * 9 / 10, y]
@@ -53,7 +53,7 @@ class AgentPipWebFrameTest {
             AgentPip(PipUi(visible = true), frame, webContent = false, reduceMotion = true,
                 topInset = 0f, bottomInset = 0f, onExpand = {}, onCollapse = {}, onAttention = {})
         }
-        val pixels = compose.onNodeWithContentDescription("Mika 的虚拟屏").captureToImage().toPixelMap()
+        val pixels = compose.onNodeWithContentDescription(virtualScreenLabel).captureToImage().toPixelMap()
         val bottom = pixels[pixels.width / 2, pixels.height - 3]
         assertTrue("bottom of phone frame was cropped: $bottom", bottom.green > .8f && bottom.red < .2f)
         frame.recycle()

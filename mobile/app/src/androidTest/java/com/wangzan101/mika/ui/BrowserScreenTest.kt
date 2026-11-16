@@ -1,15 +1,18 @@
 package com.wangzan101.mika.ui
 
 import com.wangzan101.mika.ChineseUi
+import com.wangzan101.mika.R
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
@@ -72,8 +75,12 @@ class BrowserScreenTest {
         }
     }
 
+    /**
+     * 侧栏不再有浏览器入口（言出只做手机自动化，内置浏览器入口按产品决定剪掉了）。
+     * 这里固定住这个决定：入口没回来，免得哪天又冒出一个没人维护的入口。
+     */
     @Test
-    fun drawerHasBrowserEntryThatOpensIt() {
+    fun drawerHasNoBrowserEntry() {
         compose.setContent {
             MikaTheme {
                 ChatDrawer(
@@ -84,8 +91,8 @@ class BrowserScreenTest {
                 )
             }
         }
-        compose.onNodeWithText("浏览器").assertIsDisplayed().performClick()
-        assertEquals(listOf("browser"), calls)
+        compose.onAllNodesWithText(appString(R.string.drawer_browser)).assertCountEquals(0)
+        assertEquals(emptyList<String>(), calls)
     }
 
     @Test
@@ -156,11 +163,11 @@ class BrowserScreenTest {
         }
         compose.onNodeWithText(BROWSER_DESKTOP_TAG).assertIsDisplayed()
         compose.onNodeWithTag("browser-progress").assertIsDisplayed()
-        compose.onNodeWithContentDescription("后退").assertIsNotEnabled()
-        compose.onNodeWithContentDescription("停止").performClick()
-        compose.onNodeWithContentDescription("起始页").performClick()
-        compose.onNodeWithContentDescription("分享").performClick()
-        compose.onNodeWithContentDescription("更多").performClick()
+        compose.onNodeWithContentDescription(appString(R.string.back)).assertIsNotEnabled()
+        compose.onNodeWithContentDescription(appString(R.string.chat_stop)).performClick()
+        compose.onNodeWithContentDescription(appString(R.string.browser_home)).performClick()
+        compose.onNodeWithContentDescription(appString(R.string.share)).performClick()
+        compose.onNodeWithContentDescription(appString(R.string.more)).performClick()
         compose.onNodeWithTag("browser-address-pill").performClick()
         compose.onNodeWithText("取消").assertIsDisplayed()
         assertEquals(listOf("stop", "home", "share", "more"), calls)

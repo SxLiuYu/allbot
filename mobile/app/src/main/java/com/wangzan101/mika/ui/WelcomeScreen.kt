@@ -46,10 +46,10 @@ import com.wangzan101.mika.ui.theme.MikaType
  *
  * [onStart] 走完整的助手流程（欢迎 → 模型 → 手机操作）。[onStartCalls] 是给只想先用
  * AI 接打电话的人：电话链路不读 App 主模型，所以这条路径跳过模型配置直接进手机操作引导。
- * 单参调用保持原行为，老测试和外部入口不受影响。
+ * 单参调用保持原行为，老测试和外部入口不受影响。[onStart] 放在最后，尾随 lambda 才是主操作。
  */
 @Composable
-fun WelcomeScreen(onStart: () -> Unit, onStartCalls: (() -> Unit)? = null) {
+fun WelcomeScreen(onStartCalls: (() -> Unit)? = null, onStart: () -> Unit) {
     val c = MikaTheme.colors
     PageBackground {
         Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).windowInsetsPadding(WindowInsets.navigationBars)) {
