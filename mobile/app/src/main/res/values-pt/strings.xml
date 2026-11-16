@@ -69,4 +69,5 @@
     <string name="speech_doubao_plan">Cobrança</string>
     <string name="speech_doubao_duration_note">Cobrado pelo tempo reconhecido</string>
     <string name="speech_doubao_concurrent_note">Cobrado por conexões simultâneas</string>
+    <string name="welcome_start_calls">Começar com chamadas de IA</string>
 </resources>

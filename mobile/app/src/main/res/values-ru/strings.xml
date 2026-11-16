@@ -69,4 +69,5 @@
     <string name="speech_doubao_plan">Оплата</string>
     <string name="speech_doubao_duration_note">Оплата за время распознавания</string>
     <string name="speech_doubao_concurrent_note">Оплата за одновременные подключения</string>
+    <string name="welcome_start_calls">Начать со звонков ИИ</string>
 </resources>

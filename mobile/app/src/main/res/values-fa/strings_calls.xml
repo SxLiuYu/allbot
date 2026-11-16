@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">تماس‌های تلفنی هوش مصنوعی</string>
-    <string name="calls_entry_sub">تماس‌های سلولی با صدای بلادرنگ Volcengine</string>
+    <string name="calls_entry_sub">تماس هوش مصنوعی · خط اپراتور</string>
     <string name="calls_action_failed">اقدام تماس ناموفق بود. آمادگی را بررسی و دوباره تلاش کنید.</string>
     <string name="calls_permissions_required">مجوزهای تلفن و اعلان لازم است.</string>
     <string name="calls_ai_active">هوش مصنوعی در حال مدیریت تماس است</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">سیم‌کارت تماس خروجی</string>
     <string name="calls_default">پیش‌فرض</string>
     <string name="calls_dial">تماس با هوش مصنوعی</string>
-    <string name="calls_call_note">تماس‌ها از سیم‌کارت موجود استفاده می‌کنند. ممکن است هزینه‌های مصرف اپراتور و Volcengine اعمال شود. پیش از شماره‌گیری، هدف و پیام خوش‌آمد را در تنظیمات تعیین کنید.</string>
+    <string name="calls_call_note">از سیم‌کارت شما استفاده می‌کند. ممکن است هزینهٔ اپراتور و مصرف سرویس صدا اعمال شود. می‌توانید هدف و جملهٔ آغازین را پیش از تماس در تنظیمات تعیین کنید.</string>
     <string name="calls_prepare">بررسی و آماده‌سازی</string>
     <string name="calls_enable">فعال کردن تماس هوش مصنوعی</string>
     <string name="calls_disable">غیرفعال کردن و بازگرداندن تماس عادی</string>
-    <string name="calls_provider">صدای بلادرنگ Volcengine 3.0</string>
+    <string name="calls_provider">سرویس تماس</string>
     <string name="calls_credentials">اعتبارنامه‌های صدای بلادرنگ</string>
     <string name="calls_key_saved">اعتبارنامه‌ها به‌صورت امن ذخیره شدند؛ دسترسی به سرویس همچنان به آزمایش واقعی نیاز دارد</string>
     <string name="calls_key_clear">حذف اعتبارنامه‌های ذخیره‌شده</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">شامل شماره‌های خارج از فهرست و تماس‌گیرندگان ناشناس</string>
     <string name="calls_allowlist">شماره‌های ورودی مجاز</string>
     <string name="calls_allowlist_empty">فهرست خالی: بدون پاسخ خودکار مگر اینکه گزینه همه تماس‌گیرندگان فعال باشد</string>
-    <string name="calls_privacy_note">صدای تماس فقط هنگام مدیریت هوش مصنوعی به Volcengine ارسال می‌شود. هیچ ضبط صدایی ذخیره نمی‌شود. متن‌های گفتگو به‌صورت رمزنگاری‌شده روی این گوشی نگهداری می‌شوند؛ هر زمان می‌توانید از صحبت شخصی استفاده کنید.</string>
+    <string name="calls_privacy_note">در طول تماس هوش مصنوعی، صدا به سرویس تماسی که انتخاب کرده‌اید فرستاده می‌شود. سوابق متنی روی همین گوشی می‌ماند و هر زمان می‌توانید خودتان تماس را بردارید یا قطع کنید.</string>
     <string name="calls_history_empty">هنوز سابقه تماس هوش مصنوعی وجود ندارد</string>
     <string name="calls_collapse">جمع کردن</string>
     <string name="calls_transcript">نمایش متن گفتگو</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">متن گفتگوی تماس</string>
     <string name="calls_outgoing_title">برقراری تماس</string>
     <string name="calls_rules">قوانین پاسخ‌دهی</string>
-    <string name="calls_setup_credentials">اعتبارنامه‌های صدای بلادرنگ Volcengine را پیکربندی کنید.</string>
+    <string name="calls_setup_credentials">لطفاً سرویس تماس را تنظیم کنید.</string>
     <string name="calls_setup_shell">ابتدا دستیار داخلی Mika را متصل کنید.</string>
     <string name="calls_sim_clear_preferred">پاک کردن سیم‌کارت ترجیحی</string>
     <string name="calls_sim_preferred">سیم‌کارت ترجیحی: %1$s</string>
@@ -129,4 +129,32 @@
     <string name="calls_greeting_hint">همان‌طور که نوشته شده خوانده می‌شود. برای اینکه طرف مقابل ابتدا صحبت کند، خالی بگذارید.</string>
     <string name="calls_local_endpoint">سرور محلی</string>
     <string name="calls_local_endpoint_note">برای اتصال تماس‌های هوش مصنوعی به سرور خودتان (waihu) یک نشانی ws:// یا wss:// وارد کنید؛ خالی بگذارید تا از Volcengine استفاده شود.</string>
+    <string name="welcome_start_calls">شروع با تماس‌های هوش مصنوعی</string>
+    <string name="calls_home_answer_title">پاسخ به تماس‌ها</string>
+    <string name="calls_home_answer_sub">فقط شماره‌هایی که اجازه می‌دهید؛ بقیه طبق معمول به خودتان می‌رسد</string>
+    <string name="calls_home_dial_title">تماس گرفتن</string>
+    <string name="calls_home_dial_request">درباره چه چیزی صحبت کند؟ (اختیاری)</string>
+    <string name="calls_home_dial_request_hint">مثال: دربارهٔ جمعه شب برای دو نفر بپرس و قیمت را یادداشت کن، اما رزرو نکن.</string>
+    <string name="calls_home_dial_check">بررسی و تماس</string>
+    <string name="calls_home_history">سابقهٔ تماس‌ها</string>
+    <string name="calls_home_more">تنظیمات تلفن</string>
+    <string name="calls_home_setup_needed">%1$d مرحله تا پاسخ‌دهی هوش مصنوعی باقی مانده</string>
+    <string name="calls_home_ready">آماده پاسخ به تماس‌ها</string>
+    <string name="calls_setup_title">راه‌اندازی تماس‌ها</string>
+    <string name="calls_setup_step_permissions">مجوزهای تلفن</string>
+    <string name="calls_setup_step_helper">دستیار داخلی</string>
+    <string name="calls_setup_step_notifications">اعلان‌ها و اجرا در پس‌زمینه</string>
+    <string name="calls_setup_step_audio">صدای دوطرفهٔ تماس</string>
+    <string name="calls_setup_step_backend">سرویس تماس</string>
+    <string name="calls_setup_done">انجام شد</string>
+    <string name="calls_setup_go">راه‌اندازی</string>
+    <string name="calls_backend_cloud">ابر Mika</string>
+    <string name="calls_backend_custom">سرور شخصی</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">تنظیم نشده</string>
+    <string name="calls_simple_advanced">به‌جای آن از یک وظیفهٔ تفصیلی استفاده کنید</string>
+    <string name="calls_advanced_title">تنظیمات پیشرفتهٔ تماس</string>
+    <string name="calls_simple_advanced_note">مسیر صدا، اطلاعات ورود، سیم‌کارت و رفتار پس‌زمینه در صفحهٔ تنظیمات کامل قرار دارند.</string>
+    <string name="calls_current_call">تماس جاری</string>
+    <string name="calls_missing_credentials">سرویس تماس</string>
 </resources>

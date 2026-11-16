@@ -69,4 +69,5 @@
     <string name="speech_doubao_plan">計費方式</string>
     <string name="speech_doubao_duration_note">按辨識時長計費</string>
     <string name="speech_doubao_concurrent_note">按同時連線數計費</string>
+    <string name="welcome_start_calls">先用來接打電話</string>
 </resources>

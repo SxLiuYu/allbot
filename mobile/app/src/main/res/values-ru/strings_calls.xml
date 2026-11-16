@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">Звонки с ИИ</string>
-    <string name="calls_entry_sub">Звонки по мобильной сети с голосом Volcengine в реальном времени</string>
+    <string name="calls_entry_sub">Звонки ИИ · линия оператора</string>
     <string name="calls_action_failed">Не удалось выполнить действие со звонком. Проверьте готовность и повторите попытку.</string>
     <string name="calls_permissions_required">Нужны разрешения на звонки и уведомления.</string>
     <string name="calls_ai_active">ИИ ведёт разговор</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">SIM-карта для исходящих</string>
     <string name="calls_default">По умолчанию</string>
     <string name="calls_dial">Позвонить с помощью ИИ</string>
-    <string name="calls_call_note">Для звонков используется текущая SIM-карта. Оператор и Volcengine могут взимать плату. Перед звонком укажите его цель и приветствие в настройках.</string>
+    <string name="calls_call_note">Используется ваша SIM. Возможны платежи оператору и расход службы голоса. Цель звонка и приветствие можно задать заранее.</string>
     <string name="calls_prepare">Проверить и подготовить</string>
     <string name="calls_enable">Включить звонки с ИИ</string>
     <string name="calls_disable">Отключить и вернуться к обычным звонкам</string>
-    <string name="calls_provider">Голос Volcengine 3.0 в реальном времени</string>
+    <string name="calls_provider">Служба звонков</string>
     <string name="calls_credentials">Данные доступа к голосовому сервису</string>
     <string name="calls_key_saved">Данные доступа сохранены безопасно. Доступ к сервису ещё нужно проверить пробным звонком</string>
     <string name="calls_key_clear">Удалить сохранённые учётные данные</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">В том числе номера вне списка и скрытые номера</string>
     <string name="calls_allowlist">Номера, разрешённые для автоответа</string>
     <string name="calls_allowlist_empty">Список пуст: автоответ сработает, только если разрешён ответ на все звонки</string>
-    <string name="calls_privacy_note">Звук разговора отправляется в Volcengine, только пока звонок ведёт ИИ. Аудиозаписи не сохраняются. Расшифровки хранятся на этом телефоне в зашифрованном виде. Перехватить разговор можно в любой момент.</string>
+    <string name="calls_privacy_note">Во время звонка ИИ звук передаётся в выбранную службу звонков. Текстовые записи остаются на телефоне, перехватить или завершить звонок можно в любой момент.</string>
     <string name="calls_history_empty">В истории пока нет звонков с ИИ</string>
     <string name="calls_collapse">Свернуть</string>
     <string name="calls_transcript">Показать расшифровку</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">Расшифровка вызова</string>
     <string name="calls_outgoing_title">Позвонить</string>
     <string name="calls_rules">Правила автоответа</string>
-    <string name="calls_setup_credentials">Настройте данные доступа к голосовому сервису Volcengine.</string>
+    <string name="calls_setup_credentials">Настройте службу звонков.</string>
     <string name="calls_setup_shell">Сначала подключите встроенный помощник Mika.</string>
     <string name="calls_sim_clear_preferred">Сбросить выбор SIM</string>
     <string name="calls_sim_preferred">Предпочитаемая SIM: %1$s</string>
@@ -131,10 +131,36 @@
     <string name="calls_missing_disabled">ИИ-звонки выключены</string>
     <string name="calls_missing_phone_permission">разрешение на телефон</string>
     <string name="calls_missing_notifications">уведомления о звонках</string>
-    <string name="calls_missing_credentials">Учётные данные Volcengine или локальный сервер</string>
+    <string name="calls_missing_credentials">Служба звонков</string>
     <string name="calls_local_endpoint">Локальный сервер</string>
     <string name="calls_local_endpoint_note">Укажите адрес ws:// или wss://, чтобы подключать звонки ИИ к своему серверу (waihu). Пусто — используется Volcengine.</string>
     <string name="calls_missing_audio">путь аудио звонка</string>
     <string name="calls_missing_helper">помощник телефона</string>
     <string name="calls_missing_join">, </string>
+    <string name="calls_home_answer_title">Приём звонков</string>
+    <string name="calls_home_answer_sub">Только разрешённые номера; остальные звонки идут вам как обычно</string>
+    <string name="calls_home_dial_title">Позвонить</string>
+    <string name="calls_home_dial_request">О чём говорить? (необязательно)</string>
+    <string name="calls_home_dial_request_hint">Например, узнать про пятницу вечером на двоих и записать цену, но не бронировать.</string>
+    <string name="calls_home_dial_check">Проверить и позвонить</string>
+    <string name="calls_home_history">История звонков</string>
+    <string name="calls_home_more">Настройки звонков</string>
+    <string name="calls_home_setup_needed">До готовности ИИ осталось шагов: %1$d</string>
+    <string name="calls_home_ready">Готово к приёму звонков</string>
+    <string name="calls_setup_title">Завершить настройку звонков</string>
+    <string name="calls_setup_step_permissions">Разрешения телефона</string>
+    <string name="calls_setup_step_helper">Встроенный помощник</string>
+    <string name="calls_setup_step_notifications">Уведомления и фон</string>
+    <string name="calls_setup_step_audio">Двусторонний звук</string>
+    <string name="calls_setup_step_backend">Служба звонков</string>
+    <string name="calls_setup_done">Готово</string>
+    <string name="calls_setup_go">Настроить</string>
+    <string name="calls_backend_cloud">Облако Mika</string>
+    <string name="calls_backend_custom">Свой сервер</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">Не настроено</string>
+    <string name="calls_simple_advanced">Использовать подробную задачу</string>
+    <string name="calls_advanced_title">Дополнительные настройки звонков</string>
+    <string name="calls_simple_advanced_note">Маршрут звука, учётные данные, SIM и работа в фоне находятся в полных настройках.</string>
+    <string name="calls_current_call">Текущий звонок</string>
 </resources>

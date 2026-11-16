@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">AI phone calls</string>
-    <string name="calls_entry_sub">Cellular calls with Volcengine realtime voice</string>
+    <string name="calls_entry_sub">AI calls · carrier line</string>
     <string name="calls_action_failed">The call action failed. Check readiness and retry.</string>
     <string name="calls_permissions_required">Phone and notification permissions are needed.</string>
     <string name="calls_ai_active">AI is handling the call</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">Outgoing SIM</string>
     <string name="calls_default">Default</string>
     <string name="calls_dial">Call with AI</string>
-    <string name="calls_call_note">Calls use the existing SIM. Carrier and Volcengine usage charges may apply. Set the purpose and greeting in Settings before dialing.</string>
+    <string name="calls_call_note">Uses your SIM. Carrier call charges and voice-service usage may apply. You can set the call goal and greeting in settings before dialing.</string>
     <string name="calls_prepare">Check and prepare</string>
     <string name="calls_enable">Enable AI calling</string>
     <string name="calls_disable">Disable and restore normal calling</string>
-    <string name="calls_provider">Volcengine realtime voice 3.0</string>
+    <string name="calls_provider">Calling service</string>
     <string name="calls_credentials">Realtime voice credentials</string>
     <string name="calls_key_saved">Credentials saved securely; service access still needs a real test</string>
     <string name="calls_key_clear">Clear saved credentials</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">Includes numbers outside the list and unknown callers</string>
     <string name="calls_allowlist">Allowed incoming numbers</string>
     <string name="calls_allowlist_empty">Empty list: no automatic answering unless all callers is enabled</string>
-    <string name="calls_privacy_note">Call audio is sent to Volcengine only during AI handling. No audio recordings are saved. Transcripts stay encrypted on this phone; use Take over at any time.</string>
+    <string name="calls_privacy_note">During an AI call, the audio goes to the calling service you selected. Text records stay on this phone, and you can take over or hang up at any time.</string>
     <string name="calls_history_empty">No AI call records yet</string>
     <string name="calls_collapse">Collapse</string>
     <string name="calls_transcript">Show transcript</string>
@@ -63,7 +63,7 @@
     <string name="calls_missing_disabled">AI calling is off</string>
     <string name="calls_missing_phone_permission">phone permission</string>
     <string name="calls_missing_notifications">call notifications</string>
-    <string name="calls_missing_credentials">Volcengine credentials or local backend</string>
+    <string name="calls_missing_credentials">Calling service</string>
     <string name="calls_local_endpoint">Local backend endpoint</string>
     <string name="calls_local_endpoint_note">Enter a ws:// or wss:// address to route AI calls to your own backend (waihu). Leave empty to use Volcengine.</string>
     <string name="calls_missing_audio">call audio path</string>
@@ -101,7 +101,7 @@
     <string name="calls_original_transcript">Call transcript</string>
     <string name="calls_outgoing_title">Place a call</string>
     <string name="calls_rules">Answering rules</string>
-    <string name="calls_setup_credentials">Configure Volcengine realtime voice credentials.</string>
+    <string name="calls_setup_credentials">Set up the calling service.</string>
     <string name="calls_setup_shell">Connect the built-in Mika assistant first.</string>
     <string name="calls_sim_clear_preferred">Clear preferred SIM</string>
     <string name="calls_sim_preferred">Preferred SIM: %1$s</string>
@@ -137,4 +137,30 @@
     <string name="calls_notification_settings">Open notification settings</string>
     <string name="calls_speaker_edit_note">Choose cloned voices in Voice cloning. Leave blank to restore the default voice.</string>
     <string name="calls_greeting_hint">Read as written. Leave blank to let the other person speak first.</string>
+    <string name="calls_home_answer_title">Answer calls</string>
+    <string name="calls_home_answer_sub">Only numbers you allow; anyone else reaches you as usual</string>
+    <string name="calls_home_dial_title">Make a call</string>
+    <string name="calls_home_dial_request">What should it cover? (optional)</string>
+    <string name="calls_home_dial_request_hint">For example, ask about Friday evening for two and note the price, but do not book.</string>
+    <string name="calls_home_dial_check">Check and call</string>
+    <string name="calls_home_history">Call history</string>
+    <string name="calls_home_more">Phone settings</string>
+    <string name="calls_home_setup_needed">%1$d steps left before AI can take calls</string>
+    <string name="calls_home_ready">Ready to take calls</string>
+    <string name="calls_setup_title">Set up calls</string>
+    <string name="calls_setup_step_permissions">Phone permissions</string>
+    <string name="calls_setup_step_helper">Built-in helper</string>
+    <string name="calls_setup_step_notifications">Notifications and background</string>
+    <string name="calls_setup_step_audio">Two-way call audio</string>
+    <string name="calls_setup_step_backend">Calling service</string>
+    <string name="calls_setup_done">Done</string>
+    <string name="calls_setup_go">Set up</string>
+    <string name="calls_backend_cloud">Mika cloud</string>
+    <string name="calls_backend_custom">Self-hosted</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">Not configured</string>
+    <string name="calls_simple_advanced">Use a detailed task instead</string>
+    <string name="calls_advanced_title">Advanced call settings</string>
+    <string name="calls_simple_advanced_note">Audio routing, credentials, SIM and background behaviour live in the full settings screen.</string>
+    <string name="calls_current_call">Current call</string>
 </resources>

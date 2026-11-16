@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">Panggilan telepon AI</string>
-    <string name="calls_entry_sub">Panggilan seluler dengan suara real-time Volcengine</string>
+    <string name="calls_entry_sub">Panggilan AI · jalur operator</string>
     <string name="calls_action_failed">Tindakan pada panggilan gagal. Periksa kesiapan lalu coba lagi.</string>
     <string name="calls_permissions_required">Izin telepon dan notifikasi diperlukan.</string>
     <string name="calls_ai_active">AI sedang menangani panggilan</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">SIM untuk panggilan keluar</string>
     <string name="calls_default">Bawaan</string>
     <string name="calls_dial">Telepon dengan AI</string>
-    <string name="calls_call_note">Panggilan memakai SIM yang ada. Biaya dari operator dan biaya penggunaan Volcengine mungkin berlaku. Atur tujuan dan salam pembuka di Setelan sebelum menelepon.</string>
+    <string name="calls_call_note">Menggunakan SIM Anda. Bisa ada biaya operator dan pemakaian layanan suara. Anda dapat mengatur tujuan dan sapaan sebelum menelepon.</string>
     <string name="calls_prepare">Periksa dan siapkan</string>
     <string name="calls_enable">Aktifkan panggilan AI</string>
     <string name="calls_disable">Nonaktifkan dan pulihkan panggilan biasa</string>
-    <string name="calls_provider">Suara real-time Volcengine 3.0</string>
+    <string name="calls_provider">Layanan panggilan</string>
     <string name="calls_credentials">Kredensial suara real-time</string>
     <string name="calls_key_saved">Kredensial disimpan dengan aman; akses layanan masih perlu diuji dengan panggilan sungguhan</string>
     <string name="calls_key_clear">Hapus kredensial tersimpan</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">Termasuk nomor di luar daftar dan penelepon tanpa nomor yang ditampilkan</string>
     <string name="calls_allowlist">Nomor masuk yang boleh dijawab otomatis</string>
     <string name="calls_allowlist_empty">Daftar kosong: tidak ada panggilan yang dijawab otomatis kecuali opsi untuk semua panggilan diaktifkan</string>
-    <string name="calls_privacy_note">Audio panggilan hanya dikirim ke Volcengine selama AI menangani panggilan. Rekaman audio tidak disimpan. Transkrip disimpan secara terenkripsi di ponsel ini; Anda dapat mengambil alih kapan saja.</string>
+    <string name="calls_privacy_note">Selama panggilan AI, audio dikirim ke layanan panggilan yang Anda pilih. Catatan teks tersimpan di ponsel dan Anda bisa mengambil alih atau menutup kapan saja.</string>
     <string name="calls_history_empty">Belum ada riwayat panggilan AI</string>
     <string name="calls_collapse">Ciutkan</string>
     <string name="calls_transcript">Tampilkan transkrip</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">Transkrip panggilan</string>
     <string name="calls_outgoing_title">Buat panggilan</string>
     <string name="calls_rules">Aturan menjawab</string>
-    <string name="calls_setup_credentials">Konfigurasikan kredensial suara real-time Volcengine.</string>
+    <string name="calls_setup_credentials">Atur layanan panggilan.</string>
     <string name="calls_setup_shell">Hubungkan asisten bawaan Mika terlebih dahulu.</string>
     <string name="calls_sim_clear_preferred">Hapus SIM pilihan</string>
     <string name="calls_sim_preferred">SIM pilihan: %1$s</string>
@@ -131,10 +131,36 @@
     <string name="calls_missing_disabled">Panggilan AI dinonaktifkan</string>
     <string name="calls_missing_phone_permission">izin telepon</string>
     <string name="calls_missing_notifications">notifikasi panggilan</string>
-    <string name="calls_missing_credentials">Kredensial Volcengine atau server lokal</string>
+    <string name="calls_missing_credentials">Layanan panggilan</string>
     <string name="calls_local_endpoint">Server lokal</string>
     <string name="calls_local_endpoint_note">Isi alamat ws:// atau wss:// agar panggilan AI tersambung ke server sendiri (waihu). Kosongkan untuk memakai Volcengine.</string>
     <string name="calls_missing_audio">jalur audio panggilan</string>
     <string name="calls_missing_helper">asisten telepon</string>
     <string name="calls_missing_join">, </string>
+    <string name="calls_home_answer_title">Menjawab panggilan</string>
+    <string name="calls_home_answer_sub">Hanya nomor yang Anda izinkan; sisanya masuk seperti biasa</string>
+    <string name="calls_home_dial_title">Menelepon</string>
+    <string name="calls_home_dial_request">Apa yang perlu dibicarakan? (opsional)</string>
+    <string name="calls_home_dial_request_hint">Misalnya tanya ketersediaan Jumat malam untuk dua orang dan catat harganya, tanpa memesan.</string>
+    <string name="calls_home_dial_check">Periksa lalu panggil</string>
+    <string name="calls_home_history">Riwayat panggilan</string>
+    <string name="calls_home_more">Pengaturan panggilan</string>
+    <string name="calls_home_setup_needed">Tersisa %1$d langkah agar AI bisa menjawab</string>
+    <string name="calls_home_ready">Siap menjawab panggilan</string>
+    <string name="calls_setup_title">Selesaikan pengaturan panggilan</string>
+    <string name="calls_setup_step_permissions">Izin telepon</string>
+    <string name="calls_setup_step_helper">Asisten bawaan</string>
+    <string name="calls_setup_step_notifications">Notifikasi dan latar belakang</string>
+    <string name="calls_setup_step_audio">Audio panggilan dua arah</string>
+    <string name="calls_setup_step_backend">Layanan panggilan</string>
+    <string name="calls_setup_done">Selesai</string>
+    <string name="calls_setup_go">Atur</string>
+    <string name="calls_backend_cloud">Awan Mika</string>
+    <string name="calls_backend_custom">Server sendiri</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">Belum diatur</string>
+    <string name="calls_simple_advanced">Gunakan tugas terperinci</string>
+    <string name="calls_advanced_title">Pengaturan panggilan lanjutan</string>
+    <string name="calls_simple_advanced_note">Rute audio, kredensial, SIM, dan perilaku latar belakang ada di pengaturan lengkap.</string>
+    <string name="calls_current_call">Panggilan saat ini</string>
 </resources>

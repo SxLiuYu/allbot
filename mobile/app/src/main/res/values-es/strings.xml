@@ -69,4 +69,5 @@
     <string name="speech_doubao_plan">Facturación</string>
     <string name="speech_doubao_duration_note">Se cobra por tiempo reconocido</string>
     <string name="speech_doubao_concurrent_note">Se cobra por conexiones simultáneas</string>
+    <string name="welcome_start_calls">Empezar con llamadas IA</string>
 </resources>

@@ -69,4 +69,5 @@
     <string name="speech_doubao_plan">요금 방식</string>
     <string name="speech_doubao_duration_note">인식한 시간만큼 과금</string>
     <string name="speech_doubao_concurrent_note">동시 연결 수만큼 과금</string>
+    <string name="welcome_start_calls">AI 통화부터 시작</string>
 </resources>

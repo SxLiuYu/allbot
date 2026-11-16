@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">AI 接打電話</string>
-    <string name="calls_entry_sub">火山即時語音 · 行動網路電話</string>
+    <string name="calls_entry_sub">AI 接打電話 · 電信業者線路</string>
     <string name="calls_action_failed">操作未完成，請檢查是否就緒後再試一次。</string>
     <string name="calls_permissions_required">需要電話和通知權限才能啟用。</string>
     <string name="calls_ai_active">AI 正在通話</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">撥出使用的 SIM 卡</string>
     <string name="calls_default">預設</string>
     <string name="calls_dial">由 AI 撥打</string>
-    <string name="calls_call_note">通話使用現有的 SIM 卡，可能產生電信業者通話費及火山服務用量費。撥出前請在設定填寫通話目的與開場白。</string>
+    <string name="calls_call_note">使用現有 SIM 卡；可能產生電信業者通話費和通話服務用量費。撥出前可在設定填寫通話目的和開場白。</string>
     <string name="calls_prepare">檢查並準備</string>
     <string name="calls_enable">啟用 AI 電話</string>
     <string name="calls_disable">停用並恢復一般通話</string>
-    <string name="calls_provider">火山即時語音 3.0</string>
+    <string name="calls_provider">通話服務</string>
     <string name="calls_credentials">即時語音憑證</string>
     <string name="calls_key_saved">憑證已安全儲存，服務權限仍須實際測試</string>
     <string name="calls_key_clear">清除已儲存的憑證</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">包含名單外號碼及隱藏號碼的來電</string>
     <string name="calls_allowlist">允許自動接聽的來電號碼</string>
     <string name="calls_allowlist_empty">名單為空：除非啟用接聽所有來電，否則不會自動接聽</string>
-    <string name="calls_privacy_note">僅在 AI 處理通話期間將音訊傳送至火山，不儲存錄音。通話逐字稿會加密儲存在這支手機上，隨時可親自接手。</string>
+    <string name="calls_privacy_note">AI 接管期間，通話音訊會傳送到你選擇的通話服務處理。文字記錄保存在本機，可隨時人工接管或掛斷。</string>
     <string name="calls_history_empty">目前沒有 AI 通話紀錄</string>
     <string name="calls_collapse">收合</string>
     <string name="calls_transcript">顯示通話逐字稿</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">通話文字原文</string>
     <string name="calls_outgoing_title">撥打電話</string>
     <string name="calls_rules">自動接聽規則</string>
-    <string name="calls_setup_credentials">請設定火山即時語音憑據。</string>
+    <string name="calls_setup_credentials">請先設定通話服務。</string>
     <string name="calls_setup_shell">請先連線 Mika 內建助理。</string>
     <string name="calls_sim_clear_preferred">取消預設 SIM</string>
     <string name="calls_sim_preferred">預設撥號 SIM：%1$s</string>
@@ -131,10 +131,36 @@
     <string name="calls_missing_disabled">AI 通話已關閉</string>
     <string name="calls_missing_phone_permission">電話權限</string>
     <string name="calls_missing_notifications">通話通知</string>
-    <string name="calls_missing_credentials">火山憑證或本機後端位址</string>
+    <string name="calls_missing_credentials">通話服務</string>
     <string name="calls_local_endpoint">本機後端位址</string>
     <string name="calls_local_endpoint_note">填 ws:// 或 wss:// 位址後，AI 通話改連自建後端（waihu），留空走火山引擎。</string>
     <string name="calls_missing_audio">通話音訊路徑</string>
     <string name="calls_missing_helper">電話助手</string>
     <string name="calls_missing_join">、</string>
+    <string name="calls_home_answer_title">接電話</string>
+    <string name="calls_home_answer_sub">只自動接聽你允許的號碼，其他來電照常由你接</string>
+    <string name="calls_home_dial_title">打電話</string>
+    <string name="calls_home_dial_request">這次要談什麼？（選填）</string>
+    <string name="calls_home_dial_request_hint">例如：問週五晚上有沒有兩個人的位置，記下價格，不要替我預訂。</string>
+    <string name="calls_home_dial_check">檢查並撥打</string>
+    <string name="calls_home_history">通話記錄</string>
+    <string name="calls_home_more">電話設定</string>
+    <string name="calls_home_setup_needed">還差 %1$d 步才能讓 AI 接電話</string>
+    <string name="calls_home_ready">可以接電話了</string>
+    <string name="calls_setup_title">完成電話設定</string>
+    <string name="calls_setup_step_permissions">電話權限</string>
+    <string name="calls_setup_step_helper">內建助手</string>
+    <string name="calls_setup_step_notifications">通知與背景執行</string>
+    <string name="calls_setup_step_audio">雙向通話音訊</string>
+    <string name="calls_setup_step_backend">通話服務</string>
+    <string name="calls_setup_done">已完成</string>
+    <string name="calls_setup_go">去完成</string>
+    <string name="calls_backend_cloud">言出雲端</string>
+    <string name="calls_backend_custom">自建服務</string>
+    <string name="calls_backend_volcengine">火山引擎</string>
+    <string name="calls_backend_unconfigured">尚未設定</string>
+    <string name="calls_simple_advanced">改用詳細任務</string>
+    <string name="calls_advanced_title">進階電話設定</string>
+    <string name="calls_simple_advanced_note">音訊通道、憑證、預設 SIM 和背景行為都在完整設定裡。</string>
+    <string name="calls_current_call">目前通話</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">Llamadas con IA</string>
-    <string name="calls_entry_sub">Llamadas por la red móvil con voz en tiempo real de Volcengine</string>
+    <string name="calls_entry_sub">Llamadas IA · línea del operador</string>
     <string name="calls_action_failed">No se pudo realizar la acción. Comprueba que el servicio esté listo e inténtalo de nuevo.</string>
     <string name="calls_permissions_required">Se necesitan permisos de teléfono y notificaciones.</string>
     <string name="calls_ai_active">La IA está atendiendo la llamada</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">SIM para llamadas salientes</string>
     <string name="calls_default">Predeterminada</string>
     <string name="calls_dial">Llamar con IA</string>
-    <string name="calls_call_note">Las llamadas usan la SIM actual. Pueden aplicarse cargos del operador y de Volcengine. Antes de llamar, indica el propósito y el saludo en Ajustes.</string>
+    <string name="calls_call_note">Usa tu SIM. Pueden aplicarse cargos del operador y consumo del servicio de voz. Puedes definir el objetivo y el saludo antes de llamar.</string>
     <string name="calls_prepare">Comprobar y preparar</string>
     <string name="calls_enable">Activar las llamadas con IA</string>
     <string name="calls_disable">Desactivar y restaurar las llamadas normales</string>
-    <string name="calls_provider">Voz en tiempo real de Volcengine 3.0</string>
+    <string name="calls_provider">Servicio de llamadas</string>
     <string name="calls_credentials">Credenciales de voz en tiempo real</string>
     <string name="calls_key_saved">Las credenciales se guardaron de forma segura; falta probar el acceso al servicio en una llamada real</string>
     <string name="calls_key_clear">Borrar credenciales guardadas</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">Incluye números que no están en la lista y llamadas con número oculto</string>
     <string name="calls_allowlist">Números autorizados para la respuesta automática</string>
     <string name="calls_allowlist_empty">Lista vacía: solo se contestará automáticamente si se habilita la opción para todas las llamadas</string>
-    <string name="calls_privacy_note">El audio solo se envía a Volcengine mientras la IA atiende la llamada. No se guardan grabaciones. Las transcripciones se guardan cifradas en este teléfono; puedes tomar el control en cualquier momento.</string>
+    <string name="calls_privacy_note">Durante una llamada de IA, el audio va al servicio de llamadas que elijas. Los registros de texto quedan en el teléfono y puedes intervenir o colgar cuando quieras.</string>
     <string name="calls_history_empty">Todavía no hay llamadas con IA en el historial</string>
     <string name="calls_collapse">Contraer</string>
     <string name="calls_transcript">Mostrar transcripción</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">Transcripción de la llamada</string>
     <string name="calls_outgoing_title">Hacer una llamada</string>
     <string name="calls_rules">Reglas de respuesta</string>
-    <string name="calls_setup_credentials">Configure las credenciales de voz en tiempo real de Volcengine.</string>
+    <string name="calls_setup_credentials">Configura el servicio de llamadas.</string>
     <string name="calls_setup_shell">Conecte primero el asistente integrado de Mika.</string>
     <string name="calls_sim_clear_preferred">Borrar SIM preferida</string>
     <string name="calls_sim_preferred">SIM preferida: %1$s</string>
@@ -131,10 +131,36 @@
     <string name="calls_missing_disabled">Las llamadas con IA están desactivadas</string>
     <string name="calls_missing_phone_permission">permiso de teléfono</string>
     <string name="calls_missing_notifications">notificaciones de llamada</string>
-    <string name="calls_missing_credentials">Credenciales de Volcengine o servidor local</string>
+    <string name="calls_missing_credentials">Servicio de llamadas</string>
     <string name="calls_local_endpoint">Servidor local</string>
     <string name="calls_local_endpoint_note">Introduce una dirección ws:// o wss:// para conectar las llamadas de IA a tu propio servidor (waihu). Déjalo vacío para usar Volcengine.</string>
     <string name="calls_missing_audio">ruta de audio de la llamada</string>
     <string name="calls_missing_helper">asistente de teléfono</string>
     <string name="calls_missing_join">, </string>
+    <string name="calls_home_answer_title">Contestar llamadas</string>
+    <string name="calls_home_answer_sub">Solo los números que permitas; el resto te llega como siempre</string>
+    <string name="calls_home_dial_title">Hacer una llamada</string>
+    <string name="calls_home_dial_request">¿De qué debe hablar? (opcional)</string>
+    <string name="calls_home_dial_request_hint">Por ejemplo, pregunta por el viernes por la noche para dos y anota el precio, sin reservar.</string>
+    <string name="calls_home_dial_check">Comprobar y llamar</string>
+    <string name="calls_home_history">Historial de llamadas</string>
+    <string name="calls_home_more">Ajustes de llamadas</string>
+    <string name="calls_home_setup_needed">Faltan %1$d pasos para que la IA conteste</string>
+    <string name="calls_home_ready">Listo para contestar</string>
+    <string name="calls_setup_title">Completar ajustes de llamadas</string>
+    <string name="calls_setup_step_permissions">Permisos de teléfono</string>
+    <string name="calls_setup_step_helper">Asistente integrado</string>
+    <string name="calls_setup_step_notifications">Notificaciones y segundo plano</string>
+    <string name="calls_setup_step_audio">Audio bidireccional</string>
+    <string name="calls_setup_step_backend">Servicio de llamadas</string>
+    <string name="calls_setup_done">Hecho</string>
+    <string name="calls_setup_go">Configurar</string>
+    <string name="calls_backend_cloud">Nube de Mika</string>
+    <string name="calls_backend_custom">Servidor propio</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">Sin configurar</string>
+    <string name="calls_simple_advanced">Usar una tarea detallada</string>
+    <string name="calls_advanced_title">Ajustes avanzados de llamadas</string>
+    <string name="calls_simple_advanced_note">La ruta de audio, las credenciales, la SIM y el comportamiento en segundo plano están en los ajustes completos.</string>
+    <string name="calls_current_call">Llamada actual</string>
 </resources>

@@ -70,4 +70,5 @@
     <string name="speech_doubao_plan">Billing</string>
     <string name="speech_doubao_duration_note">Billed by recognition time</string>
     <string name="speech_doubao_concurrent_note">Billed by simultaneous connections</string>
+    <string name="welcome_start_calls">Start with AI calls</string>
 </resources>

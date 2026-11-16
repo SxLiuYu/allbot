@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">AI 전화</string>
-    <string name="calls_entry_sub">Volcengine 실시간 음성을 사용하는 이동통신 통화</string>
+    <string name="calls_entry_sub">AI 통화 · 통신사 회선</string>
     <string name="calls_action_failed">통화 작업에 실패했습니다. 준비 상태를 확인한 후 다시 시도하세요.</string>
     <string name="calls_permissions_required">전화와 알림 권한이 필요합니다.</string>
     <string name="calls_ai_active">AI가 통화 중입니다</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">발신에 사용할 SIM</string>
     <string name="calls_default">기본값</string>
     <string name="calls_dial">AI로 전화 걸기</string>
-    <string name="calls_call_note">통화에는 기존 SIM을 사용합니다. 이동통신사 통화료와 Volcengine 사용료가 부과될 수 있습니다. 전화하기 전에 설정에서 통화 목적과 첫인사를 입력하세요.</string>
+    <string name="calls_call_note">기존 SIM을 사용합니다. 통신사 통화 요금과 통화 서비스 사용료가 발생할 수 있습니다. 발신 전에 설정에서 통화 목적과 인사말을 입력할 수 있습니다.</string>
     <string name="calls_prepare">확인 및 준비</string>
     <string name="calls_enable">AI 전화 켜기</string>
     <string name="calls_disable">끄고 일반 통화로 복원</string>
-    <string name="calls_provider">Volcengine 실시간 음성 3.0</string>
+    <string name="calls_provider">통화 서비스</string>
     <string name="calls_credentials">실시간 음성 인증 정보</string>
     <string name="calls_key_saved">인증 정보를 안전하게 저장했습니다. 실제 통화로 서비스를 이용할 수 있는지 확인하세요</string>
     <string name="calls_key_clear">저장된 자격 증명 삭제</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">목록에 없는 번호와 발신 번호가 표시되지 않는 전화도 포함됩니다</string>
     <string name="calls_allowlist">자동 응답을 허용할 번호</string>
     <string name="calls_allowlist_empty">목록이 비어 있으면 모든 수신 전화 받기를 켜지 않는 한 자동으로 받지 않습니다</string>
-    <string name="calls_privacy_note">AI가 통화하는 동안에만 통화 음성이 Volcengine으로 전송됩니다. 녹음은 저장되지 않습니다. 통화 텍스트는 이 휴대전화에 암호화되어 저장되며, 언제든 직접 통화할 수 있습니다.</string>
+    <string name="calls_privacy_note">AI가 통화하는 동안 음성은 선택한 통화 서비스로 전송됩니다. 텍스트 기록은 기기에 저장되며 언제든 직접 받거나 끊을 수 있습니다.</string>
     <string name="calls_history_empty">아직 AI 통화 기록이 없습니다</string>
     <string name="calls_collapse">접기</string>
     <string name="calls_transcript">통화 텍스트 보기</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">통화 대화 기록</string>
     <string name="calls_outgoing_title">전화 걸기</string>
     <string name="calls_rules">전화 받기 규칙</string>
-    <string name="calls_setup_credentials">Volcengine 실시간 음성 인증 정보를 설정하세요.</string>
+    <string name="calls_setup_credentials">통화 서비스를 설정하세요.</string>
     <string name="calls_setup_shell">먼저 Mika 내장 어시스턴트에 연결하세요.</string>
     <string name="calls_sim_clear_preferred">선호 SIM 지우기</string>
     <string name="calls_sim_preferred">선호 SIM: %1$s</string>
@@ -131,10 +131,36 @@
     <string name="calls_missing_disabled">AI 통화가 꺼져 있습니다</string>
     <string name="calls_missing_phone_permission">전화 권한</string>
     <string name="calls_missing_notifications">통화 알림</string>
-    <string name="calls_missing_credentials">Volcengine 자격 증명 또는 로컬 백엔드</string>
+    <string name="calls_missing_credentials">통화 서비스</string>
     <string name="calls_local_endpoint">로컬 백엔드 주소</string>
     <string name="calls_local_endpoint_note">ws:// 또는 wss:// 주소를 입력하면 AI 통화가 자체 백엔드(waihu)로 연결됩니다. 비워 두면 Volcengine을 사용합니다.</string>
     <string name="calls_missing_audio">통화 오디오 경로</string>
     <string name="calls_missing_helper">전화 도우미</string>
     <string name="calls_missing_join">, </string>
+    <string name="calls_home_answer_title">전화 받기</string>
+    <string name="calls_home_answer_sub">허용한 번호만 자동으로 받고 나머지는 평소대로 직접 받습니다</string>
+    <string name="calls_home_dial_title">전화 걸기</string>
+    <string name="calls_home_dial_request">이번에 할 말 (선택)</string>
+    <string name="calls_home_dial_request_hint">예: 금요일 저녁 2인 자리가 있는지와 가격을 확인하되 예약은 하지 마.</string>
+    <string name="calls_home_dial_check">확인 후 발신</string>
+    <string name="calls_home_history">통화 기록</string>
+    <string name="calls_home_more">전화 설정</string>
+    <string name="calls_home_setup_needed">AI가 전화를 받으려면 %1$d단계 남음</string>
+    <string name="calls_home_ready">전화를 받을 준비 완료</string>
+    <string name="calls_setup_title">전화 설정 완료하기</string>
+    <string name="calls_setup_step_permissions">전화 권한</string>
+    <string name="calls_setup_step_helper">내장 도우미</string>
+    <string name="calls_setup_step_notifications">알림 및 백그라운드</string>
+    <string name="calls_setup_step_audio">양방향 통화 오디오</string>
+    <string name="calls_setup_step_backend">통화 서비스</string>
+    <string name="calls_setup_done">완료</string>
+    <string name="calls_setup_go">설정하기</string>
+    <string name="calls_backend_cloud">Mika 클라우드</string>
+    <string name="calls_backend_custom">자체 호스팅</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">미설정</string>
+    <string name="calls_simple_advanced">상세 작업 사용</string>
+    <string name="calls_advanced_title">고급 전화 설정</string>
+    <string name="calls_simple_advanced_note">오디오 경로, 자격 증명, 기본 SIM, 백그라운드 동작은 전체 설정 화면에 있습니다.</string>
+    <string name="calls_current_call">현재 통화</string>
 </resources>

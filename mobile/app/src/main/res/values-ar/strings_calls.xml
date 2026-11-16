@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="calls_title">مكالمات هاتفية بالذكاء الاصطناعي</string>
-    <string name="calls_entry_sub">مكالمات عبر شبكة المحمول باستخدام خدمة الصوت الفوري من Volcengine</string>
+    <string name="calls_entry_sub">مكالمات الذكاء الاصطناعي · خط المشغّل</string>
     <string name="calls_action_failed">تعذّر تنفيذ إجراء المكالمة. تحقّق من الجاهزية وحاول مجددًا.</string>
     <string name="calls_permissions_required">يلزم منح أذونات الهاتف والإشعارات.</string>
     <string name="calls_ai_active">الذكاء الاصطناعي يتولى المكالمة</string>
@@ -19,11 +19,11 @@
     <string name="calls_sim">شريحة SIM للمكالمات الصادرة</string>
     <string name="calls_default">افتراضي</string>
     <string name="calls_dial">الاتصال بالذكاء الاصطناعي</string>
-    <string name="calls_call_note">تستخدم المكالمات شريحة SIM الحالية. قد تترتب عليها رسوم من شركة الاتصالات ورسوم استخدام Volcengine. حدّد غرض المكالمة والتحية في الإعدادات قبل الاتصال.</string>
+    <string name="calls_call_note">يستخدم شريحة SIM لديك. قد تُطبَّق رسوم المشغّل واستهلاك خدمة الصوت. يمكنك تحديد الهدف والتحية في الإعدادات قبل الاتصال.</string>
     <string name="calls_prepare">التحقّق والإعداد</string>
     <string name="calls_enable">تفعيل المكالمات بالذكاء الاصطناعي</string>
     <string name="calls_disable">التعطيل واستعادة المكالمات العادية</string>
-    <string name="calls_provider">خدمة الصوت الفوري 3.0 من Volcengine</string>
+    <string name="calls_provider">خدمة المكالمات</string>
     <string name="calls_credentials">بيانات اعتماد خدمة الصوت الفوري</string>
     <string name="calls_key_saved">حُفظت بيانات الاعتماد بأمان؛ يلزم اختبار فعلي للتأكد من إمكانية استخدام الخدمة</string>
     <string name="calls_key_clear">حذف بيانات الاعتماد المحفوظة</string>
@@ -37,7 +37,7 @@
     <string name="calls_all_note">يشمل الأرقام غير المدرجة والمتصلين مجهولي الرقم</string>
     <string name="calls_allowlist">الأرقام الواردة المسموح بالرد عليها تلقائيًا</string>
     <string name="calls_allowlist_empty">القائمة فارغة: لن يتم الرد تلقائيًا إلا إذا فُعّل الرد على جميع المتصلين</string>
-    <string name="calls_privacy_note">لا يُرسل صوت المكالمة إلى Volcengine إلا أثناء تولّي الذكاء الاصطناعي لها. لا تُحفظ تسجيلات صوتية. يُحفظ النص مشفّرًا على هذا الهاتف، ويمكن تولّي المكالمة يدويًا في أي وقت.</string>
+    <string name="calls_privacy_note">أثناء مكالمة الذكاء الاصطناعي يُرسل الصوت إلى خدمة المكالمات التي اخترتها. تبقى السجلات النصية على هذا الهاتف، ويمكنك تولّي المكالمة أو إنهاؤها في أي وقت.</string>
     <string name="calls_history_empty">لا توجد مكالمات بالذكاء الاصطناعي في السجل بعد</string>
     <string name="calls_collapse">طيّ</string>
     <string name="calls_transcript">إظهار نص المكالمة</string>
@@ -91,7 +91,7 @@
     <string name="calls_original_transcript">نص المكالمة</string>
     <string name="calls_outgoing_title">إجراء مكالمة</string>
     <string name="calls_rules">قواعد الرد</string>
-    <string name="calls_setup_credentials">اضبط بيانات اعتماد الصوت الفوري من Volcengine.</string>
+    <string name="calls_setup_credentials">يرجى إعداد خدمة المكالمات.</string>
     <string name="calls_setup_shell">اتصل بمساعد Mika المدمج أولًا.</string>
     <string name="calls_sim_clear_preferred">مسح بطاقة SIM المفضلة</string>
     <string name="calls_sim_preferred">بطاقة SIM المفضلة: %1$s</string>
@@ -129,4 +129,32 @@
     <string name="calls_greeting_hint">تُقرأ التحية كما كُتبت. اترك الحقل فارغًا ليتكلم الطرف الآخر أولًا.</string>
     <string name="calls_local_endpoint">الخادم المحلي</string>
     <string name="calls_local_endpoint_note">أدخل عنوان ws:// أو wss:// لتوصيل مكالمات الذكاء الاصطناعي بخادمك الخاص (waihu). اتركه فارغًا لاستخدام Volcengine.</string>
+    <string name="calls_home_answer_title">الرد على المكالمات</string>
+    <string name="calls_home_answer_sub">الأرقام التي تسمح بها فقط؛ البقية تصلك كالمعتاد</string>
+    <string name="calls_home_dial_title">إجراء مكالمة</string>
+    <string name="calls_home_dial_request">ما الذي يجب أن تتناوله؟ (اختياري)</string>
+    <string name="calls_home_dial_request_hint">مثال: اسأل عن مساء الجمعة لشخصين وسجّل السعر، دون حجز.</string>
+    <string name="calls_home_dial_check">تحقق ثم اتصل</string>
+    <string name="calls_home_history">سجل المكالمات</string>
+    <string name="calls_home_more">إعدادات الهاتف</string>
+    <string name="calls_home_setup_needed">تبقّى %1$d خطوات قبل أن يرد الذكاء الاصطناعي</string>
+    <string name="calls_home_ready">جاهز للرد على المكالمات</string>
+    <string name="calls_setup_title">إعداد المكالمات</string>
+    <string name="calls_setup_step_permissions">أذونات الهاتف</string>
+    <string name="calls_setup_step_helper">المساعد المدمج</string>
+    <string name="calls_setup_step_notifications">الإشعارات والعمل في الخلفية</string>
+    <string name="calls_setup_step_audio">صوت المكالمة باتجاهين</string>
+    <string name="calls_setup_step_backend">خدمة المكالمات</string>
+    <string name="calls_setup_done">تم</string>
+    <string name="calls_setup_go">إعداد</string>
+    <string name="calls_backend_cloud">سحابة Mika</string>
+    <string name="calls_backend_custom">خادم خاص</string>
+    <string name="calls_backend_volcengine">Volcengine</string>
+    <string name="calls_backend_unconfigured">غير مهيأ</string>
+    <string name="calls_simple_advanced">استخدام مهمة مفصّلة بدلًا من ذلك</string>
+    <string name="calls_advanced_title">إعدادات المكالمات المتقدمة</string>
+    <string name="calls_simple_advanced_note">مسار الصوت وبيانات الاعتماد وشريحة SIM والسلوك في الخلفية موجودة في شاشة الإعدادات الكاملة.</string>
+    <string name="calls_current_call">المكالمة الحالية</string>
+    <string name="calls_missing_credentials">خدمة المكالمات</string>
+    <string name="welcome_start_calls">شروع با مكالمات الذكاء الاصطناعي</string>
 </resources>

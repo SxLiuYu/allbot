@@ -69,4 +69,5 @@
     <string name="speech_doubao_plan">Penagihan</string>
     <string name="speech_doubao_duration_note">Ditagih per waktu pengenalan</string>
     <string name="speech_doubao_concurrent_note">Ditagih per koneksi bersamaan</string>
+    <string name="welcome_start_calls">Mulai dengan panggilan AI</string>
 </resources>
