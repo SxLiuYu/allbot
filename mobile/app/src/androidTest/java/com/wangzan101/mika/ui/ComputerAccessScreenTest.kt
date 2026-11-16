@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.wangzan101.mika.ChineseUi
+import com.wangzan101.mika.R
 import com.wangzan101.mika.core.remote.RemoteActivity
 import com.wangzan101.mika.core.remote.RelayState
 import com.wangzan101.mika.mcp.McpServerState
@@ -93,7 +94,8 @@ class ComputerAccessScreenTest {
         tap("复制安装指引")
         compose.onAllNodesWithText("复制命令")[0].performScrollTo().performClick()
         compose.onNodeWithText("mika doctor").assertDoesNotExist()
-        assertTrue(copied[0].contains("docs/cli.md"))
+        // 安装指引里的文档地址会换(现在是 agent-quickstart.md),按资源取,不写死路径
+        assertTrue(copied[0], copied[0] == appString(R.string.mcp_cli_install_prompt))
         assertEquals(listOf("mika connect"), copied.drop(1))
         networkGuide()
         assertTrue(networkChanges.isEmpty())

@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.wangzan101.mika.ChineseUi
+import com.wangzan101.mika.R
 import com.wangzan101.mika.core.remote.RelayState
 import com.wangzan101.mika.settings.RelayConfig
 import com.wangzan101.mika.ui.components.PageScaffold
@@ -74,10 +75,10 @@ class RelaySectionTest {
         config.value = RelayConfig(true, "https://relay.example/")
         state.value = RelayState.Online
         page()
-        compose.onNodeWithText("网关已连接，等待 CLI / MCP 请求").assertIsDisplayed()
+        compose.onNodeWithText(appString(R.string.relay_online)).assertIsDisplayed()
         compose.runOnIdle { state.value = RelayState.Unauthorized }
-        compose.onNodeWithText("配对已失效或被撤销，请重新配对网关").assertIsDisplayed()
+        compose.onNodeWithText(appString(R.string.relay_unauthorized)).assertIsDisplayed()
         compose.runOnIdle { state.value = RelayState.Incompatible }
-        compose.onNodeWithText("请将 Mika 与网关更新到匹配的版本").assertIsDisplayed()
+        compose.onNodeWithText(appString(R.string.relay_incompatible)).assertIsDisplayed()
     }
 }

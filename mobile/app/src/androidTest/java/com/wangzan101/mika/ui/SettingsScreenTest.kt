@@ -89,7 +89,7 @@ class SettingsScreenTest {
     fun homeRowsOpenTheirPages() {
         val opened = mutableListOf<String>()
         home(opened = opened)
-        for (t in listOf("模型", "Token 用量", "手机操作", "干活时", "悬浮胶囊", "通知", "记忆与技能", "网站登录", "文件与计算环境", "记住的操作路线", "恢复与修复", "开发者选项", "关于 Mika")) {
+        for (t in listOf("模型", "Token 用量", "手机操作", "干活时", "悬浮胶囊", "通知", "记忆与技能", "网站登录", "文件与计算环境", "记住的操作路线", "恢复与修复", "开发者选项", AboutCopy.TITLE)) {
             scrollTo(t)
             compose.onNodeWithText(t).performClick()
         }
