@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.wangzan101.mika.R
 import com.wangzan101.mika.calls.*
+import com.wangzan101.mika.settings.FeatureFlags
 import com.wangzan101.mika.ui.components.*
 import com.wangzan101.mika.ui.theme.MikaIcons
 import com.wangzan101.mika.ui.theme.MikaShapes
@@ -43,11 +44,20 @@ import kotlinx.coroutines.withContext
 import java.text.DateFormat
 import java.util.Date
 
-/** The current call and receiving controls come first; the rest expands without changing pages. */
+/**
+ * 电话界面入口。
+ *
+ * 默认（[FeatureFlags.callSimpleUi] 为真）进「首页 + 向导 + 高级设置」的精简结构；
+ * 关掉开关退回原来的四标签工作区。两套界面共用同一个 [CallRuntime] 和全部底层
+ * 通话逻辑，所以切换只是换壳，不改变放行规则、协议和存储。
+ */
 @Composable
 fun CallSettingsScreen(runtime: CallRuntime, onInstructions: (() -> Unit)? = null, onBack: () -> Unit,
     standalone: Boolean = false, onHelperSetup: () -> Unit = {}, onAbout: () -> Unit = {},
     updateAvailable: Boolean = false, focusRequest: Int = 0) {
+    val context = LocalContext.current
+    val flags = remember(context) { FeatureFlags.get(context) }
+    var simple by remember { mutableStateOf(flags.callSimpleUi()) }
     var instructionsOpen by rememberSaveable { mutableStateOf(false) }
     var handledFocusRequest by rememberSaveable { mutableIntStateOf(0) }
     val workspaceState = rememberSaveableStateHolder()
@@ -55,13 +65,23 @@ fun CallSettingsScreen(runtime: CallRuntime, onInstructions: (() -> Unit)? = nul
     LaunchedEffect(focusRequest) {
         if (focusRequest > 0 && focusRequest != handledFocusRequest) {
             instructionsOpen = false
+            simple = false // 从通知点进「当前通话」时走旧工作区，那里有完整通话卡
             handledFocusRequest = focusRequest
         }
     }
+    val openInstructions = onInstructions ?: { instructionsOpen = true }
     when {
         instructionsOpen -> CallInstructionsScreen(runtime) { instructionsOpen = false }
+        simple -> CallSimpleFlow(
+            runtime = runtime,
+            standalone = standalone,
+            onBack = onBack,
+            onOpenInstructions = openInstructions,
+            onOpenLegacy = { simple = false },
+            onAbout = onAbout,
+        )
         else -> workspaceState.SaveableStateProvider("call-workspace") {
-            CallSettingsWorkspace(runtime, taskDraft, onBack, onInstructions ?: { instructionsOpen = true },
+            CallSettingsWorkspace(runtime, taskDraft, onBack, openInstructions,
                 standalone, onHelperSetup, onAbout, updateAvailable, focusRequest)
         }
     }

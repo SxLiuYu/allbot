@@ -19,22 +19,30 @@ data class CallConfig(
     val greeting: String = CallPolicy.DEFAULT_GREETING,
     val systemPrompt: String = "",
     val speaker: String = "zh_female_vv_jupiter_bigtts",
-    val autoAnswerDelaySeconds: Int = MIN_AUTO_ANSWER_DELAY_SECONDS,
+    val autoAnswerDelaySeconds: Int = DEFAULT_AUTO_ANSWER_DELAY_SECONDS,
     val defaultOutgoingSimId: String? = null,
     val bypassIncomingNumbers: Set<String> = emptySet(),
     val localEndpoint: String? = null,
+    /** 显式服务类型；null = 老数据，按 [CallBackendKind.infer] 推导。 */
+    val backendKind: CallBackendKind? = null,
     val autoAnswerPausedUntilMs: Long? = null,
     internal val backgroundStandbyAuthorized: Boolean = false,
 ) {
     companion object {
         const val MIN_AUTO_ANSWER_DELAY_SECONDS = 3
         const val MAX_AUTO_ANSWER_DELAY_SECONDS = 15
+
+        /** 新用户默认接听延迟：比旧的 3 秒更宽容，避免对方刚响就开口。 */
+        const val DEFAULT_AUTO_ANSWER_DELAY_SECONDS = 5
     }
 
     val model: String get() = "1.2.6.1"
 
-    /** 通话后端就绪：本地后端地址或火山凭据任一即可，两边都空才挡住接听。 */
-    val backendReady: Boolean get() = credentialsConfigured || !localEndpoint.isNullOrBlank()
+    /** 当前实际生效的服务类型（老数据也给出确定答案，界面不再靠字符串是否为空反推）。 */
+    val effectiveBackendKind: CallBackendKind get() = CallBackendKind.infer(backendKind, this)
+
+    /** 通话后端是否已配置。只表示「填了」，连通性由连接测试单独判断。 */
+    val backendReady: Boolean get() = effectiveBackendKind.isConfigured(this)
     override fun toString(): String =
         "CallConfig(enabled=$enabled, autoAnswer=$autoAnswer, allowAllIncoming=$allowAllIncoming, " +
             "allowlistSize=${allowedIncomingNumbers.size}, maxCallSeconds=$maxCallSeconds, " +

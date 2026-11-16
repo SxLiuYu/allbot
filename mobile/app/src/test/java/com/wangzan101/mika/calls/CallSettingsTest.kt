@@ -88,8 +88,35 @@ class CallSettingsTest {
         assertEquals("zh_male_x", again.speaker)
     }
 
-    @Test fun localEndpointSavesReadsBackAndRejectsGarbage() {
+    @Test fun legacyConfigWithoutBackendKindStillReadsAsConfigured() {
+        // 老版本只写了 local_endpoint，没有 backend_kind。升级后必须仍能用。
         val prefs = MemoryPrefs()
+        prefs.values["enabled"] = true
+        prefs.values["local_endpoint"] = "ws://127.0.0.1:8000/api/v1/realtime/ws/mika"
+        val loaded = settings(prefs).state.value
+        assertNull("老数据不该被写入显式类型", loaded.backendKind)
+        assertEquals(CallBackendKind.CUSTOM, loaded.effectiveBackendKind)
+        assertTrue("升级后自建服务必须仍然可用", loaded.backendReady)
+    }
+
+    @Test fun explicitBackendKindRoundTrips() {
+        val prefs = MemoryPrefs()
+        val endpoint = "wss://voice.example/realtime/ws"
+        settings(prefs).save(CallConfig(enabled = true, backendKind = CallBackendKind.CLOUD, localEndpoint = endpoint))
+        val again = settings(prefs).state.value
+        assertEquals(CallBackendKind.CLOUD, again.backendKind)
+        assertEquals(endpoint, again.localEndpoint)
+    }
+
+    @Test fun selectingKindWithoutItsFieldIsNotPersistedAsReady() {
+        // 选了云端却没填地址：保存后不能显示成「已配置」。
+        val prefs = MemoryPrefs()
+        val saved = settings(prefs).save(CallConfig(enabled = true, backendKind = CallBackendKind.CLOUD))
+        assertNull("没有地址就不该留下云端类型", saved.backendKind)
+        assertFalse(saved.backendReady)
+    }
+
+    @Test fun localEndpointSavesReadsBackAndRejectsGarbage() {        val prefs = MemoryPrefs()
         val endpoint = "ws://127.0.0.1:8000/api/v1/realtime/ws/mika"
         val saved = settings(prefs).save(CallConfig(enabled = true, localEndpoint = "  $endpoint  "))
         assertEquals("首尾空白要去掉", endpoint, saved.localEndpoint)

@@ -267,6 +267,7 @@ private fun MikaRoot(store: ProviderStore, monitor: SystemStatusMonitor, activit
         modelSetupDone = onboardingState.modelSetupDone(),
         phoneNeeded = status.builtinShell != BuiltinShellStatus.Running && status.sdkInt >= Prerequisites.MIN_SDK,
         phoneGuideSeen = phoneSetup.guideSeen(),
+        primaryUse = onboardingState.primaryUse(),
     )
     fun goOnboarding(step: OnboardingStep?) {
         onboarding = step
@@ -292,7 +293,15 @@ private fun MikaRoot(store: ProviderStore, monitor: SystemStatusMonitor, activit
             phoneSetup.markGuideSeen()
             if (onboarding == OnboardingStep.Phone) goOnboarding(null) else nav.back()
         }
-        Route.Welcome -> WelcomeScreen { goOnboarding(OnboardingStep.Model) }
+        Route.Welcome -> WelcomeScreen(
+            onStart = { goOnboarding(OnboardingStep.Model) },
+            onStartCalls = {
+                // 只接打电话：电话不读 App 主模型，跳过模型配置直接进手机操作引导。
+                onboardingState.setPrimaryUse(PrimaryUse.CALLS)
+                onboardingState.markPrimaryUseAsked()
+                goOnboarding(Onboarding.firstStepFor(PrimaryUse.CALLS))
+            },
+        )
         Route.ModelSetup -> {
             val inOnboarding = onboarding == OnboardingStep.Model
             ModelSetupScreen(

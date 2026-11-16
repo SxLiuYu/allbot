@@ -47,6 +47,9 @@ class CallSettings(
             "无效的火山音色编号"
         }
         val localEndpoint = CallPolicy.localEndpoint(config.localEndpoint)
+        // 显式服务类型：只会被界面写入；老数据保持 null，读的时候再推导。
+        // 选云端/自建但没有地址时退回 null，不让「选了云端却没填地址」变成一个假就绪状态。
+        val backendKind = config.backendKind?.takeIf { it.isConfigured(config.copy(localEndpoint = localEndpoint)) }
         val audioVerified = CallPolicy.audioVerificationSurvives(config.audioVerified, previous.audioMode, config.audioMode)
         val next = config.copy(
             allowedIncomingNumbers = numbers,
@@ -63,6 +66,7 @@ class CallSettings(
             systemPrompt = config.systemPrompt.trim(),
             speaker = speaker,
             localEndpoint = localEndpoint,
+            backendKind = backendKind,
             credentialsConfigured = previous.credentialsConfigured,
         )
         val committed = prefs.edit()
@@ -82,6 +86,7 @@ class CallSettings(
             .putString("prompt", next.systemPrompt)
             .putString("speaker", next.speaker)
             .putString("local_endpoint", next.localEndpoint.orEmpty())
+            .putString("backend_kind", next.backendKind?.name)
             .commit()
         // A failed write may not leave auto-answer running with a policy the user tried to change.
         mutable.value = if (committed) next else previous.copy(enabled = next.enabled && previous.enabled, autoAnswer = false, backgroundStandbyAuthorized = false)
@@ -176,6 +181,9 @@ class CallSettings(
             systemPrompt = prefs.getString("prompt", "").orEmpty().take(CallPolicy.MAX_PROMPT_CHARS),
             speaker = prefs.getString("speaker", defaults.speaker).orEmpty().take(CallPolicy.MAX_SPEAKER_CHARS),
             localEndpoint = prefs.getString("local_endpoint", null)?.trim()?.takeIf { it.isNotEmpty() },
+            // 读不到或写成未知值时保持 null：老数据按 infer 推导，不因为解析失败把服务类型判成未配置。
+            backendKind = prefs.getString("backend_kind", null)
+                ?.let { name -> CallBackendKind.entries.firstOrNull { it.name == name } },
         )
     }.getOrDefault(CallConfig())
 

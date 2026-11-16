@@ -125,6 +125,18 @@ class FeatureFlags(private val prefs: SharedPreferences) {
         prefs.edit().putFloat(CAPSULE_CARD_HEIGHT, fraction.coerceIn(0f, 1f)).apply()
     }
 
+    /**
+     * 电话是否用「首页 + 向导」的精简界面。
+     *
+     * 默认开(新装即精简)，但保留可关闭的开关：老界面四标签工作区原样还在，关掉这个开关
+     * 就退回去，用于回归对照和出问题时的回退，不依赖发版。
+     */
+    fun callSimpleUi(): Boolean = prefs.getBoolean(CALL_SIMPLE_UI, true)
+
+    fun setCallSimpleUi(on: Boolean) {
+        prefs.edit().putBoolean(CALL_SIMPLE_UI, on).commit()
+    }
+
     companion object {
         const val PREFS = "feature_flags"
         private const val SPEED_FLAGS = "speed_flags"
@@ -146,6 +158,7 @@ class FeatureFlags(private val prefs: SharedPreferences) {
         private const val CAPSULE_SIDE = "capsule_side"
         private const val CAPSULE_HEIGHT = "capsule_height"
         private const val CAPSULE_CARD_HEIGHT = "capsule_card_height"
+        private const val CALL_SIMPLE_UI = "call_simple_ui"
 
         fun get(context: Context) = FeatureFlags(context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE))
     }

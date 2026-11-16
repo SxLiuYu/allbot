@@ -41,9 +41,15 @@ import com.wangzan101.mika.ui.theme.MikaIcons
 import com.wangzan101.mika.ui.theme.MikaTheme
 import com.wangzan101.mika.ui.theme.MikaType
 
-/** 上手第一步:说清 Mika 是什么、能做哪几类事,开始前要做的两件事和大概时间。 */
+/**
+ * 上手第一步:说清 Mika 是什么、能做哪几类事,开始前要做的两件事和大概时间。
+ *
+ * [onStart] 走完整的助手流程（欢迎 → 模型 → 手机操作）。[onStartCalls] 是给只想先用
+ * AI 接打电话的人：电话链路不读 App 主模型，所以这条路径跳过模型配置直接进手机操作引导。
+ * 单参调用保持原行为，老测试和外部入口不受影响。
+ */
 @Composable
-fun WelcomeScreen(onStart: () -> Unit) {
+fun WelcomeScreen(onStart: () -> Unit, onStartCalls: (() -> Unit)? = null) {
     val c = MikaTheme.colors
     PageBackground {
         Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).windowInsetsPadding(WindowInsets.navigationBars)) {
@@ -71,6 +77,12 @@ fun WelcomeScreen(onStart: () -> Unit) {
                     style = MikaType.Hint, fontSize = 12.5.sp, color = c.ink3, textAlign = TextAlign.Center,
                 )
                 MikaButton(WelcomeCopy.START, onStart, Modifier.fillMaxWidth().testTag("welcome-start"))
+                if (onStartCalls != null) {
+                    androidx.compose.material3.TextButton(
+                        onClick = onStartCalls,
+                        modifier = Modifier.fillMaxWidth().testTag("welcome-start-calls"),
+                    ) { Text(WelcomeCopy.START_CALLS) }
+                }
             }
         }
     }
@@ -99,6 +111,7 @@ object WelcomeCopy {
     val LEAD: String get() = tr(R.string.welcome_lead)
     val NOTE: String get() = tr(R.string.welcome_note)
     val START: String get() = tr(R.string.welcome_start)
+    val START_CALLS: String get() = tr(R.string.welcome_start_calls)
 
     data class Item(val icon: ImageVector, val title: String, val body: String)
 
