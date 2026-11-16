@@ -38,6 +38,8 @@ enum class AppLanguage(val tag: String?, val speechTag: String?) {
     companion object {
         private const val PREFS = "app_language"
         private const val KEY_TAG = "tag"
+        /** 「已按默认定过一次中文」的标记：只写一次，用户之后的选择永远优先。 */
+        private const val KEY_DEFAULT_APPLIED = "default_chinese_applied"
 
         /** 安卓 12 及以前选定的语言;null 表示跟随系统。进程里读一次,换的时候更新。 */
         @Volatile
@@ -61,6 +63,38 @@ enum class AppLanguage(val tag: String?, val speechTag: String?) {
 
         /** 语言标签对应哪一项:见 [fromTag];标签里没写文字体系时,按 ICU 的常见写法补出来。 */
         fun fromTag(tag: String?): AppLanguage = fromTag(tag) { ULocale.addLikelySubtags(ULocale.forLanguageTag(it)).script }
+
+        /**
+         * 首次启动把界面语言定成简体中文。
+         *
+         * 默认行为是「跟随系统」：系统是英文就显示英文。这个 App 面向中文用户，装完看到英文
+         * 会以为没做完，所以在**用户从没选过语言**时定成简体中文一次。标记只写一次，之后用户
+         * 自己改了语言就一直按他选的走；升级上来的老用户已经有选择，同样不动。
+         *
+         * 安卓 13 起用系统的应用语言（系统自己重建界面），12 及以下写本地并清掉资源缓存。
+         * 只读/写本 App 自己的 prefs，不需要在启动时触碰界面。
+         */
+        fun ensureDefaultChinese(context: Context) {
+            val app = context.applicationContext
+            val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            if (prefs.getBoolean(KEY_DEFAULT_APPLIED, false)) return
+            val alreadyChosen = if (systemManaged) {
+                !app.getSystemService(LocaleManager::class.java).applicationLocales.isEmpty
+            } else {
+                prefs.getString(KEY_TAG, null) != null
+            }
+            prefs.edit().putBoolean(KEY_DEFAULT_APPLIED, true).apply()
+            if (alreadyChosen) return
+            if (systemManaged) {
+                app.getSystemService(LocaleManager::class.java).applicationLocales =
+                    LocaleList.forLanguageTags(SimplifiedChinese.tag)
+            } else {
+                prefs.edit().putString(KEY_TAG, SimplifiedChinese.tag).commit()
+                legacyTag = SimplifiedChinese.tag
+                legacyLoaded = true
+                cached = null
+            }
+        }
 
         /**
          * 中文按文字体系分:写的或 [likelyScript] 补出的是 Hant 就是繁體中文,别的中文是简体中文;
