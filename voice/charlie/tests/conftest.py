@@ -102,6 +102,24 @@ _STATE_SNAPSHOT_KEYS = [
     ("agent.llm", "_ALL_DOMAIN_KEYWORDS"),
     # Round 21: WM 按会话隔离的数据（dict 隔离）；thread-local 不可深拷贝，单独清理
     ("agent.working_memory", "_session_data"),
+    # FR-14 S1：偏好/人格/记忆/历史/整机状态同步按 uid 分片后新增的进程级状态。
+    #
+    # 取舍标准：只收「与磁盘无关的纯进程状态」，**不收**「磁盘内容的镜像」。
+    #   - 偏好 _preferences / _uid_* 与 persona _states、memory_store 的
+    #     _hot_fact_cache 都是"文件内容的镜像"，其一致性由文件签名单独维护
+    #     （_preferences_file_signature / _uid_signatures）。只把镜像拍快照、
+    #     不把签名一起回滚，等于人为制造"内存与磁盘不一致"——实测会让
+    #     tests/test_voice_agent.py::TestPreferences::test_preference_count_without_copying
+    #     在下一轮把磁盘上的 3 条偏好重新读进一个本该为空的 NoCopyDict。
+    #     这些模型的隔离一律由各自测试文件的 fixture 负责（batch2/4a/5/6 都清）。
+    #   - 这里只收：history 的自动落盘计数（纯标量，回滚安全）、记忆库
+    #     "已建表路径"集合（纯进程内布尔）、state_sync 的去重哈希/版本号/内存快照。
+    ("agent.history", "_history_save_seq"),
+    ("agent.history", "_history_append_count"),
+    ("agent.memory_store", "_db_ready_paths"),
+    ("agent.state_sync", "_local_state"),
+    ("agent.state_sync", "_last_published_hash"),
+    ("agent.state_sync", "_source_version"),
 ]
 
 

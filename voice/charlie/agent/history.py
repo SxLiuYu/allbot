@@ -23,14 +23,25 @@ _history_lock = threading.Lock()
 def _data_dir() -> str:
     return os.environ.get("ASSISTANT_KID_DATA_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def _get_history_file():
-    uid = os.environ.get("CHARLIE_USER_ID", "default")
+def _resolve_uid(uid: str | None = None) -> str:
+    """身份统一入口：显式 uid > ContextVar > session 注册表 > env（见 user_context）。"""
+    if uid:
+        return uid
+    try:
+        from agent.user_context import resolve_user
+        return resolve_user() or "default"
+    except Exception:
+        return os.environ.get("CHARLIE_USER_ID", "default") or "default"
+
+def _get_history_file(uid: str | None = None):
+    """会话历史文件路径。`default` 保留原文件名（老数据不迁移），其余加 `_{uid}` 后缀。"""
+    uid = _resolve_uid(uid)
     if uid == "default":
         return os.path.join(_data_dir(), "conversation_history.json")
     return os.path.join(_data_dir(), f"conversation_history_{uid}.json")
 
-def _get_history_lock_file():
-    return _get_history_file() + ".lock"
+def _get_history_lock_file(uid: str | None = None):
+    return _get_history_file(uid) + ".lock"
 
 # 向后兼容导出（供 voice_agent.py 等 import）
 HISTORY_FILE = _get_history_file()
@@ -46,8 +57,8 @@ _history_append_count = 0  # 每 N 次 _append_history 后自动落盘，防止�
 HISTORY_SAVE_EVERY = 2     # 每 2 轮对话（4 条消息）落盘一次，减少崩溃丢失
 _context_summaries = {}  # key = session_id
 
-def _history_file_sig() -> Optional[tuple]:
-    path = _get_history_file()
+def _history_file_sig(uid: str | None = None) -> Optional[tuple]:
+    path = _get_history_file(uid)
     try:
         st = os.stat(path)
     except OSError:
@@ -55,8 +66,8 @@ def _history_file_sig() -> Optional[tuple]:
     return (st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns)
 
 @contextmanager
-def _locked_history_file(shared: bool = False):
-    lock_path = _get_history_lock_file()
+def _locked_history_file(shared: bool = False, uid: str | None = None):
+    lock_path = _get_history_lock_file(uid)
     with open(lock_path, "a+", encoding="utf-8") as lock_file:
         fcntl.flock(lock_file, fcntl.LOCK_SH if shared else fcntl.LOCK_EX)
         try:
@@ -64,16 +75,16 @@ def _locked_history_file(shared: bool = False):
         finally:
             fcntl.flock(lock_file, fcntl.LOCK_UN)
 
-def _read_history_file_locked() -> Optional[dict]:
-    uid = os.environ.get("CHARLIE_USER_ID", "default")
-    sig = _history_file_sig()
+def _read_history_file_locked(uid: str | None = None) -> Optional[dict]:
+    uid = _resolve_uid(uid)
+    sig = _history_file_sig(uid)
     if sig is None:
         _history_file_signatures.pop(uid, None)
         _history_file_caches.pop(uid, None)
         return None
     if sig == _history_file_signatures.get(uid) and uid in _history_file_caches:
         return _history_file_caches[uid]
-    path = _get_history_file()
+    path = _get_history_file(uid)
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -95,9 +106,9 @@ def _read_history_file_locked() -> Optional[dict]:
     _history_file_caches[uid] = normalized
     return normalized
 
-def _read_history_file() -> Optional[dict]:
-    with _history_file_lock, _locked_history_file(shared=True):
-        return _read_history_file_locked()
+def _read_history_file(uid: str | None = None) -> Optional[dict]:
+    with _history_file_lock, _locked_history_file(shared=True, uid=uid):
+        return _read_history_file_locked(uid)
 
 def _evict_overflow_sessions_locked() -> None:
     """维持会话数硬上限（须持有 _history_lock）。
@@ -141,8 +152,13 @@ def _searchable_history(session_id: str = "default") -> list:
             return disk_msgs
     return []
 
-def get_recent_user_message(session_id: str = "default") -> str:
-    """返回指定会话中最后一条用户消息, 无则返回空字符串"""
+def get_recent_user_message(session_id: str = "default", uid: str | None = None) -> str:
+    """返回指定会话中最后一条用户消息, 无则返回空字符串
+
+    `uid` 仅作身份声明（会话历史在内存里按 session_id 分桶，落盘时按 uid 分片）。
+    `agent/system_msg.py:448` / `:459` 一直按两参调用，改造前这里不收 uid，于是
+    每次调用都抛 TypeError 被 except 吞掉 —— 最近一条用户消息从来没进过动态段。
+    """
     try:
         hist = _get_history(session_id)
         with _history_lock:
@@ -174,16 +190,17 @@ def _session_summaries() -> list:
             })
         return summaries
 
-def _save_history() -> None:
+def _save_history(uid: str | None = None) -> None:
     global _history_save_seq
+    uid = _resolve_uid(uid)
     with _history_lock:
         data = {sid: list(hist) for sid, hist in _sessions.items()}
         save_seq = _history_save_seq + 1
         _history_save_seq = save_seq
-    path = _get_history_file()
+    path = _get_history_file(uid)
     tmp_path = None
     try:
-        with _history_file_lock, _locked_history_file(shared=False):
+        with _history_file_lock, _locked_history_file(shared=False, uid=uid):
             # 并发 snapshot 保护: 排队期间有更新 save 则旧快照跳过
             if save_seq != _history_save_seq:
                 return
@@ -225,9 +242,9 @@ def _append_history(hist: list, user_text: str, assistant_reply: str) -> None:
             log.debug(f"[agent.history] error at line 202: {e}")
             pass
 
-def _load_history() -> None:
+def _load_history(uid: str | None = None) -> None:
     try:
-        file_data = _read_history_file()
+        file_data = _read_history_file(uid)
     except Exception as e:
         log.debug(f"[agent.history] error at line 208: {e}")
         return

@@ -16,7 +16,21 @@ DATA_DIR = os.environ.get(
 
 
 def _get_current_uid() -> str:
-    return os.environ.get("CHARLIE_USER_ID", "default")
+    """当前用户身份 —— 统一走 user_context.resolve_user()，不再直接读 env。
+
+    env 仍是解析链的最后一层（agent/user_context.py:111），所以单用户老配置
+    （CHARLIE_USER_ID=laoyu）的行为不变。
+    """
+    try:
+        from agent.user_context import resolve_user
+        return resolve_user() or "default"
+    except Exception:
+        return os.environ.get("CHARLIE_USER_ID", "default") or "default"
+
+
+def _resolve_uid(uid: str = None) -> str:
+    """显式 uid 优先，否则按当前执行流解析（ContextVar → session 注册表 → env）。"""
+    return uid or _get_current_uid()
 
 
 def _persona_file(uid: str = None) -> str:
@@ -26,8 +40,7 @@ def _persona_file(uid: str = None) -> str:
     `_save(uid)` 已经在内部解析过 uid，若这里再读一次 env，env 在两次调用之间
     变了就会「读 A 的文件、写 B 的文件」。
     """
-    if uid is None:
-        uid = _get_current_uid()
+    uid = _resolve_uid(uid)
     if uid == "default":
         return os.path.join(DATA_DIR, "persona_state.json")
     return os.path.join(DATA_DIR, f"persona_state_{uid}.json")
@@ -53,8 +66,7 @@ _states: dict[str, dict] = {}
 
 
 def _load(uid: str = None) -> dict:
-    if uid is None:
-        uid = _get_current_uid()
+    uid = _resolve_uid(uid)
     with _STATE_LOCK:
         if uid in _states:
             return _states[uid]
@@ -79,8 +91,7 @@ def _load(uid: str = None) -> dict:
 
 
 def _save(uid: str = None) -> None:
-    if uid is None:
-        uid = _get_current_uid()
+    uid = _resolve_uid(uid)
     with _STATE_LOCK:
         state = _states.get(uid)
         if state is None:
@@ -103,9 +114,9 @@ def _save(uid: str = None) -> None:
             raise
 
 
-def reset() -> None:
+def reset(uid: str = None) -> None:
     """重置当前用户的人设状态到默认值。"""
-    uid = _get_current_uid()
+    uid = _resolve_uid(uid)
     with _STATE_LOCK:
         _states[uid] = copy.deepcopy(_DEFAULT)
         _save(uid)
@@ -140,7 +151,7 @@ def detect_emotion(text: str) -> str:
     return max(scores, key=scores.get)
 
 
-def update(text: str):
+def update(text: str, uid: str = None):
     """根据用户输入更新人设状态
 
     uid 只解析一次并贯穿整次更新：`_load()` 和 `_save()` 各自调
@@ -149,7 +160,7 @@ def update(text: str):
     找不到就静默 return——文件不写，调用方毫无感知。
     """
     with _STATE_LOCK:
-        uid = _get_current_uid()
+        uid = _resolve_uid(uid)
         state = _load(uid)
         emotion = detect_emotion(text)
         state["interaction_count"] += 1
@@ -186,12 +197,16 @@ _EMOTION_TO_TTS = {
 }
 
 
-def get_current_emotion() -> str:
+def get_current_emotion(uid: str = None) -> str:
     """返回最近一次检测到的用户情绪，映射为 TTS 情感标签。
+
+    `uid` 由调用方显式传入（agent/user_profile.py:269 一直按
+    `get_current_emotion(uid)` 调用，改造前这里不收参数，于是每次画像聚合
+    都抛 TypeError 被外层 except 吞掉 —— 情绪字段永远为空）。
 
     返回值: happy / sad / serious / "" (空=默认中性)
     """
-    state = _load()
+    state = _load(uid)
     recent = state.get("recent_emotions", [])
     if not recent:
         return ""
@@ -229,9 +244,9 @@ def get_persona_prompt(uid: str = None) -> str:
 
 # ===== P3: 人格稳定性增强 =====
 
-def get_tone_profile() -> dict:
+def get_tone_profile(uid: str = None) -> dict:
     """获取当前语气配置"""
-    state = _load()
+    state = _load(uid)
     return {
         "tone": state.get("tone_profile", "casual"),
         "formality": state.get("formality", "casual"),
@@ -239,29 +254,29 @@ def get_tone_profile() -> dict:
     }
 
 
-def get_relationship_level() -> str:
+def get_relationship_level(uid: str = None) -> str:
     """获取当前关系等级"""
-    state = _load()
+    state = _load(uid)
     return state.get("relationship_level", "acquaintance")
 
 
-def set_relationship_level(level: str) -> None:
+def set_relationship_level(level: str, uid: str = None) -> None:
     """设置关系等级（stranger/acquaintance/friend/family）"""
     if level not in ("stranger", "acquaintance", "friend", "family"):
         level = "acquaintance"
     with _STATE_LOCK:
         # uid 一次解析、读写共用（见 update() 的说明）
-        uid = _get_current_uid()
+        uid = _resolve_uid(uid)
         state = _load(uid)
         state["relationship_level"] = level
         _save(uid)
 
 
-def update_relationship_from_interaction(text: str) -> None:
+def update_relationship_from_interaction(text: str, uid: str = None) -> None:
     """根据用户输入更新关系亲密度"""
     with _STATE_LOCK:
         # uid 一次解析、读写共用（见 update() 的说明）
-        uid = _get_current_uid()
+        uid = _resolve_uid(uid)
         state = _load(uid)
         state["interaction_count"] = state.get("interaction_count", 0) + 1
         count = state["interaction_count"]

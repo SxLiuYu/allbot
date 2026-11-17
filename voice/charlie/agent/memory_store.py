@@ -44,11 +44,21 @@ DATA_DIR = os.environ.get("ASSISTANT_KID_DATA_DIR", os.path.dirname(os.path.absp
 
 
 def _get_uid() -> str:
-    return os.environ.get("CHARLIE_USER_ID", "default")
+    """当前用户身份 —— 统一走 user_context.resolve_user()（env 仍是最后一层兜底）。"""
+    try:
+        from agent.user_context import resolve_user
+        return resolve_user() or "default"
+    except Exception:
+        return os.environ.get("CHARLIE_USER_ID", "default") or "default"
 
 
-def _get_db_path() -> str:
-    uid = _get_uid()
+def _resolve_uid(uid: str | None = None) -> str:
+    """显式 uid 优先，否则按当前执行流解析。"""
+    return uid or _get_uid()
+
+
+def _get_db_path(uid: str | None = None) -> str:
+    uid = _resolve_uid(uid)
     name = f"memory_{uid}.db" if uid != "default" else "memory.db"
     return os.path.join(DATA_DIR, name)
 
@@ -57,9 +67,26 @@ def _get_db_path() -> str:
 _db_lock = threading.RLock()
 
 # ===== LRU 热事实缓存 =====
+# ⚠️ 键必须带 uid 前缀：分片 DB 已经隔离，但热缓存是**进程级单例**，
+# 不按 uid 分键就等于把 key 抹平（A 的热事实读得到 B 的值）。
 _HOT_FACT_CACHE_MAX = 500
+_HOT_FACT_CACHE_SEP = "\x1f"
 _hot_fact_cache: OrderedDict[str, dict] = OrderedDict()
 _hot_cache_lock = threading.Lock()
+
+
+def _hot_key(key: str, uid: str | None = None) -> str:
+    return f"{_resolve_uid(uid)}{_HOT_FACT_CACHE_SEP}{key}"
+
+
+def _hot_prefix(uid: str | None = None) -> str:
+    return f"{_resolve_uid(uid)}{_HOT_FACT_CACHE_SEP}"
+
+
+def _hot_cache_size(uid: str | None = None) -> int:
+    prefix = _hot_prefix(uid)
+    with _hot_cache_lock:
+        return sum(1 for k in _hot_fact_cache if k.startswith(prefix))
 
 
 # ===== Schema & 初始化 =====
@@ -138,6 +165,10 @@ CREATE INDEX IF NOT EXISTS idx_sessions_started ON sessions(started_at);
 """
 
 
+# 已建过表的分片库路径（每进程每路径只建一次；测试 fixture 会清空它）
+_db_ready_paths: set[str] = set()
+
+
 def _init_db() -> None:
     """初始化数据库(创建表 + 索引), 幂等。"""
     db_path = _get_db_path()
@@ -147,13 +178,34 @@ def _init_db() -> None:
             with sqlite3.connect(db_path, timeout=10) as conn:
                 conn.executescript(_SCHEMA)
                 conn.commit()
+        _db_ready_paths.add(db_path)
     except Exception as e:
         log.warning(f"[memory_store] init_db 失败: {e}")
+
+
+def _ensure_db_ready(db_path: str) -> None:
+    """确保当前分片库已建表。
+
+    `_get_conn()` 每次都会换用户（换文件），所以建表不能只在模块导入时做一次 ——
+    否则第一个非 default 用户拿到的是一个空库，"写入成功"其实全静默失败。
+    """
+    if db_path in _db_ready_paths:
+        return
+    try:
+        os.makedirs(os.path.dirname(db_path) if os.path.dirname(db_path) else ".", exist_ok=True)
+        with _db_lock:
+            with sqlite3.connect(db_path, timeout=10) as conn:
+                conn.executescript(_SCHEMA)
+                conn.commit()
+        _db_ready_paths.add(db_path)
+    except Exception as e:
+        log.warning(f"[memory_store] 分片库初始化失败({db_path}): {e}")
 
 
 def _get_conn() -> sqlite3.Connection:
     """获取数据库连接(每次调用新建, 使用 with 管理生命周期)。"""
     db_path = _get_db_path()
+    _ensure_db_ready(db_path)
     conn = sqlite3.connect(db_path, timeout=10)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
@@ -164,9 +216,12 @@ def _get_conn() -> sqlite3.Connection:
 # ===== 热事实缓存 LRU =====
 
 def _cache_hot_facts() -> int:
-    """启动时加载高频访问事实到内存 cache。返回缓存条目数。"""
+    """加载当前用户的高频事实到内存 cache。返回该用户被缓存的条目数。"""
     global _hot_fact_cache
-    _hot_fact_cache.clear()
+    prefix = _hot_prefix()
+    with _hot_cache_lock:
+        for k in [k for k in _hot_fact_cache if k.startswith(prefix)]:
+            _hot_fact_cache.pop(k, None)
     try:
         with _get_conn() as conn:
             rows = conn.execute(
@@ -175,7 +230,7 @@ def _cache_hot_facts() -> int:
                 (_HOT_FACT_CACHE_MAX,)
             ).fetchall()
             for row in rows:
-                _hot_fact_cache[row["key"]] = {
+                _hot_fact_cache[prefix + row["key"]] = {
                     "value": row["value"],
                     "category": row["category"],
                     "confidence": row["confidence"],
@@ -184,28 +239,30 @@ def _cache_hot_facts() -> int:
                 }
     except Exception as e:
         log.warning(f"[memory_store] 热缓存加载失败: {e}")
-    return len(_hot_fact_cache)
+    return _hot_cache_size()
 
 
 def _warm_cache_on_read(key: str, entry: dict) -> None:
     """Update cache entry (LRU slide). Called after DB writes too, so
     always refresh the stored value."""
+    hot_key = _hot_key(key)
     with _hot_cache_lock:
-        if key in _hot_fact_cache:
-            _hot_fact_cache[key].update(entry)
-            _hot_fact_cache.move_to_end(key)
+        if hot_key in _hot_fact_cache:
+            _hot_fact_cache[hot_key].update(entry)
+            _hot_fact_cache.move_to_end(hot_key)
         else:
             if len(_hot_fact_cache) >= _HOT_FACT_CACHE_MAX:
                 _hot_fact_cache.popitem(last=False)
-            _hot_fact_cache[key] = entry
+            _hot_fact_cache[hot_key] = entry
 
 
 def get_hot_fact(key: str) -> dict | None:
-    """从热缓存读取事实(SQLite 不落盘)。"""
+    """从热缓存读取事实(SQLite 不落盘)。键按 uid 前缀隔离。"""
+    hot_key = _hot_key(key)
     with _hot_cache_lock:
-        entry = _hot_fact_cache.get(key)
+        entry = _hot_fact_cache.get(hot_key)
         if entry:
-            _hot_fact_cache.move_to_end(key)
+            _hot_fact_cache.move_to_end(hot_key)
             return dict(entry)
     return None
 
@@ -312,7 +369,7 @@ def delete_fact(key: str) -> bool:
             conn.commit()
             if cur.rowcount > 0:
                 with _hot_cache_lock:
-                    _hot_fact_cache.pop(key, None)
+                    _hot_fact_cache.pop(_hot_key(key), None)
                 return True
     except Exception as e:
         log.warning(f"[memory_store] delete_fact 失败: {e}")
@@ -587,8 +644,7 @@ def get_memory_stats() -> dict:
                 stats[table] = row["c"]
     except Exception as e:
         log.debug(f"[memory_store] get_memory_stats 失败: {e}")
-    with _hot_cache_lock:
-        stats["cache_size"] = len(_hot_fact_cache)
+    stats["cache_size"] = _hot_cache_size()
     return stats
 
 

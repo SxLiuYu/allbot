@@ -40,8 +40,25 @@ DATA_DIR = os.environ.get("ASSISTANT_KID_DATA_DIR", os.path.dirname(os.path.absp
 
 # ===== 同步文件路径 =====
 
-def _get_sync_file() -> str:
-    uid = os.environ.get("CHARLIE_USER_ID", "default")
+def _resolve_uid(uid: str | None = None) -> str:
+    """身份统一入口：显式 uid > ContextVar > session 注册表 > env（见 user_context）。
+
+    注意：本模块**不再直接读 `CHARLIE_USER_ID`**。改造前三处（文件路径、MQTT 发布
+    topic、MQTT 订阅 topic）各读一次 env，env 一变三处会各自跟到不同用户，
+    与本进程正在服务的会话无关（tests/test_fr14_batch2_uid_sharding.py 的
+    `test_mqtt_topic_ignores_raw_env` 就是钉这个）。
+    """
+    if uid:
+        return uid
+    try:
+        from agent.user_context import resolve_user
+        return resolve_user() or "default"
+    except Exception:
+        return os.environ.get("CHARLIE_USER_ID", "default") or "default"
+
+
+def _get_sync_file(uid: str | None = None) -> str:
+    uid = _resolve_uid(uid)
     name = f"user_state_sync_{uid}.json" if uid != "default" else "user_state_sync.json"
     return os.path.join(DATA_DIR, name)
 
@@ -61,9 +78,9 @@ _last_remote_version: int = 0
 
 # ===== 文件级状态(机器内多进程共享) =====
 
-def _acquire_file_lock():
+def _acquire_file_lock(uid: str | None = None):
     """获取状态文件锁。返回 (fd, filepath) 或 None."""
-    path = _get_sync_file()
+    path = _get_sync_file(uid)
     try:
         fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
         fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
@@ -76,9 +93,9 @@ def _acquire_file_lock():
         return None, None
 
 
-def _acquire_file_lock_write():
+def _acquire_file_lock_write(uid: str | None = None):
     """获取状态文件写锁(独占)。"""
-    path = _get_sync_file()
+    path = _get_sync_file(uid)
     try:
         fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o644)
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -102,9 +119,9 @@ def _release_file_lock(fd):
         pass
 
 
-def read_shared_state() -> dict:
+def read_shared_state(uid: str | None = None) -> dict:
     """从共享文件读取最新状态(非阻塞, 加共享锁)。"""
-    fd, path = _acquire_file_lock()
+    fd, path = _acquire_file_lock(uid)
     if fd is None:
         return {}
     try:
@@ -118,9 +135,9 @@ def read_shared_state() -> dict:
     return {}
 
 
-def write_shared_state(state: dict) -> bool:
+def write_shared_state(state: dict, uid: str | None = None) -> bool:
     """写入共享状态文件(独占锁, 原子替换)。"""
-    fd, path = _acquire_file_lock_write()
+    fd, path = _acquire_file_lock_write(uid)
     if fd is None:
         return False
     try:
@@ -139,12 +156,22 @@ def write_shared_state(state: dict) -> bool:
 
 # ===== MQTT 跨设备广播 =====
 
-def _publish_mqtt(state: dict, version: int) -> None:
-    """发布状态到 MQTT topic (异步, fire-and-forget)。version 防止旧消息覆盖新状态。"""
+def _publish_mqtt(state: dict, version: int = 0, uid: str | None = None) -> None:
+    """发布状态到 MQTT topic (异步, fire-and-forget)。version 防止旧消息覆盖新状态。
+
+    `version` 可省（默认 0）：调用方也可以只表达"这一份状态发给这个 uid"。
+    `uid` 显式传入时**必须**压过 env —— topic 是 `charlie/state/{uid}`，
+    改造前这里直接读 env，env 一变 topic 就跟到别的用户去了。
+    """
     global _last_published_hash
     try:
         import hashlib
-        state_hash = hashlib.sha256(json.dumps(state, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+        uid = _resolve_uid(uid)
+        # 去重哈希必须带上 uid：不同用户的 topic 不同，内容相同也不该互相压制
+        state_hash = hashlib.sha256(
+            uid.encode("utf-8") + b"\x1f"
+            + json.dumps(state, ensure_ascii=False, sort_keys=True).encode("utf-8")
+        ).hexdigest()
         with _sync_lock:
             if state_hash == _last_published_hash:
                 return
@@ -155,7 +182,6 @@ def _publish_mqtt(state: dict, version: int) -> None:
         client = get_mqtt_client()
         if client is None:
             return
-        uid = os.environ.get("CHARLIE_USER_ID", "default")
         topic = f"charlie/state/{uid}"
         payload = json.dumps({
             "ts": time.time(),
@@ -336,7 +362,7 @@ def full_sync() -> None:
 
 # ===== MQTT 接收端 (订阅 charlie/state/{user_id}) =====
 
-def setup_mqtt_listener() -> None:
+def setup_mqtt_listener(uid: str | None = None) -> None:
     """订阅 MQTT state topic, 接收跨设备状态更新。
     在其他设备修改状态后, 本进程自动拉取最新值。
     """
@@ -348,7 +374,7 @@ def setup_mqtt_listener() -> None:
         if client is None:
             return
 
-        uid = os.environ.get("CHARLIE_USER_ID", "default")
+        uid = _resolve_uid(uid)
         topic = f"charlie/state/{uid}"
 
         def _on_message(client, userdata, msg):

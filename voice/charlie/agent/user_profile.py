@@ -46,6 +46,7 @@ import tempfile
 import threading
 import time
 import logging
+from contextlib import contextmanager
 
 log = logging.getLogger("magic")
 
@@ -109,6 +110,23 @@ def _resolve_uid(session_id: str | None = None) -> str:
         return resolve_user(session_id)
     except Exception:
         return session_id
+
+
+@contextmanager
+def _bound(uid: str | None):
+    """在指定 uid 下执行底层聚合读取。
+
+    `agent.memory_store` 按"当前用户"选分片库，而它只能看到 ContextVar / env；
+    聚合器拿到的是 `resolve_user(session_id)` 的结果，必须显式绑定下去才生效，
+    否则会话绑定的用户读到的仍是进程级 env 用户的记忆。uid 为空时不绑定
+    （不覆盖调用方已有上下文）。
+    """
+    if not uid:
+        yield
+        return
+    from agent.user_context import bind_user
+    with bind_user(uid):
+        yield
 
 
 def _read_store(uid: str) -> dict:
@@ -235,11 +253,12 @@ def _agg_interests(uid: str, sources: dict) -> list[str]:
     out: list[str] = []
     try:
         from agent.memory_store import get_facts_by_category
-        for cat in ("personal", "preference", "habit"):
-            for row in get_facts_by_category(cat, limit=20):
-                v = row.get("value")
-                if v and v not in out:
-                    out.append(v)
+        with _bound(uid):
+            for cat in ("personal", "preference", "habit"):
+                for row in get_facts_by_category(cat, limit=20):
+                    v = row.get("value")
+                    if v and v not in out:
+                        out.append(v)
         if out:
             sources["interests"] = "memory_store"
     except Exception as e:
@@ -252,12 +271,13 @@ def _agg_identity(uid: str, sources: dict) -> dict:
     ident: dict = {}
     try:
         from agent.memory_store import get_fact
-        for key in ("name", "我叫", "名字", "nickname"):
-            row = get_fact(key)
-            if row and row.get("value"):
-                ident["name"] = row["value"]
-                sources["identity"] = "memory_store"
-                break
+        with _bound(uid):
+            for key in ("name", "我叫", "名字", "nickname"):
+                row = get_fact(key)
+                if row and row.get("value"):
+                    ident["name"] = row["value"]
+                    sources["identity"] = "memory_store"
+                    break
     except Exception as e:
         log.debug(f"[user_profile] identity 聚合跳过: {e}")
     return ident

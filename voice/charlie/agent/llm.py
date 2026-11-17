@@ -110,7 +110,9 @@ def _get_max_sentences() -> int:
     """从 evolution_data 读取 max_sentences 适配状态（0 表示无限制）。"""
     try:
         import json as _json
-        uid = os.environ.get("CHARLIE_USER_ID", "default")
+        # 身份统一走 user_context（env 仍是最后一层兜底）
+        from agent.user_context import resolve_user as _resolve_user
+        uid = _resolve_user() or "default"
         _data_dir = os.environ.get("ASSISTANT_KID_DATA_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         _evolution_file = os.path.join(_data_dir, f"evolution_data_{uid}.json" if uid != "default" else "evolution_data.json")
         if not os.path.exists(_evolution_file):

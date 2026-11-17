@@ -10,42 +10,12 @@
 - 只列真正失败的 nodeid，不要整文件。整文件标会把已经通过的用例一起遮住，
   「通过了却还标着 xfail」和「失败了没人知道」一样糟。
 
-统计（2026-11-14）：282 条，来自 FR-14 多用户隔离（8 批次）与已下线的
-magic-agent 开放任务派发。
+统计（2026-11-17）：FR-14 多用户隔离（8 批次）与已下线的 magic-agent 开放任务派发。
+FR-14 S1（数据层地基）完成后，batch2（uid 分片）28 条已清零。
 """
 
 # 文件 → 该文件里已知会失败的用例（类名::方法名）
 KNOWN_INCOMPLETE: dict[str, list[str]] = {
-    'tests/test_fr14_batch2_uid_sharding.py': [
-        'TestHistoryIsolation::test_explicit_uid_wins_over_binding',
-        'TestHistoryIsolation::test_history_file_content_sharded',
-        'TestHistoryIsolation::test_history_file_sharded',
-        'TestMemoryStoreIsolation::test_db_file_sharded',
-        'TestMemoryStoreIsolation::test_facts_not_visible_across_users',
-        'TestPersonaIsolation::test_mood_per_uid',
-        'TestPersonaIsolation::test_persona_file_sharded',
-        'TestPersonaIsolation::test_relationship_level_per_uid',
-        'TestPreferencesIsolation::test_del_preference_scoped_to_uid',
-        'TestPreferencesIsolation::test_files_land_in_own_shard',
-        'TestPreferencesIsolation::test_preference_count_per_uid',
-        'TestPreferencesIsolation::test_write_read_per_uid',
-        'TestResolveUidIsSingleEntry::test_binding_drives_all_data_layers',
-        'TestResolveUidIsSingleEntry::test_env_used_only_as_last_resort',
-        'TestResolveUidIsSingleEntry::test_explicit_uid_beats_binding',
-        'TestResolveUidIsSingleEntry::test_fallback_is_default_when_nothing_set',
-        'TestResolveUidIsSingleEntry::test_session_registry_not_visible_to_data_layer',
-        'TestShardPaths::test_default_keeps_original_filenames',
-        'TestShardPaths::test_distinct_uids_distinct_paths',
-        'TestShardPaths::test_lock_file_is_path_plus_lock',
-        'TestShardPaths::test_memory_db_path_follows_current_user',
-        'TestShardPaths::test_named_uid_gets_suffix',
-        'TestShardPaths::test_same_uid_stable',
-        'TestStateSyncIsolation::test_mqtt_topic_follows_uid',
-        'TestStateSyncIsolation::test_mqtt_topic_ignores_raw_env',
-        'TestStateSyncIsolation::test_round_trip_per_uid',
-        'TestStateSyncIsolation::test_sync_file_sharded',
-        'TestTwoUsersRoundTrip::test_no_cross_contamination',
-    ],
     'tests/test_fr14_batch3a_system_msg_scope.py': [
         'TestLiteTrimKeepsSystem::test_system_survives_trim',
         'TestNonStreamPathInjectsPerSessionDynamic::test_non_stream_injects_own_uid_content',
